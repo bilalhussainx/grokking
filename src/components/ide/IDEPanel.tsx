@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Play, RotateCcw, Eye, EyeOff } from "lucide-react";
+import { Play, RotateCcw, Eye, EyeOff, Terminal } from "lucide-react";
 import CodeEditor from "./CodeEditor";
 import OutputPanel from "./OutputPanel";
 
@@ -14,7 +14,7 @@ interface IDEPanelProps {
 export default function IDEPanel({
   starterCode,
   solutionCode,
-  height = "500px",
+  height = "520px",
 }: IDEPanelProps) {
   const [code, setCode] = useState(starterCode);
   const [output, setOutput] = useState("");
@@ -25,7 +25,6 @@ export default function IDEPanel({
   const workerRef = useRef<Worker | null>(null);
 
   const runCode = useCallback(() => {
-    // Terminate previous worker if still running
     if (workerRef.current) {
       workerRef.current.terminate();
       workerRef.current = null;
@@ -40,7 +39,6 @@ export default function IDEPanel({
 
     const id = Date.now().toString();
 
-    // 10 second timeout
     const timeout = setTimeout(() => {
       worker.terminate();
       workerRef.current = null;
@@ -93,43 +91,51 @@ export default function IDEPanel({
 
   return (
     <div
-      className="rounded-lg border border-gray-700 overflow-hidden flex flex-col"
+      className="rounded-xl border border-[var(--border)] overflow-hidden flex flex-col shadow-lg"
       style={{ height }}
     >
       {/* Toolbar */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-gray-800 border-b border-gray-700">
-        <button
-          onClick={runCode}
-          disabled={isRunning}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <Play className="w-4 h-4" />
-          Run
-        </button>
+      <div className="flex items-center gap-2 px-3 py-2 bg-[#1e1e2e] border-b border-[#313244]">
+        {/* File tab indicator */}
+        <div className="flex items-center gap-1.5 mr-2 px-2.5 py-1 rounded-md bg-[#313244] text-[#cdd6f4] text-xs font-medium">
+          <Terminal className="w-3 h-3 text-green-400" />
+          main.py
+        </div>
+
+        <div className="flex-1" />
 
         <button
           onClick={handleReset}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded bg-gray-600 hover:bg-gray-500 text-white transition-colors"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-[#313244] hover:bg-[#45475a] text-[#cdd6f4] transition-colors"
         >
-          <RotateCcw className="w-4 h-4" />
+          <RotateCcw className="w-3.5 h-3.5" />
           Reset
         </button>
 
         <button
           onClick={toggleSolution}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors ml-auto"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-[#313244] hover:bg-[#45475a] text-[#cdd6f4] transition-colors"
         >
           {showSolution ? (
             <>
-              <EyeOff className="w-4 h-4" />
+              <EyeOff className="w-3.5 h-3.5" />
               Hide Solution
             </>
           ) : (
             <>
-              <Eye className="w-4 h-4" />
+              <Eye className="w-3.5 h-3.5 text-blue-400" />
               Show Solution
             </>
           )}
+        </button>
+
+        <button
+          onClick={runCode}
+          disabled={isRunning}
+          className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-lg bg-green-600 hover:bg-green-500 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-green-600/25"
+        >
+          <Play className="w-3.5 h-3.5" fill="currentColor" />
+          {isRunning ? "Running..." : "Run Code"}
         </button>
       </div>
 
@@ -145,8 +151,14 @@ export default function IDEPanel({
       </div>
 
       {/* Output */}
-      <div className="h-36 border-t border-gray-700">
-        <OutputPanel output={output} isRunning={isRunning} error={isError} />
+      <div className="h-40 border-t border-[#313244]">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1e1e2e] border-b border-[#313244] text-[10px] font-semibold uppercase tracking-wider text-[#6c7086]">
+          <Terminal className="w-3 h-3" />
+          Output
+        </div>
+        <div className="h-[calc(100%-28px)]">
+          <OutputPanel output={output} isRunning={isRunning} error={isError} />
+        </div>
       </div>
     </div>
   );

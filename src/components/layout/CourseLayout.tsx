@@ -26,7 +26,7 @@ export default function CourseLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-[var(--background)]">
       <TopNav
         courseTitle={courseTitle}
         progress={progress}
