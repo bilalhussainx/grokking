@@ -1,4 +1,5 @@
 import { Course } from "./types";
+import { codingInterviewCourse } from "./coding-interview";
+import { systemDesignCourse } from "./system-design";
 
-// Course data will be imported here once created
-export const courses: Course[] = [];
+export const courses: Course[] = [codingInterviewCourse, systemDesignCourse];
