@@ -35,7 +35,7 @@ interface InterviewContextValue extends InterviewState {
     preset: InterviewPreset;
     jobDescription: string;
     questionPlan: InterviewPlan;
-  }) => void;
+  }) => string;
   addTranscriptEntry: (entry: TranscriptEntry) => void;
   setFinalCode: (code: string) => void;
   setScorecard: (scorecard: InterviewScorecard) => void;
@@ -92,7 +92,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
       const sessionId = `interview-${Date.now()}-${Math.random()
         .toString(36)
         .slice(2, 9)}`;
-      setState({
+      const newState: InterviewState = {
         sessionId,
         interviewType: params.interviewType,
         preset: params.preset,
@@ -101,7 +101,13 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         transcript: [],
         finalCode: "",
         scorecard: null,
-      });
+      };
+      setState(newState);
+      // Write synchronously so the next page can rehydrate immediately
+      try {
+        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newState));
+      } catch { /* ignore */ }
+      return sessionId;
     },
     []
   );

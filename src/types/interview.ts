@@ -1,4 +1,4 @@
-export type InterviewPreset = 'frontend' | 'backend' | 'fullstack' | 'system-design' | 'dsa';
+export type InterviewPreset = 'frontend' | 'backend' | 'fullstack' | 'system-design' | 'dsa' | 'second-brain';
 export type InterviewType = 'technical' | 'behavioral' | 'mixed';
 
 export interface InterviewQuestion {

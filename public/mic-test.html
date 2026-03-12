@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head><title>Mic Test</title></head>
+<body style="background:#111;color:#fff;font-family:sans-serif;padding:20px">
+<h2>Microphone Test</h2>
+<p>Click the button and speak. This tests if your mic works in the browser at all.</p>
+<button id="btn" style="padding:12px 24px;font-size:16px;cursor:pointer">Start Mic Test</button>
+<div id="log" style="margin-top:20px;font-family:monospace;white-space:pre-wrap"></div>
+<canvas id="meter" width="300" height="40" style="margin-top:10px;background:#222;border-radius:4px"></canvas>
+<script>
+const logEl = document.getElementById('log');
+const canvas = document.getElementById('meter');
+const ctx2d = canvas.getContext('2d');
+function addLog(msg) { logEl.textContent += msg + '\n'; console.log(msg); }
+
+document.getElementById('btn').onclick = async () => {
+  addLog('Requesting mic...');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const track = stream.getAudioTracks()[0];
+    addLog('Track: ' + track.label);
+    addLog('Enabled: ' + track.enabled + ', Muted: ' + track.muted + ', State: ' + track.readyState);
+
+    track.onunmute = () => addLog('>>> Track UNMUTED');
+    track.onmute = () => addLog('>>> Track MUTED');
+
+    // Try AudioContext at default rate
+    const audioCtx = new AudioContext();
+    addLog('AudioContext rate: ' + audioCtx.sampleRate);
+    const source = audioCtx.createMediaStreamSource(stream);
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+    // Also connect to destination to keep graph alive
+    const gain = audioCtx.createGain();
+    gain.gain.value = 0;
+    analyser.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    let count = 0;
+    function check() {
+      analyser.getByteTimeDomainData(data);
+      let peak = 0;
+      for (let i = 0; i < data.length; i++) {
+        const v = Math.abs(data[i] - 128);
+        if (v > peak) peak = v;
+      }
+
+      // Draw meter
+      ctx2d.fillStyle = '#222';
+      ctx2d.fillRect(0, 0, 300, 40);
+      const pct = peak / 128;
+      ctx2d.fillStyle = peak < 2 ? '#f44' : peak < 20 ? '#fa0' : '#4f4';
+      ctx2d.fillRect(0, 0, pct * 300, 40);
+      ctx2d.fillStyle = '#fff';
+      ctx2d.font = '12px monospace';
+      ctx2d.fillText('Peak: ' + peak + '/128' + (peak < 2 ? ' SILENT' : ' OK'), 8, 25);
+
+      count++;
+      if (count % 50 === 0) addLog('Peak: ' + peak + '/128' + (peak < 2 ? ' ⚠️ SILENT' : ' ✅ AUDIO DETECTED'));
+      requestAnimationFrame(check);
+    }
+    check();
+
+    // Also test SpeechRecognition
+    addLog('\nStarting Speech Recognition...');
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) {
+      const rec = new SR();
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.onresult = (e) => {
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const t = e.results[i][0].transcript;
+          if (e.results[i].isFinal) addLog('FINAL: ' + t);
+          else addLog('interim: ' + t);
+        }
+      };
+      rec.onerror = (e) => addLog('SR error: ' + e.error);
+      rec.onend = () => { addLog('SR ended, restarting...'); try { rec.start(); } catch(e) {} };
+      rec.start();
+      addLog('Speech Recognition started');
+    } else {
+      addLog('SpeechRecognition NOT available');
+    }
+  } catch(err) {
+    addLog('ERROR: ' + err);
+  }
+};
+</script>
+</body>
+</html>

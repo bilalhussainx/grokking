@@ -3,7 +3,23 @@
     "allow": [
       "Bash(npx create-next-app@latest:*)",
       "Bash(cp:*)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "WebSearch",
+      "mcp__magic__21st_magic_component_builder",
+      "mcp__magic__21st_magic_component_inspiration",
+      "Bash(npm install:*)",
+      "Bash(/c/Users/bilal/Downloads/grokking/.env.local:*)",
+      "Read(//c/Users/bilal/Downloads/**)",
+      "Read(//c/Users/bilal/**)",
+      "Bash(cd \"C:/Users/bilal/Downloads/grokking\" && npx tsc --noEmit 2>&1 | head -40)",
+      "Bash(ls -d /c/Users/bilal/Downloads/grokking/src/data/*/  2>/dev/null || ls -d C:/Users/bilal/Downloads/grokking/src/data/*/ 2>/dev/null)",
+      "Bash(node test-openclaw.js)",
+      "Bash(curl -s http://localhost:3000/course/coding-interview/two-pointers-intro -o /dev/null -w \"%{http_code}\")",
+      "Bash(npx tsc:*)",
+      "WebFetch(domain:elevenlabs.io)",
+      "WebFetch(domain:developers.deepgram.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

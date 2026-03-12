@@ -34,7 +34,7 @@ export default function LessonRoute() {
     );
   }
 
-  const { lesson, prevLesson, nextLesson } = result;
+  const { lesson, module, prevLesson, nextLesson } = result;
   const allLessons = getAllLessons(course);
 
   return (
@@ -42,6 +42,7 @@ export default function LessonRoute() {
       courseSlug={courseSlug}
       courseTitle={course.title}
       modules={toSidebarModules(course)}
+      moduleTitle={module.title}
       lesson={lesson}
       prevLesson={prevLesson ? { slug: prevLesson.slug, title: prevLesson.title } : null}
       nextLesson={nextLesson ? { slug: nextLesson.slug, title: nextLesson.title } : null}

@@ -20,7 +20,7 @@ export default function LessonNav({
   onToggleComplete,
 }: LessonNavProps) {
   return (
-    <div className="flex items-center justify-between border-t border-[var(--border)] py-6 mt-10">
+    <div className="flex items-center justify-between border-t border-white/[0.06] py-6 mt-10">
       {/* Previous */}
       {prevLesson ? (
         <Link
@@ -40,8 +40,8 @@ export default function LessonNav({
         className={clsx(
           "flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all",
           isCompleted
-            ? "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800"
-            : "bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-600/20 hover:shadow-blue-600/30 hover:-translate-y-0.5"
+            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+            : "btn-gradient btn-glow text-white"
         )}
       >
         {isCompleted ? (

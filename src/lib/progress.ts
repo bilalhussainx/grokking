@@ -1,58 +1,59 @@
-const PROGRESS_KEY = "grokking-progress";
-
-interface ProgressData {
-  [courseSlug: string]: string[];
-}
-
-function readProgress(): ProgressData {
-  if (typeof window === "undefined") return {};
+export async function getCompletedLessons(courseSlug: string): Promise<Set<string>> {
   try {
-    const raw = localStorage.getItem(PROGRESS_KEY);
-    return raw ? JSON.parse(raw) : {};
+    const res = await fetch(`/api/progress?course=${encodeURIComponent(courseSlug)}`);
+    if (!res.ok) return new Set();
+    const { lessons } = await res.json();
+    return new Set(lessons);
   } catch {
-    return {};
+    return new Set();
   }
 }
 
-function writeProgress(data: ProgressData): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(data));
-}
-
-export function getCompletedLessons(courseSlug: string): Set<string> {
-  const data = readProgress();
-  return new Set(data[courseSlug] ?? []);
-}
-
-export function markLessonComplete(
+export async function markLessonComplete(
   courseSlug: string,
   lessonId: string
-): Set<string> {
-  const data = readProgress();
-  const lessons = new Set(data[courseSlug] ?? []);
-  lessons.add(lessonId);
-  data[courseSlug] = Array.from(lessons);
-  writeProgress(data);
-  return lessons;
+): Promise<Set<string>> {
+  try {
+    const res = await fetch("/api/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ courseSlug, lessonId, complete: true }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      console.error("[progress] markComplete failed:", res.status, data.error, data.detail);
+      return new Set();
+    }
+    return new Set(data.lessons);
+  } catch (err) {
+    console.error("[progress] markComplete error:", err);
+    return new Set();
+  }
 }
 
-export function markLessonIncomplete(
+export async function markLessonIncomplete(
   courseSlug: string,
   lessonId: string
-): Set<string> {
-  const data = readProgress();
-  const lessons = new Set(data[courseSlug] ?? []);
-  lessons.delete(lessonId);
-  data[courseSlug] = Array.from(lessons);
-  writeProgress(data);
-  return lessons;
+): Promise<Set<string>> {
+  try {
+    const res = await fetch("/api/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ courseSlug, lessonId, complete: false }),
+    });
+    if (!res.ok) return new Set();
+    const { lessons } = await res.json();
+    return new Set(lessons);
+  } catch {
+    return new Set();
+  }
 }
 
-export function getCourseProgress(
+export async function getCourseProgress(
   courseSlug: string,
   totalLessons: number
-): number {
+): Promise<number> {
   if (totalLessons <= 0) return 0;
-  const completed = getCompletedLessons(courseSlug);
+  const completed = await getCompletedLessons(courseSlug);
   return Math.round((completed.size / totalLessons) * 100);
 }

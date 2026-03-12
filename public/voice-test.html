@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head><title>Voice Test</title></head>
+<body style="font-family:Arial;text-align:center;padding:50px;background:#111;color:#fff">
+  <h2>Web Speech API Test</h2>
+  <p id="support"></p>
+  <button id="btn" style="font-size:24px;padding:20px 40px;cursor:pointer;background:#2563eb;color:white;border:none;border-radius:12px">
+    🎤 TAP TO TALK
+  </button>
+  <p id="status" style="color:#888;margin-top:20px">Ready</p>
+  <p id="result" style="color:#4ade80;font-size:20px;margin-top:10px"></p>
+  <pre id="log" style="text-align:left;color:#fbbf24;font-size:12px;max-width:600px;margin:20px auto;white-space:pre-wrap"></pre>
+
+  <script>
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const btn = document.getElementById('btn');
+    const status = document.getElementById('status');
+    const result = document.getElementById('result');
+    const logEl = document.getElementById('log');
+
+    document.getElementById('support').textContent = SR ? '✅ SpeechRecognition supported' : '❌ NOT supported';
+
+    function addLog(msg) {
+      const t = new Date().toLocaleTimeString();
+      logEl.textContent = `[${t}] ${msg}\n` + logEl.textContent;
+      console.log('[VoiceTest]', msg);
+    }
+
+    let rec = null;
+    let listening = false;
+
+    btn.onclick = () => {
+      if (!SR) { alert('Not supported'); return; }
+
+      if (listening) {
+        // Stop
+        addLog('User clicked STOP');
+        if (rec) rec.stop();
+        return;
+      }
+
+      // Start
+      rec = new SR();
+      rec.continuous = false;
+      rec.interimResults = true;
+      rec.lang = 'en-US';
+
+      rec.onstart = () => {
+        listening = true;
+        btn.textContent = '⏹ TAP TO STOP';
+        btn.style.background = '#dc2626';
+        status.textContent = 'Listening...';
+        addLog('onstart fired');
+      };
+
+      rec.onresult = (e) => {
+        let text = '';
+        for (let i = 0; i < e.results.length; i++) {
+          text += e.results[i][0].transcript;
+          if (e.results[i].isFinal) addLog('FINAL: ' + e.results[i][0].transcript);
+        }
+        result.textContent = text;
+        addLog('onresult: ' + text.slice(0, 80));
+      };
+
+      rec.onend = () => {
+        listening = false;
+        btn.textContent = '🎤 TAP TO TALK';
+        btn.style.background = '#2563eb';
+        status.textContent = 'Stopped';
+        addLog('onend fired — final text: ' + (result.textContent || '(empty)'));
+      };
+
+      rec.onerror = (e) => {
+        addLog('onerror: ' + e.error);
+        if (e.error === 'not-allowed') {
+          status.textContent = '❌ Mic permission denied';
+        }
+      };
+
+      rec.onspeechstart = () => addLog('onspeechstart');
+      rec.onspeechend = () => addLog('onspeechend');
+      rec.onaudiostart = () => addLog('onaudiostart');
+      rec.onaudioend = () => addLog('onaudioend');
+
+      try {
+        rec.start();
+        addLog('rec.start() called OK');
+      } catch(err) {
+        addLog('rec.start() FAILED: ' + err);
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head><title>Voice Agent Test</title></head>
+<body style="font-family:Arial;text-align:center;padding:30px;background:#111;color:#fff">
+  <h2>Deepgram Voice Agent Test</h2>
+  <button id="btn" style="font-size:20px;padding:15px 30px;cursor:pointer;background:#2563eb;color:white;border:none;border-radius:12px">
+    Start Voice Agent
+  </button>
+  <button id="stop" style="font-size:20px;padding:15px 30px;cursor:pointer;background:#dc2626;color:white;border:none;border-radius:12px;display:none">
+    Stop
+  </button>
+  <button id="tone" style="font-size:16px;padding:10px 20px;cursor:pointer;background:#16a34a;color:white;border:none;border-radius:12px;margin-left:10px">
+    🔊 Test Tone
+  </button>
+  <p id="status" style="color:#888;font-size:18px;margin-top:20px">Ready</p>
+  <div id="stats" style="color:#4ade80;font-size:13px;margin:10px auto;max-width:500px"></div>
+  <pre id="log" style="text-align:left;color:#fbbf24;font-size:11px;max-width:700px;margin:20px auto;white-space:pre-wrap;max-height:400px;overflow-y:auto"></pre>
+
+<script>
+const btn = document.getElementById('btn');
+const stopBtn = document.getElementById('stop');
+const statusEl = document.getElementById('status');
+const statsEl = document.getElementById('stats');
+const logEl = document.getElementById('log');
+
+let ws, captureCtx, worklet, mediaStream;
+let audioChunks = [];
+let totalBytesReceived = 0;
+
+function addLog(msg) {
+  const t = new Date().toLocaleTimeString();
+  logEl.textContent = `[${t}] ${msg}\n` + logEl.textContent;
+}
+
+function setStatus(s) { statusEl.textContent = s; }
+
+function updateStats() {
+  statsEl.textContent = `Audio chunks: ${audioChunks.length} | Bytes: ${totalBytesReceived.toLocaleString()}`;
+}
+
+// Build WAV file from PCM16 data
+function buildWav(pcm16Arrays, sampleRate) {
+  let totalLength = 0;
+  for (const arr of pcm16Arrays) totalLength += arr.byteLength;
+
+  const buffer = new ArrayBuffer(44 + totalLength);
+  const view = new DataView(buffer);
+  const writeStr = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
+
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + totalLength, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);        // PCM
+  view.setUint16(22, 1, true);        // mono
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, 'data');
+  view.setUint32(40, totalLength, true);
+
+  let offset = 44;
+  for (const chunk of pcm16Arrays) {
+    new Uint8Array(buffer, offset, chunk.byteLength).set(new Uint8Array(chunk));
+    offset += chunk.byteLength;
+  }
+
+  return buffer;
+}
+
+function playCollectedAudio() {
+  if (audioChunks.length === 0) {
+    addLog('No audio chunks to play!');
+    return;
+  }
+
+  const chunks = audioChunks.splice(0);
+  let totalBytes = 0;
+  for (const c of chunks) totalBytes += c.byteLength;
+
+  addLog(`Building WAV from ${chunks.length} chunks (${totalBytes} bytes = ${(totalBytes / 48000).toFixed(1)}s at 24kHz)`);
+
+  // Verify data is not silence
+  let nonZeroSamples = 0;
+  let maxVal = 0;
+  for (const chunk of chunks) {
+    const int16 = new Int16Array(chunk);
+    for (let i = 0; i < int16.length; i++) {
+      const abs = Math.abs(int16[i]);
+      if (abs > 100) nonZeroSamples++;
+      if (abs > maxVal) maxVal = abs;
+    }
+  }
+  addLog(`Audio data: ${nonZeroSamples} non-zero samples, peak=${maxVal} (${maxVal === 0 ? 'SILENT!' : 'has audio'})`);
+
+  const wav = buildWav(chunks, 24000);
+  const blob = new Blob([wav], { type: 'audio/wav' });
+  const url = URL.createObjectURL(blob);
+
+  addLog(`WAV blob: ${blob.size} bytes, URL: ${url}`);
+
+  const audio = new Audio(url);
+  audio.volume = 1.0;
+
+  audio.oncanplaythrough = () => addLog('Audio canplaythrough');
+  audio.onended = () => {
+    URL.revokeObjectURL(url);
+    addLog('Audio playback finished!');
+  };
+  audio.onerror = (e) => {
+    addLog('Audio error: ' + (audio.error ? `code=${audio.error.code} msg=${audio.error.message}` : e));
+    URL.revokeObjectURL(url);
+  };
+
+  // Also offer a download link so we can inspect the WAV file
+  const downloadLink = document.createElement('a');
+  downloadLink.href = url;
+  downloadLink.download = 'agent-audio.wav';
+  downloadLink.textContent = '⬇ Download WAV';
+  downloadLink.style.cssText = 'display:block;color:#60a5fa;margin:10px auto;font-size:14px';
+  statsEl.innerHTML = '';
+  statsEl.appendChild(downloadLink);
+
+  audio.play().then(() => {
+    addLog('audio.play() resolved - PLAYING!');
+  }).catch(err => {
+    addLog('audio.play() BLOCKED: ' + err);
+  });
+}
+
+btn.onclick = async () => {
+  btn.style.display = 'none';
+  stopBtn.style.display = 'inline-block';
+  setStatus('Connecting...');
+  totalBytesReceived = 0;
+  audioChunks = [];
+
+  try {
+    // 1. Unlock audio output (user gesture)
+    addLog('Unlocking audio...');
+    const unlockCtx = new AudioContext();
+    await unlockCtx.resume();
+    const osc = unlockCtx.createOscillator();
+    const gain = unlockCtx.createGain();
+    gain.gain.value = 0.01;
+    osc.connect(gain).connect(unlockCtx.destination);
+    osc.start(); osc.stop(unlockCtx.currentTime + 0.05);
+    await unlockCtx.close();
+    addLog('Audio unlocked');
+
+    // Also test that Audio() playback works
+    try {
+      // Create a tiny silent WAV to test
+      const testWav = buildWav([new Int16Array([0, 0, 0, 0]).buffer], 24000);
+      const testBlob = new Blob([testWav], { type: 'audio/wav' });
+      const testUrl = URL.createObjectURL(testBlob);
+      const testAudio = new Audio(testUrl);
+      await testAudio.play();
+      testAudio.pause();
+      URL.revokeObjectURL(testUrl);
+      addLog('Audio() element playback test PASSED');
+    } catch (e) {
+      addLog('Audio() element test failed: ' + e);
+    }
+
+    // 2. Get config
+    addLog('Fetching config...');
+    const resp = await fetch('/api/ai/voice-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lessonTitle: 'Two Pointers', moduleTitle: 'Arrays', courseTitle: 'Coding Interview' })
+    });
+    const { url, key, settings } = await resp.json();
+    addLog('Config: url=' + url);
+    addLog('Config: key=' + key.slice(0, 8) + '...');
+    addLog('Config: model=' + settings?.agent?.think?.provider?.model);
+    addLog('Config: voice=' + settings?.agent?.speak?.provider?.model);
+
+    // 3. Mic permission
+    const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    testStream.getTracks().forEach(t => t.stop());
+    addLog('Mic permission OK');
+
+    // 4. WebSocket
+    addLog('Connecting WebSocket...');
+    ws = new WebSocket(url, ['token', key]);
+    ws.binaryType = 'arraybuffer';
+
+    ws.onopen = () => {
+      addLog('WebSocket OPEN - sending settings...');
+      ws.send(JSON.stringify(settings));
+    };
+
+    ws.onmessage = (event) => {
+      if (event.data instanceof ArrayBuffer) {
+        audioChunks.push(event.data.slice(0));
+        totalBytesReceived += event.data.byteLength;
+        if (audioChunks.length <= 3 || audioChunks.length % 50 === 0) {
+          addLog(`Audio chunk #${audioChunks.length}: ${event.data.byteLength} bytes`);
+        }
+        updateStats();
+        return;
+      }
+
+      try {
+        const msg = JSON.parse(event.data);
+        const extra = msg.content ? ` "${msg.content.slice(0, 80)}"` : '';
+        const role = msg.role ? ` [${msg.role}]` : '';
+        addLog(`EVENT: ${msg.type}${role}${extra}`);
+
+        switch (msg.type) {
+          case 'SettingsApplied':
+            setStatus('🎤 Speak now!');
+            startMic();
+            break;
+          case 'UserStartedSpeaking':
+            setStatus('🎤 Listening...');
+            // Clear any pending chunks when user starts talking
+            audioChunks = [];
+            break;
+          case 'AgentThinking':
+            setStatus('🤔 Thinking...');
+            break;
+          case 'AgentStartedSpeaking':
+            setStatus('🔊 Agent speaking...');
+            audioChunks = [];
+            break;
+          case 'AgentAudioDone':
+            addLog('=== AgentAudioDone — playing collected audio ===');
+            playCollectedAudio();
+            setStatus('🎤 Speak now!');
+            break;
+          case 'Error':
+            setStatus('❌ Error');
+            addLog('ERROR: ' + JSON.stringify(msg));
+            break;
+        }
+      } catch {}
+    };
+
+    ws.onerror = () => { addLog('WS ERROR'); setStatus('❌ Error'); };
+    ws.onclose = (e) => {
+      addLog('WS CLOSED: code=' + e.code + ' reason=' + e.reason);
+      setStatus('Disconnected');
+      btn.style.display = 'inline-block';
+      stopBtn.style.display = 'none';
+    };
+
+  } catch (err) {
+    addLog('FATAL: ' + err);
+    setStatus('❌ ' + err);
+    btn.style.display = 'inline-block';
+    stopBtn.style.display = 'none';
+  }
+};
+
+async function startMic() {
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+    });
+    captureCtx = new AudioContext({ sampleRate: 16000 });
+    await captureCtx.audioWorklet.addModule('/audio-capture-processor.js');
+    worklet = new AudioWorkletNode(captureCtx, 'audio-capture-processor');
+    let n = 0;
+    worklet.port.onmessage = (e) => {
+      if (ws && ws.readyState === 1 && e.data) {
+        ws.send(e.data);
+        if (++n <= 3 || n % 100 === 0) addLog('Mic chunk #' + n + ' (' + e.data.byteLength + ' bytes)');
+      }
+    };
+    captureCtx.createMediaStreamSource(mediaStream).connect(worklet);
+    addLog('Mic streaming!');
+  } catch (err) {
+    addLog('Mic error: ' + err);
+  }
+}
+
+// Test tone — plays a clear 440Hz beep for 1 second
+document.getElementById('tone').onclick = async () => {
+  addLog('Playing test tone (440Hz, 1s)...');
+  const ctx = new AudioContext();
+  await ctx.resume();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.frequency.value = 440;
+  gain.gain.value = 0.3;
+  osc.connect(gain).connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 1);
+  osc.onended = () => { ctx.close(); addLog('Test tone done'); };
+};
+
+// Also test with a WAV-based tone to test Audio() element
+document.getElementById('tone').ondblclick = async () => {
+  addLog('Playing WAV-based test tone...');
+  const sr = 24000;
+  const dur = 1;
+  const samples = sr * dur;
+  const pcm = new Int16Array(samples);
+  for (let i = 0; i < samples; i++) {
+    pcm[i] = Math.sin(2 * Math.PI * 440 * i / sr) * 16000;
+  }
+  const wav = buildWav([pcm.buffer], sr);
+  const blob = new Blob([wav], { type: 'audio/wav' });
+  const url = URL.createObjectURL(blob);
+  const audio = new Audio(url);
+  audio.volume = 1.0;
+  audio.onended = () => { URL.revokeObjectURL(url); addLog('WAV tone done'); };
+  audio.play().then(() => addLog('WAV tone playing')).catch(e => addLog('WAV tone blocked: ' + e));
+};
+
+stopBtn.onclick = () => {
+  if (ws) ws.close();
+  if (worklet) worklet.disconnect();
+  if (captureCtx) captureCtx.close();
+  if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+  btn.style.display = 'inline-block';
+  stopBtn.style.display = 'none';
+  setStatus('Stopped');
+};
+</script>
+</body>
+</html>

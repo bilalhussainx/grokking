@@ -3,6 +3,8 @@
 import { useState } from "react";
 import TopNav from "./TopNav";
 import Sidebar, { SidebarModule } from "./Sidebar";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import AnimatedBlobs from "@/components/ui/AnimatedBlobs";
 
 interface CourseLayoutProps {
   courseTitle: string;
@@ -26,25 +28,30 @@ export default function CourseLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
-      <TopNav
-        courseTitle={courseTitle}
-        progress={progress}
-        onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
-      />
-
-      <div className="flex">
-        <Sidebar
-          modules={modules}
-          courseSlug={courseSlug}
-          currentLessonId={currentLessonId}
-          completedLessons={completedLessons}
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
+    <ProtectedRoute>
+      <div className="relative min-h-screen bg-[var(--background)]">
+        <AnimatedBlobs intensity="low" />
+        <TopNav
+          courseTitle={courseTitle}
+          progress={progress}
+          onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
         />
 
-        <main className="flex-1 min-w-0">{children}</main>
+        <div className="relative z-10 flex">
+          <Sidebar
+            modules={modules}
+            courseSlug={courseSlug}
+            currentLessonId={currentLessonId}
+            completedLessons={completedLessons}
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+          />
+
+          <main className="flex-1 min-w-0">{children}</main>
+        </div>
+
+        {/* Coach Alex is rendered globally via providers.tsx */}
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

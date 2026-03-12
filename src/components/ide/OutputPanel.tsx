@@ -10,7 +10,7 @@ export default function OutputPanel({
   error = false,
 }: OutputPanelProps) {
   return (
-    <div className="h-full bg-gray-950 p-3 overflow-auto font-mono text-sm">
+    <div className="h-full bg-[#080a12] p-3 overflow-auto font-mono text-sm">
       {isRunning ? (
         <div className="flex items-center gap-2 text-yellow-400">
           <svg
