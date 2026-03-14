@@ -62,8 +62,9 @@ Self-hosted is the **primary tier**, with cloud APIs as overflow and premium fal
 |---|---|---|---|
 | STT | Faster-Whisper large-v3-turbo | ~6GB | 99+ languages, MIT license |
 | TTS | Kokoro-82M | <1GB | 8 languages, Apache 2.0, #1 quality |
-| LLM | Ollama + Kimi | ~8-12GB | Live translation + conversation |
-| **Total** | | **~16-20GB** | **Fits on 24GB RTX 3090** |
+| LLM | Ollama + Kimi K1.5 Q4_K_M | ~8GB | Live translation + conversation |
+| Embeddings | nomic-embed-text (Ollama) | <1GB | 768-dim vectors for pgvector |
+| **Total** | | **~16GB** | **Fits on 24GB RTX 3090 with headroom** |
 
 **Kokoro-supported languages (Tier 1 TTS):** English, Spanish, French, Hindi, Portuguese, Mandarin Chinese, Japanese, Italian.
 
@@ -140,9 +141,15 @@ services:
       - ollama_data:/root/.ollama
 
   relay:
+    # WebSocket relay: ws library, handles auth token validation,
+    # credit metering heartbeat, rate limiting (10 concurrent sessions/VPS),
+    # and routes audio between browser ↔ Whisper/Kokoro/Ollama
     image: node:20-alpine
     ports:
       - "8080:8080"
+    environment:
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
     depends_on:
       - whisper
       - kokoro
@@ -176,23 +183,36 @@ All voice streams go through a `VoiceSession` abstraction:
 The VPS WebSocket relay is designed to be replaceable with a WebRTC signaling server. The `useLocalVoiceAgent` hook shares the same interface as `useDeepgramAgent`:
 
 ```typescript
+// Common config that both local and Deepgram agents accept
+interface VoiceAgentConfig {
+  personaId: string;
+  systemPrompt: string;
+  voiceProvider: 'kokoro' | 'sarvam' | 'minimax' | 'deepgram';
+  voiceId: string;
+  language: string;
+  proficiencyLevel?: ProficiencyLevel;
+  // Deepgram-specific (ignored by local agent)
+  lessonTitle?: string;
+  moduleTitle?: string;
+  courseTitle?: string;
+}
+
 interface VoiceAgentHook {
   isConnected: boolean;
   isConnecting: boolean;
   isSpeaking: boolean;
   micMuted: boolean;
   error: string;
-  start: (config?: VoiceAgentConfig) => Promise<void>;
+  start: (config: VoiceAgentConfig) => Promise<void>;
   stop: () => void;
   toggleMic: () => void;
   sendPromptUpdate: (prompt: string) => void;
 }
 
-function useVoiceAgent(tier: 'local' | 'deepgram'): VoiceAgentHook {
-  switch(tier) {
-    case 'local': return useLocalVoiceAgent();
-    case 'deepgram': return useDeepgramAgent();
-  }
+// Factory picks implementation based on config
+function useVoiceAgent(config: VoiceAgentConfig): VoiceAgentHook {
+  const isLocal = ['kokoro', 'sarvam', 'minimax'].includes(config.voiceProvider);
+  return isLocal ? useLocalVoiceAgent() : useDeepgramAgent();
 }
 ```
 
@@ -223,6 +243,15 @@ interface VoiceProviderRouter {
 | Placement test (one-time) | 5 | ~$0.06 |
 | Text translation (per request) | 1 | ~$0.004 |
 | Lesson content TTS (per lesson) | 2 | ~$0.02 |
+
+### Credit Metering for Voice Sessions
+
+Voice conversations are continuous WebSocket streams, not discrete API calls. Metering works via a **relay server heartbeat**:
+
+1. **Session start:** Relay server calls `deduct_credits(user_id, 3, 'voice_start')` to charge the first minute upfront. If insufficient credits → reject connection.
+2. **Heartbeat:** Every 60 seconds, the relay server calls `deduct_credits(user_id, 3, 'voice_minute')`. If the deduction fails (insufficient credits), the relay sends a `session_ending` event to the client (15-second warning), then disconnects.
+3. **Session end:** Relay calculates actual duration. If the last minute was <30 seconds, refund 1-2 credits via `add_credits(user_id, refund, 'voice_partial_refund')`.
+4. **Failsafe:** If the WebSocket drops unexpectedly (no clean disconnect), the relay's `onClose` handler stops the heartbeat timer. No orphaned billing.
 
 ### Cost Comparison
 
@@ -286,7 +315,7 @@ C1-C2 (Advanced):
 
 ### Persona Data Structure
 
-Extends the existing pattern from `src/lib/voice-personas.ts`:
+**Separate type from existing `Persona`** (not an extension — different domain, different voice providers). The `useVoiceAgent` factory uses a `VoiceAgentConfig` adapter to normalize both persona types:
 
 ```typescript
 interface LanguagePersona {
@@ -304,6 +333,32 @@ interface LanguagePersona {
   greeting: (level: ProficiencyLevel, userName?: string) => string;
 }
 
+// Adapter: normalize both persona types into a common voice config
+function toVoiceAgentConfig(
+  persona: LanguagePersona | Persona,
+  options: { language?: string; proficiencyLevel?: ProficiencyLevel }
+): VoiceAgentConfig {
+  if ('adaptiveRules' in persona) {
+    // LanguagePersona
+    return {
+      personaId: persona.id,
+      systemPrompt: persona.systemPrompt,
+      voiceProvider: persona.defaultVoice.provider,
+      voiceId: persona.defaultVoice.voiceId,
+      language: persona.language,
+      proficiencyLevel: options.proficiencyLevel,
+    };
+  }
+  // Existing Persona (Coach Alex, etc.)
+  return {
+    personaId: persona.id,
+    systemPrompt: persona.systemPrompt,
+    voiceProvider: 'deepgram',
+    voiceId: persona.defaultVoice,
+    language: 'en',
+  };
+}
+
 interface AdaptiveRule {
   levelRange: [ProficiencyLevel, ProficiencyLevel];
   nativeLanguageRatio: number;     // 0.0 - 1.0
@@ -319,7 +374,8 @@ interface AdaptiveRule {
 2. Agent asks 10-15 graduated questions via **both voice and text**
 3. Starts simple ("How do you say hello?") → complex ("Explain the difference between ser and estar")
 4. Scores responses → assigns A1-C2 level
-5. Recommends a persona + starting module
+5. If A1-A2 → recommends a persona + starting module
+6. If B1+ → places at A2 with note that higher content is coming (see B1+ Content Gating)
 6. Results stored in `placement_results` table
 7. Cost: 5 credits (one-time per language)
 
@@ -512,17 +568,17 @@ Spanish (example)
 
 ### Lesson Data Structure
 
-Extends the existing `Lesson` type from `src/data/types.ts`:
+Uses a shared base with the existing `Lesson` type from `src/data/types.ts`. Rather than extending `Lesson` directly (which would inherit irrelevant `starterCode`/`solutionCode` fields), both types share the common `id`, `slug`, `title`, `content` fields:
 
 ```typescript
-interface LanguageLesson extends Lesson {
-  // Existing fields
+interface LanguageLesson {
+  // Same base fields as Lesson
   id: string;
   slug: string;
   title: string;
   content: string;                  // Markdown: grammar notes, cultural context, examples
 
-  // Language-specific fields
+  // Language-specific fields (replaces starterCode/solutionCode)
   targetLanguage: string;           // BCP-47 code
   proficiencyLevel: 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
   vocabulary: VocabEntry[];
@@ -556,6 +612,15 @@ interface VoiceScenario {
 - **Phase 1:** Hardcode A1-A2 for 3 priority languages (Spanish, French, Urdu) — 6 course sets
 - **Phase 2:** Use existing MCP course generation pipeline (Tavily + Kimi K2) for B1+ levels and additional languages
 - **Storage:** `generated_courses` table (same JSONB structure as existing CS generated courses)
+
+### B1+ Content Gating (Phase 1)
+
+In Phase 1, only A1-A2 content exists. If a user places at B1+ via the placement test:
+- Show their assessed level: "You placed at B1 — impressive!"
+- Place them in A2 with a note: "A2 review content is available now. B1+ courses are coming soon — we'll notify you when they launch."
+- Allow them to access A2 content (which they can breeze through for credit rewards)
+- Allow free-form voice practice at `/practice` (no content gating — the agent adapts to any level)
+- The route/UI does NOT show B1-C2 modules as locked — they simply don't appear until content exists
 
 ### Assessment
 
@@ -715,7 +780,7 @@ create table mistake_patterns (
   examples text[] default '{}',
   corrections text[] default '{}',
   frequency int default 1,
-  embedding vector(1536),
+  embedding vector(768),              -- nomic-embed-text via Ollama (matches existing 768-dim convention)
   resolved boolean default false,
   last_occurred_at timestamptz default now(),
   created_at timestamptz default now()
@@ -750,9 +815,41 @@ create table placement_results (
   created_at timestamptz default now()
 );
 
+-- Row Level Security (all tables)
+alter table user_language_profiles enable row level security;
+alter table vocab_mastery enable row level security;
+alter table mistake_patterns enable row level security;
+alter table language_sessions enable row level security;
+alter table placement_results enable row level security;
+
+-- RLS Policies: users can only access their own data
+create policy "Users can read own language profiles"
+  on user_language_profiles for select using (auth.uid() = user_id);
+create policy "Users can insert own language profiles"
+  on user_language_profiles for insert with check (auth.uid() = user_id);
+create policy "Users can update own language profiles"
+  on user_language_profiles for update using (auth.uid() = user_id);
+
+create policy "Users can manage own vocab"
+  on vocab_mastery for all using (auth.uid() = user_id);
+
+create policy "Users can manage own mistakes"
+  on mistake_patterns for all using (auth.uid() = user_id);
+
+create policy "Users can read own sessions"
+  on language_sessions for select using (auth.uid() = user_id);
+create policy "Users can insert own sessions"
+  on language_sessions for insert with check (auth.uid() = user_id);
+
+create policy "Users can read own placement results"
+  on placement_results for select using (auth.uid() = user_id);
+create policy "Users can insert own placement results"
+  on placement_results for insert with check (auth.uid() = user_id);
+
 -- Indexes
+-- Use HNSW instead of IVFFlat (works well with small datasets, no minimum row requirement)
 create index mistake_embedding_idx on mistake_patterns
-  using ivfflat (embedding vector_cosine_ops) with (lists = 100);
+  using hnsw (embedding vector_cosine_ops);
 create index vocab_due_idx on vocab_mastery
   (user_id, target_language, next_review_at);
 create index lang_profile_idx on user_language_profiles
@@ -764,9 +861,13 @@ create index lang_session_idx on language_sessions
 ### Existing Tables Modified
 
 ```sql
--- Add language preferences to user_profiles
+-- Add global native language to user_profiles (used as default for translation widget)
+-- Per-language native_language in user_language_profiles overrides this when set.
+-- Resolution: user_language_profiles.native_language is authoritative for that specific
+-- language course. user_profiles.native_language is the global default used by the
+-- translation widget and for initial course setup.
 alter table user_profiles add column native_language text default 'en';
-alter table user_profiles add column translate_to text;  -- preferred translation target
+-- Note: translate_to preference stored in localStorage (client-side only, no DB column needed)
 ```
 
 ---
@@ -802,7 +903,7 @@ alter table user_profiles add column translate_to text;  -- preferred translatio
 
 **Courses:**
 - [ ] A1-A2 courses for Spanish, French, Urdu (hardcoded)
-- [ ] `LanguageLesson` type extending existing `Lesson`
+- [ ] Standalone `LanguageLesson` type (shared base fields with `Lesson`)
 - [ ] Voice scenarios per lesson
 - [ ] Vocabulary entries per lesson
 
@@ -863,12 +964,74 @@ alter table user_profiles add column translate_to text;  -- preferred translatio
 | Spaced repetition | SM-2 algorithm | Proven, simple, effective |
 | Voice transport | WebSocket (Phase 1) → WebRTC (Phase 2) | WebSocket simpler now, WebRTC needed for P2P |
 | Course framework | CEFR A1→C2 | Industry standard, universally understood |
-| Persona system | Extends existing voice-personas.ts pattern | Consistent with Coach Alex / interview personas |
+| Persona system | Separate LanguagePersona type with VoiceAgentConfig adapter | Follows voice-personas.ts conventions, not type extension |
 | Hosting | RunPod/Vast.ai RTX 3090 | 24GB VRAM fits full stack, ~$80-161/mo |
 
 ---
 
-## 10. Risk Mitigations
+## 10. Speed, Reliability & Scalability
+
+The website must be super fast. The self-hosted voice pipeline must not compromise the user experience.
+
+### Latency Budget (Target: <800ms end-to-end for voice response)
+
+| Stage | Target | How |
+|---|---|---|
+| Audio capture → VPS | <100ms | WebSocket over TLS, closest region VPS |
+| STT (Faster-Whisper) | <200ms | large-v3-turbo (4x faster than large-v3), VAD-based chunking |
+| LLM (Ollama Kimi) | <300ms first token | Kimi K1.5 Q4_K_M quantized, streaming output, KV cache |
+| TTS (Kokoro) | <100ms first audio | 96x real-time, 82M params, streams first chunk while generating rest |
+| VPS → Browser | <100ms | Same WebSocket, PCM streaming |
+| **Total** | **<800ms** | **Comparable to Deepgram's ~500-800ms agent latency** |
+
+### Reliability Architecture
+
+```
+User request
+    ↓
+VPS Health Check (cached, updated every 30s)
+    ├── Healthy → Route to VPS (Tier 1)
+    ├── Degraded → Route to cloud APIs (Tier 2/3)
+    └── Down → Route to cloud APIs (Tier 2/3) + alert admin
+```
+
+**Automatic failover:**
+- Relay server exposes `/health` endpoint checking Whisper, Kokoro, and Ollama liveness
+- Next.js API routes check VPS health before routing (cached 30s in Redis/memory)
+- If VPS is unhealthy, seamlessly route to Deepgram STT + MiniMax TTS + Kimi K2 API
+- User experiences no interruption — just slightly different voice quality
+- Degraded-mode latency target: <1500ms (acceptable for cloud API fallback)
+- Health status shown in admin dashboard (not to end users)
+
+**Connection resilience:**
+- WebSocket auto-reconnect with exponential backoff (1s, 2s, 4s, max 16s)
+- Session state preserved in memory during brief disconnects (<30s)
+- Longer disconnects: resume from session context in Supabase
+- Client shows "Reconnecting..." banner (same pattern as InterviewVoicePanel)
+
+### Scalability Strategy
+
+| Users | Infrastructure | Monthly Cost |
+|---|---|---|
+| 1-50 | Single RTX 3090 VPS | ~$80-161 |
+| 50-200 | Single RTX 4090 VPS (more headroom) | ~$285 |
+| 200-500 | 2x VPS + load balancer (round-robin by user) | ~$320-570 |
+| 500+ | Kubernetes cluster on RunPod/Lambda + auto-scaling | Custom |
+
+**Scaling triggers:**
+- VPS GPU utilization >80% sustained for 5 min → alert to add node
+- Request queue depth >10 → route overflow to Tier 2/3 cloud APIs
+- P95 latency >1.5s → investigate bottleneck (usually LLM)
+
+**Static content is always fast:**
+- Course content (markdown, vocab lists, grammar notes) served from Next.js SSR/ISR — no VPS dependency
+- TTS for pre-recorded vocabulary clips generated at build time, served from CDN
+- Only live voice conversations and translation requests hit the VPS
+- The website itself (pages, navigation, course browsing) has zero dependency on the VPS
+
+---
+
+## 11. Risk Mitigations
 
 | Risk | Mitigation |
 |---|---|
