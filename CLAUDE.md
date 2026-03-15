@@ -7,6 +7,17 @@
 This file gives every AI session (Claude, Kimi, or other) full context on where the platform
 is, what needs building, and exactly how to build it.
 
+**If you are Kimi Code:** Also read `docs/KIMI_HANDOFF.md` — it has step-by-step instructions
+for creating content using the MCP server and skill files without Claude.
+
+**Skill files to read before creating ANY content:**
+1. `skills/content-orchestrator/SKILL.md` — Master quality pipeline
+2. `skills/course-planning/SKILL.md` — Course structure
+3. `skills/lesson-planning/SKILL.md` — Lesson templates
+4. `skills/cs-exercises/SKILL.md` — Code exercises (CS courses)
+5. `skills/video-generation/SKILL.md` — Remotion video pipeline
+6. `skills/content-embedding/SKILL.md` — Embeddings and search
+
 ---
 
 ## What Samsara.ai Is
