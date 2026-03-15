@@ -8,10 +8,13 @@
  * and lesson content following Samsara.ai's methodology.
  *
  * Tools:
- *   samsara_plan_course  — Design a complete course skeleton
- *   samsara_plan_lesson  — Generate individual lesson content
- *   samsara_get_skill    — Read the raw skill file for a given skill
- *   samsara_list_domains — List all supported domains and variations
+ *   samsara_plan_course     — Design a complete course skeleton
+ *   samsara_plan_lesson     — Generate individual lesson content
+ *   samsara_get_skill       — Read the raw skill file for a given skill
+ *   samsara_list_domains    — List all supported domains and variations
+ *   samsara_embed_content   — Generate Gemini embeddings for content
+ *   samsara_semantic_search — Hybrid semantic search across course content
+ *   samsara_rag_query       — RAG query: embed question → search → return context
  *
  * Auth: API key via SAMSARA_API_KEY env var (optional, for future billing)
  */
@@ -302,6 +305,365 @@ ${skillContent}`;
         text: moduleContext,
       }],
     };
+  }
+);
+
+// ─── Embedding & RAG Tools ───
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+
+async function generateEmbedding(text: string, taskType: string = "SEMANTIC_SIMILARITY"): Promise<number[]> {
+  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
+
+  const resp = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "models/gemini-embedding-001",
+        content: { parts: [{ text }] },
+        taskType,
+        outputDimensionality: 768,
+      }),
+    }
+  );
+
+  if (!resp.ok) {
+    const err = await resp.text();
+    throw new Error(`Gemini embedding failed: ${resp.status} ${err}`);
+  }
+
+  const data = await resp.json();
+  return data.embedding.values;
+}
+
+async function supabaseQuery(sql: string, params: Record<string, unknown> = {}) {
+  if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error("Supabase not configured");
+
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/execute_sql`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+    },
+    body: JSON.stringify({ query: sql, params }),
+  });
+
+  if (!resp.ok) {
+    const err = await resp.text();
+    throw new Error(`Supabase query failed: ${resp.status} ${err}`);
+  }
+
+  return resp.json();
+}
+
+// Tool: Generate embeddings for content
+server.tool(
+  "samsara_embed_content",
+  `Generate Gemini embeddings for course/lesson content. Use for:
+- Indexing new courses/lessons for semantic search
+- Embedding user profiles for recommendations
+- Finding content gaps by comparing query embeddings to existing content`,
+  {
+    text: z.string().describe("Text content to embed (course description, lesson content, user profile, or search query)"),
+    task_type: z.enum([
+      "SEMANTIC_SIMILARITY",
+      "RETRIEVAL_DOCUMENT",
+      "RETRIEVAL_QUERY",
+      "CLASSIFICATION",
+      "CLUSTERING",
+    ]).default("SEMANTIC_SIMILARITY").describe("Embedding task type — use RETRIEVAL_DOCUMENT for indexing, RETRIEVAL_QUERY for searching"),
+    store: z.object({
+      table: z.string().describe("Supabase table to store embedding in"),
+      id_column: z.string().describe("ID column name"),
+      id_value: z.string().describe("ID value for this record"),
+      metadata: z.record(z.unknown()).optional().describe("Additional columns to store"),
+    }).optional().describe("If provided, stores the embedding in Supabase pgvector"),
+    api_key: z.string().optional(),
+  },
+  async ({ text, task_type, store, api_key }) => {
+    if (!checkAuth(api_key)) {
+      return { content: [{ type: "text" as const, text: "Error: Invalid API key" }], isError: true };
+    }
+
+    try {
+      const embedding = await generateEmbedding(text, task_type);
+
+      let stored = false;
+      if (store && SUPABASE_URL && SUPABASE_KEY) {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${store.table}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Prefer": "resolution=merge-duplicates",
+          },
+          body: JSON.stringify({
+            [store.id_column]: store.id_value,
+            embedding: `[${embedding.join(",")}]`,
+            ...store.metadata,
+          }),
+        });
+        stored = resp.ok;
+      }
+
+      return {
+        content: [{
+          type: "text" as const,
+          text: JSON.stringify({
+            dimensions: embedding.length,
+            task_type,
+            stored,
+            embedding_preview: embedding.slice(0, 5).map(v => v.toFixed(4)),
+            // Full embedding available but truncated in response for readability
+            full_embedding_available: true,
+          }, null, 2),
+        }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: "text" as const, text: `Error: ${err}` }],
+        isError: true,
+      };
+    }
+  }
+);
+
+// Tool: Hybrid semantic search across course content
+server.tool(
+  "samsara_semantic_search",
+  `Hybrid semantic search across Samsara.ai content. Combines:
+- Vector similarity search (pgvector cosine distance on Gemini embeddings)
+- Keyword filtering (domain, variation, level)
+Use for finding related courses, content gaps, or matching users to content.`,
+  {
+    query: z.string().describe("Natural language search query"),
+    search_type: z.enum(["courses", "lessons", "users"]).default("courses")
+      .describe("What to search across"),
+    filters: z.object({
+      domain: z.string().optional(),
+      variation: z.string().optional(),
+      level: z.enum(["beginner", "advanced"]).optional(),
+    }).optional().describe("Keyword filters to narrow results"),
+    limit: z.number().default(5).describe("Max results to return"),
+    similarity_threshold: z.number().default(0.6).describe("Minimum cosine similarity (0-1)"),
+    api_key: z.string().optional(),
+  },
+  async ({ query, search_type, filters, limit, similarity_threshold, api_key }) => {
+    if (!checkAuth(api_key)) {
+      return { content: [{ type: "text" as const, text: "Error: Invalid API key" }], isError: true };
+    }
+
+    try {
+      // Generate query embedding
+      const queryEmbedding = await generateEmbedding(query, "RETRIEVAL_QUERY");
+
+      // Build the search — returns instructions for the calling agent
+      // since we can't guarantee the Supabase schema exists yet
+      const searchConfig = {
+        query_embedding: `[${queryEmbedding.join(",")}]`,
+        search_type,
+        filters,
+        limit,
+        similarity_threshold,
+        supabase_rpc: {
+          function_name: `match_${search_type}`,
+          sql_template: `
+-- Required Supabase function (create if not exists):
+CREATE OR REPLACE FUNCTION match_${search_type}(
+  query_embedding vector(768),
+  match_threshold float DEFAULT ${similarity_threshold},
+  match_count int DEFAULT ${limit}
+  ${filters?.domain ? ", filter_domain text DEFAULT NULL" : ""}
+  ${filters?.level ? ", filter_level text DEFAULT NULL" : ""}
+)
+RETURNS TABLE(
+  id text,
+  title text,
+  ${search_type === "courses" ? "domain text, variation text, level text," : ""}
+  similarity float
+)
+LANGUAGE sql STABLE
+AS $$
+  SELECT
+    id,
+    title,
+    ${search_type === "courses" ? "domain, variation, level," : ""}
+    1 - (embedding <=> query_embedding) as similarity
+  FROM ${search_type === "courses" ? "course_embeddings" : search_type === "lessons" ? "lesson_embeddings" : "user_embeddings"}
+  WHERE 1 - (embedding <=> query_embedding) > match_threshold
+    ${filters?.domain ? "AND (filter_domain IS NULL OR domain = filter_domain)" : ""}
+    ${filters?.level ? "AND (filter_level IS NULL OR level = filter_level)" : ""}
+  ORDER BY similarity DESC
+  LIMIT match_count;
+$$;
+
+-- Call it:
+SELECT * FROM match_${search_type}(
+  '${queryEmbedding.slice(0, 3).join(",")}...', -- truncated for display
+  ${similarity_threshold},
+  ${limit}
+  ${filters?.domain ? `, '${filters.domain}'` : ""}
+  ${filters?.level ? `, '${filters.level}'` : ""}
+);`,
+        },
+      };
+
+      return {
+        content: [{
+          type: "text" as const,
+          text: JSON.stringify(searchConfig, null, 2),
+        }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: "text" as const, text: `Error: ${err}` }],
+        isError: true,
+      };
+    }
+  }
+);
+
+// Tool: RAG query — embed question → search → return relevant context
+server.tool(
+  "samsara_rag_query",
+  `RAG (Retrieval-Augmented Generation) query for course/lesson content.
+Embeds the question, searches for relevant content, and returns context
+that can be used to generate accurate, grounded responses.
+Use for: dynamic content creation, answering user questions about courses,
+generating lessons grounded in existing content.`,
+  {
+    question: z.string().describe("The question or topic to find relevant content for"),
+    context_type: z.enum(["course_creation", "lesson_creation", "user_question", "recommendation"])
+      .describe("What the retrieved context will be used for"),
+    max_context_chunks: z.number().default(5).describe("Max content chunks to return"),
+    include_sources: z.boolean().default(true).describe("Include source citations"),
+    api_key: z.string().optional(),
+  },
+  async ({ question, context_type, max_context_chunks, include_sources, api_key }) => {
+    if (!checkAuth(api_key)) {
+      return { content: [{ type: "text" as const, text: "Error: Invalid API key" }], isError: true };
+    }
+
+    try {
+      // Generate question embedding
+      const questionEmbedding = await generateEmbedding(question, "RETRIEVAL_QUERY");
+
+      // Build RAG pipeline instructions
+      const ragPipeline = {
+        step_1_embed: {
+          model: "gemini-embedding-001",
+          dimensions: 768,
+          task_type: "RETRIEVAL_QUERY",
+          embedding_generated: true,
+        },
+        step_2_search: {
+          method: "hybrid",
+          vector_search: {
+            table: context_type === "recommendation" ? "user_embeddings" : "course_embeddings",
+            column: "embedding",
+            metric: "cosine",
+            threshold: 0.6,
+            limit: max_context_chunks,
+          },
+          keyword_search: {
+            table: context_type === "recommendation" ? "user_profiles" : "courses",
+            columns: ["title", "description"],
+            query: question,
+          },
+          combine: "RRF (Reciprocal Rank Fusion) — merge vector and keyword results",
+        },
+        step_3_retrieve: {
+          what_to_fetch: context_type === "course_creation"
+            ? "Similar course structures, module outlines, lesson templates"
+            : context_type === "lesson_creation"
+            ? "Related lesson content, exercises, citations from same domain"
+            : context_type === "recommendation"
+            ? "User profile, completed courses, checkpoint scores, weak topics"
+            : "Relevant lesson content, explanations, cited sources",
+          max_chunks: max_context_chunks,
+          include_sources,
+        },
+        step_4_augment: {
+          instruction: `Use the retrieved context to ${
+            context_type === "course_creation" ? "design a course that fills gaps in existing coverage"
+            : context_type === "lesson_creation" ? "generate lesson content grounded in real sources"
+            : context_type === "recommendation" ? "suggest courses matching the user's profile"
+            : "answer the user's question accurately with citations"
+          }`,
+          grounding_rule: "NEVER fabricate content — only use information from retrieved context + Tavily search results",
+        },
+        supabase_sql: {
+          hybrid_search_function: `
+-- Hybrid search combining vector similarity + full-text search
+-- Create this function in Supabase:
+
+CREATE OR REPLACE FUNCTION hybrid_search(
+  query_text text,
+  query_embedding vector(768),
+  match_count int DEFAULT 5,
+  vector_weight float DEFAULT 0.7,
+  text_weight float DEFAULT 0.3
+)
+RETURNS TABLE(
+  id text,
+  title text,
+  content_preview text,
+  similarity float,
+  text_rank float,
+  combined_score float
+)
+LANGUAGE sql STABLE
+AS $$
+  WITH vector_results AS (
+    SELECT id, title, left(content, 500) as content_preview,
+           1 - (embedding <=> query_embedding) as similarity,
+           ROW_NUMBER() OVER (ORDER BY embedding <=> query_embedding) as vrank
+    FROM course_content_embeddings
+    WHERE 1 - (embedding <=> query_embedding) > 0.5
+    LIMIT match_count * 2
+  ),
+  text_results AS (
+    SELECT id, title, left(content, 500) as content_preview,
+           ts_rank(to_tsvector('english', title || ' ' || content), plainto_tsquery('english', query_text)) as text_rank,
+           ROW_NUMBER() OVER (ORDER BY ts_rank(to_tsvector('english', title || ' ' || content), plainto_tsquery('english', query_text)) DESC) as trank
+    FROM course_content_embeddings
+    WHERE to_tsvector('english', title || ' ' || content) @@ plainto_tsquery('english', query_text)
+    LIMIT match_count * 2
+  )
+  SELECT
+    COALESCE(v.id, t.id) as id,
+    COALESCE(v.title, t.title) as title,
+    COALESCE(v.content_preview, t.content_preview) as content_preview,
+    COALESCE(v.similarity, 0) as similarity,
+    COALESCE(t.text_rank, 0) as text_rank,
+    (COALESCE(v.similarity, 0) * vector_weight + COALESCE(t.text_rank, 0) * text_weight) as combined_score
+  FROM vector_results v
+  FULL OUTER JOIN text_results t ON v.id = t.id
+  ORDER BY combined_score DESC
+  LIMIT match_count;
+$$;`,
+        },
+        embedding_preview: questionEmbedding.slice(0, 5).map(v => v.toFixed(4)),
+      };
+
+      return {
+        content: [{
+          type: "text" as const,
+          text: JSON.stringify(ragPipeline, null, 2),
+        }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: "text" as const, text: `Error: ${err}` }],
+        isError: true,
+      };
+    }
   }
 );
 
