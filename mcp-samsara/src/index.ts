@@ -15,6 +15,7 @@
  *   samsara_embed_content   — Generate Gemini embeddings for content
  *   samsara_semantic_search — Hybrid semantic search across course content
  *   samsara_rag_query       — RAG query: embed question → search → return context
+ *   samsara_generate_video  — Generate Remotion video script + pipeline for a lesson
  *
  * Auth: API key via SAMSARA_API_KEY env var (optional, for future billing)
  */
@@ -664,6 +665,315 @@ $$;`,
         isError: true,
       };
     }
+  }
+);
+
+// ─── Video Generation Tool ───
+
+// Tool: Generate Remotion video for a lesson using Moonshot API
+server.tool(
+  "samsara_generate_video",
+  `Generate a complete Remotion video pipeline for a lesson. Uses Moonshot API (Kimi K2)
+to create a narration script from lesson content, then outputs the full Remotion
+composition config, SadTalker/Wav2Lip avatar instructions, and render commands.
+
+This tool does NOT render the video — it produces everything needed to render it:
+1. Narration script (generated via Moonshot API)
+2. TTS configuration (which voice provider + voice ID)
+3. SadTalker avatar generation command
+4. Remotion composition props
+5. Render command to execute`,
+  {
+    lesson_id: z.string().describe("Lesson ID (kebab-case)"),
+    lesson_title: z.string().describe("Lesson title"),
+    lesson_content: z.string().describe("Full lesson markdown content to create video from"),
+    domain: z.enum([
+      "computer-science", "finance-business", "economics",
+      "religious-studies", "philosophy", "political-strategy", "health-wellness",
+    ]).describe("Course domain"),
+    variation: z.string().describe("Domain variation"),
+    video_type: z.enum([
+      "concept_explainer", "code_walkthrough", "source_analysis", "case_study",
+    ]).describe("Type of video to generate"),
+    voice_persona: z.string().optional().describe("Voice persona name (e.g., 'Coach Alex', 'Ustadh Ibrahim')"),
+    avatar_image: z.string().optional().describe("Path to avatar reference image for SadTalker"),
+    target_duration_minutes: z.number().default(4).describe("Target video duration in minutes"),
+    language: z.string().default("en").describe("Language for TTS (en, es, fr, de, it, nl, ja, hi, pa)"),
+    api_key: z.string().optional(),
+  },
+  async (params) => {
+    if (!checkAuth(params.api_key)) {
+      return { content: [{ type: "text" as const, text: "Error: Invalid API key" }], isError: true };
+    }
+
+    const persona = params.voice_persona || "Coach Alex";
+    const SARVAM_LANGUAGES = ["hi", "pa"];
+    const DEEPGRAM_LANGUAGES = ["en", "es", "fr", "de", "it", "nl", "ja"];
+
+    // Determine TTS provider based on language
+    const ttsProvider = SARVAM_LANGUAGES.includes(params.language) ? "sarvam" : "deepgram";
+
+    const deepgramVoices: Record<string, string> = {
+      en: "aura-2-thalia-en", es: "aura-2-diana-es", fr: "aura-2-agathe-fr",
+      de: "aura-2-viktoria-de", it: "aura-2-livia-it", nl: "aura-2-rhea-nl",
+      ja: "aura-2-izanami-ja",
+    };
+    const sarvamSpeakers: Record<string, string> = { hi: "priya", pa: "simran" };
+
+    const ttsVoice = ttsProvider === "deepgram"
+      ? deepgramVoices[params.language] || "aura-2-thalia-en"
+      : sarvamSpeakers[params.language] || "priya";
+
+    // Build the complete video generation pipeline
+    const pipeline = {
+      meta: {
+        lesson_id: params.lesson_id,
+        lesson_title: params.lesson_title,
+        video_type: params.video_type,
+        persona,
+        target_duration: `${params.target_duration_minutes} minutes`,
+        language: params.language,
+      },
+
+      // Step 1: Generate narration script via Moonshot API
+      step_1_narration: {
+        provider: "Moonshot API (Kimi K2)",
+        endpoint: "https://api.moonshot.ai/v1/chat/completions",
+        model: "kimi-k2-turbo-preview",
+        request: {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${MOONSHOT_API_KEY}",
+          },
+          body: {
+            model: "kimi-k2-turbo-preview",
+            messages: [
+              {
+                role: "system",
+                content: `You are ${persona}, creating a ${params.target_duration_minutes}-minute video narration for a lesson titled "${params.lesson_title}".
+
+RULES:
+- Convert the lesson content into natural, conversational narration
+- DO NOT read the lesson text verbatim — explain it as if tutoring 1-on-1
+- Structure: greeting (10s) → explanation (${Math.floor(params.target_duration_minutes * 0.6)}min) → examples (${Math.floor(params.target_duration_minutes * 0.3)}min) → summary (10s)
+- Use ${params.video_type === "code_walkthrough" ? "step-by-step code explanation with 'notice how...' and 'the key here is...'" :
+  params.video_type === "source_analysis" ? "careful textual analysis, quoting key passages and explaining their significance" :
+  params.video_type === "case_study" ? "narrative storytelling with real data, building to insights" :
+  "clear concept explanation with real-world analogies"}
+- Speak at natural pace (~150 words/minute)
+- Target word count: ${params.target_duration_minutes * 150} words
+- Include natural pauses marked with [PAUSE]
+- Mark visual cues with [SHOW: description] for what should appear on screen
+- End with a call to action to try the exercise`,
+              },
+              {
+                role: "user",
+                content: `Create the narration for this lesson:\n\n${params.lesson_content.slice(0, 3000)}`,
+              },
+            ],
+            temperature: 0.7,
+            max_tokens: params.target_duration_minutes * 250,
+          },
+        },
+        output: "narration_text (string with [PAUSE] and [SHOW:] markers)",
+
+        // Alternative: Use Claude API instead of Moonshot
+        claude_alternative: {
+          note: "If using Claude instead of Moonshot, replace the endpoint and model:",
+          endpoint: "https://api.anthropic.com/v1/messages",
+          model: "claude-sonnet-4-6",
+          header: "x-api-key: ${ANTHROPIC_API_KEY}",
+        },
+      },
+
+      // Step 2: Generate TTS audio from narration
+      step_2_tts: {
+        provider: ttsProvider,
+        voice: ttsVoice,
+        config: ttsProvider === "deepgram" ? {
+          endpoint: `https://api.deepgram.com/v1/speak?model=${ttsVoice}`,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Token ${DEEPGRAM_API_KEY}",
+          },
+          body: "{ text: narration_text_without_markers }",
+          output: "audio/mp3 file",
+          preprocessing: "Strip [PAUSE] and [SHOW:] markers, replace [PAUSE] with '...' for natural pause",
+        } : {
+          endpoint: "https://api.sarvam.ai/text-to-speech",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "api-subscription-key": "${SARVAM_API_KEY}",
+          },
+          body: {
+            text: "narration_text_without_markers",
+            target_language_code: params.language === "hi" ? "hi-IN" : "pa-IN",
+            speaker: ttsVoice,
+            model: "bulbul:v3",
+            pace: 1.0,
+            speech_sample_rate: 22050,
+            output_audio_codec: "mp3",
+          },
+          output: "base64 mp3 → decode to file",
+        },
+      },
+
+      // Step 3: Generate avatar video with SadTalker
+      step_3_avatar: {
+        tool: "SadTalker (self-hosted on VPS)",
+        repository: "https://github.com/OpenTalker/SadTalker",
+        input: {
+          audio: "step_2_output.mp3",
+          source_image: params.avatar_image || "assets/avatars/default-professional.png",
+        },
+        command: `python inference.py \\
+  --driven_audio step_2_output.mp3 \\
+  --source_image ${params.avatar_image || "assets/avatars/default-professional.png"} \\
+  --enhancer gfpgan \\
+  --result_dir output/avatars/${params.lesson_id}/ \\
+  --still \\
+  --preprocess crop`,
+        output: "output/avatars/{lesson_id}/source_image##step_2_output.mp4",
+        alternative: {
+          tool: "Wav2Lip",
+          command: `python inference.py \\
+  --checkpoint_path checkpoints/wav2lip_gan.pth \\
+  --face ${params.avatar_image || "assets/avatars/default-professional.png"} \\
+  --audio step_2_output.mp3 \\
+  --outfile output/avatars/${params.lesson_id}/avatar.mp4`,
+        },
+      },
+
+      // Step 4: Compose with Remotion
+      step_4_remotion: {
+        framework: "Remotion (React-based programmatic video)",
+        install: "npm install @remotion/cli @remotion/renderer remotion",
+        composition_props: {
+          compositionId: "LessonVideo",
+          fps: 30,
+          width: 1920,
+          height: 1080,
+          durationInFrames: params.target_duration_minutes * 60 * 30,
+          inputProps: {
+            lessonId: params.lesson_id,
+            lessonTitle: params.lesson_title,
+            avatarVideoSrc: `output/avatars/${params.lesson_id}/avatar.mp4`,
+            narrationAudioSrc: `output/audio/${params.lesson_id}.mp3`,
+            narrationText: "< from step 1 >",
+            showMarkers: "< [SHOW:] markers extracted from narration >",
+            videoType: params.video_type,
+            domainTheme: params.domain,
+            subtitlesEnabled: true,
+          },
+        },
+        composition_code: `
+// src/remotion/LessonVideo.tsx
+import { AbsoluteFill, Sequence, OffthreadVideo, Audio, Img } from 'remotion';
+
+export const LessonVideo: React.FC<LessonVideoProps> = ({
+  lessonTitle, avatarVideoSrc, narrationAudioSrc, showMarkers, domainTheme
+}) => {
+  const DOMAIN_COLORS = {
+    'computer-science': '#1a1a2e',
+    'finance-business': '#0a192f',
+    'religious-studies': '#1a0a2e',
+    'philosophy': '#0a1a0f',
+    'political-strategy': '#1a1a1a',
+    'health-wellness': '#0a1f0a',
+    'economics': '#1f1a0a',
+  };
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: DOMAIN_COLORS[domainTheme] || '#1a1a2e' }}>
+      {/* Layer 1: Background gradient */}
+      <AbsoluteFill style={{ background: 'radial-gradient(ellipse, rgba(255,255,255,0.05), transparent)' }} />
+
+      {/* Layer 2: Content area (top-left 70%) */}
+      <Sequence from={30 * 15}> {/* After 15s intro */}
+        <div style={{ position: 'absolute', top: 40, left: 40, width: '65%', height: '85%' }}>
+          {/* Render [SHOW:] content here — code blocks, text, diagrams */}
+          {showMarkers.map((marker, i) => (
+            <Sequence key={i} from={marker.frameStart} durationInFrames={marker.duration}>
+              <ContentBlock type={marker.type} content={marker.content} />
+            </Sequence>
+          ))}
+        </div>
+      </Sequence>
+
+      {/* Layer 3: Avatar (bottom-right 25%) */}
+      <div style={{ position: 'absolute', bottom: 20, right: 20, width: '25%' }}>
+        <OffthreadVideo src={avatarVideoSrc} style={{ borderRadius: 16 }} />
+      </div>
+
+      {/* Layer 4: Title bar */}
+      <Sequence durationInFrames={30 * 10}> {/* First 10 seconds */}
+        <div style={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%,-50%)' }}>
+          <h1 style={{ color: 'white', fontSize: 48 }}>{lessonTitle}</h1>
+        </div>
+      </Sequence>
+
+      {/* Layer 5: Subtitles */}
+      <Subtitles narrationText={narrationText} />
+
+      {/* Layer 6: Branding */}
+      <div style={{ position: 'absolute', top: 16, right: 16, opacity: 0.15 }}>
+        <span style={{ color: 'white', fontSize: 14 }}>Samsara.ai</span>
+      </div>
+
+      {/* Audio track */}
+      <Audio src={narrationAudioSrc} />
+    </AbsoluteFill>
+  );
+};`,
+        render_command: `npx remotion render src/remotion/index.ts LessonVideo \\
+  output/videos/${params.lesson_id}.mp4 \\
+  --props='${JSON.stringify({
+    lessonId: params.lesson_id,
+    lessonTitle: params.lesson_title,
+    videoType: params.video_type,
+    domainTheme: params.domain,
+  }).replace(/'/g, "\\'")}'`,
+      },
+
+      // Full execution script
+      full_script: `
+#!/bin/bash
+# Full video generation pipeline for lesson: ${params.lesson_id}
+# Run from project root
+
+LESSON_ID="${params.lesson_id}"
+MOONSHOT_API_KEY="\${MOONSHOT_API_KEY}"
+${ttsProvider === "deepgram" ? 'DEEPGRAM_API_KEY="${DEEPGRAM_API_KEY}"' : 'SARVAM_API_KEY="${SARVAM_API_KEY}"'}
+
+echo "=== Step 1: Generate narration via Moonshot API ==="
+# Use the API call from step_1_narration above
+# Save output to output/narrations/\${LESSON_ID}.txt
+
+echo "=== Step 2: Generate TTS audio ==="
+# Use the API call from step_2_tts above
+# Save output to output/audio/\${LESSON_ID}.mp3
+
+echo "=== Step 3: Generate avatar video ==="
+# SSH to VPS and run SadTalker
+# Save output to output/avatars/\${LESSON_ID}/avatar.mp4
+
+echo "=== Step 4: Render with Remotion ==="
+npx remotion render src/remotion/index.ts LessonVideo \\
+  output/videos/\${LESSON_ID}.mp4
+
+echo "=== Done: output/videos/\${LESSON_ID}.mp4 ==="
+`,
+    };
+
+    return {
+      content: [{
+        type: "text" as const,
+        text: JSON.stringify(pipeline, null, 2),
+      }],
+    };
   }
 );
 
