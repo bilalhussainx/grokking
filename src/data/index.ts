@@ -1,5 +1,6 @@
 import { Course } from "./types";
 import { codingInterviewCourse } from "./coding-interview";
+import { codingInterviewPremiumCourse } from "./coding-interview-premium";
 import { systemDesignCourse } from "./system-design";
 import { pythonFundamentalsCourse } from "./python-fundamentals";
 import { javascriptFundamentalsCourse } from "./javascript-fundamentals";
@@ -12,6 +13,41 @@ import { dataStructuresAlgorithmsCourse } from "./data-structures-algorithms";
 import { webDevelopmentCourse } from "./web-development";
 import { gameDevelopmentCourse } from "./game-development";
 import { mcpClaudeCodeCourse } from "./mcp-claude-code";
+import { dpPatternsCourse } from "./dp-patterns";
+import { oodInterviewCourse } from "./ood-interview";
+import { mlInterviewCourse } from "./ml-interview";
+import { behavioralInterviewCourse } from "./behavioral-interview";
+import { advancedSystemDesignCourse } from "./advanced-system-design";
+import { modernSystemDesignCourse } from "./modern-system-design";
+import { dsInterviewCourse } from "./ds-interview";
+import { apiDesignInterviewCourse } from "./api-design-interview";
+import { concurrencyMultithreadingCourse } from "./concurrency-multithreading";
+import { aiAgentsCourse } from "./ai-agents";
+import { promptEngineeringCourse } from "./prompt-engineering";
+import { nnZeroToHeroCourse } from "./nn-zero-to-hero";
+import { ragEngineeringCourse } from "./rag-engineering";
+import { claudeCodeMasteryCourse } from "./claude-code-mastery";
+import { personalFinanceCourse } from "./personal-finance";
+import { corporateFinanceCourse } from "./corporate-finance";
+import { accountingFundamentalsCourse } from "./accounting-fundamentals";
+import { microeconomicsCourse } from "./microeconomics";
+import { investmentBankingCourse } from "./investment-banking";
+import { quantitativeFinanceCourse } from "./quantitative-finance";
+import { fintechBlockchainCourse } from "./fintech-blockchain";
+import { internationalEconomicsCourse } from "./international-economics";
+import { businessStrategyCourse } from "./business-strategy";
+import { macroeconomicsCourse } from "./macroeconomics";
+import { stockMarketInvestingCourse } from "./stock-market-investing";
+import { financialModelingCourse } from "./financial-modeling";
+import { behavioralEconomicsCourse } from "./behavioral-economics";
+import { leadershipManagementCourse } from "./leadership-management";
+import { entrepreneurshipCourse } from "./entrepreneurship";
+import { negotiationInfluenceCourse } from "./negotiation-influence";
+import { businessAnalyticsCourse } from "./business-analytics";
+import { grokkingDsaPythonCourse } from "./grokking-dsa-python";
+import { islamFoundationsCourse } from "./islam-foundations";
+import { stoicPhilosophyCourse } from "./stoic-philosophy";
+import { mentalHealthResilienceCourse } from "./mental-health-resilience";
 
 export const courses: Course[] = [
   webDevelopmentCourse,
@@ -25,6 +61,42 @@ export const courses: Course[] = [
   cppFundamentalsCourse,
   csharpFundamentalsCourse,
   codingInterviewCourse,
+  codingInterviewPremiumCourse,
   systemDesignCourse,
   mcpClaudeCodeCourse,
+  dpPatternsCourse,
+  oodInterviewCourse,
+  mlInterviewCourse,
+  behavioralInterviewCourse,
+  advancedSystemDesignCourse,
+  modernSystemDesignCourse,
+  dsInterviewCourse,
+  apiDesignInterviewCourse,
+  concurrencyMultithreadingCourse,
+  aiAgentsCourse,
+  promptEngineeringCourse,
+  nnZeroToHeroCourse,
+  ragEngineeringCourse,
+  claudeCodeMasteryCourse,
+  personalFinanceCourse,
+  corporateFinanceCourse,
+  accountingFundamentalsCourse,
+  microeconomicsCourse,
+  investmentBankingCourse,
+  quantitativeFinanceCourse,
+  fintechBlockchainCourse,
+  internationalEconomicsCourse,
+  businessStrategyCourse,
+  macroeconomicsCourse,
+  stockMarketInvestingCourse,
+  financialModelingCourse,
+  behavioralEconomicsCourse,
+  leadershipManagementCourse,
+  entrepreneurshipCourse,
+  negotiationInfluenceCourse,
+  businessAnalyticsCourse,
+  grokkingDsaPythonCourse,
+  islamFoundationsCourse,
+  stoicPhilosophyCourse,
+  mentalHealthResilienceCourse,
 ];
