@@ -20,35 +20,90 @@ function FeaturedCourses() {
   const featured = getFeaturedCourses(courses);
   if (featured.length === 0) return null;
 
+  const premium = featured.filter(c => c.tier === 'pro');
+  const free = featured.filter(c => c.tier === 'free');
+
   return (
     <motion.div variants={item} className="mb-16">
-      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-        <Star className="w-4 h-4 text-yellow-400" />
-        Featured Courses
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {featured.slice(0, 3).map((course) => (
-          <Link key={course.id} href={`/course/${course.slug}`}>
-            <motion.div
-              className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-yellow-500/20 p-5 cursor-pointer h-full hover:border-yellow-500/40 transition-all"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-medium">
-                Featured
-              </div>
-              <div className="text-3xl mb-3">{course.icon}</div>
-              <h4 className="text-white font-semibold">{course.title}</h4>
-              <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
-              {course.domain && (
-                <span className="inline-block mt-3 px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">
-                  {course.domain.replace('-', ' ')}
-                </span>
-              )}
-            </motion.div>
-          </Link>
-        ))}
-      </div>
+      {/* Premium Courses */}
+      {premium.length > 0 && (
+        <div className="mb-8">
+          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <Star className="w-4 h-4 text-yellow-400" />
+            Premium Courses
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {premium.map((course) => (
+              <Link key={course.id} href={`/course/${course.slug}`}>
+                <motion.div
+                  className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-yellow-500/5 via-slate-800/80 to-slate-900/80 border border-yellow-500/20 p-5 cursor-pointer h-full hover:border-yellow-500/40 transition-all"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-yellow-500/15 text-yellow-400 text-xs font-semibold border border-yellow-500/20">
+                    Premium
+                  </div>
+                  <div className="text-3xl mb-3">{course.icon}</div>
+                  <h4 className="text-white font-semibold">{course.title}</h4>
+                  <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
+                  <div className="flex items-center gap-2 mt-3">
+                    {course.domain && (
+                      <span className="px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">
+                        {course.domain.replace(/-/g, ' ')}
+                      </span>
+                    )}
+                    {course.level && (
+                      <span className="px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">
+                        {course.level}
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Free Featured Courses */}
+      {free.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-emerald-400" />
+            Featured — Free
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {free.map((course) => (
+              <Link key={course.id} href={`/course/${course.slug}`}>
+                <motion.div
+                  className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500/5 via-slate-800/80 to-slate-900/80 border border-emerald-500/20 p-5 cursor-pointer h-full hover:border-emerald-500/40 transition-all"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-medium">
+                    Free
+                  </div>
+                  <div className="text-3xl mb-3">{course.icon}</div>
+                  <h4 className="text-white font-semibold">{course.title}</h4>
+                  <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
+                  <div className="flex items-center gap-2 mt-3">
+                    {course.domain && (
+                      <span className="px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">
+                        {course.domain.replace(/-/g, ' ')}
+                      </span>
+                    )}
+                    {course.level && (
+                      <span className="px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">
+                        {course.level}
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -144,7 +199,6 @@ export default function HomePage() {
               { lang: "Spanish", code: "es", flag: "\u{1F1EA}\u{1F1F8}" },
               { lang: "French", code: "fr", flag: "\u{1F1EB}\u{1F1F7}" },
               { lang: "Urdu", code: "ur", flag: "\u{1F1F5}\u{1F1F0}" },
-              { lang: "Arabic", code: "ar", flag: "\u{1F1F8}\u{1F1E6}" },
               { lang: "Mandarin", code: "zh", flag: "\u{1F1E8}\u{1F1F3}" },
               { lang: "Hindi", code: "hi", flag: "\u{1F1EE}\u{1F1F3}" },
             ].map((l) => (
