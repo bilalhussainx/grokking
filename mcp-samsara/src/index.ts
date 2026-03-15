@@ -16,6 +16,7 @@
  *   samsara_semantic_search — Hybrid semantic search across course content
  *   samsara_rag_query       — RAG query: embed question → search → return context
  *   samsara_generate_video  — Generate Remotion video script + pipeline for a lesson
+ *   samsara_orchestrate     — Full quality-first course creation pipeline (chains all skills)
  *
  * Auth: API key via SAMSARA_API_KEY env var (optional, for future billing)
  */
@@ -972,6 +973,173 @@ echo "=== Done: output/videos/\${LESSON_ID}.mp4 ==="
       content: [{
         type: "text" as const,
         text: JSON.stringify(pipeline, null, 2),
+      }],
+    };
+  }
+);
+
+// ─── Orchestration Tool ───
+
+server.tool(
+  "samsara_orchestrate",
+  `Full quality-first course creation pipeline. Chains all Samsara.ai skills
+(course-planning → lesson-planning → video-generation → content-embedding)
+into a 10-step prompt chain with quality gates at each step.
+
+Returns the complete orchestration plan as executable steps that an agent
+or agent swarm should follow sequentially. Each step includes the prompt
+to execute, the skill file to read, and the quality gate to pass.
+
+Focuses on QUALITY over quantity — one excellent course beats ten mediocre ones.`,
+  {
+    title: z.string().describe("Course title"),
+    domain: z.enum([
+      "computer-science", "finance-business", "economics",
+      "religious-studies", "philosophy", "political-strategy", "health-wellness",
+    ]).describe("Primary domain"),
+    variation: z.string().describe("Specific variation"),
+    level: z.enum(["beginner", "advanced"]).describe("Education level"),
+    ab_testing_phase: z.boolean().default(true).describe("Use lenient A/B testing checkpoint config"),
+    generate_videos: z.boolean().default(true).describe("Include video generation steps"),
+    api_key: z.string().optional(),
+  },
+  async ({ title, domain, variation, level, ab_testing_phase, generate_videos, api_key }) => {
+    if (!checkAuth(api_key)) {
+      return { content: [{ type: "text" as const, text: "Error: Invalid API key" }], isError: true };
+    }
+
+    const domainConfig = DOMAIN_REGISTRY[domain];
+    const orchestratorSkill = readSkillFile("content-orchestrator");
+    const coursePlanningSkill = readSkillFile("course-planning");
+    const lessonPlanningSkill = readSkillFile("lesson-planning");
+
+    let videoSkill = "";
+    let embeddingSkill = "";
+    try { videoSkill = readSkillFile("video-generation"); } catch {}
+    try { embeddingSkill = readSkillFile("content-embedding"); } catch {}
+
+    const plan = {
+      meta: {
+        title,
+        domain,
+        variation,
+        level,
+        teaching_archetype: domainConfig.teaching_archetype,
+        assessment_style: domainConfig.assessment_style,
+        ab_testing: ab_testing_phase,
+        checkpoint_pass_threshold: ab_testing_phase ? "50%" : "60%",
+        quality_focus: "DEPTH over breadth, UNDERSTANDING over memorization",
+      },
+
+      steps: [
+        {
+          step: 1,
+          name: "UNDERSTAND",
+          agent_count: 1,
+          skill_file: "content-orchestrator/SKILL.md → Step 1",
+          prompt: `Answer the 4 understanding questions for: "${title}" (${domain}/${variation}, ${level} level). Output course_understanding.yaml.`,
+          quality_gate: "5+ specific measurable learning outcomes with action verbs",
+        },
+        {
+          step: 2,
+          name: "RESEARCH",
+          agent_count: 1,
+          skill_file: "content-orchestrator/SKILL.md → Step 2",
+          prompt: `Run 3+ Tavily searches per planned module for "${title}". Rate sources A/B/C. Minimum 3 A-rated sources per module.`,
+          quality_gate: "3+ A-rated sources per module, zero fabricated citations",
+          tavily_config: { search_depth: "advanced", min_searches_per_module: 3 },
+        },
+        {
+          step: 3,
+          name: "OUTLINE",
+          agent_count: 1,
+          skill_file: "course-planning/SKILL.md",
+          prompt: `Design course skeleton for "${title}". Each module has clear input→output transformation. 6-10 modules, 3-5 lessons each.`,
+          quality_gate: "Every module has input/output states and aha moments defined",
+        },
+        {
+          step: 4,
+          name: "WRITE",
+          agent_count: "1 per module (parallel)",
+          skill_file: "lesson-planning/SKILL.md",
+          prompt: `Generate lesson content for each module. ONE concept per lesson, taught COMPLETELY. Add voice markers. Escape template literals.`,
+          quality_gate: "Every lesson has example→principle→example structure, zero template literal violations",
+        },
+        {
+          step: 5,
+          name: "EXERCISE",
+          agent_count: "integrated with step 4",
+          prompt: `Design exercises testing UNDERSTANDING not memorization. 3-level hints. Clear solutions.`,
+          quality_gate: "No exercise tests recall only — all test comprehension or application",
+        },
+        {
+          step: 6,
+          name: "CHECKPOINT",
+          agent_count: 1,
+          skill_file: "content-orchestrator/SKILL.md → Step 6",
+          prompt: `Create checkpoints. Pass threshold: ${ab_testing_phase ? "50%" : "60%"}. Frame as celebration. "Let's review" never "Failed".`,
+          quality_gate: "No lockout language, XP for attempting, voice summary is optional conversation",
+          ab_config: {
+            pass_threshold: ab_testing_phase ? 50 : 60,
+            xp_for_attempting: ab_testing_phase ? 10 : 5,
+            voice_summary_required: !ab_testing_phase,
+            failure_message: "Let's review a couple things!",
+          },
+        },
+        {
+          step: 7,
+          name: "VOICE",
+          agent_count: 1,
+          prompt: `Add voice coaching prompts. Reference student history. Tone: warm, encouraging, specific to content.`,
+          quality_gate: "Voice interactions reference actual content, not generic praise",
+        },
+        ...(generate_videos ? [{
+          step: 8,
+          name: "VIDEO",
+          agent_count: 1,
+          skill_file: "video-generation/SKILL.md",
+          prompt: `Generate videos ONLY where text cannot suffice. Moonshot API for narration, Deepgram/Sarvam TTS, SadTalker avatar, Remotion composition.`,
+          quality_gate: "Every video EXPLAINS something text cannot — delete any that just repeat",
+        }] : []),
+        {
+          step: generate_videos ? 9 : 8,
+          name: "EMBED",
+          agent_count: 1,
+          skill_file: "content-embedding/SKILL.md",
+          prompt: `Embed course + lessons in pgvector. Set prerequisites and companions. Test search relevance.`,
+          quality_gate: "Search test returns this course for relevant queries",
+        },
+        {
+          step: generate_videos ? 10 : 9,
+          name: "REVIEW",
+          agent_count: 1,
+          skill_file: "content-orchestrator/SKILL.md → Step 10",
+          prompt: `Read entire course as a student. Expert test, student test, competitor test. Fix anything that fails.`,
+          quality_gate: "PhD would say accurate, beginner would say clear, better than free alternatives",
+        },
+      ],
+
+      skill_files_to_read: [
+        "skills/content-orchestrator/SKILL.md",
+        "skills/course-planning/SKILL.md",
+        "skills/lesson-planning/SKILL.md",
+        ...(generate_videos ? ["skills/video-generation/SKILL.md"] : []),
+        "skills/content-embedding/SKILL.md",
+      ],
+
+      estimated_cost: {
+        tavily_searches: "30-60 searches × $0.01 = $0.30-$0.60",
+        gemini_embeddings: "~3000 tokens × $0.15/M = ~$0.001",
+        moonshot_llm: "~40K tokens × $0.002/K = ~$0.08",
+        video_tts: generate_videos ? "5-10 videos × $0.02 = $0.10-$0.20" : "N/A",
+        total: generate_videos ? "$0.50-$0.90" : "$0.40-$0.70",
+      },
+    };
+
+    return {
+      content: [{
+        type: "text" as const,
+        text: JSON.stringify(plan, null, 2),
       }],
     };
   }
