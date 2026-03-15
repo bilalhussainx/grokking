@@ -12,6 +12,7 @@ import type {
   LessonContext,
   AgentTurnMetadata,
   TranscriptEntry,
+  ConversationCheckpoint,
 } from '@/data/language-types';
 import type { ProficiencyLevel, LanguagePersona } from '@/lib/language-personas';
 import { getLanguagePersona } from '@/lib/language-personas';
@@ -36,16 +37,17 @@ export async function buildAgentContext({
   persona,
 }: BuildContextParams): Promise<AgentContext> {
   // Parallel fetch all RAG components
-  const [profile, recentMistakes, dueVocab, lastSessions] = await Promise.all([
+  const [profile, recentMistakes, dueVocab, lastSessions, checkpoint] = await Promise.all([
     getUserLanguageProfile(userId, targetLanguage, nativeLanguage),
     getRecentMistakes(userId, targetLanguage, 10),
     getDueVocabulary(userId, targetLanguage, 15),
     getRecentSessions(userId, targetLanguage, 3),
+    getConversationCheckpoint(userId, targetLanguage),
   ]);
 
   // Build the system prompt context
   const effectivePersona = persona || getLanguagePersona(`${targetLanguage}-conversational-${getDefaultStyle(targetLanguage)}`);
-  
+
   const systemPromptContext = buildSystemPrompt({
     profile,
     recentMistakes,
@@ -53,6 +55,7 @@ export async function buildAgentContext({
     lastSessions,
     persona: effectivePersona,
     lessonContext,
+    checkpoint,
   });
 
   return {
@@ -70,6 +73,7 @@ interface BuildSystemPromptParams {
   lastSessions: SessionHistory[];
   persona: LanguagePersona | undefined;
   lessonContext?: LessonContext;
+  checkpoint?: ConversationCheckpoint | null;
 }
 
 function buildSystemPrompt({
@@ -79,6 +83,7 @@ function buildSystemPrompt({
   lastSessions,
   persona,
   lessonContext,
+  checkpoint,
 }: BuildSystemPromptParams): string {
   const parts: string[] = [];
 
@@ -105,6 +110,20 @@ function buildSystemPrompt({
 ## LAST SESSION
 ${lastSessions[0].agentSummary}
 `);
+  }
+
+  // Conversation checkpoint — resume context
+  if (checkpoint) {
+    parts.push(buildResumeContext(checkpoint));
+  }
+
+  // Topic transition readiness
+  if (checkpoint && checkpoint.totalExchangesOnTopic >= 6) {
+    parts.push(`
+## TOPIC TRANSITION READINESS
+The student has practiced "${checkpoint.lastTopicName}" extensively (${checkpoint.totalExchangesOnTopic} exchanges).
+If they demonstrate comfort, naturally transition to: "${checkpoint.nextTopicName}".
+Transition smoothly — weave it into conversation, don't announce a topic change.`);
   }
 
   // Recurring mistakes to watch for
@@ -299,6 +318,126 @@ async function getRecentSessions(
     agentSummary: s.agent_summary || '',
     createdAt: new Date(s.created_at),
   }));
+}
+
+// ============================================
+// Conversation Checkpoint Functions
+// ============================================
+
+export async function getConversationCheckpoint(
+  userId: string,
+  targetLanguage: string
+): Promise<ConversationCheckpoint | null> {
+  const { data, error } = await supabase
+    .from('user_language_profiles')
+    .select('conversation_checkpoint')
+    .eq('user_id', userId)
+    .eq('target_language', targetLanguage)
+    .single();
+
+  if (error || !data?.conversation_checkpoint) return null;
+
+  const checkpoint = data.conversation_checkpoint as ConversationCheckpoint;
+  if (!checkpoint.schemaVersion || !checkpoint.lastTopicId) {
+    console.warn('[language-agent] Invalid checkpoint, treating as fresh start');
+    return null;
+  }
+
+  return checkpoint;
+}
+
+export async function updateConversationCheckpoint(
+  userId: string,
+  targetLanguage: string,
+  checkpoint: ConversationCheckpoint
+): Promise<void> {
+  await supabase
+    .from('user_language_profiles')
+    .update({ conversation_checkpoint: checkpoint })
+    .eq('user_id', userId)
+    .eq('target_language', targetLanguage);
+}
+
+export function buildResumeContext(checkpoint: ConversationCheckpoint): string {
+  return `
+## CONVERSATION RESUME
+Last session: ${checkpoint.lastSessionTimestamp}
+Topic: ${checkpoint.lastTopicName}
+Progress: ${checkpoint.topicProgress} (${checkpoint.totalExchangesOnTopic} exchanges)
+Summary: ${checkpoint.lastExchangeSummary}
+Vocab in progress: ${checkpoint.vocabInProgress.join(', ') || 'None'}
+Mistake patterns: ${checkpoint.mistakePatterns.join(', ') || 'None'}
+Next topic: ${checkpoint.nextTopicName}
+
+Resume from this point. Greet the user warmly, remind them where they left off, and continue practicing the current topic.`;
+}
+
+export async function summarizeAndUpdateCheckpoint(
+  userId: string,
+  targetLanguage: string,
+  transcript: TranscriptEntry[],
+  currentCheckpoint: ConversationCheckpoint | null,
+  currentTopicId: string,
+  currentTopicName: string,
+  nextTopicId: string,
+  nextTopicName: string
+): Promise<void> {
+  const transcriptText = transcript.map(t => `${t.role}: ${t.text}`).join('\n');
+
+  const summary = await generateWithMoonshot([
+    {
+      role: 'system',
+      content: 'Summarize this language practice session in 1-2 sentences. Focus on what the student practiced, what they struggled with, and what vocabulary was used. Return ONLY the summary text.',
+    },
+    { role: 'user', content: transcriptText.slice(-3000) },
+  ], { temperature: 0.3, maxTokens: 200 });
+
+  const exchangeCount = transcript.filter(t => t.role === 'user').length;
+  const totalExchanges = (currentCheckpoint?.totalExchangesOnTopic || 0) + exchangeCount;
+
+  let topicProgress: 'started' | 'practicing' | 'comfortable' = 'started';
+  if (totalExchanges >= 8) topicProgress = 'comfortable';
+  else if (totalExchanges >= 3) topicProgress = 'practicing';
+
+  const newCheckpoint: ConversationCheckpoint = {
+    schemaVersion: 1,
+    lastTopicId: currentTopicId,
+    lastTopicName: currentTopicName,
+    topicProgress,
+    nextTopicId,
+    nextTopicName,
+    lastExchangeSummary: summary,
+    vocabInProgress: currentCheckpoint?.vocabInProgress || [],
+    mistakePatterns: currentCheckpoint?.mistakePatterns || [],
+    totalExchangesOnTopic: totalExchanges,
+    lastSessionTimestamp: new Date().toISOString(),
+  };
+
+  await updateConversationCheckpoint(userId, targetLanguage, newCheckpoint);
+}
+
+export async function advanceTopicCheckpoint(
+  userId: string,
+  targetLanguage: string,
+  newTopicId: string,
+  newTopicName: string,
+  nextTopicId: string,
+  nextTopicName: string
+): Promise<void> {
+  const checkpoint: ConversationCheckpoint = {
+    schemaVersion: 1,
+    lastTopicId: newTopicId,
+    lastTopicName: newTopicName,
+    topicProgress: 'started',
+    nextTopicId,
+    nextTopicName,
+    lastExchangeSummary: '',
+    vocabInProgress: [],
+    mistakePatterns: [],
+    totalExchangesOnTopic: 0,
+    lastSessionTimestamp: new Date().toISOString(),
+  };
+  await updateConversationCheckpoint(userId, targetLanguage, checkpoint);
 }
 
 // ============================================
