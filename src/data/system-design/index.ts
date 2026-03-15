@@ -19,6 +19,11 @@ export const systemDesignCourse: Course = {
   description:
     "Learn how to design large-scale distributed systems. Covers fundamentals, key concepts, and 10 real-world system design case studies with detailed architecture diagrams and trade-off analysis.",
   icon: "\u{1F3D7}\u{FE0F}",
+  tier: "pro",
+  featured: true,
+  domain: "computer-science",
+  variation: "interview-prep",
+  level: "advanced" as const,
   modules: [
     fundamentalsModule,
     keyConceptsModule,

@@ -23,6 +23,11 @@ export const codingInterviewCourse: Course = {
   description:
     "Master 16 essential coding patterns to solve any interview question. Each pattern includes detailed explanations, visual walkthroughs, and hands-on Python exercises with an in-browser IDE.",
   icon: "\u{1F4BB}",
+  tier: "pro",
+  featured: true,
+  domain: "computer-science",
+  variation: "interview-prep",
+  level: "advanced" as const,
   modules: [
     twoPointersModule,
     fastSlowPointersModule,

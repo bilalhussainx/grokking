@@ -15,6 +15,11 @@ export const dataStructuresAlgorithmsCourse: Course = {
   description:
     "Master fundamental data structures and algorithms from complexity analysis through dynamic programming, with hands-on Python exercises.",
   icon: "\u{1F9EE}",
+  tier: "pro",
+  featured: true,
+  domain: "computer-science",
+  variation: "interview-prep",
+  level: "beginner" as const,
   modules: [
     complexityModule,
     arraysStringsModule,

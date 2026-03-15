@@ -17,6 +17,11 @@ export const pythonFundamentalsCourse: Course = {
   description:
     "Learn Python from scratch. 10 modules covering variables, control flow, functions, data structures, OOP, and real projects — all with hands-on exercises.",
   icon: "\u{1F40D}",
+  tier: "free",
+  featured: true,
+  domain: "computer-science",
+  variation: "systems-programming",
+  level: "beginner" as const,
   modules: [
     variablesAndTypesModule,
     controlFlowModule,
