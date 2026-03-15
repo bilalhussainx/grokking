@@ -32,7 +32,7 @@ The language learning system currently has 11 languages in the voice tab but onl
 
 ### 2.2 Type Extensions
 
-Add to `LanguageCourse`:
+Add to `LanguageCourse` (both optional — Urdu A1 has no chain links):
 ```ts
 prerequisiteCourseSlug?: string  // e.g., "spanish-beginner" for spanish-intermediate
 nextCourseSlug?: string          // e.g., "spanish-advanced" for spanish-intermediate
@@ -40,7 +40,28 @@ nextCourseSlug?: string          // e.g., "spanish-advanced" for spanish-interme
 
 Add to `LanguageLesson`:
 ```ts
-topicId: string  // Unique topic identifier for voice agent reference, e.g., "es-beginner-ordering-food"
+topicId: string  // Unique topic identifier for voice agent reference
+```
+
+**`topicId` naming convention:** `{langCode}-{level}-{lessonSlug}` — e.g., `es-beginner-ordering-food`, `zh-intermediate-travel-planning`, `en-advanced-media-literacy`. Must be unique across all courses. The `langCode` is the BCP-47 code, `level` is `beginner`/`intermediate`/`advanced`, and `lessonSlug` matches the lesson's `slug` field.
+
+Add `ConversationCheckpoint` type (see Section 5.1). This type is stored as JSONB in Supabase and coexists with the existing `lastSessionSummary` field — `lastSessionSummary` continues to provide a text summary for the `LAST SESSION` section of the system prompt, while `ConversationCheckpoint` provides structured topic/progress data for the `CONVERSATION RESUME` section. Both are injected into the system prompt by `buildAgentContext()`.
+
+Add `mode` to `VoiceAgentConfig`:
+```ts
+mode?: 'free-form' | 'lesson-practice' | 'placement'  // Defaults to 'free-form'
+```
+
+`LessonPracticeConfig` (Section 4.1) is a UI-side interface that gets converted to a `LessonContext` before passing to the agent:
+```ts
+// Conversion: LessonPracticeConfig → LessonContext
+{
+  lessonId: config.lessonSlug,
+  lessonTitle: lesson.title,
+  targetPhrases: config.voiceScenarios.flatMap(s => s.targetPhrases),
+  vocabulary: config.targetVocab.map(v => v.word),
+  grammarFocus: config.targetGrammar.map(g => g.title),
+}
 ```
 
 ### 2.3 Course Content Sources
@@ -146,7 +167,14 @@ Result stored in Supabase `user_language_profiles.proficiency_level` and `curren
 - Each round's evaluation is done via LLM analysis (Moonshot) of the user's speech transcript
 - Visual UI shows: progress bar, current round, text prompts, mic button, spoken text transcript
 
-### 3.5 Placement for English (ESL)
+### 3.5 Placement Fallback & Edge Cases
+
+- **Microphone failure:** If mic access is denied or STT returns empty for all rounds, offer a text-based self-assessment questionnaire as fallback (using existing text-based placement questions)
+- **LLM scoring failure:** If Moonshot fails to evaluate a round, mark it as inconclusive and skip to next round. Place user conservatively (lower level) if scoring data is incomplete
+- **Manual override:** Add an "I already know my level" option on the placement intro screen. User can select A1/A2/B1/B2/C1 directly and skip the voice assessment
+- **Retaking placement:** Users can retake placement from their settings/profile page at any time. New result overwrites the old one and may reassign them to a different course/module
+
+### 3.6 Placement for English (ESL)
 
 English placement additionally captures the user's **native language** to configure:
 - Pronunciation correction focus areas (e.g., /θ/ for Hindi speakers, tones interference for Chinese speakers)
@@ -239,9 +267,10 @@ ALTER TABLE user_language_profiles
 ADD COLUMN conversation_checkpoint JSONB DEFAULT NULL;
 ```
 
-Schema:
+Schema (includes `schemaVersion` for forward compatibility):
 ```ts
 interface ConversationCheckpoint {
+  schemaVersion: 1;                       // For future migration
   lastTopicId: string;                    // e.g., "es-beginner-ordering-food"
   lastTopicName: string;                  // e.g., "Ordering Food at a Restaurant"
   topicProgress: 'started' | 'practicing' | 'comfortable';
@@ -284,7 +313,14 @@ At the end of each voice session (on disconnect or explicit end):
 3. Checkpoint is updated via `PATCH /api/language/session` with the new state
 4. If topic was completed (competency threshold met), checkpoint advances to next topic
 
-### 5.4 First Session (No Checkpoint)
+### 5.4 Checkpoint Validation & Edge Cases
+
+- **Corrupt checkpoint:** If JSONB fails to parse or is missing required fields, treat as "no checkpoint" (fresh start). Log the error for debugging.
+- **Stale topicId:** If `lastTopicId` references a topic that no longer exists (course content was updated), fall back to the user's current course position from `current_course_slug` + `current_module_id`.
+- **Course completion:** When the Advanced course is completed (no `nextCourseSlug`), checkpoint enters a "mastery" state — free-form practice with no topic progression pressure. The agent congratulates and offers to review any topics.
+- **Re-taking courses:** Users can restart any completed course. This creates a fresh checkpoint for that course without deleting previous mastery data.
+
+### 5.5 First Session (No Checkpoint)
 
 If no checkpoint exists:
 1. Check placement result → determine starting course/module/lesson
@@ -313,13 +349,13 @@ The initial greeting is handled as a **one-shot system event**, not a conversati
 
 **For `useDeepgramAgent.ts`:**
 - Add `isGreetingPhase` ref, initialized to `true`
-- On first `agent` message event, set `isGreetingPhase = true`
-- After greeting audio finishes playing (detect via `nextPlayTimeRef` scheduling), set `isGreetingPhase = false` and unmute mic
-- While `isGreetingPhase === true`, suppress any audio input from being sent to the WebSocket
+- After `SettingsApplied` WebSocket event, set `isGreetingPhase = true` and `micMutedRef.current = true` (uses existing mute mechanism — no new suppression path needed)
+- After first `AgentAudioDone` event (greeting playback complete), set `isGreetingPhase = false` and `micMutedRef.current = false`
+- The Deepgram Agent generates the greeting server-side via the `systemPrompt` — no client-side greeting generation needed
 
 **For `useOrchestratedVoiceAgent.ts`:**
-- Same pattern: generate greeting via API, play it, THEN start recording
-- The greeting text comes from `/api/language/persona-config` which already has greeting generation
+- Same pattern: generate greeting via API call to `/api/language/persona-config`, play the TTS audio, THEN start MediaRecorder
+- The greeting text comes from the persona greeting function + checkpoint data
 
 **For `useVoiceAgent.ts`:**
 - Expose `isGreetingPhase` in the hook return for UI feedback ("Agent is greeting you...")
@@ -354,8 +390,9 @@ src/data/languages/english-advanced.ts
 |------|---------|
 | `src/data/language-types.ts` | Add `topicId` to `LanguageLesson`, add `prerequisiteCourseSlug`/`nextCourseSlug` to `LanguageCourse`, add `ConversationCheckpoint` type |
 | `src/data/languages/index.ts` | Register all 15 courses, update `getSupportedLanguages()`, absorb old A1 courses |
-| `src/lib/language-agent.ts` | Add `getConversationCheckpoint()`, `updateConversationCheckpoint()`, `buildResumeContext()`, topic progression logic, competency detection |
+| `src/lib/language-agent.ts` | Add `getConversationCheckpoint()`, `updateConversationCheckpoint()`, `buildResumeContext()`, topic progression logic, competency detection. Update `getDefaultStyle()` to include `hi`, `zh`, `en` mappings |
 | `src/lib/language-personas.ts` | Update greeting functions to accept checkpoint data, add English personas |
+| `src/lib/voice-provider-router.ts` | Add Chinese TTS resolution (verify Aura-2 zh support or route to MiniMax). Export `isSarvamLanguage()` helper to centralize routing logic (currently duplicated in 3 files) |
 | `src/hooks/useDeepgramAgent.ts` | Add `isGreetingPhase` ref, suppress audio input during greeting, unmute after greeting playback |
 | `src/hooks/useOrchestratedVoiceAgent.ts` | Same greeting phase logic |
 | `src/hooks/useVoiceAgent.ts` | Expose `isGreetingPhase`, pass lesson context and mode (practice/free-form/placement) |
@@ -390,11 +427,13 @@ ADD COLUMN IF NOT EXISTS native_language TEXT DEFAULT 'en';
 |----------|-----|-----|-----|----------|
 | Spanish (es) | Deepgram Nova-3 | Deepgram Aura-2 | Moonshot Kimi K2 | WebSocket |
 | French (fr) | Deepgram Nova-3 | Deepgram Aura-2 | Moonshot Kimi K2 | WebSocket |
-| Chinese (zh) | Deepgram Nova-3 | Deepgram Aura-2 | Moonshot Kimi K2 | WebSocket |
+| Chinese (zh) | Deepgram Nova-3 | Deepgram Aura-2 (aura-2-izanami-ja fallback) | Moonshot Kimi K2 | WebSocket |
 | English (en) | Deepgram Nova-3 | Deepgram Aura-2 | Moonshot Kimi K2 | WebSocket |
-| Hindi (hi) | Deepgram Nova-3 | Sarvam Bulbul v3 | Moonshot Kimi K2 | HTTP Polling |
+| Hindi (hi) | Deepgram Nova-3 | Sarvam Bulbul v3 | Moonshot Kimi K2 | HTTP Streaming (NDJSON) |
 
-No changes to existing provider routing — English uses the same Deepgram pipeline as other Latin-script languages.
+**Chinese TTS note:** Deepgram Aura-2 does not currently list `zh` in `DEEPGRAM_TTS_LANGUAGES` in `voice-provider-router.ts`. The existing code already has Japanese voices (aura-2-izanami-ja, aura-2-fujin-ja) which work as a partial fallback. Implementation must either: (a) verify Deepgram Aura-2 supports Mandarin voices and add `zh` to the supported list with proper voice IDs, or (b) route Chinese to the orchestrated pipeline (HTTP streaming) with MiniMax TTS as the provider (already supported in the `TTSProvider` type). Decision deferred to implementation — check Deepgram Aura-2 voice catalog at implementation time.
+
+**Hindi pipeline clarification:** The Hindi pipeline uses HTTP streaming with NDJSON responses, not HTTP polling. The client sends audio chunks and receives streamed responses.
 
 ---
 
