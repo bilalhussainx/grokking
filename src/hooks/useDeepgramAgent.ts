@@ -227,9 +227,11 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
 
             switch (msg.type) {
               case "SettingsApplied":
-                console.log("[Deepgram] Settings applied — starting mic (muted for greeting)");
+                console.log("[Deepgram] Settings applied — greeting phase active");
                 isGreetingPhaseRef.current = true;
-                micMutedRef.current = true;
+                // Do NOT mute mic — Deepgram needs continuous audio stream or
+                // it disconnects with CLIENT_MESSAGE_TIMEOUT. We suppress user
+                // transcript processing during greeting instead.
                 setIsConnecting(false);
                 setIsConnected(true);
                 callbacksRef.current?.onConnect?.();
@@ -237,6 +239,8 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                 break;
 
               case "UserStartedSpeaking":
+                // During greeting phase, ignore user speech to prevent self-reply
+                if (isGreetingPhaseRef.current) break;
                 // Barge-in: stop agent audio, flush accumulated text
                 stopPlayback();
                 setIsSpeaking(false);
@@ -259,16 +263,15 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                   callbacksRef.current?.onAgentMessage?.(agentTextRef.current.trim());
                   agentTextRef.current = "";
                 }
-                // Unmute mic after greeting audio finishes to prevent self-reply loop
+                // End greeting phase — user speech will now be processed
                 if (isGreetingPhaseRef.current) {
-                  console.log("[Deepgram] Greeting audio done — unmuting mic");
+                  console.log("[Deepgram] Greeting audio done — now accepting user speech");
                   isGreetingPhaseRef.current = false;
-                  micMutedRef.current = false;
                 }
                 break;
 
               case "ConversationText":
-                if (msg.role === "user" && msg.content) {
+                if (msg.role === "user" && msg.content && !isGreetingPhaseRef.current) {
                   callbacksRef.current?.onUserMessage?.(msg.content);
                 } else if (msg.role === "assistant" && msg.content) {
                   // Accumulate — don't emit yet, wait for AgentAudioDone
