@@ -55,6 +55,9 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
   const vadAudioCtxRef = useRef<AudioContext | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
+  // Greeting phase — delay recording until greeting audio finishes to prevent self-reply loop
+  const isGreetingPhaseRef = useRef(true);
+
   useEffect(() => {
     callbacksRef.current = callbacks;
   }, [callbacks]);
@@ -292,19 +295,81 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
       };
 
       mediaRecorderRef.current = recorder;
-      startVAD(stream);
+
+      // Greeting phase — mute mic tracks and generate greeting before starting VAD/recording
+      isGreetingPhaseRef.current = true;
+      stream.getAudioTracks().forEach(t => { t.enabled = false; });
 
       setIsConnecting(false);
       setIsConnected(true);
       connectedRef.current = true;
       callbacksRef.current?.onConnect?.();
+
+      // Generate and play greeting before enabling mic
+      try {
+        const greetingForm = new FormData();
+        greetingForm.append('language', config.language);
+        if (config.personaId) greetingForm.append('personaId', config.personaId);
+        if (config.proficiencyLevel) greetingForm.append('proficiencyLevel', config.proficiencyLevel);
+        greetingForm.append('conversationHistory', JSON.stringify([]));
+        greetingForm.append('greeting', 'true');
+
+        const greetingResp = await fetch('/api/language/sarvam/stream', {
+          method: 'POST',
+          credentials: 'include',
+          body: greetingForm,
+        });
+
+        if (greetingResp.ok && greetingResp.body) {
+          const reader = greetingResp.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+              if (!line.trim()) continue;
+              try {
+                const event = JSON.parse(line);
+                if (event.type === 'response' && event.text) {
+                  callbacksRef.current?.onAgentMessage?.(event.text);
+                  conversationRef.current.push({ role: 'assistant', content: event.text });
+                } else if (event.type === 'audio' && event.base64) {
+                  await playAudio(event.base64);
+                  // Wait for audio playback to complete
+                  await new Promise<void>(resolve => {
+                    const checkDone = () => {
+                      if (!currentSourceRef.current) resolve();
+                      else setTimeout(checkDone, 100);
+                    };
+                    setTimeout(checkDone, 100);
+                  });
+                }
+              } catch {}
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[SarvamVoice] Greeting error (non-fatal):', err);
+      }
+
+      // Greeting done — unmute mic and start VAD/recording
+      isGreetingPhaseRef.current = false;
+      stream.getAudioTracks().forEach(t => { t.enabled = true; });
+      startVAD(stream);
     } catch (err) {
       console.error('[SarvamVoice] Start error:', err);
       setError(`Failed to start: ${err}`);
       setIsConnecting(false);
       callbacksRef.current?.onError?.(`${err}`);
     }
-  }, [isConnecting, isConnected, processAudioChunk, startVAD]);
+  }, [isConnecting, isConnected, processAudioChunk, startVAD, playAudio]);
 
   const stop = useCallback(() => {
     connectedRef.current = false;
@@ -369,5 +434,6 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
   return {
     isConnected, isConnecting, isSpeaking, micMuted, error,
     start, stop, toggleMic, sendPromptUpdate, isSarvamLanguage,
+    isGreetingPhase: isGreetingPhaseRef.current,
   };
 }

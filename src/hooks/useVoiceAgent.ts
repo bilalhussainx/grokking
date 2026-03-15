@@ -22,6 +22,7 @@ export interface VoiceAgentHook {
   isConnecting: boolean;
   isSpeaking: boolean;
   micMuted: boolean;
+  isGreetingPhase: boolean;
   error: string;
   start: (config: VoiceAgentConfig) => Promise<void>;
   stop: () => void;
@@ -119,6 +120,7 @@ export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
     isConnecting: activeAgent.isConnecting,
     isSpeaking: activeAgent.isSpeaking,
     micMuted: activeAgent.micMuted,
+    isGreetingPhase: activeAgent.isGreetingPhase || false,
     error: activeAgent.error,
     start,
     stop,
