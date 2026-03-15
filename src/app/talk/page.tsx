@@ -1,0 +1,312 @@
+"use client";
+
+import { useState, useCallback, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mic, MicOff, Phone, PhoneOff, ChevronLeft, Volume2, Settings } from "lucide-react";
+import { useVoiceAgent, type VoiceAgentCallbacks } from "@/hooks/useVoiceAgent";
+import { getLanguagePersonas, getDefaultPersona, getSupportedLanguages, type LanguagePersona } from "@/lib/language-personas";
+import Link from "next/link";
+
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+  timestamp: Date;
+}
+
+export default function TalkPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[var(--background)] flex items-center justify-center"><div className="text-slate-500 animate-pulse">Loading...</div></div>}>
+      <TalkPageInner />
+    </Suspense>
+  );
+}
+
+function TalkPageInner() {
+  const searchParams = useSearchParams();
+  const preselectedLang = searchParams.get("lang");
+
+  // State
+  const [step, setStep] = useState<"select" | "talking">(preselectedLang ? "talking" : "select");
+  const [selectedLang, setSelectedLang] = useState(preselectedLang || "");
+  const [selectedPersona, setSelectedPersona] = useState<LanguagePersona | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [sessionTime, setSessionTime] = useState(0);
+
+  // Timer
+  useEffect(() => {
+    if (step !== "talking") return;
+    const timer = setInterval(() => setSessionTime((t) => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, [step]);
+
+  const formatTime = (s: number) =>
+    `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
+
+  // Voice agent callbacks
+  const callbacks: VoiceAgentCallbacks = {
+    onUserMessage: useCallback((text: string) => {
+      setMessages((prev) => [
+        ...prev,
+        { id: `u-${Date.now()}`, role: "user", text, timestamp: new Date() },
+      ]);
+    }, []),
+    onAgentMessage: useCallback((text: string) => {
+      setMessages((prev) => [
+        ...prev,
+        { id: `a-${Date.now()}`, role: "assistant", text, timestamp: new Date() },
+      ]);
+    }, []),
+  };
+
+  const agent = useVoiceAgent(callbacks);
+
+  // Auto-start if language preselected
+  useEffect(() => {
+    if (preselectedLang && !selectedPersona) {
+      const persona = getDefaultPersona(preselectedLang);
+      setSelectedPersona(persona);
+      setSelectedLang(preselectedLang);
+    }
+  }, [preselectedLang, selectedPersona]);
+
+  const startConversation = useCallback(
+    async (lang: string) => {
+      const persona = selectedPersona || getDefaultPersona(lang);
+      setSelectedPersona(persona);
+      setSelectedLang(lang);
+      setStep("talking");
+
+      try {
+        await agent.start({
+          personaId: persona.id,
+          systemPrompt: persona.systemPrompt,
+          voiceProvider: persona.defaultVoice.provider as "kokoro" | "sarvam" | "deepgram",
+          voiceId: persona.defaultVoice.voiceId,
+          language: lang,
+          // TODO: Fetch user's actual proficiency level from their profile/placement results
+          proficiencyLevel: "A1", // Default to A1 until profile lookup is implemented
+        });
+        // Greeting is handled by Deepgram agent via onAgentMessage callback
+      } catch (err) {
+        console.error("Failed to start voice agent:", err);
+      }
+    },
+    [agent, selectedPersona]
+  );
+
+  const endConversation = useCallback(() => {
+    agent.stop();
+
+    // Save conversation checkpoint if there are messages
+    if (messages.length > 0) {
+      fetch('/api/language/session', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetLanguage: selectedLang,
+          transcript: messages.map(m => ({ role: m.role, text: m.text, timestamp: m.timestamp.toISOString() })),
+          currentTopicId: `${selectedLang}-beginner-greetings`, // TODO: get from course progress
+          currentTopicName: 'Greetings',
+          nextTopicId: `${selectedLang}-beginner-personal-info`,
+          nextTopicName: 'Personal Information',
+        }),
+      }).catch(console.error);
+    }
+
+    setStep("select");
+    setMessages([]);
+    setSessionTime(0);
+    setSelectedPersona(null);
+    setSelectedLang("");
+  }, [agent, messages, selectedLang]);
+
+  // ─── Select Language Screen ───
+  if (step === "select") {
+    const languages = [
+      { code: "en", name: "English", flag: "\u{1F1FA}\u{1F1F8}", native: "English" },
+      { code: "es", name: "Spanish", flag: "\u{1F1EA}\u{1F1F8}", native: "Espa\u00F1ol" },
+      { code: "fr", name: "French", flag: "\u{1F1EB}\u{1F1F7}", native: "Fran\u00E7ais" },
+      { code: "de", name: "German", flag: "\u{1F1E9}\u{1F1EA}", native: "Deutsch" },
+      { code: "it", name: "Italian", flag: "\u{1F1EE}\u{1F1F9}", native: "Italiano" },
+      { code: "nl", name: "Dutch", flag: "\u{1F1F3}\u{1F1F1}", native: "Nederlands" },
+      { code: "ja", name: "Japanese", flag: "\u{1F1EF}\u{1F1F5}", native: "\u65E5\u672C\u8A9E" },
+      { code: "zh", name: "Mandarin", flag: "\u{1F1E8}\u{1F1F3}", native: "\u4E2D\u6587" },
+      { code: "hi", name: "Hindi", flag: "\u{1F1EE}\u{1F1F3}", native: "\u0939\u093F\u0928\u094D\u0926\u0940" },
+      { code: "pa", name: "Punjabi", flag: "\u{1F1EE}\u{1F1F3}", native: "\u0A2A\u0A70\u0A1C\u0A3E\u0A2C\u0A40" },
+    ];
+
+    return (
+      <div className="min-h-screen bg-[var(--background)] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-800/50">
+          <Link href="/" className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors">
+            <ChevronLeft className="w-5 h-5" />
+          </Link>
+          <h1 className="text-lg font-semibold text-white">Who do you want to talk to?</h1>
+        </div>
+
+        {/* Language Grid */}
+        <div className="flex-1 px-4 py-8 max-w-2xl mx-auto w-full">
+          <motion.div
+            className="grid grid-cols-2 gap-3"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
+            }}
+          >
+            {languages.map((lang) => (
+              <motion.button
+                key={lang.code}
+                onClick={() => startConversation(lang.code)}
+                className="flex items-center gap-4 p-5 rounded-2xl bg-slate-800/40 border border-slate-700/40 hover:bg-slate-800/70 hover:border-slate-600 transition-all text-left"
+                variants={{
+                  hidden: { opacity: 0, y: 12 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <span className="text-3xl">{lang.flag}</span>
+                <div>
+                  <div className="text-white font-medium">{lang.name}</div>
+                  <div className="text-slate-500 text-sm">{lang.native}</div>
+                </div>
+              </motion.button>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Talking Screen ───
+  const persona = selectedPersona;
+  const langName = { es: "Spanish", fr: "French", de: "German", it: "Italian", nl: "Dutch", zh: "Mandarin", hi: "Hindi", pa: "Punjabi", ja: "Japanese", en: "English" }[selectedLang] || selectedLang;
+
+  return (
+    <div className="min-h-screen bg-[var(--background)] flex flex-col">
+      {/* Top Bar */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/50">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={endConversation}
+            className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <div className="text-sm font-medium text-white">
+              {persona?.name || "Language Tutor"}
+            </div>
+            <div className="text-xs text-slate-500">{langName}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-mono text-slate-500">{formatTime(sessionTime)}</span>
+          {agent.isConnected && (
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          )}
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+        <AnimatePresence mode="popLayout">
+          {messages.map((msg) => (
+            <motion.div
+              key={msg.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+                  msg.role === "user"
+                    ? "bg-blue-500/20 text-blue-100 rounded-br-md"
+                    : "bg-slate-800/60 text-slate-200 rounded-bl-md"
+                }`}
+              >
+                {msg.text}
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {agent.isSpeaking && (
+          <motion.div
+            className="flex justify-start"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-slate-800/60 rounded-bl-md">
+              <div className="flex gap-1">
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full bg-emerald-400"
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-slate-500">Speaking...</span>
+            </div>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Bottom Controls */}
+      <div className="border-t border-slate-800/50 px-4 py-6">
+        <div className="flex items-center justify-center gap-6">
+          {/* Mute Toggle */}
+          <motion.button
+            onClick={agent.toggleMic}
+            className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors ${
+              agent.micMuted
+                ? "bg-slate-700 text-slate-400"
+                : "bg-slate-800 text-white"
+            }`}
+            whileTap={{ scale: 0.9 }}
+          >
+            {agent.micMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+          </motion.button>
+
+          {/* End Call */}
+          <motion.button
+            onClick={endConversation}
+            className="w-16 h-16 rounded-full bg-red-500/20 border-2 border-red-500/40 text-red-400 flex items-center justify-center hover:bg-red-500/30 transition-colors"
+            whileTap={{ scale: 0.9 }}
+          >
+            <PhoneOff className="w-7 h-7" />
+          </motion.button>
+
+          {/* Volume (placeholder) */}
+          <motion.button
+            className="w-14 h-14 rounded-full bg-slate-800 text-white flex items-center justify-center"
+            whileTap={{ scale: 0.9 }}
+          >
+            <Volume2 className="w-6 h-6" />
+          </motion.button>
+        </div>
+
+        {/* Status */}
+        <div className="text-center mt-4">
+          <p className="text-xs text-slate-500">
+            {agent.isConnecting
+              ? "Connecting..."
+              : agent.isConnected
+              ? agent.micMuted
+                ? "Mic muted — tap to unmute"
+                : "Listening..."
+              : agent.error || "Tap a language to start"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
