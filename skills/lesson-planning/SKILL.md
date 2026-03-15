@@ -291,6 +291,76 @@ learning path.
 
 ---
 
+## Step 1b: Research Content via Tavily Search
+
+Before writing ANY lesson content, you MUST search for real sources. This is not optional.
+
+### Search Protocol
+
+```yaml
+minimum_searches_per_lesson: 2
+search_tool: Tavily MCP (search_depth: "advanced")
+fallback_tool: Brave Search (when Tavily returns <3 results)
+
+search_by_domain:
+  computer-science:
+    search_1: "{concept} {language} documentation tutorial"
+    search_2: "{concept} best practices real-world example"
+    goal: Find official docs, verified code patterns, and real usage
+
+  finance-business:
+    search_1: "{concept} case study real company example"
+    search_2: "{concept} financial data analysis {year}"
+    goal: Find real market data, company examples, regulatory references
+
+  economics:
+    search_1: "{concept} economic study empirical evidence"
+    search_2: "{concept} policy impact data {country}"
+    goal: Find real economic data, policy outcomes, academic papers
+
+  religious-studies:
+    search_1: "{tradition} {concept} {scripture_name} verse chapter"
+    search_2: "{tradition} {concept} scholarly commentary academic"
+    extra: "{tradition} {concept} historical context"
+    goal: Verify scripture citations, find real scholars, confirm historical claims
+
+  philosophy:
+    search_1: "{philosopher} {concept} primary text Stanford Encyclopedia"
+    search_2: "{concept} philosophical argument analysis academic"
+    goal: Verify primary source citations, find scholarly analysis
+
+  political-strategy:
+    search_1: "{topic} geopolitical analysis think tank report {year}"
+    search_2: "{topic} historical case study diplomatic"
+    goal: Find real policy documents, think tank analyses, historical precedents
+
+  health-wellness:
+    search_1: "{topic} study PubMed meta-analysis evidence"
+    search_2: "{topic} WHO CDC guidelines recommendations"
+    goal: Find peer-reviewed evidence, official health guidelines
+    mandatory_disclaimer: true
+
+content_from_search:
+  - Extract specific facts, statistics, and quotes from search results
+  - Cite the actual source (author, title, publication, year, URL)
+  - If a search returns no useful results, note "No direct evidence found"
+  - NEVER invent a citation — every source must come from a search result
+  - Cross-reference: if two searches agree on a fact, it's stronger evidence
+```
+
+### Search Integration in Lesson Flow
+
+```
+1. Receive module context
+2. Run 2+ Tavily searches for the lesson's core concept
+3. Extract real sources, quotes, data from search results
+4. Write lesson content incorporating real sources
+5. Add citations in the domain's citation format
+6. Add deeper reading from search results
+```
+
+---
+
 ## Step 2: Content Generation Rules
 
 ### For ALL Domains

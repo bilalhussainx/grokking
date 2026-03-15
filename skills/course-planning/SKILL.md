@@ -142,6 +142,28 @@ domains:
       - Use real historical cases as primary teaching material
       - Separate descriptive analysis from normative judgment
       - Mark opinion vs. fact explicitly
+
+  health-wellness:
+    variations:
+      - mental-health          # CBT, mindfulness, anxiety/depression, emotional regulation
+      - physical-fitness       # Exercise science, strength training, flexibility, cardio
+      - nutrition              # Macros, meal planning, dietary science, supplements
+      - sleep-science          # Circadian rhythms, sleep hygiene, recovery
+      - stress-management      # Burnout prevention, resilience, work-life balance
+      - meditation-mindfulness # Techniques, traditions, neuroscience of meditation
+      - sports-psychology      # Performance, motivation, mental toughness
+      - holistic-health        # Integrative approaches, traditional medicine overview
+    teaching_archetype: practice-and-reflect
+    assessment_style: self-assessment-and-journaling
+    citation_standard: medical-journals-and-guidelines
+    special_rules:
+      - ALWAYS include medical disclaimer: "This is educational, not medical advice"
+      - Cite peer-reviewed studies (PubMed, Lancet, JAMA, NEJM)
+      - Distinguish evidence-based practices from anecdotal claims
+      - Include practical exercises the student can do TODAY
+      - Voice agent checks in on student's wellbeing, not just knowledge
+      - Never diagnose or prescribe — always recommend consulting professionals
+      - Mark confidence levels on health claims (strong evidence vs emerging)
 ```
 
 ### Variation Detection Rules
@@ -539,6 +561,16 @@ voice_personas:
     name: "Director Chen"
     style: "Intelligence analyst — briefing style, framework-heavy, neutral"
     greeting: "Good to have you. Let's assess the situation."
+
+  health-wellness:
+    name: "Dr. Amara"
+    style: "Health coach — warm, evidence-based, empowering, non-judgmental"
+    greeting: "Welcome! Let's learn how to take better care of yourself."
+    special_behavior:
+      - Always start sessions asking how the student is feeling
+      - Frame health topics positively (what TO do, not what NOT to do)
+      - Include practical micro-exercises during lessons
+      - End sessions with one actionable takeaway
 ```
 
 ---
@@ -681,6 +713,16 @@ video_assignment_rules:
 - Historical: Source, Date, Context description
 ```
 
+### Health & Wellness
+```
+- Medical journals: Author (Year). "Title." Journal, Volume(Issue), Pages. DOI.
+- Prefer: PubMed, Lancet, JAMA, NEJM, BMJ
+- Guidelines: WHO, CDC, NHS, APA — Guideline name, Year, Section
+- Meta-analyses preferred over single studies
+- Always note sample size and study design (RCT > cohort > case study)
+- DISCLAIMER: "This content is educational and not a substitute for professional medical advice."
+```
+
 ---
 
 ## Step 7: User Learning Profile Integration
@@ -740,7 +782,96 @@ RULES:
 
 ---
 
-## Step 8: Course Prerequisites & Cross-References
+## Step 8: Research-Backed Content Generation (Tavily + Gemini)
+
+### Tavily Search Protocol
+
+Every course and lesson MUST be grounded in real, searchable sources. Use Tavily MCP
+search (`search_depth: "advanced"`) to find real studies, articles, and primary sources.
+
+**Minimum searches per concept:**
+
+```yaml
+search_requirements:
+  per_course_design:
+    - 2 searches to verify the field/topic has sufficient teaching material
+    - 1 search per module to find primary sources and key references
+    - Total: ~10-15 searches per course design phase
+
+  per_lesson_content:
+    - 2 searches minimum per core concept taught in the lesson
+    - 1 search for real-world examples or case studies
+    - 1 search for scholarly commentary (advanced level only)
+    - Total: ~3-6 searches per lesson
+
+  per_religious_tradition:
+    - 2 searches for primary scripture citations (verify chapter/verse accuracy)
+    - 2 searches for scholarly interpretation (find real scholars, real books)
+    - 1 search for cultural/historical context
+    - Total: ~5 searches per religious lesson
+
+  per_health_topic:
+    - 2 searches on PubMed/medical journals for evidence
+    - 1 search for WHO/CDC/NHS guidelines
+    - 1 search for practical implementation resources
+    - Total: ~4 searches per health lesson
+
+search_strategy:
+  primary_tool: Tavily (search_depth: "advanced")
+  fallback: Brave Search (when Tavily returns <3 relevant results)
+  query_format:
+    academic: "{topic} study PubMed {year_range}"
+    scripture: "{tradition} {concept} {scripture_name} chapter verse"
+    practical: "{topic} best practices evidence-based"
+    code: "{language} {concept} documentation official"
+
+  verification_rules:
+    - Every cited source must come from an actual search result
+    - Verify URLs resolve to real pages (discard 404s)
+    - Prefer sources in order: PubMed > Google Scholar > DOI > gov sites > universities
+    - NEVER fabricate a citation — if no source found, say "No direct evidence found"
+    - Cross-reference: if search A finds a claim, search B should verify it
+```
+
+### Gemini Embeddings for Content Discovery
+
+Use Gemini embeddings to find gaps in existing course coverage and generate new content:
+
+```yaml
+embedding_workflow:
+  step_1_embed_existing:
+    - Embed all existing course descriptions and module titles
+    - Store in Supabase pgvector (course_embeddings table)
+
+  step_2_identify_gaps:
+    - Embed user search queries and weak_topics from profiles
+    - Find queries with low similarity to any existing course (<0.5)
+    - These gaps = potential new courses or modules
+
+  step_3_generate_from_gap:
+    - Take the gap topic
+    - Run 3-5 Tavily searches to gather source material
+    - Feed sources + skill file instructions to course-planning
+    - Generate course skeleton grounded in real search results
+
+  step_4_embed_new_content:
+    - Embed the new course for future recommendations
+    - Link to existing courses via prerequisite/companion system
+
+dynamic_course_from_embeddings:
+  trigger: "User searches for topic with <0.5 similarity to any course"
+  action: |
+    1. Log the search query
+    2. After 5+ unique users search for similar topics:
+       a. Run Tavily searches for source material
+       b. Generate course using course-planning skill
+       c. Flag for admin review
+       d. Publish when approved
+```
+
+---
+
+## Step 9: Course Prerequisites & Cross-References
 
 ### Prerequisites System
 

@@ -81,6 +81,15 @@ const DOMAIN_REGISTRY = {
     teaching_archetype: "scenario-briefing",
     assessment_style: "policy-memo-and-simulation",
   },
+  "health-wellness": {
+    variations: [
+      "mental-health", "physical-fitness", "nutrition",
+      "sleep-science", "stress-management", "meditation-mindfulness",
+      "sports-psychology", "holistic-health",
+    ],
+    teaching_archetype: "practice-and-reflect",
+    assessment_style: "self-assessment-and-journaling",
+  },
 } as const;
 
 // ─── Skill File Reader ───
@@ -154,7 +163,7 @@ to generate the Course TypeScript object.`,
     title: z.string().describe("Course title, e.g., 'Islam: Foundations & Practice'"),
     domain: z.enum([
       "computer-science", "finance-business", "economics",
-      "religious-studies", "philosophy", "political-strategy",
+      "religious-studies", "philosophy", "political-strategy", "health-wellness",
     ]).describe("Primary domain for this course"),
     variation: z.string().describe("Specific variation within the domain, e.g., 'islam', 'web-development'"),
     level: z.enum(["beginner", "advanced"]).describe("Target education level"),
@@ -230,7 +239,7 @@ to generate the Lesson TypeScript object.`,
     course_title: z.string().describe("Course title"),
     domain: z.enum([
       "computer-science", "finance-business", "economics",
-      "religious-studies", "philosophy", "political-strategy",
+      "religious-studies", "philosophy", "political-strategy", "health-wellness",
     ]).describe("Course domain"),
     variation: z.string().describe("Domain variation"),
     level: z.enum(["beginner", "advanced"]).describe("Education level"),
