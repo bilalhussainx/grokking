@@ -27,8 +27,8 @@ import { englishBeginnerCourse } from "./english-beginner";
 import { englishIntermediateCourse } from "./english-intermediate";
 import { englishAdvancedCourse } from "./english-advanced";
 
-// ── Urdu ──
-import { urduA1Course } from "./urdu-a1";
+// ── Urdu — Not supported, excluded from build ──
+// import { urduA1Course } from "./urdu-a1";
 
 // ── Re-exports ──
 
@@ -57,8 +57,7 @@ export { englishBeginnerCourse, getEnglishBeginnerLessons, findEnglishBeginnerLe
 export { englishIntermediateCourse } from "./english-intermediate";
 export { englishAdvancedCourse } from "./english-advanced";
 
-// Urdu
-export { urduA1Course, getUrduA1Lessons, findUrduA1Lesson } from "./urdu-a1";
+// Urdu — not supported
 
 // ── Course Registry ──
 
@@ -83,8 +82,6 @@ export const languageCourses: LanguageCourse[] = [
   englishBeginnerCourse,
   englishIntermediateCourse,
   englishAdvancedCourse,
-  // Urdu
-  urduA1Course,
 ];
 
 // ── Lookup Functions ──
@@ -110,7 +107,6 @@ export function getSupportedLanguages() {
     hi: "\u{1F1EE}\u{1F1F3}", // India
     zh: "\u{1F1E8}\u{1F1F3}", // China
     en: "\u{1F1EC}\u{1F1E7}", // UK
-    ur: "\u{1F1F5}\u{1F1F0}", // Pakistan
   };
 
   languageCourses.forEach((course) => {

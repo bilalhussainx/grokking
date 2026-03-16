@@ -1460,7 +1460,6 @@ export interface VoiceAgentConfig {
   lessonTitle?: string;
   moduleTitle?: string;
   courseTitle?: string;
-  voiceId?: string;
 }
 
 // Adapter: normalize both persona types into a common voice config

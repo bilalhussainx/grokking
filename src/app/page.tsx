@@ -325,7 +325,7 @@ export default function HomePage() {
           <div className="flex flex-wrap gap-3">
             {ALL_SUPPORTED_LANGUAGES
               .filter(l => l.code !== (typeof window !== 'undefined' ? localStorage.getItem('native-language') : 'en'))
-              .filter(l => l.code !== 'en-IN') // Skip duplicate English-IN
+              .filter(l => (l.code as string) !== 'en-IN') // Skip duplicate English-IN
               .slice(0, 8)
               .map((l) => (
               <Link key={l.code} href={`/talk?lang=${l.code}`}>

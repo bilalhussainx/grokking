@@ -18,7 +18,7 @@ interface LessonContentProps {
 
 // Strip HTML voice coaching comments that shouldn't render
 function stripVoiceComments(markdown: string): string {
-  return markdown.replace(/<!--\s*voice:.*?-->/gs, "");
+  return markdown.replace(new RegExp('<!--\\s*voice:.*?-->', 'gs'), "");
 }
 
 export default function LessonContent({ content, showGlossary = true, courseDomain }: LessonContentProps) {

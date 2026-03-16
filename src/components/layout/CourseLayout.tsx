@@ -35,6 +35,11 @@ export default function CourseLayout({
   const langCourse = getLanguageCourse(courseSlug);
   const isLanguageCourse = !!langCourse;
 
+  // Find the current lesson in the language course for context
+  const currentLangLesson = langCourse?.modules
+    .flatMap(m => m.lessons)
+    .find(l => l.slug === currentLessonId || l.id === currentLessonId);
+
   // Inject course-specific props into the global TopNav
   useEffect(() => {
     setOverrides({
@@ -68,9 +73,12 @@ export default function CourseLayout({
               <LanguageTutorPanel
                 language={langCourse.language}
                 languageName={langCourse.languageName}
-                lessonTitle={courseTitle}
+                lessonTitle={currentLangLesson?.title ?? courseTitle}
                 courseTitle={courseTitle}
-                proficiencyLevel="A1"
+                proficiencyLevel={langCourse.proficiencyLevel || "A1"}
+                targetPhrases={currentLangLesson?.voiceScenarios?.flatMap(s => s.targetPhrases || []) || []}
+                vocabulary={currentLangLesson?.vocabulary?.map(v => `${v.word} (${v.translation})`) || []}
+                grammarFocus={currentLangLesson?.grammarPoints?.map(g => g.title) || []}
               />
             </div>
           )}

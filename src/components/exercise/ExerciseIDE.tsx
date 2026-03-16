@@ -110,6 +110,8 @@ export default function ExerciseIDE({
   // Set lesson context for coach
   useEffect(() => {
     setLessonContext({
+      courseSlug,
+      lessonSlug: lesson.slug,
       courseTitle,
       moduleTitle,
       lessonTitle: lesson.title,

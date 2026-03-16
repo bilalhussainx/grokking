@@ -70,7 +70,7 @@ async function main() {
       exclude_domain: lessonDomain,
       match_count: 2,
       match_threshold: 0.65,
-    }).catch(() => ({ data: null }));
+    }).then(r => r, () => ({ data: null }));
 
     // If RPC doesn't exist yet, use a raw approach
     if (!matches) {
