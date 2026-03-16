@@ -150,8 +150,19 @@ async function generateCoursePlan(spec: CourseSpec): Promise<any[]> {
 
   const systemPrompt = `You are a curriculum designer for Samsara.ai.
 
+QUALITY STANDARD (from content-orchestrator):
+- ONE excellent course beats ten mediocre ones
+- Each module has clear input→output learning transformation
+- Each lesson teaches ONE concept COMPLETELY
+- Example BEFORE abstraction in every lesson
+- Checkpoints celebrate progress, never punish (pass threshold 50%)
+- Voice markers required: <!-- voice:section_check --> and <!-- voice:key_insight -->
+
 COURSE DESIGN PRINCIPLES:
-${courseSkill.slice(0, 3000)}
+${courseSkill.slice(0, 4000)}
+
+DOMAIN-SPECIFIC RULES:
+${courseSkill.slice(courseSkill.indexOf('special_rules:'), courseSkill.indexOf('special_rules:') + 1000)}
 
 Return a JSON array of ${spec.moduleCount} modules. Each module has:
 - id: kebab-case
