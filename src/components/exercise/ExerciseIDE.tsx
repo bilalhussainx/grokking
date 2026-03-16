@@ -7,7 +7,7 @@ import {
   Lightbulb, Award, Terminal as TerminalIcon, BotMessageSquare,
   Code2, FileCode,
 } from "lucide-react";
-import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from "react-resizable-panels";
+import { Panel, Group, Separator } from "react-resizable-panels";
 import CodeEditor from "@/components/ide/CodeEditor";
 import LessonContent from "@/components/lesson/LessonContent";
 import { useAI } from "@/contexts/AIContext";
@@ -508,7 +508,7 @@ export default function ExerciseIDE({
       {header}
 
       <main className="flex-1 min-h-0 overflow-hidden">
-        <PanelGroup direction="horizontal" className="h-full">
+        <Group orientation="horizontal" className="h-full">
           {/* ── LEFT: Problem / Solution ── */}
           <Panel
             defaultSize={28}
@@ -576,13 +576,13 @@ export default function ExerciseIDE({
             </div>
           </Panel>
 
-          <PanelResizeHandle className="w-1.5 bg-white/[0.04] hover:bg-cyan-500/20 transition-colors cursor-col-resize flex items-center justify-center group">
+          <Separator className="w-1.5 bg-white/[0.04] hover:bg-cyan-500/20 transition-colors cursor-col-resize flex items-center justify-center group">
             <div className="w-0.5 h-8 rounded-full bg-white/10 group-hover:bg-cyan-400/50 transition-colors" />
-          </PanelResizeHandle>
+          </Separator>
 
           {/* ── RIGHT: Editor + Diagnostics (vertical split) ── */}
           <Panel defaultSize={72} minSize={50} className="flex flex-col">
-            <PanelGroup direction="vertical" className="h-full">
+            <Group orientation="vertical" className="h-full">
               {/* Code Editor */}
               <Panel defaultSize={60} minSize={30}>
                 <div className="h-full flex flex-col">
@@ -612,7 +612,7 @@ export default function ExerciseIDE({
                 </div>
               </Panel>
 
-              <PanelResizeHandle className="h-1.5 bg-white/[0.04] hover:bg-cyan-500/20 transition-colors cursor-row-resize" />
+              <Separator className="h-1.5 bg-white/[0.04] hover:bg-cyan-500/20 transition-colors cursor-row-resize" />
 
               {/* Diagnostics */}
               <Panel
@@ -622,9 +622,9 @@ export default function ExerciseIDE({
               >
                 {bottomContent}
               </Panel>
-            </PanelGroup>
+            </Group>
           </Panel>
-        </PanelGroup>
+        </Group>
       </main>
     </div>
   );
