@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
     personaId,
     voiceId,
     mode = "coach", // "coach" | "interviewer"
+    language = "en",
     lessonContext,
   } = body;
 
@@ -48,11 +49,37 @@ export async function POST(req: NextRequest) {
       ? getInterviewerPersona(personaId || "interviewer-mentor")
       : getCoachPersona(personaId || "alex");
 
-  // Select voice (user preference > persona default)
-  const voice = getVoice(voiceId || persona.defaultVoice);
+  // Select voice — use native-accent voice for the selected language
+  const LANGUAGE_VOICES: Record<string, string> = {
+    en: "aura-2-thalia-en",
+    es: "aura-2-diana-es",
+    fr: "aura-2-agathe-fr",
+    de: "aura-2-viktoria-de",
+    it: "aura-2-livia-it",
+    ja: "aura-2-izanami-ja",
+    nl: "aura-2-rhea-nl",
+    zh: "aura-2-izanami-ja", // TODO: Chinese-specific voice when available
+    hi: "aura-2-thalia-en",  // Hindi uses Sarvam pipeline, not Deepgram TTS
+  };
+  const voiceModel = language !== "en"
+    ? LANGUAGE_VOICES[language] || "aura-2-thalia-en"
+    : getVoice(voiceId || persona.defaultVoice).deepgramModel;
+
+  // Language names for the system prompt
+  const LANGUAGE_NAMES: Record<string, string> = {
+    en: "English", es: "Spanish", fr: "French", de: "German",
+    it: "Italian", ja: "Japanese", nl: "Dutch", hi: "Hindi", zh: "Mandarin Chinese",
+  };
+  const langName = LANGUAGE_NAMES[language] || "English";
 
   // Build context-aware prompt with full lesson material
   let contextPrompt = persona.systemPrompt;
+
+  // Language instruction — teach in the selected language
+  if (language !== "en") {
+    contextPrompt += `\n\n## LANGUAGE INSTRUCTION\nThe student has chosen to learn in ${langName}. You MUST:\n- Speak and respond entirely in ${langName}\n- Explain all concepts in ${langName}\n- Use natural ${langName} phrasing and accent — do NOT read ${langName} words with English pronunciation\n- If the lesson content is in English, translate and explain it in ${langName}\n- Only use English for technical terms that have no good translation`;
+  }
+
   if (lessonTitle) {
     contextPrompt += `\n\nCURRENT LESSON: ${courseTitle || "Course"} > ${moduleTitle || ""} > ${lessonTitle}`;
   }
@@ -85,7 +112,7 @@ export async function POST(req: NextRequest) {
       },
     },
     agent: {
-      language: "en",
+      language: language || "en",
       listen: {
         provider: {
           type: "deepgram",
@@ -109,7 +136,7 @@ export async function POST(req: NextRequest) {
       speak: {
         provider: {
           type: "deepgram",
-          model: voice.deepgramModel,
+          model: voiceModel,
         },
       },
       greeting,
