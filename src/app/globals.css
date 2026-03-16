@@ -344,3 +344,12 @@ pre code.hljs {
 .sidebar-active-glow {
   box-shadow: inset 3px 0 0 #3b82f6, 0 0 15px -3px rgba(59, 130, 246, 0.2);
 }
+
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

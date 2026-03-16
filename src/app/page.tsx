@@ -257,27 +257,68 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* Two Action Cards */}
-        <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-16">
+        {/* ── SECTION 1: Continue Learning (logged-in users with progress) ── */}
+        {user && inProgressCourses.length > 0 && (
+          <motion.div variants={item} className="mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
+                Continue Learning
+              </h3>
+              <Link href="/courses" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                View all
+              </Link>
+            </div>
+            {/* Horizontal scroll on mobile, grid on desktop */}
+            <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory md:grid md:grid-cols-3 md:overflow-visible md:pb-0 scrollbar-hide">
+              {inProgressCourses.map((course) => {
+                const progress = courseProgress[course.slug] ?? 0;
+                return (
+                  <Link key={course.slug} href={`/course/${course.slug}`} className="snap-start shrink-0 w-[260px] md:w-auto">
+                    <div className="rounded-xl bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-slate-700/40 p-4 hover:bg-slate-800/80 hover:border-emerald-500/30 transition-all cursor-pointer h-full">
+                      <div className="flex items-start justify-between mb-3">
+                        <span className="text-3xl">{course.icon}</span>
+                        <ProgressRing progress={progress} size={36} strokeWidth={2.5} />
+                      </div>
+                      <div className="text-sm font-semibold text-white mb-1">{course.title}</div>
+                      {/* Progress bar */}
+                      <div className="w-full h-1.5 bg-slate-700/50 rounded-full overflow-hidden mb-2">
+                        <div
+                          className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full transition-all"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-slate-500">{progress}% complete</span>
+                        <span className="text-xs text-emerald-400 font-medium">Continue →</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── SECTION 2: Two Action Cards (Talk + Learn) ── */}
+        <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
           {/* Talk Card */}
           <Link href="/talk">
             <motion.div
-              className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-slate-900/80 to-slate-900/80 backdrop-blur-sm p-8 cursor-pointer h-full"
+              className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-slate-900/80 to-slate-900/80 backdrop-blur-sm p-6 md:p-8 cursor-pointer h-full"
               whileHover={{ scale: 1.02, borderColor: "rgba(16, 185, 129, 0.4)" }}
               transition={{ duration: 0.2 }}
             >
-              {/* Glow */}
               <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-colors" />
-
               <div className="relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center mb-5">
-                  <Mic className="w-7 h-7 text-emerald-400" />
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center mb-4">
+                  <Mic className="w-6 h-6 md:w-7 md:h-7 text-emerald-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Talk</h2>
-                <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                  Start a voice conversation with an AI tutor in any language. Practice speaking naturally with instant feedback.
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Talk</h2>
+                <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-4">
+                  Voice conversation with AI tutors in 18 languages.
                 </p>
-                <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium group-hover:gap-3 transition-all">
+                <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
                   Start Talking <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
@@ -287,22 +328,20 @@ export default function HomePage() {
           {/* Learn Card */}
           <Link href="/courses">
             <motion.div
-              className="group relative overflow-hidden rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-slate-900/80 to-slate-900/80 backdrop-blur-sm p-8 cursor-pointer h-full"
+              className="group relative overflow-hidden rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-slate-900/80 to-slate-900/80 backdrop-blur-sm p-6 md:p-8 cursor-pointer h-full"
               whileHover={{ scale: 1.02, borderColor: "rgba(59, 130, 246, 0.4)" }}
               transition={{ duration: 0.2 }}
             >
-              {/* Glow */}
               <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors" />
-
               <div className="relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center mb-5">
-                  <BookOpen className="w-7 h-7 text-blue-400" />
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center mb-4">
+                  <BookOpen className="w-6 h-6 md:w-7 md:h-7 text-blue-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Learn</h2>
-                <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                  Structured courses in tech, languages, and finance. From beginner to advanced with AI coaching.
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Learn</h2>
+                <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-4">
+                  50+ courses in tech, languages, finance &amp; more.
                 </p>
-                <div className="flex items-center gap-2 text-blue-400 text-sm font-medium group-hover:gap-3 transition-all">
+                <div className="flex items-center gap-2 text-blue-400 text-sm font-medium">
                   Browse Courses <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
@@ -310,27 +349,25 @@ export default function HomePage() {
           </Link>
         </motion.div>
 
-        {/* Featured Courses */}
-        <FeaturedCourses interests={userInterests} />
-
-        {/* Quick Voice Practice — personalized by user's native language */}
-        <motion.div variants={item} className="mb-16">
-          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">
+        {/* ── SECTION 3: Quick Voice Practice ── */}
+        <motion.div variants={item} className="mb-10">
+          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <Mic className="w-3.5 h-3.5 text-emerald-400" />
             Quick Voice Practice
           </h3>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex gap-2 overflow-x-auto pb-2 snap-x scrollbar-hide md:flex-wrap md:overflow-visible md:pb-0">
             {ALL_SUPPORTED_LANGUAGES
               .filter(l => l.code !== (typeof window !== 'undefined' ? localStorage.getItem('native-language') : 'en'))
-              .filter(l => (l.code as string) !== 'en-IN') // Skip duplicate English-IN
+              .filter(l => (l.code as string) !== 'en-IN')
               .slice(0, 8)
               .map((l) => (
-              <Link key={l.code} href={`/talk?lang=${l.code}`}>
+              <Link key={l.code} href={`/talk?lang=${l.code}`} className="snap-start shrink-0">
                 <motion.button
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/50 text-slate-300 text-sm hover:bg-slate-800 hover:border-slate-600 hover:text-white transition-all"
+                  className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/50 text-slate-300 text-xs md:text-sm hover:bg-slate-800 hover:border-slate-600 hover:text-white transition-all whitespace-nowrap"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  <span className="text-lg">{l.flag}</span>
+                  <span className="text-base md:text-lg">{l.flag}</span>
                   {l.name}
                 </motion.button>
               </Link>
@@ -338,35 +375,8 @@ export default function HomePage() {
           </div>
         </motion.div>
 
-        {/* Continue Learning (logged in users with courses in progress) */}
-        {user && inProgressCourses.length > 0 && (
-          <motion.div variants={item}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">
-                Continue Learning
-              </h3>
-              <Link href="/courses" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-                View all
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {inProgressCourses.map((course) => (
-                <Link key={course.slug} href={`/course/${course.slug}`}>
-                  <div className="rounded-xl bg-slate-800/40 border border-slate-700/40 p-4 hover:bg-slate-800/60 hover:border-slate-600/50 transition-all cursor-pointer">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-2xl">{course.icon}</span>
-                      <ProgressRing progress={courseProgress[course.slug] ?? 0} size={28} strokeWidth={2} />
-                    </div>
-                    <div className="text-sm font-medium text-slate-200">{course.title}</div>
-                    <div className="text-xs text-slate-500 mt-0.5">
-                      {courseProgress[course.slug]}% complete
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </motion.div>
-        )}
+        {/* ── SECTION 4: Featured Courses (Recommended + Premium + Free) ── */}
+        <FeaturedCourses interests={userInterests} />
       </motion.div>
     </div>
   );
