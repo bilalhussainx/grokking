@@ -139,7 +139,7 @@ export default function LessonPage({
         progress={progress}
       >
         <div
-          className={`max-w-4xl mx-auto px-6 py-8 transition-all ${isPanelOpen ? "mt-11" : ""}`}
+          className={`max-w-4xl mx-auto px-6 py-8 transition-all `}
         >
           {/* Module breadcrumb */}
           <div className="flex items-center gap-2 text-xs text-white/40 mb-4">
@@ -243,7 +243,7 @@ export default function LessonPage({
         {/* Main Split Layout */}
         <PanelGroup
           orientation="horizontal"
-          className={`flex-1 min-h-0 ${isPanelOpen ? "mt-11" : ""}`}
+          className={`flex-1 min-h-0 `}
         >
           {/* ─── Left Panel: Lesson Content ─── */}
           <Panel defaultSize={45} minSize={30} maxSize={65}>

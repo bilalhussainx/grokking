@@ -419,6 +419,32 @@ export default function AICoach() {
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-[var(--background)]">
+      {/* Header */}
+      <div className="p-3 border-b border-white/[0.06] shrink-0">
+        <div className="flex items-center gap-2.5 mb-1">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs shadow-lg shadow-blue-500/20">
+            🎓
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold text-white">{getCoachPersona(selectedPersona).name}</h3>
+            <p className="text-[10px] text-white/40">
+              {deepgram.isConnecting ? 'Connecting...' :
+               isVoiceActive && agentSpeaking ? 'Speaking...' :
+               isVoiceActive ? 'Voice Mode' :
+               'AI Coding Coach'}
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 text-[10px]">
+            <Timer className="w-3 h-3 text-blue-400" />
+            <span className="text-blue-400 font-mono">{sessionTime}</span>
+          </div>
+        </div>
+        {lessonContext && (
+          <div className="text-[10px] text-white/30 truncate">
+            {lessonContext.moduleTitle} → {lessonContext.lessonTitle}
+          </div>
+        )}
+      </div>
 
       {/* Voice Control Bar */}
       <div className="px-3 py-2 border-b border-white/[0.06] flex items-center gap-2 shrink-0">
@@ -536,6 +562,25 @@ export default function AICoach() {
           </div>
         ))}
         <div ref={messagesEndRef} />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="px-3 py-2 border-t border-white/[0.06] flex gap-1.5 shrink-0">
+        <button onClick={handleHint} disabled={isStreaming}
+          className="flex-1 py-1.5 bg-violet-500/15 hover:bg-violet-500/25 text-violet-400 rounded-lg flex items-center justify-center gap-1 transition-colors text-[11px] font-semibold disabled:opacity-30">
+          <Lightbulb className="w-3 h-3" />
+          Hint{hintsGiven > 0 ? ` (${hintsGiven})` : ''}
+        </button>
+        <button onClick={handleExplain} disabled={isStreaming}
+          className="flex-1 py-1.5 bg-white/[0.04] hover:bg-white/[0.08] text-white/50 hover:text-white/70 rounded-lg flex items-center justify-center gap-1 transition-colors text-[11px] font-medium disabled:opacity-30">
+          <MessageCircle className="w-3 h-3" />
+          Explain
+        </button>
+        <button onClick={handleCelebrate} disabled={isStreaming}
+          className="flex-1 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 rounded-lg flex items-center justify-center gap-1 transition-colors text-[11px] font-semibold disabled:opacity-30">
+          <Trophy className="w-3 h-3" />
+          Solved!
+        </button>
       </div>
 
       {/* Chat Input */}
