@@ -35,18 +35,13 @@ const INTEREST_TO_DOMAIN: Record<string, string[]> = {
   'personal-growth': ['health', 'wellness', 'leadership', 'philosophy'],
 };
 
-function FeaturedCourses() {
+function FeaturedCourses({ interests = [] }: { interests?: string[] }) {
   const featured = getFeaturedCourses(courses);
   if (featured.length === 0) return null;
 
-  // Get user's interests from localStorage for personalized sorting
-  const userInterests = typeof window !== 'undefined'
-    ? JSON.parse(localStorage.getItem('learning-interests') || '[]')
-    : [];
-
   // Build domain relevance set from user interests
   const relevantDomains = new Set<string>();
-  userInterests.forEach((interest: string) => {
+  interests.forEach((interest: string) => {
     (INTEREST_TO_DOMAIN[interest] || []).forEach(d => relevantDomains.add(d));
   });
 
@@ -192,6 +187,7 @@ function FeaturedCourses() {
 export default function HomePage() {
   const { user, profile } = useAuth();
   const [showWizard, setShowWizard] = useState(false);
+  const [userInterests, setUserInterests] = useState<string[]>([]);
   const courseProgress = useCourseProgress();
 
   // Get courses user has started (progress > 0, not 100%)
@@ -202,18 +198,27 @@ export default function HomePage() {
     })
     .slice(0, 4);
 
+  // Load user preferences — from localStorage first, then Supabase
   useEffect(() => {
+    // Try localStorage first for instant load
+    const cachedInterests = localStorage.getItem('learning-interests');
+    if (cachedInterests) {
+      try { setUserInterests(JSON.parse(cachedInterests)); } catch {}
+    }
+
     if (user && !localStorage.getItem("onboarding_complete")) {
-      // Check if the new onboarding has been completed
+      // Sync from Supabase
       fetch('/api/user/preferences')
         .then(r => r.ok ? r.json() : null)
         .then(prefs => {
           if (prefs?.onboarding_completed) {
-            // Sync to localStorage
             localStorage.setItem('onboarding_complete', 'true');
             if (prefs.native_language) localStorage.setItem('native-language', prefs.native_language);
             if (prefs.instruction_language) localStorage.setItem('coach-language', prefs.instruction_language);
-            if (prefs.learning_interests) localStorage.setItem('learning-interests', JSON.stringify(prefs.learning_interests));
+            if (prefs.learning_interests) {
+              localStorage.setItem('learning-interests', JSON.stringify(prefs.learning_interests));
+              setUserInterests(prefs.learning_interests);
+            }
           } else {
             setShowWizard(true);
           }
@@ -315,7 +320,7 @@ export default function HomePage() {
         </motion.div>
 
         {/* Featured Courses */}
-        <FeaturedCourses />
+        <FeaturedCourses interests={userInterests} />
 
         {/* Quick Voice Practice — personalized by user's native language */}
         <motion.div variants={item} className="mb-16">
