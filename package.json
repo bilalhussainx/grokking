@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "generate:course": "tsx scripts/generate-flagship-course.ts"
+    "generate:course": "tsx scripts/generate-flagship-course.ts",
+    "test": "playwright test",
+    "test:mobile": "playwright test --project='Mobile iPhone 14'",
+    "test:desktop": "playwright test --project='Desktop Chrome'",
+    "test:ui": "playwright test --ui"
   },
   "dependencies": {
     "@11labs/react": "^0.2.0",
@@ -49,6 +53,7 @@
     "yjs": "^13.6.29"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

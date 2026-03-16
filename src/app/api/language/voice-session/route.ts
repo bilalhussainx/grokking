@@ -160,11 +160,14 @@ Focus this conversation on practicing the current lesson material.
 - Gently redirect if the conversation drifts too far from the lesson material`;
     }
 
-    // Pick a native-language voice based on persona style
+    // Pick a native-language voice — must match the target language
     const lang = language as string;
-    const deepgramVoice = persona.style === "conversational"
-      ? (DEEPGRAM_VOICES_MALE[lang] || DEEPGRAM_VOICES_MALE.en)
-      : (DEEPGRAM_VOICES_FEMALE[lang] || DEEPGRAM_VOICES_FEMALE.en);
+    // Use persona's configured voice if available, otherwise default for language
+    const personaVoiceId = persona.defaultVoice?.voiceId;
+    const deepgramVoice = personaVoiceId
+      || DEEPGRAM_VOICES_FEMALE[lang]
+      || DEEPGRAM_VOICES_FEMALE.en;
+    console.log(`[voice-session] Language: ${lang}, Voice: ${deepgramVoice}, Persona: ${persona.id}`);
 
     // Build greeting
     const level = proficiencyLevel as ProficiencyLevel;
@@ -191,11 +194,11 @@ Focus this conversation on practicing the current lesson material.
         },
       },
       agent: {
+        language: lang, // CRITICAL: tells Deepgram which language the user speaks
         listen: {
           provider: {
             type: "deepgram",
             model: "nova-3",
-            language: "multi", // multilingual codeswitching
           },
         },
         think: {

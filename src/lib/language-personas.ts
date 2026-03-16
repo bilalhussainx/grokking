@@ -217,7 +217,7 @@ const SPANISH_STRICT: LanguagePersona = {
   style: 'strict',
   culturalBackground: 'Peninsular Spanish (Madrid)',
   description: 'Grammar-focused, corrects every mistake, formal speech',
-  defaultVoice: { provider: 'kokoro', voiceId: 'af' }, // Kokoro Spanish voice
+  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-diana-es' },
   adaptiveRules: COMMON_ADAPTIVE_RULES,
   systemPrompt: `You are Profesora Elena, a strict but fair Spanish teacher from Madrid.
 
@@ -259,7 +259,7 @@ const SPANISH_CONVERSATIONAL: LanguagePersona = {
   style: 'conversational',
   culturalBackground: 'Mexican Spanish (Mexico City)',
   description: 'Casual, natural flow, corrects only when meaning breaks',
-  defaultVoice: { provider: 'kokoro', voiceId: 'am' }, // Kokoro Spanish voice
+  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-javier-es' },
   adaptiveRules: COMMON_ADAPTIVE_RULES,
   systemPrompt: `You are Carlos, a friendly Mexican Spanish speaker from Mexico City.
 
@@ -302,7 +302,7 @@ const SPANISH_PATIENT: LanguagePersona = {
   style: 'patient',
   culturalBackground: 'Colombian Spanish (Bogotá)',
   description: 'Slow-paced, repeats often, native language scaffolding',
-  defaultVoice: { provider: 'kokoro', voiceId: 'af' }, // Kokoro Spanish voice
+  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-estrella-es' },
   adaptiveRules: COMMON_ADAPTIVE_RULES,
   systemPrompt: `You are Ana, a warm and patient Spanish guide from Bogotá, Colombia.
 
@@ -350,7 +350,7 @@ const FRENCH_STRICT: LanguagePersona = {
   style: 'strict',
   culturalBackground: 'Parisian French',
   description: 'Grammar-focused, corrects every mistake, formal speech',
-  defaultVoice: { provider: 'kokoro', voiceId: 'af' }, // Kokoro French voice
+  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-agathe-fr' },
   adaptiveRules: COMMON_ADAPTIVE_RULES,
   systemPrompt: `You are Professeur Laurent, a rigorous French teacher from Paris.
 
@@ -392,7 +392,7 @@ const FRENCH_CONVERSATIONAL: LanguagePersona = {
   style: 'conversational',
   culturalBackground: 'Québécois French (Montreal)',
   description: 'Casual, natural flow, corrects only when meaning breaks',
-  defaultVoice: { provider: 'kokoro', voiceId: 'af' }, // Kokoro French voice
+  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-hector-fr' },
   adaptiveRules: COMMON_ADAPTIVE_RULES,
   systemPrompt: `You are Camille, a friendly French Canadian from Montreal.
 
@@ -435,7 +435,7 @@ const FRENCH_PATIENT: LanguagePersona = {
   style: 'patient',
   culturalBackground: 'Swiss French (Geneva)',
   description: 'Slow-paced, repeats often, native language scaffolding',
-  defaultVoice: { provider: 'kokoro', voiceId: 'af' }, // Kokoro French voice
+  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-agathe-fr' },
   adaptiveRules: COMMON_ADAPTIVE_RULES,
   systemPrompt: `You are Sophie, a gentle and patient French guide from Geneva, Switzerland.
 
@@ -616,7 +616,7 @@ const MANDARIN_STRICT: LanguagePersona = {
   style: 'strict',
   culturalBackground: 'Beijing, formal academic',
   description: 'Precise, disciplined, emphasizes tones and character writing',
-  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-thalia-en' },
+  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-izanami-ja' },
   adaptiveRules: COMMON_ADAPTIVE_RULES,
   systemPrompt: `You are Professor Li, a disciplined Mandarin teacher from Beijing.
 
@@ -658,7 +658,7 @@ const MANDARIN_CONVERSATIONAL: LanguagePersona = {
   style: 'conversational',
   culturalBackground: 'Shanghai, modern urban',
   description: 'Friendly peer, natural chat, tech-savvy millennial',
-  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-orion-en' },
+  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-fujin-ja' },
   adaptiveRules: COMMON_ADAPTIVE_RULES,
   systemPrompt: `You are Xiao Ming, a friendly 二十多岁 (20-something) from Shanghai.
 
@@ -699,7 +699,7 @@ const MANDARIN_PATIENT: LanguagePersona = {
   style: 'patient',
   culturalBackground: 'Chengdu, warm and nurturing',
   description: 'Gentle, motherly, lots of encouragement, very slow pace',
-  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-thalia-en' },
+  defaultVoice: { provider: 'deepgram', voiceId: 'aura-2-izanami-ja' },
   adaptiveRules: COMMON_ADAPTIVE_RULES,
   systemPrompt: `You are Auntie Wang (Wāng Āyí), a warm motherly figure from Chengdu.
 
