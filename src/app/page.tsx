@@ -7,6 +7,7 @@ import { Mic, BookOpen, ArrowRight, Sparkles, Star } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { courses } from "@/data";
 import { getFeaturedCourses } from "@/data/types";
+import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
 import WelcomeWizard from "@/components/onboarding/WelcomeWizard";
 import LearningStats from "@/components/gamification/LearningStats";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
@@ -22,15 +23,89 @@ const item = {
   visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
 
+// Map onboarding interest IDs to course domain tags
+const INTEREST_TO_DOMAIN: Record<string, string[]> = {
+  coding: ['computer science', 'programming'],
+  'ai-ml': ['computer science', 'ai', 'machine learning'],
+  'system-design': ['computer science', 'system design'],
+  'interview-prep': ['computer science', 'interview'],
+  finance: ['finance', 'business'],
+  languages: ['language'],
+  religion: ['religious studies', 'philosophy'],
+  'personal-growth': ['health', 'wellness', 'leadership', 'philosophy'],
+};
+
 function FeaturedCourses() {
   const featured = getFeaturedCourses(courses);
   if (featured.length === 0) return null;
 
-  const premium = featured.filter(c => c.tier === 'pro');
-  const free = featured.filter(c => c.tier === 'free');
+  // Get user's interests from localStorage for personalized sorting
+  const userInterests = typeof window !== 'undefined'
+    ? JSON.parse(localStorage.getItem('learning-interests') || '[]')
+    : [];
+
+  // Build domain relevance set from user interests
+  const relevantDomains = new Set<string>();
+  userInterests.forEach((interest: string) => {
+    (INTEREST_TO_DOMAIN[interest] || []).forEach(d => relevantDomains.add(d));
+  });
+
+  // Sort: relevant courses first, then alphabetically
+  const sortedFeatured = [...featured].sort((a, b) => {
+    const aRelevant = a.domain && relevantDomains.has(a.domain) ? 1 : 0;
+    const bRelevant = b.domain && relevantDomains.has(b.domain) ? 1 : 0;
+    if (bRelevant !== aRelevant) return bRelevant - aRelevant;
+    return 0;
+  });
+
+  // Separate recommended (matching interests) from the rest
+  const recommended = relevantDomains.size > 0
+    ? sortedFeatured.filter(c => c.domain && relevantDomains.has(c.domain))
+    : [];
+  const nonRecommended = relevantDomains.size > 0
+    ? sortedFeatured.filter(c => !c.domain || !relevantDomains.has(c.domain))
+    : sortedFeatured;
+
+  const premium = nonRecommended.filter(c => c.tier === 'pro');
+  const free = nonRecommended.filter(c => c.tier === 'free');
 
   return (
     <motion.div variants={item} className="mb-16">
+      {/* Recommended for You — personalized based on onboarding interests */}
+      {recommended.length > 0 && (
+        <div className="mb-8">
+          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-violet-400" />
+            Recommended for You
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {recommended.map((course) => (
+              <Link key={course.id} href={`/course/${course.slug}`}>
+                <motion.div
+                  className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-violet-500/5 via-slate-800/80 to-slate-900/80 border border-violet-500/20 p-5 cursor-pointer h-full hover:border-violet-500/40 transition-all"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-400 text-xs font-semibold border border-violet-500/20">
+                    {course.tier === 'pro' ? 'Premium' : 'Free'}
+                  </div>
+                  <div className="text-3xl mb-3">{course.icon}</div>
+                  <h4 className="text-white font-semibold">{course.title}</h4>
+                  <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
+                  <div className="flex items-center gap-2 mt-3">
+                    {course.domain && (
+                      <span className="px-2 py-0.5 rounded bg-violet-500/10 text-violet-400 text-xs">
+                        {course.domain.replace(/-/g, ' ')}
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Premium Courses */}
       {premium.length > 0 && (
         <div className="mb-8">
@@ -129,7 +204,21 @@ export default function HomePage() {
 
   useEffect(() => {
     if (user && !localStorage.getItem("onboarding_complete")) {
-      setShowWizard(true);
+      // Check if the new onboarding has been completed
+      fetch('/api/user/preferences')
+        .then(r => r.ok ? r.json() : null)
+        .then(prefs => {
+          if (prefs?.onboarding_completed) {
+            // Sync to localStorage
+            localStorage.setItem('onboarding_complete', 'true');
+            if (prefs.native_language) localStorage.setItem('native-language', prefs.native_language);
+            if (prefs.instruction_language) localStorage.setItem('coach-language', prefs.instruction_language);
+            if (prefs.learning_interests) localStorage.setItem('learning-interests', JSON.stringify(prefs.learning_interests));
+          } else {
+            setShowWizard(true);
+          }
+        })
+        .catch(() => setShowWizard(true));
     }
   }, [user]);
 
@@ -228,19 +317,17 @@ export default function HomePage() {
         {/* Featured Courses */}
         <FeaturedCourses />
 
-        {/* Quick Language Buttons */}
+        {/* Quick Voice Practice — personalized by user's native language */}
         <motion.div variants={item} className="mb-16">
           <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">
-            Quick Practice
+            Quick Voice Practice
           </h3>
           <div className="flex flex-wrap gap-3">
-            {[
-              { lang: "Spanish", code: "es", flag: "\u{1F1EA}\u{1F1F8}" },
-              { lang: "French", code: "fr", flag: "\u{1F1EB}\u{1F1F7}" },
-              { lang: "Urdu", code: "ur", flag: "\u{1F1F5}\u{1F1F0}" },
-              { lang: "Mandarin", code: "zh", flag: "\u{1F1E8}\u{1F1F3}" },
-              { lang: "Hindi", code: "hi", flag: "\u{1F1EE}\u{1F1F3}" },
-            ].map((l) => (
+            {ALL_SUPPORTED_LANGUAGES
+              .filter(l => l.code !== (typeof window !== 'undefined' ? localStorage.getItem('native-language') : 'en'))
+              .filter(l => l.code !== 'en-IN') // Skip duplicate English-IN
+              .slice(0, 8)
+              .map((l) => (
               <Link key={l.code} href={`/talk?lang=${l.code}`}>
                 <motion.button
                   className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/50 text-slate-300 text-sm hover:bg-slate-800 hover:border-slate-600 hover:text-white transition-all"
@@ -248,7 +335,7 @@ export default function HomePage() {
                   whileTap={{ scale: 0.97 }}
                 >
                   <span className="text-lg">{l.flag}</span>
-                  {l.lang}
+                  {l.name}
                 </motion.button>
               </Link>
             ))}

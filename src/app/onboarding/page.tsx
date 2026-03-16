@@ -85,6 +85,9 @@ export default function OnboardingPage() {
       localStorage.setItem("coach-language", finalInstructionLang);
       localStorage.setItem("learning-style", learningStyle);
       localStorage.setItem("comm-mode", commMode);
+      localStorage.setItem("learning-interests", JSON.stringify(interests));
+      localStorage.setItem("english-fluency", englishFluency);
+      localStorage.setItem("onboarding_complete", "true");
 
       router.push("/");
     } catch (err) {
