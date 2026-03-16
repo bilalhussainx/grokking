@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { courses } from '@/data';
+import { JsonLd, breadcrumbSchema, courseSchema } from '@/lib/schema';
 
 type Props = { params: Promise<{ courseSlug: string }> };
 
@@ -36,6 +37,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function CourseLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+export default async function CourseLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ courseSlug: string }>;
+}) {
+  const { courseSlug } = await params;
+  const course = courses.find((c) => c.slug === courseSlug);
+
+  if (!course) {
+    return <>{children}</>;
+  }
+
+  const breadcrumbs = breadcrumbSchema([
+    { name: 'Home', url: 'https://samsara.ai' },
+    { name: 'Courses', url: 'https://samsara.ai/courses' },
+    { name: course.title, url: `https://samsara.ai/course/${course.slug}` },
+  ]);
+
+  return (
+    <>
+      <JsonLd data={breadcrumbs} />
+      <JsonLd data={courseSchema(course)} />
+      {children}
+    </>
+  );
 }

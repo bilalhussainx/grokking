@@ -1,55 +1,82 @@
 import { NextResponse } from 'next/server';
 import { courses } from '@/data';
+import { getAllLessons } from '@/data/types';
 
 export async function GET() {
-  const featured = courses.filter(c => c.featured);
+  const domainGroups: Record<string, typeof courses> = {};
+  for (const c of courses) {
+    const domain = c.domain || 'general';
+    if (!domainGroups[domain]) domainGroups[domain] = [];
+    domainGroups[domain].push(c);
+  }
+
+  const domainLabels: Record<string, string> = {
+    'computer-science': 'Computer Science & Engineering',
+    'religious-studies': 'Religious Studies',
+    'philosophy': 'Philosophy',
+    'finance-business': 'Finance & Business',
+    'health-wellness': 'Health & Wellness',
+    'political-strategy': 'Political Strategy',
+    'interview-prep': 'Interview Preparation',
+    'general': 'General',
+  };
+
+  const totalLessons = courses.reduce((sum, c) => sum + getAllLessons(c).length, 0);
 
   const content = `# Samsara.ai
-> AI-powered learning platform with voice coaching across 7 domains
+
+> Samsara.ai is an AI-powered learning platform offering ${courses.length}+ interactive courses across Computer Science, Religious Studies, Philosophy, Finance, Health & Wellness, and Political Strategy. Every course includes AI voice coaching, interactive exercises, checkpoint quizzes, and personalized learning paths.
 
 ## About
-Samsara.ai is an interactive learning platform offering courses in Computer Science,
-Finance, Philosophy, Religious Studies, Political Strategy, Health & Wellness, and
-Personal Growth. Each course includes AI voice coaching, interactive exercises,
-checkpoint quizzes, and personalized learning paths.
 
-## Featured Courses
+Samsara.ai helps learners master complex subjects through structured, evidence-based curricula paired with AI tutors. The platform features ${courses.length} courses containing ${totalLessons}+ lessons organized into modules. Courses range from beginner to advanced, with both free and premium tiers. AI voice coaches provide real-time guidance, explain concepts, give hints on coding exercises, and celebrate progress.
 
-### Computer Science
-${featured.filter(c => c.domain === 'computer-science').map(c => `- [${c.title}](https://samsara.ai/course/${c.slug}): ${c.description}`).join('\n')}
+## Docs
 
-### Religious Studies
-${featured.filter(c => c.domain === 'religious-studies').map(c => `- [${c.title}](https://samsara.ai/course/${c.slug}): ${c.description}`).join('\n')}
+- [All Courses](https://samsara.ai/courses): Browse the full course catalog
+- [Pricing](https://samsara.ai/pricing): Free and Pro tier details
+- [FAQ](https://samsara.ai/faq): Frequently asked questions
+- [llms-full.txt](https://samsara.ai/llms-full.txt): Extended course details for LLM consumption
 
-### Philosophy
-${featured.filter(c => c.domain === 'philosophy').map(c => `- [${c.title}](https://samsara.ai/course/${c.slug}): ${c.description}`).join('\n')}
+## Courses by Domain
 
-### Finance & Business
-${featured.filter(c => c.domain === 'finance-business').map(c => `- [${c.title}](https://samsara.ai/course/${c.slug}): ${c.description}`).join('\n')}
+${Object.entries(domainGroups).map(([domain, domainCourses]) => {
+  const label = domainLabels[domain] || domain;
+  return `### ${label}
 
-### Health & Wellness
-${featured.filter(c => c.domain === 'health-wellness').map(c => `- [${c.title}](https://samsara.ai/course/${c.slug}): ${c.description}`).join('\n')}
-
-### Political Strategy
-${featured.filter(c => c.domain === 'political-strategy').map(c => `- [${c.title}](https://samsara.ai/course/${c.slug}): ${c.description}`).join('\n')}
-
-## All Courses (${courses.length} total)
-${courses.map(c => `- [${c.title}](https://samsara.ai/course/${c.slug}): ${c.description}`).join('\n')}
+${domainCourses.map(c => {
+  const lessonCount = getAllLessons(c).length;
+  const moduleCount = c.modules.length;
+  return `- [${c.title}](https://samsara.ai/course/${c.slug}): ${c.description} (${moduleCount} modules, ${lessonCount} lessons, ${c.tier})`;
+}).join('\n')}`;
+}).join('\n\n')}
 
 ## Features
-- AI Voice Coaching (9 languages: English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, Punjabi)
-- Interactive Python exercises with in-browser execution
-- Checkpoint quizzes with voice summaries
-- Personalized learning paths via Gemini embeddings
+
+- AI Voice Coaching with 9 language options (English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, Punjabi)
+- Interactive coding exercises with in-browser Python execution
+- Checkpoint quizzes with voice-narrated summaries
+- Personalized learning paths
 - 7 specialized voice personas per domain
-- Free and Premium tiers
+- Free and Premium (Pro) tiers
+- Dark glassmorphism UI with responsive design
+
+## API
+
+- Course catalog: https://samsara.ai/api/courses
+- AI coaching: https://samsara.ai/api/ai/coach
+- Progress tracking: https://samsara.ai/api/progress
 
 ## Contact
+
 - Website: https://samsara.ai
 - Support: support@samsara.ai
 `;
 
   return new NextResponse(content, {
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=86400',
+    },
   });
 }
