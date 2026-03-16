@@ -48,6 +48,14 @@ import { grokkingDsaPythonCourse } from "./grokking-dsa-python";
 import { islamFoundationsCourse } from "./islam-foundations";
 import { stoicPhilosophyCourse } from "./stoic-philosophy";
 import { mentalHealthResilienceCourse } from "./mental-health-resilience";
+import { investingWealthCourse } from "./investing-wealth";
+import { politicalStrategyCourse } from "./political-strategy";
+import { buddhismFoundationsCourse } from "./buddhism-foundations";
+import { christianTheologyCourse } from "./christian-theology";
+import { meditationMindfulnessCourse } from "./meditation-mindfulness";
+import { aiMlFundamentalsCourse } from "./ai-ml-fundamentals";
+import { ethicalHackingCourse } from "./ethical-hacking";
+import { leadershipGrowthCourse } from "./leadership-growth";
 
 export const courses: Course[] = [
   webDevelopmentCourse,
@@ -99,4 +107,12 @@ export const courses: Course[] = [
   islamFoundationsCourse,
   stoicPhilosophyCourse,
   mentalHealthResilienceCourse,
+  investingWealthCourse,
+  politicalStrategyCourse,
+  buddhismFoundationsCourse,
+  christianTheologyCourse,
+  meditationMindfulnessCourse,
+  aiMlFundamentalsCourse,
+  ethicalHackingCourse,
+  leadershipGrowthCourse,
 ];
