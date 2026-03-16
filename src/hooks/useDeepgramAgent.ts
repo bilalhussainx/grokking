@@ -295,11 +295,19 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                 break;
 
               case "ConversationText":
+                console.log("[Deepgram] ConversationText:", msg.role, msg.content?.slice(0, 50));
                 if (msg.role === "user" && msg.content && !isGreetingPhaseRef.current && !greetingCooldownRef.current) {
                   callbacksRef.current?.onUserMessage?.(msg.content);
                 } else if (msg.role === "assistant" && msg.content) {
                   // Accumulate — don't emit yet, wait for AgentAudioDone
                   agentTextRef.current += (agentTextRef.current ? " " : "") + msg.content;
+                }
+                break;
+
+              // Some Deepgram Agent API versions send user transcripts as separate events
+              case "UserTranscript":
+                if (msg.text && !isGreetingPhaseRef.current && !greetingCooldownRef.current) {
+                  callbacksRef.current?.onUserMessage?.(msg.text);
                 }
                 break;
 
