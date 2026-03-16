@@ -1,16 +1,53 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { courses } from "@/data";
-import { findLesson, toSidebarModules, getAllLessons } from "@/data/types";
+import { findLesson, toSidebarModules, getAllLessons, type Course } from "@/data/types";
+import { getLanguageCourse } from "@/data/languages";
+import { useAuth } from "@/contexts/AuthContext";
 import LessonPage from "@/components/lesson/LessonPage";
+import LanguageLessonPage from "@/components/language/LanguageLessonPage";
+import PaywallModal from "@/components/pricing/PaywallModal";
 
 export default function LessonRoute() {
   const params = useParams();
   const courseSlug = params.courseSlug as string;
   const lessonSlug = params.lessonSlug as string;
+  const { profile } = useAuth();
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [generatedCourse, setGeneratedCourse] = useState<Course | null>(null);
+  const [loadingGenerated, setLoadingGenerated] = useState(false);
 
-  const course = courses.find((c) => c.slug === courseSlug);
+  // First try hardcoded courses
+  const hardcodedCourse = courses.find((c) => c.slug === courseSlug);
+  
+  // Check for language courses
+  const languageCourse = getLanguageCourse(courseSlug);
+
+  // If not found in hardcoded, fetch from generated courses
+  useEffect(() => {
+    if (hardcodedCourse || generatedCourse || languageCourse) return;
+    setLoadingGenerated(true);
+    fetch("/api/courses/generated")
+      .then((r) => r.ok ? r.json() : { courses: [] })
+      .then((data) => {
+        const found = (data.courses as Course[])?.find((c) => c.slug === courseSlug);
+        if (found) setGeneratedCourse(found);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingGenerated(false));
+  }, [courseSlug, hardcodedCourse, generatedCourse, languageCourse]);
+
+  const course = hardcodedCourse || generatedCourse || languageCourse;
+
+  if (loadingGenerated && !course) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[var(--background)]">
+        <div className="animate-pulse text-white/40">Loading course...</div>
+      </div>
+    );
+  }
 
   if (!course) {
     return (
@@ -22,7 +59,40 @@ export default function LessonRoute() {
     );
   }
 
-  const result = findLesson(course, lessonSlug);
+  // Handle language courses differently
+  if (languageCourse) {
+    // Find lesson in language course
+    const langModule = languageCourse.modules.find(m => 
+      m.lessons.some(l => l.slug === lessonSlug)
+    );
+    const langLesson = langModule?.lessons.find(l => l.slug === lessonSlug);
+    
+    if (!langModule || !langLesson) {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-950">
+          <p className="text-lg text-gray-500 dark:text-gray-400">Lesson not found.</p>
+        </div>
+      );
+    }
+    
+    // Find prev/next lessons
+    const allLessons = languageCourse.modules.flatMap(m => m.lessons);
+    const lessonIndex = allLessons.findIndex(l => l.slug === lessonSlug);
+    const prevLesson = lessonIndex > 0 ? allLessons[lessonIndex - 1] : null;
+    const nextLesson = lessonIndex < allLessons.length - 1 ? allLessons[lessonIndex + 1] : null;
+    
+    return (
+      <LanguageLessonPage
+        course={languageCourse}
+        lesson={langLesson}
+        module={{ id: langModule.id, title: langModule.title }}
+        prevLesson={prevLesson}
+        nextLesson={nextLesson}
+      />
+    );
+  }
+
+  const result = findLesson(course as Course, lessonSlug);
 
   if (!result) {
     return (
@@ -34,19 +104,46 @@ export default function LessonRoute() {
     );
   }
 
+  // Course access check: free users can only access free-tier courses
+  const userRole = profile?.role || "student";
+  const isProUser = userRole === "pro" || userRole === "admin" || userRole === "teacher";
+  const isLockedCourse = 'tier' in course && course.tier === "pro" && !isProUser;
+
+  if (isLockedCourse && !showPaywall) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[var(--background)]">
+        <PaywallModal
+          courseTitle={course.title}
+          trigger="course_locked"
+          onClose={() => window.history.back()}
+        />
+      </div>
+    );
+  }
+
   const { lesson, module, prevLesson, nextLesson } = result;
-  const allLessons = getAllLessons(course);
+  const allLessons = getAllLessons(course as Course);
 
   return (
-    <LessonPage
-      courseSlug={courseSlug}
-      courseTitle={course.title}
-      modules={toSidebarModules(course)}
-      moduleTitle={module.title}
-      lesson={lesson}
-      prevLesson={prevLesson ? { slug: prevLesson.slug, title: prevLesson.title } : null}
-      nextLesson={nextLesson ? { slug: nextLesson.slug, title: nextLesson.title } : null}
-      totalLessons={allLessons.length}
-    />
+    <>
+      <LessonPage
+        courseSlug={courseSlug}
+        courseTitle={course.title}
+        courseDomain={(course as Course).domain}
+        modules={toSidebarModules(course as Course)}
+        moduleTitle={module.title}
+        lesson={lesson}
+        prevLesson={prevLesson ? { slug: prevLesson.slug, title: prevLesson.title } : null}
+        nextLesson={nextLesson ? { slug: nextLesson.slug, title: nextLesson.title } : null}
+        totalLessons={allLessons.length}
+      />
+      {showPaywall && (
+        <PaywallModal
+          courseTitle={course.title}
+          trigger="course_locked"
+          onClose={() => setShowPaywall(false)}
+        />
+      )}
+    </>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -21,11 +22,13 @@ export default function CodeEditor({
   readOnly = false,
   height = "100%",
 }: CodeEditorProps) {
+  const { isDark } = useTheme();
+
   return (
     <MonacoEditor
       height={height}
       language={language}
-      theme="vs-dark"
+      theme={isDark ? "vs-dark" : "light"}
       value={code}
       onChange={(value) => onChange(value ?? "")}
       options={{

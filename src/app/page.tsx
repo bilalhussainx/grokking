@@ -1,11 +1,17 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Mic, BookOpen, ArrowRight, Sparkles, Star } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { courses } from "@/data";
 import { getFeaturedCourses } from "@/data/types";
+import WelcomeWizard from "@/components/onboarding/WelcomeWizard";
+import LearningStats from "@/components/gamification/LearningStats";
+import { useCourseProgress } from "@/hooks/useCourseProgress";
+import ProgressRing from "@/components/ui/ProgressRing";
+import ForgettingAlert from "@/components/gamification/ForgettingAlert";
 
 const container = {
   hidden: { opacity: 0 },
@@ -110,6 +116,31 @@ function FeaturedCourses() {
 
 export default function HomePage() {
   const { user, profile } = useAuth();
+  const [showWizard, setShowWizard] = useState(false);
+  const courseProgress = useCourseProgress();
+
+  // Get courses user has started (progress > 0, not 100%)
+  const inProgressCourses = courses
+    .filter((c) => {
+      const p = courseProgress[c.slug];
+      return p && p > 0 && p < 100;
+    })
+    .slice(0, 4);
+
+  useEffect(() => {
+    if (user && !localStorage.getItem("onboarding_complete")) {
+      setShowWizard(true);
+    }
+  }, [user]);
+
+  if (showWizard) {
+    return (
+      <WelcomeWizard
+        userName={user?.user_metadata?.full_name?.split(" ")[0]}
+        onComplete={() => setShowWizard(false)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -132,6 +163,14 @@ export default function HomePage() {
             Learn languages, code, and more with AI tutors that adapt to you.
           </p>
         </motion.div>
+
+        {/* Learning Stats + Forgetting Alert (logged-in users) */}
+        {user && (
+          <motion.div variants={item} className="mb-10 space-y-4">
+            <LearningStats />
+            <ForgettingAlert />
+          </motion.div>
+        )}
 
         {/* Two Action Cards */}
         <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-16">
@@ -216,8 +255,8 @@ export default function HomePage() {
           </div>
         </motion.div>
 
-        {/* Continue Learning (logged in users) */}
-        {user && (
+        {/* Continue Learning (logged in users with courses in progress) */}
+        {user && inProgressCourses.length > 0 && (
           <motion.div variants={item}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">
@@ -228,17 +267,17 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {[
-                { title: "Spanish", slug: "spanish-beginner", icon: "\u{1F1EA}\u{1F1F8}", category: "Language" },
-                { title: "French", slug: "french-beginner", icon: "\u{1F1EB}\u{1F1F7}", category: "Language" },
-                { title: "Python", slug: "python-fundamentals", icon: "\u{1F40D}", category: "Tech" },
-                { title: "React", slug: "react-development", icon: "\u{269B}\u{FE0F}", category: "Tech" },
-              ].map((course) => (
+              {inProgressCourses.map((course) => (
                 <Link key={course.slug} href={`/course/${course.slug}`}>
                   <div className="rounded-xl bg-slate-800/40 border border-slate-700/40 p-4 hover:bg-slate-800/60 hover:border-slate-600/50 transition-all cursor-pointer">
-                    <div className="text-2xl mb-2">{course.icon}</div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{course.icon}</span>
+                      <ProgressRing progress={courseProgress[course.slug] ?? 0} size={28} strokeWidth={2} />
+                    </div>
                     <div className="text-sm font-medium text-slate-200">{course.title}</div>
-                    <div className="text-xs text-slate-500 mt-0.5">{course.category}</div>
+                    <div className="text-xs text-slate-500 mt-0.5">
+                      {courseProgress[course.slug]}% complete
+                    </div>
                   </div>
                 </Link>
               ))}

@@ -21,6 +21,7 @@ import SessionAIPanel from "./SessionAIPanel";
 import PromptLab from "./PromptLab";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react").then((m) => m.default), {
   ssr: false,
@@ -51,6 +52,7 @@ interface Props {
 }
 
 export default function SessionRoom({ session, userId, userName, userRole }: Props) {
+  const { isDark } = useTheme();
   const [messages, setMessages] = useState<SessionMessage[]>([]);
   const [rightPanel, setRightPanel] = useState<"chat" | "participants">("chat");
   const [showRight, setShowRight] = useState(true);
@@ -351,7 +353,7 @@ export default function SessionRoom({ session, userId, userName, userRole }: Pro
                       language={language}
                       value={code}
                       onChange={(val) => setCode(val ?? "")}
-                      theme="vs-dark"
+                      theme={isDark ? "vs-dark" : "light"}
                       options={{
                         minimap: { enabled: false },
                         fontSize: 14,

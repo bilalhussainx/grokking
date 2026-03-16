@@ -1,172 +1,134 @@
+// src/app/login/page.tsx
 "use client";
 
-import { useState, useEffect, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { login, user } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (user) router.push(user.role === "teacher" ? "/sessions" : "/");
-  }, [user, router]);
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError("");
-    setSubmitting(true);
-    const result = await login(email, password);
-    if (!result.ok) {
-      setError(result.error ?? "Login failed.");
-      setSubmitting(false);
-    }
-  }
-
   return (
-    <main className="relative min-h-screen lg:grid lg:grid-cols-2">
-      {/* Left Panel — Branding */}
-      <div className="relative hidden lg:flex h-full flex-col border-r border-white/[0.06] bg-[var(--background)] p-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] to-transparent z-10" />
-        <FloatingPaths position={1} />
-        <FloatingPaths position={-1} />
-
-        <div className="z-10 flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 text-white font-bold text-base shadow-lg">
-            G
-          </div>
-          <span className="text-xl font-bold tracking-tight">Grokking</span>
-        </div>
-
-        <div className="z-10 mt-auto">
-          <blockquote className="space-y-2">
-            <p className="text-xl text-[var(--muted-foreground)]">
-              &ldquo;The best way to learn coding patterns is by doing. This platform makes it effortless.&rdquo;
-            </p>
-            <footer className="text-sm font-semibold text-[var(--muted-foreground)]">
-              ~ A happy learner
-            </footer>
-          </blockquote>
-        </div>
-      </div>
-
-      {/* Right Panel — Login Form */}
-      <div className="relative flex min-h-screen flex-col justify-center p-6 bg-[var(--background)]">
-        <Link href="/" className="absolute top-6 left-6 flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors lg:hidden">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-          Home
-        </Link>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mx-auto w-full max-w-sm space-y-6"
-        >
-          <div className="flex items-center gap-2.5 lg:hidden mb-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 text-white font-bold text-sm shadow-lg">
-              G
-            </div>
-            <span className="text-xl font-bold tracking-tight">Grokking</span>
-          </div>
-
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
-            <p className="mt-1 text-[var(--muted-foreground)]">Sign in to continue learning</p>
-          </div>
-
-          {error && (
-            <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <label htmlFor="email" className="text-sm font-medium text-[var(--muted-foreground)]">Email</label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
-                placeholder="you@example.com"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="password" className="text-sm font-medium text-[var(--muted-foreground)]">Password</label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
-                placeholder="Your password"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="btn-gradient btn-glow w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {submitting ? "Signing in..." : "Sign in"}
-            </button>
-          </form>
-
-          <div className="text-center pt-2 border-t border-white/[0.06]">
-            <p className="text-sm text-[var(--muted-foreground)] pt-4">
-              Don&apos;t have an account?{" "}
-              <Link href="/signup" className="font-medium text-blue-400 hover:text-blue-300 transition-colors">
-                Create one
-              </Link>
-            </p>
-          </div>
-        </motion.div>
-      </div>
-    </main>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--background)]" />}>
+      <LoginForm />
+    </Suspense>
   );
 }
 
-function FloatingPaths({ position }: { position: number }) {
-  const paths = Array.from({ length: 24 }, (_, i) => ({
-    id: i,
-    d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${380 - i * 5 * position} -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${152 - i * 5 * position} ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${684 - i * 5 * position} ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
-    width: 0.5 + i * 0.03,
-  }));
+function LoginForm() {
+  const { signInWithGoogle, signInWithEmail, user } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") || "/";
+  const authError = searchParams.get("error");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(authError === "auth_failed" ? "Authentication failed. Please try again." : "");
+  const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in
+  if (user) {
+    router.replace(next);
+    return null;
+  }
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    const result = await signInWithEmail(email, password);
+    if (result.error) {
+      setError(result.error);
+      setLoading(false);
+    } else {
+      router.replace(next);
+    }
+  };
 
   return (
-    <div className="pointer-events-none absolute inset-0">
-      <svg className="h-full w-full text-[var(--foreground)]" viewBox="0 0 696 316" fill="none">
-        <title>Background</title>
-        {paths.map((path) => (
-          <motion.path
-            key={path.id}
-            d={path.d}
-            stroke="currentColor"
-            strokeWidth={path.width}
-            strokeOpacity={0.04 + path.id * 0.01}
-            initial={{ pathLength: 0.3, opacity: 0.3 }}
-            animate={{
-              pathLength: 1,
-              opacity: [0.15, 0.3, 0.15],
-              pathOffset: [0, 1, 0],
-            }}
-            transition={{
-              duration: 20 + Math.random() * 10,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        ))}
-      </svg>
-    </div>
+    <section className="flex min-h-screen items-center justify-center px-4 py-16 bg-[var(--background)]">
+      <form
+        onSubmit={handleEmailLogin}
+        className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 shadow-xl backdrop-blur-sm"
+      >
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+            Grokking
+          </h1>
+          <p className="text-sm text-white/50 mt-2">Sign in to continue learning</p>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full flex items-center justify-center gap-3 mb-4 h-11 border-white/10 hover:bg-white/5"
+          onClick={signInWithGoogle}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 262" className="w-5 h-5">
+            <path fill="#4285f4" d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622l38.755 30.023l2.685.268c24.659-22.774 38.875-56.282 38.875-96.027" />
+            <path fill="#34a853" d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055c-34.523 0-63.824-22.773-74.269-54.25l-1.531.13l-40.298 31.187l-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1" />
+            <path fill="#fbbc05" d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82c0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602z" />
+            <path fill="#eb4335" d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0C79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251" />
+          </svg>
+          <span>Continue with Google</span>
+        </Button>
+
+        <div className="flex items-center my-6">
+          <div className="h-px flex-1 bg-white/10" />
+          <span className="px-3 text-xs text-white/30">or</span>
+          <div className="h-px flex-1 bg-white/10" />
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-white/70">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+              className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-white/70">Password</Label>
+              <Link href="/forgot-password" className="text-xs text-violet-400 hover:underline">
+                Forgot password?
+              </Link>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Your password"
+              required
+              className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+            />
+          </div>
+
+          {error && (
+            <p className="text-xs text-red-400 bg-red-500/10 rounded-md p-2">{error}</p>
+          )}
+
+          <Button type="submit" className="w-full h-11" disabled={loading}>
+            {loading ? "Signing in..." : "Sign In"}
+          </Button>
+        </div>
+
+        <p className="text-center text-sm text-white/40 mt-6">
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" className="text-violet-400 hover:underline">
+            Sign up
+          </Link>
+        </p>
+      </form>
+    </section>
   );
 }

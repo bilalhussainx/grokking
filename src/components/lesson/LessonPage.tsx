@@ -17,6 +17,10 @@ import { SidebarModule } from "@/components/layout/Sidebar";
 import LessonContent from "./LessonContent";
 import LessonNav from "./LessonNav";
 import { useAI } from "@/contexts/AIContext";
+import { estimateReadingTime, formatReadingTime } from "@/lib/reading-time";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import ConceptBridges from "./ConceptBridges";
+import UnderstandingDepth from "./UnderstandingDepth";
 import {
   getCompletedLessons,
   getCourseProgress,
@@ -27,6 +31,7 @@ import {
 interface LessonPageProps {
   courseTitle: string;
   courseSlug: string;
+  courseDomain?: string;
   modules: SidebarModule[];
   moduleTitle: string;
   lesson: {
@@ -47,6 +52,7 @@ type ContentTab = "lesson" | "resources";
 export default function LessonPage({
   courseTitle,
   courseSlug,
+  courseDomain,
   modules,
   moduleTitle,
   lesson,
@@ -59,9 +65,23 @@ export default function LessonPage({
   );
   const [progress, setProgress] = useState(0);
   const [contentTab, setContentTab] = useState<ContentTab>("lesson");
-  const { setLessonContext, setCurrentCode } = useAI();
+  const { setLessonContext, setCurrentCode, openPanel, isPanelOpen } = useAI();
 
   const hasExercise = !!(lesson.starterCode && lesson.solutionCode);
+
+  // Keyboard shortcuts: N=next, P=prev, H=toggle coach
+  useKeyboardShortcuts({
+    courseSlug,
+    prevLessonSlug: prevLesson?.slug ?? null,
+    nextLessonSlug: nextLesson?.slug ?? null,
+    onToggleHint: () => {
+      if (isPanelOpen) {
+        // Already open, don't close
+      } else {
+        openPanel();
+      }
+    },
+  });
 
   useEffect(() => {
     async function loadProgress() {
@@ -127,9 +147,15 @@ export default function LessonPage({
           <span>{moduleTitle}</span>
         </div>
 
-        <h1 className="text-3xl font-bold mb-8">{lesson.title}</h1>
+        <h1 className="text-3xl font-bold mb-2">{lesson.title}</h1>
+        <p className="text-xs text-white/30 mb-4">
+          {formatReadingTime(estimateReadingTime(lesson.content))}
+        </p>
 
-        <LessonContent content={lesson.content} />
+        {/* Understanding depth indicator (shows for completed lessons with voice data) */}
+        <UnderstandingDepth lessonId={lesson.id} isCompleted={completedLessons.has(lesson.id)} />
+
+        <LessonContent content={lesson.content} courseDomain={courseDomain} />
 
         {/* Exercise CTA — links to full-screen IDE */}
         {hasExercise && (
@@ -147,6 +173,9 @@ export default function LessonPage({
             </p>
           </div>
         )}
+
+        {/* Cross-domain concept bridges */}
+        <ConceptBridges lessonId={lesson.id} courseSlug={courseSlug} />
 
         <LessonNav
           courseSlug={courseSlug}

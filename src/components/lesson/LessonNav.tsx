@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, CheckCircle, Circle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle, Circle, Zap } from "lucide-react";
 import clsx from "clsx";
 
 interface LessonNavProps {
@@ -50,6 +50,11 @@ export default function LessonNav({
           <Circle className="w-4 h-4" />
         )}
         {isCompleted ? "Completed" : "Mark Complete"}
+        {!isCompleted && (
+          <span className="flex items-center gap-0.5 text-[10px] opacity-70">
+            <Zap className="w-3 h-3" />+10 XP
+          </span>
+        )}
       </button>
 
       {/* Next */}

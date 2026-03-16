@@ -3,9 +3,14 @@
 import { useState } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AIProvider, useAI } from "@/contexts/AIContext";
+import { TopNavProvider } from "@/contexts/TopNavContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import AICoach from "@/components/ai/AICoach";
 import SessionNotes from "@/components/ai/SessionNotes";
 import { TranslationBar } from "@/components/language/TranslationBar";
+import TopNav from "@/components/layout/TopNav";
+import GlobalSearch from "@/components/search/GlobalSearch";
+import ShortcutsHelp from "@/components/ui/ShortcutsHelp";
 import { GraduationCap, X, FileText } from "lucide-react";
 
 /**
@@ -81,14 +86,20 @@ function CoachFAB() {
  * AppLayout — wraps children + coach sidebar in a flex row.
  * When coach is open, children shrink and sidebar takes 320px.
  * No overlays, no z-index fights.
+ *
+ * Global TopNav renders here so every page gets a nav bar.
+ * CourseLayout can override nav props via TopNavContext.
  */
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen overflow-hidden">
-      <div className="flex-1 min-w-0 overflow-auto">
-        {children}
+    <div className="flex flex-col h-screen overflow-hidden">
+      <TopNav />
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        <div className="flex-1 min-w-0 overflow-auto">
+          {children}
+        </div>
+        <CoachSidebar />
       </div>
-      <CoachSidebar />
     </div>
   );
 }
@@ -96,13 +107,19 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
-      <AIProvider>
-        <AppLayout>
-          {children}
-        </AppLayout>
-        <CoachFAB />
-        <TranslationBar />
-      </AIProvider>
+      <ThemeProvider>
+      <TopNavProvider>
+        <AIProvider>
+          <AppLayout>
+            {children}
+          </AppLayout>
+          <CoachFAB />
+          <GlobalSearch />
+          <ShortcutsHelp />
+          <TranslationBar />
+        </AIProvider>
+      </TopNavProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

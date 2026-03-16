@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Monitor, Maximize2, Minimize2, ShieldCheck, ShieldOff, Code2 } from "lucide-react";
 import type { PresenceState, StudentPermission } from "@/types/sessions";
 import dynamic from "next/dynamic";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react").then((m) => m.default), { ssr: false });
 
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export default function StudentScreens({ studentScreens, onlineUsers, permissions, onGrantPermission }: Props) {
+  const { isDark } = useTheme();
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const students = onlineUsers.filter((u) => u.role === "student");
@@ -69,7 +71,7 @@ export default function StudentScreens({ studentScreens, onlineUsers, permission
             height="100%"
             language={screen?.language || "python"}
             value={screen?.content || "// Waiting for student code..."}
-            theme="vs-dark"
+            theme={isDark ? "vs-dark" : "light"}
             options={{ readOnly: true, minimap: { enabled: false }, fontSize: 13, scrollBeyondLastLine: false }}
           />
         </div>

@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { Play, Loader2, Trash2 } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface InterviewEditorProps {
   onCodeChange: (code: string) => void;
@@ -12,6 +13,7 @@ interface InterviewEditorProps {
 const DEFAULT_CODE = `# Write your solution here\n\ndef solution():\n    pass\n`;
 
 export default function InterviewEditor({ onCodeChange, onOutputChange }: InterviewEditorProps) {
+  const { isDark } = useTheme();
   const [code, setCode] = useState(DEFAULT_CODE);
   const [output, setOutput] = useState("");
   const [running, setRunning] = useState(false);
@@ -92,7 +94,7 @@ sys.stderr = io.StringIO()
         <Editor
           height="100%"
           language="python"
-          theme="vs-dark"
+          theme={isDark ? "vs-dark" : "light"}
           value={code}
           onChange={handleCodeChange}
           options={{

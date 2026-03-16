@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronDown, ChevronRight, ChevronLeft, Check, Circle, Search, X, Menu } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronLeft, Check, Circle, Search, X, Menu, Home, BookOpen } from "lucide-react";
 import clsx from "clsx";
 
 export interface SidebarLesson {
@@ -137,6 +137,26 @@ export default function Sidebar({
               style={{ width: `${progressPercent}%` }}
             />
           </div>
+        </div>
+      )}
+
+      {/* Quick nav links */}
+      {!isCollapsed && (
+        <div className="px-3 pb-2 flex items-center gap-1.5">
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-white/[0.04] transition-colors"
+          >
+            <Home className="w-3 h-3" />
+            Home
+          </Link>
+          <Link
+            href="/courses"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-white/[0.04] transition-colors"
+          >
+            <BookOpen className="w-3 h-3" />
+            All Courses
+          </Link>
         </div>
       )}
 

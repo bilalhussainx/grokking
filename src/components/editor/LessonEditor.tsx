@@ -10,6 +10,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import { Lesson } from "@/data/types";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -22,6 +23,7 @@ interface LessonEditorProps {
 type ActiveTab = "content" | "starter" | "solution";
 
 export default function LessonEditor({ lesson, moduleTitle, courseTitle }: LessonEditorProps) {
+  const { isDark } = useTheme();
   const [title, setTitle] = useState(lesson?.title || "");
   const [content, setContent] = useState(lesson?.content || "");
   const [starterCode, setStarterCode] = useState(lesson?.starterCode || "# Write your solution here\n");
@@ -232,7 +234,7 @@ export default function LessonEditor({ lesson, moduleTitle, courseTitle }: Lesso
               <MonacoEditor
                 height="100%"
                 language="markdown"
-                theme="vs-dark"
+                theme={isDark ? "vs-dark" : "light"}
                 value={content}
                 onChange={(v) => setContent(v || "")}
                 options={{
