@@ -37,7 +37,7 @@ interface CoachMessage {
 }
 
 export default function AICoach() {
-  const { lessonContext, currentCode } = useAI();
+  const { lessonContext, currentCode, openPanel } = useAI();
   const [messages, setMessages] = useState<CoachMessage[]>([]);
   const [hintsGiven, setHintsGiven] = useState(0);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -50,7 +50,10 @@ export default function AICoach() {
   const [selectedPersona, setSelectedPersona] = useState(() => getSavedCoachPersona());
   const [selectedVoice, setSelectedVoice] = useState(() => getSavedVoice());
   const [coachLanguage, setCoachLanguage] = useState(() => {
-    if (typeof window !== 'undefined') return localStorage.getItem('coach-language') || 'en';
+    if (typeof window !== 'undefined') {
+      // Prefer explicit coach-language, fall back to native-language from signup
+      return localStorage.getItem('coach-language') || localStorage.getItem('native-language') || 'en';
+    }
     return 'en';
   });
   const [showSettings, setShowSettings] = useState(false);
@@ -285,15 +288,21 @@ export default function AICoach() {
     setHintsGiven(0);
     hintsRef.current = 0;
     setLastCodeLength(0);
-  }, [lessonContext, lastLessonId, saveNotes]);
 
-  // Welcome greeting (text mode only)
+    // Auto-open coach panel when a new lesson loads so the student sees the greeting
+    openPanel();
+  }, [lessonContext, lastLessonId, saveNotes, openPanel]);
+
+  // Welcome greeting — proactive lesson introduction
   useEffect(() => {
     if (!lessonContext || hasGreeted || deepgram.isConnected) return;
     setHasGreeted(true);
+    const hasCodingExercise = !!(lessonContext.starterCode);
     const timer = setTimeout(() => {
       sendEvent(
-        `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". Welcome them warmly. Be concise.`,
+        hasCodingExercise
+          ? `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". This lesson has a coding exercise. Welcome them, briefly introduce what the exercise is about based on the lesson content, and ask if they want you to walk through the concept first or if they want to jump into coding.`
+          : `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". Welcome them, give a 1-sentence preview of what this lesson covers based on the lesson material, and ask: "Want me to walk you through the key points, or would you prefer to read first and ask questions?"`,
         'encouraging'
       );
     }, 800);

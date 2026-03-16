@@ -61,9 +61,10 @@ export async function POST(req: NextRequest) {
     zh: "aura-2-izanami-ja", // TODO: Chinese-specific voice when available
     hi: "aura-2-thalia-en",  // Hindi uses Sarvam pipeline, not Deepgram TTS
   };
+  const voice = getVoice(voiceId || persona.defaultVoice);
   const voiceModel = language !== "en"
     ? LANGUAGE_VOICES[language] || "aura-2-thalia-en"
-    : getVoice(voiceId || persona.defaultVoice).deepgramModel;
+    : voice.deepgramModel;
 
   // Language names for the system prompt
   const LANGUAGE_NAMES: Record<string, string> = {

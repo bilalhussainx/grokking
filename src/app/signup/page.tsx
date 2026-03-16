@@ -1,260 +1,150 @@
+// src/app/signup/page.tsx
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { KeyRound } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function SignupPage() {
+  const { signInWithGoogle, signUpWithEmail, user } = useAuth();
   const router = useRouter();
-  const { signup } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"student" | "teacher">("student");
-  const [teacherKey, setTeacherKey] = useState("");
+  const [nativeLanguage, setNativeLanguage] = useState("en");
   const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  async function handleSubmit(e: FormEvent) {
+  const NATIVE_LANGUAGES = [
+    { code: "en", name: "English" },
+    { code: "es", name: "Espa\u00F1ol" },
+    { code: "fr", name: "Fran\u00E7ais" },
+    { code: "de", name: "Deutsch" },
+    { code: "it", name: "Italiano" },
+    { code: "hi", name: "\u0939\u093F\u0928\u094D\u0926\u0940 (Hindi)" },
+    { code: "zh", name: "\u4E2D\u6587 (Chinese)" },
+    { code: "ja", name: "\u65E5\u672C\u8A9E (Japanese)" },
+    { code: "ar", name: "\u0627\u0644\u0639\u0631\u0628\u064A\u0629 (Arabic)" },
+    { code: "ur", name: "\u0627\u0631\u062F\u0648 (Urdu)" },
+    { code: "pa", name: "\u0A2A\u0A70\u0A1C\u0A3E\u0A2C\u0A40 (Punjabi)" },
+    { code: "nl", name: "Nederlands" },
+    { code: "pt", name: "Portugu\u00EAs" },
+    { code: "ko", name: "\uD55C\uAD6D\uC5B4 (Korean)" },
+  ];
+
+  if (user) {
+    router.replace("/");
+    return null;
+  }
+
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     setError("");
-    setSubmitting(true);
-
-    const result = await signup(
-      name,
-      email,
-      password,
-      role,
-      role === "teacher" ? teacherKey : undefined
-    );
-    if (result.ok) {
-      router.push(role === "teacher" ? "/sessions" : "/");
+    const result = await signUpWithEmail(email, password, name);
+    if (result.error) {
+      setError(result.error);
+      setLoading(false);
     } else {
-      setError(result.error ?? "Signup failed.");
-      setSubmitting(false);
+      // Save native language for coach to use immediately
+      localStorage.setItem('coach-language', nativeLanguage);
+      localStorage.setItem('native-language', nativeLanguage);
+      setSuccess(true);
+      setLoading(false);
     }
+  };
+
+  if (success) {
+    return (
+      <section className="flex min-h-screen items-center justify-center px-4 bg-[var(--background)]">
+        <div className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 text-center">
+          <h2 className="text-xl font-semibold text-white mb-2">Check your email</h2>
+          <p className="text-sm text-white/50">We sent a confirmation link to <strong className="text-white/80">{email}</strong>. Click it to activate your account and get your 50 free credits.</p>
+          <Link href="/login" className="text-violet-400 text-sm hover:underline mt-4 inline-block">Back to login</Link>
+        </div>
+      </section>
+    );
   }
 
   return (
-    <main className="relative min-h-screen lg:grid lg:grid-cols-2">
-      {/* Left Panel — Branding */}
-      <div className="relative hidden lg:flex h-full flex-col border-r border-white/[0.06] bg-[var(--background)] p-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] to-transparent z-10" />
-        <FloatingPaths position={1} />
-        <FloatingPaths position={-1} />
-
-        <div className="z-10 flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 text-white font-bold text-base shadow-lg">
-            G
-          </div>
-          <span className="text-xl font-bold tracking-tight">Grokking</span>
+    <section className="flex min-h-screen items-center justify-center px-4 py-16 bg-[var(--background)]">
+      <form
+        onSubmit={handleSignup}
+        className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 shadow-xl backdrop-blur-sm"
+      >
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+            Join Grokking
+          </h1>
+          <p className="text-sm text-white/50 mt-2">Start with 50 free AI credits</p>
         </div>
 
-        <div className="z-10 mt-auto">
-          <blockquote className="space-y-2">
-            <p className="text-xl text-[var(--muted-foreground)]">
-              &ldquo;Interactive coding exercises and pattern-based learning changed how I prepare for interviews.&rdquo;
-            </p>
-            <footer className="text-sm font-semibold text-[var(--muted-foreground)]">
-              ~ A student who got the offer
-            </footer>
-          </blockquote>
-        </div>
-      </div>
-
-      {/* Right Panel — Signup Form */}
-      <div className="relative flex min-h-screen flex-col justify-center p-6 bg-[var(--background)]">
-        <Link href="/" className="absolute top-6 left-6 flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors lg:hidden">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-          Home
-        </Link>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mx-auto w-full max-w-sm space-y-6"
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full flex items-center justify-center gap-3 mb-4 h-11 border-white/10 hover:bg-white/5"
+          onClick={signInWithGoogle}
         >
-          <div className="flex items-center gap-2.5 lg:hidden mb-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 text-white font-bold text-sm shadow-lg">
-              G
-            </div>
-            <span className="text-xl font-bold tracking-tight">Grokking</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 262" className="w-5 h-5">
+            <path fill="#4285f4" d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622l38.755 30.023l2.685.268c24.659-22.774 38.875-56.282 38.875-96.027" />
+            <path fill="#34a853" d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055c-34.523 0-63.824-22.773-74.269-54.25l-1.531.13l-40.298 31.187l-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1" />
+            <path fill="#fbbc05" d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82c0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602z" />
+            <path fill="#eb4335" d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0C79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251" />
+          </svg>
+          <span>Continue with Google</span>
+        </Button>
+
+        <div className="flex items-center my-6">
+          <div className="h-px flex-1 bg-white/10" />
+          <span className="px-3 text-xs text-white/30">or</span>
+          <div className="h-px flex-1 bg-white/10" />
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-white/70">Full Name</Label>
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required className="bg-white/5 border-white/10 text-white placeholder:text-white/30" />
           </div>
-
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Create your account</h1>
-            <p className="mt-1 text-[var(--muted-foreground)]">
-              Start your {role === "teacher" ? "teaching" : "learning"} journey
-            </p>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-white/70">Email</Label>
+            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required className="bg-white/5 border-white/10 text-white placeholder:text-white/30" />
           </div>
-
-          {error && (
-            <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
-              {error}
-            </div>
-          )}
-
-          {/* Role toggle */}
-          <div className="flex rounded-xl overflow-hidden border border-white/10">
-            <button
-              type="button"
-              onClick={() => setRole("student")}
-              className={`flex-1 py-2.5 text-sm font-medium transition-all border-r border-white/10 ${
-                role === "student"
-                  ? "bg-blue-500/20 text-blue-400"
-                  : "text-[var(--muted-foreground)] hover:bg-white/5"
-              }`}
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-white/70">Password</Label>
+            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 6 characters" required minLength={6} className="bg-white/5 border-white/10 text-white placeholder:text-white/30" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="nativeLanguage" className="text-white/70">I speak</Label>
+            <select
+              id="nativeLanguage"
+              value={nativeLanguage}
+              onChange={(e) => setNativeLanguage(e.target.value)}
+              className="w-full h-10 px-3 rounded-md bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50"
             >
-              Student
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole("teacher")}
-              className={`flex-1 py-2.5 text-sm font-medium transition-all ${
-                role === "teacher"
-                  ? "bg-violet-500/20 text-violet-400"
-                  : "text-[var(--muted-foreground)] hover:bg-white/5"
-              }`}
-            >
-              Teacher
-            </button>
+              {NATIVE_LANGUAGES.map(lang => (
+                <option key={lang.code} value={lang.code} className="bg-slate-900">{lang.name}</option>
+              ))}
+            </select>
+            <p className="text-[10px] text-white/30">Coach Alex will explain lessons in your language</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <label htmlFor="name" className="text-sm font-medium text-[var(--muted-foreground)]">Full Name</label>
-              <input
-                id="name"
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
-                placeholder="Your name"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="email" className="text-sm font-medium text-[var(--muted-foreground)]">Email</label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
-                placeholder="you@example.com"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="password" className="text-sm font-medium text-[var(--muted-foreground)]">Password</label>
-              <input
-                id="password"
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
-                placeholder="At least 6 characters"
-              />
-            </div>
+          {error && <p className="text-xs text-red-400 bg-red-500/10 rounded-md p-2">{error}</p>}
 
-            {/* Teacher key field */}
-            {role === "teacher" && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="space-y-1.5"
-              >
-                <label htmlFor="teacherKey" className="text-sm font-medium text-violet-400">
-                  Teacher Key
-                </label>
-                <div className="relative">
-                  <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-violet-400/60" />
-                  <input
-                    id="teacherKey"
-                    type="text"
-                    required
-                    value={teacherKey}
-                    onChange={(e) => setTeacherKey(e.target.value.toUpperCase())}
-                    className="glass-input w-full rounded-xl pl-10 pr-4 py-2.5 text-sm font-mono tracking-widest border-violet-500/20 focus:border-violet-500/50"
-                    placeholder="XXXX-XXXX-XXXX"
-                    maxLength={20}
-                  />
-                </div>
-                <p className="text-[10px] text-[var(--muted-foreground)]">
-                  Contact your administrator for a teacher key
-                </p>
-              </motion.div>
-            )}
+          <Button type="submit" className="w-full h-11" disabled={loading}>
+            {loading ? "Creating account..." : "Create Account"}
+          </Button>
+        </div>
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className={`w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                role === "student" ? "btn-gradient btn-glow" : ""
-              }`}
-              style={role === "teacher" ? {
-                background: "linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #ec4899 100%)",
-              } : undefined}
-            >
-              {submitting
-                ? "Creating account..."
-                : `Create ${role === "teacher" ? "Teacher " : ""}Account`}
-            </button>
-          </form>
-
-          <div className="text-center pt-2 border-t border-white/[0.06]">
-            <p className="text-sm text-[var(--muted-foreground)] pt-4">
-              Already have an account?{" "}
-              <Link href="/login" className="font-medium text-blue-400 hover:text-blue-300 transition-colors">
-                Sign in
-              </Link>
-            </p>
-          </div>
-        </motion.div>
-      </div>
-    </main>
-  );
-}
-
-function FloatingPaths({ position }: { position: number }) {
-  const paths = Array.from({ length: 24 }, (_, i) => ({
-    id: i,
-    d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${380 - i * 5 * position} -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${152 - i * 5 * position} ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${684 - i * 5 * position} ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
-    width: 0.5 + i * 0.03,
-  }));
-
-  return (
-    <div className="pointer-events-none absolute inset-0">
-      <svg className="h-full w-full text-[var(--foreground)]" viewBox="0 0 696 316" fill="none">
-        <title>Background</title>
-        {paths.map((path) => (
-          <motion.path
-            key={path.id}
-            d={path.d}
-            stroke="currentColor"
-            strokeWidth={path.width}
-            strokeOpacity={0.04 + path.id * 0.01}
-            initial={{ pathLength: 0.3, opacity: 0.3 }}
-            animate={{
-              pathLength: 1,
-              opacity: [0.15, 0.3, 0.15],
-              pathOffset: [0, 1, 0],
-            }}
-            transition={{
-              duration: 20 + Math.random() * 10,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        ))}
-      </svg>
-    </div>
+        <p className="text-center text-sm text-white/40 mt-6">
+          Already have an account?{" "}
+          <Link href="/login" className="text-violet-400 hover:underline">Sign in</Link>
+        </p>
+      </form>
+    </section>
   );
 }
