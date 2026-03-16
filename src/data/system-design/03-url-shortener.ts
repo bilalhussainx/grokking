@@ -95,6 +95,18 @@ Response: HTTP 301/302 redirect to the original long URL.
 
 ## Architecture
 
+\`\`\`mermaid
+graph TD
+    Client[Client] --> LB[Load Balancer]
+    LB --> App1[App Server 1]
+    LB --> App2[App Server 2]
+    App1 --> Cache[Redis Cache]
+    App2 --> Cache
+    Cache -->|cache miss| DB[(Database - Sharded)]
+    App1 -.->|write| DB
+    App2 -.->|write| DB
+\`\`\`
+
 \`\`\`
   Client
     │

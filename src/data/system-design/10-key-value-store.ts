@@ -75,6 +75,17 @@ With 10 nodes, each node handles ~100 GB of data and ~5K reads/sec — well with
 
 ## Architecture Overview
 
+\`\`\`mermaid
+graph TD
+    Client[Client] --> Coord[Coordinator Node]
+    Coord -->|replicate| N1[Partition 1]
+    Coord -->|replicate| N2[Partition 2]
+    Coord -->|replicate| N3[Partition 3]
+    N1 -.->|sync| N2
+    N2 -.->|sync| N3
+    N3 -.->|sync| N1
+\`\`\`
+
 \`\`\`
          ┌──────────┐
          │  Client   │

@@ -9,7 +9,7 @@ import { Loader2 } from "lucide-react";
 
 export default function SessionPage() {
   const { id } = useParams<{ id: string }>();
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const router = useRouter();
   const [session, setSession] = useState<LiveSession | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,13 +72,13 @@ export default function SessionPage() {
     );
   }
 
-  const userRole = session.teacher_id === user.userId ? "teacher" : "student";
+  const userRole = session.teacher_id === user.id ? "teacher" : "student";
 
   return (
     <SessionRoom
       session={session}
-      userId={user.userId}
-      userName={user.name}
+      userId={user.id}
+      userName={user.user_metadata?.full_name || user.email || ""}
       userRole={userRole}
     />
   );

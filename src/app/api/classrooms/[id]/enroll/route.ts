@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabase } from "@/lib/supabase-server";
-import { verifyToken } from "@/lib/auth";
-import { cookies } from "next/headers";
+import { createServerSupabase } from "@/lib/supabase-auth";
 
 // POST /api/classrooms/[id]/enroll — student joins via join code
 export async function POST(
@@ -9,11 +8,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const user = await verifyToken(token);
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
@@ -42,7 +38,7 @@ export async function POST(
     .from("classroom_enrollments")
     .select("id, status")
     .eq("classroom_id", id)
-    .eq("student_id", user.userId)
+    .eq("student_id", user.id)
     .single();
 
   if (existing) {
@@ -62,7 +58,7 @@ export async function POST(
     .from("classroom_enrollments")
     .insert({
       classroom_id: id,
-      student_id: user.userId,
+      student_id: user.id,
       status: "active",
     });
 

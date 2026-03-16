@@ -1,0 +1,74 @@
+{
+  "course_id": "coding-interview-premium",
+  "video_generation_config": {
+    "target_duration_minutes": 4,
+    "voice_persona": "Coach Alex",
+    "avatar": "professional-male",
+    "domain_theme": "computer-science",
+    "background_color": "#0d1117",
+    "accent_color": "#58a6ff"
+  },
+  "video_assignments": {
+    "concept_explainers": [
+      "two-pointers-intro",
+      "fast-slow-intro", 
+      "sliding-window-intro",
+      "merge-intervals-intro",
+      "cyclic-sort-intro",
+      "linked-list-reversal-intro",
+      "tree-bfs-intro",
+      "tree-dfs-intro",
+      "two-heaps-intro",
+      "subsets-intro",
+      "modified-binary-search-intro",
+      "bitwise-xor-intro",
+      "top-k-elements-intro",
+      "k-way-merge-intro",
+      "topological-sort-intro",
+      "dynamic-programming-intro",
+      "backtracking-intro",
+      "trie-intro",
+      "union-find-intro",
+      "segment-tree-intro"
+    ],
+    "code_walkthroughs": [
+      {
+        "lesson_id": "pair-with-target-sum",
+        "focus": "two pointers visual demonstration",
+        "lines_to_highlight": [7, 8, 9, 10]
+      },
+      {
+        "lesson_id": "linked-list-cycle",
+        "focus": "cycle detection animation",
+        "lines_to_highlight": [14, 15, 16, 17]
+      },
+      {
+        "lesson_id": "max-sum-subarray-size-k",
+        "focus": "sliding window animation",
+        "lines_to_highlight": [12, 13, 14]
+      },
+      {
+        "lesson_id": "merge-overlapping-intervals",
+        "focus": "interval merging visualization",
+        "lines_to_highlight": [10, 11, 12, 13, 14]
+      }
+    ]
+  },
+  "remotion_composition": {
+    "fps": 30,
+    "width": 1920,
+    "height": 1080,
+    "codec": "h264",
+    "output_format": "mp4"
+  },
+  "tts_config": {
+    "provider": "deepgram",
+    "voice": "aura-2-thalia-en",
+    "language": "en"
+  },
+  "narration_style": {
+    "tone": "conversational",
+    "pace_wpm": 150,
+    "markers": ["[PAUSE]", "[SHOW:code]", "[SHOW:diagram]", "[HIGHLIGHT:lines]"]
+  }
+}

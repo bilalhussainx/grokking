@@ -13,6 +13,7 @@ export const cppFundamentalsCourse: Course = {
   description:
     "Learn C++ concepts through hands-on exercises. 6 modules covering memory management, OOP, STL, templates, and systems programming patterns.",
   icon: "\u{1F527}",
+  tier: "pro",
   modules: [
     cppBasicsModule,
     cppPointersMemoryModule,

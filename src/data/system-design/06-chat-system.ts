@@ -97,6 +97,20 @@ Let us design the core architecture for real-time messaging.
 
 ## Architecture Overview
 
+\`\`\`mermaid
+graph TD
+    A[User A] -->|WebSocket| WS1[WS Server 1]
+    B[User B] -->|WebSocket| WS2[WS Server 2]
+    WS1 --> MQ[Message Queue - Kafka]
+    WS2 --> MQ
+    MQ --> CS[Chat Service]
+    MQ --> PS[Presence Service]
+    CS --> DB[(Message DB - Cassandra)]
+    PS --> Redis[(Presence Cache - Redis)]
+    CS -.->|deliver| WS1
+    CS -.->|deliver| WS2
+\`\`\`
+
 \`\`\`
   ┌──────────┐        ┌──────────┐
   │ Client A │        │ Client B │

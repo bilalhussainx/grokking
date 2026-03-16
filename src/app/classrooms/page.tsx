@@ -13,7 +13,7 @@ import JoinClassroomForm from "@/components/classroom/JoinClassroomForm";
 import type { Classroom } from "@/types/classroom";
 
 export default function ClassroomsDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const router = useRouter();
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,7 +92,7 @@ export default function ClassroomsDashboard() {
             </div>
           </div>
 
-          {user.role === "teacher" && (
+          {profile?.role === "teacher" && (
             <button
               onClick={() => setShowCreate(true)}
               className="btn-gradient rounded-xl px-4 py-2 text-sm font-semibold text-white flex items-center gap-2"
@@ -105,13 +105,13 @@ export default function ClassroomsDashboard() {
 
       <div className="relative z-10 mx-auto max-w-5xl px-6 py-8 space-y-8">
         {/* Join form for students */}
-        {user.role === "student" && <JoinClassroomForm onJoin={handleJoin} />}
+        {profile?.role === "student" && <JoinClassroomForm onJoin={handleJoin} />}
 
         {/* Classrooms grid */}
         <section>
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-blue-400" />
-            {user.role === "teacher" ? "Your Classrooms" : "Enrolled Classrooms"}
+            {profile?.role === "teacher" ? "Your Classrooms" : "Enrolled Classrooms"}
           </h2>
 
           {loading ? (
@@ -127,7 +127,7 @@ export default function ClassroomsDashboard() {
                   key={classroom.id}
                   classroom={classroom}
                   index={i}
-                  role={user.role as "teacher" | "student"}
+                  role={(profile?.role ?? "student") as "teacher" | "student"}
                 />
               ))}
             </div>
@@ -140,11 +140,11 @@ export default function ClassroomsDashboard() {
               <GraduationCap className="w-12 h-12 mx-auto mb-4 text-[var(--muted-foreground)] opacity-30" />
               <h3 className="text-lg font-semibold mb-2">No classrooms yet</h3>
               <p className="text-sm text-[var(--muted-foreground)] mb-6">
-                {user.role === "teacher"
+                {profile?.role === "teacher"
                   ? "Create your first classroom to start teaching structured courses with gated progression."
                   : "Ask your teacher for a 6-letter join code to enroll in a classroom."}
               </p>
-              {user.role === "teacher" && (
+              {profile?.role === "teacher" && (
                 <button
                   onClick={() => setShowCreate(true)}
                   className="btn-gradient rounded-xl px-6 py-3 text-sm font-semibold text-white inline-flex items-center gap-2"

@@ -11,7 +11,7 @@ import SessionCard from "@/components/sessions/SessionCard";
 import type { LiveSession } from "@/types/sessions";
 
 export default function SessionsDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const router = useRouter();
   const [sessions, setSessions] = useState<LiveSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +24,7 @@ export default function SessionsDashboard() {
     if (!user) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/sessions?userId=${user.userId}`);
+      const res = await fetch(`/api/sessions?userId=${user.id}`);
       const data = await res.json();
       if (Array.isArray(data)) setSessions(data);
     } finally {
@@ -41,7 +41,7 @@ export default function SessionsDashboard() {
     const res = await fetch("/api/sessions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...data, teacher_id: user.userId }),
+      body: JSON.stringify({ ...data, teacher_id: user.id }),
     });
     const session = await res.json();
     if (session.id) router.push(`/sessions/${session.id}`);
@@ -55,7 +55,7 @@ export default function SessionsDashboard() {
       const res = await fetch("/api/sessions/join", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ join_code: joinCode.toUpperCase(), user_id: user.userId }),
+        body: JSON.stringify({ join_code: joinCode.toUpperCase(), user_id: user.id }),
       });
       const data = await res.json();
       if (data.session?.id) router.push(`/sessions/${data.session.id}`);
@@ -127,7 +127,7 @@ export default function SessionsDashboard() {
             ))}
           </div>
 
-          {user.role === "teacher" && (
+          {profile?.role === "teacher" && (
             <button
               onClick={() => setShowCreate(true)}
               className="rounded-lg bg-gradient-to-r from-blue-500 to-violet-600 px-3 py-1.5 text-[11px] font-semibold text-white flex items-center gap-1.5 shadow-lg shadow-blue-500/20"
@@ -163,9 +163,9 @@ export default function SessionsDashboard() {
               {filter !== "all" ? "No sessions match this filter" : "No sessions yet"}
             </p>
             <p className="text-xs text-white/20 mb-5">
-              {user.role === "teacher" ? "Create a session to get started" : "Join with a code from your teacher"}
+              {profile?.role === "teacher" ? "Create a session to get started" : "Join with a code from your teacher"}
             </p>
-            {user.role === "teacher" && (
+            {profile?.role === "teacher" && (
               <button
                 onClick={() => setShowCreate(true)}
                 className="rounded-lg bg-white/[0.06] border border-white/[0.08] px-4 py-2 text-xs font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"

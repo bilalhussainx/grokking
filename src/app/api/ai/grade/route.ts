@@ -1,9 +1,20 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getGeminiModel } from "@/lib/gemini";
 import { GRADE_SYSTEM_PROMPT } from "@/lib/ai-prompts";
 import { AIGradeRequest, AIGradeResult } from "@/types/ai";
+import { createServerSupabase } from "@/lib/supabase-auth";
+import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
 
 export async function POST(req: NextRequest) {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const ok = await deductCredits(user.id, CREDIT_COSTS.grade, "grade");
+  if (!ok) {
+    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+  }
+
   try {
     const body: AIGradeRequest = await req.json();
     const { code, output, starterCode, solutionCode, lessonTitle, lessonContent } = body;

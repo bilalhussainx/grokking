@@ -17,6 +17,14 @@ interface SarvamAgentConfig {
   language: string;
   personaId?: string;
   proficiencyLevel?: string;
+  lessonTitle?: string;
+  lessonContext?: {
+    lessonId: string;
+    lessonTitle: string;
+    targetPhrases: string[];
+    vocabulary: string[];
+    grammarFocus: string[];
+  };
 }
 
 interface SarvamAgentCallbacks {
@@ -129,6 +137,8 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
       form.append('language', config.language);
       if (config.personaId) form.append('personaId', config.personaId);
       if (config.proficiencyLevel) form.append('proficiencyLevel', config.proficiencyLevel);
+      if (config.lessonTitle) form.append('lessonTitle', config.lessonTitle);
+      if (config.lessonContext) form.append('lessonContext', JSON.stringify(config.lessonContext));
       form.append('conversationHistory', JSON.stringify(conversationRef.current.slice(-10)));
 
       const resp = await fetch('/api/language/sarvam/stream', {
@@ -311,6 +321,8 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
         greetingForm.append('language', config.language);
         if (config.personaId) greetingForm.append('personaId', config.personaId);
         if (config.proficiencyLevel) greetingForm.append('proficiencyLevel', config.proficiencyLevel);
+        if (config.lessonTitle) greetingForm.append('lessonTitle', config.lessonTitle);
+        if (config.lessonContext) greetingForm.append('lessonContext', JSON.stringify(config.lessonContext));
         greetingForm.append('conversationHistory', JSON.stringify([]));
         greetingForm.append('greeting', 'true');
 

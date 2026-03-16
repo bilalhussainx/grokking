@@ -16,6 +16,18 @@ A **Binary Search Tree** is a binary tree where for every node:
 - All values in the **left subtree** are less than the node's value
 - All values in the **right subtree** are greater than the node's value
 
+\`\`\`mermaid
+graph TD
+    A[8] --> B[3]
+    A --> C[10]
+    B --> D[1]
+    B --> E[6]
+    E --> F[4]
+    E --> G[7]
+    C --> H[14]
+    H --> I[13]
+\`\`\`
+
 ### Operations (Balanced)
 
 | Operation | Time |

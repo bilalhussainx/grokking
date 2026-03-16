@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAdminSupabase } from "@/lib/supabase-server";
-import { hashPassword, signToken } from "@/lib/auth";
+import { createServerSupabase } from "@/lib/supabase-auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,55 +20,38 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const db = createAdminSupabase();
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.auth.signUp({
+      email: email.toLowerCase().trim(),
+      password,
+      options: {
+        data: {
+          full_name: name.trim(),
+          role: role === "teacher" ? "teacher" : "student",
+        },
+      },
+    });
 
-    // Check if email already exists
-    const { data: existing } = await db
-      .from("app_users")
-      .select("id")
-      .eq("email", email.toLowerCase().trim())
-      .single();
-
-    if (existing) {
-      return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
-    }
-
-    const passwordHash = await hashPassword(password);
-
-    const { data: user, error } = await db
-      .from("app_users")
-      .insert({
-        email: email.toLowerCase().trim(),
-        password_hash: passwordHash,
-        full_name: name.trim(),
-        role: role === "teacher" ? "teacher" : "student",
-      })
-      .select("id, email, full_name, role")
-      .single();
-
-    if (error || !user) {
+    if (error) {
+      if (error.message.includes("already registered")) {
+        return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
+      }
       return NextResponse.json({ error: "Failed to create account." }, { status: 500 });
     }
 
-    const session = {
-      userId: user.id,
-      name: user.full_name,
-      email: user.email,
-      role: user.role as "student" | "teacher",
-    };
+    if (!data.user) {
+      return NextResponse.json({ error: "Failed to create account." }, { status: 500 });
+    }
 
-    const token = await signToken(session);
-
-    const res = NextResponse.json({ user: session });
-    res.cookies.set("auth-token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
+    const user = data.user;
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        email: user.email || "",
+        name: user.user_metadata?.full_name || "",
+        role: user.user_metadata?.role || "student",
+      },
     });
-
-    return res;
   } catch {
     return NextResponse.json({ error: "Signup failed." }, { status: 500 });
   }

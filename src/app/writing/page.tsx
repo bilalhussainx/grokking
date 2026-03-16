@@ -17,7 +17,7 @@ const DOC_TYPE_CONFIG: Record<DocType, { label: string; color: string; bg: strin
 };
 
 export default function WritingDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const router = useRouter();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ export default function WritingDashboard() {
     if (!user) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/documents?userId=${user.userId}`);
+      const res = await fetch(`/api/documents?userId=${user.id}`);
       const data = await res.json();
       if (Array.isArray(data)) setDocuments(data);
     } finally {
@@ -47,7 +47,7 @@ export default function WritingDashboard() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          owner_id: user.userId,
+          owner_id: user.id,
           title: "Untitled Document",
           doc_type: docType,
         }),

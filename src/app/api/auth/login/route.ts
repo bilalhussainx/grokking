@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAdminSupabase } from "@/lib/supabase-server";
-import { comparePassword, signToken } from "@/lib/auth";
+import { createServerSupabase } from "@/lib/supabase-auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,42 +9,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
     }
 
-    const db = createAdminSupabase();
-
-    const { data: user, error } = await db
-      .from("app_users")
-      .select("id, email, password_hash, full_name, role")
-      .eq("email", email.toLowerCase().trim())
-      .single();
-
-    if (error || !user) {
-      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
-    }
-
-    const valid = await comparePassword(password, user.password_hash);
-    if (!valid) {
-      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
-    }
-
-    const session = {
-      userId: user.id,
-      name: user.full_name,
-      email: user.email,
-      role: user.role as "student" | "teacher" | "admin",
-    };
-
-    const token = await signToken(session);
-
-    const res = NextResponse.json({ user: session });
-    res.cookies.set("auth-token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.toLowerCase().trim(),
+      password,
     });
 
-    return res;
+    if (error || !data.user) {
+      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
+    }
+
+    const user = data.user;
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        email: user.email || "",
+        name: user.user_metadata?.full_name || "",
+        role: user.user_metadata?.role || "student",
+      },
+    });
   } catch {
     return NextResponse.json({ error: "Login failed." }, { status: 500 });
   }

@@ -30,7 +30,7 @@ export default function DocumentEditorPage() {
   const params = useParams();
   const documentId = params.documentId as string;
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
 
   const {
     document: doc,
@@ -72,7 +72,7 @@ export default function DocumentEditorPage() {
 
   const handleStartPipeline = async () => {
     if (!user || !topic.trim()) return;
-    const newRun = await startPipeline(user.userId, doc?.doc_type || "essay");
+    const newRun = await startPipeline(user.id, doc?.doc_type || "essay");
     if (newRun) {
       setShowPipelineSetup(false);
       // Auto-execute first stage
@@ -86,7 +86,7 @@ export default function DocumentEditorPage() {
 
   const handleApprove = async (stageName: string, feedback?: string) => {
     if (!user) return;
-    const result = await approveStage(stageName, user.userId, feedback);
+    const result = await approveStage(stageName, user.id, feedback);
     // Auto-execute next stage if there is one
     if (result?.next_stage) {
       await executeStage(result.next_stage as StageName, {
@@ -151,7 +151,7 @@ export default function DocumentEditorPage() {
     );
   }
 
-  const isTeacher = user.role === "teacher";
+  const isTeacher = profile?.role === "teacher";
   const unresolvedComments = comments.filter((c) => !c.resolved).length;
 
   return (

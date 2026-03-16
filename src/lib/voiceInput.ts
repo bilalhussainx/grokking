@@ -63,7 +63,7 @@ export class VoiceInput {
       if (event.error === 'no-speech') {
         // Auto-restart on no-speech
         if (this.isListening) {
-          setTimeout(() => this.start(), 100);
+          setTimeout(() => { if (this.onTranscript) this.start(this.onTranscript); }, 100);
         }
       }
     };

@@ -67,6 +67,18 @@ SMS is the most expensive channel (typically $0.01-0.05 per message), so rate li
 
 The system accepts notification requests from various internal services, processes them through a pipeline, and delivers them via channel-specific providers.
 
+\`\`\`mermaid
+graph TD
+    E[Event Source] --> NS[Notification Service]
+    NS --> PQ[Priority Queue]
+    PQ --> CR[Channel Router]
+    CR --> Email[Email - SES/SMTP]
+    CR --> SMS[SMS - Twilio]
+    CR --> Push[Push - APNs/FCM]
+    NS -.->|check| Prefs[(User Preferences)]
+    NS -.->|check| RL[Rate Limiter]
+\`\`\`
+
 \`\`\`
 ┌──────────┐  ┌──────────┐  ┌──────────┐
 │ Service A│  │ Service B│  │ Service C│   (Internal callers)

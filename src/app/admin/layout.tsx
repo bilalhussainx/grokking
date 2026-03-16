@@ -24,9 +24,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 text-white font-bold text-xs shadow-md shadow-blue-500/20">
-                G
+                S
               </div>
-              <span className="text-lg font-bold tracking-tight">Grokking</span>
+              <span className="text-lg font-bold tracking-tight">Samsara.ai</span>
             </Link>
 
             <span className="text-white/20">/</span>

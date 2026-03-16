@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabase } from "@/lib/supabase-server";
-import { verifyToken } from "@/lib/auth";
-import { cookies } from "next/headers";
+import { createServerSupabase } from "@/lib/supabase-auth";
 
 // GET /api/classrooms/[id] — get classroom details with classes
 export async function GET(
@@ -9,11 +8,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const user = await verifyToken(token);
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const db = createAdminSupabase();
@@ -30,12 +26,12 @@ export async function GET(
   }
 
   // Check access: teacher who owns it or enrolled student
-  if (classroom.teacher_id !== user.userId) {
+  if (classroom.teacher_id !== user.id) {
     const { data: enrollment } = await db
       .from("classroom_enrollments")
       .select("id")
       .eq("classroom_id", id)
-      .eq("student_id", user.userId)
+      .eq("student_id", user.id)
       .eq("status", "active")
       .single();
 
@@ -83,12 +79,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const user = await verifyToken(token);
-  if (!user || user.role !== "teacher") {
+  const userRole = user.user_metadata?.role || "student";
+  if (userRole !== "teacher") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -99,7 +95,7 @@ export async function PATCH(
     .from("classrooms")
     .update({ ...body, updated_at: new Date().toISOString() })
     .eq("id", id)
-    .eq("teacher_id", user.userId)
+    .eq("teacher_id", user.id)
     .select()
     .single();
 

@@ -75,6 +75,16 @@ There are five main algorithms for rate limiting, each with different trade-offs
 
 Imagine a bucket that holds tokens. Tokens are added at a fixed rate (e.g., 10 tokens/second). Each request consumes one token. If the bucket is empty, the request is rejected.
 
+\`\`\`mermaid
+graph TD
+    A[Request Arrives] --> B{Tokens > 0?}
+    B -->|Yes| C[Consume 1 Token]
+    C --> D[Allow Request - 200 OK]
+    B -->|No| E[Reject Request - 429]
+    F[Token Refill Timer] -->|Add tokens at fixed rate| G[Token Bucket]
+    G --> B
+\`\`\`
+
 - **Bucket size** controls burst capacity (e.g., bucket of 50 allows a burst of 50 requests).
 - **Refill rate** controls sustained throughput.
 

@@ -149,6 +149,21 @@ for row in matrix:
 
 BFS explores a graph **level by level**, visiting all neighbors of a node before moving to their neighbors. It uses a **queue** to maintain the order.
 
+\`\`\`mermaid
+graph LR
+    A["A (1)"] --> B["B (2)"]
+    A --> C["C (2)"]
+    B --> D["D (3)"]
+    B --> E["E (3)"]
+    C --> F["F (3)"]
+    style A fill:#4ade80
+    style B fill:#60a5fa
+    style C fill:#60a5fa
+    style D fill:#f59e0b
+    style E fill:#f59e0b
+    style F fill:#f59e0b
+\`\`\`
+
 ### Properties
 
 - Finds the **shortest path** in unweighted graphs

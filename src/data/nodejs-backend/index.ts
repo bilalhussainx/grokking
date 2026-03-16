@@ -14,6 +14,7 @@ export const nodejsBackendCourse: Course = {
   description:
     "Build server-side applications with Node.js — from core modules and HTTP to Express, databases, authentication, and RESTful APIs.",
   icon: "\u{1F7E2}",
+  tier: "pro",
   modules: [
     nodeBasicsModule,
     httpModule,

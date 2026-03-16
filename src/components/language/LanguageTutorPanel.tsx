@@ -14,6 +14,8 @@ interface LanguageTutorPanelProps {
   courseTitle?: string;
   proficiencyLevel?: ProficiencyLevel;
   targetPhrases?: string[];
+  vocabulary?: string[];
+  grammarFocus?: string[];
   className?: string;
 }
 
@@ -31,6 +33,8 @@ export function LanguageTutorPanel({
   courseTitle,
   proficiencyLevel = "A1",
   targetPhrases = [],
+  vocabulary = [],
+  grammarFocus = [],
   className,
 }: LanguageTutorPanelProps) {
   const [selectedPersona, setSelectedPersona] = useState<LanguagePersona | null>(null);
@@ -102,6 +106,13 @@ export function LanguageTutorPanel({
       lessonTitle,
       moduleTitle,
       courseTitle,
+      lessonContext: {
+        lessonId: "",
+        lessonTitle: lessonTitle || "",
+        targetPhrases: targetPhrases || [],
+        vocabulary: vocabulary || [],
+        grammarFocus: grammarFocus || [],
+      },
     });
 
     // Add greeting to messages
@@ -111,7 +122,7 @@ export function LanguageTutorPanel({
         { role: "agent", text: data.greeting, timestamp: new Date() },
       ]);
     }
-  }, [selectedPersona, language, proficiencyLevel, lessonTitle, moduleTitle, courseTitle, voiceAgent]);
+  }, [selectedPersona, language, proficiencyLevel, lessonTitle, moduleTitle, courseTitle, targetPhrases, vocabulary, grammarFocus, voiceAgent]);
 
   const handleStopSession = useCallback(() => {
     voiceAgent.stop();

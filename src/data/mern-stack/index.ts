@@ -13,6 +13,7 @@ export const mernStackCourse: Course = {
   description:
     "Build full-stack web applications with MongoDB, Express, React, and Node.js. From project setup to deployment with Docker.",
   icon: "\u{1F525}",
+  tier: "pro",
   modules: [
     overviewModule,
     backendSetupModule,

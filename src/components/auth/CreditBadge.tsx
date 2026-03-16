@@ -1,0 +1,17 @@
+// src/components/auth/CreditBadge.tsx
+"use client";
+
+import { useAuth } from "@/contexts/AuthContext";
+import { Coins } from "lucide-react";
+
+export default function CreditBadge() {
+  const { credits, user } = useAuth();
+  if (!user) return null;
+
+  return (
+    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+      <Coins className="w-3.5 h-3.5" />
+      <span>{credits}</span>
+    </div>
+  );
+}

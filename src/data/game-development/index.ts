@@ -12,6 +12,7 @@ export const gameDevelopmentCourse: Course = {
   description:
     "Learn programming by building games — from Pong to Space Shooter using JavaScript and HTML5 Canvas concepts.",
   icon: "\u{1F3AE}",
+  tier: "pro",
   modules: [
     canvasBasicsModule,
     gameLoopModule,

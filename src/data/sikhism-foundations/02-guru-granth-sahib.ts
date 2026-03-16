@@ -1,0 +1,143 @@
+import { Module } from "../types";
+
+export const guruGranthSahibModule: Module = {
+  id: "sikhism-guru-granth-sahib",
+  title: "The Guru Granth Sahib",
+  description:
+    "Study the Guru Granth Sahib — Sikhism's eternal, living Guru. Understand its unique compilation, its inclusive authorship spanning Hindu and Muslim saints alongside Sikh Gurus, and its central theological teachings on Naam, Hukam, and liberation. Resources: Pashaura Singh, The Guru Granth Sahib; Christopher Shackle, Teachings of the Sikh Gurus.",
+  lessons: [
+    {
+      id: "sikhism-scripture-overview",
+      slug: "guru-granth-sahib-overview",
+      title: "The Guru Granth Sahib: Scripture as Living Guru",
+      content: \`## The Guru Granth Sahib: Scripture as Living Guru
+
+<!-- voice:section_check concept="The unique status and compilation of the Guru Granth Sahib" -->
+
+The **Guru Granth Sahib** (ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ) holds a status unique among the world's scriptures: it is not merely a holy book — it is the **eternal, living Guru** of the Sikh faith. When the tenth Guru, **Guru Gobind Singh Ji**, declared the line of human Gurus complete in 1708, he transferred the Guruship to the scripture itself:
+
+> "All Sikhs are commanded to take the Granth as Guru. Consider the Guru Granth as the visible body of the Gurus."
+> — Guru Gobind Singh Ji, recorded in Sikh tradition
+
+### Compilation and Authorship
+
+The Guru Granth Sahib was first compiled by the fifth Guru, **Guru Arjan Dev Ji**, in 1604 at the Golden Temple in Amritsar. It was later finalized by Guru Gobind Singh Ji in 1706. The scripture contains:
+
+| Author Category | Examples | Compositions |
+|----------------|----------|-------------|
+| **Sikh Gurus** | Guru Nanak, Guru Angad, Guru Amar Das, Guru Ram Das, Guru Arjan, Guru Tegh Bahadur | The majority of the text |
+| **Hindu Bhakti Saints** | Kabir, Ravidas, Namdev, Trilochan | Included for their devotion to the One God |
+| **Muslim Sufi Saints** | Sheikh Farid (Baba Farid) | Included for their spiritual depth |
+| **Bards and Devotees** | Bhatts, Satta, Balwand | Court poets who praised the Gurus |
+
+This **interfaith authorship** is extraordinary. The Guru Granth Sahib includes the writings of people from different religions, castes, and social backgrounds — united by their devotion to the one God.
+
+<!-- voice:key_insight insight="The Guru Granth Sahib is the only major world scripture that deliberately includes the writings of saints from other religious traditions. Kabir was a Muslim weaver, Ravidas was a Dalit leather-worker, Sheikh Farid was a Sufi Muslim. Their presence in the Sikh scripture is a powerful statement that truth transcends religious and social boundaries." -->
+
+### Structure
+
+The Guru Granth Sahib contains **1,430 pages** (called **Ang**, ਅੰਗ, meaning "limb" — each page is a living part of the Guru's body). It is organized primarily by:
+
+1. **Raag** (ਰਾਗ) — musical mode. The scripture is set to 31 classical raags, because its verses are meant to be **sung**, not merely read
+2. Within each raag, compositions are arranged by Guru, then by form (Chaupada, Ashtapadi, etc.)
+
+The opening composition is **Japji Sahib** (ਜਪੁਜੀ ਸਾਹਿਬ), composed by Guru Nanak — the foundational prayer recited by Sikhs every morning. It begins with the **Mool Mantar** (ਮੂਲ ਮੰਤਰ), the root formula of Sikh belief:
+
+> **ੴ ਸਤਿ ਨਾਮੁ ਕਰਤਾ ਪੁਰਖੁ ਨਿਰਭਉ ਨਿਰਵੈਰੁ ਅਕਾਲ ਮੂਰਤਿ ਅਜੂਨੀ ਸੈਭੰ ਗੁਰ ਪ੍ਰਸਾਦਿ**
+> "One Creator. Truth by Name. Creative Being. Without Fear. Without Enmity. Timeless Form. Beyond Birth. Self-Existent. By the Guru's Grace."
+> — Guru Granth Sahib, Ang 1
+
+### Key Theological Concepts
+
+**Naam** (ਨਾਮ, "the Divine Name") — The core spiritual practice in Sikhism. Naam is not just a word but the divine presence pervading all reality. Meditating on Naam connects the individual to God.
+
+**Hukam** (ਹੁਕਮ, "Divine Will/Order") — Everything happens within God's will. Accepting Hukam with grace and devotion is the mark of spiritual maturity:
+
+> "By His Command, all forms come into being; His Command cannot be described. By His Command, souls come into existence; by His Command, glory and greatness are obtained."
+> — Guru Granth Sahib, Ang 1 (Japji Sahib)
+
+**Haumai** (ਹਉਮੈ, "ego/self-centeredness") — The primary obstacle to spiritual realization. Haumai is not mere pride but the deep-rooted sense of separation from God and others.
+
+### Respect for the Scripture
+
+The Guru Granth Sahib is treated with the same reverence as a living Guru:
+
+- It is placed on a **throne** (Manji Sahib) under a **canopy** (Chanani) in the Gurdwara
+- A **chaur sahib** (ceremonial whisk) is waved over it
+- It is "put to rest" each night (Sukhasan) and "awakened" each morning (Prakash)
+- A daily **Hukamnama** (ਹੁਕਮਨਾਮਾ) — a randomly opened passage — serves as God's guidance for the day
+
+### Reflection Questions
+
+1. What does it mean for a scripture to be a "living Guru"? How does this compare to how other traditions view their scriptures?
+2. Why is the inclusion of saints from other religions in the Guru Granth Sahib significant?
+3. How does the musical organization of the Guru Granth Sahib reflect the Sikh understanding of worship?
+
+### Deeper Reading
+
+- **Pashaura Singh**, *The Guru Granth Sahib: Canon, Meaning and Authority*, Oxford University Press, 2000
+- **Christopher Shackle & Arvind-Pal Singh Mandair**, *Teachings of the Sikh Gurus*, Routledge, 2005
+\`,
+    },
+    {
+      id: "sikhism-scripture-checkpoint",
+      slug: "guru-granth-sahib-checkpoint",
+      title: "Checkpoint: The Guru Granth Sahib",
+      content: \`## Checkpoint: The Guru Granth Sahib
+
+Let us review the key concepts about Sikhism's living scripture.
+
+### Quiz
+
+**1. Who compiled the Guru Granth Sahib, and when was it finalized?**
+
+*Short Answer:* The Guru Granth Sahib was first compiled by the fifth Guru, Guru Arjan Dev Ji, in 1604. It was finalized by the tenth Guru, Guru Gobind Singh Ji, in 1706. In 1708, Guru Gobind Singh transferred the Guruship to the scripture itself.
+
+---
+
+**2. What makes the authorship of the Guru Granth Sahib unique among world scriptures?**
+
+- a) It was written by one author
+- b) It includes writings from Hindu Bhakti saints, a Muslim Sufi saint, and Sikh Gurus
+- c) It was written in English
+- d) It contains only prayers
+
+**Answer: b)** The Guru Granth Sahib deliberately includes writings from multiple religious traditions — Sikh Gurus, Hindu saints like Kabir and Ravidas, and the Sufi Muslim Sheikh Farid.
+
+---
+
+**3. What is the Mool Mantar, and what does it declare?**
+
+*Short Answer:* The Mool Mantar is the opening verse of the Guru Granth Sahib and the root formula of Sikh belief. It declares: One Creator, Truth by Name, Creative Being, Without Fear, Without Enmity, Timeless, Beyond Birth, Self-Existent, Known by the Guru's Grace.
+
+---
+
+**4. What is Haumai and why is it considered the primary spiritual obstacle?**
+
+- a) It is a form of prayer
+- b) It is ego/self-centeredness — the deep sense of separation from God
+- c) It is a physical illness
+- d) It is a type of meditation
+
+**Answer: b)** Haumai is the ego or self-centeredness that creates the illusion of separation from God and from other beings. Overcoming Haumai through Naam (meditation on the Divine Name) is central to Sikh spiritual practice.
+
+---
+
+**5. Why is each page of the Guru Granth Sahib called an "Ang" (limb)?**
+
+*Short Answer:* Because the Guru Granth Sahib is treated as the living body of the Guru. Each page (Ang) is a living part of this body, reinforcing that the scripture is not merely a book but a living spiritual presence.
+
+---
+
+### Voice Summary
+
+Explain aloud:
+- Why the Guru Granth Sahib is called a "living Guru"
+- What the Mool Mantar teaches about God's nature
+- Why including saints from other traditions in the scripture is significant
+
+Next, we explore the Five Ks and the Khalsa — the distinctive Sikh identity.
+\`,
+    },
+  ],
+};

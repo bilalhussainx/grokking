@@ -1,0 +1,285 @@
+import { NextRequest } from "next/server";
+import { getLanguagePersona, getDefaultPersona, type ProficiencyLevel } from "@/lib/language-personas";
+
+const SARVAM_API_KEY = process.env.SARVAM_API_KEY || "";
+const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
+const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
+
+const SARVAM_LANGUAGES = ['hi', 'pa'];
+const SARVAM_STT_LANGUAGES = ['pa'];
+
+const SARVAM_SPEAKERS: Record<string, string> = {
+  hi: 'priya',
+  pa: 'simran',
+};
+
+const SARVAM_TTS_LANG_MAP: Record<string, string> = {
+  hi: 'hi-IN',
+  pa: 'pa-IN',
+};
+
+const scriptGuide: Record<string, string> = {
+  hi: 'Use Devanagari script (हिंदी) for Hindi words. Mix English words naturally for the English portion.',
+  pa: 'Use Gurmukhi script (ਪੰਜਾਬੀ) for Punjabi words. Mix English words naturally for the English portion.',
+};
+
+/**
+ * POST /api/language/sarvam/stream
+ *
+ * Single streaming endpoint that does STT → LLM (streaming) → TTS in one request.
+ * Streams NDJSON events back to the client:
+ *   {"type":"transcript","text":"..."}     — user's speech transcribed (show immediately)
+ *   {"type":"response","text":"..."}       — LLM response text (show immediately)
+ *   {"type":"audio","base64":"..."}        — TTS audio (play immediately)
+ *   {"type":"error","message":"..."}       — error occurred
+ *
+ * This eliminates the round-trip between Phase 1 (transcribe) and Phase 2 (respond),
+ * saving ~100-300ms, and uses streaming LLM to get text faster.
+ */
+export async function POST(req: NextRequest) {
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = (event: Record<string, unknown>) => {
+        controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
+      };
+
+      try {
+        const formData = await req.formData();
+        const audioBlob = formData.get('audio') as Blob | null;
+        const language = formData.get('language') as string;
+        const personaId = formData.get('personaId') as string | null;
+        const proficiencyLevel = formData.get('proficiencyLevel') as string | null;
+        const historyJson = formData.get('conversationHistory') as string | null;
+        const lessonContextJson = formData.get('lessonContext') as string | null;
+        const lessonTitle = formData.get('lessonTitle') as string | null;
+
+        const lessonContext = lessonContextJson ? JSON.parse(lessonContextJson) : null;
+
+        if (!language || !SARVAM_LANGUAGES.includes(language)) {
+          send({ type: 'error', message: `Unsupported language: ${language}` });
+          controller.close();
+          return;
+        }
+
+        if (!audioBlob || audioBlob.size < 1000) {
+          send({ type: 'error', message: 'No audio provided' });
+          controller.close();
+          return;
+        }
+
+        let conversationHistory: Array<{ role: string; content: string }> | undefined;
+        if (historyJson) {
+          try { conversationHistory = JSON.parse(historyJson); } catch {}
+        }
+
+        // ── Step 1: STT ──
+        let transcript = '';
+        if (SARVAM_STT_LANGUAGES.includes(language)) {
+          // Sarvam STT for Punjabi
+          const sttForm = new FormData();
+          sttForm.append('file', audioBlob, 'recording.webm');
+          sttForm.append('model', 'saaras:v3');
+          const langMap: Record<string, string> = { hi: 'hi-IN', pa: 'pa-IN' };
+          sttForm.append('language_code', langMap[language] || 'hi-IN');
+
+          const sttResp = await fetch('https://api.sarvam.ai/speech-to-text', {
+            method: 'POST',
+            headers: { 'api-subscription-key': SARVAM_API_KEY },
+            body: sttForm,
+          });
+          if (sttResp.ok) {
+            const data = await sttResp.json();
+            transcript = data.transcript || '';
+          }
+        } else {
+          // Deepgram STT for Hindi
+          const audioBuffer = await audioBlob.arrayBuffer();
+          const sttResp = await fetch(
+            `https://api.deepgram.com/v1/listen?model=nova-3&language=${language}&smart_format=true`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Token ${DEEPGRAM_API_KEY}`,
+                'Content-Type': 'audio/webm',
+              },
+              body: audioBuffer,
+            }
+          );
+          if (sttResp.ok) {
+            const data = await sttResp.json();
+            transcript = data.results?.channels?.[0]?.alternatives?.[0]?.transcript || '';
+          }
+        }
+
+        if (!transcript.trim()) {
+          send({ type: 'transcript', text: '' });
+          controller.close();
+          return;
+        }
+
+        // Stream transcript immediately — client shows user message
+        send({ type: 'transcript', text: transcript });
+
+        // ── Step 2: LLM (streaming) ──
+        const persona = personaId
+          ? getLanguagePersona(personaId) || getDefaultPersona(language)
+          : getDefaultPersona(language);
+
+        const level = (proficiencyLevel || 'A1') as ProficiencyLevel;
+        const rule = persona.adaptiveRules.find(r => {
+          const levels: ProficiencyLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+          const idx = levels.indexOf(level);
+          const lo = levels.indexOf(r.levelRange[0]);
+          const hi = levels.indexOf(r.levelRange[1]);
+          return idx >= lo && idx <= hi;
+        }) || persona.adaptiveRules[0];
+
+        let systemPrompt = `${persona.systemPrompt}
+
+ADAPTIVE RULES for ${level} student:
+- Native language ratio: ${(rule.nativeLanguageRatio * 100).toFixed(0)}% English, ${((1 - rule.nativeLanguageRatio) * 100).toFixed(0)}% target language
+- Correction intensity: ${rule.correctionIntensity}
+- Speech speed: ${rule.speechSpeed}
+- Vocabulary: ${rule.vocabularyComplexity}
+
+VOICE CONVERSATION RULES:
+- Keep responses to 1 SHORT sentence. Maximum 2 sentences.
+- ${scriptGuide[language] || 'Respond naturally in the target language mixed with English.'}
+- This goes through TTS. Write exactly how it should be spoken aloud.
+- No markdown, no asterisks, no emojis, no parenthetical notes.`;
+
+        if (lessonContext) {
+          systemPrompt += `\n\n## CURRENT LESSON CONTEXT
+Lesson: ${lessonContext.lessonTitle || lessonTitle || 'General'}
+Target phrases to practice: ${lessonContext.targetPhrases?.join(', ') || 'General conversation'}
+Vocabulary focus: ${lessonContext.vocabulary?.join(', ') || 'General'}
+Grammar focus: ${lessonContext.grammarFocus?.join(', ') || 'General'}
+
+IMPORTANT: Focus conversation on the lesson topic above. Create scenarios where the student must use these words and structures. Gently redirect if conversation drifts from lesson material.`;
+        }
+
+        const messages: Array<{ role: string; content: string }> = [
+          { role: 'system', content: systemPrompt },
+        ];
+        if (conversationHistory?.length) {
+          messages.push(...conversationHistory.slice(-6));
+        }
+        messages.push({ role: 'user', content: transcript });
+
+        let responseText = '';
+
+        if (MOONSHOT_API_KEY) {
+          // Use streaming to get text faster
+          const llmResp = await fetch('https://api.moonshot.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${MOONSHOT_API_KEY}`,
+            },
+            body: JSON.stringify({
+              model: 'kimi-k2-turbo-preview',
+              messages,
+              temperature: 0.7,
+              max_tokens: 80,
+              stream: true,
+            }),
+          });
+
+          if (llmResp.ok && llmResp.body) {
+            // Read SSE stream from Moonshot
+            const reader = llmResp.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop() || '';
+
+              for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed.startsWith('data:')) continue;
+                const data = trimmed.slice(5).trim();
+                if (data === '[DONE]') continue;
+
+                try {
+                  const parsed = JSON.parse(data);
+                  const delta = parsed.choices?.[0]?.delta?.content;
+                  if (delta) {
+                    responseText += delta;
+                  }
+                } catch {}
+              }
+            }
+
+            responseText = responseText.trim();
+          } else if (llmResp.ok) {
+            // Fallback: non-streaming response
+            const data = await llmResp.json();
+            responseText = data.choices?.[0]?.message?.content?.trim() || transcript;
+          } else {
+            console.error('[Stream LLM] Moonshot error:', llmResp.status);
+            responseText = transcript;
+          }
+        } else {
+          responseText = transcript;
+        }
+
+        // Stream response text — client shows agent message
+        send({ type: 'response', text: responseText });
+
+        // ── Step 3: TTS ──
+        const speaker = SARVAM_SPEAKERS[language];
+        const targetLang = SARVAM_TTS_LANG_MAP[language];
+
+        if (speaker && targetLang && SARVAM_API_KEY && responseText) {
+          const ttsResp = await fetch('https://api.sarvam.ai/text-to-speech', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'api-subscription-key': SARVAM_API_KEY,
+            },
+            body: JSON.stringify({
+              text: responseText,
+              target_language_code: targetLang,
+              speaker,
+              model: 'bulbul:v3',
+              pace: 1.0,
+              speech_sample_rate: 22050,
+              output_audio_codec: 'mp3',
+            }),
+          });
+
+          if (ttsResp.ok) {
+            const data = await ttsResp.json();
+            const audioBase64 = data.audios?.[0] || '';
+            if (audioBase64) {
+              send({ type: 'audio', base64: audioBase64 });
+            }
+          } else {
+            console.error('[Stream TTS] Sarvam error:', await ttsResp.text());
+          }
+        }
+
+        controller.close();
+      } catch (error) {
+        console.error('[SarvamStream] Error:', error);
+        send({ type: 'error', message: String(error) });
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'application/x-ndjson',
+      'Cache-Control': 'no-cache',
+      'Transfer-Encoding': 'chunked',
+    },
+  });
+}

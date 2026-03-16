@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     proficiencyLevel = "A1",
     lessonTitle,
     scenario,
-    mode = "free-form",
+    mode: rawMode,
     lessonContext: clientLessonContext,
   } = body as {
     language?: string;
@@ -68,6 +68,8 @@ export async function POST(req: NextRequest) {
     mode?: 'free-form' | 'lesson-practice' | 'placement';
     lessonContext?: { lessonId: string; lessonTitle: string; targetPhrases: string[]; vocabulary: string[]; grammarFocus: string[] };
   };
+
+  const mode = rawMode || (lessonTitle ? 'lesson-practice' : 'free-form');
 
   if (!language) {
     return NextResponse.json(

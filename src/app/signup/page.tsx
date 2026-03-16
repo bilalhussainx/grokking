@@ -77,7 +77,7 @@ export default function SignupPage() {
       >
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
-            Join Grokking
+            Join Samsara<span className="text-cyan-400">.ai</span>
           </h1>
           <p className="text-sm text-white/50 mt-2">Start with 50 free AI credits</p>
         </div>

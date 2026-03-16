@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { InterviewType, InterviewPlan, TranscriptEntry } from "@/types/interview";
+import { createServerSupabase } from "@/lib/supabase-auth";
+import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
 
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 const MOONSHOT_URL = "https://api.moonshot.ai/v1/chat/completions";
@@ -50,6 +52,15 @@ Scoring Guidelines:
 - improvements: 2-4 specific, actionable areas to improve`;
 
 export async function POST(req: NextRequest) {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const ok = await deductCredits(user.id, CREDIT_COSTS.interview_score, "interview_score");
+  if (!ok) {
+    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+  }
+
   try {
     const body = await req.json();
     const {

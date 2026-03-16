@@ -15,6 +15,7 @@ export const javascriptFundamentalsCourse: Course = {
   description:
     "Master modern JavaScript from basics to async patterns. 8 modules with hands-on exercises covering ES6+, closures, promises, and real-world patterns.",
   icon: "\u26A1",
+  tier: "free",
   modules: [
     basicsModule,
     controlFlowModule,

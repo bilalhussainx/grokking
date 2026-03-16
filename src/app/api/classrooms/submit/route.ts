@@ -1,22 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabase } from "@/lib/supabase-server";
-import { verifyToken } from "@/lib/auth";
-import { cookies } from "next/headers";
+import { createServerSupabase } from "@/lib/supabase-auth";
 
 // POST /api/classrooms/submit — submit code for grading
 // Supports two modes:
 // 1. Classroom homework: { classroom_id, homework_id, code }
 // 2. Session submission: { session_id, lesson_id, code, score, passed, feedback }
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const user = await verifyToken(token);
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const db = createAdminSupabase();
+  const userRole = user.user_metadata?.role || "student";
+  const userName = user.user_metadata?.full_name || "";
 
   // Mode 2: Session-based submission (no classroom required)
   if (body.session_id) {
@@ -26,11 +24,11 @@ export async function POST(req: NextRequest) {
     // Use session_messages table with type "submission" to persist
     const { error } = await db.from("session_messages").insert({
       session_id,
-      user_id: user.userId,
+      user_id: user.id,
       content: code,
       message_type: "submission",
       metadata: {
-        sender_name: user.name,
+        sender_name: userName,
         lesson_id,
         language: language || "python",
         score,
@@ -55,7 +53,7 @@ export async function POST(req: NextRequest) {
     .from("classroom_enrollments")
     .select("id")
     .eq("classroom_id", classroom_id)
-    .eq("student_id", user.userId)
+    .eq("student_id", user.id)
     .eq("status", "active")
     .single();
 
@@ -68,7 +66,7 @@ export async function POST(req: NextRequest) {
     .from("homework_submissions")
     .insert({
       homework_id,
-      student_id: user.userId,
+      student_id: user.id,
       code,
       status: "submitted",
     })
@@ -81,13 +79,11 @@ export async function POST(req: NextRequest) {
 
 // GET /api/classrooms/submit?homework_id=xxx OR ?session_id=xxx
 export async function GET(req: NextRequest) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const user = await verifyToken(token);
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const userRole = user.user_metadata?.role || "student";
   const { searchParams } = new URL(req.url);
   const homeworkId = searchParams.get("homework_id");
   const sessionId = searchParams.get("session_id");
@@ -105,9 +101,9 @@ export async function GET(req: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     // Filter: teachers see all, students see own
-    const filtered = user.role === "teacher"
+    const filtered = userRole === "teacher"
       ? data
-      : (data || []).filter((m: { user_id: string }) => m.user_id === user.userId);
+      : (data || []).filter((m: { user_id: string }) => m.user_id === user.id);
 
     return NextResponse.json(filtered || []);
   }
@@ -119,8 +115,8 @@ export async function GET(req: NextRequest) {
       .eq("homework_id", homeworkId)
       .order("submitted_at", { ascending: false });
 
-    if (user.role !== "teacher") {
-      query.eq("student_id", user.userId);
+    if (userRole !== "teacher") {
+      query.eq("student_id", user.id);
     }
 
     const { data, error } = await query;

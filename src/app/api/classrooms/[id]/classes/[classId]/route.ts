@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabase } from "@/lib/supabase-server";
-import { verifyToken } from "@/lib/auth";
-import { cookies } from "next/headers";
+import { createServerSupabase } from "@/lib/supabase-auth";
 
 // PATCH /api/classrooms/[id]/classes/[classId] — unlock/update a class (teacher only)
 export async function PATCH(
@@ -9,12 +8,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string; classId: string }> }
 ) {
   const { id, classId } = await params;
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const user = await verifyToken(token);
-  if (!user || user.role !== "teacher") {
+  const userRole = user.user_metadata?.role || "student";
+  if (userRole !== "teacher") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -25,7 +24,7 @@ export async function PATCH(
     .from("classrooms")
     .select("id")
     .eq("id", id)
-    .eq("teacher_id", user.userId)
+    .eq("teacher_id", user.id)
     .single();
 
   if (!classroom) {

@@ -12,7 +12,7 @@ interface Opts {
  * Voice conversation hook using:
  * - Web Speech API (SpeechRecognition) for STT — bypasses getUserMedia entirely
  * - /api/ai/coach (Kimi K2) for LLM responses
- * - ElevenLabs TTS for speaking responses
+ * - Deepgram TTS for speaking responses
  *
  * This avoids the Realtek/Edge muted mic issue since SpeechRecognition
  * uses the browser's own mic access path, not Web Audio API.
@@ -26,7 +26,8 @@ export function useVoiceConversation({ onTranscript }: Opts = {}) {
   const liveRef = useRef(false);
   const onTranscriptRef = useRef(onTranscript);
   onTranscriptRef.current = onTranscript;
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const contextRef = useRef<{
     lessonTitle?: string;
@@ -185,7 +186,7 @@ export function useVoiceConversation({ onTranscript }: Opts = {}) {
         log("Listening...");
       };
 
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
+      recognition.onresult = (event: any) => {
         let interim = "";
         let final = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -207,7 +208,7 @@ export function useVoiceConversation({ onTranscript }: Opts = {}) {
         }
       };
 
-      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      recognition.onerror = (event: any) => {
         // "no-speech" and "aborted" are normal — just restart
         if (event.error === "no-speech" || event.error === "aborted") {
           if (liveRef.current) {

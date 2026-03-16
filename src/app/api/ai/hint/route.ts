@@ -1,9 +1,20 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getGeminiModel } from "@/lib/gemini";
 import { HINT_SYSTEM_PROMPT } from "@/lib/ai-prompts";
 import { AIHintRequest } from "@/types/ai";
+import { createServerSupabase } from "@/lib/supabase-auth";
+import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
 
 export async function POST(req: NextRequest) {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const ok = await deductCredits(user.id, CREDIT_COSTS.hint, "hint");
+  if (!ok) {
+    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+  }
+
   try {
     const body: AIHintRequest = await req.json();
     const { code, starterCode, solutionCode, lessonTitle, lessonContent, hintLevel } = body;

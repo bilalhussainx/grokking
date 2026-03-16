@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabase } from "@/lib/supabase-server";
-import { verifyToken } from "@/lib/auth";
-import { cookies } from "next/headers";
+import { createServerSupabase } from "@/lib/supabase-auth";
 
 // GET /api/classrooms/[id]/submissions — get all submissions for a classroom
 export async function GET(
@@ -9,11 +8,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const user = await verifyToken(token);
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const db = createAdminSupabase();
@@ -29,7 +25,7 @@ export async function GET(
     return NextResponse.json({ error: "Classroom not found" }, { status: 404 });
   }
 
-  const isTeacher = classroom.teacher_id === user.userId;
+  const isTeacher = classroom.teacher_id === user.id;
 
   // If not the teacher, verify the user is an enrolled student
   if (!isTeacher) {
@@ -37,7 +33,7 @@ export async function GET(
       .from("classroom_enrollments")
       .select("id")
       .eq("classroom_id", id)
-      .eq("student_id", user.userId)
+      .eq("student_id", user.id)
       .eq("status", "active")
       .single();
 
@@ -80,7 +76,7 @@ export async function GET(
 
   // Students only see their own submissions
   if (!isTeacher) {
-    submissionsQuery = submissionsQuery.eq("student_id", user.userId);
+    submissionsQuery = submissionsQuery.eq("student_id", user.id);
   }
 
   const { data: submissions, error: submissionsError } = await submissionsQuery;

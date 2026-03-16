@@ -12,5 +12,6 @@ export const csharpFundamentalsCourse: Course = {
   title: "C# Fundamentals",
   description: "Learn C# from basics to async programming with hands-on projects.",
   icon: "\u{1F7E3}",
+  tier: "pro",
   modules: [csharpBasicsModule, controlFlowModule, oopModule, collectionsModule, asyncModule, projectsModule],
 };

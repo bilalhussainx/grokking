@@ -1,0 +1,129 @@
+{
+  "course_id": "coding-interview-premium",
+  "course_embedding": {
+    "title": "Grokking the Coding Interview: Premium Edition",
+    "description": "The ultimate coding interview preparation course. Master 20 essential patterns with 100+ carefully curated problems, AI-powered hints, voice coaching, and detailed solutions. Includes advanced patterns like Backtracking, Trie, Union Find, and Segment Trees.",
+    "domain": "computer-science",
+    "variation": "interview-prep",
+    "level": "advanced",
+    "keywords": [
+      "coding interview", "algorithms", "data structures", "two pointers", 
+      "sliding window", "dynamic programming", "backtracking", "trie",
+      "union find", "segment tree", "binary search", "BFS", "DFS",
+      "topological sort", "merge intervals", "system design prep"
+    ]
+  },
+  "module_embeddings": [
+    {
+      "module_id": "two-pointers",
+      "title": "Two Pointers",
+      "concepts": ["opposite-direction pointers", "same-direction pointers", "dutch national flag", "pair sum", "remove duplicates"]
+    },
+    {
+      "module_id": "fast-slow-pointers", 
+      "title": "Fast & Slow Pointers",
+      "concepts": ["floyd's cycle detection", "linked list cycle", "find middle", "happy number", "cycle start"]
+    },
+    {
+      "module_id": "sliding-window",
+      "title": "Sliding Window", 
+      "concepts": ["fixed window", "dynamic window", "max sum subarray", "longest substring", "fruits into baskets"]
+    },
+    {
+      "module_id": "merge-intervals",
+      "title": "Merge Intervals",
+      "concepts": ["interval overlap", "merge intervals", "insert interval", "interval intersection", "meeting rooms"]
+    },
+    {
+      "module_id": "cyclic-sort",
+      "title": "Cyclic Sort",
+      "concepts": ["in-place sorting", "find missing number", "find duplicate", "missing numbers"]
+    },
+    {
+      "module_id": "linked-list-reversal",
+      "title": "Linked List Reversal",
+      "concepts": ["reverse linked list", "reverse sublist", "k-group reversal", "rotate list"]
+    },
+    {
+      "module_id": "tree-bfs",
+      "title": "Tree BFS",
+      "concepts": ["level order traversal", "zigzag traversal", "level averages", "minimum depth"]
+    },
+    {
+      "module_id": "tree-dfs",
+      "title": "Tree DFS",
+      "concepts": ["path sum", "all paths", "path numbers", "count paths"]
+    },
+    {
+      "module_id": "two-heaps",
+      "title": "Two Heaps",
+      "concepts": ["median finder", "max heap", "min heap", "sliding window median", "maximize capital"]
+    },
+    {
+      "module_id": "subsets",
+      "title": "Subsets",
+      "concepts": ["generate subsets", "permutations", "combinations", "balanced parentheses", "bit manipulation"]
+    },
+    {
+      "module_id": "modified-binary-search",
+      "title": "Modified Binary Search",
+      "concepts": ["rotated array", "find minimum", "order agnostic", "infinite array"]
+    },
+    {
+      "module_id": "bitwise-xor",
+      "title": "Bitwise XOR",
+      "concepts": ["single number", "two single numbers", "flip invert image", "bit manipulation"]
+    },
+    {
+      "module_id": "top-k-elements",
+      "title": "Top K Elements",
+      "concepts": ["kth largest", "k closest points", "top frequent", "min heap", "max heap"]
+    },
+    {
+      "module_id": "k-way-merge",
+      "title": "K-Way Merge",
+      "concepts": ["merge k lists", "kth smallest in matrix", "smallest range", "heap merge"]
+    },
+    {
+      "module_id": "topological-sort",
+      "title": "Topological Sort",
+      "concepts": ["task scheduling", "course schedule", "kahn's algorithm", "alien dictionary", "prerequisites"]
+    },
+    {
+      "module_id": "dynamic-programming",
+      "title": "Dynamic Programming",
+      "concepts": ["0/1 knapsack", "subset sum", "equal partition", "minimum difference", "count subsets"]
+    },
+    {
+      "module_id": "backtracking",
+      "title": "Backtracking",
+      "concepts": ["n-queens", "combination sum", "palindrome partition", "word search", "constraint satisfaction"]
+    },
+    {
+      "module_id": "trie",
+      "title": "Trie (Prefix Tree)",
+      "concepts": ["prefix tree", "word search II", "autocomplete", "dictionary design"]
+    },
+    {
+      "module_id": "union-find",
+      "title": "Union Find",
+      "concepts": ["disjoint set", "connected components", "number of provinces", "redundant connection", "path compression"]
+    },
+    {
+      "module_id": "segment-tree",
+      "title": "Segment Tree",
+      "concepts": ["range sum query", "range maximum", "mutable array", "count smaller", "lazy propagation"]
+    }
+  ],
+  "rag_context": {
+    "prerequisites": ["python-fundamentals", "data-structures-algorithms"],
+    "companion_courses": ["system-design", "advanced-system-design", "behavioral-interview"],
+    "career_paths": ["software-engineer", "senior-engineer", "staff-engineer", "tech-lead"],
+    "interview_types": ["faang", "startup", "product-company", "contractor"],
+    "difficulty_progression": {
+      "beginner_friendly": [1, 2, 3, 4, 7, 8],
+      "intermediate": [5, 6, 9, 10, 11, 12],
+      "advanced": [13, 14, 15, 16, 17, 18, 19, 20]
+    }
+  }
+}

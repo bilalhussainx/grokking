@@ -13,6 +13,7 @@ export const webDevelopmentCourse: Course = {
   description:
     "Learn the foundations of web development from scratch -- HTML, CSS, responsive design, JavaScript DOM manipulation, Git, and portfolio projects.",
   icon: "\u{1F310}",
+  tier: "free",
   modules: [
     htmlModule,
     cssModule,

@@ -14,6 +14,17 @@ export const linkedListsModule: Module = {
 
 A **singly linked list** is a linear data structure where each node contains a value and a pointer to the next node. The last node points to \`None\`.
 
+\`\`\`mermaid
+graph LR
+    A["[10|next]"] -->|ptr| B["[20|next]"]
+    B -->|ptr| C["[30|next]"]
+    C -->|ptr| D["null"]
+    style A fill:#6366f1,color:#fff
+    style B fill:#6366f1,color:#fff
+    style C fill:#6366f1,color:#fff
+    style D fill:#ef4444,color:#fff
+\`\`\`
+
 ### Structure
 
 \`\`\`

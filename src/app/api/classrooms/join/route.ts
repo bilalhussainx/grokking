@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabase } from "@/lib/supabase-server";
-import { verifyToken } from "@/lib/auth";
-import { cookies } from "next/headers";
+import { createServerSupabase } from "@/lib/supabase-auth";
 
 // POST /api/classrooms/join — join a classroom by code only (no ID needed)
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const user = await verifyToken(token);
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { join_code } = await req.json();
@@ -39,7 +35,7 @@ export async function POST(req: NextRequest) {
     .from("classroom_enrollments")
     .select("id, status")
     .eq("classroom_id", classroom.id)
-    .eq("student_id", user.userId)
+    .eq("student_id", user.id)
     .single();
 
   if (existing?.status === "active") {
@@ -54,7 +50,7 @@ export async function POST(req: NextRequest) {
   } else {
     const { error } = await db
       .from("classroom_enrollments")
-      .insert({ classroom_id: classroom.id, student_id: user.userId, status: "active" });
+      .insert({ classroom_id: classroom.id, student_id: user.id, status: "active" });
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   }

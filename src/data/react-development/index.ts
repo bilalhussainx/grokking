@@ -15,6 +15,7 @@ export const reactDevelopmentCourse: Course = {
   description:
     "Build modern UIs with React — from components and state to hooks, effects, routing, forms, and complete mini projects.",
   icon: "\u269B\uFE0F",
+  tier: "pro",
   modules: [
     componentsModule,
     stateModule,

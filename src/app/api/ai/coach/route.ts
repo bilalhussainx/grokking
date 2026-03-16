@@ -1,4 +1,7 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { createServerSupabase } from "@/lib/supabase-auth";
+import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
+import { storeMemory, searchMemories, extractTopics } from "@/lib/memory";
 
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 const MOONSHOT_URL = "https://api.moonshot.ai/v1/chat/completions";
@@ -22,6 +25,15 @@ RULES:
 - When speaking via voice, keep answers EXTRA short (1-2 sentences max)`;
 
 export async function POST(req: NextRequest) {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const ok = await deductCredits(user.id, CREDIT_COSTS.coach_text, "coach_text");
+  if (!ok) {
+    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+  }
+
   try {
     const body = await req.json();
     const {
@@ -36,6 +48,28 @@ export async function POST(req: NextRequest) {
       history,
     } = body;
 
+    // Retrieve relevant memories for context (non-blocking — don't fail if memory is unavailable)
+    let memoryContext = "";
+    try {
+      const memories = await searchMemories(user.id, `${event} ${lessonTitle || ""}`, {
+        courseSlug: body.courseSlug,
+        limit: 3,
+      });
+      if (memories.length > 0) {
+        memoryContext = `\n[RELEVANT PAST CONVERSATIONS]\n${memories.map((m) => `- ${m.summary || m.content.slice(0, 100)}`).join("\n")}\n`;
+      }
+    } catch {
+      // Memory search is optional — continue without it
+    }
+
+    // Store the user's message as memory (fire-and-forget)
+    storeMemory(user.id, event, {
+      courseSlug: body.courseSlug,
+      lessonSlug: body.lessonSlug,
+      role: "user",
+      topics: extractTopics(event),
+    }).catch(() => {});
+
     const userPrompt = `[CURRENT LESSON]
 Course: ${courseTitle || "Unknown"}
 Module: ${moduleTitle || "Unknown"}
@@ -49,7 +83,7 @@ ${currentCode ? `Student's current code:\n\`\`\`\n${currentCode}\n\`\`\`` : "No 
 
 [EVENT]
 ${event}
-
+${memoryContext}
 Respond concisely as Coach Alex:`;
 
     const messages = [

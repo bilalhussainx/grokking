@@ -1,26 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabase } from "@/lib/supabase-server";
-import { verifyToken } from "@/lib/auth";
+import { createServerSupabase } from "@/lib/supabase-auth";
 import { generateJoinCode, generateClassesFromCourse, autoGenerateHomework } from "@/lib/classroom";
-import { cookies } from "next/headers";
 
 // GET /api/classrooms — list classrooms for the current user
 export async function GET(req: NextRequest) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const user = await verifyToken(token);
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const userRole = user.user_metadata?.role || "student";
   const db = createAdminSupabase();
 
-  if (user.role === "teacher") {
+  if (userRole === "teacher") {
     // Teachers see classrooms they created
     const { data, error } = await db
       .from("classrooms")
       .select("*")
-      .eq("teacher_id", user.userId)
+      .eq("teacher_id", user.id)
       .order("created_at", { ascending: false });
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -49,7 +46,7 @@ export async function GET(req: NextRequest) {
     const { data: enrollments } = await db
       .from("classroom_enrollments")
       .select("classroom_id")
-      .eq("student_id", user.userId)
+      .eq("student_id", user.id)
       .eq("status", "active");
 
     if (!enrollments?.length) return NextResponse.json([]);
@@ -68,12 +65,12 @@ export async function GET(req: NextRequest) {
 
 // POST /api/classrooms — create a new classroom (teachers only)
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const user = await verifyToken(token);
-  if (!user || user.role !== "teacher") {
+  const userRole = user.user_metadata?.role || "student";
+  if (userRole !== "teacher") {
     return NextResponse.json({ error: "Only teachers can create classrooms" }, { status: 403 });
   }
 
@@ -91,7 +88,7 @@ export async function POST(req: NextRequest) {
   const { data: classroom, error: classroomError } = await db
     .from("classrooms")
     .insert({
-      teacher_id: user.userId,
+      teacher_id: user.id,
       course_slug,
       title,
       description: description || null,

@@ -20,11 +20,21 @@ export interface Course {
   title: string;
   description: string;
   icon: string;
+  tier: "free" | "pro";
   modules: Module[];
+  featured?: boolean;       // Highlighted on homepage
+  domain?: string;          // e.g., "computer-science", "finance-business"
+  variation?: string;       // e.g., "interview-prep", "web-development"
+  level?: "beginner" | "intermediate" | "advanced";
+  prerequisiteIds?: string[];  // Course IDs that should be taken first
 }
 
 export function getAllLessons(course: Course): Lesson[] {
   return course.modules.flatMap(m => m.lessons);
+}
+
+export function getFeaturedCourses(courses: Course[]): Course[] {
+  return courses.filter(c => c.featured);
 }
 
 export function findLesson(course: Course, lessonSlug: string): {

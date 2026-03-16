@@ -14,7 +14,7 @@ import type { Classroom, ClassUnit, ClassHomework } from "@/types/classroom";
 
 export default function ClassroomDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const router = useRouter();
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,7 +79,7 @@ export default function ClassroomDetailPage() {
 
   if (!user || !classroom) return null;
 
-  const isTeacher = user.role === "teacher" && classroom.teacher_id === user.userId;
+  const isTeacher = profile?.role === "teacher" && classroom.teacher_id === user.id;
   const classes = classroom.classes || [];
 
   const statusIcon = (status: string) => {
