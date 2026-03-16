@@ -49,6 +49,30 @@ export default function AICoach() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const codeChangeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hintsRef = useRef(0);
+  const voiceSessionStartRef = useRef<number | null>(null);
+
+  // Track voice session usage analytics
+  const sendAnalytics = useCallback((voiceUsed: boolean) => {
+    const ctx = lessonContextRef.current;
+    const duration = voiceSessionStartRef.current
+      ? Math.round((Date.now() - voiceSessionStartRef.current) / 1000)
+      : 0;
+
+    fetch('/api/user/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionType: 'coach',
+        language: coachLanguage,
+        durationSeconds: duration,
+        courseSlug: ctx?.courseSlug || null,
+        lessonSlug: ctx?.lessonSlug || null,
+        messageCount: messagesRef.current.length,
+        voiceUsed,
+        coachPersona: selectedPersona,
+      }),
+    }).catch(() => {}); // Best-effort, non-blocking
+  }, [coachLanguage, selectedPersona]);
 
   // Refs to avoid stale closures
   const isStreamingRef = useRef(false);
@@ -82,6 +106,7 @@ export default function AICoach() {
     },
     onConnect: () => {
       console.log('[Coach] Deepgram connected');
+      voiceSessionStartRef.current = Date.now();
     },
     onDisconnect: () => {
       console.log('[Coach] Deepgram disconnected');
@@ -153,11 +178,13 @@ export default function AICoach() {
     });
   }, []);
 
-  // Stop voice conversation
+  // Stop voice conversation + send usage analytics
   const stopVoice = useCallback(() => {
     saveNotes();
+    sendAnalytics(true);
+    voiceSessionStartRef.current = null;
     deepgram.stop();
-  }, [deepgram, saveNotes]);
+  }, [deepgram, saveNotes, sendAnalytics]);
 
   // Send code context updates to Deepgram agent periodically
   useEffect(() => {
@@ -281,21 +308,38 @@ export default function AICoach() {
     openPanel();
   }, [lessonContext, lastLessonId, saveNotes, openPanel]);
 
-  // Welcome greeting — proactive lesson introduction
+  // Auto-start voice coach when a lesson opens — Coach Alex greets and listens
+  const autoStartAttempted = useRef(false);
   useEffect(() => {
-    if (!lessonContext || hasGreeted || deepgram.isConnected) return;
+    if (!lessonContext || hasGreeted) return;
+    if (autoStartAttempted.current) return;
+    autoStartAttempted.current = true;
     setHasGreeted(true);
-    const hasCodingExercise = !!(lessonContext.starterCode);
-    const timer = setTimeout(() => {
-      sendEvent(
-        hasCodingExercise
-          ? `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". This lesson has a coding exercise. Welcome them, briefly introduce what the exercise is about based on the lesson content, and ask if they want you to walk through the concept first or if they want to jump into coding.`
-          : `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". Welcome them, give a 1-sentence preview of what this lesson covers based on the lesson material, and ask: "Want me to walk you through the key points, or would you prefer to read first and ask questions?"`,
-        'encouraging'
-      );
-    }, 800);
+
+    // Open the panel and auto-start voice after a brief delay
+    openPanel();
+    const timer = setTimeout(async () => {
+      try {
+        await startVoice();
+        // Voice greeting is handled by the Deepgram agent's system prompt
+      } catch {
+        // Voice failed (no mic, etc.) — fall back to text greeting
+        const hasCodingExercise = !!(lessonContext.starterCode);
+        sendEvent(
+          hasCodingExercise
+            ? `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". This lesson has a coding exercise. Welcome them, briefly introduce what the exercise is about, and ask if they want a walkthrough or to jump into coding.`
+            : `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". Welcome them, preview what the lesson covers, and ask: "Want me to walk you through the key points, or would you prefer to read first and ask questions?"`,
+          'encouraging'
+        );
+      }
+    }, 1200);
     return () => clearTimeout(timer);
-  }, [lessonContext, hasGreeted, sendEvent, deepgram.isConnected]);
+  }, [lessonContext, hasGreeted, openPanel, startVoice, sendEvent]);
+
+  // Reset auto-start flag when lesson changes
+  useEffect(() => {
+    autoStartAttempted.current = false;
+  }, [lessonContext?.lessonTitle]);
 
   // Code activity detection (text mode only)
   useEffect(() => {
@@ -411,12 +455,17 @@ export default function AICoach() {
     };
   }, [deepgram.isConnected]);
 
-  // Cleanup on unmount
+  // Cleanup on unmount — save notes + send analytics
   const saveNotesRef = useRef(saveNotes);
+  const sendAnalyticsRef = useRef(sendAnalytics);
   saveNotesRef.current = saveNotes;
+  sendAnalyticsRef.current = sendAnalytics;
   useEffect(() => {
     return () => {
       saveNotesRef.current();
+      if (voiceSessionStartRef.current) {
+        sendAnalyticsRef.current(true);
+      }
     };
   }, []);
 
