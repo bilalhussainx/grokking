@@ -17,10 +17,10 @@ import { hindiBeginnerCourse } from "./hindi-beginner";
 import { hindiIntermediateCourse } from "./hindi-intermediate";
 import { hindiAdvancedCourse } from "./hindi-advanced";
 
-// ── Chinese ──
-import { chineseBeginnerCourse } from "./chinese-beginner";
-import { chineseIntermediateCourse } from "./chinese-intermediate";
-import { chineseAdvancedCourse } from "./chinese-advanced";
+// ── Chinese — Hidden for now (no native Deepgram voice) ──
+// import { chineseBeginnerCourse } from "./chinese-beginner";
+// import { chineseIntermediateCourse } from "./chinese-intermediate";
+// import { chineseAdvancedCourse } from "./chinese-advanced";
 
 // ── English (ESL) ──
 import { englishBeginnerCourse } from "./english-beginner";
@@ -47,10 +47,7 @@ export { hindiBeginnerCourse, getHindiBeginnerLessons, findHindiBeginnerLesson }
 export { hindiIntermediateCourse } from "./hindi-intermediate";
 export { hindiAdvancedCourse } from "./hindi-advanced";
 
-// Chinese
-export { chineseBeginnerCourse, getChineseBeginnerLessons, findChineseBeginnerLesson } from "./chinese-beginner";
-export { chineseIntermediateCourse } from "./chinese-intermediate";
-export { chineseAdvancedCourse } from "./chinese-advanced";
+// Chinese — hidden for now
 
 // English (ESL)
 export { englishBeginnerCourse, getEnglishBeginnerLessons, findEnglishBeginnerLesson, PRONUNCIATION_FOCUS, GRAMMAR_ERROR_PREDICTION } from "./english-beginner";
@@ -74,10 +71,6 @@ export const languageCourses: LanguageCourse[] = [
   hindiBeginnerCourse,
   hindiIntermediateCourse,
   hindiAdvancedCourse,
-  // Chinese
-  chineseBeginnerCourse,
-  chineseIntermediateCourse,
-  chineseAdvancedCourse,
   // English (ESL)
   englishBeginnerCourse,
   englishIntermediateCourse,
@@ -105,7 +98,6 @@ export function getSupportedLanguages() {
     es: "\u{1F1EA}\u{1F1F8}", // Spain
     fr: "\u{1F1EB}\u{1F1F7}", // France
     hi: "\u{1F1EE}\u{1F1F3}", // India
-    zh: "\u{1F1E8}\u{1F1F3}", // China
     en: "\u{1F1EC}\u{1F1E7}", // UK
   };
 

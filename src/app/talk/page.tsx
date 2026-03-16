@@ -132,7 +132,6 @@ function TalkPageInner() {
       { code: "it", name: "Italian", flag: "\u{1F1EE}\u{1F1F9}", native: "Italiano" },
       { code: "nl", name: "Dutch", flag: "\u{1F1F3}\u{1F1F1}", native: "Nederlands" },
       { code: "ja", name: "Japanese", flag: "\u{1F1EF}\u{1F1F5}", native: "\u65E5\u672C\u8A9E" },
-      { code: "zh", name: "Mandarin", flag: "\u{1F1E8}\u{1F1F3}", native: "\u4E2D\u6587" },
       { code: "hi", name: "Hindi", flag: "\u{1F1EE}\u{1F1F3}", native: "\u0939\u093F\u0928\u094D\u0926\u0940" },
       { code: "pa", name: "Punjabi", flag: "\u{1F1EE}\u{1F1F3}", native: "\u0A2A\u0A70\u0A1C\u0A3E\u0A2C\u0A40" },
     ];
