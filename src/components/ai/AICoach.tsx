@@ -118,9 +118,23 @@ export default function AICoach() {
 
   const deepgram = useDeepgramAgent(deepgramCallbacks);
 
+  // Languages supported by Deepgram voice (non-Indic only)
+  const VOICE_SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'nl', 'it', 'ja'];
+
   // Start voice conversation via Deepgram
   const startVoice = useCallback(async () => {
     if (deepgram.isConnecting || deepgram.isConnected) return;
+
+    // If coach language isn't supported by Deepgram TTS, fall back to English
+    // but keep the LLM instruction to explain in the user's language via text
+    let voiceLang = coachLanguage;
+    if (!VOICE_SUPPORTED_LANGUAGES.includes(coachLanguage)) {
+      voiceLang = 'en';
+      addMessage(
+        `Voice mode for ${ALL_SUPPORTED_LANGUAGES.find(l => l.code === coachLanguage)?.name || coachLanguage} is coming soon. Using English voice for now — you can still type in your language and Coach will respond in text.`,
+        'coach', 'teaching'
+      );
+    }
 
     const ctx = lessonContextRef.current;
     await deepgram.start({
@@ -130,7 +144,7 @@ export default function AICoach() {
       personaId: selectedPersona,
       voiceId: selectedVoice,
       mode: "coach",
-      language: coachLanguage,
+      language: voiceLang,
       lessonContext: ctx ? {
         lessonId: ctx.lessonSlug || '',
         lessonTitle: ctx.lessonTitle,
