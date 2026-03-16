@@ -19,6 +19,9 @@ interface DeepgramAgentConfig {
     targetPhrases: string[];
     vocabulary: string[];
     grammarFocus: string[];
+    content?: string;
+    starterCode?: string;
+    solutionCode?: string;
   };
   apiEndpoint?: string; // Override: defaults to /api/ai/voice-session
 }

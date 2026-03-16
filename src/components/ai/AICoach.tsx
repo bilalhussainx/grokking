@@ -96,6 +96,16 @@ export default function AICoach() {
       personaId: selectedPersona,
       voiceId: selectedVoice,
       mode: "coach",
+      lessonContext: ctx ? {
+        lessonId: ctx.lessonSlug || '',
+        lessonTitle: ctx.lessonTitle,
+        targetPhrases: [],
+        vocabulary: [],
+        grammarFocus: [],
+        content: ctx.lessonContent,
+        starterCode: ctx.starterCode,
+        solutionCode: ctx.solutionCode,
+      } : undefined,
     });
   }, [deepgram, selectedPersona, selectedVoice]);
 

@@ -1,42 +1,74 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { createServerSupabase } from "@/lib/supabase-auth";
+import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
+import {
+  getCoachPersona,
+  getInterviewerPersona,
+  getVoice,
+  COACH_PERSONAS,
+} from "@/lib/voice-personas";
 
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 
-const COACH_PROMPT = `You are Coach Alex, an encouraging and intelligent AI coding tutor embedded in the Grokking learning platform.
-
-YOUR PERSONALITY:
-- Warm, encouraging, but never patronizing
-- You celebrate wins genuinely
-- You give progressive hints — never the full answer on first ask
-- You speak concisely (1-2 sentences typical, max 120 characters for voice)
-- You adapt to the student's skill level based on their code
-- You use casual, friendly language — like a supportive senior developer
-
-RULES:
-- NEVER give the full solution directly unless explicitly asked after 3+ hints
-- Keep responses SHORT — 1-2 sentences for voice
-- Reference the specific problem/pattern they're working on
-- When speaking via voice, keep answers EXTRA short
-- Do not use markdown formatting, code blocks, or special characters
-- Use plain conversational language suitable for text-to-speech`;
-
 /**
  * Returns the Deepgram Voice Agent WebSocket config.
+ * Supports persona and voice selection.
  * The browser connects directly to Deepgram's WSS endpoint.
  * Kimi K2 Turbo is the LLM brain (OpenAI-compatible).
  */
 export async function POST(req: NextRequest) {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const ok = await deductCredits(user.id, CREDIT_COSTS.voice_session, "voice_session");
+  if (!ok) {
+    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+  }
+
   if (!DEEPGRAM_API_KEY) {
     return Response.json({ error: "Deepgram API key not configured" }, { status: 500 });
   }
 
   const body = await req.json().catch(() => ({}));
-  const { lessonTitle, moduleTitle, courseTitle } = body;
+  const {
+    lessonTitle,
+    moduleTitle,
+    courseTitle,
+    personaId,
+    voiceId,
+    mode = "coach", // "coach" | "interviewer"
+    lessonContext,
+  } = body;
 
-  const contextPrompt = lessonTitle
-    ? `${COACH_PROMPT}\n\nCURRENT LESSON: ${courseTitle || "Coding"} > ${moduleTitle || ""} > ${lessonTitle}`
-    : COACH_PROMPT;
+  // Select persona
+  const persona =
+    mode === "interviewer"
+      ? getInterviewerPersona(personaId || "interviewer-mentor")
+      : getCoachPersona(personaId || "alex");
+
+  // Select voice (user preference > persona default)
+  const voice = getVoice(voiceId || persona.defaultVoice);
+
+  // Build context-aware prompt with full lesson material
+  let contextPrompt = persona.systemPrompt;
+  if (lessonTitle) {
+    contextPrompt += `\n\nCURRENT LESSON: ${courseTitle || "Course"} > ${moduleTitle || ""} > ${lessonTitle}`;
+  }
+  if (lessonContext?.content) {
+    // Truncate to ~4000 chars to stay within prompt limits
+    const content = lessonContext.content.slice(0, 4000);
+    contextPrompt += `\n\n## LESSON MATERIAL\nThe student is studying the following lesson. Reference this material when teaching, explaining concepts, or answering questions:\n\n${content}`;
+  }
+  if (lessonContext?.starterCode) {
+    contextPrompt += `\n\n## STARTER CODE\n\`\`\`\n${lessonContext.starterCode.slice(0, 1500)}\n\`\`\``;
+  }
+  if (lessonContext?.solutionCode) {
+    contextPrompt += `\n\n## SOLUTION CODE (only reveal if student is truly stuck)\n\`\`\`\n${lessonContext.solutionCode.slice(0, 1500)}\n\`\`\``;
+  }
+
+  const greeting = persona.greeting(lessonTitle);
 
   // Build the Deepgram Voice Agent settings
   const settings = {
@@ -67,7 +99,7 @@ export async function POST(req: NextRequest) {
           temperature: 0.7,
         },
         endpoint: {
-          url: "https://api.moonshot.ai/v1",
+          url: "https://api.moonshot.ai/v1/chat/completions",
           headers: {
             authorization: `Bearer ${MOONSHOT_API_KEY}`,
           },
@@ -77,12 +109,10 @@ export async function POST(req: NextRequest) {
       speak: {
         provider: {
           type: "deepgram",
-          model: "aura-2-odysseus-en",
+          model: voice.deepgramModel,
         },
       },
-      greeting: lessonTitle
-        ? `Hey! Ready to work on ${lessonTitle}?`
-        : "Hey! Ready to code together?",
+      greeting,
     },
   };
 
@@ -90,5 +120,7 @@ export async function POST(req: NextRequest) {
     url: "wss://agent.deepgram.com/v1/agent/converse",
     key: DEEPGRAM_API_KEY,
     settings,
+    persona: { id: persona.id, name: persona.name },
+    voice: { id: voice.id, name: voice.name },
   });
 }
