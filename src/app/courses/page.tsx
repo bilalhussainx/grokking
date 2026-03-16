@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { courses } from '@/data';
 import { getAllLessons } from '@/data/types';
+import { getAllLanguageCourses } from '@/data/languages';
 import { JsonLd } from '@/lib/schema';
 
 export const metadata: Metadata = {
@@ -104,7 +105,7 @@ export default function CoursesPage() {
           </h1>
           <p className="text-slate-300 text-lg leading-relaxed mb-4">
             Samsara.ai offers {courses.length}+ interactive online courses
-            spanning Computer Science, Religious Studies, Philosophy, Finance &
+            spanning Computer Science, Language Learning, Religious Studies, Philosophy, Finance &
             Business, Health & Wellness, and Political Strategy. With{' '}
             {totalLessons}+ lessons across all courses, learners can study
             everything from Python programming and system design to Islamic
@@ -182,6 +183,61 @@ export default function CoursesPage() {
             </section>
           );
         })}
+
+        {/* Language Learning Courses */}
+        {(() => {
+          const langCourses = getAllLanguageCourses();
+          if (langCourses.length === 0) return null;
+
+          const FLAGS: Record<string, string> = {
+            es: "\u{1F1EA}\u{1F1F8}", fr: "\u{1F1EB}\u{1F1F7}", hi: "\u{1F1EE}\u{1F1F3}",
+            zh: "\u{1F1E8}\u{1F1F3}", en: "\u{1F1EC}\u{1F1E7}", ur: "\u{1F1F5}\u{1F1F0}",
+          };
+
+          return (
+            <section className="mb-12">
+              <h2 className="text-2xl font-bold text-white mb-6 border-b border-slate-700/50 pb-3">
+                Language Learning
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {langCourses.map((course) => {
+                  const lessonCount = course.modules.reduce(
+                    (sum, m) => sum + m.lessons.length, 0
+                  );
+                  return (
+                    <Link
+                      key={course.id}
+                      href={`/course/${course.slug}`}
+                      className="group block"
+                    >
+                      <article className="rounded-2xl border border-emerald-500/20 bg-slate-800/30 p-5 hover:bg-slate-800/50 hover:border-emerald-500/40 transition-all h-full">
+                        <div className="flex items-start justify-between mb-3">
+                          <span className="text-3xl">
+                            {FLAGS[course.language] || course.icon || "\u{1F310}"}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400">
+                            {course.proficiencyLevel}
+                          </span>
+                        </div>
+                        <h3 className="text-white font-semibold mb-2 group-hover:text-emerald-400 transition-colors">
+                          {course.title}
+                        </h3>
+                        <p className="text-slate-400 text-sm leading-relaxed mb-3">
+                          {course.description}
+                        </p>
+                        <div className="flex items-center gap-3 text-xs text-slate-500">
+                          <span>{course.modules.length} modules</span>
+                          <span>{lessonCount} lessons</span>
+                          <span>{course.estimatedHours}h</span>
+                        </div>
+                      </article>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })()}
 
         {/* Catch any courses without a recognized domain */}
         {(() => {
