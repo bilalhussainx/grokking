@@ -140,6 +140,6 @@ export function getCourseChain(language: string): LanguageCourse[] {
   };
 
   return getCoursesByLanguage(language).sort(
-    (a, b) => (levelOrder[a.level] ?? 99) - (levelOrder[b.level] ?? 99)
+    (a, b) => (levelOrder[a.proficiencyLevel] ?? 99) - (levelOrder[b.proficiencyLevel] ?? 99)
   );
 }
