@@ -36,7 +36,10 @@ export function AIProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<AIMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [mode, setMode] = useState<AIMode>("tutor");
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('coach-panel-open') === 'true';
+    return false;
+  });
   const [lessonContext, setLessonContext] = useState<LessonContext | null>(null);
   const [currentCode, setCurrentCode] = useState("");
 
@@ -45,9 +48,19 @@ export function AIProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clearMessages = useCallback(() => setMessages([]), []);
-  const togglePanel = useCallback(() => setIsPanelOpen((p) => !p), []);
-  const openPanel = useCallback(() => setIsPanelOpen(true), []);
-  const closePanel = useCallback(() => setIsPanelOpen(false), []);
+  const togglePanel = useCallback(() => setIsPanelOpen((p) => {
+    const next = !p;
+    localStorage.setItem('coach-panel-open', String(next));
+    return next;
+  }), []);
+  const openPanel = useCallback(() => {
+    setIsPanelOpen(true);
+    localStorage.setItem('coach-panel-open', 'true');
+  }, []);
+  const closePanel = useCallback(() => {
+    setIsPanelOpen(false);
+    localStorage.setItem('coach-panel-open', 'false');
+  }, []);
 
   return (
     <AICtx.Provider

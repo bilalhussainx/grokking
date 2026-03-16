@@ -38,16 +38,110 @@ export interface VoiceProviderConfig {
 // Language Routing
 // ============================================
 
-// Deepgram Aura-2 TTS supports these languages natively
-const DEEPGRAM_TTS_LANGUAGES = ['en', 'es', 'fr', 'de', 'nl', 'it', 'ja', 'zh'];
+// ============================================
+// Full Language Support — 18 languages
+// ============================================
 
-// Sarvam for Hindi/Punjabi (TTS + STT for Punjabi)
-// Note: Urdu NOT included — Sarvam doesn't support Urdu TTS
-const SARVAM_LANGUAGES = ['pa', 'hi'];
+// Deepgram Aura-2 TTS: 7 languages with native-accent voices
+const DEEPGRAM_TTS_LANGUAGES = ['en', 'es', 'fr', 'de', 'nl', 'it', 'ja'];
+
+// Sarvam Bulbul v3 TTS: 11 Indic languages
+const SARVAM_LANGUAGES = ['hi', 'bn', 'ta', 'te', 'gu', 'kn', 'ml', 'mr', 'pa', 'od', 'en-IN'];
 
 export function isSarvamLanguage(lang: string): boolean {
   return SARVAM_LANGUAGES.includes(lang);
 }
+
+// All supported languages with metadata
+export const ALL_SUPPORTED_LANGUAGES = [
+  // Deepgram TTS languages
+  { code: 'en', name: 'English', native: 'English', flag: '\u{1F1FA}\u{1F1F8}', provider: 'deepgram' as const },
+  { code: 'es', name: 'Spanish', native: 'Espa\u00F1ol', flag: '\u{1F1EA}\u{1F1F8}', provider: 'deepgram' as const },
+  { code: 'fr', name: 'French', native: 'Fran\u00E7ais', flag: '\u{1F1EB}\u{1F1F7}', provider: 'deepgram' as const },
+  { code: 'de', name: 'German', native: 'Deutsch', flag: '\u{1F1E9}\u{1F1EA}', provider: 'deepgram' as const },
+  { code: 'nl', name: 'Dutch', native: 'Nederlands', flag: '\u{1F1F3}\u{1F1F1}', provider: 'deepgram' as const },
+  { code: 'it', name: 'Italian', native: 'Italiano', flag: '\u{1F1EE}\u{1F1F9}', provider: 'deepgram' as const },
+  { code: 'ja', name: 'Japanese', native: '\u65E5\u672C\u8A9E', flag: '\u{1F1EF}\u{1F1F5}', provider: 'deepgram' as const },
+  // Sarvam TTS languages (Indic)
+  { code: 'hi', name: 'Hindi', native: '\u0939\u093F\u0928\u094D\u0926\u0940', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
+  { code: 'bn', name: 'Bengali', native: '\u09AC\u09BE\u0982\u09B2\u09BE', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
+  { code: 'ta', name: 'Tamil', native: '\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
+  { code: 'te', name: 'Telugu', native: '\u0C24\u0C46\u0C32\u0C41\u0C17\u0C41', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
+  { code: 'gu', name: 'Gujarati', native: '\u0A97\u0AC1\u0A9C\u0AB0\u0ABE\u0AA4\u0AC0', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
+  { code: 'kn', name: 'Kannada', native: '\u0C95\u0CA8\u0CCD\u0CA8\u0CA1', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
+  { code: 'ml', name: 'Malayalam', native: '\u0D2E\u0D32\u0D2F\u0D3E\u0D33\u0D02', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
+  { code: 'mr', name: 'Marathi', native: '\u092E\u0930\u093E\u0920\u0940', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
+  { code: 'pa', name: 'Punjabi', native: '\u0A2A\u0A70\u0A1C\u0A3E\u0A2C\u0A40', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
+  { code: 'od', name: 'Odia', native: '\u0B13\u0B21\u0B3C\u0B3F\u0B06', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
+] as const;
+
+// Deepgram voice catalog — multiple voices per language with accents
+export const DEEPGRAM_VOICE_CATALOG: Record<string, { id: string; name: string; accent?: string; gender: 'male' | 'female' }[]> = {
+  en: [
+    { id: 'aura-2-thalia-en', name: 'Thalia', gender: 'female' },
+    { id: 'aura-2-orion-en', name: 'Orion', gender: 'male' },
+    { id: 'aura-2-luna-en', name: 'Luna', gender: 'female' },
+    { id: 'aura-2-arcas-en', name: 'Arcas', gender: 'male' },
+    { id: 'aura-2-athena-en', name: 'Athena', gender: 'female' },
+    { id: 'aura-2-helios-en', name: 'Helios', gender: 'male' },
+    { id: 'aura-2-draco-en', name: 'Draco', accent: 'British', gender: 'male' },
+    { id: 'aura-2-pandora-en', name: 'Pandora', accent: 'British', gender: 'female' },
+    { id: 'aura-2-hyperion-en', name: 'Hyperion', accent: 'Australian', gender: 'male' },
+    { id: 'aura-2-aurora-en', name: 'Aurora', gender: 'female' },
+    { id: 'aura-2-zeus-en', name: 'Zeus', gender: 'male' },
+    { id: 'aura-2-hera-en', name: 'Hera', gender: 'female' },
+  ],
+  es: [
+    { id: 'aura-2-diana-es', name: 'Diana', accent: 'Spain', gender: 'female' },
+    { id: 'aura-2-nestor-es', name: 'N\u00E9stor', accent: 'Spain', gender: 'male' },
+    { id: 'aura-2-estrella-es', name: 'Estrella', accent: 'Mexico', gender: 'female' },
+    { id: 'aura-2-javier-es', name: 'Javier', accent: 'Mexico', gender: 'male' },
+    { id: 'aura-2-celeste-es', name: 'Celeste', accent: 'Colombia', gender: 'female' },
+    { id: 'aura-2-antonia-es', name: 'Antonia', accent: 'Argentina', gender: 'female' },
+    { id: 'aura-2-aquila-es', name: 'Aquila', accent: 'Bilingual EN/ES', gender: 'female' },
+  ],
+  fr: [
+    { id: 'aura-2-agathe-fr', name: 'Agathe', gender: 'female' },
+    { id: 'aura-2-hector-fr', name: 'Hector', gender: 'male' },
+  ],
+  de: [
+    { id: 'aura-2-viktoria-de', name: 'Viktoria', gender: 'female' },
+    { id: 'aura-2-julius-de', name: 'Julius', gender: 'male' },
+    { id: 'aura-2-elara-de', name: 'Elara', gender: 'female' },
+    { id: 'aura-2-fabian-de', name: 'Fabian', gender: 'male' },
+  ],
+  nl: [
+    { id: 'aura-2-rhea-nl', name: 'Rhea', gender: 'female' },
+    { id: 'aura-2-sander-nl', name: 'Sander', gender: 'male' },
+    { id: 'aura-2-beatrix-nl', name: 'Beatrix', gender: 'female' },
+    { id: 'aura-2-lars-nl', name: 'Lars', gender: 'male' },
+  ],
+  it: [
+    { id: 'aura-2-livia-it', name: 'Livia', gender: 'female' },
+    { id: 'aura-2-elio-it', name: 'Elio', gender: 'male' },
+    { id: 'aura-2-cinzia-it', name: 'Cinzia', gender: 'female' },
+    { id: 'aura-2-flavio-it', name: 'Flavio', gender: 'male' },
+  ],
+  ja: [
+    { id: 'aura-2-izanami-ja', name: 'Izanami', gender: 'female' },
+    { id: 'aura-2-fujin-ja', name: 'Fujin', gender: 'male' },
+    { id: 'aura-2-uzume-ja', name: 'Uzume', gender: 'female' },
+    { id: 'aura-2-ebisu-ja', name: 'Ebisu', gender: 'male' },
+  ],
+};
+
+// Sarvam speaker catalog — all available speakers
+export const SARVAM_SPEAKER_CATALOG = [
+  'shubh', 'aditya', 'ritu', 'priya', 'neha', 'rahul', 'pooja', 'rohan',
+  'simran', 'kavya', 'amit', 'dev', 'ishita', 'shreya', 'anand', 'tanya',
+] as const;
+
+// Sarvam language codes (BCP-47 for API)
+export const SARVAM_LANGUAGE_CODES: Record<string, string> = {
+  hi: 'hi-IN', bn: 'bn-IN', ta: 'ta-IN', te: 'te-IN',
+  gu: 'gu-IN', kn: 'kn-IN', ml: 'ml-IN', mr: 'mr-IN',
+  pa: 'pa-IN', od: 'od-IN', 'en-IN': 'en-IN',
+};
 
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY;
 
@@ -127,19 +221,13 @@ export function getVoiceProviderConfig(options: RouterOptions): VoiceProviderCon
 // ============================================
 
 function getDefaultDeepgramVoice(language: string): string {
-  // Native-accent voices — verified Deepgram Aura-2 model IDs
-  const voices: Record<string, string> = {
-    en: 'aura-2-thalia-en',
-    es: 'aura-2-diana-es',
-    fr: 'aura-2-agathe-fr',
-    de: 'aura-2-viktoria-de',
-    it: 'aura-2-livia-it',
-    ja: 'aura-2-izanami-ja',
-    // TODO: Verify Chinese voice availability — using Japanese voices as closest fallback
-    zh: 'aura-2-izanami-ja',
-    nl: 'aura-2-rhea-nl',
-  };
-  return voices[language] || 'aura-2-thalia-en';
+  const catalog = DEEPGRAM_VOICE_CATALOG[language];
+  if (catalog && catalog.length > 0) return catalog[0].id;
+  return 'aura-2-thalia-en'; // English fallback
+}
+
+export function getDefaultSarvamSpeaker(): string {
+  return 'priya'; // Natural female voice, works across all 11 Indic languages
 }
 
 // ============================================

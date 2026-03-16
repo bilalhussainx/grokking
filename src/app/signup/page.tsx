@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
 
 export default function SignupPage() {
   const { signInWithGoogle, signUpWithEmail, user } = useAuth();
@@ -20,22 +21,10 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const NATIVE_LANGUAGES = [
-    { code: "en", name: "English" },
-    { code: "es", name: "Espa\u00F1ol" },
-    { code: "fr", name: "Fran\u00E7ais" },
-    { code: "de", name: "Deutsch" },
-    { code: "it", name: "Italiano" },
-    { code: "hi", name: "\u0939\u093F\u0928\u094D\u0926\u0940 (Hindi)" },
-    { code: "zh", name: "\u4E2D\u6587 (Chinese)" },
-    { code: "ja", name: "\u65E5\u672C\u8A9E (Japanese)" },
-    { code: "ar", name: "\u0627\u0644\u0639\u0631\u0628\u064A\u0629 (Arabic)" },
-    { code: "ur", name: "\u0627\u0631\u062F\u0648 (Urdu)" },
-    { code: "pa", name: "\u0A2A\u0A70\u0A1C\u0A3E\u0A2C\u0A40 (Punjabi)" },
-    { code: "nl", name: "Nederlands" },
-    { code: "pt", name: "Portugu\u00EAs" },
-    { code: "ko", name: "\uD55C\uAD6D\uC5B4 (Korean)" },
-  ];
+  // Use all 18 supported languages from voice-provider-router
+  const NATIVE_LANGUAGES = ALL_SUPPORTED_LANGUAGES.map(l => ({
+    code: l.code, name: `${l.flag} ${l.name} (${l.native})`,
+  }));
 
   if (user) {
     router.replace("/");
@@ -51,11 +40,12 @@ export default function SignupPage() {
       setError(result.error);
       setLoading(false);
     } else {
-      // Save native language for coach to use immediately
+      // Save native language for immediate use, redirect to onboarding
       localStorage.setItem('coach-language', nativeLanguage);
       localStorage.setItem('native-language', nativeLanguage);
       setSuccess(true);
       setLoading(false);
+      // After email confirmation, onboarding page will collect full preferences
     }
   };
 
@@ -65,6 +55,7 @@ export default function SignupPage() {
         <div className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 text-center">
           <h2 className="text-xl font-semibold text-white mb-2">Check your email</h2>
           <p className="text-sm text-white/50">We sent a confirmation link to <strong className="text-white/80">{email}</strong>. Click it to activate your account and get your 50 free credits.</p>
+          <p className="text-xs text-white/30 mt-3">After confirming, you'll complete a quick setup to personalize your learning experience.</p>
           <Link href="/login" className="text-violet-400 text-sm hover:underline mt-4 inline-block">Back to login</Link>
         </div>
       </section>

@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       ? getInterviewerPersona(personaId || "interviewer-mentor")
       : getCoachPersona(personaId || "alex");
 
-  // Select voice — use native-accent voice for the selected language
+  // Select voice — native-accent voice per language (Deepgram Aura-2 catalog)
   const LANGUAGE_VOICES: Record<string, string> = {
     en: "aura-2-thalia-en",
     es: "aura-2-diana-es",
@@ -58,8 +58,19 @@ export async function POST(req: NextRequest) {
     it: "aura-2-livia-it",
     ja: "aura-2-izanami-ja",
     nl: "aura-2-rhea-nl",
-    zh: "aura-2-izanami-ja", // TODO: Chinese-specific voice when available
-    hi: "aura-2-thalia-en",  // Hindi uses Sarvam pipeline, not Deepgram TTS
+    // Indic languages — Deepgram Agent uses English voice as carrier;
+    // the LLM generates text in the target language which Deepgram speaks.
+    // For higher quality, these should use Sarvam TTS pipeline.
+    hi: "aura-2-thalia-en",
+    bn: "aura-2-thalia-en",
+    ta: "aura-2-thalia-en",
+    te: "aura-2-thalia-en",
+    gu: "aura-2-thalia-en",
+    kn: "aura-2-thalia-en",
+    ml: "aura-2-thalia-en",
+    mr: "aura-2-thalia-en",
+    pa: "aura-2-thalia-en",
+    od: "aura-2-thalia-en",
   };
   const voice = getVoice(voiceId || persona.defaultVoice);
   const voiceModel = language !== "en"
@@ -69,7 +80,10 @@ export async function POST(req: NextRequest) {
   // Language names for the system prompt
   const LANGUAGE_NAMES: Record<string, string> = {
     en: "English", es: "Spanish", fr: "French", de: "German",
-    it: "Italian", ja: "Japanese", nl: "Dutch", hi: "Hindi", zh: "Mandarin Chinese",
+    it: "Italian", ja: "Japanese", nl: "Dutch",
+    hi: "Hindi", bn: "Bengali", ta: "Tamil", te: "Telugu",
+    gu: "Gujarati", kn: "Kannada", ml: "Malayalam", mr: "Marathi",
+    pa: "Punjabi", od: "Odia",
   };
   const langName = LANGUAGE_NAMES[language] || "English";
 
