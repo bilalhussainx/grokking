@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import { JsonLd, organizationSchema, websiteSchema } from "@/lib/schema";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -14,9 +15,47 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Grokking — Master Coding Interviews & System Design",
-  description:
-    "Interactive courses with hands-on Python exercises to ace your technical interviews. Learn 16 coding patterns and 12 system design case studies.",
+  metadataBase: new URL('https://samsara.ai'),
+  title: {
+    default: 'Samsara.ai — Learn Anything with AI Coaching',
+    template: '%s | Samsara.ai',
+  },
+  description: 'Master coding, philosophy, religion, finance, and more with AI voice coaches. Interactive courses with Python exercises, checkpoint quizzes, and personalized learning paths.',
+  keywords: [
+    'AI learning platform', 'online courses', 'coding interview preparation',
+    'learn Python', 'system design', 'data structures algorithms',
+    'philosophy courses', 'Islamic studies', 'Buddhist meditation',
+    'Christian theology', 'Stoic philosophy', 'personal finance',
+    'investing', 'mental health', 'meditation', 'mindfulness',
+    'AI tutor', 'voice coaching', 'interactive learning',
+    'cybersecurity course', 'machine learning', 'leadership',
+    'geopolitics', 'political strategy',
+  ],
+  authors: [{ name: 'Samsara.ai' }],
+  creator: 'Samsara.ai',
+  publisher: 'Samsara.ai',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://samsara.ai',
+    siteName: 'Samsara.ai',
+    title: 'Samsara.ai — Learn Anything with AI Coaching',
+    description: 'Master coding, philosophy, religion, finance, and more with AI voice coaches. 60+ interactive courses with personalized learning.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Samsara.ai Learning Platform' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Samsara.ai — Learn Anything with AI Coaching',
+    description: 'Master coding, philosophy, religion, finance, and more with AI voice coaches.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
+  },
+  alternates: { canonical: 'https://samsara.ai' },
+  verification: {},
 };
 
 export default function RootLayout({
@@ -29,6 +68,8 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
+        <JsonLd data={organizationSchema()} />
+        <JsonLd data={websiteSchema()} />
         <Providers>{children}</Providers>
       </body>
     </html>
