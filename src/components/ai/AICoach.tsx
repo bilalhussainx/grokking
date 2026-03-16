@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useAI } from '@/contexts/AIContext';
 import { saveSessionNote } from '@/lib/sessionNotes';
-import { useDeepgramAgent } from '@/hooks/useDeepgramAgent';
+import { useVoiceAgent, type VoiceAgentCallbacks } from '@/hooks/useVoiceAgent';
 import {
   COACH_PERSONAS, VOICES,
   getSavedCoachPersona, saveCoachPersona,
@@ -97,7 +97,7 @@ export default function AICoach() {
   }, []);
 
   // Deepgram Voice Agent hook
-  const deepgramCallbacks = useMemo(() => ({
+  const voiceCallbacks: VoiceAgentCallbacks = useMemo(() => ({
     onUserMessage: (text: string) => {
       addMessage(text, 'user', 'user');
     },
@@ -105,18 +105,18 @@ export default function AICoach() {
       addMessage(text, 'coach', 'teaching');
     },
     onConnect: () => {
-      console.log('[Coach] Deepgram connected');
+      console.log('[Coach] Voice agent connected');
       voiceSessionStartRef.current = Date.now();
     },
     onDisconnect: () => {
-      console.log('[Coach] Deepgram disconnected');
+      console.log('[Coach] Voice agent disconnected');
     },
     onError: (err: string) => {
-      console.error('[Coach] Deepgram error:', err);
+      console.error('[Coach] Voice agent error:', err);
     },
   }), [addMessage]);
 
-  const deepgram = useDeepgramAgent(deepgramCallbacks);
+  const deepgram = useVoiceAgent(voiceCallbacks);
 
   // Languages supported by Deepgram voice (non-Indic only)
   const VOICE_SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'nl', 'it', 'ja'];
@@ -137,14 +137,17 @@ export default function AICoach() {
     }
 
     const ctx = lessonContextRef.current;
+    const persona = getCoachPersona(selectedPersona);
     await deepgram.start({
+      personaId: selectedPersona,
+      systemPrompt: persona.systemPrompt,
+      voiceProvider: 'deepgram',
+      voiceId: selectedVoice,
+      language: voiceLang,
+      mode: 'coach',
       lessonTitle: ctx?.lessonTitle,
       moduleTitle: ctx?.moduleTitle,
       courseTitle: ctx?.courseTitle,
-      personaId: selectedPersona,
-      voiceId: selectedVoice,
-      mode: "coach",
-      language: voiceLang,
       lessonContext: ctx ? {
         lessonId: ctx.lessonSlug || '',
         lessonTitle: ctx.lessonTitle,
@@ -551,7 +554,7 @@ export default function AICoach() {
                 <ChevronDown className="w-3 h-3 text-white/40" />
               </button>
               {showLangPicker && (
-                <div className="absolute bottom-full left-0 mb-1 bg-slate-900 border border-white/[0.1] rounded-lg shadow-xl z-50 py-1 min-w-[160px] max-h-[280px] overflow-y-auto">
+                <div className="absolute top-full left-0 mt-1 bg-slate-900 border border-white/[0.1] rounded-lg shadow-xl z-[100] py-1 min-w-[160px] max-h-[280px] overflow-y-auto">
                   {/* English first — always available, always default */}
                   <button
                     onClick={() => {

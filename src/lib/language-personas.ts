@@ -1444,12 +1444,23 @@ export interface VoiceAgentConfig {
   voiceProvider: 'kokoro' | 'sarvam' | 'deepgram';
   voiceId: string;
   language: string;
+  lessonContext?: {
+    lessonId: string;
+    lessonTitle: string;
+    targetPhrases: string[];
+    vocabulary: string[];
+    grammarFocus: string[];
+    content?: string;
+    starterCode?: string;
+    solutionCode?: string;
+  };
   proficiencyLevel?: ProficiencyLevel;
-  mode?: 'free-form' | 'lesson-practice' | 'placement';
-  // Deepgram-specific (ignored by local agent)
+  mode?: 'free-form' | 'lesson-practice' | 'placement' | 'coach';
+  // Deepgram-specific
   lessonTitle?: string;
   moduleTitle?: string;
   courseTitle?: string;
+  voiceId?: string;
 }
 
 // Adapter: normalize both persona types into a common voice config

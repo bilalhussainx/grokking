@@ -84,6 +84,8 @@ export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
         language: config.language,
         personaId: config.personaId,
         proficiencyLevel: config.proficiencyLevel,
+        lessonTitle: config.lessonTitle,
+        lessonContext: config.lessonContext,
       });
     } else {
       // Use Deepgram Agent for Latin/CJK
@@ -93,10 +95,11 @@ export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
         courseTitle: config.courseTitle,
         personaId: config.personaId,
         voiceId: config.voiceId,
-        mode: 'language',
+        mode: config.mode === 'coach' ? 'coach' : 'language',
         language: config.language,
         systemPrompt: config.systemPrompt,
         proficiencyLevel: config.proficiencyLevel,
+        lessonContext: config.lessonContext,
       });
     }
   }, [deepgramAgent, orchestratedAgent]);
