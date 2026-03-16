@@ -21,7 +21,13 @@ const LANGUAGES = [
 export function TranslationBar({ className }: { className?: string }) {
   const { isPanelOpen } = useAI();
   const [fromLang, setFromLang] = useState("en");
-  const [toLang, setToLang] = useState("es");
+  const [toLang, setToLang] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const native = localStorage.getItem('native-language');
+      return native && native !== 'en' ? native : 'es';
+    }
+    return 'es';
+  });
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);

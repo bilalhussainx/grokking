@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { courses } from "@/data";
 import { getFeaturedCourses } from "@/data/types";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
-import WelcomeWizard from "@/components/onboarding/WelcomeWizard";
+import { useRouter } from "next/navigation";
 import LearningStats from "@/components/gamification/LearningStats";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
 import ProgressRing from "@/components/ui/ProgressRing";
@@ -186,7 +186,7 @@ function FeaturedCourses({ interests = [] }: { interests?: string[] }) {
 
 export default function HomePage() {
   const { user, profile } = useAuth();
-  const [showWizard, setShowWizard] = useState(false);
+  const router = useRouter();
   const [userInterests, setUserInterests] = useState<string[]>([]);
   const courseProgress = useCourseProgress();
 
@@ -220,21 +220,12 @@ export default function HomePage() {
               setUserInterests(prefs.learning_interests);
             }
           } else {
-            setShowWizard(true);
+            router.push('/onboarding');
           }
         })
-        .catch(() => setShowWizard(true));
+        .catch(() => router.push('/onboarding'));
     }
   }, [user]);
-
-  if (showWizard) {
-    return (
-      <WelcomeWizard
-        userName={user?.user_metadata?.full_name?.split(" ")[0]}
-        onComplete={() => setShowWizard(false)}
-      />
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
