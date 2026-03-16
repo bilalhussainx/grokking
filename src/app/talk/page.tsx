@@ -73,7 +73,8 @@ function TalkPageInner() {
 
   const startConversation = useCallback(
     async (lang: string) => {
-      const persona = selectedPersona || getDefaultPersona(lang);
+      // Always get the correct persona for this language (don't reuse from previous session)
+      const persona = getDefaultPersona(lang);
       setSelectedPersona(persona);
       setSelectedLang(lang);
       setStep("talking");

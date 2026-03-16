@@ -46,7 +46,8 @@ export default function TopNav({
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 text-white font-bold text-xs shadow-md shadow-blue-500/20">
             S
           </div>
-          <span className="text-lg font-bold tracking-tight">Samsara<span className="text-blue-400">.ai</span></span>
+          <span className="text-lg font-bold tracking-tight hidden sm:inline">Samsara<span className="text-blue-400">.ai</span></span>
+          <span className="text-lg font-bold tracking-tight sm:hidden">S<span className="text-blue-400">.</span></span>
         </Link>
 
         {courseTitle && (
