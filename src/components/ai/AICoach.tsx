@@ -1,13 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useConversation } from '@elevenlabs/react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   GraduationCap, Lightbulb, MessageCircle, Trophy, Timer,
-  Send, Mic, MicOff, Phone, PhoneOff, FileText,
+  Send, Mic, MicOff, Phone, PhoneOff, ChevronDown,
 } from 'lucide-react';
 import { useAI } from '@/contexts/AIContext';
 import { saveSessionNote } from '@/lib/sessionNotes';
+import { useDeepgramAgent } from '@/hooks/useDeepgramAgent';
+import {
+  COACH_PERSONAS, VOICES,
+  getSavedCoachPersona, saveCoachPersona,
+  getSavedVoice, saveVoicePreference,
+  getCoachPersona, getVoice,
+} from '@/lib/voice-personas';
 
 interface CoachMessage {
   id: string;
@@ -17,23 +23,20 @@ interface CoachMessage {
   timestamp: Date;
 }
 
-// Agent ID from ElevenLabs dashboard — set in .env.local
-const AGENT_ID = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '';
-console.log('[Coach] Agent ID:', AGENT_ID ? AGENT_ID.slice(0, 15) + '...' : 'NOT SET');
-
 export default function AICoach() {
   const { lessonContext, currentCode } = useAI();
   const [messages, setMessages] = useState<CoachMessage[]>([]);
   const [hintsGiven, setHintsGiven] = useState(0);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [voiceConnecting, setVoiceConnecting] = useState(false);
   const [userInput, setUserInput] = useState('');
   const [sessionStart] = useState(Date.now());
   const [sessionTime, setSessionTime] = useState('00:00');
   const [lastCodeLength, setLastCodeLength] = useState(0);
   const [hasGreeted, setHasGreeted] = useState(false);
   const [lastLessonId, setLastLessonId] = useState('');
-  const [micMuted, setMicMuted] = useState(false);
+  const [selectedPersona, setSelectedPersona] = useState(() => getSavedCoachPersona());
+  const [selectedVoice, setSelectedVoice] = useState(() => getSavedVoice());
+  const [showSettings, setShowSettings] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const codeChangeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hintsRef = useRef(0);
@@ -60,90 +63,41 @@ export default function AICoach() {
     setMessages((prev) => [...prev, msg]);
   }, []);
 
-  // ElevenLabs Conversational AI hook — pass micMuted as controlled state
-  const conversation = useConversation({
-    micMuted,
+  // Deepgram Voice Agent hook
+  const deepgramCallbacks = useMemo(() => ({
+    onUserMessage: (text: string) => {
+      addMessage(text, 'user', 'user');
+    },
+    onAgentMessage: (text: string) => {
+      addMessage(text, 'coach', 'teaching');
+    },
     onConnect: () => {
-      console.log('[Voice] Connected to ElevenLabs');
-      setVoiceConnecting(false);
+      console.log('[Coach] Deepgram connected');
     },
-    onDisconnect: (details) => {
-      console.log('[Voice] Disconnected', details);
-      setVoiceConnecting(false);
+    onDisconnect: () => {
+      console.log('[Coach] Deepgram disconnected');
     },
-    onMessage: (msg) => {
-      console.log('[Voice] Message:', msg);
-      // Transcriptions and agent replies come through here
-      if (msg.source === 'user' && msg.message) {
-        addMessage(msg.message, 'user', 'user');
-      } else if (msg.source === 'ai' && msg.message) {
-        addMessage(msg.message, 'coach', 'teaching');
-      }
+    onError: (err: string) => {
+      console.error('[Coach] Deepgram error:', err);
     },
-    onError: (err) => {
-      console.error('[Voice] Error:', err);
-      setVoiceConnecting(false);
-    },
-    onStatusChange: (status) => {
-      console.log('[Voice] Status:', status);
-    },
-  });
+  }), [addMessage]);
 
-  // Start voice conversation
+  const deepgram = useDeepgramAgent(deepgramCallbacks);
+
+  // Start voice conversation via Deepgram
   const startVoice = useCallback(async () => {
-    if (voiceConnecting || conversation.status === 'connected') return;
+    if (deepgram.isConnecting || deepgram.isConnected) return;
 
-    if (!AGENT_ID) {
-      addMessage(
-        'Voice agent not configured. Add NEXT_PUBLIC_ELEVENLABS_AGENT_ID to .env.local. Create an agent at elevenlabs.io → Agents Platform.',
-        'coach',
-        'teaching'
-      );
-      return;
-    }
-
-    setVoiceConnecting(true);
-    console.log('[Voice] Starting voice session with agent:', AGENT_ID);
-
-    try {
-      // Request mic permission and test audio level
-      const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const audioCtx = new AudioContext();
-      const source = audioCtx.createMediaStreamSource(testStream);
-      const analyser = audioCtx.createAnalyser();
-      source.connect(analyser);
-      const data = new Uint8Array(analyser.fftSize);
-      let maxLevel = 0;
-      for (let i = 0; i < 10; i++) {
-        await new Promise(r => setTimeout(r, 100));
-        analyser.getByteTimeDomainData(data);
-        const level = Math.max(...Array.from(data).map(v => Math.abs(v - 128)));
-        maxLevel = Math.max(maxLevel, level);
-      }
-      console.log('[Voice] Mic test — max audio level:', maxLevel, maxLevel < 3 ? '⚠️ NO AUDIO DETECTED' : '✅ Audio OK');
-      testStream.getTracks().forEach(t => t.stop());
-      audioCtx.close();
-
-      // Start the ElevenLabs conversation session directly with agentId
-      const conversationId = await conversation.startSession({
-        agentId: AGENT_ID,
-        connectionType: 'websocket',
-      });
-      console.log('[Voice] Session started:', conversationId);
-
-      // Send lesson context after connection is established
-      const ctx = lessonContextRef.current;
-      if (ctx?.lessonTitle) {
-        conversation.sendContextualUpdate(
-          `The student is working on "${ctx.lessonTitle}" in "${ctx.moduleTitle}" (${ctx.courseTitle}). Keep responses short (1-3 sentences). Be warm and helpful. Give progressive hints, never the full answer immediately.`
-        );
-      }
-    } catch (err) {
-      console.error('[Voice] Failed to start:', err);
-      setVoiceConnecting(false);
-      addMessage(`Voice connection failed: ${err}. Try the text chat below.`, 'coach', 'encouraging');
-    }
-  }, [voiceConnecting, conversation, addMessage]);
+    const ctx = lessonContextRef.current;
+    await deepgram.start({
+      lessonTitle: ctx?.lessonTitle,
+      moduleTitle: ctx?.moduleTitle,
+      courseTitle: ctx?.courseTitle,
+      personaId: selectedPersona,
+      voiceId: selectedVoice,
+      mode: "coach",
+    });
+  }, [deepgram, selectedPersona, selectedVoice]);
 
   // Save session notes from current messages
   const saveNotes = useCallback(() => {
@@ -180,16 +134,26 @@ export default function AICoach() {
   }, []);
 
   // Stop voice conversation
-  const stopVoice = useCallback(async () => {
-    // Save notes before ending
+  const stopVoice = useCallback(() => {
     saveNotes();
-    try {
-      await conversation.endSession();
-    } catch {
-      // Already disconnected
-    }
-    setVoiceConnecting(false);
-  }, [conversation, saveNotes]);
+    deepgram.stop();
+  }, [deepgram, saveNotes]);
+
+  // Send code context updates to Deepgram agent periodically
+  useEffect(() => {
+    if (!deepgram.isConnected) return;
+
+    const interval = setInterval(() => {
+      const code = currentCodeRef.current;
+      if (code) {
+        deepgram.sendPromptUpdate(
+          `The student's current code:\n\`\`\`\n${code}\n\`\`\`\nObserve their progress. If they seem stuck, offer a gentle nudge.`
+        );
+      }
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [deepgram.isConnected, deepgram]);
 
   // Timer
   useEffect(() => {
@@ -211,13 +175,6 @@ export default function AICoach() {
   const sendEvent = useCallback(
     async (event: string, type: CoachMessage['type'] = 'encouraging') => {
       if (isStreamingRef.current || !lessonContextRef.current) return;
-
-      // If in voice mode, send as text message to voice agent
-      if (conversation.status === 'connected') {
-        conversation.sendUserMessage(event);
-        addMessage(event, 'user', 'user');
-        return;
-      }
 
       isStreamingRef.current = true;
       setIsStreaming(true);
@@ -278,7 +235,7 @@ export default function AICoach() {
         setIsStreaming(false);
       }
     },
-    [conversation, addMessage]
+    []
   );
 
   // Reset on lesson change
@@ -303,7 +260,7 @@ export default function AICoach() {
 
   // Welcome greeting (text mode only)
   useEffect(() => {
-    if (!lessonContext || hasGreeted || conversation.status === 'connected') return;
+    if (!lessonContext || hasGreeted || deepgram.isConnected) return;
     setHasGreeted(true);
     const timer = setTimeout(() => {
       sendEvent(
@@ -312,7 +269,7 @@ export default function AICoach() {
       );
     }, 800);
     return () => clearTimeout(timer);
-  }, [lessonContext, hasGreeted, sendEvent, conversation.status]);
+  }, [lessonContext, hasGreeted, sendEvent, deepgram.isConnected]);
 
   // Code activity detection (text mode only)
   useEffect(() => {
@@ -322,7 +279,7 @@ export default function AICoach() {
     if (diff > 40 && lastCodeLength > 0) {
       if (codeChangeTimeout.current) clearTimeout(codeChangeTimeout.current);
       codeChangeTimeout.current = setTimeout(() => {
-        if (!isStreamingRef.current && conversation.status !== 'connected') {
+        if (!isStreamingRef.current && !deepgram.isConnected) {
           sendEvent(
             `Student added ~${diff} chars of code. Brief encouraging comment. Don't repeat yourself.`,
             'encouraging'
@@ -331,15 +288,18 @@ export default function AICoach() {
       }, 8000);
     }
     setLastCodeLength(codeLen);
-  }, [currentCode, lastCodeLength, lessonContext, sendEvent, conversation.status]);
+  }, [currentCode, lastCodeLength, lessonContext, sendEvent, deepgram.isConnected]);
 
   const handleHint = () => {
     hintsRef.current += 1;
     setHintsGiven(hintsRef.current);
     const level = hintsRef.current;
     const text = `Give me a hint${level > 1 ? ` (hint #${level})` : ''}`;
-    if (conversation.status === 'connected') {
-      conversation.sendUserMessage(text);
+    if (deepgram.isConnected) {
+      deepgram.sendPromptUpdate(`The student is asking for hint #${level}. ${
+        level === 1 ? 'Give a gentle nudge.' : level === 2 ? 'Give specific direction.' :
+        level === 3 ? 'Give a detailed approach.' : 'Give a near-complete walkthrough.'
+      }`);
       addMessage(text, 'user', 'user');
     } else {
       sendEvent(
@@ -352,8 +312,8 @@ export default function AICoach() {
   };
 
   const handleExplain = () => {
-    if (conversation.status === 'connected') {
-      conversation.sendUserMessage('Can you explain the core concept?');
+    if (deepgram.isConnected) {
+      deepgram.sendPromptUpdate('The student is asking you to explain the core concept. Use an analogy if helpful.');
       addMessage('Can you explain the core concept?', 'user', 'user');
     } else {
       sendEvent('Explain the core concept. Use an analogy if helpful.', 'teaching');
@@ -361,8 +321,8 @@ export default function AICoach() {
   };
 
   const handleCelebrate = () => {
-    if (conversation.status === 'connected') {
-      conversation.sendUserMessage('I solved it!');
+    if (deepgram.isConnected) {
+      deepgram.sendPromptUpdate('The student just solved the problem! Celebrate their achievement and suggest what to try next.');
       addMessage('I solved it!', 'user', 'user');
     } else {
       sendEvent('Student solved it! Celebrate and suggest next steps.', 'celebrating');
@@ -375,8 +335,9 @@ export default function AICoach() {
     const text = userInput.trim();
     setUserInput('');
 
-    if (conversation.status === 'connected') {
-      conversation.sendUserMessage(text);
+    if (deepgram.isConnected) {
+      // In voice mode, inject user text as context update
+      deepgram.sendPromptUpdate(`The student typed this message: "${text}". Respond to it.`);
       addMessage(text, 'user', 'user');
     } else {
       const userMsg: CoachMessage = {
@@ -391,17 +352,45 @@ export default function AICoach() {
     }
   };
 
-  // Cleanup on unmount only
-  const conversationRef = useRef(conversation);
-  conversationRef.current = conversation;
+  // Listen for events from the top bar
+  useEffect(() => {
+    const onHint = () => handleHint();
+    const onExplain = () => handleExplain();
+    const onCelebrate = () => handleCelebrate();
+    const onVoice = () => { if (!deepgram.isConnected) startVoice(); else stopVoice(); };
+    const onMessage = (e: Event) => {
+      const text = (e as CustomEvent).detail;
+      if (text && typeof text === 'string') {
+        setUserInput(text);
+        // Trigger form submit programmatically
+        setTimeout(() => {
+          const form = document.querySelector('[data-coach-form]') as HTMLFormElement;
+          if (form) form.requestSubmit();
+        }, 50);
+      }
+    };
+
+    window.addEventListener('coach:hint', onHint);
+    window.addEventListener('coach:explain', onExplain);
+    window.addEventListener('coach:celebrate', onCelebrate);
+    window.addEventListener('coach:voice', onVoice);
+    window.addEventListener('coach:message', onMessage);
+
+    return () => {
+      window.removeEventListener('coach:hint', onHint);
+      window.removeEventListener('coach:explain', onExplain);
+      window.removeEventListener('coach:celebrate', onCelebrate);
+      window.removeEventListener('coach:voice', onVoice);
+      window.removeEventListener('coach:message', onMessage);
+    };
+  }, [deepgram.isConnected]);
+
+  // Cleanup on unmount
   const saveNotesRef = useRef(saveNotes);
   saveNotesRef.current = saveNotes;
   useEffect(() => {
     return () => {
       saveNotesRef.current();
-      if (conversationRef.current.status === 'connected') {
-        conversationRef.current.endSession().catch(() => {});
-      }
     };
   }, []);
 
@@ -425,41 +414,15 @@ export default function AICoach() {
     }
   };
 
-  const isVoiceActive = conversation.status === 'connected';
-  const agentSpeaking = conversation.isSpeaking;
+  const isVoiceActive = deepgram.isConnected;
+  const agentSpeaking = deepgram.isSpeaking;
 
   return (
-    <div className="flex flex-col h-full bg-[var(--background)]">
-      {/* Header */}
-      <div className="p-3 border-b border-white/[0.06]">
-        <div className="flex items-center gap-2.5 mb-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-sm shadow-lg shadow-blue-500/20">
-            🎓
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-white">Coach Alex</h3>
-            <p className="text-[11px] text-white/40">
-              {voiceConnecting ? '🔄 Connecting...' :
-               isVoiceActive && agentSpeaking ? '🔊 Speaking...' :
-               isVoiceActive ? '🎙️ Voice Mode — Speak!' :
-               'AI Coding Coach'}
-            </p>
-          </div>
-          <div className="flex items-center gap-1.5 text-[11px]">
-            <Timer className="w-3 h-3 text-blue-400" />
-            <span className="text-blue-400 font-mono">{sessionTime}</span>
-          </div>
-        </div>
-        {lessonContext && (
-          <div className="text-[10px] text-white/30 truncate">
-            {lessonContext.moduleTitle} → {lessonContext.lessonTitle}
-          </div>
-        )}
-      </div>
+    <div className="flex flex-col h-full min-h-0 bg-[var(--background)]">
 
       {/* Voice Control Bar */}
-      <div className="px-3 py-2 border-b border-white/[0.06] flex items-center gap-2">
-        {!isVoiceActive && !voiceConnecting ? (
+      <div className="px-3 py-2 border-b border-white/[0.06] flex items-center gap-2 shrink-0">
+        {!isVoiceActive && !deepgram.isConnecting ? (
           <button
             onClick={startVoice}
             className="flex-1 py-2 bg-gradient-to-r from-blue-500/20 to-violet-500/20 hover:from-blue-500/30 hover:to-violet-500/30 text-white rounded-lg flex items-center justify-center gap-2 transition-all text-xs font-semibold border border-blue-500/20"
@@ -467,7 +430,7 @@ export default function AICoach() {
             <Phone className="w-3.5 h-3.5 text-blue-400" />
             <span>Start Voice Conversation</span>
           </button>
-        ) : voiceConnecting ? (
+        ) : deepgram.isConnecting ? (
           <button
             disabled
             className="flex-1 py-2 bg-amber-500/10 text-amber-400 rounded-lg flex items-center justify-center gap-2 text-xs font-semibold border border-amber-500/20"
@@ -479,15 +442,15 @@ export default function AICoach() {
           <>
             {/* Mic mute toggle */}
             <button
-              onClick={() => setMicMuted(!micMuted)}
+              onClick={() => deepgram.toggleMic()}
               className={`p-2 rounded-lg transition-colors ${
-                micMuted
+                deepgram.micMuted
                   ? 'bg-red-500/20 text-red-400 border border-red-500/30'
                   : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
               }`}
-              title={micMuted ? 'Unmute mic' : 'Mute mic'}
+              title={deepgram.micMuted ? 'Unmute mic' : 'Mute mic'}
             >
-              {micMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              {deepgram.micMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </button>
 
             {/* Voice activity indicator */}
@@ -506,7 +469,7 @@ export default function AICoach() {
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                   <span className="text-[11px] text-emerald-400 font-medium">
-                    {micMuted ? 'Mic muted' : 'Listening...'}
+                    {deepgram.micMuted ? 'Mic muted' : 'Listening...'}
                   </span>
                 </div>
               )}
@@ -524,12 +487,25 @@ export default function AICoach() {
         )}
       </div>
 
+      {/* Error bar */}
+      {deepgram.error && (
+        <div className="px-3 py-2 bg-red-500/10 border-b border-red-500/20 flex items-center gap-2 shrink-0">
+          <span className="text-xs text-red-400">{deepgram.error}</span>
+          <button
+            onClick={startVoice}
+            className="ml-auto text-xs text-red-400 underline hover:text-red-300"
+          >
+            Reconnect
+          </button>
+        </div>
+      )}
+
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+      <div className="flex-1 overflow-y-auto min-h-0 p-3 space-y-2">
         {messages.length === 0 && !isStreaming && !isVoiceActive && (
           <div className="flex flex-col items-center justify-center h-full text-center opacity-40">
             <GraduationCap className="w-8 h-8 mb-2" />
-            <p className="text-xs">Click "Start Voice Conversation" to talk with Coach Alex</p>
+            <p className="text-xs">Click &quot;Start Voice Conversation&quot; to talk with Coach Alex</p>
             <p className="text-[10px] mt-1">or use text chat below</p>
           </div>
         )}
@@ -562,27 +538,8 @@ export default function AICoach() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick Actions */}
-      <div className="px-3 py-2 border-t border-white/[0.06] flex gap-1.5">
-        <button onClick={handleHint} disabled={isStreaming}
-          className="flex-1 py-1.5 bg-violet-500/15 hover:bg-violet-500/25 text-violet-400 rounded-lg flex items-center justify-center gap-1 transition-colors text-[11px] font-semibold disabled:opacity-30">
-          <Lightbulb className="w-3 h-3" />
-          Hint{hintsGiven > 0 ? ` (${hintsGiven})` : ''}
-        </button>
-        <button onClick={handleExplain} disabled={isStreaming}
-          className="flex-1 py-1.5 bg-white/[0.04] hover:bg-white/[0.08] text-white/50 hover:text-white/70 rounded-lg flex items-center justify-center gap-1 transition-colors text-[11px] font-medium disabled:opacity-30">
-          <MessageCircle className="w-3 h-3" />
-          Explain
-        </button>
-        <button onClick={handleCelebrate} disabled={isStreaming}
-          className="flex-1 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 rounded-lg flex items-center justify-center gap-1 transition-colors text-[11px] font-semibold disabled:opacity-30">
-          <Trophy className="w-3 h-3" />
-          Solved!
-        </button>
-      </div>
-
-      {/* Chat Input (works in both modes) */}
-      <form onSubmit={handleUserMessage} className="p-3 border-t border-white/[0.06]">
+      {/* Chat Input */}
+      <form data-coach-form onSubmit={handleUserMessage} className="p-3 border-t border-white/[0.06] shrink-0">
         <div className="flex gap-2">
           <input
             value={userInput}
