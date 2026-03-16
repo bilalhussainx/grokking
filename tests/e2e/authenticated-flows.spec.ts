@@ -380,10 +380,13 @@ test.describe('Settings Page', () => {
     await login(page);
     await page.goto('/settings');
     await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
 
     await page.screenshot({
       path: path.join(SCREENSHOT_DIR, 'settings.png'),
       fullPage: true,
     });
+
+    await expect(page.getByText('Settings')).toBeVisible({ timeout: 10000 });
   });
 });
