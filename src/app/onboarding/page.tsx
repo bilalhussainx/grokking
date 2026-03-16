@@ -89,6 +89,23 @@ export default function OnboardingPage() {
       localStorage.setItem("english-fluency", englishFluency);
       localStorage.setItem("onboarding_complete", "true");
 
+      // Redeem pending invite code from signup
+      const pendingCode = localStorage.getItem("pending-invite-code");
+      if (pendingCode) {
+        try {
+          const resp = await fetch("/api/invite/redeem", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: pendingCode }),
+          });
+          if (resp.ok) {
+            const result = await resp.json();
+            console.log("[Onboarding] Invite code redeemed:", result.granted);
+          }
+        } catch {}
+        localStorage.removeItem("pending-invite-code");
+      }
+
       router.push("/");
     } catch (err) {
       console.error("Failed to save preferences:", err);

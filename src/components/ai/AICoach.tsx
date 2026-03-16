@@ -589,7 +589,9 @@ export default function AICoach() {
                     </button>
                   ))}
                   {/* Indic languages — text only for now */}
-                  <div className="px-2 py-1 text-[9px] text-white/20 uppercase tracking-wider border-t border-white/[0.06] mt-1">Text Only (Voice Coming Soon)</div>
+                  <div className="px-2 py-1 text-[9px] text-white/20 uppercase tracking-wider border-t border-white/[0.06] mt-1">
+                    Indic Languages — Voice & Chat Coming Soon via Sarvam AI
+                  </div>
                   {ALL_SUPPORTED_LANGUAGES.filter(l => !VOICE_SUPPORTED_LANGUAGES.includes(l.code) && l.code !== 'en' && l.code !== 'en-IN').map(lang => (
                     <button
                       key={lang.code}

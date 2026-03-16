@@ -17,6 +17,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nativeLanguage, setNativeLanguage] = useState("en");
+  const [inviteCode, setInviteCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -40,9 +41,15 @@ export default function SignupPage() {
       setError(result.error);
       setLoading(false);
     } else {
-      // Save native language for immediate use, redirect to onboarding
+      // Save native language for immediate use
       localStorage.setItem('coach-language', nativeLanguage);
       localStorage.setItem('native-language', nativeLanguage);
+
+      // Redeem invite code if provided (best-effort, non-blocking)
+      if (inviteCode.trim()) {
+        localStorage.setItem('pending-invite-code', inviteCode.trim());
+      }
+
       setSuccess(true);
       setLoading(false);
       // After email confirmation, onboarding page will collect full preferences
@@ -122,6 +129,18 @@ export default function SignupPage() {
               ))}
             </select>
             <p className="text-[10px] text-white/30">Coach Alex will explain lessons in your language</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="inviteCode" className="text-white/70">Invite Code <span className="text-white/30">(optional)</span></Label>
+            <Input
+              id="inviteCode"
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+              placeholder="e.g., INVESTOR-ABC123"
+              className="bg-white/5 border-white/10 text-white placeholder:text-white/30 font-mono"
+            />
+            <p className="text-[10px] text-white/30">Have an invite code? Enter it for Pro access + bonus credits</p>
           </div>
 
           {error && <p className="text-xs text-red-400 bg-red-500/10 rounded-md p-2">{error}</p>}
