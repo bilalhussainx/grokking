@@ -11,14 +11,12 @@ import { TranslationBar } from "@/components/language/TranslationBar";
 import TopNav from "@/components/layout/TopNav";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import ShortcutsHelp from "@/components/ui/ShortcutsHelp";
-import { GraduationCap, X, FileText } from "lucide-react";
+import { GraduationCap, X, FileText, ChevronLeft } from "lucide-react";
 
 /**
- * Coach Sidebar — right-side panel that PUSHES content instead of overlaying.
- *
- * The key difference from the old design: instead of `position: fixed` (which
- * overlays the IDE), the sidebar is part of the flex layout in the wrapper div.
- * The main content shrinks to accommodate it — no overlap.
+ * Coach Sidebar — responsive design:
+ * - Desktop: 320px right panel that pushes content
+ * - Mobile: Full-screen overlay with back button
  */
 function CoachSidebar() {
   const { isPanelOpen, closePanel } = useAI();
@@ -27,42 +25,89 @@ function CoachSidebar() {
   if (!isPanelOpen) return null;
 
   return (
-    <div className="w-80 shrink-0 h-[calc(100vh-3.5rem)] border-l border-white/[0.08] bg-[var(--background)] flex flex-col overflow-hidden">
-      <button
-        onClick={closePanel}
-        className="absolute top-3 right-3 z-10 p-1 rounded-md hover:bg-white/10 text-white/30 hover:text-white/60 transition-colors"
-      >
-        <X className="w-3.5 h-3.5" />
-      </button>
+    <>
+      {/* Mobile: full-screen overlay */}
+      <div className="fixed inset-0 z-50 bg-[var(--background)] flex flex-col md:hidden">
+        {/* Mobile header with back button */}
+        <div className="flex items-center gap-2 px-3 py-2 border-b border-white/[0.08] shrink-0">
+          <button
+            onClick={closePanel}
+            className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/[0.06] transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back to Lesson
+          </button>
+        </div>
 
-      {/* Tab switcher */}
-      <div className="flex border-b border-white/[0.06] shrink-0">
-        <button
-          onClick={() => setActiveTab("coach")}
-          className={`flex-1 py-2 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${
-            activeTab === "coach"
-              ? "text-blue-400 border-b-2 border-blue-400"
-              : "text-white/30 hover:text-white/50"
-          }`}
-        >
-          <GraduationCap className="w-3.5 h-3.5" />
-          Coach
-        </button>
-        <button
-          onClick={() => setActiveTab("notes")}
-          className={`flex-1 py-2 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${
-            activeTab === "notes"
-              ? "text-amber-400 border-b-2 border-amber-400"
-              : "text-white/30 hover:text-white/50"
-          }`}
-        >
-          <FileText className="w-3.5 h-3.5" />
-          Notes
-        </button>
+        {/* Tab switcher */}
+        <div className="flex border-b border-white/[0.06] shrink-0">
+          <button
+            onClick={() => setActiveTab("coach")}
+            className={`flex-1 py-2 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${
+              activeTab === "coach"
+                ? "text-blue-400 border-b-2 border-blue-400"
+                : "text-white/30 hover:text-white/50"
+            }`}
+          >
+            <GraduationCap className="w-3.5 h-3.5" />
+            Coach
+          </button>
+          <button
+            onClick={() => setActiveTab("notes")}
+            className={`flex-1 py-2 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${
+              activeTab === "notes"
+                ? "text-amber-400 border-b-2 border-amber-400"
+                : "text-white/30 hover:text-white/50"
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            Notes
+          </button>
+        </div>
+
+        <div className="flex-1 min-h-0 overflow-hidden">
+          {activeTab === "coach" ? <AICoach /> : <SessionNotes />}
+        </div>
       </div>
 
-      {activeTab === "coach" ? <AICoach /> : <SessionNotes />}
-    </div>
+      {/* Desktop: side panel */}
+      <div className="hidden md:flex w-80 shrink-0 h-[calc(100vh-3.5rem)] border-l border-white/[0.08] bg-[var(--background)] flex-col overflow-hidden relative">
+        <button
+          onClick={closePanel}
+          className="absolute top-3 right-3 z-10 p-1 rounded-md hover:bg-white/10 text-white/30 hover:text-white/60 transition-colors"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+
+        {/* Tab switcher */}
+        <div className="flex border-b border-white/[0.06] shrink-0">
+          <button
+            onClick={() => setActiveTab("coach")}
+            className={`flex-1 py-2 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${
+              activeTab === "coach"
+                ? "text-blue-400 border-b-2 border-blue-400"
+                : "text-white/30 hover:text-white/50"
+            }`}
+          >
+            <GraduationCap className="w-3.5 h-3.5" />
+            Coach
+          </button>
+          <button
+            onClick={() => setActiveTab("notes")}
+            className={`flex-1 py-2 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${
+              activeTab === "notes"
+                ? "text-amber-400 border-b-2 border-amber-400"
+                : "text-white/30 hover:text-white/50"
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            Notes
+          </button>
+        </div>
+
+        {activeTab === "coach" ? <AICoach /> : <SessionNotes />}
+      </div>
+    </>
   );
 }
 
@@ -74,21 +119,17 @@ function CoachFAB() {
   return (
     <button
       onClick={openPanel}
-      className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-violet-600 px-4 py-3 text-white text-sm font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all hover:scale-105"
+      className="fixed bottom-16 right-4 md:bottom-6 md:right-6 z-40 flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-violet-600 px-4 py-3 text-white text-sm font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all hover:scale-105"
     >
       <GraduationCap className="w-5 h-5" />
-      Coach Alex
+      <span className="hidden sm:inline">Coach Alex</span>
     </button>
   );
 }
 
 /**
  * AppLayout — wraps children + coach sidebar in a flex row.
- * When coach is open, children shrink and sidebar takes 320px.
- * No overlays, no z-index fights.
- *
- * Global TopNav renders here so every page gets a nav bar.
- * CourseLayout can override nav props via TopNavContext.
+ * On mobile, coach is a full-screen overlay (not part of flex).
  */
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (

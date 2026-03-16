@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import { Languages, ArrowRightLeft, Volume2, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAI } from "@/contexts/AIContext";
 
 const LANGUAGES = [
   { code: "en", name: "English" },
@@ -18,6 +19,7 @@ const LANGUAGES = [
 ];
 
 export function TranslationBar({ className }: { className?: string }) {
+  const { isPanelOpen } = useAI();
   const [fromLang, setFromLang] = useState("en");
   const [toLang, setToLang] = useState("es");
   const [input, setInput] = useState("");
@@ -92,15 +94,16 @@ export function TranslationBar({ className }: { className?: string }) {
   // Minimized: just a small pill
   if (isMinimized) {
     return (
-      <div className={cn("fixed bottom-0 left-0 right-0 z-40", className)}>
+      <div className={cn("fixed bottom-0 left-0 right-0 z-30", isPanelOpen ? "hidden md:block" : "", className)}>
         <div className="max-w-3xl mx-auto px-4 pb-3">
           <button
             onClick={() => { setIsMinimized(false); setTimeout(() => inputRef.current?.focus(), 100); }}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/90 backdrop-blur-sm border border-slate-700/50 text-slate-400 text-sm hover:text-white hover:bg-slate-800 transition-all shadow-lg"
+            className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-slate-800/90 backdrop-blur-sm border border-slate-700/50 text-slate-400 text-xs md:text-sm hover:text-white hover:bg-slate-800 transition-all shadow-lg"
             title="Translate words or phrases between languages"
           >
-            <Languages className="w-4 h-4 text-indigo-400" />
-            <span>Translate a word or phrase</span>
+            <Languages className="w-3.5 h-3.5 md:w-4 md:h-4 text-indigo-400" />
+            <span className="hidden sm:inline">Translate a word or phrase</span>
+            <span className="sm:hidden">Translate</span>
           </button>
         </div>
       </div>
@@ -109,7 +112,7 @@ export function TranslationBar({ className }: { className?: string }) {
 
   // Expanded: persistent bottom bar
   return (
-    <div className={cn("fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-sm border-t border-slate-800", className)}>
+    <div className={cn("fixed bottom-0 left-0 right-0 z-30 bg-slate-900/95 backdrop-blur-sm border-t border-slate-800", isPanelOpen ? "hidden md:block" : "", className)}>
       <div className="max-w-3xl mx-auto px-4 py-3">
         <div className="flex items-center gap-3">
           {/* From Language */}
