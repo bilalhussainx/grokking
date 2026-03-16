@@ -397,7 +397,22 @@ export default function OnboardingPage() {
               Back
             </button>
           ) : (
-            <div />
+            <button
+              onClick={async () => {
+                localStorage.setItem('onboarding_complete', 'true');
+                try {
+                  await fetch('/api/user/preferences', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ onboarding_completed: true }),
+                  });
+                } catch {}
+                router.push('/');
+              }}
+              className="px-4 py-2 text-sm text-white/30 hover:text-white/60 transition-colors"
+            >
+              Skip for now
+            </button>
           )}
 
           {step === "summary" ? (
