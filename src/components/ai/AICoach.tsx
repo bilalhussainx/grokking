@@ -551,8 +551,25 @@ export default function AICoach() {
                 <ChevronDown className="w-3 h-3 text-white/40" />
               </button>
               {showLangPicker && (
-                <div className="absolute bottom-full left-0 mb-1 bg-slate-900 border border-white/[0.1] rounded-lg shadow-xl z-50 py-1 min-w-[140px] max-h-[200px] overflow-y-auto">
-                  {ALL_SUPPORTED_LANGUAGES.map(lang => (
+                <div className="absolute bottom-full left-0 mb-1 bg-slate-900 border border-white/[0.1] rounded-lg shadow-xl z-50 py-1 min-w-[160px] max-h-[280px] overflow-y-auto">
+                  {/* English first — always available, always default */}
+                  <button
+                    onClick={() => {
+                      setCoachLanguage('en');
+                      localStorage.setItem('coach-language', 'en');
+                      setShowLangPicker(false);
+                    }}
+                    className={`w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-white/[0.06] transition-colors border-b border-white/[0.06] ${
+                      coachLanguage === 'en' ? 'text-blue-400 bg-blue-500/5' : 'text-white/80'
+                    }`}
+                  >
+                    <span>{'\u{1F1FA}\u{1F1F8}'}</span>
+                    <span className="font-medium">English</span>
+                    <span className="text-[9px] text-white/30 ml-auto">default</span>
+                  </button>
+                  {/* Voice-supported languages */}
+                  <div className="px-2 py-1 text-[9px] text-white/20 uppercase tracking-wider">Voice Available</div>
+                  {ALL_SUPPORTED_LANGUAGES.filter(l => VOICE_SUPPORTED_LANGUAGES.includes(l.code) && l.code !== 'en').map(lang => (
                     <button
                       key={lang.code}
                       onClick={() => {
@@ -562,6 +579,24 @@ export default function AICoach() {
                       }}
                       className={`w-full px-3 py-1.5 text-left text-xs flex items-center gap-2 hover:bg-white/[0.06] transition-colors ${
                         coachLanguage === lang.code ? 'text-blue-400' : 'text-white/70'
+                      }`}
+                    >
+                      <span>{lang.flag}</span>
+                      <span>{lang.name}</span>
+                    </button>
+                  ))}
+                  {/* Indic languages — text only for now */}
+                  <div className="px-2 py-1 text-[9px] text-white/20 uppercase tracking-wider border-t border-white/[0.06] mt-1">Text Only (Voice Coming Soon)</div>
+                  {ALL_SUPPORTED_LANGUAGES.filter(l => !VOICE_SUPPORTED_LANGUAGES.includes(l.code) && l.code !== 'en' && l.code !== 'en-IN').map(lang => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        setCoachLanguage(lang.code);
+                        localStorage.setItem('coach-language', lang.code);
+                        setShowLangPicker(false);
+                      }}
+                      className={`w-full px-3 py-1.5 text-left text-xs flex items-center gap-2 hover:bg-white/[0.06] transition-colors ${
+                        coachLanguage === lang.code ? 'text-blue-400' : 'text-white/50'
                       }`}
                     >
                       <span>{lang.flag}</span>
