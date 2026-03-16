@@ -13,6 +13,13 @@ interface DeepgramAgentConfig {
   language?: string;
   systemPrompt?: string;
   proficiencyLevel?: string;
+  lessonContext?: {
+    lessonId: string;
+    lessonTitle: string;
+    targetPhrases: string[];
+    vocabulary: string[];
+    grammarFocus: string[];
+  };
   apiEndpoint?: string; // Override: defaults to /api/ai/voice-session
 }
 
@@ -46,8 +53,12 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
   // Agent message accumulation — one message per speaking turn
   const agentTextRef = useRef("");
 
-  // Greeting phase — mute mic until first agent audio completes to prevent self-reply loop
+  // Greeting phase — suppress user transcript processing until agent finishes greeting.
+  // After greeting ends, a cooldown period ignores transcripts from speaker echo.
   const isGreetingPhaseRef = useRef(true);
+  const greetingCooldownRef = useRef(false);
+  // Count how many AgentStartedSpeaking events we've seen — the first speaking turn is the greeting
+  const agentSpeakCountRef = useRef(0);
 
   useEffect(() => {
     callbacksRef.current = callbacks;
@@ -194,6 +205,7 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
             language: config?.language,
             systemPrompt: config?.systemPrompt,
             proficiencyLevel: config?.proficiencyLevel,
+            lessonContext: config?.lessonContext,
           }),
         });
 
@@ -229,6 +241,8 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
               case "SettingsApplied":
                 console.log("[Deepgram] Settings applied — greeting phase active");
                 isGreetingPhaseRef.current = true;
+                greetingCooldownRef.current = false;
+                agentSpeakCountRef.current = 0;
                 // Do NOT mute mic — Deepgram needs continuous audio stream or
                 // it disconnects with CLIENT_MESSAGE_TIMEOUT. We suppress user
                 // transcript processing during greeting instead.
@@ -239,8 +253,8 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                 break;
 
               case "UserStartedSpeaking":
-                // During greeting phase, ignore user speech to prevent self-reply
-                if (isGreetingPhaseRef.current) break;
+                // During greeting phase or cooldown, ignore user speech to prevent self-reply
+                if (isGreetingPhaseRef.current || greetingCooldownRef.current) break;
                 // Barge-in: stop agent audio, flush accumulated text
                 stopPlayback();
                 setIsSpeaking(false);
@@ -254,6 +268,7 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                 // New agent turn — reset text accumulator
                 agentTextRef.current = "";
                 setIsSpeaking(true);
+                agentSpeakCountRef.current += 1;
                 break;
 
               case "AgentAudioDone":
@@ -263,15 +278,21 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                   callbacksRef.current?.onAgentMessage?.(agentTextRef.current.trim());
                   agentTextRef.current = "";
                 }
-                // End greeting phase — user speech will now be processed
-                if (isGreetingPhaseRef.current) {
-                  console.log("[Deepgram] Greeting audio done — now accepting user speech");
+                // End greeting phase after the first agent speaking turn completes.
+                // Use a cooldown to ignore echo from speakers being picked up by mic.
+                if (isGreetingPhaseRef.current && agentSpeakCountRef.current >= 1) {
+                  console.log("[Deepgram] Greeting done — starting 2s echo cooldown");
                   isGreetingPhaseRef.current = false;
+                  greetingCooldownRef.current = true;
+                  setTimeout(() => {
+                    greetingCooldownRef.current = false;
+                    console.log("[Deepgram] Echo cooldown ended — now accepting user speech");
+                  }, 2000);
                 }
                 break;
 
               case "ConversationText":
-                if (msg.role === "user" && msg.content && !isGreetingPhaseRef.current) {
+                if (msg.role === "user" && msg.content && !isGreetingPhaseRef.current && !greetingCooldownRef.current) {
                   callbacksRef.current?.onUserMessage?.(msg.content);
                 } else if (msg.role === "assistant" && msg.content) {
                   // Accumulate — don't emit yet, wait for AgentAudioDone
