@@ -7,7 +7,7 @@ import {
   Lightbulb, Award, Terminal as TerminalIcon, BotMessageSquare,
   Code2, FileCode,
 } from "lucide-react";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from "react-resizable-panels";
 import CodeEditor from "@/components/ide/CodeEditor";
 import LessonContent from "@/components/lesson/LessonContent";
 import { useAI } from "@/contexts/AIContext";
