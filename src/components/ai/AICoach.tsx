@@ -309,20 +309,26 @@ export default function AICoach() {
   }, [lessonContext, lastLessonId, saveNotes, openPanel]);
 
   // Auto-start voice coach when a lesson opens — Coach Alex greets and listens
-  const autoStartAttempted = useRef(false);
+  const autoStartLessonRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!lessonContext || hasGreeted) return;
-    if (autoStartAttempted.current) return;
-    autoStartAttempted.current = true;
+    if (!lessonContext) return;
+    // Only auto-start once per unique lesson
+    const lessonKey = `${lessonContext.courseTitle}/${lessonContext.lessonTitle}`;
+    if (autoStartLessonRef.current === lessonKey) return;
+    if (hasGreeted) return; // Already greeted for this lesson via the reset effect
+    autoStartLessonRef.current = lessonKey;
     setHasGreeted(true);
 
     // Open the panel and auto-start voice after a brief delay
     openPanel();
     const timer = setTimeout(async () => {
       try {
+        // Stop any existing voice session before starting new one
+        if (deepgram.isConnected) deepgram.stop();
         await startVoice();
-        // Voice greeting is handled by the Deepgram agent's system prompt
-      } catch {
+        console.log("[Coach] Auto-started voice for lesson:", lessonContext.lessonTitle);
+      } catch (err) {
+        console.warn("[Coach] Voice auto-start failed, using text:", err);
         // Voice failed (no mic, etc.) — fall back to text greeting
         const hasCodingExercise = !!(lessonContext.starterCode);
         sendEvent(
@@ -332,14 +338,9 @@ export default function AICoach() {
           'encouraging'
         );
       }
-    }, 1200);
+    }, 1500);
     return () => clearTimeout(timer);
-  }, [lessonContext, hasGreeted, openPanel, startVoice, sendEvent]);
-
-  // Reset auto-start flag when lesson changes
-  useEffect(() => {
-    autoStartAttempted.current = false;
-  }, [lessonContext?.lessonTitle]);
+  }, [lessonContext, hasGreeted, openPanel, startVoice, sendEvent, deepgram]);
 
   // Code activity detection (text mode only)
   useEffect(() => {
