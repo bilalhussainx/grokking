@@ -13,7 +13,7 @@ export const judaismFoundationsCourse: Course = {
   title: "Judaism: Torah & Tradition",
   description:
     "Explore the world's oldest monotheistic tradition -- from the covenant at Sinai to the Talmud, Jewish ethics, holidays, and modern denominations. Engage with primary sources and scholarly commentary.",
-  icon: "2721FE0F",
+  icon: "✡️",
   tier: "free",
   featured: true,
   domain: "religious-studies",
