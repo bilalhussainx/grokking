@@ -56,6 +56,9 @@ import { meditationMindfulnessCourse } from "./meditation-mindfulness";
 import { aiMlFundamentalsCourse } from "./ai-ml-fundamentals";
 import { ethicalHackingCourse } from "./ethical-hacking";
 import { leadershipGrowthCourse } from "./leadership-growth";
+import { hinduismFoundationsCourse } from "./hinduism-foundations";
+import { sikhismFoundationsCourse } from "./sikhism-foundations";
+import { apCsPrinciplesCourse } from "./ap-cs-principles";
 
 export const courses: Course[] = [
   webDevelopmentCourse,
@@ -115,4 +118,7 @@ export const courses: Course[] = [
   aiMlFundamentalsCourse,
   ethicalHackingCourse,
   leadershipGrowthCourse,
+  hinduismFoundationsCourse,
+  sikhismFoundationsCourse,
+  apCsPrinciplesCourse,
 ];
