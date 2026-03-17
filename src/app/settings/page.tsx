@@ -11,7 +11,7 @@ import GemShop from "@/components/gamification/GemShop";
 import { Coins, User, CreditCard, Share2, Palette, Volume2, VolumeX } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSoundEffect } from "@/hooks/useSoundEffect";
-import type { League } from "@/lib/leaderboard";
+import type { League } from "@/lib/leaderboard-constants";
 
 export default function SettingsPage() {
   const { user, profile, credits } = useAuth();
@@ -32,7 +32,20 @@ export default function SettingsPage() {
       .catch(() => {});
   }, []);
 
-  if (!user || !profile) return null;
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
+        <p className="text-white/40">Please sign in to view settings.</p>
+      </div>
+    );
+  }
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
+        <div className="animate-pulse text-white/40">Loading settings...</div>
+      </div>
+    );
+  }
 
   const referralLink = `${typeof window !== "undefined" ? window.location.origin : ""}/ref/${profile.referral_code}`;
 
