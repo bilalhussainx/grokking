@@ -176,7 +176,7 @@ export default function LessonPage({
             messages: [
               {
                 role: "user",
-                content: `Generate one fascinating "did you know" fact related to: ${lesson.title} in ${courseTitle}. One sentence only. No quotes or prefix.`,
+                content: `Generate one fascinating "did you know" fact specifically about the topic "${lesson.title}" from the course "${courseTitle}". The lesson covers: ${lesson.content.slice(0, 500)}. Give ONE surprising fact directly related to THIS topic. One sentence only. No quotes or prefix. Do NOT give a generic coding fact.`,
               },
             ],
           }),
