@@ -65,6 +65,8 @@ import { taoismFoundationsCourse } from "./taoism-foundations";
 import { confucianismFoundationsCourse } from "./confucianism-foundations";
 import { sufismFoundationsCourse } from "./sufism-foundations";
 import { apBiologyCourse } from "./ap-biology";
+import { introPsychologyCourse } from "./intro-psychology";
+import { worldHistoryCourse } from "./world-history";
 
 export const courses: Course[] = [
   webDevelopmentCourse,
@@ -133,4 +135,6 @@ export const courses: Course[] = [
   confucianismFoundationsCourse,
   sufismFoundationsCourse,
   apBiologyCourse,
+  introPsychologyCourse,
+  worldHistoryCourse,
 ];
