@@ -59,6 +59,12 @@ import { leadershipGrowthCourse } from "./leadership-growth";
 import { hinduismFoundationsCourse } from "./hinduism-foundations";
 import { sikhismFoundationsCourse } from "./sikhism-foundations";
 import { apCsPrinciplesCourse } from "./ap-cs-principles";
+import { apCsACourse } from "./ap-cs-a";
+import { judaismFoundationsCourse } from "./judaism-foundations";
+import { taoismFoundationsCourse } from "./taoism-foundations";
+import { confucianismFoundationsCourse } from "./confucianism-foundations";
+import { sufismFoundationsCourse } from "./sufism-foundations";
+import { apBiologyCourse } from "./ap-biology";
 
 export const courses: Course[] = [
   webDevelopmentCourse,
@@ -121,4 +127,10 @@ export const courses: Course[] = [
   hinduismFoundationsCourse,
   sikhismFoundationsCourse,
   apCsPrinciplesCourse,
+  apCsACourse,
+  judaismFoundationsCourse,
+  taoismFoundationsCourse,
+  confucianismFoundationsCourse,
+  sufismFoundationsCourse,
+  apBiologyCourse,
 ];

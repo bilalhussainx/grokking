@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "generate:course": "tsx scripts/generate-flagship-course.ts",
+    "generate:course": "tsx scripts/generate-course.ts",
     "test": "playwright test",
     "test:mobile": "playwright test --project='Mobile iPhone 14'",
     "test:desktop": "playwright test --project='Desktop Chrome'",
