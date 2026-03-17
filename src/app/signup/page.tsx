@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
 
 export default function SignupPage() {
-  const { signInWithGoogle, signUpWithEmail, refreshCredits, user } = useAuth();
+  const { signInWithGoogle, signUpWithEmail, user } = useAuth();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -45,32 +45,14 @@ export default function SignupPage() {
       localStorage.setItem('coach-language', nativeLanguage);
       localStorage.setItem('native-language', nativeLanguage);
 
-      // Redeem invite code if provided
+      // Save invite code to localStorage — will be redeemed after login when cookies are ready
       if (inviteCode.trim()) {
-        if (result.confirmed) {
-          try {
-            const redeemRes = await fetch("/api/invite/redeem", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ code: inviteCode.trim() }),
-            });
-            if (redeemRes.ok) {
-              // Refresh credits + profile after redeem updated the DB
-              await refreshCredits();
-            }
-          } catch {
-            localStorage.setItem('pending-invite-code', inviteCode.trim());
-          }
-        } else {
-          localStorage.setItem('pending-invite-code', inviteCode.trim());
-        }
+        localStorage.setItem('pending-invite-code', inviteCode.trim());
       }
 
       if (result.confirmed) {
-        // Auto-confirmed — send to onboarding, full reload so initAuth picks up latest DB state
         window.location.href = "/onboarding";
       } else {
-        // Email confirmation needed — show "check your email"
         setSuccess(true);
       }
       setLoading(false);

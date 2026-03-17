@@ -128,11 +128,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
-        await fetchProfile(session.user.id);
+
+        // 1. Ensure profile + credits exist (trigger may have failed)
+        await ensureProfile(session.user);
+
+        // 2. Redeem pending invite code if saved from signup
+        const pendingCode = localStorage.getItem("pending-invite-code");
+        if (pendingCode) {
+          try {
+            const res = await fetch("/api/invite/redeem", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ code: pendingCode }),
+            });
+            if (res.ok) {
+              localStorage.removeItem("pending-invite-code");
+              // Re-fetch profile and credits after redeem changed them
+              await fetchProfile(session.user.id);
+              const { data } = await supabase.rpc("get_credit_balance", { p_user_id: session.user.id });
+              setCredits((data as number) || 0);
+            }
+          } catch {
+            // Will retry next page load
+          }
+        }
+
+        // 3. Load latest credits
         const { data } = await supabase.rpc("get_credit_balance", { p_user_id: session.user.id });
         setCredits((data as number) || 0);
-        // Update login streak (debounced to once per day by the RPC)
-        await supabase.rpc("update_login_streak", { p_user_id: session.user.id });
+
+        // 4. Update login streak
+        await supabase.rpc("update_login_streak", { p_user_id: session.user.id }).catch(() => {});
       }
       setLoading(false);
     };
@@ -165,7 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     return () => subscription.unsubscribe();
-  }, [supabase, fetchProfile]);
+  }, [supabase, fetchProfile, ensureProfile]);
 
   const signInWithGoogle = async () => {
     await supabase.auth.signInWithOAuth({
