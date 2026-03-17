@@ -8,15 +8,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProfileCard from "@/components/gamification/ProfileCard";
 import GemShop from "@/components/gamification/GemShop";
-import { Coins, User, CreditCard, Share2, Palette } from "lucide-react";
+import { Coins, User, CreditCard, Share2, Palette, Volume2, VolumeX } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useSoundEffect } from "@/hooks/useSoundEffect";
 import type { League } from "@/lib/leaderboard";
 
 export default function SettingsPage() {
   const { user, profile, credits } = useAuth();
   const { xp, level, gems, achievements } = useXP();
+  const { toggleMute, isMuted } = useSoundEffect();
   const [copied, setCopied] = useState(false);
+  const [soundOff, setSoundOff] = useState(false);
   const [league, setLeague] = useState<League>("bronze");
+
+  useEffect(() => {
+    setSoundOff(isMuted);
+  }, [isMuted]);
 
   useEffect(() => {
     fetch("/api/xp/leaderboard")
@@ -125,6 +132,37 @@ export default function SettingsPage() {
               <Button variant="outline" size="sm" onClick={copyReferral} className="border-white/10">
                 {copied ? "Copied!" : "Copy"}
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sound Effects */}
+        <Card className="bg-white/[0.03] border-white/[0.08]">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              {soundOff ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-emerald-400" />}
+              Sound Effects
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white/60">
+                  {soundOff ? "Sound effects are muted." : "Sound effects are enabled."}
+                </p>
+                <p className="text-xs text-white/30 mt-1">Includes XP gains, level ups, and achievement sounds.</p>
+              </div>
+              <button
+                onClick={() => {
+                  const newMuted = toggleMute();
+                  setSoundOff(newMuted);
+                }}
+                className={`relative w-12 h-6 rounded-full transition-colors ${soundOff ? "bg-white/10" : "bg-emerald-500"}`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${soundOff ? "" : "translate-x-6"}`}
+                />
+              </button>
             </div>
           </CardContent>
         </Card>
