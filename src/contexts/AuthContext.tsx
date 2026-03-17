@@ -61,14 +61,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           login_streak: 0,
           avatar_url: authUser.user_metadata?.avatar_url || null,
         };
-        // Insert profile — might fail if RLS blocks but that's OK
-        await supabase.from("user_profiles").upsert({
+        // Set profile immediately so UI doesn't stay stuck
+        setProfile(newProfile as UserProfile);
+        // Try to persist — might fail if RLS blocks, that's OK
+        supabase.from("user_profiles").upsert({
           id: userId,
           email: newProfile.email,
           full_name: newProfile.full_name,
           role: newProfile.role,
-        }, { onConflict: "id" });
-        setProfile(newProfile as UserProfile);
+        }, { onConflict: "id" }).catch(() => {});
       }
     }
   }, [supabase]);

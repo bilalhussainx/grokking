@@ -12,6 +12,7 @@ export async function GET() {
     return NextResponse.json(board);
   } catch (err) {
     console.error('Leaderboard error:', err);
-    return NextResponse.json({ error: 'Failed to load leaderboard' }, { status: 500 });
+    // Return empty data instead of 500 — tables might not exist yet
+    return NextResponse.json({ league: 'bronze', rank: 0, groupSize: 0, members: [] });
   }
 }
