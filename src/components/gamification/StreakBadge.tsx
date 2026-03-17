@@ -2,7 +2,7 @@
 
 import { Flame } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getFlameColor, FLAME_COLORS, FLAME_BG_COLORS } from "@/lib/streaks";
+import { getFlameColor, FLAME_COLORS, FLAME_BG_COLORS } from "@/lib/streaks-constants";
 
 /**
  * Compact streak display for TopNav.
