@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   GraduationCap,
   BookOpen,
@@ -17,10 +17,13 @@ import { SidebarModule } from "@/components/layout/Sidebar";
 import LessonContent from "./LessonContent";
 import LessonNav from "./LessonNav";
 import { useAI } from "@/contexts/AIContext";
+import { useXP } from "@/contexts/XPContext";
 import { estimateReadingTime, formatReadingTime } from "@/lib/reading-time";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import ConceptBridges from "./ConceptBridges";
 import UnderstandingDepth from "./UnderstandingDepth";
+import DidYouKnowCard from "@/components/gamification/DidYouKnowCard";
+import QuizCard from "@/components/gamification/QuizCard";
 import {
   getCompletedLessons,
   getCourseProgress,
@@ -49,6 +52,15 @@ interface LessonPageProps {
 
 type ContentTab = "lesson" | "resources";
 
+/** Deterministic boolean from a slug string — returns true ~50% of the time */
+function seededChance(slug: string): boolean {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    hash = (hash * 31 + slug.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash) % 2 === 0;
+}
+
 export default function LessonPage({
   courseTitle,
   courseSlug,
@@ -66,8 +78,29 @@ export default function LessonPage({
   const [progress, setProgress] = useState(0);
   const [contentTab, setContentTab] = useState<ContentTab>("lesson");
   const { setLessonContext, setCurrentCode, openPanel, isPanelOpen } = useAI();
+  const { earnXP } = useXP();
+
+  // Gamification overlays
+  const [showDidYouKnow, setShowDidYouKnow] = useState(false);
+  const [didYouKnowFact, setDidYouKnowFact] = useState<string | null>(null);
+  const [showQuiz, setShowQuiz] = useState(false);
 
   const hasExercise = !!(lesson.starterCode && lesson.solutionCode);
+
+  // Find current lesson's index within its module (for quiz trigger)
+  const lessonIndexInModule = useMemo(() => {
+    const currentModule = modules.find((m) =>
+      m.lessons.some((l) => l.id === lesson.id)
+    );
+    if (!currentModule) return 0;
+    return currentModule.lessons.findIndex((l) => l.id === lesson.id);
+  }, [modules, lesson.id]);
+
+  // Current module for completion checks
+  const currentModule = useMemo(
+    () => modules.find((m) => m.lessons.some((l) => l.id === lesson.id)),
+    [modules, lesson.id]
+  );
 
   // Keyboard shortcuts: N=next, P=prev, H=toggle coach
   useKeyboardShortcuts({
@@ -116,18 +149,105 @@ export default function LessonPage({
     setLessonContext,
   ]);
 
+  // "Did You Know?" — fetch or load cached fact on lesson mount
+  useEffect(() => {
+    const cacheKey = `dyk_${lesson.slug}`;
+    const shouldShow = seededChance(lesson.slug);
+    if (!shouldShow) return;
+
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      setDidYouKnowFact(cached);
+      setShowDidYouKnow(true);
+      return;
+    }
+
+    // Fetch from AI
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/ai/coach", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [
+              {
+                role: "user",
+                content: `Generate one fascinating "did you know" fact related to: ${lesson.title} in ${courseTitle}. One sentence only. No quotes or prefix.`,
+              },
+            ],
+          }),
+        });
+        if (!res.ok || cancelled) return;
+        const text = await res.text();
+        // The coach API may stream — grab the full text
+        const fact = text.trim().replace(/^"|"$/g, "");
+        if (!cancelled && fact.length > 10) {
+          localStorage.setItem(cacheKey, fact);
+          setDidYouKnowFact(fact);
+          setShowDidYouKnow(true);
+        }
+      } catch {
+        // Silently skip — DYK is non-critical
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lesson.slug, lesson.title, courseTitle]);
+
   // No longer auto-opening coach panel — exercises are separate pages now
 
-  const toggleComplete = async () => {
+  const toggleComplete = useCallback(async () => {
     let updated: Set<string>;
-    if (completedLessons.has(lesson.id)) {
+    const wasCompleted = completedLessons.has(lesson.id);
+
+    if (wasCompleted) {
       updated = await markLessonIncomplete(courseSlug, lesson.id);
     } else {
       updated = await markLessonComplete(courseSlug, lesson.id);
+
+      // --- XP rewards ---
+      // 1. Lesson complete
+      await earnXP("lesson_complete", lesson.slug);
+
+      // 2. Check module completion
+      if (currentModule) {
+        const allModuleLessonsDone = currentModule.lessons.every((l) =>
+          updated.has(l.id)
+        );
+        if (allModuleLessonsDone) {
+          await earnXP("module_complete", currentModule.id);
+        }
+      }
+
+      // 3. Check course completion
+      const allLessonIds = modules.flatMap((m) => m.lessons.map((l) => l.id));
+      const allCourseDone = allLessonIds.every((id) => updated.has(id));
+      if (allCourseDone) {
+        await earnXP("course_complete", courseSlug);
+      }
+
+      // 4. Show quiz after every 3rd lesson in a module
+      if (lessonIndexInModule % 3 === 2) {
+        setShowQuiz(true);
+      }
     }
+
     setCompletedLessons(updated);
     setProgress(Math.round((updated.size / totalLessons) * 100));
-  };
+  }, [
+    completedLessons,
+    lesson.id,
+    lesson.slug,
+    courseSlug,
+    currentModule,
+    modules,
+    totalLessons,
+    lessonIndexInModule,
+    earnXP,
+  ]);
 
   // ─── Unified Layout: content + optional exercise CTA ───────
   // All lessons render full-width. Exercises open as separate pages.
@@ -185,6 +305,23 @@ export default function LessonPage({
           onToggleComplete={toggleComplete}
         />
       </div>
+
+      {/* Gamification overlays */}
+      {showDidYouKnow && didYouKnowFact && (
+        <DidYouKnowCard
+          fact={didYouKnowFact}
+          lessonSlug={lesson.slug}
+          onDismiss={() => setShowDidYouKnow(false)}
+        />
+      )}
+
+      {showQuiz && (
+        <QuizCard
+          lessonTitle={lesson.title}
+          lessonSlug={lesson.slug}
+          onClose={() => setShowQuiz(false)}
+        />
+      )}
     </CourseLayout>
   );
 }
