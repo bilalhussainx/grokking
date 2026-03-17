@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: newProfile.email,
           full_name: newProfile.full_name,
           role: newProfile.role,
-        }, { onConflict: "id" }).catch(() => {});
+        }, { onConflict: "id" }).then(() => {}, () => {});
       }
     }
   }, [supabase]);
