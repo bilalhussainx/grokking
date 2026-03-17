@@ -12,7 +12,7 @@ export const taoismFoundationsCourse: Course = {
   title: "Taoism: The Way of Nature",
   description:
     "Explore the ancient Chinese tradition of Taoism -- from the paradoxes of the Tao Te Ching to Zhuangzi's stories, wu wei, and the art of living in harmony with nature.",
-  icon: "262FFE0F",
+  icon: "☯️",
   tier: "free",
   featured: true,
   domain: "religious-studies",
