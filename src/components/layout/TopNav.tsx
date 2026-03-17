@@ -23,7 +23,7 @@ export default function TopNav({
   const { user, profile, signOut } = useAuth();
   const { overrides } = useTopNav();
   const { isDark, toggle: toggleDarkMode } = useTheme();
-  const { level, gems } = useXP();
+  const { level, gems, xpMultiplier } = useXP();
 
   // Props override context (for backward compat), context overrides defaults
   const courseTitle = propCourseTitle ?? overrides.courseTitle;
@@ -82,12 +82,22 @@ export default function TopNav({
         {/* Streak + Level + Gems + Credit Badge */}
         {user && <StreakBadge />}
         {user && (
-          <div
-            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-semibold cursor-default"
-            title={`Level ${level}`}
-          >
-            <span className="hidden sm:inline">&#11088; Lv.{level}</span>
-            <span className="sm:hidden text-[11px]">&#11088;{level}</span>
+          <div className="flex items-center gap-1">
+            <div
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-semibold cursor-default"
+              title={`Level ${level}`}
+            >
+              <span className="hidden sm:inline">&#11088; Lv.{level}</span>
+              <span className="sm:hidden text-[11px]">&#11088;{level}</span>
+            </div>
+            {xpMultiplier > 1 && (
+              <div
+                className="flex items-center px-1.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold animate-pulse cursor-default"
+                title={`${xpMultiplier}x XP multiplier active!`}
+              >
+                {xpMultiplier}x
+              </div>
+            )}
           </div>
         )}
         {user && (

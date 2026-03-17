@@ -14,6 +14,7 @@ import GlobalSearch from "@/components/search/GlobalSearch";
 import ShortcutsHelp from "@/components/ui/ShortcutsHelp";
 import XPFlyUp from "@/components/gamification/XPFlyUp";
 import AchievementToast from "@/components/gamification/AchievementToast";
+import VariableReward from "@/components/gamification/VariableReward";
 import { GraduationCap, X, FileText, ChevronLeft, Mic } from "lucide-react";
 
 /**
@@ -171,7 +172,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
  * Must be inside XPProvider to access context.
  */
 function GamificationOverlays() {
-  const { showXPFlyUp, lastXPAmount, pendingAchievements, dismissAchievement } = useXP();
+  const { showXPFlyUp, lastXPAmount, pendingAchievements, dismissAchievement, pendingReward, dismissReward } = useXP();
 
   return (
     <>
@@ -180,6 +181,7 @@ function GamificationOverlays() {
         achievements={pendingAchievements}
         onDismiss={dismissAchievement}
       />
+      <VariableReward reward={pendingReward} onDismiss={dismissReward} />
     </>
   );
 }

@@ -14,6 +14,8 @@ import LearningStats from "@/components/gamification/LearningStats";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
 import ProgressRing from "@/components/ui/ProgressRing";
 import ForgettingAlert from "@/components/gamification/ForgettingAlert";
+import VariableReward from "@/components/gamification/VariableReward";
+import { getDailyLoginReward } from "@/lib/rewards";
 
 const container = {
   hidden: { opacity: 0 },
@@ -187,10 +189,11 @@ function FeaturedCourses({ interests = [] }: { interests?: string[] }) {
 
 export default function HomePage() {
   const { user, profile } = useAuth();
-  const { earnXP, showXPFlyUp, lastXPAmount } = useXP();
+  const { earnXP, showXPFlyUp, lastXPAmount, pendingReward, dismissReward } = useXP();
   const router = useRouter();
   const [userInterests, setUserInterests] = useState<string[]>([]);
   const [dailyXPAwarded, setDailyXPAwarded] = useState(false);
+  const [dailyLoginReward, setDailyLoginReward] = useState<{ gems: number; xp: number; message: string; isJackpot: boolean } | null>(null);
   const courseProgress = useCourseProgress();
 
   // Get courses user has started (progress > 0, not 100%)
@@ -230,18 +233,46 @@ export default function HomePage() {
     }
   }, [user]);
 
-  // Award daily login XP once per day
+  // Award escalating daily login rewards once per day
   useEffect(() => {
     if (!user) return;
     const today = new Date().toISOString().slice(0, 10);
     const lastDate = localStorage.getItem("last-login-xp-date");
     if (lastDate === today) return;
+
+    // Track consecutive login days
+    const lastLoginDate = localStorage.getItem("last-login-date");
+    let consecutiveDay = parseInt(localStorage.getItem("login-consecutive-day") || "0", 10);
+
+    if (lastLoginDate) {
+      const lastD = new Date(lastLoginDate);
+      const todayD = new Date(today);
+      const diffMs = todayD.getTime() - lastD.getTime();
+      const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDays === 1) {
+        consecutiveDay += 1;
+      } else if (diffDays > 1) {
+        consecutiveDay = 1; // streak broken, restart
+      }
+    } else {
+      consecutiveDay = 1; // first login
+    }
+
+    localStorage.setItem("last-login-date", today);
     localStorage.setItem("last-login-xp-date", today);
+    localStorage.setItem("login-consecutive-day", String(consecutiveDay));
+
+    const reward = getDailyLoginReward(consecutiveDay);
+    setDailyLoginReward(reward);
+
     earnXP("daily_login").then(() => setDailyXPAwarded(true));
   }, [user, earnXP]);
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
+      {/* Variable reward popup */}
+      <VariableReward reward={pendingReward} onDismiss={dismissReward} />
+
       {/* XP fly-up on daily login */}
       {showXPFlyUp > 0 && dailyXPAwarded && (
         <motion.div
@@ -252,8 +283,14 @@ export default function HomePage() {
           transition={{ duration: 1.5, ease: "easeOut" }}
           onAnimationComplete={() => setDailyXPAwarded(false)}
         >
-          <div className="px-4 py-2 rounded-xl bg-violet-500/20 border border-violet-500/30 text-violet-300 font-bold text-lg shadow-lg shadow-violet-500/10">
-            +{lastXPAmount} XP
+          <div className={`px-4 py-2 rounded-xl border font-bold text-lg shadow-lg ${
+            dailyLoginReward?.isJackpot
+              ? "bg-yellow-500/20 border-yellow-500/30 text-yellow-300 shadow-yellow-500/10"
+              : "bg-violet-500/20 border-violet-500/30 text-violet-300 shadow-violet-500/10"
+          }`}>
+            {dailyLoginReward
+              ? dailyLoginReward.message
+              : `+${lastXPAmount} XP`}
           </div>
         </motion.div>
       )}

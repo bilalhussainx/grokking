@@ -7,6 +7,7 @@ import {
   getVoice,
   COACH_PERSONAS,
 } from "@/lib/voice-personas";
+import { getCoachEnthusiasm } from "@/lib/rewards";
 
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
@@ -87,8 +88,55 @@ export async function POST(req: NextRequest) {
   };
   const langName = LANGUAGE_NAMES[language] || "English";
 
+  // Fetch engagement signals for coach enthusiasm
+  let enthusiasmModifier = "";
+  try {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayISO = todayStart.toISOString();
+
+    // Count today's lesson completions
+    const { count: lessonsToday } = await supabase
+      .from("xp_transactions")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("action", "lesson_complete")
+      .gte("created_at", todayISO);
+
+    // Get login streak from user_profiles
+    const { data: profileData } = await supabase
+      .from("user_profiles")
+      .select("login_streak")
+      .eq("id", user.id)
+      .single();
+
+    // Sum today's XP
+    const { data: xpRows } = await supabase
+      .from("xp_transactions")
+      .select("xp_amount")
+      .eq("user_id", user.id)
+      .gte("created_at", todayISO);
+
+    const xpToday = (xpRows || []).reduce((sum: number, r: { xp_amount: number }) => sum + (r.xp_amount || 0), 0);
+
+    // Estimate minutes active from transaction count (rough: 3 min per transaction)
+    const totalTransactions = (xpRows || []).length;
+    const minutesActive = totalTransactions * 3;
+
+    const enthusiasm = getCoachEnthusiasm({
+      lessonsToday: lessonsToday || 0,
+      streakDays: profileData?.login_streak || 0,
+      xpToday,
+      minutesActive,
+    });
+
+    enthusiasmModifier = enthusiasm.modifier;
+  } catch {
+    // silently continue without enthusiasm modifier
+  }
+
   // Build context-aware prompt with full lesson material
-  let contextPrompt = persona.systemPrompt;
+  let contextPrompt = persona.systemPrompt + enthusiasmModifier;
 
   // Language instruction — teach in the selected language
   if (language !== "en") {
