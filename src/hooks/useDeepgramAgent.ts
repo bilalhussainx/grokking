@@ -32,6 +32,7 @@ interface DeepgramAgentCallbacks {
   onConnect?: () => void;
   onDisconnect?: () => void;
   onError?: (error: string) => void;
+  onGreetingDone?: () => void;
 }
 
 export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
@@ -287,6 +288,7 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                   console.log("[Deepgram] Greeting done — starting 2s echo cooldown");
                   isGreetingPhaseRef.current = false;
                   greetingCooldownRef.current = true;
+                  callbacksRef.current?.onGreetingDone?.();
                   setTimeout(() => {
                     greetingCooldownRef.current = false;
                     console.log("[Deepgram] Echo cooldown ended — now accepting user speech");

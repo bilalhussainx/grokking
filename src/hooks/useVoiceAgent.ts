@@ -15,6 +15,7 @@ export interface VoiceAgentCallbacks {
   onConnect?: () => void;
   onDisconnect?: () => void;
   onError?: (error: string) => void;
+  onGreetingDone?: () => void;
 }
 
 export interface VoiceAgentHook {
@@ -56,6 +57,7 @@ export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
     onConnect: callbacks?.onConnect,
     onDisconnect: callbacks?.onDisconnect,
     onError: callbacks?.onError,
+    onGreetingDone: callbacks?.onGreetingDone,
   });
 
   // Orchestrated agent for Indic languages
