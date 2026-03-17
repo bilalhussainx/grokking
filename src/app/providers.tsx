@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AIProvider, useAI } from "@/contexts/AIContext";
+import { XPProvider, useXP } from "@/contexts/XPContext";
 import { TopNavProvider } from "@/contexts/TopNavContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import AICoach from "@/components/ai/AICoach";
@@ -11,6 +12,8 @@ import { TranslationBar } from "@/components/language/TranslationBar";
 import TopNav from "@/components/layout/TopNav";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import ShortcutsHelp from "@/components/ui/ShortcutsHelp";
+import XPFlyUp from "@/components/gamification/XPFlyUp";
+import AchievementToast from "@/components/gamification/AchievementToast";
 import { GraduationCap, X, FileText, ChevronLeft, Mic } from "lucide-react";
 
 /**
@@ -163,19 +166,40 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Global gamification overlays — XP fly-up + achievement toasts.
+ * Must be inside XPProvider to access context.
+ */
+function GamificationOverlays() {
+  const { showXPFlyUp, lastXPAmount, pendingAchievements, dismissAchievement } = useXP();
+
+  return (
+    <>
+      <XPFlyUp trigger={showXPFlyUp} amount={lastXPAmount} />
+      <AchievementToast
+        achievements={pendingAchievements}
+        onDismiss={dismissAchievement}
+      />
+    </>
+  );
+}
+
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       <ThemeProvider>
       <TopNavProvider>
         <AIProvider>
-          <AppLayout>
-            {children}
-          </AppLayout>
-          <CoachFAB />
-          <GlobalSearch />
-          <ShortcutsHelp />
-          <TranslationBar />
+          <XPProvider>
+            <AppLayout>
+              {children}
+            </AppLayout>
+            <CoachFAB />
+            <GamificationOverlays />
+            <GlobalSearch />
+            <ShortcutsHelp />
+            <TranslationBar />
+          </XPProvider>
         </AIProvider>
       </TopNavProvider>
       </ThemeProvider>
