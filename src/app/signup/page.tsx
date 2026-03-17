@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
 
 export default function SignupPage() {
-  const { signInWithGoogle, signUpWithEmail, user } = useAuth();
+  const { signInWithGoogle, signUpWithEmail, refreshCredits, user } = useAuth();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -47,16 +47,18 @@ export default function SignupPage() {
 
       // Redeem invite code if provided
       if (inviteCode.trim()) {
-        // Try to redeem immediately if user is auto-confirmed and logged in
         if (result.confirmed) {
           try {
-            await fetch("/api/invite/redeem", {
+            const redeemRes = await fetch("/api/invite/redeem", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ code: inviteCode.trim() }),
             });
+            if (redeemRes.ok) {
+              // Refresh credits + profile after redeem updated the DB
+              await refreshCredits();
+            }
           } catch {
-            // Non-critical — save for later
             localStorage.setItem('pending-invite-code', inviteCode.trim());
           }
         } else {
@@ -65,8 +67,8 @@ export default function SignupPage() {
       }
 
       if (result.confirmed) {
-        // Auto-confirmed — go straight to the app
-        router.replace("/");
+        // Auto-confirmed — send to onboarding, full reload so initAuth picks up latest DB state
+        window.location.href = "/onboarding";
       } else {
         // Email confirmation needed — show "check your email"
         setSuccess(true);

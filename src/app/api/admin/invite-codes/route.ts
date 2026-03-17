@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { label, credits, durationDays, maxUses, count, prefix } = await req.json();
+  const { label, credits, durationDays, maxUses, count, prefix, role } = await req.json();
 
   const admin = createAdminSupabase();
   const codes: string[] = [];
@@ -26,9 +26,10 @@ export async function POST(req: NextRequest) {
     const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
     const code = `${codePrefix}-${randomPart}`;
 
-    // Try new schema first (with label, credits, duration_days, max_uses)
+    // Try new schema first (with label, credits, duration_days, max_uses, role)
     const { error } = await admin.from("invite_codes").insert({
       code,
+      role: role || "pro",
       label: label || `${codePrefix} Demo`,
       credits: credits || 1000,
       duration_days: durationDays || 14,
