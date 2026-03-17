@@ -10,176 +10,19 @@ export const rumiModule: Module = {
       id: "sufism-rumi-life",
       slug: "rumi-life",
       title: "The Life of Rumi",
-      content: `## The Life of Rumi
-
-<!-- voice:section_check concept="Rumi's biographical journey and his transformative encounter with Shams" -->
-
-**Jalaluddin Muhammad Rumi** (جلال الدین محمد رومی, 1207–1273 CE) was born in Balkh (in present-day Afghanistan) and spent most of his life in Konya, in modern-day Turkey. He is arguably the most widely read poet in the world — his works have been translated into dozens of languages and sell millions of copies annually.
-
-But Rumi was not primarily a poet. He was a **scholar of Islamic law and theology** who was transformed by a mystical encounter into one of history's greatest spiritual voices.
-
-### From Scholar to Mystic
-
-Rumi's father, Bahauddin Walad (بهاء الدین ولد), was a respected theologian and jurist. When the Mongol armies threatened Balkh, the family migrated westward — eventually settling in Konya, the capital of the Seljuk Sultanate of Rum (hence the name "Rumi," meaning "from Rum/Rome").
-
-After his father's death, Rumi inherited his position as a leading religious scholar and preacher. He was respected, influential, and thoroughly conventional.
-
-Then, in 1244, everything changed. He met **Shams-i Tabrizi** (شمس تبریزی) — a wandering mystic of intense, provocative spiritual power.
-
-### The Encounter with Shams
-
-The meeting of Rumi and Shams is one of the most celebrated episodes in the history of mysticism. According to tradition, Shams asked Rumi a question that shattered his scholarly certainty and opened his heart to a dimension of spiritual experience that books alone could never provide.
-
-Rumi abandoned his lectern, his students, and his reputation to spend months in intense spiritual conversation (sohbet, صحبت) with Shams. His students grew jealous. Shams disappeared — possibly murdered. Rumi was devastated.
-
-And out of that devastation poured poetry.
-
-<!-- voice:key_insight insight="Rumi's transformation illustrates a central Sufi teaching: intellectual knowledge of God (ilm) is not the same as experiential knowledge of God (ma'rifa). Rumi the scholar knew about God. After Shams, Rumi the mystic knew God." -->
-
-> "I was raw, I was cooked, I was burned."
-> — Attributed to Rumi (Divan-i Shams-i Tabrizi)
-
-### Rumi's Legacy
-
-Rumi spent the rest of his life in Konya, composing two monumental works:
-- The **Masnavi-yi Ma'navi** (مثنوی معنوی, "Spiritual Couplets") — a six-book epic poem of approximately 25,000 verses
-- The **Divan-i Shams-i Tabrizi** (دیوان شمس تبریزی) — a vast collection of lyric poems dedicated to his beloved teacher
-
-When Rumi died on December 17, 1273, his funeral was attended by Muslims, Christians, and Jews. His tomb in Konya remains one of the most visited pilgrimage sites in Turkey.
-
-### Reflection Questions
-
-1. What does it mean that a respected religious scholar was transformed by encountering a wandering mystic?
-2. How might grief function as a spiritual catalyst, as it did for Rumi?
-3. Why do you think Rumi's funeral drew mourners from multiple faiths?
-
-### Deeper Reading
-
-- **Franklin Lewis**, *Rumi: Past and Present, East and West*, Oneworld, 2000 — The definitive English-language biography.
-- **Jawid Mojaddedi** (trans.), *The Masnavi, Book One*, Oxford World's Classics, 2004
-`,
+      content: "## The Life of Rumi\n\n<!-- voice:section_check concept=\"Rumi's biographical journey and his transformative encounter with Shams\" -->\n\n**Jalaluddin Muhammad Rumi** (جلال الدین محمد رومی, 1207–1273 CE) was born in Balkh (in present-day Afghanistan) and spent most of his life in Konya, in modern-day Turkey. He is arguably the most widely read poet in the world — his works have been translated into dozens of languages and sell millions of copies annually.\n\nBut Rumi was not primarily a poet. He was a **scholar of Islamic law and theology** who was transformed by a mystical encounter into one of history's greatest spiritual voices.\n\n### From Scholar to Mystic\n\nRumi's father, Bahauddin Walad (بهاء الدین ولد), was a respected theologian and jurist. When the Mongol armies threatened Balkh, the family migrated westward — eventually settling in Konya, the capital of the Seljuk Sultanate of Rum (hence the name \"Rumi,\" meaning \"from Rum/Rome\").\n\nAfter his father's death, Rumi inherited his position as a leading religious scholar and preacher. He was respected, influential, and thoroughly conventional.\n\nThen, in 1244, everything changed. He met **Shams-i Tabrizi** (شمس تبریزی) — a wandering mystic of intense, provocative spiritual power.\n\n### The Encounter with Shams\n\nThe meeting of Rumi and Shams is one of the most celebrated episodes in the history of mysticism. According to tradition, Shams asked Rumi a question that shattered his scholarly certainty and opened his heart to a dimension of spiritual experience that books alone could never provide.\n\nRumi abandoned his lectern, his students, and his reputation to spend months in intense spiritual conversation (sohbet, صحبت) with Shams. His students grew jealous. Shams disappeared — possibly murdered. Rumi was devastated.\n\nAnd out of that devastation poured poetry.\n\n<!-- voice:key_insight insight=\"Rumi's transformation illustrates a central Sufi teaching: intellectual knowledge of God (ilm) is not the same as experiential knowledge of God (ma'rifa). Rumi the scholar knew about God. After Shams, Rumi the mystic knew God.\" -->\n\n> \"I was raw, I was cooked, I was burned.\"\n> — Attributed to Rumi (Divan-i Shams-i Tabrizi)\n\n### Rumi's Legacy\n\nRumi spent the rest of his life in Konya, composing two monumental works:\n- The **Masnavi-yi Ma'navi** (مثنوی معنوی, \"Spiritual Couplets\") — a six-book epic poem of approximately 25,000 verses\n- The **Divan-i Shams-i Tabrizi** (دیوان شمس تبریزی) — a vast collection of lyric poems dedicated to his beloved teacher\n\nWhen Rumi died on December 17, 1273, his funeral was attended by Muslims, Christians, and Jews. His tomb in Konya remains one of the most visited pilgrimage sites in Turkey.\n\n### Reflection Questions\n\n1. What does it mean that a respected religious scholar was transformed by encountering a wandering mystic?\n2. How might grief function as a spiritual catalyst, as it did for Rumi?\n3. Why do you think Rumi's funeral drew mourners from multiple faiths?\n\n### Deeper Reading\n\n- **Franklin Lewis**, *Rumi: Past and Present, East and West*, Oneworld, 2000 — The definitive English-language biography.\n- **Jawid Mojaddedi** (trans.), *The Masnavi, Book One*, Oxford World's Classics, 2004\n",
     },
     {
       id: "sufism-rumi-poetry",
       slug: "rumi-poetry",
       title: "The Reed Flute & Love Mysticism",
-      content: `## The Reed Flute & Love Mysticism
-
-<!-- voice:section_check concept="Rumi's central metaphors — the reed flute and love as the path to God" -->
-
-The Masnavi opens with one of the most famous passages in all of world literature: the **Song of the Reed** (Nay-Nama, نی نامه).
-
-> "Listen to the reed, how it tells its tale,
-> complaining of separations.
-> Ever since I was cut from the reed-bed,
-> my lament has made men and women weep.
-> I want a heart torn open by separation
-> so that I might explain the pain of yearning."
-> — Masnavi, Book 1, Lines 1–4 (trans. Jawid Mojaddedi)
-
-### The Metaphor of the Reed
-
-The **nay** (نی) — the reed flute — is Rumi's metaphor for the human soul. Just as the reed was cut from its bed and fashioned into a flute, the soul has been separated from its divine source. The music it makes — poetry, prayer, longing — is the sound of its yearning to return.
-
-This metaphor encodes several Sufi teachings:
-
-| Element | Meaning |
-|---------|---------|
-| The reed-bed | The divine source, union with God |
-| Being cut | The soul's descent into the material world |
-| The hollow center | Emptiness of ego — only when empty can the reed make music |
-| The breath of the player | God's spirit animating the soul |
-| The music | Prayer, poetry, longing — the soul's response to separation |
-
-<!-- voice:key_insight insight="The reed can only produce beautiful music because it is hollow — emptied of itself. This is the Sufi paradox: you must become empty of ego (fana) to be filled with God. The deepest spiritual music comes from the deepest surrender." -->
-
-### Love as the Path
-
-For Rumi, the path to God is not primarily through intellectual study or even ascetic discipline. It is through **love** (ishq, عشق):
-
-> "Reason is powerless in the expression of love.
-> Love alone is capable of revealing the truth of love."
-> — Masnavi, Book 1
-
-> "Wherever you are, and whatever you do, be in love."
-> — Attributed to Rumi (Fihi Ma Fihi, Discourse 4)
-
-This is not romantic love in the ordinary sense. Rumi uses the language of human love — longing, union, separation, ecstasy — as a vehicle for describing the soul's relationship with God. The beloved in his poetry is ultimately always God, whether the immediate subject is Shams, wine, or a garden.
-
-### Key Themes in Rumi's Poetry
-
-- **Separation and union:** The pain of being apart from God, the ecstasy of reunion
-- **The transformative power of love:** Love burns away the ego and reveals the divine within
-- **The inadequacy of reason:** The intellect can point toward God but cannot reach Him
-- **Universal mercy:** God's love embraces all, regardless of religion or status
-
-> "Come, come, whoever you are —
-> wanderer, worshiper, lover of leaving.
-> It does not matter. Ours is not a caravan of despair.
-> Come, even if you have broken your vow a thousand times.
-> Come, yet again, come, come."
-> — Attributed to Rumi (widely circulated, origin debated)
-
-### Reflection Questions
-
-1. How does the reed flute metaphor make you think about the purpose of human longing and creativity?
-2. Can the language of romantic love adequately describe the relationship between the soul and God? What are the strengths and risks?
-3. Why might Rumi insist that love is superior to reason as a path to God?
-
-### Deeper Reading
-
-- **Jawid Mojaddedi** (trans.), *The Masnavi, Books 1–3*, Oxford World's Classics, 2004–2013
-- **Coleman Barks**, *The Essential Rumi*, HarperOne, 1995 — Popular but paraphrased; read alongside a scholarly translation.
-`,
+      content: "## The Reed Flute & Love Mysticism\n\n<!-- voice:section_check concept=\"Rumi's central metaphors — the reed flute and love as the path to God\" -->\n\nThe Masnavi opens with one of the most famous passages in all of world literature: the **Song of the Reed** (Nay-Nama, نی نامه).\n\n> \"Listen to the reed, how it tells its tale,\n> complaining of separations.\n> Ever since I was cut from the reed-bed,\n> my lament has made men and women weep.\n> I want a heart torn open by separation\n> so that I might explain the pain of yearning.\"\n> — Masnavi, Book 1, Lines 1–4 (trans. Jawid Mojaddedi)\n\n### The Metaphor of the Reed\n\nThe **nay** (نی) — the reed flute — is Rumi's metaphor for the human soul. Just as the reed was cut from its bed and fashioned into a flute, the soul has been separated from its divine source. The music it makes — poetry, prayer, longing — is the sound of its yearning to return.\n\nThis metaphor encodes several Sufi teachings:\n\n| Element | Meaning |\n|---------|---------|\n| The reed-bed | The divine source, union with God |\n| Being cut | The soul's descent into the material world |\n| The hollow center | Emptiness of ego — only when empty can the reed make music |\n| The breath of the player | God's spirit animating the soul |\n| The music | Prayer, poetry, longing — the soul's response to separation |\n\n<!-- voice:key_insight insight=\"The reed can only produce beautiful music because it is hollow — emptied of itself. This is the Sufi paradox: you must become empty of ego (fana) to be filled with God. The deepest spiritual music comes from the deepest surrender.\" -->\n\n### Love as the Path\n\nFor Rumi, the path to God is not primarily through intellectual study or even ascetic discipline. It is through **love** (ishq, عشق):\n\n> \"Reason is powerless in the expression of love.\n> Love alone is capable of revealing the truth of love.\"\n> — Masnavi, Book 1\n\n> \"Wherever you are, and whatever you do, be in love.\"\n> — Attributed to Rumi (Fihi Ma Fihi, Discourse 4)\n\nThis is not romantic love in the ordinary sense. Rumi uses the language of human love — longing, union, separation, ecstasy — as a vehicle for describing the soul's relationship with God. The beloved in his poetry is ultimately always God, whether the immediate subject is Shams, wine, or a garden.\n\n### Key Themes in Rumi's Poetry\n\n- **Separation and union:** The pain of being apart from God, the ecstasy of reunion\n- **The transformative power of love:** Love burns away the ego and reveals the divine within\n- **The inadequacy of reason:** The intellect can point toward God but cannot reach Him\n- **Universal mercy:** God's love embraces all, regardless of religion or status\n\n> \"Come, come, whoever you are —\n> wanderer, worshiper, lover of leaving.\n> It does not matter. Ours is not a caravan of despair.\n> Come, even if you have broken your vow a thousand times.\n> Come, yet again, come, come.\"\n> — Attributed to Rumi (widely circulated, origin debated)\n\n### Reflection Questions\n\n1. How does the reed flute metaphor make you think about the purpose of human longing and creativity?\n2. Can the language of romantic love adequately describe the relationship between the soul and God? What are the strengths and risks?\n3. Why might Rumi insist that love is superior to reason as a path to God?\n\n### Deeper Reading\n\n- **Jawid Mojaddedi** (trans.), *The Masnavi, Books 1–3*, Oxford World's Classics, 2004–2013\n- **Coleman Barks**, *The Essential Rumi*, HarperOne, 1995 — Popular but paraphrased; read alongside a scholarly translation.\n",
     },
     {
       id: "sufism-rumi-checkpoint",
       slug: "rumi-checkpoint",
       title: "Checkpoint: Rumi & Poetry",
-      content: `## Checkpoint: Rumi & Poetry
-
-Nice work exploring Rumi's world! Let us review.
-
-### Quiz
-
-**1. Where was Rumi born, and where did he spend most of his life?**
-
-**Answer:** Rumi was born in Balkh (present-day Afghanistan) in 1207 and spent most of his life in Konya (present-day Turkey), the capital of the Seljuk Sultanate of Rum.
-
----
-
-**2. Who was Shams-i Tabrizi, and how did he transform Rumi?**
-
-*Short Answer:* Shams-i Tabrizi was a wandering mystic whose intense spiritual encounter with Rumi in 1244 transformed Rumi from a conventional religious scholar into an ecstatic mystic poet. Their relationship — and Shams's eventual disappearance — catalyzed Rumi's greatest poetry.
-
----
-
-**3. What does the reed flute (nay) symbolize in the opening of the Masnavi?**
-
-- a) Musical talent
-- b) The human soul separated from its divine source
-- c) The Quran
-- d) The beauty of nature
-
-**Answer: b)** The reed, cut from its bed, represents the soul separated from God. Its music is the sound of spiritual longing.
-
----
-
-**4. What is ishq (عشق) in Rumi's teaching, and why does he prioritize it over reason?**
-
-*Short Answer:* Ishq is passionate, selfless love — ultimately directed toward God. Rumi prioritizes it over reason because he believes the intellect can point toward God but cannot reach Him. Only love can dissolve the ego and achieve direct union with the Divine.
-
----
-
-### Voice Summary
-
-Explain aloud:
-- The story of Rumi and Shams and why it matters
-- What the reed flute symbolizes
-- Why love is central to Rumi's Sufism
-
-Beautiful! In the next module, we explore the profound metaphysics of Ibn Arabi.
-`,
+      content: "## Checkpoint: Rumi & Poetry\n\nNice work exploring Rumi's world! Let us review.\n\n### Quiz\n\n**1. Where was Rumi born, and where did he spend most of his life?**\n\n**Answer:** Rumi was born in Balkh (present-day Afghanistan) in 1207 and spent most of his life in Konya (present-day Turkey), the capital of the Seljuk Sultanate of Rum.\n\n---\n\n**2. Who was Shams-i Tabrizi, and how did he transform Rumi?**\n\n*Short Answer:* Shams-i Tabrizi was a wandering mystic whose intense spiritual encounter with Rumi in 1244 transformed Rumi from a conventional religious scholar into an ecstatic mystic poet. Their relationship — and Shams's eventual disappearance — catalyzed Rumi's greatest poetry.\n\n---\n\n**3. What does the reed flute (nay) symbolize in the opening of the Masnavi?**\n\n- a) Musical talent\n- b) The human soul separated from its divine source\n- c) The Quran\n- d) The beauty of nature\n\n**Answer: b)** The reed, cut from its bed, represents the soul separated from God. Its music is the sound of spiritual longing.\n\n---\n\n**4. What is ishq (عشق) in Rumi's teaching, and why does he prioritize it over reason?**\n\n*Short Answer:* Ishq is passionate, selfless love — ultimately directed toward God. Rumi prioritizes it over reason because he believes the intellect can point toward God but cannot reach Him. Only love can dissolve the ego and achieve direct union with the Divine.\n\n---\n\n### Voice Summary\n\nExplain aloud:\n- The story of Rumi and Shams and why it matters\n- What the reed flute symbolizes\n- Why love is central to Rumi's Sufism\n\nBeautiful! In the next module, we explore the profound metaphysics of Ibn Arabi.\n",
     },
   ],
 };

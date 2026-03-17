@@ -10,218 +10,25 @@ export const renJunziModule: Module = {
       id: "confucianism-ren-benevolence",
       slug: "ren-benevolence",
       title: "Ren: The Heart of Confucianism",
-      content: `## Ren: The Heart of Confucianism
-
-<!-- voice:section_check concept="Ren as the supreme virtue encompassing all others" -->
-
-If you could distill Confucianism to a single word, it would be **ren** (仁). The character itself is composed of two elements: 人 (person) and 二 (two) — suggesting that ren is fundamentally about the *relationship between people*. It is variously translated as benevolence, humaneness, goodness, compassion, or simply "human-heartedness."
-
-### Why Ren Resists Definition
-
-Confucius speaks of ren more than any other virtue in the Analects — yet he never gives it a fixed definition. When different students ask "What is ren?", they receive different answers:
-
-> To Yan Hui (his most gifted student): "To master yourself and return to ritual propriety — that is ren."
-> — Analects 12.1
-
-> To Zhonggong: "Do not impose on others what you yourself do not desire."
-> — Analects 12.2
-
-> To Fan Chi: "Love others." When Fan Chi asked about wisdom: "Know others."
-> — Analects 12.22
-
-Each answer illuminates a different facet: self-discipline, reciprocity, love, understanding. Together, they paint a picture of a virtue that is not a single trait but an **encompassing quality of character** — the sum of all other virtues working in harmony.
-
-<!-- voice:key_insight insight="Ren is not one virtue among many — it is the virtue that integrates all others. A person of ren is courageous without being reckless, wise without being cunning, respectful without being servile. Ren is the master virtue that gives each other virtue its proper proportion." -->
-
-### Ren in Practice
-
-Ren is not an abstract ideal. It manifests in concrete behavior:
-
-- **Awareness of others' needs:** "The person of ren, wishing to establish himself, also establishes others. Wishing to develop himself, he also develops others." (Analects 6.30)
-- **Moral courage:** "When faced with what is right, to leave it undone shows a lack of courage." (Analects 2.24)
-- **Perseverance:** "Is ren really so far away? If I want ren, ren is here." (Analects 7.30)
-
-That last passage is remarkable. Ren is not reserved for sages born with special gifts. It is available to anyone who sincerely desires it and commits to the work of self-cultivation.
-
-### Reflection Questions
-
-1. Why might Confucius have refused to give a single definition of ren?
-2. How does the idea that ren integrates all virtues compare to virtue ethics in other traditions?
-3. What does it mean practically that "if I want ren, ren is here"?
-
-### Deeper Reading
-
-- **Tu Weiming**, *Humanity and Self-Cultivation: Essays in Confucian Thought*, Chardwick-Healey, 1979
-- **Wing-tsit Chan**, *A Source Book in Chinese Philosophy*, Princeton University Press, 1963
-`,
+      content: "## Ren: The Heart of Confucianism\n\n<!-- voice:section_check concept=\"Ren as the supreme virtue encompassing all others\" -->\n\nIf you could distill Confucianism to a single word, it would be **ren** (仁). The character itself is composed of two elements: 人 (person) and 二 (two) — suggesting that ren is fundamentally about the *relationship between people*. It is variously translated as benevolence, humaneness, goodness, compassion, or simply \"human-heartedness.\"\n\n### Why Ren Resists Definition\n\nConfucius speaks of ren more than any other virtue in the Analects — yet he never gives it a fixed definition. When different students ask \"What is ren?\", they receive different answers:\n\n> To Yan Hui (his most gifted student): \"To master yourself and return to ritual propriety — that is ren.\"\n> — Analects 12.1\n\n> To Zhonggong: \"Do not impose on others what you yourself do not desire.\"\n> — Analects 12.2\n\n> To Fan Chi: \"Love others.\" When Fan Chi asked about wisdom: \"Know others.\"\n> — Analects 12.22\n\nEach answer illuminates a different facet: self-discipline, reciprocity, love, understanding. Together, they paint a picture of a virtue that is not a single trait but an **encompassing quality of character** — the sum of all other virtues working in harmony.\n\n<!-- voice:key_insight insight=\"Ren is not one virtue among many — it is the virtue that integrates all others. A person of ren is courageous without being reckless, wise without being cunning, respectful without being servile. Ren is the master virtue that gives each other virtue its proper proportion.\" -->\n\n### Ren in Practice\n\nRen is not an abstract ideal. It manifests in concrete behavior:\n\n- **Awareness of others' needs:** \"The person of ren, wishing to establish himself, also establishes others. Wishing to develop himself, he also develops others.\" (Analects 6.30)\n- **Moral courage:** \"When faced with what is right, to leave it undone shows a lack of courage.\" (Analects 2.24)\n- **Perseverance:** \"Is ren really so far away? If I want ren, ren is here.\" (Analects 7.30)\n\nThat last passage is remarkable. Ren is not reserved for sages born with special gifts. It is available to anyone who sincerely desires it and commits to the work of self-cultivation.\n\n### Reflection Questions\n\n1. Why might Confucius have refused to give a single definition of ren?\n2. How does the idea that ren integrates all virtues compare to virtue ethics in other traditions?\n3. What does it mean practically that \"if I want ren, ren is here\"?\n\n### Deeper Reading\n\n- **Tu Weiming**, *Humanity and Self-Cultivation: Essays in Confucian Thought*, Chardwick-Healey, 1979\n- **Wing-tsit Chan**, *A Source Book in Chinese Philosophy*, Princeton University Press, 1963\n",
     },
     {
       id: "confucianism-junzi-ideal",
       slug: "junzi-ideal",
       title: "The Junzi: The Exemplary Person",
-      content: `## The Junzi: The Exemplary Person
-
-<!-- voice:section_check concept="The junzi as the Confucian moral ideal and its contrast with the xiaoren" -->
-
-The **junzi** (君子) is the human ideal in Confucianism — the person who embodies ren in every aspect of life. The term originally meant "son of a lord" (a person of noble birth), but Confucius radically redefined it: nobility comes from **moral character**, not family lineage.
-
-> "The junzi is not a vessel."
-> — Analects 2.12
-
-A vessel has one function. The junzi is not a specialist but a person of comprehensive moral cultivation — someone who brings virtue to every situation.
-
-### Junzi vs. Xiaoren
-
-Confucius frequently contrasts the junzi with the **xiaoren** (小人, "petty person" or "small person"):
-
-| The Junzi (君子) | The Xiaoren (小人) |
-|-----------------|-------------------|
-| Understands what is right (yi, 義) | Understands what is profitable (li, 利) |
-| Makes demands on himself | Makes demands on others |
-| Is at ease but not arrogant | Is arrogant but not at ease |
-| Associates upward (seeks higher standards) | Associates downward (seeks easy approval) |
-| Is slow to speak but quick to act | Is quick to speak but slow to act |
-
-> "The junzi understands righteousness (yi); the xiaoren understands profit (li)."
-> — Analects 4.16
-
-> "The junzi makes demands on himself; the xiaoren makes demands on others."
-> — Analects 15.21
-
-<!-- voice:key_insight insight="The junzi-xiaoren distinction is not about social class or intelligence. It is about moral orientation. Do you orient your life around what is right, or around what is advantageous? That choice, made daily, determines which kind of person you become." -->
-
-### The Process of Becoming a Junzi
-
-No one is born a junzi. Becoming one requires lifelong **self-cultivation** (xiuyang, 修養):
-
-1. **Study** (xue, 學) — Learning from the classics, from history, from virtuous people
-2. **Reflection** (si, 思) — "Learning without reflection is a waste. Reflection without learning is dangerous." (Analects 2.15)
-3. **Practice** (xi, 習) — Putting virtue into action through li (禮) in daily life
-4. **Self-examination** — Zengzi's daily three-fold examination (Analects 1.4)
-
-Confucius himself modeled this. Recall his self-description: "At fifteen, I set my heart on learning..." (Analects 2.4). The path of the junzi never ends — it is a lifelong project.
-
-### Reflection Questions
-
-1. How does Confucius's redefinition of junzi from "nobleman" to "morally exemplary person" reflect his broader values?
-2. Where do you see yourself — and people around you — falling on the junzi-xiaoren spectrum?
-3. How does the Confucian emphasis on self-cultivation compare to notions of moral development in other traditions?
-
-### Deeper Reading
-
-- **Philip J. Ivanhoe**, *Confucian Moral Self Cultivation*, Hackett, 2000 — Clear introduction to the stages of moral development in Confucianism.
-- **Bryan W. Van Norden**, *Virtue Ethics and Consequentialism in Early Chinese Philosophy*, Cambridge University Press, 2007
-`,
+      content: "## The Junzi: The Exemplary Person\n\n<!-- voice:section_check concept=\"The junzi as the Confucian moral ideal and its contrast with the xiaoren\" -->\n\nThe **junzi** (君子) is the human ideal in Confucianism — the person who embodies ren in every aspect of life. The term originally meant \"son of a lord\" (a person of noble birth), but Confucius radically redefined it: nobility comes from **moral character**, not family lineage.\n\n> \"The junzi is not a vessel.\"\n> — Analects 2.12\n\nA vessel has one function. The junzi is not a specialist but a person of comprehensive moral cultivation — someone who brings virtue to every situation.\n\n### Junzi vs. Xiaoren\n\nConfucius frequently contrasts the junzi with the **xiaoren** (小人, \"petty person\" or \"small person\"):\n\n| The Junzi (君子) | The Xiaoren (小人) |\n|-----------------|-------------------|\n| Understands what is right (yi, 義) | Understands what is profitable (li, 利) |\n| Makes demands on himself | Makes demands on others |\n| Is at ease but not arrogant | Is arrogant but not at ease |\n| Associates upward (seeks higher standards) | Associates downward (seeks easy approval) |\n| Is slow to speak but quick to act | Is quick to speak but slow to act |\n\n> \"The junzi understands righteousness (yi); the xiaoren understands profit (li).\"\n> — Analects 4.16\n\n> \"The junzi makes demands on himself; the xiaoren makes demands on others.\"\n> — Analects 15.21\n\n<!-- voice:key_insight insight=\"The junzi-xiaoren distinction is not about social class or intelligence. It is about moral orientation. Do you orient your life around what is right, or around what is advantageous? That choice, made daily, determines which kind of person you become.\" -->\n\n### The Process of Becoming a Junzi\n\nNo one is born a junzi. Becoming one requires lifelong **self-cultivation** (xiuyang, 修養):\n\n1. **Study** (xue, 學) — Learning from the classics, from history, from virtuous people\n2. **Reflection** (si, 思) — \"Learning without reflection is a waste. Reflection without learning is dangerous.\" (Analects 2.15)\n3. **Practice** (xi, 習) — Putting virtue into action through li (禮) in daily life\n4. **Self-examination** — Zengzi's daily three-fold examination (Analects 1.4)\n\nConfucius himself modeled this. Recall his self-description: \"At fifteen, I set my heart on learning...\" (Analects 2.4). The path of the junzi never ends — it is a lifelong project.\n\n### Reflection Questions\n\n1. How does Confucius's redefinition of junzi from \"nobleman\" to \"morally exemplary person\" reflect his broader values?\n2. Where do you see yourself — and people around you — falling on the junzi-xiaoren spectrum?\n3. How does the Confucian emphasis on self-cultivation compare to notions of moral development in other traditions?\n\n### Deeper Reading\n\n- **Philip J. Ivanhoe**, *Confucian Moral Self Cultivation*, Hackett, 2000 — Clear introduction to the stages of moral development in Confucianism.\n- **Bryan W. Van Norden**, *Virtue Ethics and Consequentialism in Early Chinese Philosophy*, Cambridge University Press, 2007\n",
     },
     {
       id: "confucianism-de-virtue",
       slug: "de-virtue-power",
       title: "De: Virtue as Power",
-      content: `## De: Virtue as Power
-
-<!-- voice:section_check concept="De as moral charisma — how virtue radiates outward to transform others" -->
-
-One of the most distinctive ideas in Confucianism is **de** (德) — a concept that bridges "virtue" and "power." De is the moral charisma that radiates from a person of genuine virtue, naturally influencing others toward goodness without coercion.
-
-### The Magnetic Force of Virtue
-
-Confucius used a striking metaphor:
-
-> "Governing with virtue (de) is like being the North Star: it occupies its place while all the other stars revolve around it."
-> — Analects 2.1
-
-The North Star does not chase the other stars. It simply *is* what it is, and everything orients around it. Similarly, a ruler (or any person) who cultivates genuine virtue does not need to force compliance — people are naturally drawn to follow.
-
-This is not wishful thinking for Confucius. He believed it was supported by historical evidence: the sage-kings Yao (堯) and Shun (舜) governed vast territories through moral example, not military force.
-
-### De in the Junzi
-
-De is not exclusive to rulers. Any junzi possesses de in proportion to their cultivation:
-
-> "Virtue (de) is never solitary; it always has neighbors."
-> — Analects 4.25
-
-<!-- voice:key_insight insight="This brief saying contains a profound sociological insight: genuine virtue is contagious. A person of real moral character naturally attracts others who want to be better. Virtue creates community." -->
-
-### The Relationship Between De and Li
-
-De is the inner substance; li (禮) is the outward expression. When a person performs ritual propriety with genuine inner virtue, the result is de — a moral presence that others can sense and respond to.
-
-Consider the difference between:
-- A teacher who follows the curriculum perfectly but treats students mechanically
-- A teacher who follows the same curriculum but radiates warmth, care, and genuine investment in students' growth
-
-Both perform the same forms. Only the second has de.
-
-### Zhongyong: The Doctrine of the Mean
-
-The **Zhongyong** (中庸, Doctrine of the Mean) — attributed to Confucius's grandson Zisi (子思) — explores how de is cultivated through **balance and sincerity**:
-
-> "Before pleasure, anger, sorrow, and joy are expressed, they are called the Mean (zhong, 中). When they are expressed to the proper degree, they are called Harmony (he, 和)."
-> — Zhongyong, Chapter 1
-
-The person of de does not suppress emotions. Rather, every emotion is expressed at the right time, in the right measure, toward the right object. This is zhongyong — the balanced center.
-
-### Reflection Questions
-
-1. Can you think of someone you know who possesses "de" — a person whose moral character naturally influences those around them?
-2. How does the Confucian idea of "leading by example" compare to modern leadership theories?
-3. Is the Doctrine of the Mean about being moderate, or about being precise? What is the difference?
-
-### Deeper Reading
-
-- **Tu Weiming**, *Centrality and Commonality: An Essay on Confucian Religiousness*, SUNY Press, 1989
-- **Andrew Plaks**, *Ta Hsueh and Chung Yung: The Highest Order of Cultivation and On the Practice of the Mean*, Penguin Classics, 2003
-`,
+      content: "## De: Virtue as Power\n\n<!-- voice:section_check concept=\"De as moral charisma — how virtue radiates outward to transform others\" -->\n\nOne of the most distinctive ideas in Confucianism is **de** (德) — a concept that bridges \"virtue\" and \"power.\" De is the moral charisma that radiates from a person of genuine virtue, naturally influencing others toward goodness without coercion.\n\n### The Magnetic Force of Virtue\n\nConfucius used a striking metaphor:\n\n> \"Governing with virtue (de) is like being the North Star: it occupies its place while all the other stars revolve around it.\"\n> — Analects 2.1\n\nThe North Star does not chase the other stars. It simply *is* what it is, and everything orients around it. Similarly, a ruler (or any person) who cultivates genuine virtue does not need to force compliance — people are naturally drawn to follow.\n\nThis is not wishful thinking for Confucius. He believed it was supported by historical evidence: the sage-kings Yao (堯) and Shun (舜) governed vast territories through moral example, not military force.\n\n### De in the Junzi\n\nDe is not exclusive to rulers. Any junzi possesses de in proportion to their cultivation:\n\n> \"Virtue (de) is never solitary; it always has neighbors.\"\n> — Analects 4.25\n\n<!-- voice:key_insight insight=\"This brief saying contains a profound sociological insight: genuine virtue is contagious. A person of real moral character naturally attracts others who want to be better. Virtue creates community.\" -->\n\n### The Relationship Between De and Li\n\nDe is the inner substance; li (禮) is the outward expression. When a person performs ritual propriety with genuine inner virtue, the result is de — a moral presence that others can sense and respond to.\n\nConsider the difference between:\n- A teacher who follows the curriculum perfectly but treats students mechanically\n- A teacher who follows the same curriculum but radiates warmth, care, and genuine investment in students' growth\n\nBoth perform the same forms. Only the second has de.\n\n### Zhongyong: The Doctrine of the Mean\n\nThe **Zhongyong** (中庸, Doctrine of the Mean) — attributed to Confucius's grandson Zisi (子思) — explores how de is cultivated through **balance and sincerity**:\n\n> \"Before pleasure, anger, sorrow, and joy are expressed, they are called the Mean (zhong, 中). When they are expressed to the proper degree, they are called Harmony (he, 和).\"\n> — Zhongyong, Chapter 1\n\nThe person of de does not suppress emotions. Rather, every emotion is expressed at the right time, in the right measure, toward the right object. This is zhongyong — the balanced center.\n\n### Reflection Questions\n\n1. Can you think of someone you know who possesses \"de\" — a person whose moral character naturally influences those around them?\n2. How does the Confucian idea of \"leading by example\" compare to modern leadership theories?\n3. Is the Doctrine of the Mean about being moderate, or about being precise? What is the difference?\n\n### Deeper Reading\n\n- **Tu Weiming**, *Centrality and Commonality: An Essay on Confucian Religiousness*, SUNY Press, 1989\n- **Andrew Plaks**, *Ta Hsueh and Chung Yung: The Highest Order of Cultivation and On the Practice of the Mean*, Penguin Classics, 2003\n",
     },
     {
       id: "confucianism-ren-junzi-checkpoint",
       slug: "ren-junzi-checkpoint",
       title: "Checkpoint: Ren & the Junzi",
-      content: `## Checkpoint: Ren & the Junzi
-
-Nice work engaging with the core virtues of Confucianism! Let us review.
-
-### Quiz
-
-**1. Why does Confucius give different definitions of ren to different students?**
-
-*Short Answer:* Because ren is not a single trait but an encompassing quality of character — the integration of all virtues in proper proportion. Each student needs to develop a different aspect, so Confucius addresses their specific deficiencies.
-
----
-
-**2. What is the key difference between a junzi and a xiaoren?**
-
-- a) Social class
-- b) Intelligence
-- c) Moral orientation — the junzi seeks what is right (yi), the xiaoren seeks what is profitable (li)
-- d) Age
-
-**Answer: c)** The distinction is purely about moral orientation, not birth, intelligence, or status.
-
----
-
-**3. What does the metaphor of the North Star (Analects 2.1) illustrate about de (德)?**
-
-*Short Answer:* Just as the North Star stays in its place while all other stars revolve around it, a person who governs with genuine virtue naturally attracts others' allegiance without coercion. De is moral charisma — the power that radiates from authentic virtue.
-
----
-
-**4. What is zhongyong (中庸), and what does it teach?**
-
-**Answer:** Zhongyong is the Doctrine of the Mean, attributed to Confucius's grandson Zisi. It teaches that virtue lies in expressing emotions and acting to the proper degree — neither excess nor deficiency. The balanced center (zhong) produces harmony (he).
-
----
-
-### Voice Summary
-
-Explain aloud:
-- What ren is and why it resists a single definition
-- The contrast between junzi and xiaoren with a concrete example
-- How de functions as "virtue-power" that transforms without coercion
-
-Excellent! In the next module, we explore Neo-Confucianism.
-`,
+      content: "## Checkpoint: Ren & the Junzi\n\nNice work engaging with the core virtues of Confucianism! Let us review.\n\n### Quiz\n\n**1. Why does Confucius give different definitions of ren to different students?**\n\n*Short Answer:* Because ren is not a single trait but an encompassing quality of character — the integration of all virtues in proper proportion. Each student needs to develop a different aspect, so Confucius addresses their specific deficiencies.\n\n---\n\n**2. What is the key difference between a junzi and a xiaoren?**\n\n- a) Social class\n- b) Intelligence\n- c) Moral orientation — the junzi seeks what is right (yi), the xiaoren seeks what is profitable (li)\n- d) Age\n\n**Answer: c)** The distinction is purely about moral orientation, not birth, intelligence, or status.\n\n---\n\n**3. What does the metaphor of the North Star (Analects 2.1) illustrate about de (德)?**\n\n*Short Answer:* Just as the North Star stays in its place while all other stars revolve around it, a person who governs with genuine virtue naturally attracts others' allegiance without coercion. De is moral charisma — the power that radiates from authentic virtue.\n\n---\n\n**4. What is zhongyong (中庸), and what does it teach?**\n\n**Answer:** Zhongyong is the Doctrine of the Mean, attributed to Confucius's grandson Zisi. It teaches that virtue lies in expressing emotions and acting to the proper degree — neither excess nor deficiency. The balanced center (zhong) produces harmony (he).\n\n---\n\n### Voice Summary\n\nExplain aloud:\n- What ren is and why it resists a single definition\n- The contrast between junzi and xiaoren with a concrete example\n- How de functions as \"virtue-power\" that transforms without coercion\n\nExcellent! In the next module, we explore Neo-Confucianism.\n",
     },
   ],
 };

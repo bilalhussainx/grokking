@@ -10,178 +10,19 @@ export const taoistPracticesModule: Module = {
       id: "taoism-meditation-qigong",
       slug: "meditation-and-qigong",
       title: "Meditation and Qigong",
-      content: `## Meditation and Qigong
-
-<!-- voice:section_check concept="Taoist meditation as emptying the mind, not filling it" -->
-## Sitting and Forgetting
-
-While the *Tao Te Ching* and *Zhuangzi* are philosophical texts, Taoism has always had a practical side: techniques for cultivating harmony with the Tao in one's own body and mind.
-
-### Zuowang: Sitting and Forgetting
-
-The earliest Taoist meditation practice is **zuowang** (\u5750\u5FD8, "sitting and forgetting"). Zhuangzi describes it through a character named Yan Hui:
-
-> **Zhuangzi, Chapter 6**
-> "I smash up my limbs and body, drive out perception and intellect, cast off form, do away with understanding, and make myself identical with the Great Thoroughfare. This is what I mean by sitting and forgetting."
-> -- trans. Burton Watson
-
-This is not concentration on an object (like a mantra). It is the opposite -- releasing all mental content until the mind becomes empty and still, like a clear pool reflecting everything without holding anything.
-
-### Qigong: Cultivating Vital Energy
-
-**Qigong** (\u6C23\u529F, "energy work") is a family of practices combining slow movement, breathing, and focused awareness to cultivate **qi** (\u6C23, vital energy). While qigong has many schools, Taoist qigong emphasizes:
-
-- **Slow, flowing movements** that mimic nature (clouds, water, animals)
-- **Deep abdominal breathing** (dan tian breathing -- breathing into the lower belly)
-- **Relaxed awareness** -- attention without tension
-- **Coordination of breath and movement** -- the body follows the breath
-
-> **Within the tradition:** Qigong practitioners describe the experience as feeling energy circulate through the body's meridian channels, bringing health and vitality.
->
-> **Academic perspective:** Herbert Benson's research at Harvard Medical School documented measurable physiological changes during qigong practice -- reduced heart rate, lower blood pressure, and decreased stress hormone levels (*The Relaxation Response*, 1975).
-
-<!-- voice:key_insight insight="Taoist meditation empties the mind rather than filling it. The goal is not to think better thoughts but to create a space of stillness where the natural order (Tao) can be directly experienced." -->
-
-### Taijiquan (Tai Chi)
-
-**Taijiquan** (\u592A\u6975\u62F3, "Supreme Ultimate Fist") is perhaps the most widely practiced Taoist art. Originally a martial art, it is performed as a slow, graceful sequence of movements. Every movement embodies wu wei -- using the opponent's force against them rather than meeting strength with strength.
-
-### Reflection Questions
-
-1. How does "sitting and forgetting" (zuowang) differ from concentration-based meditation?
-2. What connection do you see between qigong's slow movements and the Taoist value of wu wei?
-3. Why might emptying the mind be harder than filling it with positive thoughts?
-
-### Deeper Reading
-- **Livia Kohn**, *Sitting in Oblivion: The Heart of Daoist Meditation*, Three Pines Press, 2010
-- **Kenneth Cohen**, *The Way of Qigong*, Ballantine, 1997
-- **Herbert Benson**, *The Relaxation Response*, William Morrow, 1975`,
+      content: "## Meditation and Qigong\n\n<!-- voice:section_check concept=\"Taoist meditation as emptying the mind, not filling it\" -->\n## Sitting and Forgetting\n\nWhile the *Tao Te Ching* and *Zhuangzi* are philosophical texts, Taoism has always had a practical side: techniques for cultivating harmony with the Tao in one's own body and mind.\n\n### Zuowang: Sitting and Forgetting\n\nThe earliest Taoist meditation practice is **zuowang** (\\u5750\\u5FD8, \"sitting and forgetting\"). Zhuangzi describes it through a character named Yan Hui:\n\n> **Zhuangzi, Chapter 6**\n> \"I smash up my limbs and body, drive out perception and intellect, cast off form, do away with understanding, and make myself identical with the Great Thoroughfare. This is what I mean by sitting and forgetting.\"\n> -- trans. Burton Watson\n\nThis is not concentration on an object (like a mantra). It is the opposite -- releasing all mental content until the mind becomes empty and still, like a clear pool reflecting everything without holding anything.\n\n### Qigong: Cultivating Vital Energy\n\n**Qigong** (\\u6C23\\u529F, \"energy work\") is a family of practices combining slow movement, breathing, and focused awareness to cultivate **qi** (\\u6C23, vital energy). While qigong has many schools, Taoist qigong emphasizes:\n\n- **Slow, flowing movements** that mimic nature (clouds, water, animals)\n- **Deep abdominal breathing** (dan tian breathing -- breathing into the lower belly)\n- **Relaxed awareness** -- attention without tension\n- **Coordination of breath and movement** -- the body follows the breath\n\n> **Within the tradition:** Qigong practitioners describe the experience as feeling energy circulate through the body's meridian channels, bringing health and vitality.\n>\n> **Academic perspective:** Herbert Benson's research at Harvard Medical School documented measurable physiological changes during qigong practice -- reduced heart rate, lower blood pressure, and decreased stress hormone levels (*The Relaxation Response*, 1975).\n\n<!-- voice:key_insight insight=\"Taoist meditation empties the mind rather than filling it. The goal is not to think better thoughts but to create a space of stillness where the natural order (Tao) can be directly experienced.\" -->\n\n### Taijiquan (Tai Chi)\n\n**Taijiquan** (\\u592A\\u6975\\u62F3, \"Supreme Ultimate Fist\") is perhaps the most widely practiced Taoist art. Originally a martial art, it is performed as a slow, graceful sequence of movements. Every movement embodies wu wei -- using the opponent's force against them rather than meeting strength with strength.\n\n### Reflection Questions\n\n1. How does \"sitting and forgetting\" (zuowang) differ from concentration-based meditation?\n2. What connection do you see between qigong's slow movements and the Taoist value of wu wei?\n3. Why might emptying the mind be harder than filling it with positive thoughts?\n\n### Deeper Reading\n- **Livia Kohn**, *Sitting in Oblivion: The Heart of Daoist Meditation*, Three Pines Press, 2010\n- **Kenneth Cohen**, *The Way of Qigong*, Ballantine, 1997\n- **Herbert Benson**, *The Relaxation Response*, William Morrow, 1975",
     },
     {
       id: "taoism-simplicity-daily-life",
       slug: "simplicity-and-daily-life",
       title: "Simplicity and Daily Life",
-      content: `## Simplicity and Daily Life
-
-<!-- voice:section_check concept="Taoist simplicity as freedom from excess, not deprivation" -->
-## Less Is More
-
-Taoism's most radical practical teaching may be its simplest: **want less**.
-
-> **Tao Te Ching, Chapter 44**
-> "Which is more precious, your body or your possessions?
-> Which causes more suffering, gaining or losing?
-> Whoever is attached to things will suffer much.
-> Whoever saves will suffer heavy loss.
-> Know when to stop, and you will be free of danger."
-> -- Laozi (trans. adapted from Stephen Mitchell)
-
-This is not asceticism -- the Taoists do not demand poverty or self-denial. It is a practical observation: the more you chase, the more anxious you become. The more you accumulate, the more you fear losing. Simplicity is not deprivation; it is freedom.
-
-### The Taoist Approach to Living
-
-**On ambition:**
-> **Tao Te Ching, Chapter 9**
-> "Fill your bowl to the brim and it will spill. Keep sharpening your knife and it will blunt. Chase after money and security and your heart will never unclench."
-> -- Laozi (trans. Stephen Mitchell)
-
-**On contentment:**
-> **Tao Te Ching, Chapter 33**
-> "He who knows he has enough is rich."
-> -- Laozi
-
-**On leadership:**
-> **Tao Te Ching, Chapter 17**
-> "The best leaders are those the people hardly know exist. When the best leader's work is done, the people say, 'We did it ourselves.'"
-> -- Laozi (trans. Stephen Mitchell)
-
-### Simplicity in Practice
-
-| Area | Taoist Approach |
-|------|-----------------|
-| **Diet** | Simple, seasonal, local food; moderation |
-| **Possessions** | Keep what you need; release what you don't |
-| **Speech** | Say what is necessary; silence is often wiser |
-| **Work** | Do what aligns with your nature (ziran); avoid overstriving |
-| **Relationships** | Be present without controlling; flow like water |
-
-<!-- voice:key_insight insight="Taoist simplicity is not about having nothing -- it is about not being owned by what you have. Contentment is not settling for less; it is recognizing that enough is already here." -->
-
-### Taoism and the Natural World
-
-Taoist temples are often built in mountains and forests, not in city centers. Nature is not a backdrop to spiritual life -- it is the teacher. Observing how seasons change, how rivers flow, how trees grow without striving -- this is Taoist practice as much as any meditation.
-
-### Reflection Questions
-
-1. How does Taoist simplicity differ from asceticism or self-denial?
-2. What does "he who knows he has enough is rich" mean in a consumer culture?
-3. How might Chapter 17's leadership principle apply in a workplace or family?
-
-### Deeper Reading
-- **Laozi**, *Tao Te Ching*, Chapters 9, 17, 33, 44, 80 -- the simplicity chapters
-- **Henry David Thoreau**, *Walden*, 1854 -- an American parallel to Taoist simplicity
-- **Alan Watts**, *Tao: The Watercourse Way*, Pantheon, 1975, Chapter 3`,
+      content: "## Simplicity and Daily Life\n\n<!-- voice:section_check concept=\"Taoist simplicity as freedom from excess, not deprivation\" -->\n## Less Is More\n\nTaoism's most radical practical teaching may be its simplest: **want less**.\n\n> **Tao Te Ching, Chapter 44**\n> \"Which is more precious, your body or your possessions?\n> Which causes more suffering, gaining or losing?\n> Whoever is attached to things will suffer much.\n> Whoever saves will suffer heavy loss.\n> Know when to stop, and you will be free of danger.\"\n> -- Laozi (trans. adapted from Stephen Mitchell)\n\nThis is not asceticism -- the Taoists do not demand poverty or self-denial. It is a practical observation: the more you chase, the more anxious you become. The more you accumulate, the more you fear losing. Simplicity is not deprivation; it is freedom.\n\n### The Taoist Approach to Living\n\n**On ambition:**\n> **Tao Te Ching, Chapter 9**\n> \"Fill your bowl to the brim and it will spill. Keep sharpening your knife and it will blunt. Chase after money and security and your heart will never unclench.\"\n> -- Laozi (trans. Stephen Mitchell)\n\n**On contentment:**\n> **Tao Te Ching, Chapter 33**\n> \"He who knows he has enough is rich.\"\n> -- Laozi\n\n**On leadership:**\n> **Tao Te Ching, Chapter 17**\n> \"The best leaders are those the people hardly know exist. When the best leader's work is done, the people say, 'We did it ourselves.'\"\n> -- Laozi (trans. Stephen Mitchell)\n\n### Simplicity in Practice\n\n| Area | Taoist Approach |\n|------|-----------------|\n| **Diet** | Simple, seasonal, local food; moderation |\n| **Possessions** | Keep what you need; release what you don't |\n| **Speech** | Say what is necessary; silence is often wiser |\n| **Work** | Do what aligns with your nature (ziran); avoid overstriving |\n| **Relationships** | Be present without controlling; flow like water |\n\n<!-- voice:key_insight insight=\"Taoist simplicity is not about having nothing -- it is about not being owned by what you have. Contentment is not settling for less; it is recognizing that enough is already here.\" -->\n\n### Taoism and the Natural World\n\nTaoist temples are often built in mountains and forests, not in city centers. Nature is not a backdrop to spiritual life -- it is the teacher. Observing how seasons change, how rivers flow, how trees grow without striving -- this is Taoist practice as much as any meditation.\n\n### Reflection Questions\n\n1. How does Taoist simplicity differ from asceticism or self-denial?\n2. What does \"he who knows he has enough is rich\" mean in a consumer culture?\n3. How might Chapter 17's leadership principle apply in a workplace or family?\n\n### Deeper Reading\n- **Laozi**, *Tao Te Ching*, Chapters 9, 17, 33, 44, 80 -- the simplicity chapters\n- **Henry David Thoreau**, *Walden*, 1854 -- an American parallel to Taoist simplicity\n- **Alan Watts**, *Tao: The Watercourse Way*, Pantheon, 1975, Chapter 3",
     },
     {
       id: "taoism-practices-checkpoint",
       slug: "practices-checkpoint",
       title: "Checkpoint: Taoist Practices",
-      content: `## Checkpoint: Taoist Practices
-
-Nice work! Taoism is a tradition meant to be lived, not just studied.
-
-<!-- voice:section_check concept="zuowang, qigong, simplicity, nature as teacher" -->
-
-### Question 1
-What is zuowang and how does it work?
-
-<details>
-<summary>Show Answer</summary>
-
-Zuowang ("sitting and forgetting") is the earliest Taoist meditation practice. Instead of concentrating on an object, the practitioner releases all mental content -- thoughts, perceptions, self-image -- until the mind becomes empty and still, allowing direct experience of the Tao.
-</details>
-
-### Question 2
-What is qigong and what does it cultivate?
-
-<details>
-<summary>Show Answer</summary>
-
-Qigong ("energy work") combines slow movements, deep breathing, and focused awareness to cultivate qi (vital energy). Taoist qigong emphasizes flowing movements that mimic nature, relaxed awareness, and coordination of breath and body.
-</details>
-
-### Question 3
-What does Laozi mean by "he who knows he has enough is rich"?
-
-<details>
-<summary>Show Answer</summary>
-
-True wealth is not measured by accumulation but by contentment. A person who recognizes that they already have what they need experiences abundance, while a person who always wants more experiences perpetual lack, regardless of how much they possess.
-</details>
-
-### Question 4
-How does Taoist simplicity differ from deprivation?
-
-<details>
-<summary>Show Answer</summary>
-
-Taoist simplicity is not about having nothing or punishing yourself. It is about freedom from excess -- not being owned by possessions, ambition, or anxiety. The goal is ease and contentment, not suffering.
-</details>
-
-### Question 5
-Why are Taoist temples often built in natural settings?
-
-<details>
-<summary>Show Answer</summary>
-
-Nature is the primary teacher in Taoism. Mountains, rivers, and forests embody the Tao directly -- they demonstrate wu wei, ziran, and the yin-yang balance without any text. Being in nature is itself a form of Taoist practice.
-</details>
-
-### Voice Summary
-
-Describe how Taoist practices -- meditation, qigong, and simplicity -- translate the philosophical teachings of the *Tao Te Ching* into daily life.
-
-Next: Capstone -- bringing all of Taoism together.`,
+      content: "## Checkpoint: Taoist Practices\n\nNice work! Taoism is a tradition meant to be lived, not just studied.\n\n<!-- voice:section_check concept=\"zuowang, qigong, simplicity, nature as teacher\" -->\n\n### Question 1\nWhat is zuowang and how does it work?\n\n<details>\n<summary>Show Answer</summary>\n\nZuowang (\"sitting and forgetting\") is the earliest Taoist meditation practice. Instead of concentrating on an object, the practitioner releases all mental content -- thoughts, perceptions, self-image -- until the mind becomes empty and still, allowing direct experience of the Tao.\n</details>\n\n### Question 2\nWhat is qigong and what does it cultivate?\n\n<details>\n<summary>Show Answer</summary>\n\nQigong (\"energy work\") combines slow movements, deep breathing, and focused awareness to cultivate qi (vital energy). Taoist qigong emphasizes flowing movements that mimic nature, relaxed awareness, and coordination of breath and body.\n</details>\n\n### Question 3\nWhat does Laozi mean by \"he who knows he has enough is rich\"?\n\n<details>\n<summary>Show Answer</summary>\n\nTrue wealth is not measured by accumulation but by contentment. A person who recognizes that they already have what they need experiences abundance, while a person who always wants more experiences perpetual lack, regardless of how much they possess.\n</details>\n\n### Question 4\nHow does Taoist simplicity differ from deprivation?\n\n<details>\n<summary>Show Answer</summary>\n\nTaoist simplicity is not about having nothing or punishing yourself. It is about freedom from excess -- not being owned by possessions, ambition, or anxiety. The goal is ease and contentment, not suffering.\n</details>\n\n### Question 5\nWhy are Taoist temples often built in natural settings?\n\n<details>\n<summary>Show Answer</summary>\n\nNature is the primary teacher in Taoism. Mountains, rivers, and forests embody the Tao directly -- they demonstrate wu wei, ziran, and the yin-yang balance without any text. Being in nature is itself a form of Taoist practice.\n</details>\n\n### Voice Summary\n\nDescribe how Taoist practices -- meditation, qigong, and simplicity -- translate the philosophical teachings of the *Tao Te Ching* into daily life.\n\nNext: Capstone -- bringing all of Taoism together.",
     },
   ],
 };

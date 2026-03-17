@@ -10,183 +10,19 @@ export const meditationTraditionsModule: Module = {
       id: "buddhism-samatha-vipassana",
       slug: "samatha-and-vipassana",
       title: "Samatha and Vipassana: Calm and Insight",
-      content: `## Samatha and Vipassana: Calm and Insight
-
-<!-- voice:section_check concept="The two fundamental modes of Buddhist meditation" -->
-
-All Buddhist meditation can be understood through two fundamental modes: **samatha** (tranquility, calm abiding) and **vipassana** (insight, clear seeing). These are not competing methods but complementary practices — like the two wings of a bird.
-
-### Samatha: The Calm Mind
-
-**Samatha** (Pali: "calming, pacifying") develops concentration (samadhi) by fixing attention on a single object. The mind becomes progressively still, unified, and luminous.
-
-Common samatha objects include:
-
-| Object | Pali Term | Description |
-|--------|-----------|-------------|
-| **Breath** | *anapanasati* | Attention on the sensation of breathing at the nostrils or abdomen |
-| **Loving-kindness** | *metta bhavana* | Generating feelings of goodwill toward self and others |
-| **Kasina** | *kasina* | Visual devices — colored disks, flames, water |
-| **Body parts** | *kayagatasati* | Contemplation of the 32 parts of the body |
-
-The Visuddhimagga, Buddhaghosa's 5th-century meditation manual, lists 40 traditional samatha objects. The culmination of samatha practice is the four jhanas — the progressively deep states of absorption we studied in the Eightfold Path module.
-
-### Vipassana: The Seeing Mind
-
-**Vipassana** (Pali: "seeing clearly, insight") develops wisdom (panna) by observing the three marks of all conditioned phenomena:
-
-1. **Anicca** (impermanence) — everything arises and passes away
-2. **Dukkha** (unsatisfactoriness) — what is impermanent cannot provide lasting fulfillment
-3. **Anatta** (non-self) — no phenomenon contains a fixed, unchanging "I"
-
-The primary instruction for vipassana comes from the **Satipatthana Sutta** (Majjhima Nikaya 10):
-
-> "A monk dwells contemplating the body in the body, ardent, clearly comprehending, and mindful, having removed covetousness and displeasure in regard to the world."
-> — Majjhima Nikaya 10
-
-<!-- voice:key_insight insight="The phrase 'contemplating the body in the body' is significant. It means experiencing the body directly — from the inside, as raw sensation — rather than thinking about the body as an abstract concept. Vipassana is experiential, not intellectual." -->
-
-### The Debate: Samatha First or Vipassana First?
-
-Different Buddhist traditions disagree about the relationship between these two practices:
-
-- **Classical Theravada** (following the Visuddhimagga): Develop jhana (samatha) first, then use the concentrated mind for vipassana
-- **Burmese Vipassana** (Mahasi Sayadaw, U Ba Khin, S.N. Goenka): Begin with vipassana directly, using momentary concentration rather than full jhana
-- **Thai Forest Tradition** (Ajahn Chah, Ajahn Sumedho): Samatha and vipassana are inseparable — "the calm mind sees clearly; the seeing mind becomes calm"
-
-All three approaches are supported by different readings of the Pali Canon, and all three have produced accomplished practitioners.
-
-### Reflection Questions
-
-1. In your own experience, does a calm mind see more clearly? Does clear seeing produce calm?
-2. Why might the Burmese tradition emphasize starting with vipassana rather than developing deep concentration first?
-3. How do samatha and vipassana relate to the Eightfold Path factors of Right Mindfulness and Right Concentration?
-
-### Deeper Reading
-
-- **Buddhaghosa**, *Visuddhimagga* (Path of Purification), trans. Bhikkhu Nanamoli, Buddhist Publication Society, 1975
-- **Joseph Goldstein**, *Mindfulness: A Practical Guide to Awakening*, Sounds True, 2013
-`,
+      content: "## Samatha and Vipassana: Calm and Insight\n\n<!-- voice:section_check concept=\"The two fundamental modes of Buddhist meditation\" -->\n\nAll Buddhist meditation can be understood through two fundamental modes: **samatha** (tranquility, calm abiding) and **vipassana** (insight, clear seeing). These are not competing methods but complementary practices — like the two wings of a bird.\n\n### Samatha: The Calm Mind\n\n**Samatha** (Pali: \"calming, pacifying\") develops concentration (samadhi) by fixing attention on a single object. The mind becomes progressively still, unified, and luminous.\n\nCommon samatha objects include:\n\n| Object | Pali Term | Description |\n|--------|-----------|-------------|\n| **Breath** | *anapanasati* | Attention on the sensation of breathing at the nostrils or abdomen |\n| **Loving-kindness** | *metta bhavana* | Generating feelings of goodwill toward self and others |\n| **Kasina** | *kasina* | Visual devices — colored disks, flames, water |\n| **Body parts** | *kayagatasati* | Contemplation of the 32 parts of the body |\n\nThe Visuddhimagga, Buddhaghosa's 5th-century meditation manual, lists 40 traditional samatha objects. The culmination of samatha practice is the four jhanas — the progressively deep states of absorption we studied in the Eightfold Path module.\n\n### Vipassana: The Seeing Mind\n\n**Vipassana** (Pali: \"seeing clearly, insight\") develops wisdom (panna) by observing the three marks of all conditioned phenomena:\n\n1. **Anicca** (impermanence) — everything arises and passes away\n2. **Dukkha** (unsatisfactoriness) — what is impermanent cannot provide lasting fulfillment\n3. **Anatta** (non-self) — no phenomenon contains a fixed, unchanging \"I\"\n\nThe primary instruction for vipassana comes from the **Satipatthana Sutta** (Majjhima Nikaya 10):\n\n> \"A monk dwells contemplating the body in the body, ardent, clearly comprehending, and mindful, having removed covetousness and displeasure in regard to the world.\"\n> — Majjhima Nikaya 10\n\n<!-- voice:key_insight insight=\"The phrase 'contemplating the body in the body' is significant. It means experiencing the body directly — from the inside, as raw sensation — rather than thinking about the body as an abstract concept. Vipassana is experiential, not intellectual.\" -->\n\n### The Debate: Samatha First or Vipassana First?\n\nDifferent Buddhist traditions disagree about the relationship between these two practices:\n\n- **Classical Theravada** (following the Visuddhimagga): Develop jhana (samatha) first, then use the concentrated mind for vipassana\n- **Burmese Vipassana** (Mahasi Sayadaw, U Ba Khin, S.N. Goenka): Begin with vipassana directly, using momentary concentration rather than full jhana\n- **Thai Forest Tradition** (Ajahn Chah, Ajahn Sumedho): Samatha and vipassana are inseparable — \"the calm mind sees clearly; the seeing mind becomes calm\"\n\nAll three approaches are supported by different readings of the Pali Canon, and all three have produced accomplished practitioners.\n\n### Reflection Questions\n\n1. In your own experience, does a calm mind see more clearly? Does clear seeing produce calm?\n2. Why might the Burmese tradition emphasize starting with vipassana rather than developing deep concentration first?\n3. How do samatha and vipassana relate to the Eightfold Path factors of Right Mindfulness and Right Concentration?\n\n### Deeper Reading\n\n- **Buddhaghosa**, *Visuddhimagga* (Path of Purification), trans. Bhikkhu Nanamoli, Buddhist Publication Society, 1975\n- **Joseph Goldstein**, *Mindfulness: A Practical Guide to Awakening*, Sounds True, 2013\n",
     },
     {
       id: "buddhism-zen-tibetan",
       slug: "zen-and-tibetan-meditation",
       title: "Zen and Tibetan Meditation",
-      content: `## Zen and Tibetan Meditation
-
-<!-- voice:section_check concept="Meditation practices in Mahayana traditions — Zen zazen and Tibetan visualization" -->
-
-While Theravada traditions emphasize samatha and vipassana as described in the Pali Canon, the Mahayana schools of East Asia and Tibet developed distinctive meditation practices rooted in their own philosophical frameworks.
-
-### Zen Meditation: Zazen
-
-**Zen** (Japanese; Chinese: Chan; from Sanskrit: *dhyana*, meditation) strips practice down to its essence. The central practice is **zazen** — "seated meditation."
-
-The 13th-century Japanese master **Dogen Zenji** taught that zazen is not a means to awakening but the **expression** of awakening itself:
-
-> "To study the Buddha Way is to study the self. To study the self is to forget the self. To forget the self is to be awakened by the ten thousand things."
-> — Dogen, *Genjokoan* (Actualizing the Fundamental Point)
-
-Zen has two major schools with different approaches:
-
-| School | Approach | Key Practice |
-|--------|----------|-------------|
-| **Rinzai** | Sudden awakening through breakthrough | **Koan** practice — paradoxical questions (e.g., "What is the sound of one hand clapping?") designed to exhaust conceptual thinking |
-| **Soto** | Gradual, continuous practice | **Shikantaza** ("just sitting") — sitting with open, choiceless awareness without any specific object or goal |
-
-### Tibetan Buddhist Meditation
-
-Tibetan Buddhism (Vajrayana) adds a rich array of meditation techniques to the foundational samatha-vipassana framework:
-
-**Visualization** (sadhana): Practitioners visualize themselves as enlightened beings (yidams) — complete with specific colors, postures, and sacred implements. This is not imagination for its own sake but a method of transforming self-perception from "ordinary, suffering being" to "awakened being."
-
-**Mantra recitation**: Phrases like **Om Mani Padme Hum** (the mantra of Avalokiteshvara, the bodhisattva of compassion) are repeated thousands of times to purify the mind and invoke the qualities of the deity.
-
-**Tonglen** ("giving and taking"): A compassion practice where the practitioner breathes in the suffering of others (visualized as dark smoke) and breathes out well-being and relief (visualized as white light). This directly counters the ego's instinct to seek pleasure and avoid pain.
-
-<!-- voice:key_insight insight="Tibetan meditation practices may seem exotic, but they share the same fundamental goal as Theravada vipassana and Zen zazen: seeing through the illusion of a fixed, separate self. The methods differ — analytical, experiential, devotional, imaginative — but they converge on the same insight." -->
-
-### The Mahayana Motivation: Bodhicitta
-
-What distinguishes Mahayana meditation from Theravada is the **motivation**. While Theravada emphasizes individual liberation (becoming an arahant), Mahayana practice is driven by **bodhicitta** — the aspiration to attain full Buddhahood for the benefit of all sentient beings.
-
-The 8th-century Indian master Shantideva expressed this aspiration:
-
-> "For as long as space endures and for as long as living beings remain, until then may I too abide to dispel the misery of the world."
-> — Shantideva, *Bodhicaryavatara* (Guide to the Bodhisattva's Way of Life), 10.55
-
-### Reflection Questions
-
-1. How does Dogen's teaching that zazen *is* awakening (rather than a path *to* awakening) change the way you think about meditation?
-2. What psychological effect might tonglen practice have on a person's relationship with suffering?
-3. Does the Mahayana emphasis on practicing for all beings change the character of meditation itself?
-
-### Deeper Reading
-
-- **Shunryu Suzuki**, *Zen Mind, Beginner's Mind*, Weatherhill, 1970
-- **Pema Chodron**, *When Things Fall Apart*, Shambhala, 1997
-- **The Dalai Lama**, *The World of Tibetan Buddhism*, Wisdom Publications, 1995
-`,
+      content: "## Zen and Tibetan Meditation\n\n<!-- voice:section_check concept=\"Meditation practices in Mahayana traditions — Zen zazen and Tibetan visualization\" -->\n\nWhile Theravada traditions emphasize samatha and vipassana as described in the Pali Canon, the Mahayana schools of East Asia and Tibet developed distinctive meditation practices rooted in their own philosophical frameworks.\n\n### Zen Meditation: Zazen\n\n**Zen** (Japanese; Chinese: Chan; from Sanskrit: *dhyana*, meditation) strips practice down to its essence. The central practice is **zazen** — \"seated meditation.\"\n\nThe 13th-century Japanese master **Dogen Zenji** taught that zazen is not a means to awakening but the **expression** of awakening itself:\n\n> \"To study the Buddha Way is to study the self. To study the self is to forget the self. To forget the self is to be awakened by the ten thousand things.\"\n> — Dogen, *Genjokoan* (Actualizing the Fundamental Point)\n\nZen has two major schools with different approaches:\n\n| School | Approach | Key Practice |\n|--------|----------|-------------|\n| **Rinzai** | Sudden awakening through breakthrough | **Koan** practice — paradoxical questions (e.g., \"What is the sound of one hand clapping?\") designed to exhaust conceptual thinking |\n| **Soto** | Gradual, continuous practice | **Shikantaza** (\"just sitting\") — sitting with open, choiceless awareness without any specific object or goal |\n\n### Tibetan Buddhist Meditation\n\nTibetan Buddhism (Vajrayana) adds a rich array of meditation techniques to the foundational samatha-vipassana framework:\n\n**Visualization** (sadhana): Practitioners visualize themselves as enlightened beings (yidams) — complete with specific colors, postures, and sacred implements. This is not imagination for its own sake but a method of transforming self-perception from \"ordinary, suffering being\" to \"awakened being.\"\n\n**Mantra recitation**: Phrases like **Om Mani Padme Hum** (the mantra of Avalokiteshvara, the bodhisattva of compassion) are repeated thousands of times to purify the mind and invoke the qualities of the deity.\n\n**Tonglen** (\"giving and taking\"): A compassion practice where the practitioner breathes in the suffering of others (visualized as dark smoke) and breathes out well-being and relief (visualized as white light). This directly counters the ego's instinct to seek pleasure and avoid pain.\n\n<!-- voice:key_insight insight=\"Tibetan meditation practices may seem exotic, but they share the same fundamental goal as Theravada vipassana and Zen zazen: seeing through the illusion of a fixed, separate self. The methods differ — analytical, experiential, devotional, imaginative — but they converge on the same insight.\" -->\n\n### The Mahayana Motivation: Bodhicitta\n\nWhat distinguishes Mahayana meditation from Theravada is the **motivation**. While Theravada emphasizes individual liberation (becoming an arahant), Mahayana practice is driven by **bodhicitta** — the aspiration to attain full Buddhahood for the benefit of all sentient beings.\n\nThe 8th-century Indian master Shantideva expressed this aspiration:\n\n> \"For as long as space endures and for as long as living beings remain, until then may I too abide to dispel the misery of the world.\"\n> — Shantideva, *Bodhicaryavatara* (Guide to the Bodhisattva's Way of Life), 10.55\n\n### Reflection Questions\n\n1. How does Dogen's teaching that zazen *is* awakening (rather than a path *to* awakening) change the way you think about meditation?\n2. What psychological effect might tonglen practice have on a person's relationship with suffering?\n3. Does the Mahayana emphasis on practicing for all beings change the character of meditation itself?\n\n### Deeper Reading\n\n- **Shunryu Suzuki**, *Zen Mind, Beginner's Mind*, Weatherhill, 1970\n- **Pema Chodron**, *When Things Fall Apart*, Shambhala, 1997\n- **The Dalai Lama**, *The World of Tibetan Buddhism*, Wisdom Publications, 1995\n",
     },
     {
       id: "buddhism-meditation-traditions-checkpoint",
       slug: "meditation-traditions-checkpoint",
       title: "Checkpoint: Meditation Traditions",
-      content: `## Checkpoint: Meditation Traditions
-
-Great work exploring the diversity of Buddhist meditation! Let us consolidate what you have learned.
-
-### Quiz
-
-**1. What is the difference between samatha and vipassana?**
-
-*Short Answer:* Samatha (tranquility) develops concentration by fixing attention on a single object, producing a calm, unified mind. Vipassana (insight) develops wisdom by observing the three marks of existence — impermanence (anicca), unsatisfactoriness (dukkha), and non-self (anatta) — in all phenomena. They are complementary practices.
-
----
-
-**2. What is a koan, and which Zen school emphasizes its use?**
-
-- a) A breathing technique used in Soto Zen
-- b) A paradoxical question used in Rinzai Zen to exhaust conceptual thinking
-- c) A Tibetan visualization practice
-- d) A Pali Canon meditation instruction
-
-**Answer: b)** Koans are paradoxical questions or statements (e.g., "What is the sound of one hand clapping?") used in Rinzai Zen to push practitioners beyond conceptual thought.
-
----
-
-**3. What is tonglen practice, and what is its purpose?**
-
-*Short Answer:* Tonglen ("giving and taking") is a Tibetan compassion practice where the meditator breathes in the suffering of others (visualized as dark smoke) and breathes out well-being (visualized as white light). Its purpose is to develop compassion and directly counter the ego's habitual clinging to pleasure and aversion to pain.
-
----
-
-**4. What is bodhicitta?**
-
-- a) A meditation posture
-- b) The aspiration to attain Buddhahood for the benefit of all beings
-- c) A type of chanting practice
-- d) The name for the first jhana
-
-**Answer: b)** Bodhicitta is the Mahayana aspiration to achieve full awakening not for oneself alone but for the liberation of all sentient beings.
-
----
-
-**5. Dogen taught that zazen is not a means to awakening but the expression of awakening itself. What does this mean?**
-
-*Short Answer:* Dogen rejected the idea that meditation is a tool you use to get somewhere else. For Dogen, the act of sitting with full presence *is* the manifestation of Buddha-nature. Practice and realization are not separate — sitting in awareness is itself the awakened state, not a preparation for it.
-
----
-
-### Voice Summary
-
-Explain aloud:
-- The relationship between samatha and vipassana
-- One key difference between Zen and Tibetan meditation
-- Why different traditions can use different methods but aim at the same insight
-
-In the next module, we will explore the key scriptures of Buddhism.
-`,
+      content: "## Checkpoint: Meditation Traditions\n\nGreat work exploring the diversity of Buddhist meditation! Let us consolidate what you have learned.\n\n### Quiz\n\n**1. What is the difference between samatha and vipassana?**\n\n*Short Answer:* Samatha (tranquility) develops concentration by fixing attention on a single object, producing a calm, unified mind. Vipassana (insight) develops wisdom by observing the three marks of existence — impermanence (anicca), unsatisfactoriness (dukkha), and non-self (anatta) — in all phenomena. They are complementary practices.\n\n---\n\n**2. What is a koan, and which Zen school emphasizes its use?**\n\n- a) A breathing technique used in Soto Zen\n- b) A paradoxical question used in Rinzai Zen to exhaust conceptual thinking\n- c) A Tibetan visualization practice\n- d) A Pali Canon meditation instruction\n\n**Answer: b)** Koans are paradoxical questions or statements (e.g., \"What is the sound of one hand clapping?\") used in Rinzai Zen to push practitioners beyond conceptual thought.\n\n---\n\n**3. What is tonglen practice, and what is its purpose?**\n\n*Short Answer:* Tonglen (\"giving and taking\") is a Tibetan compassion practice where the meditator breathes in the suffering of others (visualized as dark smoke) and breathes out well-being (visualized as white light). Its purpose is to develop compassion and directly counter the ego's habitual clinging to pleasure and aversion to pain.\n\n---\n\n**4. What is bodhicitta?**\n\n- a) A meditation posture\n- b) The aspiration to attain Buddhahood for the benefit of all beings\n- c) A type of chanting practice\n- d) The name for the first jhana\n\n**Answer: b)** Bodhicitta is the Mahayana aspiration to achieve full awakening not for oneself alone but for the liberation of all sentient beings.\n\n---\n\n**5. Dogen taught that zazen is not a means to awakening but the expression of awakening itself. What does this mean?**\n\n*Short Answer:* Dogen rejected the idea that meditation is a tool you use to get somewhere else. For Dogen, the act of sitting with full presence *is* the manifestation of Buddha-nature. Practice and realization are not separate — sitting in awareness is itself the awakened state, not a preparation for it.\n\n---\n\n### Voice Summary\n\nExplain aloud:\n- The relationship between samatha and vipassana\n- One key difference between Zen and Tibetan meditation\n- Why different traditions can use different methods but aim at the same insight\n\nIn the next module, we will explore the key scriptures of Buddhism.\n",
     },
   ],
 };
