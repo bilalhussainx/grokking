@@ -2,15 +2,28 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { useXP } from "@/contexts/XPContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Coins, User, CreditCard, Share2 } from "lucide-react";
-import { useState } from "react";
+import ProfileCard from "@/components/gamification/ProfileCard";
+import GemShop from "@/components/gamification/GemShop";
+import { Coins, User, CreditCard, Share2, Palette } from "lucide-react";
+import { useState, useEffect } from "react";
+import type { League } from "@/lib/leaderboard";
 
 export default function SettingsPage() {
   const { user, profile, credits } = useAuth();
+  const { xp, level, gems, achievements } = useXP();
   const [copied, setCopied] = useState(false);
+  const [league, setLeague] = useState<League>("bronze");
+
+  useEffect(() => {
+    fetch("/api/xp/leaderboard")
+      .then((r) => r.json())
+      .then((d) => { if (d.league) setLeague(d.league); })
+      .catch(() => {});
+  }, []);
 
   if (!user || !profile) return null;
 
@@ -112,6 +125,32 @@ export default function SettingsPage() {
               <Button variant="outline" size="sm" onClick={copyReferral} className="border-white/10">
                 {copied ? "Copied!" : "Copy"}
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Profile Card & Shop */}
+        <Card className="bg-white/[0.03] border-white/[0.08]">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Palette className="w-5 h-5 text-violet-400" /> Profile Card & Shop
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex justify-center">
+              <ProfileCard
+                name={profile.full_name || "Learner"}
+                league={league}
+                level={level}
+                xp={xp}
+                xpToNext={(level + 1) * 500}
+                streak={profile.login_streak}
+                achievements={achievements.slice(0, 3).map((a) => ({ icon: a.icon }))}
+              />
+            </div>
+            <div className="border-t border-white/[0.08] pt-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Gem Shop</h3>
+              <GemShop />
             </div>
           </CardContent>
         </Card>
