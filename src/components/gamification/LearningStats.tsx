@@ -1,7 +1,8 @@
 "use client";
 
-import { Flame, BookOpen, CheckCircle, Clock } from "lucide-react";
+import { Flame, BookOpen, CheckCircle, Clock, Star, Gem } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useXP } from "@/contexts/XPContext";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
 
 /**
@@ -10,6 +11,7 @@ import { useCourseProgress } from "@/hooks/useCourseProgress";
  */
 export default function LearningStats() {
   const { profile } = useAuth();
+  const { level, gems } = useXP();
   const courseProgress = useCourseProgress();
 
   if (!profile) return null;
@@ -23,24 +25,32 @@ export default function LearningStats() {
 
   const stats = [
     {
+      icon: Star,
+      label: `Level ${level}`,
+      value: level,
+      color: "text-violet-400",
+      bg: "bg-violet-500/10",
+      border: "border-violet-500/20",
+    },
+    {
       icon: Flame,
-      label: "Day Streak",
+      label: "Streak",
       value: streak,
       color: "text-orange-400",
       bg: "bg-orange-500/10",
       border: "border-orange-500/20",
     },
     {
-      icon: BookOpen,
-      label: "Courses Started",
-      value: coursesStarted,
-      color: "text-blue-400",
-      bg: "bg-blue-500/10",
-      border: "border-blue-500/20",
+      icon: Gem,
+      label: "Gems",
+      value: gems,
+      color: "text-purple-400",
+      bg: "bg-purple-500/10",
+      border: "border-purple-500/20",
     },
     {
       icon: CheckCircle,
-      label: "Completed",
+      label: "Complete",
       value: coursesCompleted,
       color: "text-emerald-400",
       bg: "bg-emerald-500/10",
@@ -49,7 +59,7 @@ export default function LearningStats() {
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-4 gap-3">
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Mic, BookOpen, ArrowRight, Sparkles, Star } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useXP } from "@/contexts/XPContext";
 import { courses } from "@/data";
 import { getFeaturedCourses } from "@/data/types";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
@@ -186,8 +187,10 @@ function FeaturedCourses({ interests = [] }: { interests?: string[] }) {
 
 export default function HomePage() {
   const { user, profile } = useAuth();
+  const { earnXP, showXPFlyUp, lastXPAmount } = useXP();
   const router = useRouter();
   const [userInterests, setUserInterests] = useState<string[]>([]);
+  const [dailyXPAwarded, setDailyXPAwarded] = useState(false);
   const courseProgress = useCourseProgress();
 
   // Get courses user has started (progress > 0, not 100%)
@@ -227,8 +230,33 @@ export default function HomePage() {
     }
   }, [user]);
 
+  // Award daily login XP once per day
+  useEffect(() => {
+    if (!user) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const lastDate = localStorage.getItem("last-login-xp-date");
+    if (lastDate === today) return;
+    localStorage.setItem("last-login-xp-date", today);
+    earnXP("daily_login").then(() => setDailyXPAwarded(true));
+  }, [user, earnXP]);
+
   return (
     <div className="min-h-screen bg-[var(--background)]">
+      {/* XP fly-up on daily login */}
+      {showXPFlyUp > 0 && dailyXPAwarded && (
+        <motion.div
+          key={showXPFlyUp}
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] pointer-events-none"
+          initial={{ opacity: 1, y: 0, scale: 1 }}
+          animate={{ opacity: 0, y: -60, scale: 1.3 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          onAnimationComplete={() => setDailyXPAwarded(false)}
+        >
+          <div className="px-4 py-2 rounded-xl bg-violet-500/20 border border-violet-500/30 text-violet-300 font-bold text-lg shadow-lg shadow-violet-500/10">
+            +{lastXPAmount} XP
+          </div>
+        </motion.div>
+      )}
       <motion.div
         className="max-w-5xl mx-auto px-4 pt-16 pb-20"
         variants={container}
