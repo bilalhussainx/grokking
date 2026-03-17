@@ -174,7 +174,7 @@ export default function TopNav({
               {(user.user_metadata?.full_name || user.email || "U").charAt(0).toUpperCase()}
             </Link>
             <button
-              onClick={() => { signOut(); window.location.href = "/login"; }}
+              onClick={() => signOut()}
               className="hidden sm:flex p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"
               aria-label="Log out"
             >

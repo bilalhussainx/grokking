@@ -1,7 +1,7 @@
 // src/contexts/AuthContext.tsx
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from "react";
 import { createBrowserSupabase } from "@/lib/supabase-browser";
 import type { User } from "@supabase/supabase-js";
 
@@ -34,6 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [credits, setCredits] = useState(0);
   const [loading, setLoading] = useState(true);
+  const signingOutRef = useRef(false);
 
   // Stable Supabase client — never re-created on re-renders
   const supabase = useMemo(() => createBrowserSupabase(), []);
@@ -100,6 +101,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // Don't re-authenticate during signout
+        if (event === "SIGNED_OUT" || signingOutRef.current) {
+          setUser(null);
+          setProfile(null);
+          setCredits(0);
+          setLoading(false);
+          return;
+        }
         if (session?.user) {
           setUser(session.user);
           await fetchProfile(session.user.id);
@@ -164,10 +173,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Prevent onAuthStateChange from re-authenticating
+    signingOutRef.current = true;
+    // Clear state first to prevent UI flicker
     setUser(null);
     setProfile(null);
     setCredits(0);
+    // Sign out from Supabase (clears cookies/tokens)
+    await supabase.auth.signOut({ scope: "local" });
+    // Force full page reload to /login to clear any cached session state
+    window.location.replace("/login");
   };
 
   return (

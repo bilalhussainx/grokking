@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
     const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
     const code = `${codePrefix}-${randomPart}`;
 
+    // Try new schema first (with label, credits, duration_days, max_uses)
     const { error } = await admin.from("invite_codes").insert({
       code,
       label: label || `${codePrefix} Demo`,
@@ -34,7 +35,16 @@ export async function POST(req: NextRequest) {
       max_uses: maxUses ?? 1,
     });
 
-    if (!error) codes.push(code);
+    if (error) {
+      // Fallback: old schema only has code, role, used_by, created_by, expires_at
+      const { error: fallbackErr } = await admin.from("invite_codes").insert({
+        code,
+        role: "pro",
+      });
+      if (!fallbackErr) codes.push(code);
+    } else {
+      codes.push(code);
+    }
   }
 
   return NextResponse.json({ codes, count: codes.length });
