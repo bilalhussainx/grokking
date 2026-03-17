@@ -225,11 +225,12 @@ export default function HomePage() {
               localStorage.setItem('learning-interests', JSON.stringify(prefs.learning_interests));
               setUserInterests(prefs.learning_interests);
             }
-          } else {
-            router.push('/onboarding');
           }
+          // If onboarding not completed, don't redirect — let them use the app
         })
-        .catch(() => router.push('/onboarding'));
+        .catch(() => {
+          // API failed — don't redirect, just continue
+        });
     }
   }, [user]);
 
