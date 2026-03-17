@@ -12,7 +12,7 @@ export const sikhismFoundationsCourse: Course = {
   title: "Sikhism: The Guru's Path",
   description:
     "Walk the path of the Gurus — from Guru Nanak's revolutionary message of oneness to the Khalsa's fearless commitment to justice. Explore the Guru Granth Sahib, the Five Ks, Sikh ethics of Seva and equality, and a history defined by courage and sacrifice.",
-  icon: "\u262C",
+  icon: "262C",
   tier: "free",
   featured: true,
   domain: "religious-studies",
