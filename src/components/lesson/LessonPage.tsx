@@ -23,6 +23,8 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import ConceptBridges from "./ConceptBridges";
 import UnderstandingDepth from "./UnderstandingDepth";
 import PodcastPlayer from "./PodcastPlayer";
+import DownloadPDF from "./DownloadPDF";
+import SlideButton from "./SlideButton";
 import DidYouKnowCard from "@/components/gamification/DidYouKnowCard";
 import QuizCard from "@/components/gamification/QuizCard";
 import {
@@ -269,9 +271,22 @@ export default function LessonPage({
         </div>
 
         <h1 className="text-3xl font-bold mb-2">{lesson.title}</h1>
-        <p className="text-xs text-white/30 mb-4">
-          {formatReadingTime(estimateReadingTime(lesson.content))}
-        </p>
+        <div className="flex items-center gap-3 mb-4">
+          <p className="text-xs text-white/30">
+            {formatReadingTime(estimateReadingTime(lesson.content))}
+          </p>
+          <DownloadPDF
+            lessonContent={lesson.content}
+            lessonTitle={lesson.title}
+            courseTitle={courseTitle}
+            moduleTitle={moduleTitle}
+          />
+          <SlideButton
+            lessonContent={lesson.content}
+            lessonTitle={lesson.title}
+            courseTitle={courseTitle}
+          />
+        </div>
 
         {/* Listen as Podcast */}
         <PodcastPlayer
