@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LEAGUE_ICONS, type League } from "@/lib/leaderboard";
+import { LEAGUE_ICONS, type League } from "@/lib/leaderboard-constants";
 import { Flame, Share2 } from "lucide-react";
 
 export type CardFrame = "minimal" | "neon" | "gold" | "holographic";

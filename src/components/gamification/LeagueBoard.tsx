@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LEAGUE_ICONS, LEAGUE_COLORS, type League } from "@/lib/leaderboard";
+import { LEAGUE_ICONS, LEAGUE_COLORS, type League } from "@/lib/leaderboard-constants";
 
 interface Member {
   userId: string;
