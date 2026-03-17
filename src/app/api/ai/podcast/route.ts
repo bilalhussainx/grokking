@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
   // Step 1: Generate podcast script with Gemini
   const scriptResp = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key=${GEMINI_KEY}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -69,8 +69,10 @@ ${lessonContent.slice(0, 8000)}`,
   );
 
   if (!scriptResp.ok) {
+    const errText = await scriptResp.text().catch(() => "");
+    console.error("[Podcast] Gemini script failed:", scriptResp.status, errText);
     return NextResponse.json(
-      { error: "Failed to generate script" },
+      { error: `Script generation failed (${scriptResp.status}). ${errText.slice(0, 200)}` },
       { status: 500 }
     );
   }

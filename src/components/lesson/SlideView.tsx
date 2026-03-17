@@ -8,6 +8,8 @@ import {
   ChevronRight,
   Maximize,
   Minimize,
+  Play,
+  Pause,
 } from "lucide-react";
 
 interface SlideViewProps {
@@ -188,12 +190,33 @@ export default function SlideView({
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [autoPlay, setAutoPlay] = useState(false);
+  const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const slides = useMemo(
     () => splitIntoSlides(lessonContent, lessonTitle, courseTitle),
     [lessonContent, lessonTitle, courseTitle]
   );
+
+  // Auto-play: advance every 8 seconds
+  useEffect(() => {
+    if (autoPlay) {
+      autoPlayRef.current = setInterval(() => {
+        setCurrent((c) => {
+          if (c < slides.length - 1) {
+            setDirection(1);
+            return c + 1;
+          }
+          setAutoPlay(false);
+          return c;
+        });
+      }, 8000);
+    }
+    return () => {
+      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    };
+  }, [autoPlay, slides.length]);
 
   const goNext = useCallback(() => {
     if (current < slides.length - 1) {
