@@ -8,6 +8,7 @@ const PUBLIC_ROUTES = [
   "/login",
   "/signup",
   "/pricing",
+  "/courses",
   "/auth/callback",
   "/api/webhooks/paddle",
 ];
@@ -17,7 +18,15 @@ const PUBLIC_PREFIXES = ["/ref/", "/_next/", "/favicon", "/api/webhooks/", "/api
 
 function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.includes(pathname)) return true;
-  return PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  if (PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return true;
+
+  // /course/<slug> (course overview) is public, but /course/<slug>/<lesson> requires auth
+  if (pathname.startsWith("/course/")) {
+    const segments = pathname.replace(/^\/course\//, "").split("/").filter(Boolean);
+    if (segments.length <= 1) return true;
+  }
+
+  return false;
 }
 
 export async function middleware(request: NextRequest) {

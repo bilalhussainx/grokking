@@ -82,13 +82,12 @@ export default function TopNav({
         {/* Streak + Level + Gems + Credit Badge */}
         {user && <StreakBadge />}
         {user && (
-          <div className="flex items-center gap-1">
+          <div className="hidden sm:flex items-center gap-1">
             <div
               className="flex items-center gap-1 px-2 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-semibold cursor-default"
               title={`Level ${level}`}
             >
-              <span className="hidden sm:inline">&#11088; Lv.{level}</span>
-              <span className="sm:hidden text-[11px]">&#11088;{level}</span>
+              &#11088; Lv.{level}
             </div>
             {xpMultiplier > 1 && (
               <div
@@ -102,11 +101,10 @@ export default function TopNav({
         )}
         {user && (
           <div
-            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold cursor-default"
+            className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold cursor-default"
             title={`${gems} gems`}
           >
-            <span className="hidden sm:inline">&#128142; {gems}</span>
-            <span className="sm:hidden text-[11px]">&#128142;{gems}</span>
+            &#128142; {gems}
           </div>
         )}
         {user && <CreditBadge />}
@@ -126,7 +124,7 @@ export default function TopNav({
           onClick={() => {
             window.dispatchEvent(new CustomEvent("open-global-search"));
           }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[var(--muted-foreground)] text-xs hover:bg-white/10 hover:text-[var(--foreground)] transition-all"
+          className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[var(--muted-foreground)] text-xs hover:bg-white/10 hover:text-[var(--foreground)] transition-all"
           title="Search courses and lessons (Ctrl+K)"
         >
           <Search className="w-3.5 h-3.5" />
@@ -138,7 +136,7 @@ export default function TopNav({
 
         <Link
           href="/talk"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-all"
+          className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-all"
           title="Start a voice conversation"
         >
           <Mic className="w-3.5 h-3.5" />
@@ -147,7 +145,7 @@ export default function TopNav({
 
         <Link
           href="/courses"
-          className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"
+          className="hidden sm:flex p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"
           aria-label="Browse Courses"
           title="Browse Courses"
         >
@@ -156,7 +154,7 @@ export default function TopNav({
 
         <button
           onClick={toggleDarkMode}
-          className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"
+          className="hidden sm:flex p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"
           aria-label="Toggle dark mode"
         >
           {isDark ? (
@@ -170,14 +168,14 @@ export default function TopNav({
           <div className="flex items-center gap-2">
             <Link
               href="/settings"
-              className="hidden sm:flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-white text-xs font-bold shadow-md shadow-violet-500/20 hover:ring-2 hover:ring-violet-400/50 transition-all"
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-white text-xs font-bold shadow-md shadow-violet-500/20 hover:ring-2 hover:ring-violet-400/50 transition-all"
               title="Settings"
             >
               {(user.user_metadata?.full_name || user.email || "U").charAt(0).toUpperCase()}
             </Link>
             <button
               onClick={() => { signOut(); window.location.href = "/login"; }}
-              className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"
+              className="hidden sm:flex p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"
               aria-label="Log out"
             >
               <LogOut className="w-[18px] h-[18px]" />

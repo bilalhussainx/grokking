@@ -11,9 +11,16 @@ export default function CourseOverviewPage() {
   const params = useParams();
   const courseSlug = params.courseSlug as string;
   const [checked, setChecked] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
 
   const hardcodedCourse = courses.find((c) => c.slug === courseSlug);
   const langCourse = !hardcodedCourse ? getLanguageCourse(courseSlug) : undefined;
+
+  // Timeout: if redirect hasn't happened in 5 seconds, show error
+  useEffect(() => {
+    const timer = setTimeout(() => setTimedOut(true), 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     // Standard course — redirect to first lesson
@@ -21,6 +28,8 @@ export default function CourseOverviewPage() {
       const allLessons = getAllLessons(hardcodedCourse);
       if (allLessons.length > 0) {
         router.replace(`/course/${courseSlug}/${allLessons[0].slug}`);
+      } else {
+        setChecked(true);
       }
       return;
     }
@@ -30,6 +39,8 @@ export default function CourseOverviewPage() {
       const firstLesson = langCourse.modules[0]?.lessons[0];
       if (firstLesson) {
         router.replace(`/course/${courseSlug}/${firstLesson.slug}`);
+      } else {
+        setChecked(true);
       }
       return;
     }
@@ -49,7 +60,7 @@ export default function CourseOverviewPage() {
         setChecked(true);
       })
       .catch(() => setChecked(true));
-  }, [hardcodedCourse, courseSlug, router]);
+  }, [hardcodedCourse, langCourse, courseSlug, router]);
 
   if (!hardcodedCourse && !langCourse && checked) {
     return (
@@ -57,6 +68,24 @@ export default function CourseOverviewPage() {
         <p className="text-lg text-gray-500 dark:text-gray-400">
           Course not found.
         </p>
+      </div>
+    );
+  }
+
+  if (timedOut) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[var(--background)]">
+        <div className="text-center space-y-4">
+          <p className="text-lg text-white/60">
+            Unable to load this course. The redirect took too long.
+          </p>
+          <a
+            href={`/course/${courseSlug}`}
+            className="inline-block px-4 py-2 rounded-lg bg-white/10 text-white/80 hover:bg-white/20 transition-colors"
+          >
+            Try again
+          </a>
+        </div>
       </div>
     );
   }

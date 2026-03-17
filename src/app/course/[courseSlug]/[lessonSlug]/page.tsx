@@ -18,25 +18,44 @@ export default function LessonRoute() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [generatedCourse, setGeneratedCourse] = useState<Course | null>(null);
   const [loadingGenerated, setLoadingGenerated] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   // First try hardcoded courses
   const hardcodedCourse = courses.find((c) => c.slug === courseSlug);
-  
+
   // Check for language courses
   const languageCourse = getLanguageCourse(courseSlug);
 
-  // If not found in hardcoded, fetch from generated courses
+  // If not found in hardcoded, fetch from generated courses with timeout
   useEffect(() => {
     if (hardcodedCourse || generatedCourse || languageCourse) return;
     setLoadingGenerated(true);
-    fetch("/api/courses/generated")
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      controller.abort();
+      setLoadError(true);
+      setLoadingGenerated(false);
+    }, 5000);
+
+    fetch("/api/courses/generated", { signal: controller.signal })
       .then((r) => r.ok ? r.json() : { courses: [] })
       .then((data) => {
         const found = (data.courses as Course[])?.find((c) => c.slug === courseSlug);
         if (found) setGeneratedCourse(found);
       })
-      .catch(() => {})
-      .finally(() => setLoadingGenerated(false));
+      .catch(() => {
+        if (!controller.signal.aborted) setLoadError(true);
+      })
+      .finally(() => {
+        clearTimeout(timeout);
+        setLoadingGenerated(false);
+      });
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
   }, [courseSlug, hardcodedCourse, generatedCourse, languageCourse]);
 
   const course = hardcodedCourse || generatedCourse || languageCourse;
@@ -45,6 +64,22 @@ export default function LessonRoute() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--background)]">
         <div className="animate-pulse text-white/40">Loading course...</div>
+      </div>
+    );
+  }
+
+  if (loadError && !course) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[var(--background)]">
+        <div className="text-center space-y-4">
+          <p className="text-lg text-white/60">Failed to load course data.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 rounded-lg bg-white/10 text-white/80 hover:bg-white/20 transition-colors"
+          >
+            Try again
+          </button>
+        </div>
       </div>
     );
   }

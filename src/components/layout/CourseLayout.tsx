@@ -84,8 +84,7 @@ export default function CourseLayout({
           )}
         </div>
 
-        {/* Translation Widget for CS courses */}
-        {!isLanguageCourse && <TranslationWidget />}
+        {/* TranslationBar rendered globally via providers.tsx */}
 
         {/* Coach Alex is rendered globally via providers.tsx */}
       </div>

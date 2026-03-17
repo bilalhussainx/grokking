@@ -14,12 +14,13 @@ import { useSoundEffect } from "@/hooks/useSoundEffect";
 import type { League } from "@/lib/leaderboard-constants";
 
 export default function SettingsPage() {
-  const { user, profile, credits } = useAuth();
+  const { user, profile, credits, loading } = useAuth();
   const { xp, level, gems, achievements } = useXP();
   const { toggleMute, isMuted } = useSoundEffect();
   const [copied, setCopied] = useState(false);
   const [soundOff, setSoundOff] = useState(false);
   const [league, setLeague] = useState<League>("bronze");
+  const [profileTimedOut, setProfileTimedOut] = useState(false);
 
   useEffect(() => {
     setSoundOff(isMuted);
@@ -27,10 +28,25 @@ export default function SettingsPage() {
 
   useEffect(() => {
     fetch("/api/xp/leaderboard")
-      .then((r) => r.json())
-      .then((d) => { if (d.league) setLeague(d.league); })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: { league?: League } | null) => { if (d?.league) setLeague(d.league); })
       .catch(() => {});
   }, []);
+
+  // If profile hasn't loaded after 5 seconds, stop waiting
+  useEffect(() => {
+    if (profile || !user) return;
+    const timer = setTimeout(() => setProfileTimedOut(true), 5000);
+    return () => clearTimeout(timer);
+  }, [profile, user]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
+        <div className="animate-pulse text-white/40">Loading settings...</div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -39,15 +55,35 @@ export default function SettingsPage() {
       </div>
     );
   }
-  if (!profile) {
+  if (!profile && !profileTimedOut) {
     return (
       <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
         <div className="animate-pulse text-white/40">Loading settings...</div>
       </div>
     );
   }
+  if (!profile && profileTimedOut) {
+    return (
+      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-lg text-white/60">Unable to load your profile.</p>
+          <p className="text-sm text-white/30">
+            There may be a connection issue with the database.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 rounded-lg bg-white/10 text-white/80 hover:bg-white/20 transition-colors"
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  const referralLink = `${typeof window !== "undefined" ? window.location.origin : ""}/ref/${profile.referral_code}`;
+  // At this point, profile is guaranteed non-null (all null cases return early above)
+  const p = profile!;
+  const referralLink = `${typeof window !== "undefined" ? window.location.origin : ""}/ref/${p.referral_code}`;
 
   const copyReferral = () => {
     navigator.clipboard.writeText(referralLink);
@@ -70,7 +106,7 @@ export default function SettingsPage() {
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-white/50">Name</span>
-              <span className="text-white">{profile.full_name || "Not set"}</span>
+              <span className="text-white">{p.full_name || "Not set"}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-white/50">Email</span>
@@ -78,13 +114,13 @@ export default function SettingsPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-white/50">Role</span>
-              <Badge variant={profile.role === "pro" ? "default" : "secondary"}>
-                {profile.role}
+              <Badge variant={p.role === "pro" ? "default" : "secondary"}>
+                {p.role}
               </Badge>
             </div>
             <div className="flex justify-between">
               <span className="text-white/50">Login Streak</span>
-              <span className="text-white">{profile.login_streak} days</span>
+              <span className="text-white">{p.login_streak} days</span>
             </div>
           </CardContent>
         </Card>
@@ -99,11 +135,11 @@ export default function SettingsPage() {
           <CardContent>
             <div className="text-4xl font-bold text-amber-400 mb-2">{credits}</div>
             <p className="text-sm text-white/40">
-              {profile.role === "pro"
+              {p.role === "pro"
                 ? "500 credits refresh monthly with your Pro subscription."
                 : "Upgrade to Pro for 500 credits/month."}
             </p>
-            {profile.role === "student" && (
+            {p.role === "student" && (
               <Button className="mt-4 bg-violet-500 hover:bg-violet-600" asChild>
                 <a href="/pricing">Upgrade to Pro</a>
               </Button>
@@ -119,7 +155,7 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {profile.role === "pro" || profile.role === "teacher" ? (
+            {p.role === "pro" || p.role === "teacher" ? (
               <p className="text-sm text-white/60">
                 Manage your subscription, update payment method, or view invoices through the Paddle customer portal.
               </p>
@@ -190,12 +226,12 @@ export default function SettingsPage() {
           <CardContent className="space-y-6">
             <div className="flex justify-center">
               <ProfileCard
-                name={profile.full_name || "Learner"}
+                name={p.full_name || "Learner"}
                 league={league}
                 level={level}
                 xp={xp}
                 xpToNext={(level + 1) * 500}
-                streak={profile.login_streak}
+                streak={p.login_streak}
                 achievements={achievements.slice(0, 3).map((a) => ({ icon: a.icon }))}
               />
             </div>
