@@ -141,10 +141,10 @@ function CoachFAB() {
   return (
     <button
       onClick={openPanel}
-      className="fixed bottom-16 right-4 md:bottom-6 md:right-6 z-40 flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-violet-600 px-4 py-3 text-white text-sm font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all hover:scale-105"
+      className="fixed bottom-20 right-3 md:bottom-6 md:right-6 z-30 flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:gap-2 md:px-4 md:py-3 rounded-full bg-gradient-to-r from-blue-500 to-violet-600 text-white text-sm font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all hover:scale-105"
     >
-      <GraduationCap className="w-5 h-5" />
-      <span className="hidden sm:inline">Coach Alex</span>
+      <GraduationCap className="w-4 h-4 md:w-5 md:h-5" />
+      <span className="hidden md:inline">Coach Alex</span>
     </button>
   );
 }

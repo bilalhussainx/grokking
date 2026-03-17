@@ -4,9 +4,9 @@ import { createServerSupabase } from "@/lib/supabase-auth";
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 const DEEPGRAM_KEY = process.env.DEEPGRAM_API_KEY;
 
-// Voice IDs for the two hosts
-const VOICE_ALEX = "aura-2-en-us-andromeda"; // deep, authoritative
-const VOICE_SAM = "aura-2-en-us-luna"; // lighter, curious
+// Deepgram Aura TTS voices (v1 format: aura-{name}-en)
+const VOICE_ALEX = "aura-orion-en"; // deep, authoritative male
+const VOICE_SAM = "aura-luna-en"; // lighter, curious female
 
 export async function POST(req: NextRequest) {
   // Auth check
@@ -117,6 +117,8 @@ ${lessonContent.slice(0, 8000)}`,
     if (ttsResp.ok) {
       const audioBuffer = Buffer.from(await ttsResp.arrayBuffer());
       audioChunks.push(audioBuffer);
+    } else {
+      console.error(`[Podcast] TTS failed for ${segment.host}: ${ttsResp.status} ${await ttsResp.text().catch(() => "")}`);
     }
 
     // Small delay to avoid rate limiting
@@ -124,6 +126,13 @@ ${lessonContent.slice(0, 8000)}`,
   }
 
   // Step 4: Concatenate and return
+  if (audioChunks.length === 0) {
+    return NextResponse.json(
+      { error: "TTS failed for all segments. Check Deepgram API key and voice models." },
+      { status: 500 }
+    );
+  }
+
   const combined = Buffer.concat(audioChunks);
 
   return new NextResponse(combined, {
