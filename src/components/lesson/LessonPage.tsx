@@ -22,6 +22,7 @@ import { estimateReadingTime, formatReadingTime } from "@/lib/reading-time";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import ConceptBridges from "./ConceptBridges";
 import UnderstandingDepth from "./UnderstandingDepth";
+import PodcastPlayer from "./PodcastPlayer";
 import DidYouKnowCard from "@/components/gamification/DidYouKnowCard";
 import QuizCard from "@/components/gamification/QuizCard";
 import {
@@ -271,6 +272,13 @@ export default function LessonPage({
         <p className="text-xs text-white/30 mb-4">
           {formatReadingTime(estimateReadingTime(lesson.content))}
         </p>
+
+        {/* Listen as Podcast */}
+        <PodcastPlayer
+          lessonContent={lesson.content}
+          lessonTitle={lesson.title}
+          courseTitle={courseTitle}
+        />
 
         {/* Understanding depth indicator (shows for completed lessons with voice data) */}
         <UnderstandingDepth lessonId={lesson.id} isCompleted={completedLessons.has(lesson.id)} />
