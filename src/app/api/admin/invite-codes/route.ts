@@ -26,10 +26,10 @@ export async function POST(req: NextRequest) {
     const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
     const code = `${codePrefix}-${randomPart}`;
 
-    // Try new schema first (with label, credits, duration_days, max_uses, role)
+    // Try new schema first (with label, credits, duration_days, max_uses)
     const { error } = await admin.from("invite_codes").insert({
       code,
-      role: role || "pro",
+      role: role || "teacher",
       label: label || `${codePrefix} Demo`,
       credits: credits || 1000,
       duration_days: durationDays || 14,

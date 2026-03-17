@@ -47,24 +47,19 @@ export async function POST(req: NextRequest) {
   // Defaults for codes that use old schema (no credits/duration columns)
   const creditsToGrant = invite.credits ?? 1000; // Default 1000 for investor codes
   const durationDays = invite.duration_days ?? 90;
-  const role = invite.role || "pro";
+  // Always grant "pro" role to user (invite_codes.role may be "teacher" due to DB constraint)
+  const userRole = "pro";
 
   // Calculate pro expiry
   const proExpiresAt = new Date();
   proExpiresAt.setDate(proExpiresAt.getDate() + durationDays);
-
-  // Grant role (pro or teacher)
-  await admin
-    .from("user_profiles")
-    .update({ role })
-    .eq("id", user.id);
 
   // Grant credits via RPC — also ensure profile exists first
   await admin.from("user_profiles").upsert({
     id: user.id,
     email: user.email || "",
     full_name: user.user_metadata?.full_name || user.user_metadata?.name || "User",
-    role,
+    role: userRole,
   }, { onConflict: "id" });
 
   try {
@@ -118,7 +113,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     ok: true,
     granted: {
-      role,
+      role: userRole,
       credits: creditsToGrant,
       expiresAt: proExpiresAt.toISOString(),
       durationDays,
