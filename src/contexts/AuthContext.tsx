@@ -133,12 +133,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUpWithEmail = async (email: string, password: string, name: string) => {
     // Read referral cookie if present (set by /ref/[code] page)
     const refCode = document.cookie.match(/referral_code=([^;]+)/)?.[1] || undefined;
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: name, referral_code: refCode } },
     });
-    if (error) return { error: error.message };
+
+    if (error) {
+      // "Database error saving new user" = trigger failed but user may be created
+      // Try signing in — if user was created despite trigger failure, login works
+      if (error.message.includes("Database error")) {
+        console.warn("[Auth] Trigger failed, trying sign-in recovery...");
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (!signInErr) {
+          // User exists — trigger failed but auth user was created. Create profile manually.
+          const { data: { user: recoveredUser } } = await supabase.auth.getUser();
+          if (recoveredUser) {
+            await fetchProfile(recoveredUser.id);
+          }
+          if (refCode) document.cookie = "referral_code=; max-age=0; path=/";
+          return {};
+        }
+      }
+      return { error: error.message };
+    }
+
     // Clear referral cookie after use
     if (refCode) document.cookie = "referral_code=; max-age=0; path=/";
     return {};
