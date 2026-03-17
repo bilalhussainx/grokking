@@ -9,12 +9,15 @@ const PUBLIC_ROUTES = [
   "/signup",
   "/pricing",
   "/courses",
+  "/forgot-password",
+  "/reset-password",
+  "/onboarding",
   "/auth/callback",
   "/api/webhooks/paddle",
 ];
 
 // Route prefixes that are always public
-const PUBLIC_PREFIXES = ["/ref/", "/_next/", "/favicon", "/api/webhooks/", "/api/admin/", "/api/courses/"];
+const PUBLIC_PREFIXES = ["/ref/", "/_next/", "/favicon", "/api/webhooks/", "/api/admin/", "/api/courses/", "/talk", "/career"];
 
 function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.includes(pathname)) return true;
@@ -69,24 +72,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Lazy check: if user has a canceled subscription past its period end, downgrade role
-  // This avoids needing a cron job for role downgrades
-  if (pathname.startsWith("/api/ai/") || pathname.startsWith("/course/")) {
-    const { createClient } = await import("@supabase/supabase-js");
-    const admin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-    const { data: sub } = await admin
-      .from("subscriptions")
-      .select("status, current_period_end")
-      .eq("user_id", user.id)
-      .eq("status", "canceled")
-      .single();
-    if (sub && sub.current_period_end && new Date(sub.current_period_end) < new Date()) {
-      await admin.from("user_profiles").update({ role: "student" }).eq("id", user.id);
-    }
-  }
+  // Subscription downgrade check moved to API routes — too slow for middleware.
+  // Dynamic import + DB query on every request added 500ms+ latency.
 
   return response;
 }
