@@ -298,6 +298,15 @@ export default function LessonPage({
         {/* Understanding depth indicator (shows for completed lessons with voice data) */}
         <UnderstandingDepth lessonId={lesson.id} isCompleted={completedLessons.has(lesson.id)} />
 
+        {/* Did You Know inline banner — above content, not blocked by translate bar */}
+        {showDidYouKnow && didYouKnowFact && (
+          <DidYouKnowCard
+            fact={didYouKnowFact}
+            lessonSlug={lesson.slug}
+            onDismiss={() => setShowDidYouKnow(false)}
+          />
+        )}
+
         <LessonContent content={lesson.content} courseDomain={courseDomain} />
 
         {/* Exercise CTA — links to full-screen IDE */}
@@ -330,13 +339,6 @@ export default function LessonPage({
       </div>
 
       {/* Gamification overlays */}
-      {showDidYouKnow && didYouKnowFact && (
-        <DidYouKnowCard
-          fact={didYouKnowFact}
-          lessonSlug={lesson.slug}
-          onDismiss={() => setShowDidYouKnow(false)}
-        />
-      )}
 
       {showQuiz && (
         <QuizCard
