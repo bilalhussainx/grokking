@@ -34,80 +34,87 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "This invite code has expired" }, { status: 410 });
   }
 
-  // Check max uses
-  if (invite.max_uses !== null && invite.times_used >= invite.max_uses) {
+  // Check if already used (old schema uses used_by, new schema uses times_used)
+  if (invite.used_by && invite.used_by !== user.id) {
+    return NextResponse.json({ error: "This invite code has already been used" }, { status: 410 });
+  }
+
+  // Check max uses (if column exists)
+  if (invite.max_uses !== null && invite.max_uses !== undefined && invite.times_used >= invite.max_uses) {
     return NextResponse.json({ error: "This invite code has reached its usage limit" }, { status: 410 });
   }
 
-  // Check if user already redeemed this code
-  const { data: existing } = await admin
-    .from("invite_redemptions")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("invite_code_id", invite.id);
-
-  if (existing && existing.length > 0) {
-    return NextResponse.json({ error: "You've already redeemed this code" }, { status: 409 });
-  }
+  // Defaults for codes that use old schema (no credits/duration columns)
+  const creditsToGrant = invite.credits ?? 1000; // Default 1000 for investor codes
+  const durationDays = invite.duration_days ?? 90;
+  const role = invite.role || "pro";
 
   // Calculate pro expiry
   const proExpiresAt = new Date();
-  proExpiresAt.setDate(proExpiresAt.getDate() + invite.duration_days);
+  proExpiresAt.setDate(proExpiresAt.getDate() + durationDays);
 
-  // Grant pro role
+  // Grant role (pro or teacher)
   await admin
     .from("user_profiles")
-    .update({ role: invite.role || "pro" })
+    .update({ role })
     .eq("id", user.id);
 
-  // Grant credits
-  const { data: currentCredits } = await admin
-    .from("user_credits")
-    .select("balance")
-    .eq("user_id", user.id)
-    .single();
-
-  const newBalance = (currentCredits?.balance || 0) + invite.credits;
-  await admin
-    .from("user_credits")
-    .upsert({
-      user_id: user.id,
-      balance: Math.min(newBalance, 999999),
-    }, { onConflict: "user_id" });
-
-  // Log the credit grant
-  await admin
-    .from("credit_txns")
-    .insert({
-      user_id: user.id,
-      amount: invite.credits,
-      action: "invite_code",
-      ref_id: invite.code,
+  // Grant credits via RPC (most reliable)
+  try {
+    await admin.rpc("add_credits", {
+      p_user_id: user.id,
+      p_amount: creditsToGrant,
+      p_action: "invite_code",
+      p_ref_id: invite.code,
     });
+  } catch {
+    // Fallback: direct upsert
+    const { data: currentCredits } = await admin
+      .from("user_credits")
+      .select("balance")
+      .eq("user_id", user.id)
+      .single();
 
-  // Record redemption
-  await admin
-    .from("invite_redemptions")
-    .insert({
-      user_id: user.id,
-      invite_code_id: invite.id,
-      pro_expires_at: proExpiresAt.toISOString(),
-    });
+    const newBalance = (currentCredits?.balance || 0) + creditsToGrant;
+    await admin
+      .from("user_credits")
+      .upsert({
+        user_id: user.id,
+        balance: Math.min(newBalance, 999999),
+      }, { onConflict: "user_id" });
+  }
 
-  // Increment usage count
+  // Mark code as used (old schema)
   await admin
     .from("invite_codes")
-    .update({ times_used: invite.times_used + 1 })
+    .update({
+      used_by: user.id,
+      used_at: new Date().toISOString(),
+      ...(invite.times_used !== undefined ? { times_used: (invite.times_used || 0) + 1 } : {}),
+    })
     .eq("id", invite.id);
+
+  // Try to record redemption (new schema table may not exist)
+  try {
+    await admin
+      .from("invite_redemptions")
+      .insert({
+        user_id: user.id,
+        invite_code_id: invite.id,
+        pro_expires_at: proExpiresAt.toISOString(),
+      });
+  } catch {
+    // Table may not exist in old schema — non-critical
+  }
 
   return NextResponse.json({
     ok: true,
     granted: {
-      role: invite.role,
-      credits: invite.credits,
+      role,
+      credits: creditsToGrant,
       expiresAt: proExpiresAt.toISOString(),
-      durationDays: invite.duration_days,
-      label: invite.label,
+      durationDays,
+      label: invite.label || invite.code,
     },
   });
 }
