@@ -39,12 +39,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const supabase = useMemo(() => createBrowserSupabase(), []);
 
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("user_profiles")
       .select("id, email, full_name, role, referral_code, login_streak, avatar_url")
       .eq("id", userId)
       .single();
-    if (data) setProfile(data as UserProfile);
+    if (data) {
+      setProfile(data as UserProfile);
+    } else if (error) {
+      // Profile might not exist yet (Google OAuth, trigger failed, etc.)
+      // Try to get user info and create a minimal profile
+      console.warn("[Auth] Profile not found, attempting to create:", error.message);
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        const newProfile = {
+          id: userId,
+          email: authUser.email || "",
+          full_name: authUser.user_metadata?.full_name || authUser.user_metadata?.name || "User",
+          role: "student" as const,
+          referral_code: null,
+          login_streak: 0,
+          avatar_url: authUser.user_metadata?.avatar_url || null,
+        };
+        // Insert profile — might fail if RLS blocks but that's OK
+        await supabase.from("user_profiles").upsert({
+          id: userId,
+          email: newProfile.email,
+          full_name: newProfile.full_name,
+          role: newProfile.role,
+        }, { onConflict: "id" });
+        setProfile(newProfile as UserProfile);
+      }
+    }
   }, [supabase]);
 
   const refreshCredits = useCallback(async () => {
