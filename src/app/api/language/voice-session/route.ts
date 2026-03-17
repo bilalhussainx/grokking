@@ -93,8 +93,8 @@ export async function POST(req: NextRequest) {
       ? getLanguagePersona(personaId) || getDefaultPersona(language)
       : getDefaultPersona(language);
 
-    // Resolve lesson context based on mode
-    const effectiveLessonContext = mode === 'lesson-practice' && clientLessonContext
+    // Resolve lesson context — prefer client-provided context (has vocab/grammar)
+    const effectiveLessonContext = clientLessonContext
       ? clientLessonContext
       : lessonTitle
         ? {

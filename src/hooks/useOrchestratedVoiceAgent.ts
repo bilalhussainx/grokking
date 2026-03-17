@@ -224,7 +224,7 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
     const dataArray = new Uint8Array(analyser.frequencyBinCount);
     let speaking = false;
     const THRESHOLD = 20;
-    const SILENCE_DURATION = 500; // Reduced from 700ms → 500ms for snappier response
+    const SILENCE_DURATION = 300; // Reduced for snappier response
 
     const check = () => {
       if (!connectedRef.current) return;
@@ -275,11 +275,7 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
     conversationRef.current = [];
 
     try {
-      // Health check
-      const healthRes = await fetch('/api/language/sarvam', { credentials: 'include' });
-      if (!healthRes.ok) throw new Error('Sarvam voice service unavailable');
-      const health = await healthRes.json();
-      if (!health.healthy) throw new Error('Voice APIs not configured');
+      // Skip health check — it adds 200-300ms delay. Errors will surface on first request.
 
       // Get mic
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -306,75 +302,66 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
 
       mediaRecorderRef.current = recorder;
 
-      // Greeting phase — mute mic tracks and generate greeting before starting VAD/recording
-      isGreetingPhaseRef.current = true;
-      stream.getAudioTracks().forEach(t => { t.enabled = false; });
-
       setIsConnecting(false);
       setIsConnected(true);
       connectedRef.current = true;
       callbacksRef.current?.onConnect?.();
 
-      // Generate and play greeting before enabling mic
-      try {
-        const greetingForm = new FormData();
-        greetingForm.append('language', config.language);
-        if (config.personaId) greetingForm.append('personaId', config.personaId);
-        if (config.proficiencyLevel) greetingForm.append('proficiencyLevel', config.proficiencyLevel);
-        if (config.lessonTitle) greetingForm.append('lessonTitle', config.lessonTitle);
-        if (config.lessonContext) greetingForm.append('lessonContext', JSON.stringify(config.lessonContext));
-        greetingForm.append('conversationHistory', JSON.stringify([]));
-        greetingForm.append('greeting', 'true');
+      // Enable mic and start VAD immediately — don't wait for greeting
+      isGreetingPhaseRef.current = false;
+      startVAD(stream);
 
-        const greetingResp = await fetch('/api/language/sarvam/stream', {
-          method: 'POST',
-          credentials: 'include',
-          body: greetingForm,
-        });
+      // Generate greeting in background (non-blocking)
+      // User can start speaking while greeting is still being generated
+      (async () => {
+        try {
+          const greetingForm = new FormData();
+          greetingForm.append('language', config.language);
+          if (config.personaId) greetingForm.append('personaId', config.personaId);
+          if (config.proficiencyLevel) greetingForm.append('proficiencyLevel', config.proficiencyLevel);
+          if (config.lessonTitle) greetingForm.append('lessonTitle', config.lessonTitle);
+          if (config.lessonContext) greetingForm.append('lessonContext', JSON.stringify(config.lessonContext));
+          greetingForm.append('conversationHistory', JSON.stringify([]));
+          greetingForm.append('greeting', 'true');
 
-        if (greetingResp.ok && greetingResp.body) {
-          const reader = greetingResp.body.getReader();
-          const decoder = new TextDecoder();
-          let buffer = '';
+          const greetingResp = await fetch('/api/language/sarvam/stream', {
+            method: 'POST',
+            credentials: 'include',
+            body: greetingForm,
+          });
 
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+          if (greetingResp.ok && greetingResp.body) {
+            const reader = greetingResp.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
 
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split('\n');
-            buffer = lines.pop() || '';
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
 
-            for (const line of lines) {
-              if (!line.trim()) continue;
-              try {
-                const event = JSON.parse(line);
-                if (event.type === 'response' && event.text) {
-                  callbacksRef.current?.onAgentMessage?.(event.text);
-                  conversationRef.current.push({ role: 'assistant', content: event.text });
-                } else if (event.type === 'audio' && event.base64) {
-                  await playAudio(event.base64);
-                  // Wait for audio playback to complete
-                  await new Promise<void>(resolve => {
-                    const checkDone = () => {
-                      if (!currentSourceRef.current) resolve();
-                      else setTimeout(checkDone, 100);
-                    };
-                    setTimeout(checkDone, 100);
-                  });
-                }
-              } catch {}
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop() || '';
+
+              for (const line of lines) {
+                if (!line.trim()) continue;
+                try {
+                  const event = JSON.parse(line);
+                  if (event.type === 'response' && event.text) {
+                    callbacksRef.current?.onAgentMessage?.(event.text);
+                    conversationRef.current.push({ role: 'assistant', content: event.text });
+                  } else if (event.type === 'audio' && event.base64) {
+                    // Play greeting audio without blocking — fire and forget
+                    playAudio(event.base64);
+                  }
+                } catch {}
+              }
             }
           }
+        } catch (err) {
+          console.error('[SarvamVoice] Greeting error (non-fatal):', err);
         }
-      } catch (err) {
-        console.error('[SarvamVoice] Greeting error (non-fatal):', err);
-      }
-
-      // Greeting done — unmute mic and start VAD/recording
-      isGreetingPhaseRef.current = false;
-      stream.getAudioTracks().forEach(t => { t.enabled = true; });
-      startVAD(stream);
+      })();
     } catch (err) {
       console.error('[SarvamVoice] Start error:', err);
       setError(`Failed to start: ${err}`);
