@@ -158,7 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setCredits((data as number) || 0);
 
         // 4. Update login streak
-        await supabase.rpc("update_login_streak", { p_user_id: session.user.id }).catch(() => {});
+        try { await supabase.rpc("update_login_streak", { p_user_id: session.user.id }); } catch {}
       }
       setLoading(false);
     };
