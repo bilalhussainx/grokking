@@ -59,14 +59,22 @@ export async function POST(req: NextRequest) {
     .update({ role })
     .eq("id", user.id);
 
-  // Grant credits via RPC (most reliable)
+  // Grant credits via RPC — also ensure profile exists first
+  await admin.from("user_profiles").upsert({
+    id: user.id,
+    email: user.email || "",
+    full_name: user.user_metadata?.full_name || user.user_metadata?.name || "User",
+    role,
+  }, { onConflict: "id" });
+
   try {
-    await admin.rpc("add_credits", {
+    const { error: rpcErr } = await admin.rpc("add_credits", {
       p_user_id: user.id,
       p_amount: creditsToGrant,
       p_action: "invite_code",
       p_ref_id: invite.code,
     });
+    if (rpcErr) throw rpcErr;
   } catch {
     // Fallback: direct upsert
     const { data: currentCredits } = await admin
