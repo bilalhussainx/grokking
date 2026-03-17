@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import { Analytics } from "@vercel/analytics/next";
 import { JsonLd, organizationSchema, websiteSchema } from "@/lib/schema";
 
 const inter = Inter({
@@ -71,6 +72,7 @@ export default function RootLayout({
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
