@@ -114,7 +114,7 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
   // Single streaming call: STT → LLM → TTS all in one request
   const processAudioChunk = useCallback(async (audioBlob: Blob) => {
     const config = configRef.current;
-    if (!config || processingRef.current || audioBlob.size < 1000) return;
+    if (!config || processingRef.current || audioBlob.size < 500) return;
     processingRef.current = true;
 
     // Abort any previous in-flight request

@@ -57,13 +57,67 @@ export async function POST(req: NextRequest) {
 
         const lessonContext = lessonContextJson ? JSON.parse(lessonContextJson) : null;
 
+        const isGreeting = formData.get('greeting') === 'true';
+
         if (!language || !SARVAM_LANGUAGES.includes(language)) {
           send({ type: 'error', message: `Unsupported language: ${language}` });
           controller.close();
           return;
         }
 
-        if (!audioBlob || audioBlob.size < 1000) {
+        if (!SARVAM_API_KEY && SARVAM_STT_LANGUAGES.includes(language)) {
+          send({ type: 'error', message: 'Voice service not configured. Please contact support.' });
+          controller.close();
+          return;
+        }
+
+        if (!audioBlob || audioBlob.size < 500) {
+          if (isGreeting && (!audioBlob || audioBlob.size < 500)) {
+            // Generate greeting without requiring audio input
+            const persona = personaId
+              ? getLanguagePersona(personaId) || getDefaultPersona(language)
+              : getDefaultPersona(language);
+            const greetingText = persona.greeting(
+              (proficiencyLevel || 'A1') as any,
+              undefined
+            );
+
+            send({ type: 'response', text: greetingText });
+
+            // TTS for greeting
+            const speaker = SARVAM_SPEAKERS[language];
+            const targetLang = SARVAM_TTS_LANG_MAP[language];
+            if (speaker && targetLang && SARVAM_API_KEY && greetingText) {
+              try {
+                const ttsResp = await fetch('https://api.sarvam.ai/text-to-speech', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'api-subscription-key': SARVAM_API_KEY,
+                  },
+                  body: JSON.stringify({
+                    inputs: [greetingText],
+                    target_language_code: targetLang,
+                    speaker: speaker,
+                    model: 'bulbul:v2',
+                  }),
+                });
+
+                if (ttsResp.ok) {
+                  const ttsData = await ttsResp.json();
+                  if (ttsData.audios?.[0]) {
+                    send({ type: 'audio', base64: ttsData.audios[0] });
+                  }
+                }
+              } catch (err) {
+                console.error('[SarvamStream] Greeting TTS error:', err);
+              }
+            }
+
+            controller.close();
+            return;
+          }
+
           send({ type: 'error', message: 'No audio provided' });
           controller.close();
           return;
@@ -92,6 +146,9 @@ export async function POST(req: NextRequest) {
           if (sttResp.ok) {
             const data = await sttResp.json();
             transcript = data.transcript || '';
+          } else {
+            const err = await sttResp.text().catch(() => "");
+            console.error('[SarvamStream] STT failed:', sttResp.status, err);
           }
         } else {
           // Deepgram STT for Hindi
@@ -110,11 +167,14 @@ export async function POST(req: NextRequest) {
           if (sttResp.ok) {
             const data = await sttResp.json();
             transcript = data.results?.channels?.[0]?.alternatives?.[0]?.transcript || '';
+          } else {
+            const err = await sttResp.text().catch(() => "");
+            console.error('[SarvamStream] Deepgram STT failed:', sttResp.status, err);
           }
         }
 
         if (!transcript.trim()) {
-          send({ type: 'transcript', text: '' });
+          send({ type: 'error', message: 'Speech not recognized. Please speak clearly and try again.' });
           controller.close();
           return;
         }
