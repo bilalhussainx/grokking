@@ -45,14 +45,33 @@ export default function SignupPage() {
       localStorage.setItem('coach-language', nativeLanguage);
       localStorage.setItem('native-language', nativeLanguage);
 
-      // Redeem invite code if provided (best-effort, non-blocking)
+      // Redeem invite code if provided
       if (inviteCode.trim()) {
-        localStorage.setItem('pending-invite-code', inviteCode.trim());
+        // Try to redeem immediately if user is auto-confirmed and logged in
+        if (result.confirmed) {
+          try {
+            await fetch("/api/invite/redeem", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ code: inviteCode.trim() }),
+            });
+          } catch {
+            // Non-critical — save for later
+            localStorage.setItem('pending-invite-code', inviteCode.trim());
+          }
+        } else {
+          localStorage.setItem('pending-invite-code', inviteCode.trim());
+        }
       }
 
-      setSuccess(true);
+      if (result.confirmed) {
+        // Auto-confirmed — go straight to the app
+        router.replace("/");
+      } else {
+        // Email confirmation needed — show "check your email"
+        setSuccess(true);
+      }
       setLoading(false);
-      // After email confirmation, onboarding page will collect full preferences
     }
   };
 

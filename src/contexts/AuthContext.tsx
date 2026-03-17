@@ -22,7 +22,7 @@ interface AuthContextType {
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<{ error?: string }>;
-  signUpWithEmail: (email: string, password: string, name: string) => Promise<{ error?: string }>;
+  signUpWithEmail: (email: string, password: string, name: string) => Promise<{ error?: string; confirmed?: boolean }>;
   signOut: () => Promise<void>;
   refreshCredits: () => Promise<void>;
 }
@@ -74,6 +74,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
   }, [supabase]);
+
+  // Ensure profile + credits exist after signup (trigger may have failed silently)
+  const ensureProfile = useCallback(async (authUser: User, name?: string) => {
+    // Try fetching first
+    const { data: existing } = await supabase
+      .from("user_profiles")
+      .select("id")
+      .eq("id", authUser.id)
+      .single();
+
+    if (!existing) {
+      // Profile doesn't exist — create it via upsert
+      await supabase.from("user_profiles").upsert({
+        id: authUser.id,
+        email: authUser.email || "",
+        full_name: name || authUser.user_metadata?.full_name || "User",
+        role: "student",
+      }, { onConflict: "id" });
+    }
+
+    // Ensure credits exist
+    const { data: creditRow } = await supabase
+      .from("user_credits")
+      .select("user_id")
+      .eq("user_id", authUser.id)
+      .single();
+
+    if (!creditRow) {
+      await supabase.from("user_credits").upsert({
+        user_id: authUser.id,
+        balance: 50,
+      }, { onConflict: "user_id" });
+    }
+
+    // Now fetch the full profile
+    await fetchProfile(authUser.id);
+
+    // Load credits
+    const { data: bal } = await supabase.rpc("get_credit_balance", { p_user_id: authUser.id });
+    setCredits((bal as number) || 0);
+  }, [supabase, fetchProfile]);
 
   const refreshCredits = useCallback(async () => {
     if (!user) return;
@@ -155,19 +196,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.warn("[Auth] Trigger failed, trying sign-in recovery...");
         const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
         if (!signInErr) {
-          // User exists — trigger failed but auth user was created. Create profile manually.
           const { data: { user: recoveredUser } } = await supabase.auth.getUser();
           if (recoveredUser) {
-            await fetchProfile(recoveredUser.id);
+            await ensureProfile(recoveredUser, name);
           }
           if (refCode) document.cookie = "referral_code=; max-age=0; path=/";
-          return {};
+          return { confirmed: true };
         }
       }
       return { error: error.message };
     }
 
-    // Clear referral cookie after use
+    // Check if user was auto-confirmed (no email verification needed)
+    const signedUpUser = data?.user;
+    if (signedUpUser?.email_confirmed_at) {
+      // Auto-confirmed — ensure profile exists and set user state
+      setUser(signedUpUser);
+      await ensureProfile(signedUpUser, name);
+      if (refCode) document.cookie = "referral_code=; max-age=0; path=/";
+      return { confirmed: true };
+    }
+
+    // Email confirmation required — show "check your email" screen
     if (refCode) document.cookie = "referral_code=; max-age=0; path=/";
     return {};
   };
@@ -179,8 +229,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setProfile(null);
     setCredits(0);
-    // Sign out from Supabase (clears cookies/tokens)
-    await supabase.auth.signOut({ scope: "local" });
+    // Sign out from Supabase (global = revoke all sessions server-side)
+    await supabase.auth.signOut({ scope: "global" });
+    // Manually clear all Supabase auth cookies and localStorage
+    document.cookie.split(";").forEach((c) => {
+      const name = c.trim().split("=")[0];
+      if (name.startsWith("sb-")) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+      }
+    });
+    // Clear Supabase localStorage entries
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("sb-") || key.includes("supabase")) {
+        localStorage.removeItem(key);
+      }
+    });
     // Force full page reload to /login to clear any cached session state
     window.location.replace("/login");
   };
