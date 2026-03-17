@@ -15,12 +15,28 @@ import {
   getCoachPersona, getVoice,
 } from '@/lib/voice-personas';
 import { ALL_SUPPORTED_LANGUAGES } from '@/lib/voice-provider-router';
+import { useScrollCoach } from '@/hooks/useScrollCoach';
+
+// ---------- Teaching mode logic ----------
+type TeachingMode = 'standard' | 'challenge' | 'story' | 'speed-round';
+
+function getTeachingMode(lessonTitle: string): TeachingMode {
+  const hash = lessonTitle.split('').reduce((a, c) => a + c.charCodeAt(0), 0) + new Date().getDate();
+  const roll = hash % 100;
+  if (roll < 60) return 'standard';
+  if (roll < 80) return 'challenge';
+  if (roll < 90) return 'story';
+  return 'speed-round';
+}
+
+// ---------- Coach mode (hybrid voice lifecycle) ----------
+type CoachMode = 'greeting' | 'text-monitoring' | 'voice-active' | 'celebrating';
 
 interface CoachMessage {
   id: string;
   role: 'coach' | 'user';
   text: string;
-  type?: 'encouraging' | 'teaching' | 'hint' | 'celebrating' | 'user';
+  type?: 'encouraging' | 'teaching' | 'hint' | 'celebrating' | 'user' | 'scroll';
   timestamp: Date;
 }
 
@@ -39,7 +55,6 @@ export default function AICoach() {
   const [selectedVoice, setSelectedVoice] = useState(() => getSavedVoice());
   const [coachLanguage, setCoachLanguage] = useState(() => {
     if (typeof window !== 'undefined') {
-      // Prefer explicit coach-language, fall back to native-language from signup
       return localStorage.getItem('coach-language') || localStorage.getItem('native-language') || 'en';
     }
     return 'en';
@@ -50,6 +65,36 @@ export default function AICoach() {
   const codeChangeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hintsRef = useRef(0);
   const voiceSessionStartRef = useRef<number | null>(null);
+
+  // --- Hybrid voice lifecycle state ---
+  const [coachMode, setCoachMode] = useState<CoachMode>('text-monitoring');
+  const coachModeRef = useRef<CoachMode>('text-monitoring');
+  useEffect(() => { coachModeRef.current = coachMode; }, [coachMode]);
+
+  // --- Variable teaching style ---
+  const [teachingMode, setTeachingMode] = useState<TeachingMode>('standard');
+
+  // --- Scroll coach (active only in text-monitoring mode) ---
+  const { messages: scrollMessages, reset: resetScrollMessages } = useScrollCoach(coachMode === 'text-monitoring');
+
+  // Inject scroll messages as coach bubbles
+  const lastScrollCountRef = useRef(0);
+  useEffect(() => {
+    if (scrollMessages.length > lastScrollCountRef.current) {
+      const newMsgs = scrollMessages.slice(lastScrollCountRef.current);
+      for (const sm of newMsgs) {
+        const scrollMsg: CoachMessage = {
+          id: `scroll-${Date.now()}-${Math.random()}`,
+          role: 'coach',
+          text: sm.text,
+          type: 'scroll',
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, scrollMsg]);
+      }
+      lastScrollCountRef.current = scrollMessages.length;
+    }
+  }, [scrollMessages]);
 
   // Track voice session usage analytics
   const sendAnalytics = useCallback((voiceUsed: boolean) => {
@@ -71,7 +116,7 @@ export default function AICoach() {
         voiceUsed,
         coachPersona: selectedPersona,
       }),
-    }).catch(() => {}); // Best-effort, non-blocking
+    }).catch(() => {});
   }, [coachLanguage, selectedPersona]);
 
   // Refs to avoid stale closures
@@ -114,9 +159,22 @@ export default function AICoach() {
     onError: (err: string) => {
       console.error('[Coach] Voice agent error:', err);
     },
+    onGreetingDone: () => {
+      console.log('[Coach] Greeting done — transitioning to text-monitoring');
+      // After greeting is delivered, disconnect voice and enter text-monitoring
+      if (coachModeRef.current === 'greeting') {
+        // Small delay to let the audio finish playing
+        setTimeout(() => {
+          deepgramRef.current?.stop();
+          setCoachMode('text-monitoring');
+        }, 1500);
+      }
+    },
   }), [addMessage]);
 
   const deepgram = useVoiceAgent(voiceCallbacks);
+  const deepgramRef = useRef(deepgram);
+  useEffect(() => { deepgramRef.current = deepgram; }, [deepgram]);
 
   // Languages supported by Deepgram voice (non-Indic only)
   const VOICE_SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'nl', 'it', 'ja'];
@@ -125,8 +183,6 @@ export default function AICoach() {
   const startVoice = useCallback(async () => {
     if (deepgram.isConnecting || deepgram.isConnected) return;
 
-    // If coach language isn't supported by Deepgram TTS, fall back to English
-    // but keep the LLM instruction to explain in the user's language via text
     let voiceLang = coachLanguage;
     if (!VOICE_SUPPORTED_LANGUAGES.includes(coachLanguage)) {
       voiceLang = 'en';
@@ -141,6 +197,81 @@ export default function AICoach() {
     await deepgram.start({
       personaId: selectedPersona,
       systemPrompt: persona.systemPrompt,
+      voiceProvider: 'deepgram',
+      voiceId: selectedVoice,
+      language: voiceLang,
+      mode: 'coach',
+      lessonTitle: ctx?.lessonTitle,
+      moduleTitle: ctx?.moduleTitle,
+      courseTitle: ctx?.courseTitle,
+      lessonContext: ctx ? {
+        lessonId: ctx.lessonSlug || '',
+        lessonTitle: ctx.lessonTitle,
+        targetPhrases: [],
+        vocabulary: [],
+        grammarFocus: [],
+        content: ctx.lessonContent,
+        starterCode: ctx.starterCode,
+        solutionCode: ctx.solutionCode,
+      } : undefined,
+    });
+  }, [deepgram, selectedPersona, selectedVoice, coachLanguage]);
+
+  // Start voice for re-engagement (user taps mic or speaks)
+  const startVoiceReengage = useCallback(async () => {
+    if (deepgram.isConnecting || deepgram.isConnected) return;
+
+    let voiceLang = coachLanguage;
+    if (!VOICE_SUPPORTED_LANGUAGES.includes(coachLanguage)) {
+      voiceLang = 'en';
+    }
+
+    const ctx = lessonContextRef.current;
+    const persona = getCoachPersona(selectedPersona);
+    // Override system prompt to not re-greet
+    const reengagePrompt = `${persona.systemPrompt}\n\nIMPORTANT: The student was reading and decided to talk. Don't re-greet them. Start with something like "I'm here — what's on your mind?" and respond to their question.`;
+
+    setCoachMode('voice-active');
+    await deepgram.start({
+      personaId: selectedPersona,
+      systemPrompt: reengagePrompt,
+      voiceProvider: 'deepgram',
+      voiceId: selectedVoice,
+      language: voiceLang,
+      mode: 'coach',
+      lessonTitle: ctx?.lessonTitle,
+      moduleTitle: ctx?.moduleTitle,
+      courseTitle: ctx?.courseTitle,
+      lessonContext: ctx ? {
+        lessonId: ctx.lessonSlug || '',
+        lessonTitle: ctx.lessonTitle,
+        targetPhrases: [],
+        vocabulary: [],
+        grammarFocus: [],
+        content: ctx.lessonContent,
+        starterCode: ctx.starterCode,
+        solutionCode: ctx.solutionCode,
+      } : undefined,
+    });
+  }, [deepgram, selectedPersona, selectedVoice, coachLanguage]);
+
+  // Start voice for celebration
+  const startVoiceCelebrate = useCallback(async () => {
+    if (deepgram.isConnecting || deepgram.isConnected) return;
+
+    let voiceLang = coachLanguage;
+    if (!VOICE_SUPPORTED_LANGUAGES.includes(coachLanguage)) {
+      voiceLang = 'en';
+    }
+
+    const ctx = lessonContextRef.current;
+    const persona = getCoachPersona(selectedPersona);
+    const celebratePrompt = `${persona.systemPrompt}\n\nIMPORTANT: The student just completed the lesson! Congratulate them enthusiastically, mention what they learned, and optionally ask a quick quiz question to reinforce the concept.`;
+
+    setCoachMode('celebrating');
+    await deepgram.start({
+      personaId: selectedPersona,
+      systemPrompt: celebratePrompt,
       voiceProvider: 'deepgram',
       voiceId: selectedVoice,
       language: voiceLang,
@@ -201,6 +332,7 @@ export default function AICoach() {
     sendAnalytics(true);
     voiceSessionStartRef.current = null;
     deepgram.stop();
+    setCoachMode('text-monitoring');
   }, [deepgram, saveNotes, sendAnalytics]);
 
   // Send code context updates to Deepgram agent periodically
@@ -320,33 +452,38 @@ export default function AICoach() {
     setHintsGiven(0);
     hintsRef.current = 0;
     setLastCodeLength(0);
+    setCoachMode('text-monitoring');
+    resetScrollMessages();
+    lastScrollCountRef.current = 0;
+
+    // Determine teaching mode for this lesson
+    setTeachingMode(getTeachingMode(lessonContext.lessonTitle));
 
     // Auto-open coach panel when a new lesson loads so the student sees the greeting
     openPanel();
-  }, [lessonContext, lastLessonId, saveNotes, openPanel]);
+  }, [lessonContext, lastLessonId, saveNotes, openPanel, resetScrollMessages]);
 
-  // Auto-start voice coach when a lesson opens — Coach Alex greets and listens
+  // Auto-start voice coach when a lesson opens — greet then disconnect
   const autoStartLessonRef = useRef<string | null>(null);
   useEffect(() => {
     if (!lessonContext) return;
-    // Only auto-start once per unique lesson
     const lessonKey = `${lessonContext.courseTitle}/${lessonContext.lessonTitle}`;
     if (autoStartLessonRef.current === lessonKey) return;
-    if (hasGreeted) return; // Already greeted for this lesson via the reset effect
+    if (hasGreeted) return;
     autoStartLessonRef.current = lessonKey;
     setHasGreeted(true);
 
-    // Open the panel and auto-start voice after a brief delay
     openPanel();
     const timer = setTimeout(async () => {
       try {
-        // Stop any existing voice session before starting new one
         if (deepgram.isConnected) deepgram.stop();
+        setCoachMode('greeting');
         await startVoice();
-        console.log("[Coach] Auto-started voice for lesson:", lessonContext.lessonTitle);
+        console.log("[Coach] Auto-started voice for greeting:", lessonContext.lessonTitle);
+        // After greeting, the onGreetingDone callback will transition to text-monitoring
       } catch (err) {
         console.warn("[Coach] Voice auto-start failed, using text:", err);
-        // Voice failed (no mic, etc.) — fall back to text greeting
+        setCoachMode('text-monitoring');
         const hasCodingExercise = !!(lessonContext.starterCode);
         sendEvent(
           hasCodingExercise
@@ -413,7 +550,20 @@ export default function AICoach() {
       deepgram.sendPromptUpdate('The student just solved the problem! Celebrate their achievement and suggest what to try next.');
       addMessage('I solved it!', 'user', 'user');
     } else {
-      sendEvent('Student solved it! Celebrate and suggest next steps.', 'celebrating');
+      // Reconnect voice for celebration
+      addMessage('I solved it!', 'user', 'user');
+      startVoiceCelebrate().catch(() => {
+        sendEvent('Student solved it! Celebrate and suggest next steps.', 'celebrating');
+      });
+    }
+  };
+
+  // Handle "Tap to talk" — reconnect voice in re-engage mode
+  const handleTapToTalk = () => {
+    if (coachMode === 'text-monitoring') {
+      startVoiceReengage().catch(() => {
+        console.warn('[Coach] Voice re-engage failed');
+      });
     }
   };
 
@@ -424,7 +574,6 @@ export default function AICoach() {
     setUserInput('');
 
     if (deepgram.isConnected) {
-      // In voice mode, inject user text as context update
       deepgram.sendPromptUpdate(`The student typed this message: "${text}". Respond to it.`);
       addMessage(text, 'user', 'user');
     } else {
@@ -445,12 +594,21 @@ export default function AICoach() {
     const onHint = () => handleHint();
     const onExplain = () => handleExplain();
     const onCelebrate = () => handleCelebrate();
-    const onVoice = () => { if (!deepgram.isConnected) startVoice(); else stopVoice(); };
+    const onVoice = () => {
+      if (!deepgram.isConnected) {
+        if (coachMode === 'text-monitoring') {
+          handleTapToTalk();
+        } else {
+          startVoice();
+        }
+      } else {
+        stopVoice();
+      }
+    };
     const onMessage = (e: Event) => {
       const text = (e as CustomEvent).detail;
       if (text && typeof text === 'string') {
         setUserInput(text);
-        // Trigger form submit programmatically
         setTimeout(() => {
           const form = document.querySelector('[data-coach-form]') as HTMLFormElement;
           if (form) form.requestSubmit();
@@ -471,7 +629,7 @@ export default function AICoach() {
       window.removeEventListener('coach:voice', onVoice);
       window.removeEventListener('coach:message', onMessage);
     };
-  }, [deepgram.isConnected]);
+  }, [deepgram.isConnected, coachMode]);
 
   // Cleanup on unmount — save notes + send analytics
   const saveNotesRef = useRef(saveNotes);
@@ -493,22 +651,48 @@ export default function AICoach() {
       case 'teaching': return 'border-amber-500/40 bg-amber-500/5';
       case 'hint': return 'border-violet-500/40 bg-violet-500/5';
       case 'celebrating': return 'border-pink-500/40 bg-pink-500/5';
+      case 'scroll': return 'border-cyan-500/40 bg-cyan-500/5';
       default: return 'border-blue-500/40 bg-blue-500/5';
     }
   };
 
   const getTypeIcon = (type?: string) => {
     switch (type) {
-      case 'encouraging': return '🌟';
-      case 'teaching': return '📚';
-      case 'hint': return '💡';
-      case 'celebrating': return '🎉';
-      default: return '💬';
+      case 'encouraging': return '\u{1F31F}';
+      case 'teaching': return '\u{1F4DA}';
+      case 'hint': return '\u{1F4A1}';
+      case 'celebrating': return '\u{1F389}';
+      case 'scroll': return '\u{1F4D6}';
+      default: return '\u{1F4AC}';
     }
   };
 
   const isVoiceActive = deepgram.isConnected;
   const agentSpeaking = deepgram.isSpeaking;
+
+  // Mode status label
+  const getModeLabel = () => {
+    switch (coachMode) {
+      case 'greeting': return '\u{1F3A4} Greeting...';
+      case 'text-monitoring': return '\u{1F4D6} Reading along...';
+      case 'voice-active': return '\u{1F3A4} Listening...';
+      case 'celebrating': return '\u{1F389} Celebrating!';
+    }
+  };
+
+  // Teaching mode indicator
+  const getTeachingModeIndicator = () => {
+    switch (teachingMode) {
+      case 'challenge':
+        return <span className="text-[10px] text-amber-400 font-semibold">{'\u26A1'} Challenge Mode — 2x XP!</span>;
+      case 'story':
+        return <span className="text-[10px] text-emerald-400 font-semibold">{'\u{1F4D6}'} Story Time</span>;
+      case 'speed-round':
+        return <span className="text-[10px] text-cyan-400 font-semibold">{'\u{1F3C3}'} Speed Round</span>;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-[var(--background)]">
@@ -516,15 +700,12 @@ export default function AICoach() {
       <div className="p-3 border-b border-white/[0.06] shrink-0">
         <div className="flex items-center gap-2.5 mb-1">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-xs shadow-lg shadow-blue-500/20">
-            🎓
+            {'\u{1F393}'}
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-white">{getCoachPersona(selectedPersona).name}</h3>
             <p className="text-[10px] text-white/40">
-              {deepgram.isConnecting ? 'Connecting...' :
-               isVoiceActive && agentSpeaking ? 'Speaking...' :
-               isVoiceActive ? 'Voice Mode' :
-               'AI Coding Coach'}
+              {getModeLabel()}
             </p>
           </div>
           <div className="flex items-center gap-1.5 text-[10px]">
@@ -532,16 +713,26 @@ export default function AICoach() {
             <span className="text-blue-400 font-mono">{sessionTime}</span>
           </div>
         </div>
-        {lessonContext && (
-          <div className="text-[10px] text-white/30 truncate">
-            {lessonContext.moduleTitle} → {lessonContext.lessonTitle}
+        {/* Teaching mode indicator + lesson info */}
+        <div className="flex items-center gap-2">
+          {lessonContext && (
+            <div className="text-[10px] text-white/30 truncate flex-1">
+              {lessonContext.moduleTitle} {'\u2192'} {lessonContext.lessonTitle}
+            </div>
+          )}
+          {getTeachingModeIndicator()}
+        </div>
+        {/* Challenge mode XP badge */}
+        {teachingMode === 'challenge' && (
+          <div className="mt-1 px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded text-[10px] text-amber-400 font-semibold inline-block">
+            2x XP Active!
           </div>
         )}
       </div>
 
       {/* Voice Control Bar */}
       <div className="px-3 py-2 border-b border-white/[0.06] flex items-center gap-2 shrink-0">
-        {!isVoiceActive && !deepgram.isConnecting ? (
+        {coachMode === 'text-monitoring' && !deepgram.isConnecting ? (
           <div className="flex-1 flex items-center gap-1.5">
             {/* Language Picker */}
             <div className="relative">
@@ -555,7 +746,7 @@ export default function AICoach() {
               </button>
               {showLangPicker && (
                 <div className="absolute top-full left-0 mt-1 bg-slate-900 border border-white/[0.1] rounded-lg shadow-xl z-[100] py-1 min-w-[160px] max-h-[280px] overflow-y-auto">
-                  {/* English first — always available, always default */}
+                  {/* English first */}
                   <button
                     onClick={() => {
                       setCoachLanguage('en');
@@ -588,7 +779,7 @@ export default function AICoach() {
                       <span>{lang.name}</span>
                     </button>
                   ))}
-                  {/* Indic languages — text only for now */}
+                  {/* Indic languages */}
                   <div className="px-2 py-1 text-[9px] text-white/20 uppercase tracking-wider border-t border-white/[0.06] mt-1">
                     Indic Languages — Voice & Chat Coming Soon via Sarvam AI
                   </div>
@@ -611,22 +802,22 @@ export default function AICoach() {
                 </div>
               )}
             </div>
-            {/* Start Button */}
+            {/* Tap to Talk button (replaces "Start Voice Conversation" in text-monitoring mode) */}
             <button
-              onClick={startVoice}
+              onClick={handleTapToTalk}
               className="flex-1 py-2 bg-gradient-to-r from-blue-500/20 to-violet-500/20 hover:from-blue-500/30 hover:to-violet-500/30 text-white rounded-lg flex items-center justify-center gap-2 transition-all text-xs font-semibold border border-blue-500/20"
             >
-              <Phone className="w-3.5 h-3.5 text-blue-400" />
-              <span>Start Voice Conversation</span>
+              <Mic className="w-3.5 h-3.5 text-blue-400" />
+              <span>Tap to talk</span>
             </button>
           </div>
-        ) : deepgram.isConnecting ? (
+        ) : deepgram.isConnecting || coachMode === 'greeting' ? (
           <button
             disabled
             className="flex-1 py-2 bg-amber-500/10 text-amber-400 rounded-lg flex items-center justify-center gap-2 text-xs font-semibold border border-amber-500/20"
           >
             <div className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-            <span>Connecting...</span>
+            <span>{coachMode === 'greeting' ? 'Greeting...' : 'Connecting...'}</span>
           </button>
         ) : (
           <>
@@ -659,7 +850,7 @@ export default function AICoach() {
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                   <span className="text-[11px] text-emerald-400 font-medium">
-                    {deepgram.micMuted ? 'Mic muted' : 'Listening...'}
+                    {deepgram.micMuted ? 'Mic muted' : coachMode === 'celebrating' ? 'Celebrating!' : 'Listening...'}
                   </span>
                 </div>
               )}
@@ -692,11 +883,11 @@ export default function AICoach() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto min-h-0 p-3 space-y-2">
-        {messages.length === 0 && !isStreaming && !isVoiceActive && (
+        {messages.length === 0 && !isStreaming && !isVoiceActive && coachMode === 'text-monitoring' && (
           <div className="flex flex-col items-center justify-center h-full text-center opacity-40">
             <GraduationCap className="w-8 h-8 mb-2" />
-            <p className="text-xs">Click &quot;Start Voice Conversation&quot; to talk with Coach Alex</p>
-            <p className="text-[10px] mt-1">or use text chat below</p>
+            <p className="text-xs">Coach Alex is reading along with you</p>
+            <p className="text-[10px] mt-1">Tap the mic or type below to chat</p>
           </div>
         )}
         {messages.map((msg) => (
@@ -712,7 +903,7 @@ export default function AICoach() {
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className="text-sm">{getTypeIcon(msg.type)}</span>
                   <span className="text-[10px] text-white/30 uppercase tracking-wider font-medium">
-                    {msg.type || 'coach'}
+                    {msg.type === 'scroll' ? 'reading along' : msg.type || 'coach'}
                   </span>
                 </div>
                 <p className="text-white/80 text-xs leading-relaxed whitespace-pre-wrap">
