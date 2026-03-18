@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AIProvider, useAI } from "@/contexts/AIContext";
 import { XPProvider, useXP } from "@/contexts/XPContext";
@@ -9,6 +10,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import AICoach from "@/components/ai/AICoach";
 import SessionNotes from "@/components/ai/SessionNotes";
 import { TranslationBar } from "@/components/language/TranslationBar";
+import { getLanguageCourse } from "@/data/languages";
 import TopNav from "@/components/layout/TopNav";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import ShortcutsHelp from "@/components/ui/ShortcutsHelp";
@@ -16,6 +18,16 @@ import XPFlyUp from "@/components/gamification/XPFlyUp";
 import AchievementToast from "@/components/gamification/AchievementToast";
 import VariableReward from "@/components/gamification/VariableReward";
 import { GraduationCap, X, FileText, ChevronLeft, Mic } from "lucide-react";
+
+/** Check if current page is a language course (has its own tutor panel) */
+function useIsLanguageCourse() {
+  const pathname = usePathname();
+  if (!pathname) return false;
+  // pathname like /course/french-beginner/some-lesson
+  const match = pathname.match(/^\/course\/([^/]+)/);
+  if (!match) return false;
+  return !!getLanguageCourse(match[1]);
+}
 
 /**
  * Coach Sidebar — keeps AICoach ALWAYS mounted so voice stays connected.
@@ -25,9 +37,14 @@ import { GraduationCap, X, FileText, ChevronLeft, Mic } from "lucide-react";
  *
  * CRITICAL: We never unmount AICoach — we hide it with CSS.
  * This keeps the Deepgram WebSocket alive when user toggles the panel.
+ * HIDDEN on language courses (they have their own Language Tutor panel).
  */
 function CoachSidebar() {
   const { isPanelOpen, closePanel, lessonContext } = useAI();
+  const isLanguageCourse = useIsLanguageCourse();
+
+  // Hide Coach Alex entirely on language courses
+  if (isLanguageCourse) return null;
   const [activeTab, setActiveTab] = useState<"coach" | "notes">("coach");
   // Track if coach has ever been shown (to avoid mounting before needed)
   const [hasBeenOpened, setHasBeenOpened] = useState(false);
@@ -135,8 +152,10 @@ function CoachSidebar() {
  */
 function CoachFAB() {
   const { isPanelOpen, openPanel, lessonContext } = useAI();
+  const isLanguageCourse = useIsLanguageCourse();
 
-  if (isPanelOpen || !lessonContext) return null;
+  // Hide on language courses (they have their own Language Tutor panel)
+  if (isPanelOpen || !lessonContext || isLanguageCourse) return null;
 
   return (
     <button

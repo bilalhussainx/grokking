@@ -16,6 +16,7 @@ interface LanguageTutorPanelProps {
   targetPhrases?: string[];
   vocabulary?: string[];
   grammarFocus?: string[];
+  lessonContent?: string;
   className?: string;
 }
 
@@ -35,6 +36,7 @@ export function LanguageTutorPanel({
   targetPhrases = [],
   vocabulary = [],
   grammarFocus = [],
+  lessonContent,
   className,
 }: LanguageTutorPanelProps) {
   const [selectedPersona, setSelectedPersona] = useState<LanguagePersona | null>(null);
@@ -112,6 +114,7 @@ export function LanguageTutorPanel({
         targetPhrases: targetPhrases || [],
         vocabulary: vocabulary || [],
         grammarFocus: grammarFocus || [],
+        content: lessonContent ? lessonContent.slice(0, 2000) : undefined,
       },
     });
 
@@ -122,7 +125,7 @@ export function LanguageTutorPanel({
         { role: "agent", text: data.greeting, timestamp: new Date() },
       ]);
     }
-  }, [selectedPersona, language, proficiencyLevel, lessonTitle, moduleTitle, courseTitle, targetPhrases, vocabulary, grammarFocus, voiceAgent]);
+  }, [selectedPersona, language, proficiencyLevel, lessonTitle, moduleTitle, courseTitle, targetPhrases, vocabulary, grammarFocus, lessonContent, voiceAgent]);
 
   const handleStopSession = useCallback(() => {
     voiceAgent.stop();

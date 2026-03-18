@@ -79,6 +79,7 @@ export default function CourseLayout({
                 targetPhrases={currentLangLesson?.voiceScenarios?.flatMap(s => s.targetPhrases || []) || []}
                 vocabulary={currentLangLesson?.vocabulary?.map(v => `${v.word} (${v.translation})`) || []}
                 grammarFocus={currentLangLesson?.grammarPoints?.map(g => g.title) || []}
+                lessonContent={currentLangLesson?.content}
               />
             </div>
           )}
