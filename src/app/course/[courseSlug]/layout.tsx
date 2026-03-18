@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { courses } from '@/data';
+import { getLanguageCourse } from '@/data/languages';
 import { JsonLd, breadcrumbSchema, courseSchema } from '@/lib/schema';
 
 type Props = { params: Promise<{ courseSlug: string }> };
@@ -8,7 +9,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { courseSlug } = await params;
   const course = courses.find(c => c.slug === courseSlug);
 
-  if (!course) return { title: 'Course Not Found' };
+  // Check language courses if not found in hardcoded courses
+  if (!course) {
+    const langCourse = getLanguageCourse(courseSlug);
+    if (langCourse) {
+      return {
+        title: langCourse.title,
+        description: langCourse.description,
+      };
+    }
+    return { title: 'Course | Samsara.ai' };
+  }
 
   const moduleCount = course.modules.length;
   const lessonCount = course.modules.reduce((s, m) => s + m.lessons.length, 0);
