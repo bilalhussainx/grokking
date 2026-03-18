@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/supabase-auth";
+import { createServerSupabase, createAdminSupabase } from "@/lib/supabase-auth";
 
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
@@ -8,24 +8,44 @@ export async function POST(req: NextRequest) {
 
   const prefs = await req.json();
 
-  const { error } = await supabase
+  // Use admin client to bypass RLS — profile may not exist yet during onboarding
+  let admin;
+  try {
+    admin = createAdminSupabase();
+  } catch {
+    // Fallback to server client if service key not set
+    admin = supabase;
+  }
+
+  // Build update payload — only include defined fields
+  const updateData: Record<string, unknown> = {
+    onboarding_completed: prefs.onboarding_completed ?? true,
+    personalization_consent: prefs.personalization_consent ?? false,
+  };
+  if (prefs.native_language) updateData.native_language = prefs.native_language;
+  if (prefs.instruction_language) updateData.instruction_language = prefs.instruction_language;
+  if (prefs.english_fluency) updateData.english_fluency = prefs.english_fluency;
+  if (prefs.learning_interests) updateData.learning_interests = prefs.learning_interests;
+  if (prefs.learning_style) updateData.learning_style = prefs.learning_style;
+  if (prefs.communication_mode) updateData.communication_mode = prefs.communication_mode;
+  if (prefs.coach_persona) updateData.coach_persona = prefs.coach_persona;
+  if (prefs.preferred_voice_id) updateData.preferred_voice_id = prefs.preferred_voice_id;
+
+  // Try update first, then upsert if no rows matched (profile doesn't exist)
+  const { error, count } = await admin
     .from("user_profiles")
-    .update({
-      native_language: prefs.native_language,
-      instruction_language: prefs.instruction_language,
-      english_fluency: prefs.english_fluency,
-      learning_interests: prefs.learning_interests,
-      learning_style: prefs.learning_style,
-      communication_mode: prefs.communication_mode,
-      coach_persona: prefs.coach_persona,
-      preferred_voice_id: prefs.preferred_voice_id,
-      onboarding_completed: prefs.onboarding_completed ?? true,
-      personalization_consent: prefs.personalization_consent ?? false,
-    })
+    .update(updateData)
     .eq("id", user.id);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error || count === 0) {
+    // Profile might not exist — create it with preferences
+    await admin.from("user_profiles").upsert({
+      id: user.id,
+      email: user.email || "",
+      full_name: user.user_metadata?.full_name || user.user_metadata?.name || "User",
+      role: "pro",
+      ...updateData,
+    }, { onConflict: "id" });
   }
 
   return NextResponse.json({ ok: true });

@@ -14,9 +14,9 @@ const PRO_MONTHLY_PRICE = process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_MONTHLY ||
 const PRO_ANNUAL_PRICE = process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_ANNUAL || "";
 
 const FREE_FEATURES = [
-  "3 full courses (Python, JS, Web Dev)",
-  "Preview first 3 lessons of any Pro course",
-  "50 AI credits on signup",
+  "1-month free Pro trial on signup",
+  "300 AI credits to start",
+  "Preview first 3 lessons after trial ends",
   "Code editor + auto-grading",
   "Progress tracking",
 ];

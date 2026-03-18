@@ -361,8 +361,15 @@ export default function OnboardingPage() {
         </div>
 
         <p className="text-xs text-white/30">
-          You can change any of these in Settings. Tell Coach Alex "switch to English" at any time during a lesson.
+          You can change any of these in Settings. Tell Coach Alex &quot;switch to English&quot; at any time during a lesson.
         </p>
+
+        <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 mt-4">
+          <p className="text-xs text-amber-400 font-medium mb-1">Your Free Pro Trial</p>
+          <p className="text-xs text-white/50">
+            You have 1 month of full Pro access and 300 AI credits. After your trial, you can subscribe for $15/mo or continue with free-tier access (first 3 lessons of each premium course).
+          </p>
+        </div>
       </div>
     </div>
   );

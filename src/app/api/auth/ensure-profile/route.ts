@@ -21,53 +21,56 @@ export async function POST() {
     return NextResponse.json({ error: "Service role key not configured" }, { status: 500 });
   }
 
-  // 1. Ensure profile exists
+  // 1. Ensure profile exists with pro trial
   const { data: existingProfile } = await admin
     .from("user_profiles")
     .select("id, role, trial_ends_at")
     .eq("id", user.id)
     .single();
 
-  let role = existingProfile?.role || "pro";
-  let trialEndsAt = existingProfile?.trial_ends_at;
-
   if (!existingProfile) {
-    // Create profile with pro trial
+    // Create profile with pro trial (30 days)
     const trialEnd = new Date();
     trialEnd.setDate(trialEnd.getDate() + 30);
-    trialEndsAt = trialEnd.toISOString();
 
     await admin.from("user_profiles").upsert({
       id: user.id,
       email: user.email || "",
       full_name: user.user_metadata?.full_name || user.user_metadata?.name || "User",
       role: "pro",
-      trial_ends_at: trialEndsAt,
+      trial_ends_at: trialEnd.toISOString(),
     }, { onConflict: "id" });
-    role = "pro";
+  } else if (!existingProfile.trial_ends_at) {
+    // Existing user without trial_ends_at — set it now (30 days from today)
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 30);
+    await admin.from("user_profiles")
+      .update({ role: "pro", trial_ends_at: trialEnd.toISOString() })
+      .eq("id", user.id);
   }
 
-  // 2. Ensure credits exist — check if signup_bonus was ever granted
-  const { data: bonusTxn } = await admin
+  // 2. Ensure user has 300 signup credits
+  //    Check total signup_bonus credits ever granted
+  const { data: bonusTxns } = await admin
     .from("credit_txns")
-    .select("id")
+    .select("amount")
     .eq("user_id", user.id)
-    .eq("action", "signup_bonus")
-    .limit(1)
-    .maybeSingle();
+    .eq("action", "signup_bonus");
 
+  const totalBonusGranted = (bonusTxns || []).reduce((sum: number, t: { amount: number }) => sum + t.amount, 0);
   let credits = 0;
 
-  if (!bonusTxn) {
-    // Grant 50 signup bonus credits via admin RPC
+  if (totalBonusGranted < 300) {
+    // Top up to 300 — grant the difference
+    const topUp = 300 - totalBonusGranted;
     const { data: newBalance } = await admin.rpc("add_credits", {
       p_user_id: user.id,
-      p_amount: 50,
+      p_amount: topUp,
       p_action: "signup_bonus",
     });
-    credits = (newBalance as number) || 50;
+    credits = (newBalance as number) || 300;
   } else {
-    // Already has signup bonus — just fetch current balance
+    // Already has full signup bonus — fetch current balance
     const { data: bal } = await admin.rpc("get_credit_balance", {
       p_user_id: user.id,
     });

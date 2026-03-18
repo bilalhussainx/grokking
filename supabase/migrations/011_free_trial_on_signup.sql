@@ -31,11 +31,11 @@ BEGIN
 
   -- Create initial credits (50 free)
   BEGIN
-    INSERT INTO user_credits (user_id, balance) VALUES (NEW.id, 50)
+    INSERT INTO user_credits (user_id, balance) VALUES (NEW.id, 300)
     ON CONFLICT (user_id) DO NOTHING;
 
     INSERT INTO credit_txns (user_id, amount, action)
-    VALUES (NEW.id, 50, 'signup_bonus');
+    VALUES (NEW.id, 300, 'signup_bonus');
   EXCEPTION WHEN OTHERS THEN
     RAISE LOG 'handle_new_user CREDITS failed for %: % %', NEW.id, SQLERRM, SQLSTATE;
   END;

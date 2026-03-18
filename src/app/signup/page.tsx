@@ -64,7 +64,7 @@ export default function SignupPage() {
       <section className="flex min-h-screen items-center justify-center px-4 bg-[var(--background)]">
         <div className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 text-center">
           <h2 className="text-xl font-semibold text-white mb-2">Check your email</h2>
-          <p className="text-sm text-white/50">We sent a confirmation link to <strong className="text-white/80">{email}</strong>. Click it to activate your account and get your 50 free credits.</p>
+          <p className="text-sm text-white/50">We sent a confirmation link to <strong className="text-white/80">{email}</strong>. Click it to activate your account and get your 300 free credits + 1 month of Pro access.</p>
           <p className="text-xs text-white/30 mt-3">After confirming, you'll complete a quick setup to personalize your learning experience.</p>
           <Link href="/login" className="text-violet-400 text-sm hover:underline mt-4 inline-block">Back to login</Link>
         </div>
@@ -82,7 +82,7 @@ export default function SignupPage() {
           <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
             Join Samsara<span className="text-cyan-400">.ai</span>
           </h1>
-          <p className="text-sm text-white/50 mt-2">Start with 50 free AI credits</p>
+          <p className="text-sm text-white/50 mt-2">Start with 300 free AI credits + 1 month Pro access</p>
         </div>
 
         <Button

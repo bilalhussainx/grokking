@@ -188,7 +188,7 @@ function FeaturedCourses({ interests = [] }: { interests?: string[] }) {
 }
 
 export default function HomePage() {
-  const { user, profile } = useAuth();
+  const { user, profile, credits } = useAuth();
   const { earnXP, showXPFlyUp, lastXPAmount, pendingReward, dismissReward } = useXP();
   const router = useRouter();
   const [userInterests, setUserInterests] = useState<string[]>([]);
@@ -320,6 +320,32 @@ export default function HomePage() {
           <motion.div variants={item} className="mb-10 space-y-4">
             <LearningStats />
             <ForgettingAlert />
+          </motion.div>
+        )}
+
+        {/* Trial banner — show when user is on a free pro trial */}
+        {user && profile?.role === "pro" && profile?.trial_ends_at && (
+          <motion.div variants={item} className="mb-8">
+            <div className="rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/5 to-orange-500/5 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium text-white">
+                  You're on a free 1-month Pro trial
+                </p>
+                <p className="text-xs text-white/50 mt-0.5">
+                  Pro access and {credits} credits expire on{" "}
+                  <span className="text-amber-400 font-medium">
+                    {new Date(profile.trial_ends_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  </span>
+                  . Subscribe to keep full access to all courses, AI coaching, and credits.
+                </p>
+              </div>
+              <Link
+                href="/pricing"
+                className="shrink-0 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold hover:from-amber-400 hover:to-orange-400 transition-all"
+              >
+                Subscribe — $15/mo
+              </Link>
+            </div>
           </motion.div>
         )}
 
