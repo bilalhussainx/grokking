@@ -58,11 +58,13 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
   const agentTextRef = useRef("");
 
   // Greeting phase — suppress user transcript processing until agent finishes greeting.
-  // After greeting ends, a cooldown period ignores transcripts from speaker echo.
+  // After greeting ends, a brief cooldown ignores transcripts from speaker echo.
   const isGreetingPhaseRef = useRef(true);
   const greetingCooldownRef = useRef(false);
   // Count how many AgentStartedSpeaking events we've seen — the first speaking turn is the greeting
   const agentSpeakCountRef = useRef(0);
+  // Safety timeout: force-end greeting phase after 8 seconds no matter what
+  const greetingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     callbacksRef.current = callbacks;
@@ -245,6 +247,15 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
               case "SettingsApplied":
                 console.log("[Deepgram] Settings applied — greeting phase active");
                 isGreetingPhaseRef.current = true;
+                // Safety timeout: force-end greeting phase after 8s
+                if (greetingTimeoutRef.current) clearTimeout(greetingTimeoutRef.current);
+                greetingTimeoutRef.current = setTimeout(() => {
+                  if (isGreetingPhaseRef.current) {
+                    console.log("[Deepgram] Safety timeout — force-ending greeting phase");
+                    isGreetingPhaseRef.current = false;
+                    greetingCooldownRef.current = false;
+                  }
+                }, 8000);
                 greetingCooldownRef.current = false;
                 agentSpeakCountRef.current = 0;
                 // Do NOT mute mic — Deepgram needs continuous audio stream or
@@ -283,23 +294,28 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                   agentTextRef.current = "";
                 }
                 // End greeting phase after the first agent speaking turn completes.
-                // Use a cooldown to ignore echo from speakers being picked up by mic.
+                // Brief cooldown to ignore echo from speakers being picked up by mic.
                 if (isGreetingPhaseRef.current && agentSpeakCountRef.current >= 1) {
-                  console.log("[Deepgram] Greeting done — starting 2s echo cooldown");
+                  console.log("[Deepgram] Greeting done — starting 1s echo cooldown");
                   isGreetingPhaseRef.current = false;
+                  if (greetingTimeoutRef.current) clearTimeout(greetingTimeoutRef.current);
                   greetingCooldownRef.current = true;
                   callbacksRef.current?.onGreetingDone?.();
                   setTimeout(() => {
                     greetingCooldownRef.current = false;
                     console.log("[Deepgram] Echo cooldown ended — now accepting user speech");
-                  }, 2000);
+                  }, 1000);
                 }
                 break;
 
               case "ConversationText":
                 console.log("[Deepgram] ConversationText:", msg.role, msg.content?.slice(0, 50));
-                if (msg.role === "user" && msg.content && !isGreetingPhaseRef.current && !greetingCooldownRef.current) {
-                  callbacksRef.current?.onUserMessage?.(msg.content);
+                if (msg.role === "user" && msg.content) {
+                  // Only suppress during initial greeting phase, not during cooldown
+                  // (cooldown was too aggressive — blocked legitimate user speech)
+                  if (!isGreetingPhaseRef.current) {
+                    callbacksRef.current?.onUserMessage?.(msg.content);
+                  }
                 } else if (msg.role === "assistant" && msg.content) {
                   // Accumulate — don't emit yet, wait for AgentAudioDone
                   agentTextRef.current += (agentTextRef.current ? " " : "") + msg.content;
@@ -308,7 +324,7 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
 
               // Some Deepgram Agent API versions send user transcripts as separate events
               case "UserTranscript":
-                if (msg.text && !isGreetingPhaseRef.current && !greetingCooldownRef.current) {
+                if (msg.text && !isGreetingPhaseRef.current) {
                   callbacksRef.current?.onUserMessage?.(msg.text);
                 }
                 break;
