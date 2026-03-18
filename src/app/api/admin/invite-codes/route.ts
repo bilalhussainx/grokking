@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     // Try new schema first (with label, credits, duration_days, max_uses)
     const { error } = await admin.from("invite_codes").insert({
       code,
-      role: role || "teacher",
+      role: role || "pro",
       label: label || `${codePrefix} Demo`,
       credits: credits || 1000,
       duration_days: durationDays || 14,

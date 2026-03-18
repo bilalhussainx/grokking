@@ -15,9 +15,9 @@ const PRO_ANNUAL_PRICE = process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_ANNUAL || "
 
 const FREE_FEATURES = [
   "3 full courses (Python, JS, Web Dev)",
+  "Preview first 3 lessons of any Pro course",
   "50 AI credits on signup",
   "Code editor + auto-grading",
-  "Community Discord access",
   "Progress tracking",
 ];
 
@@ -117,7 +117,7 @@ export default function PricingCards() {
               ${annual ? "12" : "15"}<span className="text-lg text-white/40">/mo</span>
             </div>
             <div className="text-sm text-white/40 mb-6">
-              {annual ? "$144/year" : "billed monthly"}
+              {annual ? "$144/year — save 20%" : "billed monthly"}
             </div>
             <ul className="space-y-3 mb-8">
               {PRO_FEATURES.map((f) => (

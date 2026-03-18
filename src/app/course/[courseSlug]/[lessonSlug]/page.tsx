@@ -139,12 +139,18 @@ export default function LessonRoute() {
     );
   }
 
-  // Course access check: free users can only access free-tier courses
+  // Course access check: free users can preview first 3 lessons of pro courses
+  const FREE_PREVIEW_LESSONS = 3;
   const userRole = profile?.role || "student";
   const isProUser = userRole === "pro" || userRole === "admin" || userRole === "teacher";
-  const isLockedCourse = 'tier' in course && course.tier === "pro" && !isProUser;
+  const isProCourse = 'tier' in course && course.tier === "pro";
 
-  if (isLockedCourse && !showPaywall) {
+  // Determine if this specific lesson is locked (beyond the free preview window)
+  const allCourseLessons = getAllLessons(course as Course);
+  const currentLessonIndex = allCourseLessons.findIndex(l => l.slug === lessonSlug);
+  const isLessonLocked = isProCourse && !isProUser && currentLessonIndex >= FREE_PREVIEW_LESSONS;
+
+  if (isLessonLocked && !showPaywall) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--background)]">
         <PaywallModal
@@ -159,6 +165,10 @@ export default function LessonRoute() {
   const { lesson, module, prevLesson, nextLesson } = result;
   const allLessons = getAllLessons(course as Course);
 
+  // For preview lessons in pro courses, show an upgrade banner
+  const isPreviewLesson = isProCourse && !isProUser && currentLessonIndex < FREE_PREVIEW_LESSONS;
+  const remainingPreview = FREE_PREVIEW_LESSONS - currentLessonIndex - 1;
+
   return (
     <>
       <LessonPage
@@ -171,6 +181,13 @@ export default function LessonRoute() {
         prevLesson={prevLesson ? { slug: prevLesson.slug, title: prevLesson.title } : null}
         nextLesson={nextLesson ? { slug: nextLesson.slug, title: nextLesson.title } : null}
         totalLessons={allLessons.length}
+        previewBanner={isPreviewLesson ? {
+          currentIndex: currentLessonIndex,
+          freeTotal: FREE_PREVIEW_LESSONS,
+          remaining: remainingPreview,
+          totalLessons: allLessons.length,
+        } : undefined}
+        lockedLessonIndex={isProCourse && !isProUser ? FREE_PREVIEW_LESSONS : undefined}
       />
       {showPaywall && (
         <PaywallModal

@@ -10,6 +10,8 @@ import {
   CheckCircle,
   Circle,
   Play,
+  Crown,
+  Lock,
 } from "lucide-react";
 import Link from "next/link";
 import CourseLayout from "@/components/layout/CourseLayout";
@@ -35,6 +37,13 @@ import {
   markLessonIncomplete,
 } from "@/lib/progress";
 
+interface PreviewBanner {
+  currentIndex: number;
+  freeTotal: number;
+  remaining: number;
+  totalLessons: number;
+}
+
 interface LessonPageProps {
   courseTitle: string;
   courseSlug: string;
@@ -52,6 +61,8 @@ interface LessonPageProps {
   prevLesson: { slug: string; title: string } | null;
   nextLesson: { slug: string; title: string } | null;
   totalLessons: number;
+  previewBanner?: PreviewBanner;
+  lockedLessonIndex?: number;
 }
 
 type ContentTab = "lesson" | "resources";
@@ -75,6 +86,8 @@ export default function LessonPage({
   prevLesson,
   nextLesson,
   totalLessons,
+  previewBanner,
+  lockedLessonIndex,
 }: LessonPageProps) {
   const [completedLessons, setCompletedLessons] = useState<Set<string>>(
     new Set()
@@ -270,6 +283,27 @@ export default function LessonPage({
           <BookOpen className="w-3.5 h-3.5" />
           <span>{moduleTitle}</span>
         </div>
+
+        {/* Preview banner for free users viewing pro course lessons */}
+        {previewBanner && (
+          <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm">
+              <Crown className="w-4 h-4 text-amber-400 shrink-0" />
+              <span className="text-white/70">
+                Free preview — lesson {previewBanner.currentIndex + 1} of {previewBanner.freeTotal}.
+                {previewBanner.remaining > 0
+                  ? ` ${previewBanner.remaining} free lesson${previewBanner.remaining > 1 ? "s" : ""} remaining.`
+                  : " This is your last free lesson."}
+              </span>
+            </div>
+            <Link
+              href="/pricing"
+              className="shrink-0 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold hover:from-amber-400 hover:to-orange-400 transition-all"
+            >
+              Unlock all {previewBanner.totalLessons} lessons — $15/mo
+            </Link>
+          </div>
+        )}
 
         <h1 className="text-3xl font-bold mb-2">{lesson.title}</h1>
         <p className="text-xs text-white/30 mb-4">

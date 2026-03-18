@@ -13,6 +13,7 @@ interface UserProfile {
   referral_code: string | null;
   login_streak: number;
   avatar_url: string | null;
+  trial_ends_at: string | null;
 }
 
 interface AuthContextType {
@@ -35,85 +36,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [credits, setCredits] = useState(0);
   const [loading, setLoading] = useState(true);
   const signingOutRef = useRef(false);
+  const ensureProfilePromiseRef = useRef<Promise<void> | null>(null);
 
   // Stable Supabase client — never re-created on re-renders
   const supabase = useMemo(() => createBrowserSupabase(), []);
 
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("user_profiles")
-      .select("id, email, full_name, role, referral_code, login_streak, avatar_url")
+      .select("id, email, full_name, role, referral_code, login_streak, avatar_url, trial_ends_at")
       .eq("id", userId)
       .single();
     if (data) {
       setProfile(data as UserProfile);
-    } else if (error) {
-      // Profile might not exist yet (Google OAuth, trigger failed, etc.)
-      // Try to get user info and create a minimal profile
-      console.warn("[Auth] Profile not found, attempting to create:", error.message);
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
-        const newProfile = {
-          id: userId,
-          email: authUser.email || "",
-          full_name: authUser.user_metadata?.full_name || authUser.user_metadata?.name || "User",
-          role: "student" as const,
-          referral_code: null,
-          login_streak: 0,
-          avatar_url: authUser.user_metadata?.avatar_url || null,
-        };
-        // Set profile immediately so UI doesn't stay stuck
-        setProfile(newProfile as UserProfile);
-        // Try to persist — might fail if RLS blocks, that's OK
-        supabase.from("user_profiles").upsert({
-          id: userId,
-          email: newProfile.email,
-          full_name: newProfile.full_name,
-          role: newProfile.role,
-        }, { onConflict: "id" }).then(() => {}, () => {});
-      }
     }
+    // If profile not found, ensureProfile (called elsewhere) will create it
+    // via the server-side admin endpoint
   }, [supabase]);
 
   // Ensure profile + credits exist after signup (trigger may have failed silently)
-  const ensureProfile = useCallback(async (authUser: User, name?: string) => {
-    // Try fetching first
-    const { data: existing } = await supabase
-      .from("user_profiles")
-      .select("id")
-      .eq("id", authUser.id)
-      .single();
-
-    if (!existing) {
-      // Profile doesn't exist — create it via upsert
-      await supabase.from("user_profiles").upsert({
-        id: authUser.id,
-        email: authUser.email || "",
-        full_name: name || authUser.user_metadata?.full_name || "User",
-        role: "student",
-      }, { onConflict: "id" });
+  // Uses server-side admin client to bypass RLS — most reliable path
+  // Deduped: concurrent calls share the same promise
+  const ensureProfile = useCallback(async (_authUser: User, _name?: string) => {
+    if (ensureProfilePromiseRef.current) {
+      return ensureProfilePromiseRef.current;
     }
 
-    // Ensure credits exist
-    const { data: creditRow } = await supabase
-      .from("user_credits")
-      .select("user_id")
-      .eq("user_id", authUser.id)
-      .single();
+    const doEnsure = async () => {
+      try {
+        const res = await fetch("/api/auth/ensure-profile", { method: "POST" });
+        if (res.ok) {
+          const { profile: serverProfile, credits: serverCredits } = await res.json();
+          if (serverProfile) setProfile(serverProfile as UserProfile);
+          if (typeof serverCredits === "number") setCredits(serverCredits);
+          return;
+        }
+      } catch {
+        console.warn("[Auth] Server ensure-profile failed, falling back to client-side");
+      }
 
-    if (!creditRow) {
-      await supabase.from("user_credits").upsert({
-        user_id: authUser.id,
-        balance: 50,
-      }, { onConflict: "user_id" });
-    }
+      // Fallback: client-side (may fail due to RLS but better than nothing)
+      await fetchProfile(_authUser.id);
+      const { data: bal } = await supabase.rpc("get_credit_balance", { p_user_id: _authUser.id });
+      setCredits((bal as number) || 0);
+    };
 
-    // Now fetch the full profile
-    await fetchProfile(authUser.id);
+    ensureProfilePromiseRef.current = doEnsure().finally(() => {
+      ensureProfilePromiseRef.current = null;
+    });
 
-    // Load credits
-    const { data: bal } = await supabase.rpc("get_credit_balance", { p_user_id: authUser.id });
-    setCredits((bal as number) || 0);
+    return ensureProfilePromiseRef.current;
   }, [supabase, fetchProfile]);
 
   const refreshCredits = useCallback(async () => {
@@ -153,11 +125,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        // 3. Load latest credits
+        // 3. Check trial expiry — downgrade if pro trial has ended
+        try {
+          const { data: trialResult } = await supabase.rpc("check_trial_expiry", { p_user_id: session.user.id });
+          if (trialResult && typeof trialResult === "object" && (trialResult as Record<string, unknown>).expired) {
+            // Re-fetch profile to pick up the downgraded role
+            await fetchProfile(session.user.id);
+          }
+        } catch {
+          // RPC may not exist yet — non-critical
+        }
+
+        // 4. Load latest credits
         const { data } = await supabase.rpc("get_credit_balance", { p_user_id: session.user.id });
         setCredits((data as number) || 0);
 
-        // 4. Update login streak
+        // 5. Update login streak
         try { await supabase.rpc("update_login_streak", { p_user_id: session.user.id }); } catch {}
       }
       setLoading(false);
@@ -178,9 +161,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         if (session?.user) {
           setUser(session.user);
-          await fetchProfile(session.user.id);
-          const { data } = await supabase.rpc("get_credit_balance", { p_user_id: session.user.id });
-          setCredits((data as number) || 0);
+          // Use ensureProfile (not just fetchProfile) so credits are created
+          // for Google OAuth users where the trigger may have failed
+          await ensureProfile(session.user);
         } else {
           setUser(null);
           setProfile(null);
