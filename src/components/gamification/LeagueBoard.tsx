@@ -113,7 +113,7 @@ export default function LeagueBoard() {
 
               {/* Weekly XP */}
               <span className="text-sm font-semibold text-amber-400">
-                {member.weeklyXP.toLocaleString()} XP
+                {(member.weeklyXP ?? 0).toLocaleString()} XP
               </span>
             </div>
           );

@@ -29,7 +29,7 @@ BEGIN
     RAISE LOG 'handle_new_user PROFILE failed for %: % %', NEW.id, SQLERRM, SQLSTATE;
   END;
 
-  -- Create initial credits (50 free)
+  -- Create initial credits (300 free)
   BEGIN
     INSERT INTO user_credits (user_id, balance) VALUES (NEW.id, 300)
     ON CONFLICT (user_id) DO NOTHING;
@@ -69,7 +69,42 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
--- 2. Function to check and expire trials (call periodically or on login)
+-- 2. Improved deduct_credits: auto-creates row with 300 if missing
+CREATE OR REPLACE FUNCTION deduct_credits(p_user_id UUID, p_amount INT, p_action TEXT, p_ref_id TEXT DEFAULT NULL)
+RETURNS BOOLEAN AS $$
+DECLARE
+  current_balance INT;
+BEGIN
+  SELECT balance INTO current_balance
+  FROM user_credits
+  WHERE user_id = p_user_id
+  FOR UPDATE;
+
+  -- If no row exists, create one with 300 signup credits
+  IF NOT FOUND THEN
+    INSERT INTO user_credits (user_id, balance) VALUES (p_user_id, 300)
+    ON CONFLICT (user_id) DO NOTHING;
+    INSERT INTO credit_txns (user_id, amount, action) VALUES (p_user_id, 300, 'signup_bonus');
+    -- Re-read the balance
+    SELECT balance INTO current_balance FROM user_credits WHERE user_id = p_user_id FOR UPDATE;
+  END IF;
+
+  IF current_balance IS NULL OR current_balance < p_amount THEN
+    RETURN FALSE;
+  END IF;
+
+  UPDATE user_credits
+  SET balance = balance - p_amount, updated_at = NOW()
+  WHERE user_id = p_user_id;
+
+  INSERT INTO credit_txns (user_id, amount, action, ref_id, created_at)
+  VALUES (p_user_id, -p_amount, p_action, p_ref_id, NOW());
+
+  RETURN TRUE;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 3. Function to check and expire trials (call periodically or on login)
 CREATE OR REPLACE FUNCTION check_trial_expiry(p_user_id UUID)
 RETURNS JSON AS $$
 DECLARE

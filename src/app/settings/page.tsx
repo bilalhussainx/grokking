@@ -133,9 +133,11 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-amber-400 mb-2">{credits}</div>
+            <div className="text-4xl font-bold text-amber-400 mb-2">{credits ?? 0}</div>
             <p className="text-sm text-white/40">
-              {p.role === "pro"
+              {p.role === "pro" && p.trial_ends_at
+                ? `Free trial credits — expires ${new Date(p.trial_ends_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.`
+                : p.role === "pro"
                 ? "500 credits refresh monthly with your Pro subscription."
                 : "Upgrade to Pro for 500 credits/month."}
             </p>

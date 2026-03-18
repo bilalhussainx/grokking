@@ -110,8 +110,8 @@ export default function ProfileCard({
           {/* XP progress bar */}
           <div className="w-full">
             <div className="flex justify-between text-xs text-white/40 mb-1">
-              <span>{xp.toLocaleString()} XP</span>
-              <span>{xpToNext.toLocaleString()} XP</span>
+              <span>{(xp ?? 0).toLocaleString()} XP</span>
+              <span>{(xpToNext ?? 0).toLocaleString()} XP</span>
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
               <div

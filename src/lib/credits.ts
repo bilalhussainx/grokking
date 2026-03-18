@@ -34,6 +34,34 @@ export async function deductCredits(
     console.error("[Credits] Deduction error:", error);
     return false;
   }
+
+  // If deduction returned false, the user_credits row may not exist yet
+  // (signup trigger failed). Create it with 300 credits and retry once.
+  if (data === false) {
+    const { data: existingRow } = await db
+      .from("user_credits")
+      .select("user_id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (!existingRow) {
+      // Row doesn't exist — create it with signup bonus, then retry deduction
+      await db.rpc("add_credits", {
+        p_user_id: userId,
+        p_amount: 300,
+        p_action: "signup_bonus",
+      });
+      // Retry the deduction
+      const { data: retryData } = await db.rpc("deduct_credits", {
+        p_user_id: userId,
+        p_amount: amount,
+        p_action: action,
+        p_ref_id: refId || null,
+      });
+      return retryData === true;
+    }
+  }
+
   return data === true;
 }
 
