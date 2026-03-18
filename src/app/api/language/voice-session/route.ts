@@ -92,6 +92,7 @@ export async function POST(req: NextRequest) {
     const persona = personaId
       ? getLanguagePersona(personaId) || getDefaultPersona(language)
       : getDefaultPersona(language);
+    const languageName = persona.languageName || language;
 
     // Resolve lesson context — prefer client-provided context (has vocab/grammar)
     const effectiveLessonContext = clientLessonContext
@@ -188,7 +189,8 @@ APPROACH:
     // Combine system prompt with mode-specific additions
     const fullSystemPrompt = agentContext.systemPromptContext
       + (modePromptAddition ? '\n' + modePromptAddition : '')
-      + `\n\nIMPORTANT: Start the conversation with this greeting: "${greeting}". Say it naturally as your first response when the user connects.`;
+      + `\n\nIMPORTANT: Start the conversation with this greeting: "${greeting}". Say it naturally as your first response when the user connects.`
+      + `\n\nSPEECH RECOGNITION NOTE: The student is a language learner. Their speech may be transcribed imperfectly — accented ${languageName} words may appear as English phonetic approximations. Be generous in interpreting what they say. If the transcription looks like a phonetic attempt at a ${languageName} word, acknowledge it as such and help with pronunciation. Never say "I didn't understand" — always try to work with what they said.`;
 
     // Build Deepgram Voice Agent settings (same format as Coach Alex)
     const settings = {
@@ -209,7 +211,11 @@ APPROACH:
           provider: {
             type: "deepgram",
             model: "nova-3",
-            language: "multi", // Multilingual STT — understands English AND target language
+            // Use 'multi' for advanced learners who mostly speak the target language
+            // Use 'en' for beginners who mostly speak English with some target language
+            language: (proficiencyLevel === "B2" || proficiencyLevel === "C1" || proficiencyLevel === "C2") ? "multi" : "en",
+            // Lower endpointing threshold so STT doesn't wait too long for "perfect" speech
+            endpointing: 300,
           },
         },
         think: {
