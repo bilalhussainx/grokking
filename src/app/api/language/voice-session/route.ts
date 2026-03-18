@@ -205,7 +205,6 @@ APPROACH:
         },
       },
       agent: {
-        language: lang, // Primary language for TTS output
         listen: {
           provider: {
             type: "deepgram",
