@@ -90,6 +90,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshCredits = useCallback(async () => {
     if (!user) return;
+    // Use server endpoint for reliable credit fetch (bypasses RLS)
+    try {
+      const res = await fetch("/api/auth/ensure-profile", { method: "POST" });
+      if (res.ok) {
+        const { credits: serverCredits } = await res.json();
+        if (typeof serverCredits === "number") {
+          setCredits(serverCredits);
+          return;
+        }
+      }
+    } catch {}
+    // Fallback to browser RPC
     const { data } = await supabase.rpc("get_credit_balance", { p_user_id: user.id });
     setCredits((data as number) || 0);
   }, [user, supabase]);
@@ -136,11 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // RPC may not exist yet — non-critical
         }
 
-        // 4. Load latest credits
-        const { data } = await supabase.rpc("get_credit_balance", { p_user_id: session.user.id });
-        setCredits((data as number) || 0);
-
-        // 5. Update login streak
+        // 4. Update login streak
         try { await supabase.rpc("update_login_streak", { p_user_id: session.user.id }); } catch {}
       }
       setLoading(false);
