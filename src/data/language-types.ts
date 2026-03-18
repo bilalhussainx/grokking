@@ -254,6 +254,7 @@ export interface LessonContext {
   targetPhrases: string[];
   vocabulary: string[];
   grammarFocus: string[];
+  content?: string;
 }
 
 export interface AgentContext {

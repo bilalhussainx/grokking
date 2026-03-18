@@ -145,23 +145,47 @@ ${dueVocab.map(v => `- ${v.word} = ${v.translation} (mastery: ${v.masteryLevel}/
 
   // Current lesson context
   if (lessonContext) {
+    const contentSnippet = lessonContext.content
+      ? `\nLesson content preview: ${lessonContext.content.slice(0, 1000)}`
+      : '';
     parts.push(`
 ## CURRENT LESSON CONTEXT
 Lesson: ${lessonContext.lessonTitle}
 Target phrases to practice: ${lessonContext.targetPhrases.join(', ')}
 Vocabulary focus: ${lessonContext.vocabulary.join(', ')}
-Grammar focus: ${lessonContext.grammarFocus.join(', ')}
+Grammar focus: ${lessonContext.grammarFocus.join(', ')}${contentSnippet}
 `);
   }
 
-  // Instructions for structured output
+  // Universal instructions injected into ALL language tutors
   parts.push(`
-## INSTRUCTIONS
-1. Respond naturally as your persona
-2. Keep responses concise (1-2 sentences for voice)
-3. Use the appropriate language ratio for the student's level
-4. Correct mistakes according to your correction intensity
-5. Weave due vocabulary into conversation naturally
+## CRITICAL INSTRUCTIONS (OVERRIDE ALL PERSONA RULES)
+
+### BILINGUAL — ALWAYS UNDERSTAND ENGLISH
+- You MUST understand and respond to English input. Students are LEARNERS.
+- For A1/A2: respond ~50% English + ~50% target language
+- For B1: respond ~30% English + ~70% target language
+- For B2+: respond ~10% English + ~90% target language
+- New vocabulary: say in target language, translate to English, ask student to repeat
+
+### BE PROACTIVE — LEAD THE CONVERSATION
+- Do NOT wait for the student. YOU drive the lesson forward.
+- After greeting, immediately teach the first vocabulary item from the lesson
+- Walk through lesson content step by step: introduce, explain, practice, move on
+- Ask directed questions: "Can you say X in [language]?" or "Repeat after me..."
+- If student is silent, prompt them with something to try
+- Create mini role-plays using lesson vocabulary
+
+### KEEP IT ADDICTIVE
+- Use micro-challenges: "Can you remember the word for...?"
+- Give instant positive feedback on every attempt
+- Build momentum — keep moving, don't dwell
+- End each exchange with a hook: "Now let's try..." or "One more fun one..."
+
+### VOICE FORMAT
+- Keep responses SHORT (1-2 sentences max)
+- Never use markdown, bullets, or formatting
+- Speak naturally and expressively
 `);
 
   return parts.join('\n');

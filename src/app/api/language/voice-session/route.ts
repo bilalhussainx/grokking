@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     lessonTitle?: string;
     scenario?: string;
     mode?: 'free-form' | 'lesson-practice' | 'placement';
-    lessonContext?: { lessonId: string; lessonTitle: string; targetPhrases: string[]; vocabulary: string[]; grammarFocus: string[] };
+    lessonContext?: { lessonId: string; lessonTitle: string; targetPhrases: string[]; vocabulary: string[]; grammarFocus: string[]; content?: string };
   };
 
   const mode = rawMode || (lessonTitle ? 'lesson-practice' : 'free-form');
@@ -150,14 +150,25 @@ You are conducting a language placement assessment. Your goal is to EVALUATE the
 - After 8-10 exchanges, assess their level (A1-C2) based on CEFR descriptors
 - Keep a natural conversational tone — this should feel like a chat, not an exam`;
     } else if (mode === 'lesson-practice' && effectiveLessonContext) {
+      const contentSnippet = (effectiveLessonContext as { content?: string }).content
+        ? `\n- Lesson content the student is reading:\n${(effectiveLessonContext as { content?: string }).content!.slice(0, 1500)}`
+        : '';
       modePromptAddition = `
 ## LESSON PRACTICE MODE
-Focus this conversation on practicing the current lesson material.
+You are helping the student practice the current lesson material. Be proactive — guide them through the lesson.
+- Lesson title: ${effectiveLessonContext.lessonTitle || 'Current lesson'}
 - Target vocabulary: ${effectiveLessonContext.vocabulary.join(', ') || 'General'}
 - Grammar focus: ${effectiveLessonContext.grammarFocus.join(', ') || 'General'}
-- Target phrases: ${effectiveLessonContext.targetPhrases.join(', ') || 'General'}
-- Create scenarios where the student must use these words and structures
-- Gently redirect if the conversation drifts too far from the lesson material`;
+- Target phrases: ${effectiveLessonContext.targetPhrases.join(', ') || 'General'}${contentSnippet}
+
+APPROACH:
+- After greeting, proactively introduce the lesson topic and teach key vocabulary
+- Say each new word/phrase in the target language, then explain in English
+- Ask the student to repeat after you
+- Create mini-scenarios using the lesson vocabulary
+- If the student speaks English, understand them and respond with a mix of English explanation + target language practice
+- Keep a ratio: ~60% target language, ~40% English for A1/A2 students
+- Be encouraging — celebrate attempts even if pronunciation isn't perfect`;
     }
 
     // Pick a native-language voice — must match the target language
@@ -194,11 +205,12 @@ Focus this conversation on practicing the current lesson material.
         },
       },
       agent: {
-        language: lang, // CRITICAL: tells Deepgram which language the user speaks
+        language: lang, // Primary language for TTS output
         listen: {
           provider: {
             type: "deepgram",
             model: "nova-3",
+            language: "multi", // Multilingual STT — understands English AND target language
           },
         },
         think: {
