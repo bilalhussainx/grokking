@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samsara — Early Feedback Survey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #06080f;
+    --bg2: #0d1120;
+    --bg3: #131829;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.18);
+    --text: #e8eaf2;
+    --text-muted: #8891aa;
+    --amber: #f0a855;
+    --amber-dim: rgba(240,168,85,0.12);
+    --amber-glow: rgba(240,168,85,0.25);
+    --success: #4ade80;
+    --radius: 12px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1rem 6rem;
+  }
+
+  .wordmark {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 3rem;
+    opacity: 0.9;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 640px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem 2.75rem;
+    position: relative;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    border-radius: 99px;
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--amber);
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .step { display: none; animation: fadeUp 0.35s ease; }
+  .step.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.65rem;
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 0.6rem;
+    color: #f0f2fa;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  .q-label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .q-group { margin-bottom: 1.75rem; }
+
+  input[type="text"],
+  input[type="email"],
+  textarea,
+  select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 300;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--amber);
+  }
+
+  textarea { min-height: 90px; }
+
+  select option { background: var(--bg2); }
+
+  .radio-group { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .radio-option:hover {
+    border-color: var(--border-hover);
+    background: rgba(255,255,255,0.03);
+    color: var(--text);
+  }
+
+  .radio-option input[type="radio"],
+  .radio-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--amber);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .radio-option.selected {
+    border-color: var(--amber);
+    background: var(--amber-dim);
+    color: var(--text);
+  }
+
+  .scale-row {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .scale-btn {
+    flex: 1;
+    min-width: 36px;
+    padding: 0.55rem 0;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .scale-btn:hover { border-color: var(--border-hover); color: var(--text); }
+
+  .scale-btn.selected {
+    background: var(--amber-dim);
+    border-color: var(--amber);
+    color: var(--amber);
+    font-weight: 500;
+  }
+
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.4rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  .app-cta {
+    background: var(--amber-dim);
+    border: 1px solid var(--amber-glow);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .app-cta-text { font-size: 0.9rem; color: var(--text); }
+  .app-cta-text strong { color: var(--amber); font-weight: 500; display: block; margin-bottom: 0.2rem; }
+
+  .app-link {
+    display: inline-block;
+    background: var(--amber);
+    color: #06080f;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.55rem 1.1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+
+  .app-link:hover { opacity: 0.85; }
+
+  .btn-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 0.7rem 1.6rem;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
+
+  .btn-primary {
+    background: var(--amber);
+    color: #06080f;
+    font-weight: 500;
+  }
+
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .thank-you {
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .checkmark {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(74,222,128,0.12);
+    border: 1px solid rgba(74,222,128,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 1.3rem;
+  }
+
+  .note {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 0.4rem;
+  }
+
+  @media (max-width: 520px) {
+    .card { padding: 2rem 1.5rem; }
+    h1 { font-size: 1.4rem; }
+    .app-cta { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wordmark">Samsara</div>
+
+<div class="card">
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width: 10%"></div></div>
+
+  <!-- STEP 0: Intro + consent -->
+  <div class="step active" id="step-0">
+    <div class="step-label">Early Access · Focus Group</div>
+    <h1>Help shape the future of learning</h1>
+    <p class="subtitle">You're one of a small group of people testing Samsara before public launch. This takes about 20 minutes — 5 min before you try the app, 15 min using it, and 3 min of feedback after. No wrong answers.</p>
+    <div class="q-group">
+      <label class="q-label">Your name</label>
+      <input type="text" id="name" placeholder="First name is fine" />
+    </div>
+    <div class="q-group">
+      <label class="q-label">Your email <span class="note">(only used to follow up if you'd like)</span></label>
+      <input type="email" id="email" placeholder="optional" />
+    </div>
+    <div class="q-group">
+      <label class="q-label">How would you describe yourself?</label>
+      <div class="radio-group" id="role-group">
+        <label class="radio-option"><input type="radio" name="role" value="student_hs"> High school student</label>
+        <label class="radio-option"><input type="radio" name="role" value="student_uni"> University / college student</label>
+        <label class="radio-option"><input type="radio" name="role" value="teacher"> Teacher or tutor</label>
+        <label class="radio-option"><input type="radio" name="role" value="parent"> Parent of a student</label>
+        <label class="radio-option"><input type="radio" name="role" value="professional"> Working professional learning something new</label>
+        <label class="radio-option"><input type="radio" name="role" value="other"> Other</label>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="nextStep()">Start survey →</button>
+    </div>
+  </div>
+
+  <!-- STEP 1: Pre-session — subject + confidence -->
+  <div class="step" id="step-1">
+    <div class="step-label">Before you try Samsara · 1 of 2</div>
+    <h1>Before you open the app</h1>
+    <p class="subtitle">Answer these quickly — they take 2 minutes and help us understand your starting point.</p>
+    <div class="q-group">
+      <label class="q-label">What subject or topic do you most want help with right now?</label>
+      <input type="text" id="subject" placeholder="e.g. calculus, Python, organic chemistry, essay writing..." />
+    </div>
+    <div class="q-group">
+      <label class="q-label">How confident do you feel in that subject right now?</label>
+      <div class="scale-row" id="confidence-before"></div>
+      <div class="scale-labels"><span>Not confident at all</span><span>Very confident</span></div>
+    </div>
+    <div class="q-group">
+      <label class="q-label">Have you used an AI tool to study or learn before?</label>
+      <div class="radio-group" id="ai-exp-group">
+        <label class="radio-option"><input type="radio" name="ai_exp" value="regularly"> Yes, regularly</label>
+        <label class="radio-option"><input type="radio" name="ai_exp" value="few_times"> Yes, a few times</label>
+        <label class="radio-option"><input type="radio" name="ai_exp" value="never"> No, never</label>
+      </div>
+    </div>
+    <div class="q-group">
+      <label class="q-label">What's your biggest frustration with how you currently get help when stuck?</label>
+      <textarea id="frustration" placeholder="Be honest — this is exactly what we're trying to solve..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Try the app -->
+  <div class="step" id="step-2">
+    <div class="step-label">Now · Use the app</div>
+    <h1>Time to try Samsara</h1>
+    <p class="subtitle">Open the app in a new tab and spend 10–15 minutes with it. Ask it something you're actually stuck on — there's no prepared demo, just real tutoring. Come back here when you're done.</p>
+    <div class="app-cta">
+      <div class="app-cta-text">
+        <strong>Open Samsara</strong>
+        Ask it about: <span id="subject-echo" style="color:var(--amber)">your chosen subject</span>
+      </div>
+    <a href="https://grokking-delta.vercel.app" target="_blank" class="app-link">Open app ↗</a>
+    </div>
+    <p class="note" style="text-align:center; font-size:0.82rem; color:var(--text-muted)">Take your time. Come back to this tab when you're ready to share feedback.</p>
+    <div class="btn-row" style="justify-content:center; margin-top:2.5rem">
+      <button class="btn btn-primary" onclick="nextStep()">I'm done — give feedback →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Post-session part 1 -->
+  <div class="step" id="step-3">
+    <div class="step-label">After using Samsara · 1 of 2</div>
+    <h1>How did it go?</h1>
+    <p class="subtitle">Your first impressions matter most — be as blunt as you want.</p>
+    <div class="q-group">
+      <label class="q-label">Describe your experience with the AI tutor in one sentence.</label>
+      <textarea id="one-sentence" placeholder="Just say what you actually thought..."></textarea>
+    </div>
+    <div class="q-group">
+      <label class="q-label">Did the AI explain things in a way that made sense to you?</label>
+      <div class="radio-group" id="clarity-group">
+        <label class="radio-option"><input type="radio" name="clarity" value="very_clear"> Yes, very clearly</label>
+        <label class="radio-option"><input type="radio" name="clarity" value="mostly"> Mostly yes</label>
+        <label class="radio-option"><input type="radio" name="clarity" value="somewhat"> Somewhat</label>
+        <label class="radio-option"><input type="radio" name="clarity" value="not_really"> Not really</label>
+      </div>
+    </div>
+    <div class="q-group">
+      <label class="q-label">Did the tutor adapt to your level, or did it feel generic?</label>
+      <div class="radio-group" id="personalized-group">
+        <label class="radio-option"><input type="radio" name="personalized" value="very"> Felt very personalized to me</label>
+        <label class="radio-option"><input type="radio" name="personalized" value="middle"> Somewhere in between</label>
+        <label class="radio-option"><input type="radio" name="personalized" value="generic"> Felt generic, like any chatbot</label>
+      </div>
+    </div>
+    <div class="q-group">
+      <label class="q-label">How confident do you feel in that subject NOW?</label>
+      <div class="scale-row" id="confidence-after"></div>
+      <div class="scale-labels"><span>Not confident at all</span><span>Very confident</span></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Post-session part 2 -->
+  <div class="step" id="step-4">
+    <div class="step-label">After using Samsara · 2 of 2</div>
+    <h1>Almost done</h1>
+    <p class="subtitle">Last few questions — these are the most important ones for shaping what we build next.</p>
+    <div class="q-group">
+      <label class="q-label">What was the single most useful thing about the session?</label>
+      <textarea id="most-useful" placeholder="Even one specific thing helps..."></textarea>
+    </div>
+    <div class="q-group">
+      <label class="q-label">What was missing or frustrating?</label>
+      <textarea id="missing" placeholder="Don't hold back — this is genuinely more valuable than the praise..."></textarea>
+    </div>
+    <div class="q-group">
+      <label class="q-label">Compared to Googling, YouTube, or asking a human tutor — how does Samsara rank?</label>
+      <div class="radio-group" id="comparison-group">
+        <label class="radio-option"><input type="radio" name="comparison" value="better_all"> Better than all of them</label>
+        <label class="radio-option"><input type="radio" name="comparison" value="better_some"> Better than some</label>
+        <label class="radio-option"><input type="radio" name="comparison" value="same"> About the same</label>
+        <label class="radio-option"><input type="radio" name="comparison" value="worse"> Worse, honestly</label>
+      </div>
+    </div>
+    <div class="q-group">
+      <label class="q-label">Would you use this regularly if it were free?</label>
+      <div class="radio-group" id="use-free-group">
+        <label class="radio-option"><input type="radio" name="use_free" value="def_yes"> Definitely yes</label>
+        <label class="radio-option"><input type="radio" name="use_free" value="prob_yes"> Probably yes</label>
+        <label class="radio-option"><input type="radio" name="use_free" value="not_sure"> Not sure</label>
+        <label class="radio-option"><input type="radio" name="use_free" value="prob_no"> Probably not</label>
+      </div>
+    </div>
+    <div class="q-group">
+      <label class="q-label">Would you pay for this? If yes, how much per month feels fair?</label>
+      <input type="text" id="pay" placeholder="e.g. $10/mo, $5/mo, no I wouldn't pay..." />
+    </div>
+    <div class="q-group">
+      <label class="q-label">How likely are you to recommend Samsara to a friend?</label>
+      <div class="scale-row" id="nps"></div>
+      <div class="scale-labels"><span>Not at all likely (0)</span><span>Extremely likely (10)</span></div>
+    </div>
+    <div class="q-group">
+      <label class="q-label">Anything else you want to say?</label>
+      <textarea id="other" placeholder="Open floor — say whatever's on your mind..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" onclick="submitForm()">Submit feedback →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: Thank you -->
+  <div class="step" id="step-5">
+    <div class="thank-you">
+      <div class="checkmark">✓</div>
+      <h1 style="margin-bottom:0.75rem">Thank you — seriously.</h1>
+      <p class="subtitle">Your feedback goes directly to Bilal, the person building this. Every response shapes what gets built next. You're not filling out a form — you're co-designing a product.</p>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-top:1.5rem">If you'd like to stay in the loop as Samsara grows, keep an eye on your inbox. You'll hear from us before anyone else does.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xojkyzpy';
+  const VERCEL_URL = 'https://grokking-delta.vercel.app';
+
+  let currentStep = 0;
+  const totalSteps = 5;
+  const responses = {};
+
+  function buildScales() {
+    buildScale('confidence-before', 5, 'confidence_before');
+    buildScale('confidence-after', 5, 'confidence_after');
+    buildNPS('nps');
+  }
+
+  function buildScale(id, max, key) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '';
+    for (let i = 1; i <= max; i++) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'scale-btn';
+      btn.textContent = i;
+      btn.dataset.val = i;
+      btn.dataset.key = key;
+      btn.onclick = () => selectScale(id, i, key);
+      el.appendChild(btn);
+    }
+  }
+
+  function buildNPS(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '';
+    for (let i = 0; i <= 10; i++) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'scale-btn';
+      btn.textContent = i;
+      btn.dataset.val = i;
+      btn.onclick = () => selectScale(id, i, 'nps');
+      el.appendChild(btn);
+    }
+  }
+
+  function selectScale(groupId, val, key) {
+    const btns = document.querySelectorAll('#' + groupId + ' .scale-btn');
+    btns.forEach(b => { b.classList.toggle('selected', parseInt(b.dataset.val) === val); });
+    responses[key] = val;
+  }
+
+  document.querySelectorAll('.radio-option input').forEach(input => {
+    input.addEventListener('change', () => {
+      const group = input.closest('.radio-group');
+      group.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+      input.closest('.radio-option').classList.add('selected');
+    });
+  });
+
+  function collectStep(step) {
+    if (step === 0) {
+      responses.name = document.getElementById('name').value;
+      responses.email = document.getElementById('email').value;
+      const role = document.querySelector('input[name="role"]:checked');
+      responses.role = role ? role.value : '';
+    }
+    if (step === 1) {
+      responses.subject = document.getElementById('subject').value;
+      responses.frustration = document.getElementById('frustration').value;
+      const aiExp = document.querySelector('input[name="ai_exp"]:checked');
+      responses.ai_experience = aiExp ? aiExp.value : '';
+    }
+    if (step === 3) {
+      responses.one_sentence = document.getElementById('one-sentence').value;
+      const clarity = document.querySelector('input[name="clarity"]:checked');
+      responses.clarity = clarity ? clarity.value : '';
+      const pers = document.querySelector('input[name="personalized"]:checked');
+      responses.personalization = pers ? pers.value : '';
+    }
+    if (step === 4) {
+      responses.most_useful = document.getElementById('most-useful').value;
+      responses.missing = document.getElementById('missing').value;
+      responses.pay = document.getElementById('pay').value;
+      responses.other = document.getElementById('other').value;
+      const comp = document.querySelector('input[name="comparison"]:checked');
+      responses.comparison = comp ? comp.value : '';
+      const useFree = document.querySelector('input[name="use_free"]:checked');
+      responses.use_free = useFree ? useFree.value : '';
+    }
+  }
+
+  function nextStep() {
+    collectStep(currentStep);
+    if (currentStep === 1) {
+      const subjectEl = document.getElementById('subject-echo');
+      const subj = responses.subject || 'your chosen subject';
+      if (subjectEl) subjectEl.textContent = subj;
+      document.querySelector('.app-link').href = VERCEL_URL;
+    }
+    currentStep++;
+    showStep(currentStep);
+  }
+
+  function prevStep() {
+    currentStep--;
+    showStep(currentStep);
+  }
+
+  function showStep(n) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('step-' + n);
+    if (target) target.classList.add('active');
+    const pct = Math.round((n / totalSteps) * 100);
+    document.getElementById('progress').style.width = pct + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function submitForm() {
+    collectStep(4);
+    responses.submitted_at = new Date().toISOString();
+
+    try {
+      await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(responses)
+      });
+    } catch(e) {
+      console.log('Submission error:', e);
+    }
+
+    currentStep = 5;
+    showStep(5);
+  }
+
+  buildScales();
+</script>
+</body>
+</html>
