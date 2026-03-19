@@ -629,18 +629,29 @@
     collectStep(4);
     responses.submitted_at = new Date().toISOString();
 
+    // REPLACE 'your_form_id' with your actual Formspree ID
+    const FORMSPREE_URL = 'https://formspree.io/f/xojkyzpy';
+
     try {
-      await fetch('/api/survey', {
+      const response = await fetch(FORMSPREE_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json' 
+        },
         body: JSON.stringify(responses)
       });
+
+      if (response.ok) {
+        currentStep = 5;
+        showStep(5);
+      } else {
+        alert("There was an issue with the submission. Please try again.");
+      }
     } catch(e) {
       console.log('Submission error:', e);
+      alert("Submission failed. Check your internet connection.");
     }
-
-    currentStep = 5;
-    showStep(5);
   }
 
   buildScales();
