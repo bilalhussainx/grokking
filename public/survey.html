@@ -510,7 +510,6 @@
 </div>
 
 <script>
-  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xojkyzpy';
   const VERCEL_URL = 'https://grokking-delta.vercel.app';
 
   let currentStep = 0;
@@ -631,9 +630,9 @@
     responses.submitted_at = new Date().toISOString();
 
     try {
-      await fetch(FORMSPREE_ENDPOINT, {
+      await fetch('/api/survey', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(responses)
       });
     } catch(e) {
