@@ -24,6 +24,17 @@ message = greet("Alice")
 print(message)  # Hello, Alice!
 \`\`\`
 
+### Function Call Flow
+
+\`\`\`mermaid
+flowchart LR
+    A[Caller Code] -->|Pass arguments| B[Function receives parameters]
+    B --> C[Execute function body]
+    C --> D[Compute result]
+    D -->|Return value| E[Caller receives result]
+    E --> F[Continue caller code]
+\`\`\`
+
 ### Anatomy of a Function
 
 \`\`\`python

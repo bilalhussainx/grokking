@@ -19,6 +19,24 @@ Imagine a spreadsheet. It has rows going across and columns going down. A **2D a
 
 In Java, a 2D array is literally an "array of arrays." Each element of the outer array is itself an array representing one row.
 
+\`\`\`mermaid
+graph TD
+    subgraph "matrix[row][col]"
+        direction LR
+        subgraph "Row 0"
+            A0["[0][0]: 1"] --- A1["[0][1]: 2"] --- A2["[0][2]: 3"]
+        end
+        subgraph "Row 1"
+            B0["[1][0]: 4"] --- B1["[1][1]: 5"] --- B2["[1][2]: 6"]
+        end
+        subgraph "Row 2"
+            C0["[2][0]: 7"] --- C1["[2][1]: 8"] --- C2["[2][2]: 9"]
+        end
+    end
+\`\`\`
+
+Access any element with two indices: \`matrix[row][col]\`. The first index selects the row, the second selects the column.
+
 ### Java vs. Python
 
 **Java:**

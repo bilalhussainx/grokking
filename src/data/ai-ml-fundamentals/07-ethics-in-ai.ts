@@ -53,6 +53,26 @@ There are multiple mathematical definitions of fairness, and they are often **mu
 - **Predictive Parity**: Equal precision across groups
 - **Individual Fairness**: Similar individuals receive similar predictions
 
+\`\`\`mermaid
+graph TD
+    ETH["Ethical AI"] --> FAIR["Fairness"]
+    ETH --> ACC["Accountability"]
+    ETH --> TRANS["Transparency"]
+    ETH --> PRIV["Privacy"]
+    FAIR --> DEMO["Demographic Parity"]
+    FAIR --> EQO["Equal Opportunity"]
+    TRANS --> EXPL["Explainability"]
+    TRANS --> AUDIT["Auditing"]
+    PRIV --> DP["Differential Privacy"]
+    PRIV --> FL["Federated Learning"]
+
+    style ETH fill:#4f46e5,color:#fff
+    style FAIR fill:#7c3aed,color:#fff
+    style ACC fill:#7c3aed,color:#fff
+    style TRANS fill:#7c3aed,color:#fff
+    style PRIV fill:#7c3aed,color:#fff
+\`\`\`
+
 ### Mitigation Strategies
 
 1. **Diverse, representative training data**: Audit datasets for demographic balance

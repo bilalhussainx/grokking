@@ -54,6 +54,38 @@ Input Layer    Hidden Layer    Output Layer
 
 Each hidden neuron learns a different linear boundary. The output layer combines these boundaries to create complex, non-linear decision regions.
 
+\`\`\`mermaid
+graph LR
+    subgraph Input Layer
+        x1["x1"]
+        x2["x2"]
+        x3["x3"]
+    end
+    subgraph Hidden Layer
+        h1["h1"]
+        h2["h2"]
+        h3["h3"]
+        h4["h4"]
+    end
+    subgraph Output Layer
+        o1["output"]
+    end
+
+    x1 --> h1 & h2 & h3 & h4
+    x2 --> h1 & h2 & h3 & h4
+    x3 --> h1 & h2 & h3 & h4
+    h1 & h2 & h3 & h4 --> o1
+
+    style x1 fill:#0ea5e9,color:#fff
+    style x2 fill:#0ea5e9,color:#fff
+    style x3 fill:#0ea5e9,color:#fff
+    style h1 fill:#7c3aed,color:#fff
+    style h2 fill:#7c3aed,color:#fff
+    style h3 fill:#7c3aed,color:#fff
+    style h4 fill:#7c3aed,color:#fff
+    style o1 fill:#ef4444,color:#fff
+\`\`\`
+
 ### Activation Functions
 
 The key to non-linearity. Without activation functions, stacking layers is pointless (a linear function of linear functions is still linear).

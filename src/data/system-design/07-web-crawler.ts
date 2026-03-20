@@ -68,6 +68,18 @@ Every URL requires a DNS lookup. At 385 lookups/sec, DNS can become a bottleneck
 
 A web crawler has several collaborating components that form a pipeline. Each URL flows through this pipeline from discovery to storage.
 
+\`\`\`mermaid
+graph LR
+    Seed[Seed URLs] --> Frontier[URL Frontier]
+    Frontier --> Fetcher[HTTP Fetcher]
+    Fetcher --> Parser[HTML Parser]
+    Parser --> Extractor[Link Extractor]
+    Extractor --> Dedup[URL Dedup]
+    Dedup --> Filter[URL Filter]
+    Filter --> Frontier
+    Parser --> Storage[(Content Storage)]
+\`\`\`
+
 \`\`\`
 ┌─────────────┐     ┌───────────┐     ┌──────────┐     ┌────────────┐
 │  Seed URLs   │────>│   URL     │────>│  HTTP    │────>│   HTML     │

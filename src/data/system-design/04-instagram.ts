@@ -87,6 +87,22 @@ Let us define the major services and how they interact.
 
 ## Architecture Overview
 
+\`\`\`mermaid
+graph TD
+    Users[Users - iOS/Android/Web] --> CDN[CDN - Photos & Videos]
+    Users --> AG[API Gateway]
+    AG --> Upload[Upload Service]
+    AG --> Feed[Feed Service]
+    AG --> Follow[Follow Service]
+    Upload --> S3[(Object Store - S3)]
+    Upload --> PostDB[(Post DB)]
+    S3 --> CDN
+    Feed --> Redis[(Feed Cache - Redis)]
+    Redis -->|cache miss| PostDB
+    Follow --> GraphDB[(Social Graph DB)]
+    Upload -.->|fan-out event| Feed
+\`\`\`
+
 \`\`\`
                     ┌─────────┐
          ┌────────▶│   CDN   │◀── (photos, videos, static assets)

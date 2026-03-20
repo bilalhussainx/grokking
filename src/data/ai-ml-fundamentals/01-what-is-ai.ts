@@ -105,24 +105,23 @@ Key challenges:
 
 Modern AI is dominated by **Machine Learning (ML)** — systems that learn patterns from data rather than following explicit rules.
 
-\`\`\`
-Artificial Intelligence
-  |
-  +-- Machine Learning
-  |     |
-  |     +-- Supervised Learning (labeled data)
-  |     +-- Unsupervised Learning (unlabeled data)
-  |     +-- Reinforcement Learning (reward signals)
-  |     |
-  |     +-- Deep Learning (neural networks with many layers)
-  |           |
-  |           +-- CNNs (images)
-  |           +-- RNNs/LSTMs (sequences)
-  |           +-- Transformers (language, vision, multimodal)
-  |
-  +-- Symbolic AI (rules, logic, knowledge graphs)
-  +-- Evolutionary Algorithms
-  +-- Robotics
+\`\`\`mermaid
+graph TD
+    AI["Artificial Intelligence"] --> ML["Machine Learning"]
+    AI --> SYM["Symbolic AI"]
+    AI --> EVO["Evolutionary Algorithms"]
+    AI --> ROB["Robotics"]
+    ML --> SUP["Supervised Learning"]
+    ML --> UNSUP["Unsupervised Learning"]
+    ML --> RL["Reinforcement Learning"]
+    ML --> DL["Deep Learning"]
+    DL --> CNN["CNNs (Images)"]
+    DL --> RNN["RNNs/LSTMs (Sequences)"]
+    DL --> TF["Transformers (Language, Vision)"]
+
+    style AI fill:#4f46e5,color:#fff
+    style ML fill:#7c3aed,color:#fff
+    style DL fill:#a855f7,color:#fff
 \`\`\`
 
 ### Supervised vs. Unsupervised vs. Reinforcement Learning

@@ -47,6 +47,20 @@ To convert binary to decimal, add up the positions where there is a 1:
 
 So \`01010110\` in binary = **86** in decimal.
 
+\`\`\`mermaid
+graph LR
+    B["Binary: 01010110"] --> P["Positional Values"]
+    P --> P1["0x128=0"]
+    P --> P2["1x64=64"]
+    P --> P3["0x32=0"]
+    P --> P4["1x16=16"]
+    P --> P5["0x8=0"]
+    P --> P6["1x4=4"]
+    P --> P7["1x2=2"]
+    P --> P8["0x1=0"]
+    P1 & P2 & P3 & P4 & P5 & P6 & P7 & P8 --> S["Sum = 86"]
+\`\`\`
+
 <!-- voice:section_check -->
 
 ### Real-World Connection

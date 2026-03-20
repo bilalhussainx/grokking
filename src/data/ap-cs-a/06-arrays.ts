@@ -43,6 +43,22 @@ length = len(scores)        # 5
 | Bounds | ArrayIndexOutOfBoundsException | IndexError |
 | Length | \`.length\` (property) | \`len()\` (function) |
 
+### Array Index Layout
+
+\`\`\`mermaid
+graph LR
+    subgraph "primes array"
+        I0["[0]: 2"] --> I1["[1]: 3"]
+        I1 --> I2["[2]: 5"]
+        I2 --> I3["[3]: 7"]
+        I3 --> I4["[4]: 11"]
+    end
+    style I0 fill:#4a9eff,color:#fff
+    style I4 fill:#4a9eff,color:#fff
+\`\`\`
+
+Elements are accessed by index, starting at **0** and ending at **length - 1**.
+
 ### Traversing an Array
 
 **By index:**

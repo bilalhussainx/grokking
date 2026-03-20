@@ -28,6 +28,25 @@ else:
 
 **Important:** Python uses **indentation** (4 spaces) to define code blocks, not curly braces.
 
+### How if/elif/else Works
+
+\`\`\`mermaid
+flowchart TD
+    A[Start] --> B{if condition}
+    B -->|True| C[Run if block]
+    B -->|False| D{elif condition}
+    D -->|True| E[Run elif block]
+    D -->|False| F{More elif?}
+    F -->|Yes| D
+    F -->|No| G{else exists?}
+    G -->|Yes| H[Run else block]
+    G -->|No| I[Skip all]
+    C --> J[Continue program]
+    E --> J
+    H --> J
+    I --> J
+\`\`\`
+
 ### Comparison Operators
 
 | Operator | Meaning | Example |

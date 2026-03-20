@@ -44,6 +44,24 @@ This capstone demonstrates that you understand every component:
 
 <!-- voice:key_insight -->
 
+\`\`\`mermaid
+graph LR
+    PROB["Define Problem"] --> DATA["Collect Data"]
+    DATA --> PRE["Preprocessing"]
+    PRE --> SEL["Model Selection"]
+    SEL --> TRAIN["Training"]
+    TRAIN --> EVAL["Evaluation"]
+    EVAL -->|Iterate| SEL
+    EVAL --> DEP["Deployment"]
+
+    style PROB fill:#0ea5e9,color:#fff
+    style DATA fill:#7c3aed,color:#fff
+    style PRE fill:#a855f7,color:#fff
+    style TRAIN fill:#f59e0b,color:#fff
+    style EVAL fill:#22c55e,color:#fff
+    style DEP fill:#ef4444,color:#fff
+\`\`\`
+
 ### Synthetic Data
 
 We will generate synthetic tumor data with features that mimic real medical datasets:

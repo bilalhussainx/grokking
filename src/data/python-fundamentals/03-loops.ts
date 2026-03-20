@@ -14,6 +14,22 @@ export const loopsModule: Module = {
 
 Loops let you execute code repeatedly. Python has two main loop types: \`for\` and \`while\`.
 
+### Loop Execution Flow
+
+\`\`\`mermaid
+flowchart TD
+    A[Initialize] --> B{Check condition}
+    B -->|True| C[Execute body]
+    C --> D{break?}
+    D -->|Yes| G[Exit loop]
+    D -->|No| E{continue?}
+    E -->|Yes| F[Update / Next item]
+    E -->|No| F
+    F --> B
+    B -->|False| G
+    G --> H[Continue program]
+\`\`\`
+
 ### The for Loop
 
 Use \`for\` when you know how many times to iterate (or when iterating over a collection):

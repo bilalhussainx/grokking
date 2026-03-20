@@ -199,6 +199,20 @@ Timeline generation is the heart of Twitter's architecture. Let us explore the a
 
 When a user with 10 million followers tweets, naive fan-out means writing that tweet ID to 10 million Redis entries. At the platform's tweet volume (5,800 tweets/sec), even if only 0.1% of tweets are from high-follower accounts, the fan-out load is enormous.
 
+\`\`\`mermaid
+graph LR
+    Tweet[User Publishes Tweet] --> TS[Tweet Service]
+    TS --> DB[(Tweet DB)]
+    TS --> FO[Fan-Out Service]
+    FO --> W1[Worker 1]
+    FO --> W2[Worker 2]
+    FO --> W3[Worker N]
+    W1 --> FC1[(Follower 1 Cache)]
+    W1 --> FC2[(Follower 2 Cache)]
+    W2 --> FC3[(Follower 3 Cache)]
+    W3 --> FCN[(Follower N Cache)]
+\`\`\`
+
 ## Three Approaches
 
 ### 1. Fan-Out on Write (Push)

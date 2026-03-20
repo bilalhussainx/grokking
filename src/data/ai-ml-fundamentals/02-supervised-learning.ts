@@ -72,6 +72,21 @@ The **learning rate** controls your step size:
 - Too small: training takes forever
 - Just right: steady convergence to the minimum
 
+\`\`\`mermaid
+graph LR
+    D["Training Data"] --> F["Extract Features"]
+    F --> M["Model (w, b)"]
+    M --> P["Predictions"]
+    P --> L["Loss Function"]
+    L --> U["Update Weights"]
+    U --> M
+
+    style D fill:#0ea5e9,color:#fff
+    style M fill:#7c3aed,color:#fff
+    style L fill:#ef4444,color:#fff
+    style U fill:#22c55e,color:#fff
+\`\`\`
+
 ### Key Takeaway
 
 Linear regression is the foundation of all supervised learning. The concepts of weights, bias, loss functions, and gradient descent appear in every model from logistic regression to deep neural networks.

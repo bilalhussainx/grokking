@@ -78,6 +78,27 @@ Benefits: reduces computation, provides translation invariance, keeps strongest 
 
 ### CNN Architecture
 
+\`\`\`mermaid
+graph LR
+    IMG["Input Image"] --> C1["Conv Layer"]
+    C1 --> R1["ReLU"]
+    R1 --> P1["Pooling"]
+    P1 --> C2["Conv Layer"]
+    C2 --> R2["ReLU"]
+    R2 --> P2["Pooling"]
+    P2 --> FL["Flatten"]
+    FL --> DN["Dense Layer"]
+    DN --> OUT["Output"]
+
+    style IMG fill:#0ea5e9,color:#fff
+    style C1 fill:#7c3aed,color:#fff
+    style C2 fill:#7c3aed,color:#fff
+    style P1 fill:#f59e0b,color:#fff
+    style P2 fill:#f59e0b,color:#fff
+    style DN fill:#a855f7,color:#fff
+    style OUT fill:#ef4444,color:#fff
+\`\`\`
+
 A typical CNN stacks: Conv -> ReLU -> Pool -> Conv -> ReLU -> Pool -> Flatten -> Dense -> Output
 
 - Early layers detect edges and textures

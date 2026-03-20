@@ -57,6 +57,19 @@ ReLU's derivative is beautifully simple:
 
 This is why \`(z1 > 0)\` appears in the backward pass — it is a binary mask that "gates" the gradient.
 
+\`\`\`mermaid
+graph LR
+    FP["Forward Pass"] --> LC["Loss Calculation"]
+    LC --> BP["Backward Pass"]
+    BP --> WU["Weight Update"]
+    WU --> FP
+
+    style FP fill:#0ea5e9,color:#fff
+    style LC fill:#ef4444,color:#fff
+    style BP fill:#f59e0b,color:#fff
+    style WU fill:#22c55e,color:#fff
+\`\`\`
+
 ### Computational Graph View
 
 Think of the network as a graph of operations. Forward pass computes values left to right. Backward pass computes gradients right to left.

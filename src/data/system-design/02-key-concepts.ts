@@ -22,6 +22,16 @@ The CAP theorem, proposed by Eric Brewer in 2000, states that a distributed data
 
 In any distributed system, network partitions **will** happen — cables get cut, switches fail, data centers lose connectivity. Since partitions are unavoidable, you must choose between consistency and availability when a partition occurs.
 
+\`\`\`mermaid
+graph TD
+    CAP[CAP Theorem] --- C[Consistency]
+    CAP --- A[Availability]
+    CAP --- P[Partition Tolerance]
+    C ---|CA: Single node only| A
+    C ---|CP: Rejects reads during partition| P
+    A ---|AP: Serves stale data during partition| P
+\`\`\`
+
 \`\`\`
         ┌──────────────┐
         │   Choose 2   │

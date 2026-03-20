@@ -67,6 +67,21 @@ class Student:
 **Methods**: Functions that operate on the object's data
 **Encapsulation**: Hiding internal data and exposing it through methods (getters/setters)
 
+### Class Structure Overview
+
+\`\`\`mermaid
+graph TD
+    A["Student Class"] --> B["Fields"]
+    A --> C["Constructor"]
+    A --> D["Methods"]
+    B --> B1["- name: String"]
+    B --> B2["- grade: int"]
+    C --> C1["Student(name, grade)"]
+    D --> D1["getName()"]
+    D --> D2["getGrade()"]
+    D --> D3["toString()"]
+\`\`\`
+
 ### Why Encapsulation?
 
 Making variables private (using \`_\` prefix in Python, \`private\` in Java) prevents outside code from breaking the object's internal state. You control access through methods.

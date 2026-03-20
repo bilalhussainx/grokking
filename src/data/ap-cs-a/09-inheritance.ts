@@ -63,6 +63,19 @@ class Warrior(Character):           # Subclass
         self.armor = armor
 \`\`\`
 
+\`\`\`mermaid
+graph TD
+    V["Vehicle"] --> C["Car"]
+    V --> T["Truck"]
+    V --> M["Motorcycle"]
+    V -.- VN["name, speed\nmove(), stop()"]
+    C -.- CN["numDoors\nopenTrunk()"]
+    T -.- TN["payload\nhaulCargo()"]
+    M -.- MN["engineCC\nwheelie()"]
+\`\`\`
+
+Each subclass **inherits** the fields and methods of the superclass, while adding its own specialized members.
+
 <!-- voice:key_insight insight="Inheritance models an is-a relationship. A Warrior IS A Character. If you cannot say 'SubclassX is a SuperclassY' and have it make sense, inheritance is the wrong tool." -->
 
 ### The \`super()\` Keyword
@@ -126,6 +139,16 @@ print(wizard.attack())   # "Gandalf casts a fireball for 30 damage"
 \`\`\`
 
 Each subclass provides its own version of \`attack()\`, replacing the generic superclass behavior.
+
+\`\`\`mermaid
+graph TD
+    Call["hero.attack()"] --> Check{"What is the\nactual type?"}
+    Check -->|"Warrior"| W["Warrior.attack()\n'swings a sword'"]
+    Check -->|"Mage"| M["Mage.attack()\n'casts a fireball'"]
+    Check -->|"Character"| C["Character.attack()\n'attacks for 10 damage'"]
+\`\`\`
+
+At runtime, Python (and Java) look at the **actual object type**, not the declared type, to decide which version of the method to run. This is called **dynamic dispatch**.
 
 <!-- voice:key_insight insight="Overriding changes WHAT a method does. The method name stays the same, but the subclass provides a specialized implementation. The superclass version still exists and can be called with super().method_name()." -->
 

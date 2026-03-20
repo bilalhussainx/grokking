@@ -165,6 +165,16 @@ Example (limit: 100/min, current time = 1:15):
 
 The rate limiter runs as middleware that intercepts every API request before it reaches the application logic.
 
+\`\`\`mermaid
+graph LR
+    Client[Client] --> RL[Rate Limiter Middleware]
+    RL -->|Check Counter| Redis[(Redis)]
+    Redis -->|Under Limit| RL
+    RL -->|Allowed| App[Backend Server]
+    RL -->|Over Limit| Reject[429 Too Many Requests]
+    Rules[Rules Engine] -.->|Config| RL
+\`\`\`
+
 \`\`\`
                     ┌─────────────────────────────┐
                     │        Rules Engine          │

@@ -31,6 +31,17 @@ Estimate scale: daily active users, requests per second, storage per year. These
 ### Step 3 — High-Level Design (10-15 min)
 Draw the major components: clients, load balancers, application servers, databases, caches, queues. Show how data flows through the system for the most important use cases.
 
+\`\`\`mermaid
+graph LR
+    Client[Client] -->|HTTP Request| LB[Load Balancer]
+    LB --> AppServer[App Server]
+    AppServer -->|Read/Write| Cache[(Cache - Redis)]
+    Cache -->|Cache Miss| DB[(Database)]
+    AppServer -->|Write| DB
+    DB -->|Response| AppServer
+    AppServer -->|HTTP Response| Client
+\`\`\`
+
 ### Step 4 — Deep Dive (10-15 min)
 Pick the hardest parts and zoom in. Discuss data models, API contracts, sharding strategies, failure modes, and how you would monitor the system in production.
 
@@ -108,6 +119,19 @@ Add more machines of the same (or similar) size and distribute the workload acro
 
 **When to use it:** Web-tier application servers (stateless), read-heavy workloads (replicas), large-scale storage (sharding).
 
+\`\`\`mermaid
+graph TD
+    subgraph Vertical["Vertical Scaling (Scale Up)"]
+        V1[Server] -->|Add CPU, RAM, SSD| V2[Bigger Server]
+    end
+    subgraph Horizontal["Horizontal Scaling (Scale Out)"]
+        LB[Load Balancer] --> S1[Server 1]
+        LB --> S2[Server 2]
+        LB --> S3[Server 3]
+        LB --> S4[Server N...]
+    end
+\`\`\`
+
 ## Practical Reality
 
 Most production systems use **both**. You scale vertically until the cost or risk becomes unacceptable, then scale horizontally. For example, a startup might run on a single powerful database server for its first year, then add read replicas and eventually shard when they reach millions of users.
@@ -137,6 +161,20 @@ Without a load balancer, all traffic hits a single server. When that server is o
 3. **Horizontal scalability** — you can add or remove servers behind the balancer without clients noticing.
 
 ## Architecture
+
+\`\`\`mermaid
+graph TD
+    C[Clients] --> LB[Load Balancer]
+    LB -->|Round Robin / Least Conn| S1[Server 1]
+    LB --> S2[Server 2]
+    LB --> S3[Server 3]
+    S1 --> DB[(Database)]
+    S2 --> DB
+    S3 --> DB
+    LB -.->|Health Check| S1
+    LB -.->|Health Check| S2
+    LB -.->|Health Check| S3
+\`\`\`
 
 \`\`\`
   Clients

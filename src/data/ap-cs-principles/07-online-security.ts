@@ -67,6 +67,17 @@ You lock your doors (passwords), install an alarm (antivirus), do not let strang
 - Only your private key can unlock it
 - Like a mailbox: anyone can drop mail through the slot (public key), but only you have the key to open it (private key)
 
+\`\`\`mermaid
+graph LR
+    A["Plaintext\n'Hello'"] -->|"Encrypt\nwith Key"| B["Ciphertext\n'7f3a9c...'"]
+    B -->|"Decrypt\nwith Key"| C["Plaintext\n'Hello'"]
+    style A fill:#22c55e,color:#fff
+    style B fill:#ef4444,color:#fff
+    style C fill:#22c55e,color:#fff
+\`\`\`
+
+In symmetric encryption, the same key locks and unlocks the message. In asymmetric encryption, one key encrypts (public) and a different key decrypts (private).
+
 ### How HTTPS Uses Both
 
 1. Your browser gets the website's **public key**

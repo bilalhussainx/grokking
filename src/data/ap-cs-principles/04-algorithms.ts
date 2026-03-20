@@ -96,6 +96,24 @@ def binary_search(lst, target):
 
 <!-- voice:key_insight -->
 
+\`\`\`mermaid
+graph TD
+    subgraph "Linear Search"
+        L1["Start at index 0"] --> L2["Is this the target?"]
+        L2 -->|"No"| L3["Move to next index"]
+        L3 --> L2
+        L2 -->|"Yes"| L4["Found!"]
+    end
+    subgraph "Binary Search (sorted list)"
+        B1["Look at middle element"] --> B2{"Target vs middle?"}
+        B2 -->|"Equal"| B3["Found!"]
+        B2 -->|"Less"| B4["Search left half"]
+        B2 -->|"Greater"| B5["Search right half"]
+        B4 --> B1
+        B5 --> B1
+    end
+\`\`\`
+
 ### How Many Steps?
 
 | List Size | Linear Search (worst) | Binary Search (worst) |

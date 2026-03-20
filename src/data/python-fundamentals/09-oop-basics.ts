@@ -21,6 +21,17 @@ Object-Oriented Programming (OOP) organizes code around **objects** — bundles 
 - **Encapsulation**: Hide internal details, expose a clean interface
 - **Inheritance**: Build specialized classes from general ones
 
+### Object Lifecycle
+
+\`\`\`mermaid
+flowchart LR
+    A[Class Definition] -->|"MyClass()"| B[__init__ runs]
+    B --> C[Object in memory]
+    C --> D[Method calls]
+    D --> C
+    C -->|No references left| E[Garbage collected]
+\`\`\`
+
 ### Classes and Objects
 
 A **class** is a blueprint. An **object** (or instance) is a specific thing built from that blueprint.
@@ -68,6 +79,34 @@ print(Dog("Rex"))  # Dog(Rex)
 \`\`\`
 
 ### Inheritance
+
+A child class inherits attributes and methods from a parent class, then adds or overrides behavior:
+
+\`\`\`mermaid
+classDiagram
+    Animal <|-- Dog
+    Animal <|-- Cat
+    Animal <|-- Bird
+    class Animal {
+        +name
+        +speak()
+    }
+    class Dog {
+        +breed
+        +speak()
+        +fetch()
+    }
+    class Cat {
+        +indoor
+        +speak()
+        +purr()
+    }
+    class Bird {
+        +can_fly
+        +speak()
+        +fly()
+    }
+\`\`\`
 
 Create a child class that inherits from a parent:
 

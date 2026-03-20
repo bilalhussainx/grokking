@@ -44,6 +44,17 @@ Each packet contains:
 
 Packets can take different routes and arrive out of order. The receiving device reassembles them.
 
+\`\`\`mermaid
+graph LR
+    S["Source\n192.168.1.1"] -->|"Pkt 1"| RA["Router A"]
+    S -->|"Pkt 2"| RB["Router B"]
+    RA -->|"Pkt 1"| RC["Router C"]
+    RB -->|"Pkt 2"| RC
+    RC -->|"Pkt 1, 2"| D["Destination\n142.250.80.68"]
+\`\`\`
+
+Packets may travel different paths through the network. Routers forward each packet independently toward the destination, where they are reassembled in order.
+
 ### Analogy: Packets Are Like Sending a Book by Mail
 
 Imagine mailing a book one page at a time in separate envelopes. Each envelope has the page number, your address, and the destination. Even if they arrive out of order, the recipient can reassemble the book.

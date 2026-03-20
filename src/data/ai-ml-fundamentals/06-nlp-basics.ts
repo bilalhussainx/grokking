@@ -80,6 +80,22 @@ Modern models (BERT, GPT, Claude) produce **contextual embeddings** — the same
 
 In Word2Vec, "bank" has one fixed vector. In BERT/GPT, it gets different vectors based on surrounding words.
 
+\`\`\`mermaid
+graph LR
+    TXT["Raw Text"] --> TOK["Tokenize"]
+    TOK --> EMB["Embed"]
+    EMB --> ENC["Encode (RNN/Transformer)"]
+    ENC --> DEC["Decode"]
+    DEC --> OUT["Output"]
+
+    style TXT fill:#0ea5e9,color:#fff
+    style TOK fill:#7c3aed,color:#fff
+    style EMB fill:#a855f7,color:#fff
+    style ENC fill:#f59e0b,color:#fff
+    style DEC fill:#22c55e,color:#fff
+    style OUT fill:#ef4444,color:#fff
+\`\`\`
+
 ### Key Takeaway
 
 Text representation has evolved from simple word counts (BoW) to contextual embeddings (Transformers). Each advance captures more semantic nuance. Modern language models learn rich, context-dependent representations that enable remarkable language understanding.
