@@ -52,9 +52,17 @@ export async function GET(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data, error } = await supabase
+  // Use admin client to bypass RLS for reliable reads
+  let db;
+  try {
+    db = createAdminSupabase();
+  } catch {
+    db = supabase;
+  }
+
+  const { data, error } = await db
     .from("user_profiles")
-    .select("native_language, instruction_language, english_fluency, learning_interests, learning_style, communication_mode, coach_persona, preferred_voice_id, onboarding_completed")
+    .select("native_language, instruction_language, english_fluency, learning_interests, learning_style, communication_mode, coach_persona, preferred_voice_id, onboarding_completed, personalization_consent")
     .eq("id", user.id)
     .single();
 
@@ -62,5 +70,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data);
+  return NextResponse.json(data || {});
 }

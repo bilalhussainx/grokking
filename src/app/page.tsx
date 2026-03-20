@@ -204,7 +204,7 @@ export default function HomePage() {
     })
     .slice(0, 4);
 
-  // Load user preferences — from localStorage first, then Supabase
+  // Load user preferences — always sync from Supabase on login
   useEffect(() => {
     // Try localStorage first for instant load
     const cachedInterests = localStorage.getItem('learning-interests');
@@ -212,26 +212,32 @@ export default function HomePage() {
       try { setUserInterests(JSON.parse(cachedInterests)); } catch {}
     }
 
-    if (user && !localStorage.getItem("onboarding_complete")) {
-      // Check Supabase to see if onboarding was completed in another session
-      fetch('/api/user/preferences')
-        .then(r => r.ok ? r.json() : null)
-        .then(prefs => {
-          if (prefs?.onboarding_completed) {
-            localStorage.setItem('onboarding_complete', 'true');
-            if (prefs.native_language) localStorage.setItem('native-language', prefs.native_language);
-            if (prefs.instruction_language) localStorage.setItem('coach-language', prefs.instruction_language);
-            if (prefs.learning_interests) {
-              localStorage.setItem('learning-interests', JSON.stringify(prefs.learning_interests));
-              setUserInterests(prefs.learning_interests);
-            }
-          } else {
-            // Onboarding not completed — redirect to onboarding
-            router.push('/onboarding');
+    if (!user) return;
+
+    // Always fetch from Supabase to restore preferences (handles new devices/browsers)
+    fetch('/api/user/preferences')
+      .then(r => r.ok ? r.json() : null)
+      .then(prefs => {
+        if (!prefs) return;
+
+        if (prefs.onboarding_completed) {
+          localStorage.setItem('onboarding_complete', 'true');
+          // Restore ALL preferences to localStorage
+          if (prefs.native_language) localStorage.setItem('native-language', prefs.native_language);
+          if (prefs.instruction_language) localStorage.setItem('coach-language', prefs.instruction_language);
+          if (prefs.learning_style) localStorage.setItem('learning-style', prefs.learning_style);
+          if (prefs.communication_mode) localStorage.setItem('comm-mode', prefs.communication_mode);
+          if (prefs.english_fluency) localStorage.setItem('english-fluency', prefs.english_fluency);
+          if (prefs.learning_interests) {
+            localStorage.setItem('learning-interests', JSON.stringify(prefs.learning_interests));
+            setUserInterests(prefs.learning_interests);
           }
-        })
-        .catch(() => {});
-    }
+        } else {
+          // Onboarding not completed — redirect to onboarding
+          router.push('/onboarding');
+        }
+      })
+      .catch(() => {});
   }, [user]);
 
   // Award escalating daily login rewards once per day
