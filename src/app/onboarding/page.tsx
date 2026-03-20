@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
@@ -42,6 +42,14 @@ const COMM_MODES = [
 export default function OnboardingPage() {
   const router = useRouter();
   const { profile } = useAuth();
+
+  // If already onboarded, redirect to home
+  useEffect(() => {
+    if (localStorage.getItem("onboarding_complete") === "true") {
+      router.replace("/");
+    }
+  }, [router]);
+
   const [step, setStep] = useState<Step>("language");
   const [nativeLanguage, setNativeLanguage] = useState("en");
   const [instructionLanguage, setInstructionLanguage] = useState("en");
@@ -404,22 +412,7 @@ export default function OnboardingPage() {
               Back
             </button>
           ) : (
-            <button
-              onClick={async () => {
-                localStorage.setItem('onboarding_complete', 'true');
-                try {
-                  await fetch('/api/user/preferences', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ onboarding_completed: true }),
-                  });
-                } catch {}
-                router.push('/');
-              }}
-              className="px-4 py-2 text-sm text-white/30 hover:text-white/60 transition-colors"
-            >
-              Skip for now
-            </button>
+            <div /> /* Empty spacer — onboarding cannot be skipped */
           )}
 
           {step === "summary" ? (
