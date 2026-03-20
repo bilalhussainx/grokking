@@ -43,6 +43,7 @@ export function LanguageTutorPanel({
   const [messages, setMessages] = useState<Message[]>([]);
   const [showPersonaSelector, setShowPersonaSelector] = useState(false);
   const [dueVocab, setDueVocab] = useState<{ word: string; translation: string; masteryLevel: number }[]>([]);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const voiceAgent = useVoiceAgent({
@@ -85,11 +86,20 @@ export function LanguageTutorPanel({
   const handleStartSession = useCallback(async () => {
     if (!selectedPersona) return;
 
+    // Show 3-2-1 countdown
+    setCountdown(3);
+    await new Promise(r => setTimeout(r, 1000));
+    setCountdown(2);
+    await new Promise(r => setTimeout(r, 1000));
+    setCountdown(1);
+    await new Promise(r => setTimeout(r, 1000));
+    setCountdown(null);
+
     // Get persona config from API
     const resp = await fetch(
       `/api/language/persona-config?language=${language}&personaId=${selectedPersona.id}&proficiencyLevel=${proficiencyLevel}`
     );
-    
+
     if (!resp.ok) {
       console.error("[LanguageTutor] Failed to get persona config");
       return;
@@ -134,7 +144,17 @@ export function LanguageTutorPanel({
   const personas = getLanguagePersonas(language);
 
   return (
-    <div className={cn("flex flex-col h-full bg-slate-900 border-l border-slate-800", className)}>
+    <div className={cn("flex flex-col h-full bg-slate-900 border-l border-slate-800 relative", className)}>
+      {/* Countdown overlay */}
+      {countdown !== null && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/95">
+          <div className="text-center">
+            <div className="text-6xl font-bold text-[#f0a855] animate-pulse">{countdown}</div>
+            <p className="text-sm text-slate-400 mt-3">Get ready to speak...</p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
         <div className="flex items-center gap-2">
@@ -221,17 +241,23 @@ export function LanguageTutorPanel({
         )}
       </div>
 
-      {/* Voice Status */}
+      {/* Voice Status — prominent listening indicator */}
       {voiceAgent.isConnected && (
-        <div className="px-4 py-2 border-b border-slate-800 bg-slate-800/30">
+        <div className={cn(
+          "px-4 py-2.5 border-b border-slate-800 transition-colors",
+          voiceAgent.isSpeaking ? "bg-emerald-500/10" : voiceAgent.micMuted ? "bg-red-500/10" : "bg-indigo-500/10"
+        )}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className={cn(
-                "w-2 h-2 rounded-full animate-pulse",
-                voiceAgent.isSpeaking ? "bg-emerald-400" : "bg-indigo-400"
+                "w-2.5 h-2.5 rounded-full",
+                voiceAgent.isSpeaking ? "bg-emerald-400 animate-pulse" : voiceAgent.micMuted ? "bg-red-400" : "bg-indigo-400 animate-pulse"
               )} />
-              <span className="text-xs text-slate-300">
-                {voiceAgent.isSpeaking ? "Speaking..." : voiceAgent.micMuted ? "Mic muted" : "Listening..."}
+              <span className={cn(
+                "text-xs font-medium",
+                voiceAgent.isSpeaking ? "text-emerald-400" : voiceAgent.micMuted ? "text-red-400" : "text-indigo-400"
+              )}>
+                {voiceAgent.isSpeaking ? "Tutor speaking..." : voiceAgent.micMuted ? "Mic muted" : "Listening — speak now!"}
               </span>
             </div>
             <button

@@ -33,6 +33,7 @@ function TalkPageInner() {
   const [selectedPersona, setSelectedPersona] = useState<LanguagePersona | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessionTime, setSessionTime] = useState(0);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   // Timer
   useEffect(() => {
@@ -73,11 +74,19 @@ function TalkPageInner() {
 
   const startConversation = useCallback(
     async (lang: string) => {
-      // Always get the correct persona for this language (don't reuse from previous session)
       const persona = getDefaultPersona(lang);
       setSelectedPersona(persona);
       setSelectedLang(lang);
       setStep("talking");
+
+      // Show 3-2-1 countdown
+      setCountdown(3);
+      await new Promise(r => setTimeout(r, 1000));
+      setCountdown(2);
+      await new Promise(r => setTimeout(r, 1000));
+      setCountdown(1);
+      await new Promise(r => setTimeout(r, 1000));
+      setCountdown(null);
 
       try {
         await agent.start({
@@ -86,15 +95,13 @@ function TalkPageInner() {
           voiceProvider: persona.defaultVoice.provider as "kokoro" | "sarvam" | "deepgram",
           voiceId: persona.defaultVoice.voiceId,
           language: lang,
-          // TODO: Fetch user's actual proficiency level from their profile/placement results
-          proficiencyLevel: "A1", // Default to A1 until profile lookup is implemented
+          proficiencyLevel: "A1",
         });
-        // Greeting is handled by Deepgram agent via onAgentMessage callback
       } catch (err) {
         console.error("Failed to start voice agent:", err);
       }
     },
-    [agent, selectedPersona]
+    [agent]
   );
 
   const endConversation = useCallback(() => {
@@ -188,7 +195,25 @@ function TalkPageInner() {
   const langName = { es: "Spanish", fr: "French", de: "German", it: "Italian", nl: "Dutch", zh: "Mandarin", hi: "Hindi", pa: "Punjabi", ja: "Japanese", en: "English" }[selectedLang] || selectedLang;
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex flex-col">
+    <div className="min-h-screen bg-[var(--background)] flex flex-col relative">
+      {/* Countdown overlay */}
+      {countdown !== null && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-[var(--background)]/95">
+          <div className="text-center">
+            <motion.div
+              key={countdown}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 1.5, opacity: 0 }}
+              className="text-8xl font-bold text-[#f0a855]"
+            >
+              {countdown}
+            </motion.div>
+            <p className="text-lg text-slate-400 mt-4">Get ready to speak...</p>
+          </div>
+        </div>
+      )}
+
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/50">
         <div className="flex items-center gap-3">
@@ -255,6 +280,20 @@ function TalkPageInner() {
                 ))}
               </div>
               <span className="text-xs text-slate-500">Speaking...</span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Listening indicator — when agent is not speaking and mic is on */}
+        {agent.isConnected && !agent.isSpeaking && !agent.micMuted && (
+          <motion.div
+            className="flex justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+              <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+              <span className="text-xs font-medium text-indigo-400">Listening — speak now!</span>
             </div>
           </motion.div>
         )}

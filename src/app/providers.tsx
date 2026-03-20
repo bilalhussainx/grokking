@@ -42,16 +42,24 @@ function useIsLanguageCourse() {
 function CoachSidebar() {
   const { isPanelOpen, closePanel, lessonContext } = useAI();
   const isLanguageCourse = useIsLanguageCourse();
-
-  // Hide Coach Alex entirely on language courses
-  if (isLanguageCourse) return null;
+  const pathname = usePathname();
+  const isTalkPage = pathname?.startsWith("/talk");
   const [activeTab, setActiveTab] = useState<"coach" | "notes">("coach");
-  // Track if coach has ever been shown (to avoid mounting before needed)
   const [hasBeenOpened, setHasBeenOpened] = useState(false);
 
   useEffect(() => {
     if (isPanelOpen) setHasBeenOpened(true);
   }, [isPanelOpen]);
+
+  // Auto-close Coach Alex on language courses and /talk page
+  useEffect(() => {
+    if ((isLanguageCourse || isTalkPage) && isPanelOpen) {
+      closePanel();
+    }
+  }, [isLanguageCourse, isTalkPage, isPanelOpen, closePanel]);
+
+  // Hide Coach Alex entirely on language courses and /talk page
+  if (isLanguageCourse || isTalkPage) return null;
 
   // Don't mount coach until it's been opened at least once or there's a lesson
   if (!hasBeenOpened && !lessonContext) return null;
@@ -153,9 +161,11 @@ function CoachSidebar() {
 function CoachFAB() {
   const { isPanelOpen, openPanel, lessonContext } = useAI();
   const isLanguageCourse = useIsLanguageCourse();
+  const pathname = usePathname();
+  const isTalkPage = pathname?.startsWith("/talk");
 
-  // Hide on language courses (they have their own Language Tutor panel)
-  if (isPanelOpen || !lessonContext || isLanguageCourse) return null;
+  // Hide on language courses and /talk page
+  if (isPanelOpen || !lessonContext || isLanguageCourse || isTalkPage) return null;
 
   return (
     <button
