@@ -213,7 +213,7 @@ export default function HomePage() {
     }
 
     if (user && !localStorage.getItem("onboarding_complete")) {
-      // Sync from Supabase
+      // Check Supabase to see if onboarding was completed in another session
       fetch('/api/user/preferences')
         .then(r => r.ok ? r.json() : null)
         .then(prefs => {
@@ -225,12 +225,12 @@ export default function HomePage() {
               localStorage.setItem('learning-interests', JSON.stringify(prefs.learning_interests));
               setUserInterests(prefs.learning_interests);
             }
+          } else {
+            // Onboarding not completed — redirect to onboarding
+            router.push('/onboarding');
           }
-          // If onboarding not completed, don't redirect — let them use the app
         })
-        .catch(() => {
-          // API failed — don't redirect, just continue
-        });
+        .catch(() => {});
     }
   }, [user]);
 
