@@ -31,6 +31,20 @@ Pop → returns 1
 \`\`\`
 
 <!-- voice:section_check concept="stack is LIFO — last in, first out" -->
+
+\`\`\`mermaid
+graph TB
+    subgraph "Stack: LIFO Operations"
+        direction TB
+        PUSH["push(4)"] -.->|"add to top"| TOP
+        TOP["4  <-- top"] --- M1["3"] --- M2["2"] --- BOT["1  <-- bottom"]
+        TOP -.->|"pop() returns 4"| POP["pop()"]
+    end
+    style TOP fill:#f9a825,stroke:#333
+    style PUSH fill:#66bb6a,stroke:#333
+    style POP fill:#ef5350,stroke:#333
+\`\`\`
+
 ## Stack in Python
 
 Python lists work perfectly as stacks:
@@ -274,6 +288,20 @@ Dequeue → returns 1 (first in line)
 \`\`\`
 
 <!-- voice:section_check concept="queue is FIFO — first in, first out" -->
+
+\`\`\`mermaid
+graph LR
+    ENQ["enqueue(4)"] -.->|"add to back"| BACK
+    subgraph "Queue: FIFO Operations"
+        FRONT["1  front"] --- M1["2"] --- M2["3"] --- BACK["4  back"]
+    end
+    FRONT -.->|"dequeue() returns 1"| DEQ["dequeue()"]
+    style FRONT fill:#ef5350,stroke:#333
+    style BACK fill:#66bb6a,stroke:#333
+    style ENQ fill:#66bb6a,stroke:#333
+    style DEQ fill:#ef5350,stroke:#333
+\`\`\`
+
 ## Queue in Python: Use deque
 
 **Do NOT use a regular list as a queue.** Removing from the front of a list is O(n) because every element shifts. Python's \`collections.deque\` gives O(1) operations on both ends.

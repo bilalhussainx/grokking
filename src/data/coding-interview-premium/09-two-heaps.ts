@@ -59,6 +59,30 @@ def find_median():
 
 <!-- voice:key_insight insight="Split the numbers into two halves — max-heap for the smaller half, min-heap for the larger half. The median is at the top of one or both heaps." -->
 
+### Two Heaps for Median Finding
+
+\`\`\`mermaid
+graph TD
+    subgraph MaxHeap["Max-Heap (smaller half)"]
+        MH1["top: 3"] --> MH2["1"]
+        MH1 --> MH3["2"]
+    end
+    subgraph Median["Median"]
+        MED["(3 + 4) / 2 = 3.5"]
+    end
+    subgraph MinHeap["Min-Heap (larger half)"]
+        NH1["top: 4"] --> NH2["5"]
+        NH1 --> NH3["6"]
+    end
+    MH1 -->|"max of small half"| MED
+    NH1 -->|"min of large half"| MED
+    style MH1 fill:#339af0,color:#fff
+    style NH1 fill:#51cf66,color:#fff
+    style MED fill:#ffd93d,color:#000
+\`\`\`
+
+> The **max-heap** stores the smaller half so its top is the largest small number. The **min-heap** stores the larger half so its top is the smallest large number. The median is always at the top of one or both heaps.
+
 ### When to Use
 
 - Finding median of a number stream

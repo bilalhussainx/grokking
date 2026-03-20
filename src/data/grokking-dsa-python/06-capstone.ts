@@ -16,6 +16,26 @@ export const capstoneModule: Module = {
 In a real interview or project, nobody tells you "use a hash map here." You see a problem and must recognize WHICH data structure and pattern to apply. This lesson is a decision framework.
 
 <!-- voice:section_check concept="the real skill is matching problems to patterns" -->
+
+\`\`\`mermaid
+graph TD
+    START["What does the problem need?"] -->|"O(1) lookup?"| HASH["Hash Map / Set"]
+    START -->|"Sorted data?"| SORTED["Two Pointers / Binary Search"]
+    START -->|"Contiguous subarray?"| WINDOW["Sliding Window"]
+    START -->|"LIFO ordering?"| STACK["Stack"]
+    START -->|"FIFO / level-by-level?"| QUEUE["Queue / BFS"]
+    START -->|"Hierarchy or paths?"| TREE["Tree DFS / Graph BFS"]
+    START -->|"Next greater/smaller?"| MONO["Monotonic Stack"]
+    style START fill:#42a5f5,stroke:#333
+    style HASH fill:#66bb6a,stroke:#333
+    style SORTED fill:#66bb6a,stroke:#333
+    style WINDOW fill:#66bb6a,stroke:#333
+    style STACK fill:#f9a825,stroke:#333
+    style QUEUE fill:#f9a825,stroke:#333
+    style TREE fill:#ef5350,stroke:#333
+    style MONO fill:#ef5350,stroke:#333
+\`\`\`
+
 ## The Decision Tree
 
 Ask yourself these questions in order:

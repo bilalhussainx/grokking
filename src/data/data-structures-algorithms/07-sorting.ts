@@ -30,6 +30,23 @@ Find the minimum element in the unsorted portion and swap it to the front. Repea
 - **Space:** O(1)
 - **Stable:** No (in basic implementation)
 
+### Choosing a Sorting Algorithm
+
+\`\`\`mermaid
+flowchart TD
+    Start["Need to sort?"] --> Size{"n < 20?"}
+    Size -->|Yes| Simple["Insertion/Selection Sort<br/>O(n squared), simple"]
+    Size -->|No| Stable{"Need stable sort?"}
+    Stable -->|Yes| Merge["Merge Sort<br/>O(n log n), O(n) space"]
+    Stable -->|No| Space{"Memory constrained?"}
+    Space -->|Yes| Quick["Quick Sort<br/>O(n log n) avg, in-place"]
+    Space -->|No| Merge2["Merge Sort<br/>O(n log n) guaranteed"]
+    style Simple fill:#4ade80,color:#000
+    style Merge fill:#60a5fa,color:#000
+    style Quick fill:#f59e0b,color:#000
+    style Merge2 fill:#60a5fa,color:#000
+\`\`\`
+
 ### When to Use
 
 - Very small datasets (< 20 elements)
@@ -140,6 +157,34 @@ print(f"Already sorted: {arr5}")  # Expected: [1, 2, 3, 4, 5]
 - We divide log n times (each level halves the problem)
 - At each level, we do O(n) work to merge
 - Total: O(n log n)
+
+\`\`\`mermaid
+graph TD
+    A["[38, 27, 43, 3]"] --> B["[38, 27]"]
+    A --> C["[43, 3]"]
+    B --> D["[38]"]
+    B --> E["[27]"]
+    C --> F["[43]"]
+    C --> G["[3]"]
+    D --> H["[27, 38]"]
+    E --> H
+    F --> I["[3, 43]"]
+    G --> I
+    H --> J["[3, 27, 38, 43]"]
+    I --> J
+    style A fill:#f59e0b,color:#000
+    style B fill:#60a5fa,color:#000
+    style C fill:#60a5fa,color:#000
+    style D fill:#6366f1,color:#fff
+    style E fill:#6366f1,color:#fff
+    style F fill:#6366f1,color:#fff
+    style G fill:#6366f1,color:#fff
+    style H fill:#4ade80,color:#000
+    style I fill:#4ade80,color:#000
+    style J fill:#22c55e,color:#000
+\`\`\`
+
+*Top-down: split phase. Bottom-up: merge phase. Each level does O(n) merge work.*
 
 ### Problem
 

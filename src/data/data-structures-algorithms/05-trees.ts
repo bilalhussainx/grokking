@@ -194,6 +194,31 @@ print(bst.inorder())    # Expected: [1, 4, 6, 7, 8]
 | **Post-order** | Left, Right, Root | Deleting a tree, expression eval |
 | **Level-order** | Level by level (BFS) | Level-based processing |
 
+### Traversal Orders Visualized
+
+\`\`\`mermaid
+graph TD
+    subgraph "Pre: Root,L,R | In: L,Root,R | Post: L,R,Root"
+    R["1 (pre:1st, in:4th, post:6th)"]
+    L["2 (pre:2nd, in:2nd, post:3rd)"]
+    RI["3 (pre:5th, in:5th, post:5th)"]
+    LL["4 (pre:3rd, in:1st, post:1st)"]
+    LR["5 (pre:4th, in:3rd, post:2nd)"]
+    RR["6 (pre:6th, in:6th, post:4th)"]
+    R --> L
+    R --> RI
+    L --> LL
+    L --> LR
+    RI --> RR
+    end
+    style R fill:#f59e0b,color:#000
+    style L fill:#60a5fa,color:#000
+    style RI fill:#60a5fa,color:#000
+    style LL fill:#4ade80,color:#000
+    style LR fill:#4ade80,color:#000
+    style RR fill:#4ade80,color:#000
+\`\`\`
+
 ### Problem
 
 Given a binary tree, implement all four traversals. Return each as a list of values.

@@ -42,6 +42,26 @@ There is often a **time-space tradeoff**: you can speed up an algorithm by using
 3. **Consider the worst case** unless stated otherwise
 4. **Amortized analysis** accounts for occasional expensive operations averaged over many cheap ones (e.g., dynamic array resizing)
 
+### Growth Rate Comparison
+
+\`\`\`mermaid
+graph TD
+    subgraph "Growth Rates as n increases"
+    A["n = 10"] --> B["O(1) = 1"]
+    A --> C["O(log n) = 3"]
+    A --> D["O(n) = 10"]
+    A --> E["O(n log n) = 33"]
+    A --> F["O(n squared) = 100"]
+    A --> G["O(2 to the n) = 1024"]
+    end
+    style B fill:#4ade80,color:#000
+    style C fill:#86efac,color:#000
+    style D fill:#fde047,color:#000
+    style E fill:#fdba74,color:#000
+    style F fill:#f87171,color:#fff
+    style G fill:#dc2626,color:#fff
+\`\`\`
+
 ### Why This Matters
 
 Every data structure and algorithm in this course will be analyzed through the lens of Big-O. Choosing the right data structure often comes down to understanding which operations need to be fast and what trade-offs you are willing to make.`,

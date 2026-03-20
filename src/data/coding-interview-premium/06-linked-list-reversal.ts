@@ -42,6 +42,29 @@ return prev  # New head
 
 <!-- voice:key_insight insight="Reversal is about changing where each node's 'next' pointer points — from next node to previous node" -->
 
+### Step-by-Step Pointer Manipulation
+
+\`\`\`mermaid
+graph LR
+    subgraph Step1["Step 1: Store next"]
+        P1["prev=None"] ~~~ C1["curr=1"] -->|next| N1["next=2"] --> X1["3"]
+    end
+    subgraph Step2["Step 2: Reverse link"]
+        P2["prev=None"] <--|"curr.next = prev"| C2["curr=1"]
+        N2["next=2"] --> X2["3"]
+    end
+    subgraph Step3["Step 3: Advance"]
+        D1["1"] --- P3["prev=1"]
+        C3["curr=2"] --> X3["3"]
+    end
+    Step1 --> Step2 --> Step3
+    style C1 fill:#339af0,color:#fff
+    style C2 fill:#339af0,color:#fff
+    style C3 fill:#339af0,color:#fff
+\`\`\`
+
+> At each step: (1) save \`next\`, (2) reverse \`current.next\` to point to \`prev\`, (3) advance \`prev\` and \`current\` forward. After the loop, \`prev\` is the new head.
+
 ### Key Pointers
 
 | Pointer | Purpose |

@@ -16,6 +16,24 @@ export const hashMapsSetsModule: Module = {
 If arrays are the workhorse, dictionaries are the **Swiss army knife**. A Python \`dict\` maps **keys to values** with O(1) lookup, insert, and delete. Under the hood, it uses a **hash table** — a hash function converts each key into an array index.
 
 <!-- voice:section_check concept="dict uses hash function for O(1) operations" -->
+
+\`\`\`mermaid
+graph LR
+    K1["Key: 'Alice'"] -->|"hash()"| H1["Hash: 3"]
+    K2["Key: 'Bob'"] -->|"hash()"| H2["Hash: 1"]
+    K3["Key: 'Charlie'"] -->|"hash()"| H3["Hash: 3"]
+    subgraph "Buckets (array)"
+        B0["Bucket 0: empty"]
+        B1["Bucket 1: Bob->87"]
+        B2["Bucket 2: empty"]
+        B3["Bucket 3: Alice->95 -> Charlie->92"]
+    end
+    H1 --> B3
+    H2 --> B1
+    H3 --> B3
+    style B3 fill:#ef5350,stroke:#333
+\`\`\`
+
 ## Creating and Using Dictionaries
 
 \`\`\`python
@@ -97,6 +115,19 @@ print(count_words("the cat and the dog and the fish"))
 \`\`\`
 
 <!-- voice:section_check concept="dict.get(key, 0) + 1 is the counting idiom" -->
+
+\`\`\`mermaid
+graph TB
+    subgraph "Collision Handling: Chaining"
+        H["hash('Alice') = hash('Charlie') = 3"]
+        B["Bucket 3"]
+        N1["Alice: 95"] -->|"next"| N2["Charlie: 92"] -->|"next"| N3["None"]
+        B --> N1
+    end
+    style B fill:#42a5f5,stroke:#333
+    style N1 fill:#66bb6a,stroke:#333
+    style N2 fill:#66bb6a,stroke:#333
+\`\`\`
 
 ## defaultdict and Counter
 

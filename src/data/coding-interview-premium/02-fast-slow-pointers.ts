@@ -31,6 +31,25 @@ This pattern, also known as **Floyd's Cycle Detection Algorithm** or the **Torto
 
 <!-- voice:key_insight insight="If there's a cycle, the fast pointer (moving 2x) will eventually meet the slow pointer (moving 1x)" -->
 
+### Floyd's Cycle Detection Visualized
+
+\`\`\`mermaid
+graph LR
+    A["1"] -->|slow +1| B["2"]
+    B -->|slow +1| C["3"]
+    C -->|slow +1| D["4"]
+    D -->|slow +1| E["5"]
+    E -->|cycle| C
+    A -.->|fast +2| C
+    C -.->|fast +2| E
+    E -.->|fast +2| D
+    D -.->|fast +2| C
+    style C fill:#ff6b6b,color:#fff
+    style D fill:#ffd93d,color:#000
+\`\`\`
+
+> **Slow** moves 1 step at a time, **Fast** moves 2 steps. If a cycle exists, they will meet inside the cycle (red node). To find the cycle start, reset one pointer to head and move both at 1 step -- they meet at the cycle entry.
+
 ### How It Works
 
 1. Initialize both pointers at the start.

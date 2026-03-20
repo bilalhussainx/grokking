@@ -38,6 +38,26 @@ graph = {
 
 **Adjacency Matrix** — A 2D matrix where \`matrix[i][j] = 1\` if there is an edge from i to j. Best for dense graphs.
 
+\`\`\`mermaid
+graph TD
+    subgraph "Adjacency List"
+    AL_A["A -> [B, C]"]
+    AL_B["B -> [A, D]"]
+    AL_C["C -> [A, D]"]
+    AL_D["D -> [B, C]"]
+    end
+    subgraph "Same Graph"
+    A --- B
+    A --- C
+    B --- D
+    C --- D
+    end
+    style A fill:#6366f1,color:#fff
+    style B fill:#6366f1,color:#fff
+    style C fill:#6366f1,color:#fff
+    style D fill:#6366f1,color:#fff
+\`\`\`
+
 ### Comparison
 
 | | Adjacency List | Adjacency Matrix |
@@ -282,6 +302,23 @@ print(bfs_shortest_path(graph, 'A', 'Z'))
       content: `## Depth-First Search (DFS)
 
 DFS explores a graph by going **as deep as possible** along each branch before backtracking. It uses a **stack** (or recursion).
+
+\`\`\`mermaid
+graph TD
+    A["A (1)"] --> B["B (2)"]
+    A --> C["C (5)"]
+    B --> D["D (3)"]
+    B --> E["E (4)"]
+    C --> F["F (6)"]
+    style A fill:#4ade80,color:#000
+    style B fill:#60a5fa,color:#000
+    style D fill:#f59e0b,color:#000
+    style E fill:#f59e0b,color:#000
+    style C fill:#60a5fa,color:#000
+    style F fill:#f59e0b,color:#000
+\`\`\`
+
+*Numbers show DFS visit order -- goes deep (A->B->D) before backtracking to E, then C->F.*
 
 ### Properties
 

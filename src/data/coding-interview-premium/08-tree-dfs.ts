@@ -41,6 +41,31 @@ function dfs(node):
 
 <!-- voice:key_insight insight="DFS naturally follows the recursive structure of trees — solve for children first, then combine results" -->
 
+### DFS Traversal Orders
+
+\`\`\`mermaid
+graph TD
+    A["A"] --> B["B"]
+    A --> C["C"]
+    B --> D["D"]
+    B --> E["E"]
+    C --> F["F"]
+    C --> G["G"]
+    style A fill:#339af0,color:#fff
+    style B fill:#51cf66,color:#fff
+    style C fill:#ffd93d,color:#000
+    style D fill:#ff6b6b,color:#fff
+    style E fill:#ff6b6b,color:#fff
+    style F fill:#cc5de8,color:#fff
+    style G fill:#cc5de8,color:#fff
+\`\`\`
+
+| Order | Visit Sequence | Use Case |
+|-------|---------------|----------|
+| **Pre-order** | A, B, D, E, C, F, G | Root first -- serialization |
+| **In-order** | D, B, E, A, F, C, G | BST sorted order |
+| **Post-order** | D, E, B, F, G, C, A | Leaves first -- deletion |
+
 ### When to Use DFS vs BFS
 
 - **Use DFS** for: Path problems, all paths, tree properties, problems requiring backtracking

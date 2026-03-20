@@ -41,7 +41,27 @@ Most fast/slow pointer solutions run in **O(n)** time and **O(1)** space, avoidi
 
 ### Note on Implementation
 
-Since we are running Python in the browser (Pyodide), we will simulate linked lists using arrays or simple \`ListNode\` classes defined inline. The algorithmic logic is identical.`,
+Since we are running Python in the browser (Pyodide), we will simulate linked lists using arrays or simple \`ListNode\` classes defined inline. The algorithmic logic is identical.
+
+\`\`\`mermaid
+graph LR
+    N1["1"] --> N2["2"] --> N3["3"] --> N4["4"] --> N5["5"]
+    N5 -->|"cycle"| N3
+    S["Slow (1 step)"] -.-> N2
+    F["Fast (2 steps)"] -.-> N4
+    style S fill:#4CAF50,color:#fff
+    style F fill:#f44336,color:#fff
+\`\`\`
+
+\`\`\`mermaid
+graph TD
+    A["Both start at head"] --> B{"Fast reached end?"}
+    B -->|"Yes"| C["No cycle"]
+    B -->|"No"| D["Slow += 1 step<br/>Fast += 2 steps"]
+    D --> E{"Slow == Fast?"}
+    E -->|"Yes"| F["Cycle detected!"]
+    E -->|"No"| B
+\`\`\``,
     },
     {
       id: "fast-slow-linked-list-cycle",
@@ -81,6 +101,26 @@ Explanation: Node 2 points back to head (index 0).
 - Move \`slow\` one step, \`fast\` two steps.
 - If \`fast\` or \`fast.next\` becomes \`None\`, there is no cycle.
 - If \`slow == fast\` at any point, a cycle exists.
+
+\`\`\`mermaid
+graph LR
+    subgraph Step1["Step 1"]
+        S1["S=1, F=1 → S→2, F→3"]
+    end
+    subgraph Step2["Step 2"]
+        S2["S=2, F=3 → S→3, F→5"]
+    end
+    subgraph Step3["Step 3"]
+        S3["S=3, F=5 → S→4, F→3"]
+    end
+    subgraph Step4["Step 4"]
+        S4["S=4, F=3 → S→5, F→5"]
+    end
+    subgraph Step5["Step 5: Meet!"]
+        S5["S=5, F=5 → Cycle found!"]
+    end
+    Step1 --> Step2 --> Step3 --> Step4 --> Step5
+\`\`\`
 
 ### Complexity
 

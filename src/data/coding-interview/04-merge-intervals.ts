@@ -55,7 +55,32 @@ Many problems involve dealing with **overlapping intervals** — time slots, ran
 
 ### Complexity
 
-Sorting takes **O(n log n)** and the merge pass takes **O(n)**, giving **O(n log n)** overall with **O(n)** space for the result.`,
+Sorting takes **O(n log n)** and the merge pass takes **O(n)**, giving **O(n log n)** overall with **O(n)** space for the result.
+
+\`\`\`mermaid
+graph LR
+    subgraph Before["Unsorted Intervals"]
+        I1["[6,7]"] --- I2["[2,4]"] --- I3["[5,9]"]
+    end
+    subgraph Sorted["After Sort by Start"]
+        S1["[2,4]"] --- S2["[5,9]"] --- S3["[6,7]"]
+    end
+    subgraph Merged["After Merge"]
+        M1["[2,4]"] --- M2["[5,9]"]
+    end
+    Before -->|"Sort"| Sorted -->|"Merge overlaps"| Merged
+\`\`\`
+
+\`\`\`mermaid
+graph TD
+    A["Sort intervals by start"] --> B["Take first interval"]
+    B --> C["Compare next interval"]
+    C --> D{"Overlapping?"}
+    D -->|"next.start <= curr.end"| E["Merge: extend end"]
+    D -->|"No overlap"| F["Start new interval"]
+    E --> C
+    F --> C
+\`\`\``,
     },
     {
       id: "merge-intervals-merge",
@@ -94,6 +119,24 @@ Explanation: All three overlap into one merged interval.
 3. For each subsequent interval, check if it overlaps with the last interval in the merged list.
 4. If yes, update the end of the last merged interval to the max of both ends.
 5. If no, append the current interval to the merged list.
+
+\`\`\`mermaid
+graph LR
+    subgraph Input["Sorted: [1,4] [2,6] [3,5]"]
+        direction LR
+        I1["[1,4]"] --- I2["[2,6]"] --- I3["[3,5]"]
+    end
+    subgraph S1["Step 1: merged=[[1,4]]"]
+        M1["[1,4]"]
+    end
+    subgraph S2["Step 2: 2<=4, merge"]
+        M2["[1,6]"]
+    end
+    subgraph S3["Step 3: 3<=6, merge"]
+        M3["[1,6] no change"]
+    end
+    Input --> S1 --> S2 --> S3
+\`\`\`
 
 ### Complexity
 

@@ -43,7 +43,38 @@ top = -heapq.heappop(max_heap)     # pop and negate back
 - Balancing two groups to minimize difference
 - Problems requiring quick access to both the maximum of a lower set and the minimum of an upper set
 
-The key insight is that by maintaining two sorted halves via heaps, you get O(log n) insertions and O(1) median lookups — far better than re-sorting each time.`,
+The key insight is that by maintaining two sorted halves via heaps, you get O(log n) insertions and O(1) median lookups — far better than re-sorting each time.
+
+\`\`\`mermaid
+graph TD
+    subgraph MaxHeap["Max-Heap (smaller half)"]
+        MH1["3"]
+        MH2["1"] --- MH3["2"]
+        MH1 --- MH2
+    end
+    subgraph MinHeap["Min-Heap (larger half)"]
+        NH1["5"]
+        NH2["7"] --- NH3["8"]
+        NH1 --- NH2
+    end
+    MaxHeap -->|"top=3"| Med["Median = avg(3,5) = 4.0"]
+    MinHeap -->|"top=5"| Med
+    style Med fill:#4CAF50,color:#fff
+\`\`\`
+
+\`\`\`mermaid
+graph TD
+    A["New number arrives"] --> B{"num <= max_heap top?"}
+    B -->|"Yes"| C["Push to Max-Heap"]
+    B -->|"No"| D["Push to Min-Heap"]
+    C --> E{"Heaps balanced?"}
+    D --> E
+    E -->|"Max > Min+1"| F["Move max top to min"]
+    E -->|"Min > Max"| G["Move min top to max"]
+    E -->|"Balanced"| H["Read median from tops"]
+    F --> H
+    G --> H
+\`\`\``,
     },
     {
       id: "two-heaps-median-stream",
@@ -73,6 +104,23 @@ insert_num(4), find_median() → 3.5
 \`\`\`
 insert_num(8), find_median() → 8.0
 insert_num(2), find_median() → 5.0
+\`\`\`
+
+\`\`\`mermaid
+graph LR
+    subgraph S1["Insert 3"]
+        A1["Max:[3] Min:[]<br/>Median=3.0"]
+    end
+    subgraph S2["Insert 1"]
+        A2["Max:[1] Min:[3]<br/>Median=2.0"]
+    end
+    subgraph S3["Insert 5"]
+        A3["Max:[1,3] Min:[5]<br/>Median=3.0"]
+    end
+    subgraph S4["Insert 4"]
+        A4["Max:[1,3] Min:[4,5]<br/>Median=3.5"]
+    end
+    S1 --> S2 --> S3 --> S4
 \`\`\`
 
 ## Approach

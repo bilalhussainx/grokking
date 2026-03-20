@@ -52,7 +52,34 @@ Most DFS tree problems are naturally expressed recursively. Each recursive call 
 
 ### Tree Representation
 
-We use the same \`TreeNode\` class and \`build_tree\` helper as in BFS problems, building from a level-order array.`,
+We use the same \`TreeNode\` class and \`build_tree\` helper as in BFS problems, building from a level-order array.
+
+\`\`\`mermaid
+graph TD
+    R["1"] --> L["2"]
+    R --> Ri["3"]
+    L --> LL["4"]
+    L --> LR["5"]
+    Ri --> RL["6"]
+    Ri --> RR["7"]
+    P1["Pre-order:<br/>1,2,4,5,3,6,7"]
+    P2["In-order:<br/>4,2,5,1,6,3,7"]
+    P3["Post-order:<br/>4,5,2,6,7,3,1"]
+    style P1 fill:#4CAF50,color:#fff
+    style P2 fill:#2196F3,color:#fff
+    style P3 fill:#FF9800,color:#fff
+\`\`\`
+
+\`\`\`mermaid
+graph TD
+    A["Visit root"] --> B["Recurse left subtree"]
+    B --> C["Go deeper until None"]
+    C --> D["Backtrack"]
+    D --> E["Recurse right subtree"]
+    E --> F["Go deeper until None"]
+    F --> G["Backtrack to parent"]
+    G --> H["Continue up the tree"]
+\`\`\``,
     },
     {
       id: "tree-dfs-path-sum",
@@ -105,6 +132,16 @@ Output: False
 - Use recursion. At each node, subtract the node's value from the target.
 - If you reach a leaf and the remaining target equals the leaf's value, return True.
 - Otherwise, recursively check left and right subtrees.
+
+\`\`\`mermaid
+graph TD
+    R["1 (target=10)"] -->|"remain=9"| L["2"]
+    R -->|"remain=9"| Ri["3"]
+    L -->|"remain=7"| LL["4<br/>leaf: 4!=7"]
+    L -->|"remain=7"| LR["5<br/>leaf: 5!=7"]
+    Ri -->|"remain=6"| RR["6<br/>leaf: 6==6 FOUND!"]
+    style RR fill:#4CAF50,color:#fff
+\`\`\`
 
 ### Complexity
 

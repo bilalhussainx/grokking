@@ -23,6 +23,22 @@ A **stack** is a Last-In-First-Out (LIFO) data structure. Think of a stack of pl
 | \`peek()\` | View top element | O(1) |
 | \`is_empty()\` | Check if empty | O(1) |
 
+### Stack vs Queue
+
+\`\`\`mermaid
+graph TD
+    subgraph "Stack: LIFO"
+    S3["top: 3"] --> S2["2"] --> S1["1"]
+    P1["push(4)"] -.->|"add to top"| S3
+    S3 -.->|"pop() = 3"| P2["remove from top"]
+    end
+    subgraph "Queue: FIFO"
+    Q1["front: 1"] --> Q2["2"] --> Q3["3"]
+    E1["enqueue(4)"] -.->|"add to back"| Q3
+    Q1 -.->|"dequeue() = 1"| D1["remove from front"]
+    end
+\`\`\`
+
 ### Applications
 
 - Function call stack (recursion)

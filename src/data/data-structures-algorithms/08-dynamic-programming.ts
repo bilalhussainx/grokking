@@ -32,6 +32,27 @@ def solve(n, memo={}):
     return result
 \`\`\`
 
+### Overlapping Subproblems: Fibonacci
+
+\`\`\`mermaid
+graph TD
+    F5["fib(5)"] --> F4["fib(4)"]
+    F5 --> F3a["fib(3)"]
+    F4 --> F3b["fib(3)"]
+    F4 --> F2a["fib(2)"]
+    F3a --> F2b["fib(2)"]
+    F3a --> F1a["fib(1)"]
+    F3b --> F2c["fib(2)"]
+    F3b --> F1b["fib(1)"]
+    style F3a fill:#f59e0b,color:#000
+    style F3b fill:#f59e0b,color:#000
+    style F2a fill:#ef4444,color:#fff
+    style F2b fill:#ef4444,color:#fff
+    style F2c fill:#ef4444,color:#fff
+\`\`\`
+
+*Yellow/red nodes are computed multiple times without memoization. DP caches them so each is computed only once.*
+
 ### Problem: Climbing Stairs
 
 You are climbing a staircase with \`n\` steps. Each time you can climb 1 or 2 steps. How many distinct ways can you reach the top?
@@ -136,6 +157,26 @@ def solve(n):
 | Stack overflow risk | Yes | No |
 | Computes | Only needed subproblems | All subproblems |
 | Space optimization | Harder | Easier |
+
+### Top-Down vs Bottom-Up
+
+\`\`\`mermaid
+flowchart LR
+    subgraph "Top-Down (Memoization)"
+    TD1["Start: fib(5)"] --> TD2["Recurse down"]
+    TD2 --> TD3["Hit base case"]
+    TD3 --> TD4["Cache & return up"]
+    end
+    subgraph "Bottom-Up (Tabulation)"
+    BU1["Start: dp[0]=0, dp[1]=1"] --> BU2["Build dp[2]"]
+    BU2 --> BU3["Build dp[3]"]
+    BU3 --> BU4["... dp[n] = answer"]
+    end
+    style TD1 fill:#6366f1,color:#fff
+    style BU1 fill:#4ade80,color:#000
+    style TD4 fill:#6366f1,color:#fff
+    style BU4 fill:#4ade80,color:#000
+\`\`\`
 
 ### Problem: Fibonacci & Coin Change
 

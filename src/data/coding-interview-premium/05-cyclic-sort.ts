@@ -38,6 +38,29 @@ for i from 0 to n-1:
 
 <!-- voice:key_insight insight="Each number tells us exactly where it belongs — we use the value as an index to place it correctly" -->
 
+### Cyclic Sort in Action
+
+\`\`\`mermaid
+graph TD
+    subgraph Before["Before: unsorted"]
+        A0["idx 0: 3"] --- A1["idx 1: 1"] --- A2["idx 2: 5"] --- A3["idx 3: 2"] --- A4["idx 4: 4"]
+    end
+    subgraph Step1["Swap: 3 goes to idx 2"]
+        B0["idx 0: 5"] --- B1["idx 1: 1"] --- B2["idx 2: 3"] --- B3["idx 3: 2"] --- B4["idx 4: 4"]
+    end
+    subgraph After["After: each value = index + 1"]
+        C0["idx 0: 1"] --- C1["idx 1: 2"] --- C2["idx 2: 3"] --- C3["idx 3: 4"] --- C4["idx 4: 5"]
+    end
+    Before --> Step1 --> After
+    style C0 fill:#51cf66,color:#fff
+    style C1 fill:#51cf66,color:#fff
+    style C2 fill:#51cf66,color:#fff
+    style C3 fill:#51cf66,color:#fff
+    style C4 fill:#51cf66,color:#fff
+\`\`\`
+
+> Each number **n** belongs at index **n-1**. We swap elements into their correct positions until the array is sorted. Any index where \`nums[i] != i + 1\` reveals a missing or duplicate number.
+
 ### When to Use
 
 - Array contains numbers in range [1..n] or [0..n-1]

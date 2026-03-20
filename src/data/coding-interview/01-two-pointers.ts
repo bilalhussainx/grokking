@@ -44,6 +44,31 @@ A naive approach to finding a pair of elements that meet some criterion typicall
 
 Most two-pointer solutions run in **O(n)** time and **O(1)** extra space, making them far superior to hash-map or brute-force alternatives when the input is already sorted.
 
+\`\`\`mermaid
+graph LR
+    A["[1"] --> B["2"] --> C["3"] --> D["4"] --> E["6]"]
+    L["left pointer"] -.-> A
+    R["right pointer"] -.-> E
+    style L fill:#4CAF50,color:#fff
+    style R fill:#2196F3,color:#fff
+    A2["Sum too small?"] -->|"Move left -->>"| A3["left moves right"]
+    A4["Sum too large?"] -->|"<<-- Move right"| A5["right moves left"]
+    A6["Sum matches?"] -->|"Found pair!"| A7["Return indices"]
+\`\`\`
+
+\`\`\`mermaid
+graph TD
+    subgraph Opposite["Opposite-Direction Pointers"]
+        O1["L=start, R=end"] --> O2["Compare pair"]
+        O2 --> O3{"Condition?"}
+        O3 -->|"Too small"| O4["L++"]
+        O3 -->|"Too large"| O5["R--"]
+        O3 -->|"Match"| O6["Done"]
+        O4 --> O2
+        O5 --> O2
+    end
+\`\`\`
+
 In the following lessons you will apply this pattern to five classic problems of increasing difficulty.`,
     },
     {
@@ -81,6 +106,20 @@ Output: [-1, -1]
 - If the sum of the two pointed-to values equals the target, return the indices.
 - If the sum is less than the target, move the left pointer right.
 - If the sum is greater, move the right pointer left.
+
+\`\`\`mermaid
+graph LR
+    subgraph Step1["Step 1: L=0, R=4"]
+        S1["arr=[1,2,3,4,6] target=6<br/>1+6=7 > 6 → R--"]
+    end
+    subgraph Step2["Step 2: L=0, R=3"]
+        S2["1+4=5 < 6 → L++"]
+    end
+    subgraph Step3["Step 3: L=1, R=3"]
+        S3["2+4=6 == 6 → Return [1,3]"]
+    end
+    Step1 --> Step2 --> Step3
+\`\`\`
 
 ### Complexity
 

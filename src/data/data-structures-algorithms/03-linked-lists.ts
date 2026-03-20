@@ -165,6 +165,21 @@ None <- [prev|value|next] <-> [prev|value|next] <-> [prev|value|next] -> None
 
 ### Advantages Over Singly Linked
 
+\`\`\`mermaid
+graph LR
+    N["null"] ---|prev| A["Node A"]
+    A -->|next| B["Node B"]
+    B -->|prev| A
+    B -->|next| C["Node C"]
+    C -->|prev| B
+    C -->|next| N2["null"]
+    style A fill:#6366f1,color:#fff
+    style B fill:#6366f1,color:#fff
+    style C fill:#6366f1,color:#fff
+    style N fill:#ef4444,color:#fff
+    style N2 fill:#ef4444,color:#fff
+\`\`\`
+
 - O(1) deletion when you have a reference to the node
 - O(1) pop from tail (with tail pointer)
 - Bidirectional traversal
@@ -316,6 +331,22 @@ has_cycle(1 -> 2 -> 3 -> None) -> False
 \`\`\`
 
 ### Key Techniques
+
+\`\`\`mermaid
+graph TD
+    subgraph "Insert X after A"
+    A1["A"] -->|"next (old)"| B1["B"]
+    A1 -.->|"1: A.next = X"| X1["X"]
+    X1 -.->|"2: X.next = B"| B1
+    end
+    subgraph "Delete B (A.next = C)"
+    A2["A"] -->|"next (old)"| B2["B"]
+    B2 -->|"next"| C2["C"]
+    A2 -.->|"A.next = C"| C2
+    end
+    style X1 fill:#4ade80,color:#000
+    style B2 fill:#ef4444,color:#fff
+\`\`\`
 
 - **Three-pointer reversal**: Use prev, curr, next to reverse links one at a time
 - **Fast/slow pointers**: Fast moves 2 steps, slow moves 1. When fast reaches the end, slow is at the middle

@@ -25,6 +25,19 @@ Linked List: [10]→[20]→[30]→[40]→[50]→None
 \`\`\`
 
 <!-- voice:section_check concept="linked lists use nodes with pointers instead of contiguous memory" -->
+
+\`\`\`mermaid
+graph LR
+    HEAD["head"] --> N1
+    N1["data: 10<br/>next: *"] -->|"next"| N2["data: 20<br/>next: *"] -->|"next"| N3["data: 30<br/>next: *"] -->|"next"| N4["data: 40<br/>next: *"] -->|"next"| NULL["None"]
+    style HEAD fill:#42a5f5,stroke:#333
+    style N1 fill:#66bb6a,stroke:#333
+    style N2 fill:#66bb6a,stroke:#333
+    style N3 fill:#66bb6a,stroke:#333
+    style N4 fill:#66bb6a,stroke:#333
+    style NULL fill:#bdbdbd,stroke:#333
+\`\`\`
+
 ## Building a Linked List in Python
 
 \`\`\`python
@@ -113,6 +126,16 @@ def delete_node(head, target):
 \`\`\`
 
 <!-- voice:section_check concept="insertion and deletion are pointer manipulation" -->
+
+\`\`\`mermaid
+graph LR
+    subgraph "Insert at Head: O(1)"
+        NEW["new: 0"] -->|"1. next = head"| A1["10"] --> A2["20"] --> A3["30"] --> NULL1["None"]
+        NEWHEAD["head"] -.->|"2. head = new"| NEW
+    end
+    style NEW fill:#f9a825,stroke:#333
+    style NEWHEAD fill:#42a5f5,stroke:#333
+\`\`\`
 
 ## Try It Yourself
 

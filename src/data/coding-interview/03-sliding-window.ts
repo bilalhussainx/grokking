@@ -41,7 +41,31 @@ The **sliding window** pattern maintains a subset of elements (a "window") as it
 
 ### Complexity
 
-Most sliding-window problems are solved in **O(n)** time with **O(1)** or **O(k)** extra space, compared to the O(n \u00d7 k) or O(n\u00b2) brute force.`,
+Most sliding-window problems are solved in **O(n)** time with **O(1)** or **O(k)** extra space, compared to the O(n \u00d7 k) or O(n\u00b2) brute force.
+
+\`\`\`mermaid
+graph LR
+    subgraph Array["Array"]
+        A1["a"] --- A2["b"] --- A3["c"] --- A4["d"] --- A5["e"] --- A6["f"]
+    end
+    W1["Window Start"] -.-> A2
+    W2["Window End"] -.-> A4
+    style W1 fill:#4CAF50,color:#fff
+    style W2 fill:#2196F3,color:#fff
+    EX["Expand: End -->><br/>Contract: <<-- Start"]
+\`\`\`
+
+\`\`\`mermaid
+graph TD
+    A["Initialize window_start=0"] --> B["Expand: move window_end right"]
+    B --> C["Add element to window state"]
+    C --> D{"Window valid?"}
+    D -->|"Fixed: size==k"| E["Record result, slide start++"]
+    D -->|"Dynamic: condition met"| F["Shrink from left until invalid"]
+    D -->|"Not yet"| B
+    E --> B
+    F --> B
+\`\`\``,
     },
     {
       id: "sliding-window-max-sum-k",
@@ -78,6 +102,27 @@ Output: 2
 - Calculate the sum of the first \`k\` elements.
 - Slide the window: add the next element, subtract the element that just left the window.
 - Keep track of the maximum sum seen.
+
+\`\`\`mermaid
+graph LR
+    subgraph W1["Window 1: sum=8"]
+        direction LR
+        A1["[2"] --- A2["1"] --- A3["5]"]
+    end
+    subgraph W2["Window 2: sum=7"]
+        direction LR
+        B2["[1"] --- B3["5"] --- B4["1]"]
+    end
+    subgraph W3["Window 3: sum=9 MAX"]
+        direction LR
+        C3["[5"] --- C4["1"] --- C5["3]"]
+    end
+    subgraph W4["Window 4: sum=6"]
+        direction LR
+        D4["[1"] --- D5["3"] --- D6["2]"]
+    end
+    W1 -->|"-2, +1"| W2 -->|"-1, +1"| W3 -->|"-5, +2"| W4
+\`\`\`
 
 ### Complexity
 

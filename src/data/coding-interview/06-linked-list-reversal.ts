@@ -51,7 +51,38 @@ Since we run Python in the browser, each problem defines a simple \`ListNode\` c
 
 ### Complexity
 
-In-place reversal runs in **O(n)** time and **O(1)** space.`,
+In-place reversal runs in **O(n)** time and **O(1)** space.
+
+\`\`\`mermaid
+graph LR
+    subgraph Before["Before Reversal"]
+        direction LR
+        B1["1"] -->|"next"| B2["2"] -->|"next"| B3["3"] -->|"next"| B4["None"]
+    end
+    subgraph Pointers["Three Pointers"]
+        P["prev=None"] -.-> B1
+        C["current"] -.-> B1
+        N["next_node"] -.-> B2
+    end
+    subgraph After["After Reversal"]
+        direction LR
+        A3["3"] -->|"next"| A2["2"] -->|"next"| A1["1"] -->|"next"| A0["None"]
+    end
+    Before -->|"Reverse each link"| After
+    style P fill:#9C27B0,color:#fff
+    style C fill:#4CAF50,color:#fff
+    style N fill:#2196F3,color:#fff
+\`\`\`
+
+\`\`\`mermaid
+graph TD
+    S0["prev=None, curr=1, next=2"]
+    S1["Set 1.next=None<br/>prev=1, curr=2, next=3"]
+    S2["Set 2.next=1<br/>prev=2, curr=3, next=None"]
+    S3["Set 3.next=2<br/>prev=3, curr=None"]
+    S4["Return prev=3<br/>Result: 3->2->1->None"]
+    S0 --> S1 --> S2 --> S3 --> S4
+\`\`\``,
     },
     {
       id: "ll-reversal-full",
@@ -85,6 +116,26 @@ Output: 7 -> None
 - Use three pointers: \`prev\`, \`current\`, \`next_node\`.
 - At each step, save the next node, reverse the current node's pointer, and advance all three pointers.
 - When \`current\` is \`None\`, \`prev\` is the new head.
+
+\`\`\`mermaid
+graph LR
+    subgraph S1["Step 1: curr=1"]
+        A1["None <-- 1  2 -> 3 -> 4 -> 5"]
+    end
+    subgraph S2["Step 2: curr=2"]
+        A2["None <-- 1 <-- 2  3 -> 4 -> 5"]
+    end
+    subgraph S3["Step 3: curr=3"]
+        A3["None <-- 1 <-- 2 <-- 3  4 -> 5"]
+    end
+    subgraph S4["Step 4: curr=4"]
+        A4["None <-- 1 <-- 2 <-- 3 <-- 4  5"]
+    end
+    subgraph S5["Step 5: curr=5"]
+        A5["5 -> 4 -> 3 -> 2 -> 1 -> None"]
+    end
+    S1 --> S2 --> S3 --> S4 --> S5
+\`\`\`
 
 ### Complexity
 

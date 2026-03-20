@@ -26,6 +26,20 @@ A **binary tree** is a tree where each node has **at most two children**: a left
 \`\`\`
 
 <!-- voice:section_check concept="binary tree = each node has at most 2 children" -->
+
+\`\`\`mermaid
+graph TB
+    R["1 (root)"] --> L["2 (left child)"]
+    R --> Ri["3 (right child)"]
+    L --> LL["4 (leaf)"]
+    L --> LR["5 (leaf)"]
+    Ri --> RR["6 (leaf)"]
+    style R fill:#42a5f5,stroke:#333
+    style LL fill:#66bb6a,stroke:#333
+    style LR fill:#66bb6a,stroke:#333
+    style RR fill:#66bb6a,stroke:#333
+\`\`\`
+
 ## Tree Terminology
 
 | Term | Meaning |
@@ -562,6 +576,26 @@ Tree (special graph):       General graph:
 \`\`\`
 
 <!-- voice:section_check concept="graphs generalize trees — any node can connect to any other" -->
+
+\`\`\`mermaid
+graph LR
+    subgraph "Directed Graph"
+        DA["A"] -->|""| DB["B"]
+        DA -->|""| DC["C"]
+        DB -->|""| DD["D"]
+        DC -->|""| DD
+    end
+    subgraph "Undirected Graph"
+        UA["A"] ---|""| UB["B"]
+        UA ---|""| UC["C"]
+        UB ---|""| UD["D"]
+        UC ---|""| UD
+        UB ---|""| UC
+    end
+    style DA fill:#42a5f5,stroke:#333
+    style UA fill:#66bb6a,stroke:#333
+\`\`\`
+
 ## Graph Terminology
 
 | Term | Meaning |

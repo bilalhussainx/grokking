@@ -52,6 +52,27 @@ while queue:
 
 <!-- voice:key_insight insight="BFS uses a queue to ensure we process all nodes at depth d before any node at depth d+1" -->
 
+### BFS Level-by-Level Traversal
+
+\`\`\`mermaid
+graph TD
+    A["1 (Level 0)"] --> B["2 (Level 1)"]
+    A --> C["3 (Level 1)"]
+    B --> D["4 (Level 2)"]
+    B --> E["5 (Level 2)"]
+    C --> F["6 (Level 2)"]
+    C --> G["7 (Level 2)"]
+    style A fill:#339af0,color:#fff
+    style B fill:#51cf66,color:#fff
+    style C fill:#51cf66,color:#fff
+    style D fill:#ffd93d,color:#000
+    style E fill:#ffd93d,color:#000
+    style F fill:#ffd93d,color:#000
+    style G fill:#ffd93d,color:#000
+\`\`\`
+
+> **Queue state per level:** Level 0: \`[1]\` -> Level 1: \`[2, 3]\` -> Level 2: \`[4, 5, 6, 7]\`. The queue size at each level tells you exactly how many nodes to process before moving on.
+
 ### Complexity
 
 - **Time:** O(n) — visit each node once

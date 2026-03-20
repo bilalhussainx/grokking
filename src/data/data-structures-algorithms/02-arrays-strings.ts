@@ -18,6 +18,18 @@ Arrays and strings are the most fundamental data structures in computer science.
 
 An array stores elements in **contiguous memory**, providing:
 
+\`\`\`mermaid
+graph LR
+    subgraph "Array Memory Layout"
+    I0["idx 0<br/>42"] --- I1["idx 1<br/>17"] --- I2["idx 2<br/>93"] --- I3["idx 3<br/>8"] --- I4["idx 4<br/>55"]
+    end
+    style I0 fill:#6366f1,color:#fff
+    style I1 fill:#6366f1,color:#fff
+    style I2 fill:#6366f1,color:#fff
+    style I3 fill:#6366f1,color:#fff
+    style I4 fill:#6366f1,color:#fff
+\`\`\`
+
 | Operation | Time |
 |-----------|------|
 | Access by index | O(1) |
@@ -35,6 +47,17 @@ An array stores elements in **contiguous memory**, providing:
 **Prefix Sums** — Precompute cumulative sums so that any subarray sum can be answered in O(1).
 
 **Kadane's Algorithm** — Find the maximum subarray sum in O(n) using a clever single-pass approach.
+
+\`\`\`mermaid
+graph LR
+    subgraph "Dynamic Array Resize (capacity doubling)"
+    A["size=4<br/>cap=4<br/>[1,2,3,4]"] -->|"append(5)"| B["Allocate cap=8"]
+    B --> C["Copy elements"]
+    C --> D["size=5<br/>cap=8<br/>[1,2,3,4,5,_,_,_]"]
+    end
+    style A fill:#f59e0b,color:#000
+    style D fill:#4ade80,color:#000
+\`\`\`
 
 ### Strings
 

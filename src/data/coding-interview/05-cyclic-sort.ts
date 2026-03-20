@@ -43,7 +43,34 @@ Regular sorting is O(n log n). Since we know the exact range of values, cyclic s
 ### Complexity
 
 - **Time:** O(n) — each number is swapped at most once.
-- **Space:** O(1) — in-place.`,
+- **Space:** O(1) — in-place.
+
+\`\`\`mermaid
+graph LR
+    subgraph Idea["Core Idea: number k belongs at index k-1"]
+        direction LR
+        V1["val=3"] -.->|"place at idx 2"| I2["index 2"]
+        V2["val=1"] -.->|"place at idx 0"| I0["index 0"]
+        V3["val=5"] -.->|"place at idx 4"| I4["index 4"]
+    end
+\`\`\`
+
+\`\`\`mermaid
+graph TD
+    subgraph Start["[3, 1, 5, 4, 2]"]
+        S0["i=0: arr[0]=3, swap to idx 2"]
+    end
+    subgraph Step1["[5, 1, 3, 4, 2]"]
+        S1["i=0: arr[0]=5, swap to idx 4"]
+    end
+    subgraph Step2["[2, 1, 3, 4, 5]"]
+        S2["i=0: arr[0]=2, swap to idx 1"]
+    end
+    subgraph Step3["[1, 2, 3, 4, 5]"]
+        S3["i=0: arr[0]=1, correct! Done."]
+    end
+    Start --> Step1 --> Step2 --> Step3
+\`\`\``,
     },
     {
       id: "cyclic-sort-basic",
@@ -77,6 +104,26 @@ Output: [1, 2, 3]   (already sorted)
 - Start at index 0. If the current number is not at its correct position (i.e., \`arr[i] != i + 1\`), swap it to its correct index.
 - Keep swapping at the same index until the correct number lands there.
 - Then move to the next index.
+
+\`\`\`mermaid
+graph LR
+    subgraph S1["i=0: swap 2<->6"]
+        A1["[2,6,4,3,1,5]"]
+    end
+    subgraph S2["i=0: swap 6<->5"]
+        A2["[6,2,4,3,1,5]"]
+    end
+    subgraph S3["i=0: swap 5<->1"]
+        A3["[5,2,4,3,6,1]"]
+    end
+    subgraph S4["i=0: 1 correct, move on"]
+        A4["[1,2,4,3,6,5]"]
+    end
+    subgraph S5["Continue swaps..."]
+        A5["[1,2,3,4,5,6]"]
+    end
+    S1 --> S2 --> S3 --> S4 --> S5
+\`\`\`
 
 ### Complexity
 

@@ -43,7 +43,33 @@ In our problems, we define a \`TreeNode\` class and build trees from arrays usin
 
 ### Complexity
 
-BFS visits every node once: **O(n)** time, **O(w)** space where w is the maximum width of the tree (at most n/2 for a complete binary tree).`,
+BFS visits every node once: **O(n)** time, **O(w)** space where w is the maximum width of the tree (at most n/2 for a complete binary tree).
+
+\`\`\`mermaid
+graph TD
+    R["1"] --> L["2"]
+    R --> Ri["3"]
+    L --> LL["4"]
+    L --> LR["5"]
+    Ri --> RR["6"]
+    subgraph Queue["Queue processes level by level"]
+        Q1["Level 0: [1]"]
+        Q2["Level 1: [2, 3]"]
+        Q3["Level 2: [4, 5, 6]"]
+    end
+    Q1 --> Q2 --> Q3
+\`\`\`
+
+\`\`\`mermaid
+graph TD
+    A["Push root to queue"] --> B{"Queue empty?"}
+    B -->|"No"| C["level_size = len queue"]
+    C --> D["Process level_size nodes"]
+    D --> E["Dequeue node, enqueue children"]
+    E --> F["Repeat for all in level"]
+    F --> B
+    B -->|"Yes"| G["Done: all levels processed"]
+\`\`\``,
     },
     {
       id: "tree-bfs-level-order",
@@ -522,6 +548,22 @@ Output: [5.0]
 
 - Standard BFS, but at each level compute the sum and divide by the count.
 - Collect the average for each level into the result.
+
+\`\`\`mermaid
+graph TD
+    R["1"] --> L["2"]
+    R --> Ri["3"]
+    L --> LL["4"]
+    L --> LR["5"]
+    Ri --> RL["6"]
+    Ri --> RR["7"]
+    subgraph Averages["Level Averages"]
+        AV0["Level 0: avg 1 = 1.0"]
+        AV1["Level 1: avg 2,3 = 2.5"]
+        AV2["Level 2: avg 4,5,6,7 = 5.5"]
+    end
+    AV0 --> AV1 --> AV2
+\`\`\`
 
 ### Complexity
 

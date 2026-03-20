@@ -18,6 +18,16 @@ An **array** is the most basic data structure in computer science. It stores ele
 In Python, the built-in \`list\` is a **dynamic array** — it resizes automatically as you add elements. In lower-level languages like C or Java, arrays have a fixed size.
 
 <!-- voice:section_check concept="arrays store elements contiguously by index" -->
+
+\`\`\`mermaid
+graph LR
+    subgraph "Array in Memory (contiguous)"
+        I0["Index 0<br/>10"] --- I1["Index 1<br/>20"] --- I2["Index 2<br/>30"] --- I3["Index 3<br/>40"] --- I4["Index 4<br/>50"]
+    end
+    A["arr[2]"] -->|"O(1) direct access"| I2
+    style I2 fill:#f9a825,stroke:#333
+\`\`\`
+
 ## Python Lists: Your Go-To Array
 
 \`\`\`python
@@ -292,6 +302,22 @@ String result = sb.toString();  // "HELLO"
 \`\`\`
 
 <!-- voice:section_check concept="use StringBuilder/list+join for efficient string building" -->
+
+\`\`\`mermaid
+graph LR
+    subgraph "String Slice: s[1:4]"
+        C0["h"] --- C1["e"] --- C2["l"] --- C3["l"] --- C4["o"]
+    end
+    subgraph "Result (new string)"
+        R0["e"] --- R1["l"] --- R2["l"]
+    end
+    C1 -.->|"copy"| R0
+    C2 -.->|"copy"| R1
+    C3 -.->|"copy"| R2
+    style C1 fill:#66bb6a,stroke:#333
+    style C2 fill:#66bb6a,stroke:#333
+    style C3 fill:#66bb6a,stroke:#333
+\`\`\`
 
 ## The Palindrome Check — A Classic String Problem
 
