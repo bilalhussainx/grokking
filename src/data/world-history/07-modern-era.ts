@@ -98,6 +98,15 @@ The reality was exploitation. In the **Congo Free State** under Belgian King Leo
 
 Some historians view the two World Wars as a single extended crisis — a "Thirty Years' Crisis" that destroyed the old European order and created the modern world.
 
+\`\`\`mermaid
+graph LR
+    A[WWI 1914] --> B[Treaty of Versailles 1919]
+    B --> C[Great Depression 1929]
+    C --> D[WWII 1939]
+    D --> E[Cold War 1947]
+    E --> F[Fall of Berlin Wall 1989]
+\`\`\`
+
 <!-- voice:section_check concept="World War I" -->
 
 ### World War I (1914-1918)

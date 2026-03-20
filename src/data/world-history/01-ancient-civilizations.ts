@@ -185,6 +185,18 @@ The Mandate of Heaven was revolutionary because it implied that **rulers could b
 
 Despite being separated by thousands of miles and developing independently, all four civilizations share common features:
 
+\`\`\`mermaid
+graph TD
+    A[Ancient Civilizations] --> B[Mesopotamia]
+    A --> C[Egypt]
+    A --> D[Indus Valley]
+    A --> E[China]
+    B --> B1[Tigris-Euphrates]
+    C --> C1[Nile]
+    D --> D1[Indus River]
+    E --> E1[Yellow River]
+\`\`\`
+
 1. **River-based agriculture** — all four depended on river flooding for fertile soil
 2. **Writing systems** — all developed writing (though the Indus script remains undeciphered)
 3. **Social hierarchies** — all had stratified societies with rulers, priests, artisans, and laborers

@@ -54,6 +54,19 @@ The Sermon on the Mount also includes the **Lord's Prayer** (Matthew 6:9-13), th
 > "So in everything, do to others what you would have them do to you, for this sums up the Law and the Prophets."
 > — Matthew 7:12 NIV
 
+### Timeline of Jesus' Ministry
+
+The major events of Jesus' public life follow a dramatic arc:
+
+\`\`\`mermaid
+graph LR
+    A[Baptism] --> B[Galilee<br>Ministry]
+    B --> C[Transfiguration]
+    C --> D[Jerusalem<br>Entry]
+    D --> E[Crucifixion]
+    E --> F[Resurrection]
+\`\`\`
+
 ### Jesus and the Marginalized
 
 A striking feature of Jesus' ministry was his consistent attention to people on the margins of society:

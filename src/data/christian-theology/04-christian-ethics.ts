@@ -39,6 +39,20 @@ The apostle Paul's famous description in 1 Corinthians 13 captures its character
 
 <!-- voice:key_insight insight="The most radical feature of Jesus' love ethic is the command to love enemies: 'Love your enemies and pray for those who persecute you' (Matthew 5:44 NIV). This goes beyond tolerance or non-violence — it demands actively seeking the good of the person who harms you. This command has inspired both Christian pacifism and the civil rights movement." -->
 
+### The Love Commandment in Practice
+
+Jesus' ethical teaching flows from a single principle into concrete action:
+
+\`\`\`mermaid
+graph TD
+    A[Greatest Commandment] --> B[Love God]
+    A --> C[Love Neighbor]
+    C --> D[Golden Rule<br>Do unto others...]
+    D --> E1[Sermon on the Mount<br>Love enemies]
+    D --> E2[Good Samaritan<br>Mercy in action]
+    D --> E3[Sheep and Goats<br>Serve the vulnerable]
+\`\`\`
+
 ### The Parable of the Good Samaritan (Luke 10:25-37)
 
 When a lawyer asked "Who is my neighbor?", Jesus told the parable of a man beaten and left for dead on the road. A priest and a Levite passed by. A **Samaritan** — a member of a despised ethnic group — stopped to help.

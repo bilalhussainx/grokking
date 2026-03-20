@@ -59,6 +59,15 @@ Strong research also identifies what mindfulness does NOT do:
 
 <!-- voice:section_check -->
 
+\`\`\`mermaid
+graph LR
+    A[Notice] --> B[Pause]
+    B --> C[Breathe]
+    C --> D[Observe without judgment]
+    D --> E[Respond consciously]
+    E -.->|Practice again| A
+\`\`\`
+
 ### Types of Meditation Practice
 
 | Type | Focus | Best For |

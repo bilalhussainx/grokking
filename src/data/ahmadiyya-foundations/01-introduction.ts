@@ -115,6 +115,17 @@ These claims were revolutionary and deeply controversial.
 
 He died on **26 May 1908** in Lahore and is buried in **Bahishti Maqbarah** (Heavenly Graveyard) in Qadian.
 
+\\\`\\\`\\\`mermaid
+graph LR
+    A[1835\\nBirth] --> B[1889\\nClaim]
+    B --> C[1908\\nPassing]
+    C --> D[Khilafat I\\n1908]
+    D --> E[Khilafat II\\n1914]
+    E --> F[...]
+    F --> G[Khilafat IV\\n1982]
+    G --> H[Khilafat V\\n2003-present]
+\\\`\\\`\\\`
+
 ### Reflection Questions
 
 1. Why might Ghulam Ahmad's early work defending Islam have been praised, while his later claims were rejected by the same scholars?

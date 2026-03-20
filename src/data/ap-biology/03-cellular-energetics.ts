@@ -49,6 +49,15 @@ The Calvin cycle was discovered by Melvin Calvin, Andrew Benson, and James Bassh
 
 <!-- voice:key_insight insight="Photosynthesis has two stages: the light reactions charge the energy carriers (ATP and NADPH), and the Calvin cycle uses them to build sugar from CO2." -->
 
+\`\`\`mermaid
+graph LR
+    A[Sunlight + CO2 + H2O] --> B[Photosynthesis]
+    B --> C[Glucose + O2]
+    C --> D[Cellular Respiration]
+    D --> E[ATP + CO2 + H2O]
+    E -.->|CO2 & H2O recycled| A
+\`\`\`
+
 ### Why Leaves Are Green
 
 The pigment **chlorophyll** absorbs red and blue wavelengths of light but reflects green — which is why leaves appear green to our eyes. In autumn, as chlorophyll breaks down, other pigments (yellow carotenoids, red anthocyanins) are revealed, creating fall colors.

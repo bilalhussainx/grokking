@@ -176,6 +176,15 @@ This means four states are possible:
 
 Keyes' research found that only about **17% of American adults** were truly flourishing. The majority were in a state of **languishing** — not clinically ill, but not thriving either. Emerging research suggests the COVID-19 pandemic increased languishing significantly (Keyes & Michalec, 2023).
 
+\`\`\`mermaid
+graph LR
+    A[Thriving] <--> B[Coping]
+    B <--> C[Struggling]
+    C <--> D[Crisis]
+    A -.->|Recovery possible| D
+    D -.->|With support| A
+\`\`\`
+
 ### Recognizing Where You Are
 
 Your position on the spectrum shifts daily, weekly, and seasonally. Some common signs at different points:

@@ -105,6 +105,20 @@ The 50/30/20 rule is one of the simplest and most popular budgeting frameworks. 
 | **Wants** | 30% | Dining out, entertainment, hobbies, vacations, subscriptions, upgrades |
 | **Savings/Debt** | 20% | Emergency fund, retirement contributions, extra debt payments, investments |
 
+\`\`\`mermaid
+graph TD
+    A[Monthly Income After Tax] --> B[Needs 50%]
+    A --> C[Wants 30%]
+    A --> D[Savings 20%]
+    B --> B1[Housing]
+    B --> B2[Food & Groceries]
+    B --> B3[Transportation]
+    C --> C1[Entertainment]
+    C --> C2[Dining Out]
+    D --> D1[Emergency Fund]
+    D --> D2[Retirement Contributions]
+\`\`\`
+
 ### Applying the Rule
 
 If your take-home pay is \\\$4,000/month:

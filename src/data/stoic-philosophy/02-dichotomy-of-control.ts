@@ -94,6 +94,16 @@ Epictetus does not merely describe these categories. He prescribes a radical res
 
 This is not passivity. Epictetus is not saying "do not act." He is saying: direct your energy toward your own judgments, choices, and character -- and release your attachment to outcomes you cannot guarantee.
 
+\`\`\`mermaid
+graph TD
+    A[Event Occurs] --> B{Is it in my control?}
+    B -->|Yes| C[Focus energy here]
+    C --> D[Act with virtue]
+    B -->|No| E[Accept it]
+    E --> F[Don't waste energy]
+    F --> G[Inner peace]
+\`\`\`
+
 ### The Irvine Modification: Trichotomy of Control
 
 Philosopher **William Irvine** (*A Guide to the Good Life*, 2009) has argued that Epictetus's strict dichotomy needs a third category: **things we have *some* control over**. For example, winning a tennis match is not entirely up to you (your opponent matters), but it is not entirely outside your control either (your preparation and effort matter).

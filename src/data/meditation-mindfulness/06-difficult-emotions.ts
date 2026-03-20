@@ -62,6 +62,15 @@ Meditation teacher **Tara Brach** popularized the **RAIN** technique — a four-
 - Recognize that you are not the emotion — it is passing through you
 - Offer yourself compassion: "This is hard. And I can hold this with kindness."
 
+\`\`\`mermaid
+graph TD
+    A[RAIN Technique] --> B[Recognize]
+    A --> C[Allow]
+    A --> D[Investigate]
+    A --> E[Nurture]
+    E --> F[Non-identification]
+\`\`\`
+
 ### Research on Emotional Regulation
 
 The evidence for mindfulness-based emotional regulation is robust:

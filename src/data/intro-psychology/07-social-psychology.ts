@@ -107,6 +107,16 @@ Muzafer **Sherif** demonstrated how quickly prejudice can form. He took 22 boys 
 
 The solution? **Superordinate goals** — challenges that required both groups to cooperate (like fixing a broken water supply). Once the groups had to work together, hostility decreased dramatically. This suggests prejudice is partly situational — created by competition and reduced by cooperation.
 
+\`\`\`mermaid
+graph TD
+    A[Social Influence] --> B[Conformity]
+    A --> C[Obedience]
+    A --> D[Group Polarization]
+    A --> E[Bystander Effect]
+    B --> B1["Asch: 75% conformed"]
+    C --> C1["Milgram: 65% obeyed"]
+\`\`\`
+
 ### Group Effects on Behavior
 
 Groups change how individuals act:

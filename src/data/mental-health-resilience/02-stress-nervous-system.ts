@@ -52,6 +52,20 @@ The response evolved for short-term physical threats:
 
 A fourth response, **fawn** (identified by therapist Pete Walker), involves people-pleasing to avoid conflict. This is particularly common in individuals with childhood trauma histories.
 
+\`\`\`mermaid
+graph TD
+    A[Trigger / Stressor] --> B[Amygdala Activation]
+    B --> C{Response}
+    C --> D[Fight]
+    C --> E[Flight]
+    C --> F[Freeze]
+    B --> G[Cortisol Release]
+    G --> H{Recovery?}
+    H -->|Yes| I[Return to Baseline]
+    H -->|No| J[Chronic Stress Loop]
+    J --> G
+\`\`\`
+
 ### The Problem: Your Brain Cannot Tell the Difference
 
 Here is the critical insight from stress neuroscience: **your amygdala cannot distinguish between a physical threat and a psychological one**. A work email from an angry boss triggers a similar cascade as encountering a predator — elevated cortisol, increased heart rate, muscle tension.

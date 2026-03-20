@@ -42,6 +42,20 @@ The tax system is **progressive** — each bracket applies only to the income wi
 - **Marginal rate:** 22% (the rate on your last dollar)
 - **Effective rate:** 16.2% (\\\$13,753 / \\\$85,000)
 
+\`\`\`mermaid
+graph LR
+    A[Gross Income] --> B[Standard Deduction]
+    B --> C[Taxable Income]
+    C --> D[10% Bracket]
+    D --> E[12% Bracket]
+    E --> F[22% Bracket]
+    F --> G[24% Bracket]
+    style D fill:#2d6a4f
+    style E fill:#40916c
+    style F fill:#52b788
+    style G fill:#74c69d
+\`\`\`
+
 You are "in the 22% bracket" but you pay only 16.2% overall. The common fear — "If I earn more, I will lose money to taxes" — is a myth. Only the income above each threshold is taxed at the higher rate.
 
 ### Taxable Income vs Gross Income

@@ -53,6 +53,18 @@ Seneca's evening review asks three questions:
 
 This practice is remarkably similar to modern **reflective journaling** techniques used in psychology, coaching, and mindfulness programs. The key Stoic addition: the review is specifically *moral*, not just emotional or practical. It asks not "How did I feel?" but "Did I act virtuously?"
 
+\`\`\`mermaid
+graph LR
+    A[Morning] --> B[Premeditatio Malorum]
+    B --> C[Day]
+    C --> D[Mindful Action]
+    C --> E[Dichotomy of Control]
+    D --> F[Evening]
+    E --> F
+    F --> G[What went well?]
+    F --> H[What to improve?]
+\`\`\`
+
 ### Journaling: The Meditations as Model
 
 Marcus Aurelius's *Meditations* are themselves the product of this daily practice. They are a philosophical journal -- not written for anyone else, but as a tool for self-examination and self-correction.

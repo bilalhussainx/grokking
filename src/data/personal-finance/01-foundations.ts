@@ -100,6 +100,18 @@ Income is any money you receive. It comes in several forms:
 
 Your **gross income** is the total before taxes and deductions. Your **net income** (take-home pay) is what actually hits your bank account. Always plan your budget around net income, not gross.
 
+\`\`\`mermaid
+graph TD
+    A[Gross Income] --> B[Taxes & Deductions]
+    B --> C[Net Income / Take-Home Pay]
+    C --> D[Needs 50%]
+    C --> E[Wants 30%]
+    C --> F[Savings 20%]
+    D --> G[Housing, Food, Transport]
+    E --> H[Entertainment, Dining]
+    F --> I[Emergency Fund, Retirement]
+\`\`\`
+
 ### Expenses: Money Going Out
 
 Expenses fall into two categories:
@@ -126,6 +138,14 @@ Net worth is the single most important number in personal finance:
 
 \`\`\`
 Net Worth = Total Assets - Total Liabilities
+\`\`\`
+
+\`\`\`mermaid
+graph LR
+    A[Assets] --> B(minus)
+    B --> C[Liabilities]
+    C --> D(equals)
+    D --> E[Net Worth]
 \`\`\`
 
 **Assets** are things you own that have value: cash, investments, retirement accounts, real estate, vehicles.

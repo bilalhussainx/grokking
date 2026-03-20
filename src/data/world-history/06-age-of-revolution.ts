@@ -49,6 +49,16 @@ Think of it as humanity applying the scientific method to politics: just as scie
 
 Locke's view won out in the revolutionary era. His argument that governments exist to protect natural rights — and that people can overthrow governments that fail to do so — became the intellectual foundation of revolution.
 
+\`\`\`mermaid
+graph TD
+    A[Economic Inequality] --> E[Revolution]
+    B[Political Oppression] --> E
+    C[Enlightenment Ideas] --> E
+    D[Catalyst Event] --> E
+    E --> F[New Political Order]
+    F --> G[Contradictions Remain]
+\`\`\`
+
 <!-- voice:key_insight insight="The Enlightenment's most radical idea was that political authority should come from reason and the consent of the governed — not from divine right, tradition, or force." -->
 
 ### Reflection Questions

@@ -124,6 +124,14 @@ Mirza Ghulam Ahmad presented this argument in his book **Jesus in India** (Masih
 
 <!-- voice:key_insight insight="The Jesus question is not merely historical for Ahmadis — it is theologically necessary. If Jesus is alive in heaven, he can physically return, and there is no need for a new Messiah. If Jesus has died, then the prophecies of a Messiah's coming must be fulfilled by someone new. The entire Ahmadiyya claim depends on Jesus having completed his natural life." -->
 
+\\\`\\\`\\\`mermaid
+graph TD
+    A[Ahmadiyya Beliefs] --> B[Jesus Survived\\nCrucifixion]
+    A --> C[Jihad of\\nthe Pen]
+    A --> D[Prophethood\\nContinues]
+    A --> E[Promised Messiah\\nHas Come]
+\\\`\\\`\\\`
+
 ### Distinction 3: The Nature of Prophethood
 
 We covered this in Module 2, but to summarize the key distinction:

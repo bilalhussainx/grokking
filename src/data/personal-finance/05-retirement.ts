@@ -172,6 +172,16 @@ If your income exceeds the Roth IRA limits, you can use the "backdoor" strategy:
 
 This is a legal strategy used by high-income earners. Consult a tax professional to navigate the pro-rata rule if you have existing Traditional IRA balances.
 
+\`\`\`mermaid
+graph TD
+    A{Employer match available?}
+    A -->|Yes| B[Contribute to 401k up to match]
+    B --> C[Then max out Roth IRA]
+    A -->|No| D[Start with Roth IRA]
+    D --> E[Then contribute to taxable account]
+    C --> F[Then max out remaining 401k]
+\`\`\`
+
 ### Where to Open an IRA
 
 The best IRA providers offer no-fee accounts, low-cost index funds, and excellent customer service:

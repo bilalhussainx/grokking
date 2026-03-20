@@ -220,6 +220,18 @@ You direct \\\$500 extra to Credit Card B (\\\$550/month total). It is paid off 
 **Pros:** Quick wins build motivation. Research published in the *Harvard Business Review* found that people who pay off small debts first are more likely to eliminate all their debt.
 **Cons:** You pay more in total interest because higher-rate debts accrue interest longer.
 
+\`\`\`mermaid
+graph TD
+    A[Debt Repayment Strategy] --> B[Snowball Method]
+    A --> C[Avalanche Method]
+    B --> B1[Pay smallest balance first]
+    B --> B2[Builds motivation]
+    B1 --> B3[Quick wins]
+    C --> C1[Pay highest interest first]
+    C --> C2[Saves more money]
+    C1 --> C3[Mathematically optimal]
+\`\`\`
+
 ### Head-to-Head Comparison
 
 Using the example above with \\\$500/month extra:

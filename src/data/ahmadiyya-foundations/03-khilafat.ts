@@ -47,6 +47,14 @@ Key features that distinguish the Ahmadiyya Khilafat:
 
 <!-- voice:section_check concept="How Ahmadiyya Khilafat differs from political caliphate movements like ISIS" -->
 
+\\\`\\\`\\\`mermaid
+graph TD
+    A[Khalifa] --> B[Shura\\nAdvisory Council]
+    A --> C[Auxiliary Orgs\\nLajna / Khuddam / Ansar]
+    A --> D[National Amirs]
+    D --> E[Local Jamaats]
+\\\`\\\`\\\`
+
 ### Khilafat vs. "Caliphate"
 
 In recent decades, groups like **ISIS/ISIL** and **Hizb ut-Tahrir** have called for the restoration of a political caliphate — a Muslim state governed by a caliph with political and military power.

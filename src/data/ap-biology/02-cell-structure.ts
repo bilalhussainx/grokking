@@ -97,6 +97,20 @@ The **nucleus** is the cell's control center. It contains the cell's DNA, organi
 
 Inside the nucleus, the **nucleolus** assembles the components of **ribosomes**, the molecular machines that build proteins.
 
+\`\`\`mermaid
+graph TD
+    A[Eukaryotic Cell] --> B[Nucleus]
+    A --> C[Mitochondria]
+    A --> D[Endoplasmic Reticulum]
+    A --> E[Golgi Apparatus]
+    A --> F[Lysosome]
+    B --> B1[DNA Storage]
+    C --> C1[Energy / ATP]
+    D --> D1[Protein Synthesis]
+    E --> E1[Packaging]
+    F --> F1[Recycling]
+\`\`\`
+
 ### The Production and Shipping System
 
 | Organelle | Function | Factory Analogy |

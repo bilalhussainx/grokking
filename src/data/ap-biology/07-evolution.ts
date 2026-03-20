@@ -41,6 +41,15 @@ Natural selection occurs when ALL four conditions are met:
 
 Over many generations, the population shifts — more brown beetles, fewer green ones. This is **natural selection**: the environment "selects" which traits become more common.
 
+\`\`\`mermaid
+graph LR
+    A[Variation] --> B[Competition]
+    B --> C[Selection]
+    C --> D[Reproduction]
+    D --> E[Adaptation]
+    E -.->|Mutation| A
+\`\`\`
+
 ### Darwin's Journey
 
 Darwin didn't invent his theory overnight. Key influences:

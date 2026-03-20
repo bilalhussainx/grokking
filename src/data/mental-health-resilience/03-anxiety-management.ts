@@ -31,6 +31,13 @@ At the core of CBT is a simple but powerful insight: **thoughts, feelings, and b
 
 <!-- voice:key_insight -->
 
+\`\`\`mermaid
+graph TD
+    A[Thoughts] <--> B[Feelings]
+    B <--> C[Behaviors]
+    C <--> A
+\`\`\`
+
 **Example:**
 - **Situation:** Your friend does not reply to your text for 24 hours
 - **Thought:** "They must be angry at me. I said something wrong."

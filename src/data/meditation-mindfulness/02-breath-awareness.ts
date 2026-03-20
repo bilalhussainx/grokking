@@ -61,6 +61,15 @@ Different traditions recommend slightly different focal points:
 
 There is no "correct" answer. Choose whichever feels most natural and stay with it consistently.
 
+\`\`\`mermaid
+graph LR
+    A[Inhale] --> B[Notice sensation]
+    B --> C[Exhale]
+    C --> D[Mind wanders]
+    D --> E[Gently return]
+    E --> A
+\`\`\`
+
 ### Guided Practice: 5-Minute Breath Awareness
 
 Find a comfortable seated position — chair, cushion, or floor. Keep your back upright but not rigid.

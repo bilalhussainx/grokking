@@ -143,6 +143,18 @@ Same contribution, radically different outcomes. The difference is compounding r
 - Risk: Essentially none
 - Best for: Short-term needs, emergency fund
 
+\`\`\`mermaid
+graph TD
+    A[Investing] --> B[Stocks]
+    A --> C[Bonds]
+    A --> D[Index Funds]
+    A --> E[Real Estate]
+    B --> B1[Growth potential]
+    C --> C1[Steady income]
+    D --> D1[Diversified & low-cost]
+    E --> E1[Tangible asset]
+\`\`\`
+
 ### Stocks: A Closer Look
 
 When you buy a share of Apple stock, you own a tiny piece of Apple Inc. If Apple earns more profit, launches successful products, and grows, your share becomes more valuable. You can profit in two ways:

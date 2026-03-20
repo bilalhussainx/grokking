@@ -31,6 +31,24 @@ With approximately 2.4 billion adherents worldwide (Pew Research Center, 2023), 
 
 <!-- voice:key_insight insight="Christianity is not primarily a moral code or a philosophy. At its center is a person — Jesus Christ — and a claim about what God has done through him. Everything else in Christian theology flows from this: ethics, worship, community, and hope." -->
 
+### Major Christian Denominations
+
+Christianity encompasses a wide family of traditions:
+
+\`\`\`mermaid
+graph TD
+    A[Christianity] --> B[Catholic]
+    A --> C[Protestant]
+    A --> D[Orthodox]
+    C --> C1[Lutheran]
+    C --> C2[Baptist]
+    C --> C3[Methodist]
+    C --> C4[Pentecostal]
+    D --> D1[Greek]
+    D --> D2[Russian]
+    D --> D3[Coptic]
+\`\`\`
+
 ### The Bible
 
 The Christian Bible consists of two main sections:

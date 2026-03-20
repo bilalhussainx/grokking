@@ -197,6 +197,15 @@ The offspring ratios reveal the unknown parent's genotype.
 
 <!-- voice:key_insight insight="Punnett squares show probability, not certainty. A 3:1 ratio means each offspring has a 75% chance of being dominant, not that exactly 3 out of every 4 will be." -->
 
+\`\`\`mermaid
+graph TD
+    A["Parent 1 (Aa)"] --- B["Cross (x)"]
+    C["Parent 2 (Aa)"] --- B
+    B --> D["AA (25%)"]
+    B --> E["Aa (50%)"]
+    B --> F["aa (25%)"]
+\`\`\`
+
 ### Beyond Simple Dominance
 
 Not all traits follow simple Mendelian patterns:

@@ -37,6 +37,15 @@ Your brain contains approximately **86 billion neurons** — specialized cells t
 | **Axon terminals** | Release chemical messengers (neurotransmitters) to the next neuron | The "send" button |
 | **Synapse** | The gap between two neurons | The airspace a text message crosses |
 
+\`\`\`mermaid
+graph LR
+    A[Dendrites] --> B[Cell Body]
+    B --> C[Axon]
+    C --> D[Synaptic Terminal]
+    D --> E[Neurotransmitter Release]
+    E --> F[Next Neuron]
+\`\`\`
+
 ### Electrical Signals: The Action Potential
 
 When a neuron is at rest, the inside is negatively charged relative to the outside (about -70 millivolts). This is called the **resting potential** — the neuron is loaded and ready, like a cocked spring.

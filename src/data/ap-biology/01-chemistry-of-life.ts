@@ -94,6 +94,18 @@ The prefix "macro" means large. These molecules are built by linking smaller uni
 | **Proteins** | Amino acids (20 types) | C, H, O, N, S | Enzymes, structure, transport, defense | Hemoglobin, collagen, antibodies |
 | **Nucleic Acids** | Nucleotides | C, H, O, N, P | Store and transmit genetic information | DNA, RNA |
 
+\`\`\`mermaid
+graph TD
+    A[Biomolecules] --> B[Carbohydrates]
+    A --> C[Lipids]
+    A --> D[Proteins]
+    A --> E[Nucleic Acids]
+    B --> B1[Energy]
+    C --> C1[Membranes]
+    D --> D1[Function & Structure]
+    E --> E1[Genetic Information]
+\`\`\`
+
 **Carbohydrates** are your body's preferred quick fuel. A glucose molecule is like a matchstick — easy to light and burns fast. Plants store glucose as **starch**; animals store it as **glycogen**. Plants also use glucose to build **cellulose**, the tough fiber in cell walls.
 
 **Lipids** are the long-term energy reserves — like a log that burns slowly. They also form the **phospholipid bilayer** of every cell membrane, creating the barrier between inside and outside.

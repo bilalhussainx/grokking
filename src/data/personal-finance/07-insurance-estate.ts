@@ -109,6 +109,17 @@ Health insurance is not optional — one serious medical event can bankrupt you.
 
 Life insurance provides a financial safety net for your dependents if you die. It is one of the most important — and most oversold — financial products. Understanding the difference between term and whole life insurance can save you thousands of dollars while still protecting your family.
 
+\`\`\`mermaid
+graph TD
+    A[Insurance] --> B[Health]
+    A --> C[Auto]
+    A --> D[Home / Renters]
+    A --> E[Life]
+    A --> F[Disability]
+    E --> E1[Term Life]
+    E --> E2[Whole Life]
+\`\`\`
+
 ### Who Needs Life Insurance?
 
 You need life insurance if someone depends on your income:

@@ -137,6 +137,16 @@ No single school "won." Modern psychology integrates insights from all of them.
 - What psychologists do beyond therapy
 - How psychology connects to other careers
 
+\`\`\`mermaid
+graph TD
+    A[Psychology] --> B[Clinical]
+    A --> C[Cognitive]
+    A --> D[Developmental]
+    A --> E[Social]
+    A --> F[Biological]
+    A --> G[Industrial-Organizational]
+\`\`\`
+
 ### Not Just Therapists
 
 When you picture a psychologist, you probably imagine someone listening to a patient talk about their feelings. And yes, **clinical psychologists** do that. But they represent only one branch of a much larger tree.

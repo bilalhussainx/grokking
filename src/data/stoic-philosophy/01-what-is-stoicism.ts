@@ -42,6 +42,18 @@ As Epictetus, a formerly enslaved Stoic philosopher, would later put it:
 
 This idea -- that our inner life is within our control even when external circumstances are not -- became the beating heart of Stoicism.
 
+\`\`\`mermaid
+graph TD
+    A[Stoic Virtues] --> B[Wisdom]
+    A --> C[Courage]
+    A --> D[Justice]
+    A --> E[Temperance]
+    B --> B1[Knowledge of good and evil]
+    C --> C1[Endurance and resilience]
+    D --> D1[Fairness toward others]
+    E --> E1[Self-control and moderation]
+\`\`\`
+
 ### The Succession
 
 After Zeno, the school passed to **Cleanthes** (famous for his *Hymn to Zeus*) and then to **Chrysippus**, who systematized Stoic logic so thoroughly that the ancients said, "Without Chrysippus, there would be no Stoa." Unfortunately, almost none of the early Stoics' writings survived intact. What we have today comes mostly from the later **Roman Stoics**: Seneca, Epictetus, and Marcus Aurelius.

@@ -22,6 +22,15 @@ The American Psychological Association defines resilience as "the process and ou
 
 A landmark longitudinal study by Werner & Smith (1992), following 698 children on the Hawaiian island of Kauai for 40 years, found that one-third of children born into high-risk environments (poverty, parental mental illness, family instability) developed into competent, confident, and caring adults. The protective factors? Strong relationships, internal locus of control, and problem-solving skills — all learnable.
 
+\`\`\`mermaid
+graph TD
+    A[Resilience] --> B[Social Connection]
+    A --> C[Sense of Purpose]
+    A --> D[Self-Care]
+    A --> E[Adaptability]
+    A --> F[Positive Mindset]
+\`\`\`
+
 ### Carol Dweck's Growth Mindset
 
 Stanford psychologist Carol Dweck's research, published in her seminal book *Mindset: The New Psychology of Success* (2006), identified two fundamental belief systems about ability:

@@ -105,6 +105,15 @@ Richard Atkinson and Richard Shiffrin proposed that memory flows through three s
 | **Short-term / Working memory** | About 20-30 seconds without rehearsal | 7 plus or minus 2 items (George Miller, 1956) | Remembering a phone number long enough to dial it |
 | **Long-term memory** | Potentially permanent | Essentially unlimited | Your childhood memories, learned skills, facts |
 
+\`\`\`mermaid
+graph LR
+    A[Sensory Input] --> B[Sensory Memory]
+    B -->|Attention| C[Short-term / Working Memory]
+    C -->|Encoding| D[Long-term Memory]
+    D -->|Retrieval| C
+    B -->|Ignored| E[Forgotten]
+\`\`\`
+
 **Sensory memory** is the brief snapshot your senses take. Most of it vanishes immediately.
 
 **Short-term memory (STM)** holds information you're currently thinking about. It's limited — about 7 items (a phone number). **Chunking** extends this: instead of remembering F-B-I-C-I-A-I-R-S as 9 letters, you chunk them into FBI-CIA-IRS (3 chunks).

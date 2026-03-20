@@ -41,6 +41,18 @@ Jon Kabat-Zinn, the pioneer of Mindfulness-Based Stress Reduction (MBSR), offers
 
 <!-- voice:key_insight insight="The most important thing to understand about meditation is this: you cannot fail at it. Every time you notice your mind has wandered and you gently bring attention back, you have just done the mental equivalent of a bicep curl. The wandering IS the training. This is the most common point of confusion for beginners." -->
 
+\`\`\`mermaid
+graph TD
+    A[Meditation] --> B[Focused Attention]
+    A --> C[Open Monitoring]
+    A --> D[Loving-Kindness]
+    B --> B1[Breath]
+    B --> B2[Mantra]
+    C --> C1[Vipassana]
+    C --> C2[Zen]
+    D --> D1[Metta]
+\`\`\`
+
 ### The Science
 
 Research published in leading journals has documented measurable effects of regular meditation:
