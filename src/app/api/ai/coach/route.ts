@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
       solutionCode,
       hintsGiven,
       history,
+      language,
     } = body;
 
     // Retrieve relevant memories for context (non-blocking — don't fail if memory is unavailable)
@@ -95,8 +96,14 @@ ${event}
 ${memoryContext}
 Respond concisely as Coach Alex:`;
 
+    // Add language instruction if user chose a non-English language
+    const langNames: Record<string, string> = { fr: "French", es: "Spanish", de: "German", hi: "Hindi", zh: "Mandarin", ja: "Japanese", it: "Italian", nl: "Dutch", pa: "Punjabi", pt: "Portuguese", ko: "Korean", ar: "Arabic", tr: "Turkish", ru: "Russian", ur: "Urdu" };
+    const langInstruction = language && language !== "en"
+      ? `\n\nLANGUAGE: The student prefers explanations in ${langNames[language] || language}. Respond primarily in ${langNames[language] || language} with key technical terms in English. If explaining code, use ${langNames[language] || language} for the explanation but keep code and variable names in English.`
+      : "";
+
     const messages = [
-      { role: "system", content: COACH_DIRECTIVE },
+      { role: "system", content: COACH_DIRECTIVE + langInstruction },
       ...((history as { role: string; content: string }[]) || []).map(
         (m: { role: string; content: string }) => ({
           role: m.role === "assistant" ? "assistant" : "user",

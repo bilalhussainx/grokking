@@ -404,6 +404,7 @@ export default function AICoach() {
             solutionCode: ctx.solutionCode,
             hintsGiven: hintsRef.current,
             history,
+            language: coachLanguage,
           }),
         });
 

@@ -31,21 +31,17 @@ export async function POST(req: NextRequest) {
   if (prefs.coach_persona) updateData.coach_persona = prefs.coach_persona;
   if (prefs.preferred_voice_id) updateData.preferred_voice_id = prefs.preferred_voice_id;
 
-  // Try update first, then upsert if no rows matched (profile doesn't exist)
-  const { error, count } = await admin
-    .from("user_profiles")
-    .update(updateData)
-    .eq("id", user.id);
+  // Always upsert — works whether profile exists or not
+  const { error: upsertErr } = await admin.from("user_profiles").upsert({
+    id: user.id,
+    email: user.email || "",
+    full_name: user.user_metadata?.full_name || user.user_metadata?.name || "User",
+    ...updateData,
+  }, { onConflict: "id" });
 
-  if (error || count === 0) {
-    // Profile might not exist — create it with preferences
-    await admin.from("user_profiles").upsert({
-      id: user.id,
-      email: user.email || "",
-      full_name: user.user_metadata?.full_name || user.user_metadata?.name || "User",
-      role: "pro",
-      ...updateData,
-    }, { onConflict: "id" });
+  if (upsertErr) {
+    console.error("[Preferences] Upsert error:", upsertErr);
+    return NextResponse.json({ error: upsertErr.message }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

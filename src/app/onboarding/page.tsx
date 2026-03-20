@@ -100,7 +100,7 @@ function OnboardingInner() {
       const finalInstructionLang = wantInstruction ? instructionLanguage : "en";
 
       // Save to Supabase
-      await fetch("/api/user/preferences", {
+      const saveResp = await fetch("/api/user/preferences", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -114,6 +114,10 @@ function OnboardingInner() {
           personalization_consent: personalizationConsent,
         }),
       });
+      if (!saveResp.ok) {
+        const errData = await saveResp.json().catch(() => ({}));
+        console.error("[Onboarding] Failed to save preferences:", errData);
+      }
 
       // Also save to localStorage for immediate coach use
       localStorage.setItem("native-language", nativeLanguage);
