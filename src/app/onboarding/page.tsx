@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
 import { ChevronRight, Globe, BookOpen, Mic, MessageSquare, GraduationCap, Sparkles } from "lucide-react";
@@ -40,28 +40,42 @@ const COMM_MODES = [
 ];
 
 export default function OnboardingPage() {
-  const router = useRouter();
-  const { profile } = useAuth();
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[var(--background)]" />}>
+      <OnboardingInner />
+    </Suspense>
+  );
+}
 
-  // If already onboarded (check localStorage first for speed, then verify with DB)
+function OnboardingInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { profile } = useAuth();
+  const isNewUser = searchParams.get("new") === "1";
+
+  // If this is a new user (sent here by auth callback), clear any stale localStorage
   useEffect(() => {
-    if (localStorage.getItem("onboarding_complete") === "true") {
+    if (isNewUser) {
+      localStorage.removeItem("onboarding_complete");
+    }
+  }, [isNewUser]);
+
+  // Only redirect if onboarding was completed AND this is not a fresh signup redirect
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+  useEffect(() => {
+    if (!isNewUser && localStorage.getItem("onboarding_complete") === "true") {
+      setShouldRedirect(true);
       router.replace("/");
-      return;
     }
-    // Also check DB in case localStorage was cleared
-    if (profile) {
-      fetch("/api/user/preferences")
-        .then(r => r.ok ? r.json() : null)
-        .then(prefs => {
-          if (prefs?.onboarding_completed === true) {
-            localStorage.setItem("onboarding_complete", "true");
-            router.replace("/");
-          }
-        })
-        .catch(() => {});
-    }
-  }, [router, profile]);
+  }, [router, isNewUser]);
+
+  if (shouldRedirect) {
+    return (
+      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
+        <div className="animate-pulse text-white/40">Redirecting...</div>
+      </div>
+    );
+  }
 
   const [step, setStep] = useState<Step>("language");
   const [nativeLanguage, setNativeLanguage] = useState("en");

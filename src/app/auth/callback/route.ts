@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 
         // First-time user or onboarding not completed → go to onboarding
         if (!profile || !profile.onboarding_completed) {
-          return NextResponse.redirect(`${origin}/onboarding`);
+          return NextResponse.redirect(`${origin}/onboarding?new=1`);
         }
       }
       return NextResponse.redirect(`${origin}${next}`);
