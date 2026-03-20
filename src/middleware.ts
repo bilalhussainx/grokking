@@ -13,7 +13,9 @@ const PUBLIC_ROUTES = [
   "/reset-password",
   "/onboarding",
   "/auth/callback",
+  "/auth/confirm",
   "/api/webhooks/paddle",
+  "/api/survey",
 ];
 
 // Route prefixes that are always public

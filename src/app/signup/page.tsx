@@ -59,14 +59,37 @@ export default function SignupPage() {
     }
   };
 
+  const handleResend = async () => {
+    setLoading(true);
+    const supabase = (await import("@/lib/supabase-browser")).createBrowserSupabase();
+    await supabase.auth.resend({ type: "signup", email });
+    setLoading(false);
+    alert("Confirmation email resent! Check your inbox.");
+  };
+
   if (success) {
     return (
       <section className="flex min-h-screen items-center justify-center px-4 bg-[var(--background)]">
         <div className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 text-center">
-          <h2 className="text-xl font-semibold text-white mb-2">Check your email</h2>
-          <p className="text-sm text-white/50">We sent a confirmation link to <strong className="text-white/80">{email}</strong>. Click it to activate your account and get your 300 free credits + 1 month of Pro access.</p>
-          <p className="text-xs text-white/30 mt-3">After confirming, you'll complete a quick setup to personalize your learning experience.</p>
-          <Link href="/login" className="text-violet-400 text-sm hover:underline mt-4 inline-block">Back to login</Link>
+          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+            <svg className="w-7 h-7 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-white mb-2">Verify your email</h2>
+          <p className="text-sm text-white/50">We sent a confirmation link to <strong className="text-white/80">{email}</strong>.</p>
+          <p className="text-sm text-white/50 mt-2">Click the link to activate your account and get your <strong className="text-white/80">300 free credits + 1 month of Pro access</strong>.</p>
+          <div className="mt-6 space-y-3">
+            <button
+              onClick={handleResend}
+              disabled={loading}
+              className="w-full py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white/60 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
+            >
+              {loading ? "Sending..." : "Resend confirmation email"}
+            </button>
+            <Link href="/login" className="text-violet-400 text-sm hover:underline block">Back to login</Link>
+          </div>
+          <p className="text-[10px] text-white/20 mt-4">Check your spam folder if you don't see the email within a few minutes.</p>
         </div>
       </section>
     );

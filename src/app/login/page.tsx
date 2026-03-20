@@ -26,7 +26,11 @@ function LoginForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(authError === "auth_failed" ? "Authentication failed. Please try again." : "");
+  const [error, setError] = useState(
+    authError === "auth_failed" ? "Authentication failed. Please try again."
+    : authError === "confirmation_failed" ? "Email confirmation link expired or invalid. Please sign up again."
+    : ""
+  );
   const [loading, setLoading] = useState(false);
 
   // Redirect if already logged in
