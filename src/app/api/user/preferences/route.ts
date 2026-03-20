@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   // Build update payload — only include defined fields
   const updateData: Record<string, unknown> = {
-    onboarding_completed: prefs.onboarding_completed ?? true,
+    onboarding_completed: prefs.onboarding_completed ?? false,
     personalization_consent: prefs.personalization_consent ?? false,
   };
   if (prefs.native_language) updateData.native_language = prefs.native_language;

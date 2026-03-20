@@ -43,12 +43,25 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { profile } = useAuth();
 
-  // If already onboarded, redirect to home
+  // If already onboarded (check localStorage first for speed, then verify with DB)
   useEffect(() => {
     if (localStorage.getItem("onboarding_complete") === "true") {
       router.replace("/");
+      return;
     }
-  }, [router]);
+    // Also check DB in case localStorage was cleared
+    if (profile) {
+      fetch("/api/user/preferences")
+        .then(r => r.ok ? r.json() : null)
+        .then(prefs => {
+          if (prefs?.onboarding_completed === true) {
+            localStorage.setItem("onboarding_complete", "true");
+            router.replace("/");
+          }
+        })
+        .catch(() => {});
+    }
+  }, [router, profile]);
 
   const [step, setStep] = useState<Step>("language");
   const [nativeLanguage, setNativeLanguage] = useState("en");
