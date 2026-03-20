@@ -7,7 +7,7 @@ import { Mic, BookOpen, ArrowRight, Sparkles, Star } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useXP } from "@/contexts/XPContext";
 import { courses } from "@/data";
-import { getFeaturedCourses } from "@/data/types";
+import type { Course } from "@/data/types";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
 import { useRouter } from "next/navigation";
 import LearningStats from "@/components/gamification/LearningStats";
@@ -26,50 +26,71 @@ const item = {
   visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
 
-// Map onboarding interest IDs to course domain tags
+// Map onboarding interest IDs to actual course domain values
 const INTEREST_TO_DOMAIN: Record<string, string[]> = {
-  coding: ['computer science', 'programming'],
-  'ai-ml': ['computer science', 'ai', 'machine learning'],
-  'system-design': ['computer science', 'system design'],
-  'interview-prep': ['computer science', 'interview'],
-  finance: ['finance', 'business'],
+  coding: ['computer-science'],
+  'ai-ml': ['computer-science'],
+  'system-design': ['computer-science'],
+  'interview-prep': ['computer-science'],
+  finance: ['finance-business'],
   languages: ['language'],
-  religion: ['religious studies', 'philosophy'],
-  'personal-growth': ['health', 'wellness', 'leadership', 'philosophy'],
+  religion: ['religious-studies', 'philosophy'],
+  'personal-growth': ['health-wellness', 'philosophy', 'political-strategy'],
 };
 
+// Map interest IDs to keyword patterns for finer matching within domains
+const INTEREST_TO_KEYWORDS: Record<string, string[]> = {
+  coding: ['python', 'javascript', 'react', 'node', 'web', 'c++', 'c#', 'game', 'mern'],
+  'ai-ml': ['ai', 'ml', 'machine learning', 'neural', 'rag', 'prompt', 'agent', 'claude'],
+  'system-design': ['system design', 'api design', 'concurrency'],
+  'interview-prep': ['interview', 'coding interview', 'behavioral', 'dsa'],
+  finance: ['finance', 'accounting', 'economics', 'investing', 'banking', 'stock', 'fintech'],
+  languages: ['french', 'spanish', 'hindi', 'chinese', 'japanese', 'english', 'german'],
+  religion: ['islam', 'christian', 'buddhism', 'hinduism', 'judaism', 'sikh', 'sufi', 'taoism', 'confuci', 'ahmadiyya', 'stoic'],
+  'personal-growth': ['leadership', 'negotiation', 'mental health', 'meditation', 'mindfulness', 'psychology', 'entrepreneurship'],
+};
+
+/** Score a course's relevance to user interests (0-10) */
+function scoreCourse(course: { title: string; slug: string; domain?: string; description: string }, interests: string[]): number {
+  if (interests.length === 0) return 0;
+  let score = 0;
+  const title = course.title.toLowerCase();
+  const slug = course.slug.toLowerCase();
+  const desc = course.description.toLowerCase();
+
+  for (const interest of interests) {
+    // Domain match = strong signal
+    const domains = INTEREST_TO_DOMAIN[interest] || [];
+    if (course.domain && domains.includes(course.domain)) score += 3;
+
+    // Keyword match in title/slug = precise match
+    const keywords = INTEREST_TO_KEYWORDS[interest] || [];
+    for (const kw of keywords) {
+      if (title.includes(kw) || slug.includes(kw)) { score += 4; break; }
+      if (desc.includes(kw)) { score += 1; break; }
+    }
+  }
+  return Math.min(score, 10);
+}
+
 function FeaturedCourses({ interests = [] }: { interests?: string[] }) {
-  const featured = getFeaturedCourses(courses);
-  if (featured.length === 0) return null;
+  const hasInterests = interests.length > 0;
 
-  // Build domain relevance set from user interests
-  const relevantDomains = new Set<string>();
-  interests.forEach((interest: string) => {
-    (INTEREST_TO_DOMAIN[interest] || []).forEach(d => relevantDomains.add(d));
-  });
-
-  // Sort: relevant courses first, then alphabetically
-  const sortedFeatured = [...featured].sort((a, b) => {
-    const aRelevant = a.domain && relevantDomains.has(a.domain) ? 1 : 0;
-    const bRelevant = b.domain && relevantDomains.has(b.domain) ? 1 : 0;
-    if (bRelevant !== aRelevant) return bRelevant - aRelevant;
-    return 0;
-  });
-
-  // Separate recommended (matching interests) from the rest
-  const recommended = relevantDomains.size > 0
-    ? sortedFeatured.filter(c => c.domain && relevantDomains.has(c.domain))
+  // Score all courses by relevance
+  const scored = courses.map(c => ({ course: c, score: scoreCourse(c, interests) }));
+  const recommended = hasInterests
+    ? scored.filter(s => s.score > 0).sort((a, b) => b.score - a.score).map(s => s.course).slice(0, 9)
     : [];
-  const nonRecommended = relevantDomains.size > 0
-    ? sortedFeatured.filter(c => !c.domain || !relevantDomains.has(c.domain))
-    : sortedFeatured;
+  const recommendedIds = new Set(recommended.map(c => c.id));
 
-  const premium = nonRecommended.filter(c => c.tier === 'pro');
-  const free = nonRecommended.filter(c => c.tier === 'free');
+  // Remaining courses not in recommended
+  const remaining = courses.filter(c => !recommendedIds.has(c.id));
+  const premium = remaining.filter(c => c.tier === 'pro').slice(0, 6);
+  const free = remaining.filter(c => c.tier === 'free').slice(0, 6);
 
   return (
     <motion.div variants={item} className="mb-16">
-      {/* Recommended for You — personalized based on onboarding interests */}
+      {/* Recommended for You */}
       {recommended.length > 0 && (
         <div className="mb-8">
           <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -78,112 +99,78 @@ function FeaturedCourses({ interests = [] }: { interests?: string[] }) {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {recommended.map((course) => (
-              <Link key={course.id} href={`/course/${course.slug}`}>
-                <motion.div
-                  className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-violet-500/5 via-slate-800/80 to-slate-900/80 border border-violet-500/20 p-5 cursor-pointer h-full hover:border-violet-500/40 transition-all"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-400 text-xs font-semibold border border-violet-500/20">
-                    {course.tier === 'pro' ? 'Premium' : 'Free'}
-                  </div>
-                  <div className="text-3xl mb-3">{course.icon}</div>
-                  <h4 className="text-white font-semibold">{course.title}</h4>
-                  <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
-                  <div className="flex items-center gap-2 mt-3">
-                    {course.domain && (
-                      <span className="px-2 py-0.5 rounded bg-violet-500/10 text-violet-400 text-xs">
-                        {course.domain.replace(/-/g, ' ')}
-                      </span>
-                    )}
-                  </div>
-                </motion.div>
-              </Link>
+              <CourseCard key={course.id} course={course} accent="violet" />
             ))}
           </div>
         </div>
       )}
 
-      {/* Premium Courses */}
+      {/* More to Explore — Premium */}
       {premium.length > 0 && (
         <div className="mb-8">
           <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
             <Star className="w-4 h-4 text-yellow-400" />
-            Premium Courses
+            {hasInterests ? "More to Explore" : "Premium Courses"}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {premium.map((course) => (
-              <Link key={course.id} href={`/course/${course.slug}`}>
-                <motion.div
-                  className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-yellow-500/5 via-slate-800/80 to-slate-900/80 border border-yellow-500/20 p-5 cursor-pointer h-full hover:border-yellow-500/40 transition-all"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-yellow-500/15 text-yellow-400 text-xs font-semibold border border-yellow-500/20">
-                    Premium
-                  </div>
-                  <div className="text-3xl mb-3">{course.icon}</div>
-                  <h4 className="text-white font-semibold">{course.title}</h4>
-                  <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
-                  <div className="flex items-center gap-2 mt-3">
-                    {course.domain && (
-                      <span className="px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">
-                        {course.domain.replace(/-/g, ' ')}
-                      </span>
-                    )}
-                    {course.level && (
-                      <span className="px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">
-                        {course.level}
-                      </span>
-                    )}
-                  </div>
-                </motion.div>
-              </Link>
+              <CourseCard key={course.id} course={course} accent="amber" />
             ))}
           </div>
         </div>
       )}
 
-      {/* Free Featured Courses */}
+      {/* Free Courses */}
       {free.length > 0 && (
         <div>
           <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-emerald-400" />
-            Featured — Free
+            Free Courses
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {free.map((course) => (
-              <Link key={course.id} href={`/course/${course.slug}`}>
-                <motion.div
-                  className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500/5 via-slate-800/80 to-slate-900/80 border border-emerald-500/20 p-5 cursor-pointer h-full hover:border-emerald-500/40 transition-all"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-medium">
-                    Free
-                  </div>
-                  <div className="text-3xl mb-3">{course.icon}</div>
-                  <h4 className="text-white font-semibold">{course.title}</h4>
-                  <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
-                  <div className="flex items-center gap-2 mt-3">
-                    {course.domain && (
-                      <span className="px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">
-                        {course.domain.replace(/-/g, ' ')}
-                      </span>
-                    )}
-                    {course.level && (
-                      <span className="px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">
-                        {course.level}
-                      </span>
-                    )}
-                  </div>
-                </motion.div>
-              </Link>
+              <CourseCard key={course.id} course={course} accent="emerald" />
             ))}
           </div>
         </div>
       )}
     </motion.div>
+  );
+}
+
+/** Reusable course card */
+function CourseCard({ course, accent }: { course: { id: string; slug: string; icon: string; title: string; description: string; tier: string; domain?: string; level?: string }; accent: "violet" | "amber" | "emerald" }) {
+  const colors = {
+    violet: { border: "border-violet-500/20 hover:border-violet-500/40", bg: "from-violet-500/5", badge: "bg-violet-500/15 text-violet-400 border-violet-500/20", tag: "bg-violet-500/10 text-violet-400" },
+    amber: { border: "border-yellow-500/20 hover:border-yellow-500/40", bg: "from-yellow-500/5", badge: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20", tag: "bg-slate-700/50 text-slate-400" },
+    emerald: { border: "border-emerald-500/20 hover:border-emerald-500/40", bg: "from-emerald-500/5", badge: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20", tag: "bg-slate-700/50 text-slate-400" },
+  }[accent];
+
+  return (
+    <Link href={`/course/${course.slug}`}>
+      <motion.div
+        className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${colors.bg} via-slate-800/80 to-slate-900/80 border ${colors.border} p-5 cursor-pointer h-full transition-all`}
+        whileHover={{ scale: 1.02 }}
+        transition={{ duration: 0.2 }}
+      >
+        <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-full ${colors.badge} text-xs font-semibold border`}>
+          {course.tier === 'pro' ? 'Premium' : 'Free'}
+        </div>
+        <div className="text-3xl mb-3">{course.icon}</div>
+        <h4 className="text-white font-semibold">{course.title}</h4>
+        <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
+        <div className="flex items-center gap-2 mt-3">
+          {course.domain && (
+            <span className={`px-2 py-0.5 rounded ${colors.tag} text-xs`}>
+              {course.domain.replace(/-/g, ' ')}
+            </span>
+          )}
+          {course.level && (
+            <span className="px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">{course.level}</span>
+          )}
+        </div>
+      </motion.div>
+    </Link>
   );
 }
 
@@ -196,13 +183,13 @@ export default function HomePage() {
   const [dailyLoginReward, setDailyLoginReward] = useState<{ gems: number; xp: number; message: string; isJackpot: boolean } | null>(null);
   const courseProgress = useCourseProgress();
 
-  // Get courses user has started (progress > 0, not 100%)
+  // Get ALL courses user has started (progress > 0, not 100%), sorted by progress desc
   const inProgressCourses = courses
     .filter((c) => {
       const p = courseProgress[c.slug];
       return p && p > 0 && p < 100;
     })
-    .slice(0, 4);
+    .sort((a, b) => (courseProgress[b.slug] ?? 0) - (courseProgress[a.slug] ?? 0));
 
   // Load user preferences — always sync from Supabase on login
   useEffect(() => {
@@ -363,23 +350,20 @@ export default function HomePage() {
                 <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
                 Continue Learning
               </h3>
-              <Link href="/courses" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-                View all
-              </Link>
+              <span className="text-xs text-slate-600">{inProgressCourses.length} course{inProgressCourses.length > 1 ? "s" : ""} in progress</span>
             </div>
-            {/* Horizontal scroll on mobile, grid on desktop */}
-            <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory md:grid md:grid-cols-3 md:overflow-visible md:pb-0 scrollbar-hide">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {inProgressCourses.map((course) => {
                 const progress = courseProgress[course.slug] ?? 0;
+                const encouragement = progress >= 75 ? "Almost there!" : progress >= 50 ? "Halfway done!" : progress >= 25 ? "Great start!" : "Keep going!";
                 return (
-                  <Link key={course.slug} href={`/course/${course.slug}`} className="snap-start shrink-0 w-[260px] md:w-auto">
+                  <Link key={course.slug} href={`/course/${course.slug}`}>
                     <div className="rounded-xl bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-slate-700/40 p-4 hover:bg-slate-800/80 hover:border-emerald-500/30 transition-all cursor-pointer h-full">
                       <div className="flex items-start justify-between mb-3">
                         <span className="text-3xl">{course.icon}</span>
                         <ProgressRing progress={progress} size={36} strokeWidth={2.5} />
                       </div>
                       <div className="text-sm font-semibold text-white mb-1">{course.title}</div>
-                      {/* Progress bar */}
                       <div className="w-full h-1.5 bg-slate-700/50 rounded-full overflow-hidden mb-2">
                         <div
                           className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full transition-all"
@@ -387,8 +371,8 @@ export default function HomePage() {
                         />
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-500">{progress}% complete</span>
-                        <span className="text-xs text-emerald-400 font-medium">Continue →</span>
+                        <span className="text-xs text-slate-500">{Math.round(progress)}% complete</span>
+                        <span className="text-xs text-emerald-400 font-medium">{encouragement}</span>
                       </div>
                     </div>
                   </Link>
