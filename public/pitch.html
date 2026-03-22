@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samsara - AI Interview Coach | Pitch Deck</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .slide {
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            background: white;
+            padding: 3rem 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide.cover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            min-height: 600px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .slide.cover h2 {
+            color: white;
+            border-bottom: 3px solid white;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #764ba2;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .founder-info {
+            font-size: 1.1rem;
+            margin-top: 2rem;
+            opacity: 0.9;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+
+        .metric-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .problem-list, .solution-list {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .problem-list li, .solution-list li {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .problem-list li:before {
+            content: "❌";
+            position: absolute;
+            left: 0;
+        }
+
+        .solution-list li:before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1rem 0.5rem;
+            transition: all 0.3s ease;
+            border: 2px solid #667eea;
+        }
+
+        .cta-button:hover {
+            background: #764ba2;
+            border-color: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .cta-button.secondary {
+            background: white;
+            color: #667eea;
+        }
+
+        .cta-button.secondary:hover {
+            background: #f8f9fa;
+        }
+
+        .slide.cover .cta-button {
+            background: white;
+            color: #667eea;
+            margin-top: 2rem;
+        }
+
+        .slide.cover .cta-button:hover {
+            background: #f8f9fa;
+        }
+
+        .video-container {
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .video-placeholder {
+            background: #f8f9fa;
+            padding: 3rem;
+            border-radius: 8px;
+            border: 2px dashed #667eea;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .team-member {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .team-member h4 {
+            font-size: 1.3rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-member .role {
+            color: #764ba2;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .highlight-box strong {
+            color: #667eea;
+            font-size: 1.3rem;
+        }
+
+        .contact-info {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #eee;
+            text-align: center;
+        }
+
+        .contact-info a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            background: #333;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .slide {
+                padding: 2rem 1.5rem;
+                min-height: auto;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-button {
+                display: block;
+                margin: 1rem 0;
+            }
+        }
+
+        .stat-bar {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            opacity: 0.1;
+            transition: width 1s ease;
+        }
+
+        .stat-bar-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-col {
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .comparison-col.old {
+            background: #fee;
+            border: 2px solid #fcc;
+        }
+
+        .comparison-col.new {
+            background: #efe;
+            border: 2px solid #cfc;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Slide 1: Cover -->
+    <div class="slide cover">
+        <h1>Samsara</h1>
+        <p class="tagline">AI Interview Coach: Pattern Recognition > Memorization</p>
+        <p style="font-size: 1.3rem; margin: 2rem 0;">Teaching the 20 core patterns that cover 80%+ of technical interviews</p>
+        <div>
+            <a href="https://go.screenpal.com/watch/cOeqrVnTVgS" class="cta-button" target="_blank">Watch 2-Min Demo</a>
+            <a href="https://grokking-delta.vercel.app/survey.html" class="cta-button" target="_blank">View Our Metrics</a>
+        </div>
+        <div class="founder-info">
+            <strong>Bilal Hussain</strong><br>
+            Harvard CS '22 | Former Milton Academy CS Instructor<br>
+            YC W26 Applicant | Pre-Seed Raise
+        </div>
+    </div>
+
+    <!-- Slide 2: Problem -->
+    <div class="slide">
+        <h2>The Problem</h2>
+        <ul class="problem-list">
+            <li><strong>Students waste months</strong> grinding 500+ LeetCode problems</li>
+            <li><strong>Memorization ≠ Understanding</strong> — they still bomb interviews</li>
+            <li><strong>Existing platforms</strong> are just problem banks, not teachers</li>
+            <li><strong>No personalization</strong> — one-size-fits-all explanations don't work</li>
+        </ul>
+        
+        <div class="highlight-box">
+            <strong>The Reality:</strong> Most students spend 3-6 months preparing for technical interviews. 
+            80% fail to land their target roles despite putting in hundreds of hours.
+        </div>
+
+        <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: 75%;"></div>
+            <div class="stat-bar-content">
+                <span><strong>Average prep time:</strong> 3-6 months</span>
+                <span style="color: #dc3545;"><strong>Success rate:</strong> 20%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Solution -->
+    <div class="slide">
+        <h2>The Solution</h2>
+        <ul class="solution-list">
+            <li><strong>Teach patterns, not problems</strong> — 20 core frameworks cover 80%+ of interviews</li>
+            <li><strong>AI-powered personalization</strong> — adapts to each student's learning style</li>
+            <li><strong>Focus on transferable skills</strong> — pattern recognition beats memorization</li>
+            <li><strong>Real-time feedback</strong> — identify gaps and adjust explanations instantly</li>
+        </ul>
+
+        <div class="highlight-box">
+            <strong>The Insight:</strong> Two Pointers, Sliding Window, BFS/DFS, Dynamic Programming — 
+            master these 20 patterns and you can solve 80%+ of interview problems.
+        </div>
+
+        <h3 style="margin-top: 2rem;">How It Works</h3>
+        <p><strong>1. Pattern Library:</strong> Curated collection of 20 core problem-solving frameworks</p>
+        <p><strong>2. Adaptive Learning:</strong> LLM identifies your learning style and adjusts explanations</p>
+        <p><strong>3. Practice → Mastery:</strong> Apply patterns to real problems with guided support</p>
+    </div>
+
+    <!-- Slide 4: Demo -->
+    <div class="slide">
+        <h2>Product Demo</h2>
+        <div class="video-container">
+            <a href="https://go.screenpal.com/watch/cOeqrVnTVgS" target="_blank">
+                <div class="video-placeholder">
+                    <p style="font-size: 1.5rem; margin-bottom: 1rem;">🎥 Watch 2-Minute Demo</p>
+                    <p>See Samsara's AI-powered pattern recognition in action</p>
+                    <div style="margin-top: 2rem;">
+                        <span class="cta-button">Play Demo Video</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="highlight-box" style="margin-top: 2rem;">
+            <strong>Live Platform:</strong> Try it yourself at 
+            <a href="https://grokking-delta.vercel.app/" target="_blank" style="color: #667eea; text-decoration: underline;">grokking-delta.vercel.app</a>
+        </div>
+    </div>
+
+    <!-- Slide 5: Traction -->
+    <div class="slide">
+        <h2>Early Traction</h2>
+        
+        <div class="metrics-grid">
+            <div class="metric">
+                <span class="metric-number">100+</span>
+                <span class="metric-label">Early Testers</span>
+            </div>
+            <div class="metric">
+                <span class="metric-number">60%</span>
+                <span class="metric-label">Faster Prep Time</span>
+            </div>
+            <div class="metric">
+                <span class="metric-number">↑</span>
+                <span class="metric-label">Higher Interview Success</span>
+            </div>
+            <div class="metric">
+                <span class="metric-number">YC W26</span>
+                <span class="metric-label">Application Submitted</span>
+            </div>
+        </div>
+
+        <div class="comparison">
+            <div class="comparison-col old">
+                <h3 style="color: #dc3545; font-size: 1.3rem;">❌ Traditional Approach</h3>
+                <p>✗ 3-6 months of grinding</p>
+                <p>✗ 500+ problems memorized</p>
+                <p>✗ Still fail interviews</p>
+                <p>✗ No transferable learning</p>
+            </div>
+            <div class="comparison-col new">
+                <h3 style="color: #28a745; font-size: 1.3rem;">✅ Samsara Approach</h3>
+                <p>✓ 60% faster prep time</p>
+                <p>✓ 20 patterns mastered</p>
+                <p>✓ Higher success rate</p>
+                <p>✓ Transferable frameworks</p>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <strong>User Feedback:</strong> "I spent 4 months grinding LeetCode and still struggled. 
+            Samsara taught me the patterns in 6 weeks and I finally understood the 'why' behind solutions."
+        </div>
+    </div>
+
+    <!-- Slide 6: Market Opportunity -->
+    <div class="slide">
+        <h2>Market Opportunity</h2>
+        
+        <div class="highlight-box">
+            <strong>TAM (Total Addressable Market):</strong> $5B+ interview prep market
+        </div>
+
+        <h3>Target Segments</h3>
+        <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: 100%;"></div>
+            <div class="stat-bar-content">
+                <span><strong>CS Students:</strong></span>
+                <span>500K+ graduating annually</span>
+            </div>
+        </div>
+        <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: 80%;"></div>
+            <div class="stat-bar-content">
+                <span><strong>Career Switchers:</strong></span>
+                <span>200K+ bootcamp grads/year</span>
+            </div>
+        </div>
+        <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: 60%;"></div>
+            <div class="stat-bar-content">
+                <span><strong>Experienced Engineers:</strong></span>
+                <span>1M+ job seekers/year</span>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 2rem;">Competitive Landscape</h3>
+        <ul class="solution-list">
+            <li><strong>LeetCode:</strong> Problem bank, no teaching ($159/year)</li>
+            <li><strong>AlgoExpert:</strong> Video explanations, not adaptive ($99/year)</li>
+            <li><strong>Educative/Grokking:</strong> Courses, not personalized ($79/year)</li>
+            <li><strong>Samsara:</strong> AI-powered pattern mastery with personalization</li>
+        </ul>
+
+        <div class="highlight-box" style="margin-top: 1.5rem;">
+            <strong>Our Edge:</strong> We're the only platform teaching adaptive pattern recognition with real-time AI coaching.
+        </div>
+    </div>
+
+    <!-- Slide 7: Business Model -->
+    <div class="slide">
+        <h2>Business Model</h2>
+        
+        <h3>Revenue Streams</h3>
+        <div class="metrics-grid">
+            <div class="metric">
+                <span class="metric-number">$29</span>
+                <span class="metric-label">Monthly Subscription</span>
+            </div>
+            <div class="metric">
+                <span class="metric-number">$199</span>
+                <span class="metric-label">Annual Subscription</span>
+            </div>
+            <div class="metric">
+                <span class="metric-number">$499</span>
+                <span class="metric-label">Premium (1-on-1 Coaching)</span>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 2rem;">Unit Economics (Projected)</h3>
+        <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: 20%;"></div>
+            <div class="stat-bar-content">
+                <span><strong>CAC:</strong></span>
+                <span>$50 (organic + paid)</span>
+            </div>
+        </div>
+        <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: 80%;"></div>
+            <div class="stat-bar-content">
+                <span><strong>LTV:</strong></span>
+                <span>$400 (2-3 month avg retention)</span>
+            </div>
+        </div>
+        <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: 90%;"></div>
+            <div class="stat-bar-content">
+                <span><strong>LTV/CAC:</strong></span>
+                <span style="color: #28a745;"><strong>8:1 ratio</strong></span>
+            </div>
+        </div>
+
+        <div class="highlight-box" style="margin-top: 2rem;">
+            <strong>Go-to-Market:</strong> Content marketing (LeetCode tutorials) + 
+            Reddit/Discord communities + University partnerships
+        </div>
+    </div>
+
+    <!-- Slide 8: Team -->
+    <div class="slide">
+        <h2>Team</h2>
+        
+        <div class="team-grid">
+            <div class="team-member">
+                <h4>Bilal Hussain</h4>
+                <div class="role">Founder & CEO</div>
+                <p><strong>Harvard CS '22</strong> — Computer Science degree from Harvard University</p>
+                <p><strong>Teaching Experience:</strong> CS Instructor at Milton Academy (2022-2024), taught 100+ students</p>
+                <p><strong>Technical Background:</strong> Senior Full-Stack Developer (Django/React/AI), 5+ years experience</p>
+                <p><strong>Previous:</strong> Lead Software Engineer at Healthynox, built HIPAA-compliant patient platforms</p>
+            </div>
+        </div>
+
+        <div class="highlight-box" style="margin-top: 2rem;">
+            <strong>Advisors & Support:</strong> Currently applying to Y Combinator W26, 
+            Entrepreneur First, and other top accelerators. Building advisor network in EdTech and AI/ML space.
+        </div>
+
+        <h3 style="margin-top: 2rem;">Why I Built This</h3>
+        <p>As a CS instructor at Milton Academy, I watched hundreds of bright students struggle with 
+        interview prep. They'd grind LeetCode for months, memorize solutions, and still bomb interviews. 
+        The problem wasn't effort — it was approach. I built Samsara to teach the way students actually learn: 
+        through patterns and personalized coaching, not rote memorization.</p>
+    </div>
+
+    <!-- Slide 9: Roadmap -->
+    <div class="slide">
+        <h2>Roadmap</h2>
+        
+        <h3>Q1 2026 (Current)</h3>
+        <ul class="solution-list">
+            <li>100+ beta testers collecting feedback</li>
+            <li>YC W26 application submitted</li>
+            <li>Pattern library: 20 core frameworks live</li>
+            <li>Pre-seed fundraise initiated</li>
+        </ul>
+
+        <h3>Q2 2026</h3>
+        <ul class="solution-list">
+            <li>Launch monetization: $29/month subscription</li>
+            <li>1,000 paying users (target)</li>
+            <li>Content marketing engine (SEO + YouTube)</li>
+            <li>University partnerships (3-5 CS programs)</li>
+        </ul>
+
+        <h3>Q3-Q4 2026</h3>
+        <ul class="solution-list">
+            <li>Scale to 10,000 users</li>
+            <li>Premium tier: 1-on-1 AI coaching</li>
+            <li>Mobile app launch (iOS/Android)</li>
+            <li>Expand to behavioral interviews</li>
+        </ul>
+
+        <div class="highlight-box" style="margin-top: 2rem;">
+            <strong>Long-term Vision:</strong> Become the AI-powered tutor for all technical skill development — 
+            starting with interviews, expanding to system design, data structures, algorithms, and beyond.
+        </div>
+    </div>
+
+    <!-- Slide 10: The Ask -->
+    <div class="slide">
+        <h2>The Ask</h2>
+        
+        <div class="highlight-box">
+            <strong style="font-size: 1.8rem;">Raising $500K Pre-Seed</strong>
+        </div>
+
+        <h3>Use of Funds</h3>
+        <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: 40%;"></div>
+            <div class="stat-bar-content">
+                <span><strong>Product Development:</strong></span>
+                <span>40% ($200K)</span>
+            </div>
+        </div>
+        <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: 30%;"></div>
+            <div class="stat-bar-content">
+                <span><strong>Marketing & Growth:</strong></span>
+                <span>30% ($150K)</span>
+            </div>
+        </div>
+        <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: 20%;"></div>
+            <div class="stat-bar-content">
+                <span><strong>Team Expansion:</strong></span>
+                <span>20% ($100K)</span>
+            </div>
+        </div>
+        <div class="stat-bar">
+            <div class="stat-bar-fill" style="width: 10%;"></div>
+            <div class="stat-bar-content">
+                <span><strong>Operations:</strong></span>
+                <span>10% ($50K)</span>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 2rem;">12-Month Milestones</h3>
+        <ul class="solution-list">
+            <li>10,000 paying users ($3M ARR run-rate)</li>
+            <li>Launch mobile apps (iOS + Android)</li>
+            <li>Hire 3-5 team members (eng + marketing)</li>
+            <li>Partner with 10+ universities</li>
+            <li>Expand pattern library to 50+ frameworks</li>
+            <li>Position for Series A fundraise</li>
+        </ul>
+
+        <div class="highlight-box" style="margin-top: 2rem;">
+            <strong>Why Now?</strong> We're raising pre-seed to strengthen traction before YC. 
+            If accepted, equity terms will be significantly less favorable. Early investors get better access.
+        </div>
+    </div>
+
+    <!-- Slide 11: Contact / CTA -->
+    <div class="slide cover">
+        <h2 style="border: none; padding-bottom: 0;">Let's Talk</h2>
+        <p class="tagline">I'm looking for investors who can provide strategic guidance and support</p>
+        
+        <div style="margin: 3rem 0;">
+            <a href="mailto:bilal@samsara.ai" class="cta-button">Email Me</a>
+            <a href="https://calendly.com/bilalhussain" class="cta-button" target="_blank">Schedule a Call</a>
+        </div>
+
+        <div class="contact-info" style="border-color: rgba(255,255,255,0.3); color: white;">
+            <p><strong>Bilal Hussain</strong></p>
+            <p>Founder & CEO, Samsara</p>
+            <p>Harvard CS '22 | Former Milton Academy CS Instructor</p>
+            <p style="margin-top: 1rem;">
+                <a href="https://grokking-delta.vercel.app/" target="_blank" style="color: white;">Live Platform</a> | 
+                <a href="https://go.screenpal.com/watch/cOeqrVnTVgS" target="_blank" style="color: white;">Demo Video</a> | 
+                <a href="https://grokking-delta.vercel.app/survey.html" target="_blank" style="color: white;">Traction Survey</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Samsara. All rights reserved.</p>
+        <p style="margin-top: 0.5rem; opacity: 0.7;">Pattern Recognition > Memorization</p>
+    </div>
+
+</body>
+</html>
