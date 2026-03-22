@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { useSoundEffect } from "@/hooks/useSoundEffect";
+import { useAuth } from "@/contexts/AuthContext";
 import type { Achievement } from "@/components/gamification/AchievementToast";
 import { rollVariableReward, type RewardEvent } from "@/lib/rewards";
 
@@ -44,6 +45,7 @@ export function useXP() {
 }
 
 export function XPProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [profile, setProfile] = useState<XPProfile>({
     xp: 0,
     level: 1,
@@ -71,8 +73,8 @@ export function XPProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    refreshProfile();
-  }, [refreshProfile]);
+    if (user) refreshProfile();
+  }, [user, refreshProfile]);
 
   const dismissReward = useCallback(() => {
     setPendingReward(null);

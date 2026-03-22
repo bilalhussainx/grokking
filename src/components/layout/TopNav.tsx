@@ -184,12 +184,20 @@ export default function TopNav({
         )}
 
         {!user && (
-          <Link
-            href="/login"
-            className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-blue-500 to-violet-600 text-white text-sm font-medium hover:opacity-90 transition-opacity"
-          >
-            Sign In
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              className="hidden sm:inline-block px-3 py-1.5 rounded-lg text-white/60 text-sm font-medium hover:text-white hover:bg-white/5 transition-all"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 text-white text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              Sign Up
+            </Link>
+          </div>
         )}
       </div>
     </nav>
