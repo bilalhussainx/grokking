@@ -126,12 +126,20 @@ function LoginForm() {
           </Button>
         </div>
 
-        <p className="text-center text-sm text-white/40 mt-6">
-          Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-violet-400 hover:underline">
-            Sign up
+        <div className="text-center mt-6 space-y-3">
+          <p className="text-sm text-white/40">
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" className="text-violet-400 hover:underline font-medium">
+              Sign up
+            </Link>
+          </p>
+          <Link
+            href="/signup"
+            className="block w-full py-2.5 rounded-lg bg-gradient-to-r from-violet-500/20 to-cyan-500/20 border border-violet-500/30 text-violet-400 text-sm font-semibold hover:from-violet-500/30 hover:to-cyan-500/30 transition-all text-center"
+          >
+            Get Started Free — 300 Credits
           </Link>
-        </p>
+        </div>
       </form>
     </section>
   );

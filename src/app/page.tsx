@@ -303,9 +303,25 @@ export default function HomePage() {
           <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
             Master Anything.
           </h1>
-          <p className="mt-4 text-lg text-slate-400 max-w-xl mx-auto">
+          <p className="mt-4 text-lg text-white/50 max-w-xl mx-auto">
             Learn languages, code, and more with AI tutors that adapt to you.
           </p>
+          {!user && (
+            <div className="flex items-center justify-center gap-3 mt-8">
+              <Link
+                href="/signup"
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-sm hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25"
+              >
+                Try Free — 300 Credits
+              </Link>
+              <Link
+                href="/courses"
+                className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white/70 font-medium text-sm hover:bg-white/10 hover:text-white transition-all"
+              >
+                Browse Courses
+              </Link>
+            </div>
+          )}
         </motion.div>
 
         {/* Learning Stats + Forgetting Alert (logged-in users) */}

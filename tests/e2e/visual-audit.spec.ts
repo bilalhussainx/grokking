@@ -17,10 +17,19 @@ const FLOWS = [
   { name: 'courses', url: '/courses' },
   { name: 'talk', url: '/talk' },
   { name: 'pricing', url: '/pricing' },
-  { name: 'placement-spanish', url: '/placement/es' },
-  { name: 'course-islam', url: '/course/islam-foundations/what-is-islam' },
+  { name: 'settings', url: '/settings' },
+  { name: 'course-coding', url: '/course/coding-interview' },
   { name: 'course-python', url: '/course/python-fundamentals' },
-  { name: 'course-spanish-beginner', url: '/course/spanish-beginner' },
+  { name: 'course-islam', url: '/course/islam-foundations' },
+  { name: 'course-finance', url: '/course/personal-finance' },
+  { name: 'course-french', url: '/course/french-beginner' },
+  { name: 'course-stoic', url: '/course/stoic-philosophy' },
+  { name: 'course-aiml', url: '/course/ai-ml-fundamentals' },
+  { name: 'course-sysdesign', url: '/course/system-design' },
+  { name: 'course-dsa', url: '/course/data-structures-algorithms' },
+  { name: 'course-mentalhealth', url: '/course/mental-health-resilience' },
+  { name: 'course-apbio', url: '/course/ap-biology' },
+  { name: 'admin-survey', url: '/admin/survey' },
 ];
 
 test.describe('Visual Audit — Desktop (1440x900)', () => {
@@ -57,7 +66,7 @@ test.describe('Visual Audit — Mobile (390x844)', () => {
 
 test.describe('Visual Audit — User Flows', () => {
   test('flow: signup → onboarding → dashboard', async ({ page }) => {
-    test.use({ viewport: { width: 390, height: 844 } });
+    await page.setViewportSize({ width: 390, height: 844 });
 
     // Signup page
     await page.goto('/signup');

@@ -44,6 +44,8 @@ function CoachSidebar() {
   const isLanguageCourse = useIsLanguageCourse();
   const pathname = usePathname();
   const isTalkPage = pathname?.startsWith("/talk");
+  const isAuthPage = pathname === "/login" || pathname === "/signup" || pathname === "/onboarding";
+  const shouldHide = isLanguageCourse || isTalkPage || isAuthPage;
   const [activeTab, setActiveTab] = useState<"coach" | "notes">("coach");
   const [hasBeenOpened, setHasBeenOpened] = useState(false);
 
@@ -51,15 +53,15 @@ function CoachSidebar() {
     if (isPanelOpen) setHasBeenOpened(true);
   }, [isPanelOpen]);
 
-  // Auto-close Coach Alex on language courses and /talk page
+  // Auto-close Coach Alex on pages where it shouldn't appear
   useEffect(() => {
-    if ((isLanguageCourse || isTalkPage) && isPanelOpen) {
+    if (shouldHide && isPanelOpen) {
       closePanel();
     }
-  }, [isLanguageCourse, isTalkPage, isPanelOpen, closePanel]);
+  }, [shouldHide, isPanelOpen, closePanel]);
 
-  // Hide Coach Alex entirely on language courses and /talk page
-  if (isLanguageCourse || isTalkPage) return null;
+  // Hide Coach Alex on language courses, /talk, login, signup, onboarding
+  if (shouldHide) return null;
 
   // Don't mount coach until it's been opened at least once or there's a lesson
   if (!hasBeenOpened && !lessonContext) return null;
@@ -163,9 +165,10 @@ function CoachFAB() {
   const isLanguageCourse = useIsLanguageCourse();
   const pathname = usePathname();
   const isTalkPage = pathname?.startsWith("/talk");
+  const isAuthPage = pathname === "/login" || pathname === "/signup" || pathname === "/onboarding";
 
-  // Hide on language courses and /talk page
-  if (isPanelOpen || !lessonContext || isLanguageCourse || isTalkPage) return null;
+  // Hide on language courses, /talk, login, signup, onboarding
+  if (isPanelOpen || !lessonContext || isLanguageCourse || isTalkPage || isAuthPage) return null;
 
   return (
     <button
@@ -194,6 +197,13 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
     </div>
   );
+}
+
+/** Translation bar — only show on course/lesson pages, not auth/marketing pages */
+function TranslationBarWrapper() {
+  const pathname = usePathname();
+  if (!pathname?.startsWith("/course/")) return null;
+  return <TranslationBar />;
 }
 
 /**
@@ -229,7 +239,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             <GamificationOverlays />
             <GlobalSearch />
             <ShortcutsHelp />
-            <TranslationBar />
+            <TranslationBarWrapper />
           </XPProvider>
         </AIProvider>
       </TopNavProvider>
