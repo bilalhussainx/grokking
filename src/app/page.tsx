@@ -294,35 +294,109 @@ export default function HomePage() {
         initial="hidden"
         animate="visible"
       >
-        {/* Hero */}
-        <motion.div variants={item} className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium mb-6">
+        {/* ── HERO — Cinematic, value-first ── */}
+        <motion.div variants={item} className="text-center mb-16 pt-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6">
             <Sparkles className="w-3.5 h-3.5" />
-            AI-powered learning hub
+            50+ courses &middot; 8 languages &middot; AI voice coaching
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
-            Master Anything.
+          <h1 className="text-4xl sm:text-6xl font-bold text-white tracking-tight leading-[1.1]">
+            Your AI tutor that<br />
+            <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+              speaks your language.
+            </span>
           </h1>
-          <p className="mt-4 text-lg text-white/50 max-w-xl mx-auto">
-            Learn languages, code, and more with AI tutors that adapt to you.
+          <p className="mt-5 text-lg sm:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
+            Learn to code, speak French, study Islam, master finance — with an AI coach that explains in your language, adapts to your level, and talks back.
           </p>
           {!user && (
-            <div className="flex items-center justify-center gap-3 mt-8">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10">
               <Link
                 href="/signup"
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-sm hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-base hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
               >
-                Try Free — 300 Credits
+                Start Free — 300 AI Credits
               </Link>
               <Link
-                href="/courses"
-                className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white/70 font-medium text-sm hover:bg-white/10 hover:text-white transition-all"
+                href="/talk"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white/70 font-medium text-base hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2"
               >
-                Browse Courses
+                <Mic className="w-4 h-4" />
+                Try a Voice Lesson
               </Link>
             </div>
           )}
         </motion.div>
+
+        {/* ── HOW IT WORKS — 3-step product flow ── */}
+        {!user && (
+          <motion.div variants={item} className="mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Step 1: Pick a course */}
+              <motion.div
+                className="relative rounded-2xl border border-blue-500/15 bg-gradient-to-br from-blue-500/5 via-slate-900/80 to-slate-900/80 p-6"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="absolute top-4 right-4 text-3xl font-bold text-blue-500/10">1</div>
+                <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
+                  <BookOpen className="w-6 h-6 text-blue-400" />
+                </div>
+                <h3 className="text-white font-semibold text-lg mb-2">Pick any course</h3>
+                <p className="text-white/50 text-sm leading-relaxed">Coding interviews, French, Islamic studies, personal finance — 50+ structured courses with exercises.</p>
+              </motion.div>
+
+              {/* Step 2: Talk to tutor */}
+              <motion.div
+                className="relative rounded-2xl border border-emerald-500/15 bg-gradient-to-br from-emerald-500/5 via-slate-900/80 to-slate-900/80 p-6"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="absolute top-4 right-4 text-3xl font-bold text-emerald-500/10">2</div>
+                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
+                  <Mic className="w-6 h-6 text-emerald-400" />
+                </div>
+                <h3 className="text-white font-semibold text-lg mb-2">Talk to your AI tutor</h3>
+                <p className="text-white/50 text-sm leading-relaxed">Voice conversations in 8 languages. Coach Alex explains concepts, gives hints, and adapts to your level.</p>
+              </motion.div>
+
+              {/* Step 3: Master it */}
+              <motion.div
+                className="relative rounded-2xl border border-violet-500/15 bg-gradient-to-br from-violet-500/5 via-slate-900/80 to-slate-900/80 p-6"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="absolute top-4 right-4 text-3xl font-bold text-violet-500/10">3</div>
+                <div className="w-11 h-11 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-4">
+                  <Sparkles className="w-6 h-6 text-violet-400" />
+                </div>
+                <h3 className="text-white font-semibold text-lg mb-2">Master it your way</h3>
+                <p className="text-white/50 text-sm leading-relaxed">Track progress, earn XP, get personalized recommendations. Learn at your pace, in your language.</p>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── SOCIAL PROOF — Numbers bar ── */}
+        {!user && (
+          <motion.div variants={item} className="mb-14">
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 py-4">
+              {[
+                { value: "50+", label: "Courses" },
+                { value: "8", label: "Voice Languages" },
+                { value: "2,200+", label: "Lessons" },
+                { value: "Free", label: "1-Month Trial" },
+              ].map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs text-white/40 mt-1">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Learning Stats + Forgetting Alert (logged-in users) */}
         {user && (
