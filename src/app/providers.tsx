@@ -102,15 +102,20 @@ function CoachSidebar() {
         }`}
       >
         {/* Mobile header */}
-        <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.08] shrink-0">
+        <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/[0.08] shrink-0">
           <button
             onClick={closePanel}
-            className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/[0.06] transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-white/70 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
-            Back to Lesson
+            Close Coach
           </button>
-          <span className="text-[10px] text-white/20">Voice stays active</span>
+          <button
+            onClick={closePanel}
+            className="p-2 rounded-lg bg-white/5 hover:bg-white/15 text-white/50 hover:text-white transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {tabBar}
@@ -135,9 +140,10 @@ function CoachSidebar() {
         <div className={`flex flex-col h-full min-w-[320px] ${isPanelOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
           <button
             onClick={closePanel}
-            className="absolute top-3 right-3 z-10 p-1 rounded-md hover:bg-white/10 text-white/30 hover:text-white/60 transition-colors"
+            className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-white/50 hover:text-white transition-colors"
+            title="Close Coach Alex"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
 
           {tabBar}
