@@ -383,7 +383,7 @@ server.tool(
       table: z.string().describe("Supabase table to store embedding in"),
       id_column: z.string().describe("ID column name"),
       id_value: z.string().describe("ID value for this record"),
-      metadata: z.record(z.unknown()).optional().describe("Additional columns to store"),
+      metadata: z.record(z.string(), z.unknown()).optional().describe("Additional columns to store"),
     }).optional().describe("If provided, stores the embedding in Supabase pgvector"),
     api_key: z.string().optional(),
   },

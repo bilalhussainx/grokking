@@ -1,0 +1,84 @@
+# Local Development VPS Stack
+# Run this on your local machine with NVIDIA GPU
+# Then use Cloudflare Tunnel or Ngrok to expose port 8080
+#
+# Architecture:
+# - STT: Faster-Whisper (local GPU)
+# - TTS: Kokoro-82M (local GPU)
+# - LLM: Moonshot API (cloud - Kimi K2)
+
+version: '3.8'
+
+services:
+  # ============================================
+  # STT: Faster-Whisper (Local)
+  # ============================================
+  whisper:
+    image: fedirz/faster-whisper-server:latest-cuda
+    container_name: grokking-whisper
+    ports:
+      - "8001:8000"
+    environment:
+      - WHISPER_MODEL=large-v3-turbo
+      - WHISPER_DEVICE=cuda
+      - WHISPER_COMPUTE_TYPE=float16
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # ============================================
+  # TTS: Kokoro-82M (Local)
+  # Built from custom Dockerfile
+  # ============================================
+  kokoro:
+    build:
+      context: ./kokoro
+      dockerfile: Dockerfile
+    container_name: grokking-kokoro
+    ports:
+      - "8002:8000"
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  # ============================================
+  # WebSocket Relay (Node.js)
+  # Connects to Moonshot API for LLM
+  # ============================================
+  relay:
+    build:
+      context: ./relay
+      dockerfile: Dockerfile
+    container_name: grokking-relay
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - WHISPER_URL=http://whisper:8000
+      - KOKORO_URL=http://kokoro:8000
+      - MOONSHOT_API_KEY=${MOONSHOT_API_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - JWT_SECRET=${JWT_SECRET:-your-jwt-secret-change-in-production}
+    depends_on:
+      - whisper
+      - kokoro
+    restart: unless-stopped

@@ -19,7 +19,32 @@
       "WebFetch(domain:elevenlabs.io)",
       "WebFetch(domain:developers.deepgram.com)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(echo \".superpowers/\" >> .gitignore 2>/dev/null; git add docs/superpowers/specs/2026-03-13-phase1-auth-payments-design.md .gitignore && git commit -m \"$\\(cat <<'EOF'\ndocs: add Phase 1 auth, payments & credit system design spec\n\nComprehensive design for Supabase Auth \\(Google OAuth\\), Paddle\nsubscription billing \\(Free/Pro/Teams tiers\\), and credit-based\nAI feature metering. Reviewed and approved.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(node -e \"require\\('@paddle/paddle-js'\\); console.log\\('paddle-js OK'\\)\" && node -e \"require\\('class-variance-authority'\\); console.log\\('cva OK'\\)\" && node -e \"require\\('clsx'\\); console.log\\('clsx OK'\\)\")",
+      "Bash(for dir:*)",
+      "Bash(do echo:*)",
+      "Read(//c/Users/bilal/Downloads/grokking/src/data/**)",
+      "Bash(done)",
+      "Bash(cd:*)",
+      "WebFetch(domain:techcrunch.com)",
+      "WebFetch(domain:getfluently.app)",
+      "WebFetch(domain:help.getfluently.app)",
+      "WebFetch(domain:www.midoo.ai)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:aitools.inc)",
+      "WebFetch(domain:www.producthunt.com)",
+      "WebFetch(domain:londoninsider.co.uk)",
+      "WebFetch(domain:hiretop.com)",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(wc:*)",
+      "Bash(node:*)",
+      "Bash(for course:*)",
+      "Bash(ls /c/Users/bilal/Downloads/grokking/src/data/judaism-foundations/0*.ts)",
+      "Bash(xargs -I {} basename {} .ts)"
     ]
   }
 }

@@ -1,0 +1,19 @@
+{
+  "name": "grokking-voice-relay",
+  "version": "1.0.0",
+  "description": "WebSocket relay for language learning voice agent",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

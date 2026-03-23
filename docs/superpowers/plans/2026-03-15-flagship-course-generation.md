@@ -12,12 +12,12 @@
 
 ## Chunk 1: Platform — Featured Courses & Data Model
 
-### Task 1: Add `featured` flag to Course type
+### Task 1: Add `featured` flag to Course type ✅ COMPLETED
 
 **Files:**
 - Modify: `src/data/types.ts`
 
-- [ ] **Step 1: Extend Course interface**
+- [x] **Step 1: Extend Course interface**
 
 ```typescript
 // In src/data/types.ts, add optional featured field:
@@ -37,7 +37,7 @@ export interface Course {
 }
 ```
 
-- [ ] **Step 2: Add getFeaturedCourses helper**
+- [x] **Step 2: Add getFeaturedCourses helper**
 
 ```typescript
 // In src/data/types.ts, add:
@@ -46,7 +46,7 @@ export function getFeaturedCourses(courses: Course[]): Course[] {
 }
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/data/types.ts
@@ -55,49 +55,20 @@ git commit -m "feat(types): add featured flag, domain, level, prerequisites to C
 
 ---
 
-### Task 2: Add Featured section to homepage
+### Task 2: Add Featured section to homepage ✅ COMPLETED
 
 **Files:**
 - Modify: `src/app/page.tsx`
 
-- [ ] **Step 1: Read current homepage**
+- [x] **Step 1: Read current homepage**
 
 Read `src/app/page.tsx` to understand the existing course grid layout.
 
-- [ ] **Step 2: Add Featured Courses section above the main grid**
+- [x] **Step 2: Add Featured Courses section above the main grid**
 
-Add a "Featured Courses" section at the top that only shows courses with `featured: true`. These get a highlighted card with a badge. The existing grid remains below.
+Added a "Featured Courses" section with highlighted cards, yellow star badge, and gradient backgrounds.
 
-```tsx
-// Above the main course grid:
-{featuredCourses.length > 0 && (
-  <section className="mb-12">
-    <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-      <span className="text-yellow-400">★</span> Featured Courses
-    </h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {featuredCourses.map(course => (
-        <Link key={course.id} href={`/course/${course.slug}`}
-          className="relative p-6 rounded-2xl bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-yellow-500/20 hover:border-yellow-500/40 transition-all">
-          <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-medium">
-            Featured
-          </div>
-          <span className="text-3xl">{course.icon}</span>
-          <h3 className="text-white font-semibold mt-3">{course.title}</h3>
-          <p className="text-slate-400 text-sm mt-1">{course.description}</p>
-          {course.domain && (
-            <span className="inline-block mt-2 px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">
-              {course.domain}
-            </span>
-          )}
-        </Link>
-      ))}
-    </div>
-  </section>
-)}
-```
-
-- [ ] **Step 3: Wire up featured filtering**
+- [x] **Step 3: Wire up featured filtering**
 
 ```typescript
 import { courses } from "@/data";
@@ -106,7 +77,7 @@ import { getFeaturedCourses } from "@/data/types";
 const featuredCourses = getFeaturedCourses(courses);
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/app/page.tsx
@@ -117,14 +88,27 @@ git commit -m "feat(ui): add Featured Courses section to homepage"
 
 ## Chunk 2: MCP Client — Course Generation Script
 
-### Task 3: Create MCP client that reads skill files and generates courses
+### Task 3: Create MCP client that reads skill files and generates courses ✅ COMPLETED
 
 **Files:**
-- Create: `scripts/generate-flagship-course.ts`
-- Create: `scripts/lib/course-generator-client.ts`
-- Create: `scripts/lib/review-agent.ts`
+- Create: `scripts/lib/course-generator-client.ts` ✅
+- Create: `scripts/lib/review-agent.ts` ✅
+- Create: `scripts/generate-flagship-course.ts` ✅
 
-- [ ] **Step 1: Create the course generator client**
+- [x] **Step 1: Create the course generator client**
+
+Created `scripts/lib/course-generator-client.ts` with:
+- `readSkill(name)` - Reads skill files from `skills/` directory
+- `tavilySearch(query)` - Tavily API integration for research
+- `moonshot(systemPrompt, userMessage, maxTokens)` - Moonshot API (Kimi K2) integration
+- `generateLesson(params)` - Full lesson generation with research integration
+
+- [x] **Step 2: Commit**
+
+```bash
+git add scripts/lib/course-generator-client.ts
+git commit -m "feat(scripts): add MCP client for course generation via Moonshot + Tavily"
+```
 
 This script reads skill files directly (no MCP server needed — they're local files),
 uses Moonshot API for LLM generation, and Tavily for research.
@@ -274,98 +258,19 @@ git commit -m "feat(scripts): add MCP client for course generation via Moonshot 
 
 ---
 
-### Task 4: Create the review agent
+### Task 4: Create the review agent ✅ COMPLETED
 
 **Files:**
-- Create: `scripts/lib/review-agent.ts`
+- Create: `scripts/lib/review-agent.ts` ✅
 
-- [ ] **Step 1: Build review agent that compares against reference courses**
+- [x] **Step 1: Build review agent that compares against reference courses**
 
-```typescript
-// scripts/lib/review-agent.ts
+Created `scripts/lib/review-agent.ts` with:
+- `loadReferenceMaterial(domain)` - Loads reference courses (coding-interview, python-fundamentals, etc.)
+- `reviewModule(moduleCode, domain, courseTitle)` - AI-powered quality review with scoring
+- Returns `{ passed, issues, suggestions, scores }` structure
 
-import { moonshot, readSkill } from './course-generator-client';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
-
-// Load reference material from existing high-quality courses
-function loadReferenceMaterial(domain: string): string {
-  const references: Record<string, string[]> = {
-    'computer-science': [
-      'src/data/coding-interview/01-two-pointers.ts',
-      'src/data/python-fundamentals/01-variables-and-types.ts',
-      'src/data/data-structures-algorithms/index.ts',
-    ],
-    'finance-business': [
-      'src/data/personal-finance/index.ts',
-      'src/data/corporate-finance/index.ts',
-    ],
-    'economics': [
-      'src/data/microeconomics/index.ts',
-      'src/data/macroeconomics/index.ts',
-    ],
-  };
-
-  const files = references[domain] || references['computer-science'];
-  return files.map(f => {
-    try {
-      const content = readFileSync(resolve(__dirname, '../../', f), 'utf-8');
-      return `--- ${f} ---\n${content.slice(0, 2000)}`;
-    } catch { return ''; }
-  }).join('\n\n');
-}
-
-export async function reviewModule(
-  moduleCode: string,
-  domain: string,
-  courseTitle: string,
-): Promise<{ passed: boolean; issues: string[]; suggestions: string[] }> {
-  const orchestratorSkill = readSkill('content-orchestrator');
-  const referenceMaterial = loadReferenceMaterial(domain);
-
-  const systemPrompt = `You are a quality review agent for Samsara.ai.
-
-Your job is to review a generated course module against:
-1. The quality standards in the content-orchestrator skill
-2. Reference material from existing high-quality courses
-3. The quality checklist (Step 10 from the orchestrator)
-
-QUALITY STANDARDS (from skill):
-${orchestratorSkill.slice(orchestratorSkill.indexOf('Step 10: REVIEW'), orchestratorSkill.indexOf('## Anti-Patterns'))}
-
-REFERENCE MATERIAL (what good courses look like):
-${referenceMaterial.slice(0, 3000)}
-
-Review the module and return JSON:
-{
-  "passed": true/false,
-  "issues": ["list of specific problems found"],
-  "suggestions": ["list of improvements"],
-  "scores": {
-    "content_depth": 1-10,
-    "exercise_quality": 1-10,
-    "voice_markers": 1-10,
-    "citation_quality": 1-10,
-    "overall": 1-10
-  }
-}
-
-PASS THRESHOLD: overall >= 7
-Only return valid JSON.`;
-
-  const result = await moonshot(systemPrompt, `Review this module for "${courseTitle}":\n\n${moduleCode.slice(0, 6000)}`, 2000);
-
-  try {
-    const jsonMatch = result.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return { passed: false, issues: ['Review parse failed'], suggestions: [] };
-    return JSON.parse(jsonMatch[0]);
-  } catch {
-    return { passed: false, issues: ['Review parse failed'], suggestions: [] };
-  }
-}
-```
-
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add scripts/lib/review-agent.ts
@@ -374,12 +279,32 @@ git commit -m "feat(scripts): add review agent comparing against reference cours
 
 ---
 
-### Task 5: Create the main flagship course generator script
+### Task 5: Create the main flagship course generator script ✅ COMPLETED
 
 **Files:**
-- Create: `scripts/generate-flagship-course.ts`
+- Create: `scripts/generate-flagship-course.ts` ✅
 
-- [ ] **Step 1: Build the main orchestration script**
+- [x] **Step 1: Build the main orchestration script**
+
+Created `scripts/generate-flagship-course.ts` with:
+- Pre-configured course specifications for 6 flagship courses:
+  - `advanced-system-design` - System design mastery
+  - `fullstack-bootcamp` - Full-stack web development
+  - `islamic-ethics` - Islamic finance & ethics
+  - `philosophy-critical-thinking` - Critical thinking
+  - `finance-wealth-building` - Personal finance
+  - `health-optimization` - Health & performance
+- Phase 1: Design course skeleton
+- Phase 2: Research per module via Tavily
+- Phase 3: Generate lessons with voice markers and code exercises
+- Phase 4: Quality review and save to `src/data/generated/`
+
+- [x] **Step 2: Commit**
+
+```bash
+git add scripts/generate-flagship-course.ts scripts/lib/
+git commit -m "feat(scripts): add flagship course generator with MCP skills + review agent"
+```
 
 ```typescript
 // scripts/generate-flagship-course.ts
@@ -830,3 +755,71 @@ Task 12 → Package scripts
 Tasks 1-5 are sequential (infrastructure).
 Tasks 6-10 are independent (can run in parallel).
 Tasks 11-12 are cleanup.
+
+
+---
+
+## 📊 CURRENT STATUS UPDATE
+
+### ✅ COMPLETED (Tasks 1-5): Infrastructure
+
+| Task | Description | Files |
+|------|-------------|-------|
+| 1 | Add featured flag to Course type | `src/data/types.ts` |
+| 2 | Add Featured Courses section to homepage | `src/app/page.tsx` |
+| 3 | Create course generator client | `scripts/lib/course-generator-client.ts` |
+| 4 | Create review agent | `scripts/lib/review-agent.ts` |
+| 5 | Create main generation script | `scripts/generate-flagship-course.ts` |
+
+### 🔄 PENDING (Tasks 6-12): Course Generation
+
+| Task | Course | Status |
+|------|--------|--------|
+| 6 | Advanced System Design | ⏳ Pending |
+| 7 | Full-Stack Web Development Bootcamp | ⏳ Pending |
+| 8 | Islamic Ethics & Personal Finance | ⏳ Pending |
+| 9 | Philosophy & Critical Thinking | ⏳ Pending |
+| 10 | Finance & Wealth Building | ⏳ Pending |
+| 11 | Health & Human Performance | ⏳ Pending |
+| 12 | Feature existing courses + package scripts | ⏳ Partial (script added) |
+
+### 🚀 Usage
+
+```bash
+# Set environment variables
+$env:MOONSHOT_API_KEY="your_key"
+$env:TAVILY_API_KEY="your_key"
+
+# Install tsx (if not already installed)
+npm install -D tsx
+
+# Generate a course
+npx tsx scripts/generate-flagship-course.ts advanced-system-design
+
+# Or use npm script
+npm run generate:course -- advanced-system-design
+```
+
+### 📁 Files Created
+
+```
+scripts/
+├── lib/
+│   ├── course-generator-client.ts    # Moonshot + Tavily integration
+│   └── review-agent.ts               # Quality validation
+└── generate-flagship-course.ts       # Main orchestration script
+```
+
+### 🔧 Package.json Script Added
+
+```json
+{
+  "scripts": {
+    "generate:course": "tsx scripts/generate-flagship-course.ts"
+  }
+}
+```
+
+---
+
+*Last updated: 2026-03-15*
