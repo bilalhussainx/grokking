@@ -1,7 +1,9 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
+**/node_modules/
+**/dist/
 /.pnp
 .pnp.*
 .yarn/*
@@ -40,3 +42,20 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .superpowers/
+
+.vercel
+
+# Audit/report files (not code)
+AUDIT_*.md
+*_AUDIT_*.md
+*_SUMMARY*.md
+*_REPORT*.md
+PRIORITY_FIXES*.md
+BUG_TRACKER.md
+ACTION_ITEMS_CHECKLIST.md
+MCP_Interview_QA.md
+USER_STUDY_IMPLEMENTATION_PLAN.md
+
+# Test artifacts
+test-results/
+tests/screenshots/
