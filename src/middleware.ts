@@ -20,7 +20,7 @@ const PUBLIC_ROUTES = [
 ];
 
 // Route prefixes that are always public
-const PUBLIC_PREFIXES = ["/ref/", "/_next/", "/favicon", "/api/webhooks/", "/api/admin/", "/api/courses/", "/api/submissions", "/talk", "/career", "/admin/survey"];
+const PUBLIC_PREFIXES = ["/ref/", "/_next/", "/favicon", "/api/webhooks/", "/api/admin/", "/api/courses/", "/api/submissions", "/api/call/", "/talk", "/call", "/career", "/admin/survey"];
 
 function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.includes(pathname)) return true;
