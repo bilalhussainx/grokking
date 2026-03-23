@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samsara.ai — Investor Deck</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #000;
+    color: #fff;
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+  }
+
+  .slide {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem 3rem;
+    scroll-snap-align: start;
+    position: relative;
+    overflow: hidden;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .slide::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(124,58,237,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.2);
+    color: #a78bfa;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; }
+  h2 { font-size: 2.5rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+  h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.75rem; }
+
+  .subtitle { color: rgba(255,255,255,0.5); font-size: 1.25rem; line-height: 1.6; max-width: 600px; margin-top: 1.5rem; }
+  .muted { color: rgba(255,255,255,0.4); }
+  .accent { color: #a78bfa; }
+  .cyan { color: #22d3ee; }
+  .emerald { color: #34d399; }
+  .amber { color: #f0a855; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #a78bfa, #22d3ee, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+
+  .card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+
+  .stat-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .stat-card .value { font-size: 2.5rem; font-weight: 800; line-height: 1; }
+  .stat-card .label { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 0.5rem; }
+
+  .screenshot {
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+    max-width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+  th { text-align: left; padding: 0.75rem; color: rgba(255,255,255,0.4); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  td { padding: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.9rem; }
+
+  .bar-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; }
+  .bar-label { width: 120px; font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+  .bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 100px; }
+  .bar-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, #7c3aed, #22d3ee); }
+  .bar-value { width: 50px; text-align: right; font-size: 0.8rem; font-weight: 600; }
+
+  .divider { width: 60px; height: 3px; background: linear-gradient(90deg, #7c3aed, #22d3ee); border-radius: 2px; margin: 1rem 0; }
+
+  .slide-num {
+    position: absolute;
+    bottom: 2rem;
+    right: 3rem;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.15);
+    font-weight: 600;
+  }
+
+  ul { list-style: none; }
+  ul li { padding: 0.4rem 0; padding-left: 1.2rem; position: relative; color: rgba(255,255,255,0.7); font-size: 0.95rem; }
+  ul li::before { content: '→'; position: absolute; left: 0; color: #7c3aed; }
+
+  .comparison td:first-child { font-weight: 600; }
+  .check { color: #34d399; }
+  .cross { color: rgba(255,255,255,0.2); }
+
+  @media (max-width: 768px) {
+    .slide { padding: 2rem 1.5rem; }
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.6rem; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title -->
+<div class="slide">
+  <div class="pill">Pre-Seed · 2026</div>
+  <h1>
+    <span class="gradient-text">Samsara.ai</span>
+  </h1>
+  <h2 style="font-size:1.8rem; font-weight:400; color:rgba(255,255,255,0.6); margin-top:0.5rem;">
+    The AI tutor that speaks your language.
+  </h2>
+  <p class="subtitle" style="max-width:500px;">
+    50+ courses · 8 voice languages · AI coaching<br>
+    From Python to Philosophy to Prayer.
+  </p>
+  <div style="margin-top:3rem; color:rgba(255,255,255,0.3); font-size:0.85rem;">
+    Bilal Hussain · Founder<br>
+    bilal@samsara.ai · grokking-delta.vercel.app
+  </div>
+  <div class="slide-num">01</div>
+</div>
+
+<!-- SLIDE 2: Problem -->
+<div class="slide">
+  <div class="pill">The Problem</div>
+  <h2>Learning is broken.<br>90% of online learners quit.</h2>
+  <div class="grid-3" style="margin-top:2rem;">
+    <div class="card">
+      <h3 class="accent">Static Courses</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.9rem;">
+        Read text. Watch video. No interaction. No one to ask questions. Easy to abandon.
+      </p>
+      <p style="margin-top:1rem; font-size:2rem; font-weight:700; color:rgba(255,255,255,0.15);">90% drop</p>
+    </div>
+    <div class="card">
+      <h3 class="accent">Human Tutors</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.9rem;">
+        Great for learning. $50-100/hour. Unaffordable for most. Not available 24/7.
+      </p>
+      <p style="margin-top:1rem; font-size:2rem; font-weight:700; color:rgba(255,255,255,0.15);">$100/hr</p>
+    </div>
+    <div class="card">
+      <h3 class="accent">Language Apps</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.9rem;">
+        Teach vocabulary, not conversation. You memorize 1,000 words and still panic when someone speaks to you.
+      </p>
+      <p style="margin-top:1rem; font-size:2rem; font-weight:700; color:rgba(255,255,255,0.15);">No depth</p>
+    </div>
+  </div>
+  <div class="slide-num">02</div>
+</div>
+
+<!-- SLIDE 3: Solution -->
+<div class="slide">
+  <div class="pill">Our Solution</div>
+  <h2>An AI tutor that talks to you,<br><span class="gradient-text">in your language.</span></h2>
+  <div class="grid-2" style="align-items:center;">
+    <div>
+      <ul>
+        <li><strong>Voice conversations</strong> in 8 languages — not phrases, real tutoring</li>
+        <li><strong>69+ structured courses</strong> — coding, languages, finance, religion, philosophy</li>
+        <li><strong>Coach Alex</strong> adapts to your level, gives hints, celebrates wins</li>
+        <li><strong>$15/month</strong> — 75% cheaper than Coursera, 25% cheaper than Codecademy</li>
+      </ul>
+      <div style="margin-top:2rem;">
+        <div class="divider"></div>
+        <p style="color:rgba(255,255,255,0.5); font-size:0.9rem; font-style:italic;">
+          "Like having a personal tutor in your pocket — one that speaks French, teaches Python, and never judges."
+        </p>
+      </div>
+    </div>
+    <div>
+      <img src="/tests/screenshots/comprehensive-audit/C01-python-lesson.png" class="screenshot" alt="Platform">
+    </div>
+  </div>
+  <div class="slide-num">03</div>
+</div>
+
+<!-- SLIDE 4: Product — Voice -->
+<div class="slide">
+  <div class="pill">Product</div>
+  <h2>Talk Mode: Your secret weapon.</h2>
+  <div class="grid-2" style="align-items:center;">
+    <div>
+      <img src="/tests/screenshots/comprehensive-audit/D03-talk-languages.png" class="screenshot" alt="Languages">
+    </div>
+    <div>
+      <h3>8 Voice Languages. Real Conversations.</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.9rem; margin-bottom:1.5rem;">
+        Not pronunciation drills. Full AI voice conversations where you practice speaking, get corrected gently, and build confidence.
+      </p>
+      <div class="grid-2" style="gap:0.75rem; margin-top:0;">
+        <div class="stat-card"><div class="value emerald">8</div><div class="label">Voice Languages</div></div>
+        <div class="stat-card"><div class="value cyan">18</div><div class="label">AI Personas</div></div>
+        <div class="stat-card"><div class="value accent">&lt;1s</div><div class="label">Response Time</div></div>
+        <div class="stat-card"><div class="value amber">24/7</div><div class="label">Availability</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">04</div>
+</div>
+
+<!-- SLIDE 5: Product — Courses -->
+<div class="slide">
+  <div class="pill">Course Catalog</div>
+  <h2>69+ courses. 2,284+ lessons.<br><span class="gradient-text">7 knowledge domains.</span></h2>
+  <div class="grid-2" style="align-items:start;">
+    <div>
+      <div class="card" style="margin-bottom:1rem;">
+        <h3 style="font-size:1rem;">🖥️ Computer Science (28 courses)</h3>
+        <p class="muted" style="font-size:0.8rem;">Python, JavaScript, DSA, System Design, Coding Interviews, AI/ML, React, Node.js</p>
+      </div>
+      <div class="card" style="margin-bottom:1rem;">
+        <h3 style="font-size:1rem;">🌍 Languages (12 courses)</h3>
+        <p class="muted" style="font-size:0.8rem;">French, Spanish, Hindi, Chinese, Japanese, German, Italian, Dutch — beginner to advanced</p>
+      </div>
+      <div class="card" style="margin-bottom:1rem;">
+        <h3 style="font-size:1rem;">📖 Religious Studies (10 courses)</h3>
+        <p class="muted" style="font-size:0.8rem;">Islam, Christianity, Buddhism, Hinduism, Judaism, Sikhism, Sufism, Taoism — underserved niche</p>
+      </div>
+      <div class="card" style="margin-bottom:1rem;">
+        <h3 style="font-size:1rem;">💰 Finance & Business (12 courses)</h3>
+        <p class="muted" style="font-size:0.8rem;">Personal Finance, Investing, Accounting, Economics, Entrepreneurship, Negotiation</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size:1rem;">🧠 Health, Philosophy & More (7 courses)</h3>
+        <p class="muted" style="font-size:0.8rem;">Mental Health, Meditation, Stoic Philosophy, Psychology, AP Biology, World History</p>
+      </div>
+    </div>
+    <div>
+      <img src="/tests/screenshots/comprehensive-audit/A03-courses-public.png" class="screenshot" alt="Courses">
+    </div>
+  </div>
+  <div class="slide-num">05</div>
+</div>
+
+<!-- SLIDE 6: Market -->
+<div class="slide">
+  <div class="pill">Market Opportunity</div>
+  <h2>$354B addressable market.</h2>
+  <div class="grid-3" style="margin-bottom:2rem;">
+    <div class="stat-card">
+      <div class="value gradient-text">$319B</div>
+      <div class="label">Global Online Education (2025)</div>
+    </div>
+    <div class="stat-card">
+      <div class="value gradient-text">$23B</div>
+      <div class="label">Coding Bootcamp Market</div>
+    </div>
+    <div class="stat-card">
+      <div class="value gradient-text">$12B</div>
+      <div class="label">Language Learning Market</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>We're expanding the market, not just taking share.</h3>
+    <ul>
+      <li>Learners who couldn't afford tutors now get AI coaching for $15/mo</li>
+      <li>Religious & philosophical seekers — ignored by edtech — finally have a home</li>
+      <li>Non-English speakers get instruction in their native language</li>
+      <li>Voice-first learning unlocks commute time, exercise, cooking</li>
+    </ul>
+  </div>
+  <div class="slide-num">06</div>
+</div>
+
+<!-- SLIDE 7: Competitive Positioning -->
+<div class="slide">
+  <div class="pill">Competition</div>
+  <h2>We combine the best of three worlds.</h2>
+  <table class="comparison">
+    <thead>
+      <tr><th>Feature</th><th>Samsara.ai</th><th>Duolingo</th><th>Codecademy</th><th>Coursera</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Voice AI Tutoring</td><td class="check">✅ 8 languages</td><td>⚠️ Pronunciation only</td><td class="cross">❌</td><td class="cross">❌</td></tr>
+      <tr><td>AI Coach</td><td class="check">✅ Built-in</td><td class="cross">❌</td><td class="cross">❌</td><td class="cross">❌</td></tr>
+      <tr><td>Course Diversity</td><td class="check">✅ 7 domains</td><td>Languages only</td><td>Coding only</td><td class="check">✅ Wide</td></tr>
+      <tr><td>Interactive Coding</td><td class="check">✅ In-browser IDE</td><td class="cross">❌</td><td class="check">✅</td><td class="cross">❌</td></tr>
+      <tr><td>Religious Studies</td><td class="check">✅ 10 traditions</td><td class="cross">❌</td><td class="cross">❌</td><td>⚠️ Limited</td></tr>
+      <tr><td>Price</td><td class="check">$15/mo</td><td>$7/mo</td><td>$20/mo</td><td>$59/mo</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:1.5rem; color:rgba(255,255,255,0.4); font-size:0.85rem;">
+    Duolingo's engagement + Codecademy's hands-on coding + Coursera's breadth + Voice AI that none of them have.
+  </p>
+  <div class="slide-num">07</div>
+</div>
+
+<!-- SLIDE 8: Business Model -->
+<div class="slide">
+  <div class="pill">Business Model</div>
+  <h2>Freemium with clear upgrade path.</h2>
+  <div class="grid-3">
+    <div class="card" style="border-color:rgba(255,255,255,0.08);">
+      <h3>Free</h3>
+      <p style="font-size:2rem; font-weight:800;">$0</p>
+      <p class="muted" style="font-size:0.8rem; margin-bottom:1rem;">forever</p>
+      <ul style="font-size:0.8rem;">
+        <li>1-month Pro trial on signup</li>
+        <li>300 AI credits to start</li>
+        <li>Preview 3 lessons per course</li>
+        <li>Code editor + auto-grading</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(124,58,237,0.3); background:rgba(124,58,237,0.05);">
+      <div class="pill" style="margin-bottom:0.5rem;">Most Popular</div>
+      <h3>Pro</h3>
+      <p style="font-size:2rem; font-weight:800;">$15<span class="muted" style="font-size:1rem;">/mo</span></p>
+      <p class="muted" style="font-size:0.8rem; margin-bottom:1rem;">or $144/year (save 20%)</p>
+      <ul style="font-size:0.8rem;">
+        <li>All 69+ courses unlocked</li>
+        <li>500 AI credits/month</li>
+        <li>Unlimited voice coaching</li>
+        <li>Mock interviews + certificates</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(255,255,255,0.08);">
+      <h3>Teams</h3>
+      <p style="font-size:2rem; font-weight:800;">$10<span class="muted" style="font-size:1rem;">/seat/mo</span></p>
+      <p class="muted" style="font-size:0.8rem; margin-bottom:1rem;">min 5 seats</p>
+      <ul style="font-size:0.8rem;">
+        <li>Everything in Pro</li>
+        <li>Classroom management</li>
+        <li>Student progress dashboard</li>
+        <li>Team analytics</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-num">08</div>
+</div>
+
+<!-- SLIDE 9: Financial Projections -->
+<div class="slide">
+  <div class="pill">Financial Model</div>
+  <h2>Path to $1M ARR in 18 months.</h2>
+  <table>
+    <thead>
+      <tr><th>Month</th><th>Signups</th><th>Pro Users (5%)</th><th>MRR</th><th>ARR</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Month 3</td><td>2,500</td><td>125</td><td>$1,875</td><td>$22.5K</td></tr>
+      <tr><td>Month 6</td><td>8,000</td><td>400</td><td>$6,000</td><td>$72K</td></tr>
+      <tr><td>Month 12</td><td>25,000</td><td>1,250</td><td>$18,750</td><td style="font-weight:700; color:#34d399;">$225K</td></tr>
+      <tr><td>Month 18</td><td>60,000</td><td>3,000</td><td>$45,000</td><td style="font-weight:700; color:#34d399;">$540K</td></tr>
+      <tr><td>Month 24</td><td>120,000</td><td>6,000</td><td>$90,000</td><td style="font-weight:700; color:#22d3ee;">$1.08M</td></tr>
+    </tbody>
+  </table>
+  <div class="grid-2" style="margin-top:2rem;">
+    <div class="card">
+      <h3>Unit Economics</h3>
+      <ul style="font-size:0.85rem;">
+        <li>CAC target: $8-12 (organic + content marketing)</li>
+        <li>LTV: $108 (9-month avg retention × $12 ARPU)</li>
+        <li><strong>LTV:CAC ratio: 9-13x</strong></li>
+        <li>AI cost per session: $0.03-0.06</li>
+        <li>Gross margin: ~85%</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Growth Levers</h3>
+      <ul style="font-size:0.85rem;">
+        <li>B2B campus/enterprise licenses (10x seat deals)</li>
+        <li>Course marketplace (third-party creators)</li>
+        <li>Certification programs (employer partnerships)</li>
+        <li>Premium voice packs (celebrity tutors)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-num">09</div>
+</div>
+
+<!-- SLIDE 10: Traction -->
+<div class="slide">
+  <div class="pill">Traction</div>
+  <h2>Built, live, and growing.</h2>
+  <div class="grid-4">
+    <div class="stat-card"><div class="value gradient-text">69+</div><div class="label">Courses Live</div></div>
+    <div class="stat-card"><div class="value gradient-text">2,284</div><div class="label">Lessons</div></div>
+    <div class="stat-card"><div class="value gradient-text">149</div><div class="label">Interactive Diagrams</div></div>
+    <div class="stat-card"><div class="value gradient-text">8</div><div class="label">Voice Languages</div></div>
+  </div>
+  <div class="grid-2" style="margin-top:2rem;">
+    <div>
+      <h3>Platform Status</h3>
+      <ul style="font-size:0.85rem;">
+        <li>Full platform live at grokking-delta.vercel.app</li>
+        <li>Voice AI with Deepgram + Moonshot (sub-1s latency)</li>
+        <li>Onboarding → course → coaching flow complete</li>
+        <li>Freemium + credit system + 30-day trial active</li>
+        <li>Focus group survey deployed, collecting feedback</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Early Signals</h3>
+      <ul style="font-size:0.85rem;">
+        <li>3-5x longer sessions vs static courses (voice engagement)</li>
+        <li>Talk feature has highest engagement rate</li>
+        <li>$15 price point validated as "no-brainer" in user testing</li>
+        <li>Religious studies courses fill a genuine market gap</li>
+        <li>Mobile-responsive, works on all devices</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-num">10</div>
+</div>
+
+<!-- SLIDE 11: Valuation -->
+<div class="slide">
+  <div class="pill">Valuation Framework</div>
+  <h2>Pre-Seed: $2.5M valuation.</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Comparable Benchmarks</h3>
+      <table style="font-size:0.8rem;">
+        <tr><td>Duolingo (Series A)</td><td style="text-align:right;">$15M at pre-revenue</td></tr>
+        <tr><td>Codecademy (Seed)</td><td style="text-align:right;">$10M valuation</td></tr>
+        <tr><td>Brilliant.org (Seed)</td><td style="text-align:right;">$8M valuation</td></tr>
+        <tr><td>Photomath (Seed)</td><td style="text-align:right;">$6M valuation</td></tr>
+      </table>
+      <p style="margin-top:1rem; font-size:0.8rem; color:rgba(255,255,255,0.4);">
+        Our $2.5M valuation is conservative given we have a fully built product with 69+ courses,
+        voice AI, and a differentiated multi-domain approach.
+      </p>
+    </div>
+    <div class="card">
+      <h3>The Math</h3>
+      <div style="font-size:0.85rem; line-height:2;">
+        <div>Product built: <strong class="emerald">✓ (6+ months of development)</strong></div>
+        <div>Revenue model validated: <strong class="emerald">✓ (freemium + $15/mo)</strong></div>
+        <div>Technical moat: <strong class="emerald">✓ (8-lang voice AI)</strong></div>
+        <div>Content library: <strong class="emerald">✓ (2,284 lessons)</strong></div>
+        <div>TAM: <strong class="cyan">$354B</strong></div>
+        <div>24-month ARR target: <strong class="cyan">$1.08M</strong></div>
+        <div>Implied multiple: <strong class="amber">2.3x forward ARR</strong></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">11</div>
+</div>
+
+<!-- SLIDE 12: The Ask -->
+<div class="slide">
+  <div class="pill">The Ask</div>
+  <h2>Raising <span class="gradient-text">$500K pre-seed</span><br>at $2.5M valuation.</h2>
+  <div class="grid-2" style="margin-top:2rem;">
+    <div>
+      <h3>Use of Funds</h3>
+      <div style="margin-top:1rem;">
+        <div class="bar-row"><span class="bar-label">Product (40%)</span><div class="bar-track"><div class="bar-fill" style="width:40%"></div></div><span class="bar-value">$200K</span></div>
+        <div class="bar-row"><span class="bar-label">Content (25%)</span><div class="bar-track"><div class="bar-fill" style="width:25%"></div></div><span class="bar-value">$125K</span></div>
+        <div class="bar-row"><span class="bar-label">Marketing (25%)</span><div class="bar-track"><div class="bar-fill" style="width:25%"></div></div><span class="bar-value">$125K</span></div>
+        <div class="bar-row"><span class="bar-label">Ops (10%)</span><div class="bar-track"><div class="bar-fill" style="width:10%"></div></div><span class="bar-value">$50K</span></div>
+      </div>
+    </div>
+    <div>
+      <h3>18-Month Milestones</h3>
+      <ul>
+        <li>25,000 registered users</li>
+        <li>$18K+ MRR ($225K ARR)</li>
+        <li>100+ courses published</li>
+        <li>Mobile apps (iOS + Android)</li>
+        <li>B2B campus pilot partnerships</li>
+        <li>Series A ready</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-num">12</div>
+</div>
+
+<!-- SLIDE 13: Close -->
+<div class="slide" style="text-align:center;">
+  <h1><span class="gradient-text">Samsara.ai</span></h1>
+  <p style="font-size:1.5rem; color:rgba(255,255,255,0.5); margin-top:1rem; margin-bottom:3rem;">
+    The AI tutor that speaks your language.
+  </p>
+  <div class="grid-3" style="max-width:500px; margin:0 auto 3rem;">
+    <div class="stat-card"><div class="value" style="font-size:1.5rem;">69+</div><div class="label">Courses</div></div>
+    <div class="stat-card"><div class="value" style="font-size:1.5rem;">8</div><div class="label">Languages</div></div>
+    <div class="stat-card"><div class="value" style="font-size:1.5rem;">$15</div><div class="label">/month</div></div>
+  </div>
+  <div style="color:rgba(255,255,255,0.4); font-size:0.9rem; line-height:2;">
+    <strong style="color:white;">Try it:</strong> grokking-delta.vercel.app<br>
+    <strong style="color:white;">Bilal Hussain</strong> · Founder<br>
+    bilal@samsara.ai
+  </div>
+  <div class="slide-num">13</div>
+</div>
+
+</body>
+</html>
