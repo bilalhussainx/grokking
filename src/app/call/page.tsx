@@ -132,7 +132,7 @@ export default function CallPage() {
               Real-Time Translation
             </div>
             <h1 className="text-3xl font-bold text-white">Translated Call</h1>
-            <p className="text-white/40 text-sm mt-2">Talk to anyone in any of 7 languages</p>
+            <p className="text-white/40 text-sm mt-2">Talk to anyone in 7 languages — translated in real-time</p>
           </div>
 
           {/* Call Form */}
