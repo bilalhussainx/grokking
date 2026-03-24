@@ -8,6 +8,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useXP } from "@/contexts/XPContext";
 import CreditBadge from "@/components/auth/CreditBadge";
 import StreakBadge from "@/components/gamification/StreakBadge";
+import { SamsaraLogoIcon } from "@/components/ui/SamsaraLogo";
 
 interface TopNavProps {
   courseTitle?: string;
@@ -45,11 +46,9 @@ export default function TopNav({
         )}
 
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 text-white font-bold text-xs shadow-md shadow-blue-500/20">
-            S
-          </div>
-          <span className="text-lg font-bold tracking-tight hidden sm:inline">Samsara<span className="text-blue-400">.ai</span></span>
-          <span className="text-lg font-bold tracking-tight sm:hidden">S<span className="text-blue-400">.</span></span>
+          <SamsaraLogoIcon size={28} />
+          <span className="text-lg font-bold tracking-tight hidden sm:inline bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">Samsara<span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">.ai</span></span>
+          <span className="text-lg font-bold tracking-tight sm:hidden bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">S.</span>
         </Link>
 
         {courseTitle && (

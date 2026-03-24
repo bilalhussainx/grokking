@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
+import SamsaraLogo from "@/components/ui/SamsaraLogo";
 
 export default function SignupPage() {
   const { signInWithGoogle, signUpWithEmail, user } = useAuth();
@@ -71,10 +72,8 @@ export default function SignupPage() {
     return (
       <section className="flex min-h-screen items-center justify-center px-4 bg-[var(--background)]">
         <div className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 text-center">
-          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-            <svg className="w-7 h-7 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-            </svg>
+          <div className="mx-auto mb-4">
+            <SamsaraLogo size="md" showText={false} />
           </div>
           <h2 className="text-xl font-semibold text-white mb-2">Verify your email</h2>
           <p className="text-sm text-white/50">We sent a confirmation link to <strong className="text-white/80">{email}</strong>.</p>
@@ -101,9 +100,10 @@ export default function SignupPage() {
         onSubmit={handleSignup}
         className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 shadow-xl backdrop-blur-sm"
       >
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
-            Join Samsara<span className="text-cyan-400">.ai</span>
+        <div className="flex flex-col items-center mb-8">
+          <SamsaraLogo size="lg" showText={false} className="mb-4" />
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
+            Join Samsara<span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">.ai</span>
           </h1>
           <p className="text-sm text-white/50 mt-2">Start with 300 free AI credits + 1 month Pro access</p>
         </div>

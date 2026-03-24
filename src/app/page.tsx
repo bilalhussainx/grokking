@@ -16,6 +16,7 @@ import ProgressRing from "@/components/ui/ProgressRing";
 import ForgettingAlert from "@/components/gamification/ForgettingAlert";
 import VariableReward from "@/components/gamification/VariableReward";
 import { getDailyLoginReward } from "@/lib/rewards";
+import SamsaraLogo from "@/components/ui/SamsaraLogo";
 
 const container = {
   hidden: { opacity: 0 },
@@ -296,6 +297,14 @@ export default function HomePage() {
       >
         {/* ── HERO — Cinematic, value-first ── */}
         <motion.div variants={item} className="text-center mb-16 pt-4">
+          <motion.div
+            className="flex justify-center mb-8"
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <SamsaraLogo size="xl" showText={false} />
+          </motion.div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             50+ courses &middot; 8 languages &middot; AI voice coaching
