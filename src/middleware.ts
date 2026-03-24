@@ -17,6 +17,7 @@ const PUBLIC_ROUTES = [
   "/api/webhooks/paddle",
   "/api/survey",
   "/survey.html",
+  "/call",
 ];
 
 // Route prefixes that are always public
