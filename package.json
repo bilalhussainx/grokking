@@ -51,7 +51,6 @@
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.5.0",
-    "twilio": "^5.13.0",
     "y-protocols": "^1.0.7",
     "yjs": "^13.6.29"
   },

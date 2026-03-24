@@ -44,7 +44,8 @@
       "Bash(node:*)",
       "Bash(for course:*)",
       "Bash(ls /c/Users/bilal/Downloads/grokking/src/data/judaism-foundations/0*.ts)",
-      "Bash(xargs -I {} basename {} .ts)"
+      "Bash(xargs -I {} basename {} .ts)",
+      "Bash(find C:UsersbilalDownloadsgrokkingpublic -type f \\\\\\(-name *.png -o -name *.jpg -o -name *.jpeg -o -name *.svg -o -name *.webp \\\\\\))"
     ]
   }
 }

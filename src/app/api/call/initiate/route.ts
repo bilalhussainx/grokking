@@ -1,15 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase, createAdminSupabase } from "@/lib/supabase-auth";
-import twilio from "twilio";
 
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || "";
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || "";
 const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER || "";
 
+/** Make a Twilio REST API call without the SDK */
+async function twilioCall(to: string, from: string, url: string, statusCallback: string) {
+  const authHeader = Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString("base64");
+
+  const res = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Calls.json`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${authHeader}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        To: to,
+        From: from,
+        Url: url,
+        StatusCallback: statusCallback,
+        StatusCallbackEvent: "completed failed",
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Twilio API error: ${res.status} ${err}`);
+  }
+
+  return res.json();
+}
+
 /**
  * POST /api/call/initiate
- * Web-initiated call — user enters both numbers and languages on the website.
- * Server calls User A first, then bridges to User B.
+ * Web-initiated call. No Twilio SDK — uses REST API directly.
  */
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
@@ -47,49 +75,24 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (dbErr || !session) {
-      console.error("[Call Initiate] DB error:", dbErr);
       return NextResponse.json({ error: "Failed to create call session" }, { status: 500 });
     }
 
-    const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+    // Call User B
+    const callB = await twilioCall(
+      calleePhone,
+      TWILIO_PHONE_NUMBER,
+      `${baseUrl}/api/call/connect?callerLang=${callerLanguage}&callSidA=web&calleeLang=${calleeLanguage}&skipGather=1`,
+      `${baseUrl}/api/call/status`
+    );
 
-    // Call User A (caller) — they pick up and hear hold music while we call B
-    const callA = await client.calls.create({
-      to: callerPhone,
-      from: TWILIO_PHONE_NUMBER,
-      twiml: `<Response>
-        <Say voice="Polly.Joanna">Connecting your translated call. Please hold.</Say>
-        <Play loop="10">http://com.twilio.sounds.music.s3.amazonaws.com/MARKOVICHAMP-B8075.mp3</Play>
-      </Response>`,
-      statusCallback: `${baseUrl}/api/call/status`,
-      statusCallbackEvent: ["completed", "failed"],
-    });
-
-    // Call User B (callee)
-    const callB = await client.calls.create({
-      to: calleePhone,
-      from: TWILIO_PHONE_NUMBER,
-      url: `${baseUrl}/api/call/connect?callerLang=${callerLanguage}&callSidA=${callA.sid}&calleeLang=${calleeLanguage}&skipGather=1`,
-      statusCallback: `${baseUrl}/api/call/status`,
-      statusCallbackEvent: ["completed", "failed", "no-answer"],
-    });
-
-    // Update session with call SIDs
+    // Update session
     await admin
       .from("call_sessions")
-      .update({
-        twilio_call_sid_a: callA.sid,
-        twilio_call_sid_b: callB.sid,
-        status: "ringing",
-      })
+      .update({ twilio_call_sid_b: callB.sid, status: "ringing" })
       .eq("id", session.id);
 
-    return NextResponse.json({
-      ok: true,
-      sessionId: session.id,
-      callSidA: callA.sid,
-      callSidB: callB.sid,
-    });
+    return NextResponse.json({ ok: true, sessionId: session.id });
   } catch (err) {
     console.error("[Call Initiate] Error:", err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
