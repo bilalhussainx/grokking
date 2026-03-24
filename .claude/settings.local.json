@@ -46,7 +46,9 @@
       "Bash(ls /c/Users/bilal/Downloads/grokking/src/data/judaism-foundations/0*.ts)",
       "Bash(xargs -I {} basename {} .ts)",
       "Bash(find C:UsersbilalDownloadsgrokkingpublic -type f \\\\\\(-name *.png -o -name *.jpg -o -name *.jpeg -o -name *.svg -o -name *.webp \\\\\\))",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "Bash(1)",
+      "Bash(tee /tmp/vercel-build.log)"
     ]
   }
 }
