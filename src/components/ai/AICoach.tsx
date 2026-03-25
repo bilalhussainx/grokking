@@ -488,8 +488,20 @@ export default function AICoach() {
         const contentPreview = ctx.lessonContent?.slice(0, 500) || "";
         const hasCodingExercise = !!(ctx.starterCode);
 
-        // Fire greeting with FULL context — no race condition possible
-        // because the event carries the data directly
+        // CRITICAL: Update the ref BEFORE firing sendEvent
+        // This is what was broken — sendEvent reads from lessonContextRef
+        // which was still null when the event bus fired
+        lessonContextRef.current = {
+          courseSlug: '',
+          lessonSlug: '',
+          lessonTitle: ctx.lessonTitle,
+          lessonContent: ctx.lessonContent,
+          moduleTitle: ctx.moduleTitle,
+          courseTitle: ctx.courseTitle,
+          starterCode: ctx.starterCode,
+          solutionCode: ctx.solutionCode,
+        };
+
         setTimeout(() => {
           sendEvent(
             `[LESSON_OPENED EVENT] The student just opened a new lesson.
