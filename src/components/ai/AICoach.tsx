@@ -436,34 +436,19 @@ export default function AICoach() {
     []
   );
 
-  // Reset on lesson change
+  // Reset on lesson change — ONLY handles hint count and teaching mode
+  // DO NOT clear messages here — the event bus handler already did that
+  // and clearing again would wipe the greeting
   useEffect(() => {
     if (!lessonContext) return;
     const lessonId = lessonContext.lessonTitle;
     if (lessonId === lastLessonId) return;
-
-    // Save notes from previous lesson before clearing
-    if (lastLessonId && messagesRef.current.length >= 2) {
-      saveNotes();
-    }
-
     setLastLessonId(lessonId);
-    setMessages([]);
-    messagesRef.current = [];
-    setHasGreeted(false);
     setHintsGiven(0);
     hintsRef.current = 0;
     setLastCodeLength(0);
-    setCoachMode('text-monitoring');
-    resetScrollMessages();
-    lastScrollCountRef.current = 0;
-
-    // Determine teaching mode for this lesson
     setTeachingMode(getTeachingMode(lessonContext.lessonTitle));
-
-    // Auto-open coach panel when a new lesson loads so the student sees the greeting
-    openPanel();
-  }, [lessonContext, lastLessonId, saveNotes, openPanel, resetScrollMessages]);
+  }, [lessonContext, lastLessonId]);
 
   // EVENT BUS SUBSCRIPTION — Coach listens for events from the app
   // This is the SINGLE source of truth for lesson opens, code changes, etc.
@@ -544,18 +529,30 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
     setLastCodeLength(codeLen);
   }, [currentCode, lastCodeLength, lessonContext, sendEvent, deepgram.isConnected]);
 
-  // TUTOR CHECK-IN — after 5 minutes of quiet study, Coach says something smart
-  // Like a real tutor who watches you work and comments when relevant
+  // TUTOR CHECK-IN — Coach speaks up when user is quiet
   const checkInTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const checkInCountRef = useRef(0);
-  useEffect(() => {
-    if (!hasGreeted) return;
+  const checkInActiveRef = useRef(false);
 
-    const ctx = lessonContextRef.current;
+  // Activate check-ins when a lesson opens
+  useEffect(() => {
+    const unsub = subscribe((event) => {
+      if (event.type === "LESSON_OPENED") {
+        checkInActiveRef.current = true;
+        checkInCountRef.current = 0;
+      } else if (event.type === "LESSON_CLOSED") {
+        checkInActiveRef.current = false;
+      }
+    });
+    return unsub;
+  }, [subscribe]);
+
+  useEffect(() => {
     const scheduleCheckIn = () => {
       if (checkInTimerRef.current) clearTimeout(checkInTimerRef.current);
       checkInTimerRef.current = setTimeout(() => {
-        if (isStreamingRef.current || deepgram.isConnected) return;
+        if (!checkInActiveRef.current || isStreamingRef.current || deepgram.isConnected) return;
+        const ctx = lessonContextRef.current; // Read FRESH ref value at timer fire time
         checkInCountRef.current += 1;
         const count = checkInCountRef.current;
 
@@ -594,7 +591,7 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
       if (checkInTimerRef.current) clearTimeout(checkInTimerRef.current);
       window.removeEventListener("submit", resetOnAction);
     };
-  }, [lessonContext, hasGreeted, sendEvent, deepgram.isConnected]);
+  }, [sendEvent, deepgram.isConnected, subscribe]);
 
   const handleHint = () => {
     hintsRef.current += 1;
