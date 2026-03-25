@@ -86,8 +86,8 @@ export default function CallPage() {
       setSessionId(data.sessionId);
       setCallState("ringing");
 
-      // Simulate connection (in production, Twilio webhooks update this)
-      setTimeout(() => setCallState("active"), 3000);
+      // Poll for call status updates from Supabase
+      pollForCallStatus(data.sessionId);
     } catch (err) {
       setError(String(err instanceof Error ? err.message : err));
       setCallState("idle");
@@ -108,12 +108,49 @@ export default function CallPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const pollForCallStatus = (sid: string) => {
+    // Poll Supabase every 2s for call status + transcript updates
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/call/session?id=${sid}`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (data.status === "active" && callState !== "active") {
+          setCallState("active");
+        }
+        if (data.status === "completed" || data.status === "failed") {
+          setCallState("ended");
+          if (pollRef.current) clearInterval(pollRef.current);
+        }
+
+        // Update transcript from bridge
+        if (data.transcript && Array.isArray(data.transcript) && data.transcript.length > transcript.length) {
+          setTranscript(data.transcript.map((t: { speaker: string; original: string; translated: string; ts: string }) => ({
+            speaker: t.speaker as "caller" | "callee",
+            original: t.original,
+            translated: t.translated,
+            timestamp: new Date(t.ts),
+          })));
+        }
+      } catch {}
+    }, 2000);
+  };
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, []);
+
   const resetCall = () => {
     setCallState("idle");
     setTranscript([]);
     setDuration(0);
     setSessionId(null);
     setError("");
+    if (pollRef.current) clearInterval(pollRef.current);
   };
 
   // ─── IDLE STATE: Start a Call ───

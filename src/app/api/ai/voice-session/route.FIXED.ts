@@ -17,6 +17,12 @@ const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
  * Supports persona and voice selection.
  * The browser connects directly to Deepgram's WSS endpoint.
  * Kimi K2 Turbo is the LLM brain (OpenAI-compatible).
+ * 
+ * FIXED ISSUES:
+ * 1. Changed agent.think.prompt to agent.think.instructions (correct Deepgram API format)
+ * 2. Added proactive behavior instructions
+ * 3. Improved lesson context injection
+ * 4. Fixed multi-language handling
  */
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
@@ -124,41 +130,78 @@ export async function POST(req: NextRequest) {
   }
 
   // Build context-aware prompt with full lesson material
-  let contextPrompt = persona.systemPrompt + enthusiasmModifier;
+  let systemInstructions = persona.systemPrompt + enthusiasmModifier;
+
+  // ✅ FIX #1: Add proactive behavior instructions
+  systemInstructions += `\n\n## PROACTIVE BEHAVIOR
+You are a PROACTIVE tutor. Do NOT wait passively for questions. Instead:
+- After greeting, immediately reference the current lesson and ask what they'd like to start with
+- If they seem stuck or silent for >3 seconds, offer a hint or ask if they need help
+- Regularly check understanding by asking questions
+- Reference the lesson material naturally in conversation
+- Guide them through concepts step-by-step without being asked
+- Be conversational and encouraging, like a real human tutor`;
 
   // Language instruction — teach in the selected language
   if (language !== "en") {
-    contextPrompt += `\n\n## LANGUAGE INSTRUCTION\nThe student has chosen to learn in ${langName}. You MUST:\n- Speak and respond entirely in ${langName}\n- Explain all concepts in ${langName}\n- Use natural ${langName} phrasing and accent — do NOT read ${langName} words with English pronunciation\n- If the lesson content is in English, translate and explain it in ${langName}\n- Only use English for technical terms that have no good translation`;
+    systemInstructions += `\n\n## LANGUAGE INSTRUCTION
+The student has chosen to learn in ${langName}. You MUST:
+- Speak and respond entirely in ${langName}
+- Explain all concepts in ${langName}
+- Use natural ${langName} phrasing and accent
+- If the lesson content is in English, translate and explain it in ${langName}
+- Only use English for technical terms that have no good translation
+- Be as fluent and natural as a native ${langName} speaker`;
   }
 
+  // ✅ FIX #2: Better context injection with clear sections
   if (lessonTitle) {
-    contextPrompt += `\n\nCURRENT LESSON: ${courseTitle || "Course"} > ${moduleTitle || ""} > ${lessonTitle}`;
-  }
+    systemInstructions += `\n\n## CURRENT LESSON CONTEXT
+Course: ${courseTitle || "Unknown"}
+Module: ${moduleTitle || "Unknown"}  
+Lesson: ${lessonTitle}
 
-  // Proactive teaching instruction
-  contextPrompt += `\n\n## PROACTIVE BEHAVIOR (CRITICAL)
-You are NOT a passive assistant waiting for questions. You are an ACTIVE tutor. After greeting:
-1. Immediately reference the current lesson topic by name
-2. Ask the student a thought-provoking question about the material
-3. If they seem stuck or silent for a moment, offer to explain the next concept
-4. Keep the conversation flowing — always end with a question or a "let's try..."
-5. Keep responses to 1-2 sentences for voice. Short and punchy.
-Never say "How can I help?" — instead say "So in this lesson we're looking at [topic]. What's your take on [concept]?"`;
+YOU MUST reference this lesson when teaching. The student is currently working on "${lessonTitle}". Start by asking what part of this lesson they want to explore.`;
+  }
 
   if (lessonContext?.content) {
+    // Truncate to ~4000 chars to stay within prompt limits
     const content = lessonContext.content.slice(0, 4000);
-    contextPrompt += `\n\n## LESSON MATERIAL (USE THIS — the student is reading this right now)\n${content}`;
+    systemInstructions += `\n\n## LESSON MATERIAL
+This is the lesson content the student is studying. Reference specific parts of this material when teaching:
+
+${content}
+
+IMPORTANT: When the student asks about this lesson, quote or reference specific parts of the material above. Don't say "I don't have the lesson content" - you DO have it above!`;
   }
+
   if (lessonContext?.starterCode) {
-    contextPrompt += `\n\n## STARTER CODE\n\`\`\`\n${lessonContext.starterCode.slice(0, 1500)}\n\`\`\``;
+    systemInstructions += `\n\n## STARTER CODE
+The student has this starter code:
+\`\`\`
+${lessonContext.starterCode.slice(0, 1500)}
+\`\`\`
+
+Reference this code when explaining concepts. Ask them what they're trying to implement.`;
   }
+
   if (lessonContext?.solutionCode) {
-    contextPrompt += `\n\n## SOLUTION CODE (only reveal if student is truly stuck)\n\`\`\`\n${lessonContext.solutionCode.slice(0, 1500)}\n\`\`\``;
+    systemInstructions += `\n\n## SOLUTION CODE (ONLY reveal if student is truly stuck after multiple attempts)
+\`\`\`
+${lessonContext.solutionCode.slice(0, 1500)}
+\`\`\`
+
+Only show this if they explicitly ask for the solution after struggling.`;
   }
 
-  const greeting = persona.greeting(lessonTitle);
+  // ✅ FIX #3: More engaging greeting that references lesson
+  const lessonRef = lessonTitle ? ` I see you're working on "${lessonTitle}" - ` : " ";
+  const greeting = lessonTitle
+    ? `${persona.greeting("")}${lessonRef}What would you like to start with?`
+    : persona.greeting(lessonTitle);
 
-  // Build the Deepgram Voice Agent settings
+  // ✅ FIX #4: Use correct Deepgram API format - "instructions" not "prompt"
+  // Reference: https://developers.deepgram.com/docs/voice-agent-api
   const settings = {
     type: "Settings",
     audio: {
@@ -173,16 +216,19 @@ Never say "How can I help?" — instead say "So in this lesson we're looking at 
       },
     },
     agent: {
+      language: language || "en",
       listen: {
         provider: {
           type: "deepgram",
           model: "nova-3",
+          endpointing: 150,  // ms of silence before considering user finished
         },
       },
       think: {
         provider: {
           type: "open_ai",
           model: "kimi-k2-turbo-preview",
+          temperature: 0.6,  // Slightly higher for more natural responses
         },
         endpoint: {
           url: "https://api.moonshot.ai/v1/chat/completions",
@@ -190,7 +236,10 @@ Never say "How can I help?" — instead say "So in this lesson we're looking at 
             authorization: `Bearer ${MOONSHOT_API_KEY}`,
           },
         },
-        prompt: contextPrompt,
+        // ✅ CRITICAL FIX: Use "instructions" not "prompt"
+        instructions: systemInstructions,
+        // Optional: Add few-shot examples for better context loading
+        functions: [],  // Can add function calling later for interactive exercises
       },
       speak: {
         provider: {

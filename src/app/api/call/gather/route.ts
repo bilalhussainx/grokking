@@ -13,6 +13,7 @@ const LANG_NAMES: Record<string, string> = {
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || "";
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || "";
 const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER || "";
+const BRIDGE_URL = process.env.CALL_BRIDGE_URL || "";
 
 /**
  * POST /api/call/gather
@@ -52,8 +53,14 @@ export async function POST(req: NextRequest) {
     const baseUrl = req.nextUrl.origin || `https://${req.headers.get("host")}`;
 
     // Initiate outbound call via Twilio REST API (no SDK)
+    const sessionId = `dial-${Date.now()}`;
     try {
       const authHeader = Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString("base64");
+
+      // Use bridge if configured, otherwise standard connect route
+      const connectUrl = BRIDGE_URL
+        ? `https://${BRIDGE_URL}/voice/b/${sessionId}?callerLang=${callerLang}&calleeLang=pending`
+        : `${baseUrl}/api/call/connect?callerLang=${callerLang}&callSidA=${callSidA}`;
 
       await fetch(
         `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Calls.json`,
@@ -66,7 +73,7 @@ export async function POST(req: NextRequest) {
           body: new URLSearchParams({
             To: phoneNumber,
             From: TWILIO_PHONE_NUMBER,
-            Url: `${baseUrl}/api/call/connect?callerLang=${callerLang}&callSidA=${callSidA}`,
+            Url: connectUrl,
             StatusCallback: `${baseUrl}/api/call/status`,
             StatusCallbackEvent: "completed failed no-answer",
           }),
@@ -80,7 +87,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+    // Connect Caller A to bridge stream (if available) or hold with music
+    const twiml = BRIDGE_URL
+      ? `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna">Calling ${phoneNumber}. Connecting you with real-time translation.</Say>
+  <Connect>
+    <Stream url="wss://${BRIDGE_URL}/stream/a/${sessionId}" />
+  </Connect>
+</Response>`
+      : `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="Polly.Joanna">Calling ${phoneNumber}. Please hold while we connect you.</Say>
   <Play loop="10">http://com.twilio.sounds.music.s3.amazonaws.com/MARKOVICHAMP-B8075.mp3</Play>

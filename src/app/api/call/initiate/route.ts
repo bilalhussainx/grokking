@@ -4,6 +4,7 @@ import { createServerSupabase, createAdminSupabase } from "@/lib/supabase-auth";
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || "";
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || "";
 const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER || "";
+const BRIDGE_URL = process.env.CALL_BRIDGE_URL || "";
 
 /** Make a Twilio REST API call without the SDK */
 async function twilioCall(to: string, from: string, url: string, statusCallback: string) {
@@ -37,7 +38,7 @@ async function twilioCall(to: string, from: string, url: string, statusCallback:
 
 /**
  * POST /api/call/initiate
- * Web-initiated call. No Twilio SDK — uses REST API directly.
+ * Web-initiated call. Calls User B and connects both sides to the bridge.
  */
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
@@ -78,19 +79,42 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to create call session" }, { status: 500 });
     }
 
+    // Determine the URL for User B's call
+    // If bridge is configured, User B connects via bridge's TwiML endpoint
+    // Otherwise, fall back to the standard connect route
+    const connectUrl = BRIDGE_URL
+      ? `https://${BRIDGE_URL}/voice/b/${session.id}?callerLang=${callerLanguage}&calleeLang=${calleeLanguage}`
+      : `${baseUrl}/api/call/connect?callerLang=${callerLanguage}&callSidA=web&sessionId=${session.id}&calleeLang=${calleeLanguage}&skipGather=1`;
+
     // Call User B
     const callB = await twilioCall(
       calleePhone,
       TWILIO_PHONE_NUMBER,
-      `${baseUrl}/api/call/connect?callerLang=${callerLanguage}&callSidA=web&calleeLang=${calleeLanguage}&skipGather=1`,
+      connectUrl,
       `${baseUrl}/api/call/status`
     );
 
-    // Update session
+    // Update session with call SID
     await admin
       .from("call_sessions")
       .update({ twilio_call_sid_b: callB.sid, status: "ringing" })
       .eq("id", session.id);
+
+    // If bridge is configured, also call User A back so they connect to the bridge
+    // (User A initiated from web, so we call their phone and connect to bridge stream A)
+    if (BRIDGE_URL) {
+      const callA = await twilioCall(
+        callerPhone,
+        TWILIO_PHONE_NUMBER,
+        `https://${BRIDGE_URL}/voice/a/${session.id}`,
+        `${baseUrl}/api/call/status`
+      );
+
+      await admin
+        .from("call_sessions")
+        .update({ twilio_call_sid_a: callA.sid })
+        .eq("id", session.id);
+    }
 
     return NextResponse.json({ ok: true, sessionId: session.id });
   } catch (err) {

@@ -48,7 +48,8 @@
       "Bash(find C:UsersbilalDownloadsgrokkingpublic -type f \\\\\\(-name *.png -o -name *.jpg -o -name *.jpeg -o -name *.svg -o -name *.webp \\\\\\))",
       "Bash(npx vercel:*)",
       "Bash(1)",
-      "Bash(tee /tmp/vercel-build.log)"
+      "Bash(tee /tmp/vercel-build.log)",
+      "WebFetch(domain:www.twilio.com)"
     ]
   }
 }

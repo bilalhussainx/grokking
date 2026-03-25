@@ -215,15 +215,12 @@ APPROACH:
             // Use 'multi' for advanced learners who mostly speak the target language
             // Use 'en' for beginners who mostly speak English with some target language
             language: (proficiencyLevel === "B2" || proficiencyLevel === "C1" || proficiencyLevel === "C2") ? "multi" : "en",
-            endpointing: 150,
           },
         },
         think: {
           provider: {
             type: "open_ai",
             model: "kimi-k2-turbo-preview",
-            temperature: 0.5,
-            max_tokens: 150,
           },
           endpoint: {
             url: "https://api.moonshot.ai/v1/chat/completions",
