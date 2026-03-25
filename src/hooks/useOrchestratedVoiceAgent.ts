@@ -224,7 +224,7 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
     const dataArray = new Uint8Array(analyser.frequencyBinCount);
     let speaking = false;
     const THRESHOLD = 20;
-    const SILENCE_DURATION = 300; // Reduced for snappier response
+    const SILENCE_DURATION = 150; // Aggressive — 150ms silence = end of utterance
 
     const check = () => {
       if (!connectedRef.current) return;

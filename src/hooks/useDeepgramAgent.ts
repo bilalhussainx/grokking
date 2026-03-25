@@ -255,7 +255,7 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                     isGreetingPhaseRef.current = false;
                     greetingCooldownRef.current = false;
                   }
-                }, 8000);
+                }, 5000);
                 greetingCooldownRef.current = false;
                 agentSpeakCountRef.current = 0;
                 // Do NOT mute mic — Deepgram needs continuous audio stream or
@@ -296,7 +296,7 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                 // End greeting phase after the first agent speaking turn completes.
                 // Brief cooldown to ignore echo from speakers being picked up by mic.
                 if (isGreetingPhaseRef.current && agentSpeakCountRef.current >= 1) {
-                  console.log("[Deepgram] Greeting done — starting 1s echo cooldown");
+                  console.log("[Deepgram] Greeting done — starting 500ms echo cooldown");
                   isGreetingPhaseRef.current = false;
                   if (greetingTimeoutRef.current) clearTimeout(greetingTimeoutRef.current);
                   greetingCooldownRef.current = true;
@@ -304,7 +304,7 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                   setTimeout(() => {
                     greetingCooldownRef.current = false;
                     console.log("[Deepgram] Echo cooldown ended — now accepting user speech");
-                  }, 1000);
+                  }, 500);
                 }
                 break;
 
