@@ -527,38 +527,55 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
     setLastCodeLength(codeLen);
   }, [currentCode, lastCodeLength, lessonContext, sendEvent, deepgram.isConnected]);
 
-  // SILENCE DETECTION — if user is inactive for 45s, Coach proactively engages
-  const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const silenceCountRef = useRef(0);
+  // TUTOR CHECK-IN — after 5 minutes of quiet study, Coach says something smart
+  // Like a real tutor who watches you work and comments when relevant
+  const checkInTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const checkInCountRef = useRef(0);
   useEffect(() => {
-    if (!lessonContext || !hasGreeted) return;
+    if (!hasGreeted) return;
 
-    // Reset silence timer on any user activity
-    const resetSilence = () => {
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-      silenceTimerRef.current = setTimeout(() => {
+    const ctx = lessonContextRef.current;
+    const scheduleCheckIn = () => {
+      if (checkInTimerRef.current) clearTimeout(checkInTimerRef.current);
+      checkInTimerRef.current = setTimeout(() => {
         if (isStreamingRef.current || deepgram.isConnected) return;
-        silenceCountRef.current += 1;
-        const count = silenceCountRef.current;
+        checkInCountRef.current += 1;
+        const count = checkInCountRef.current;
 
+        // Context-aware prompts that feel like a real tutor observing
+        const lessonTitle = ctx?.lessonTitle || "their current page";
+        const hasCoding = !!(ctx?.starterCode);
         const prompts = [
-          `The student has been reading silently for 45 seconds. Check in naturally — ask if they have any questions about what they're reading, or offer to explain a concept from the lesson. Keep it short and warm.`,
-          `Still quiet. Share one interesting insight or "did you know" fact from the lesson content. Make it engaging and end with a question.`,
-          `The student seems to be deeply focused on reading. Give them space but offer: "Take your time — I'm here whenever you want to discuss anything or try an exercise."`,
+          // First check-in at 5 min — observational, specific
+          hasCoding
+            ? `You notice the student has been working on "${lessonTitle}" for 5 minutes. As a good tutor would, make ONE specific observation about the exercise — a common mistake to watch for, or a pro tip about the pattern. Don't ask if they need help — just share the insight naturally like a colleague leaning over. 1-2 sentences.`
+            : `The student has been reading "${lessonTitle}" for 5 minutes. Share one surprising or counterintuitive insight from the lesson material that would make them go "huh, interesting." Don't ask if they need help. Just drop knowledge. 1-2 sentences.`,
+          // Second check-in at 10 min — push them forward
+          `The student has been on this lesson for a while. Suggest a concrete next step: "Hey, you've been on this a while — want to try the exercise?" or "Ready to move to the next section?" or "Want me to quiz you on what you've read so far?" Pick whichever fits the lesson type. Be casual.`,
+          // Third check-in at 15 min — recommendation
+          `The student has spent 15+ minutes here. Based on what they're studying, recommend a related course or suggest trying the Talk feature to practice conversationally. Be specific: "By the way, if you're into [topic], you might love the [specific course] — it goes deeper into [aspect]." Or: "Want to practice this in conversation? Try the Talk feature — you can discuss [topic] with an AI tutor."`,
         ];
         const prompt = prompts[Math.min(count - 1, prompts.length - 1)];
         sendEvent(prompt, 'teaching');
-      }, 45000);
+
+        // Schedule next check-in (5 min intervals)
+        scheduleCheckIn();
+      }, 8 * 1000); // 8 seconds — quick enough to feel alive, not annoying
     };
 
-    resetSilence();
-    // Reset on user typing or code changes
-    window.addEventListener("keydown", resetSilence);
-    window.addEventListener("click", resetSilence);
+    scheduleCheckIn();
+
+    // Reset timer on significant user actions (not every keystroke)
+    const resetOnAction = () => {
+      checkInCountRef.current = 0;
+      scheduleCheckIn();
+    };
+
+    // Only reset on meaningful interactions, not passive browsing
+    window.addEventListener("submit", resetOnAction);
     return () => {
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-      window.removeEventListener("keydown", resetSilence);
-      window.removeEventListener("click", resetSilence);
+      if (checkInTimerRef.current) clearTimeout(checkInTimerRef.current);
+      window.removeEventListener("submit", resetOnAction);
     };
   }, [lessonContext, hasGreeted, sendEvent, deepgram.isConnected]);
 
