@@ -3,6 +3,21 @@ import { createServerSupabase } from "@/lib/supabase-auth";
 import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
 import { storeMemory, searchMemories, extractTopics } from "@/lib/memory";
 
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+
+// Smart model routing: DeepSeek for coding, GPT-4o-mini for everything else
+const CODING_DOMAINS = ["computer-science", "programming", "coding-interview", "system-design", "data-structures", "algorithms"];
+function pickModel(courseTitle?: string): string {
+  const title = (courseTitle || "").toLowerCase();
+  const isCoding = CODING_DOMAINS.some(d => title.includes(d)) ||
+    title.includes("python") || title.includes("javascript") || title.includes("react") ||
+    title.includes("node") || title.includes("dsa") || title.includes("coding") ||
+    title.includes("c++") || title.includes("c#") || title.includes("mern") ||
+    title.includes("system design") || title.includes("algorithm");
+  return isCoding ? "deepseek/deepseek-chat-v3-0324" : "openai/gpt-4o-mini";
+}
+
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 const MOONSHOT_URL = "https://api.moonshot.ai/v1/chat/completions";
 const MOONSHOT_MODEL = "kimi-k2-turbo-preview";
@@ -121,34 +136,48 @@ Respond concisely as Coach Alex:`;
       { role: "user", content: userPrompt },
     ];
 
-    // Primary: Kimi K2.5 (fast, streaming)
-    if (MOONSHOT_API_KEY) {
+    // Primary: OpenRouter GPT-4o-mini (best quality/cost for tutoring)
+    // Fallback: Kimi K2 Turbo (cheaper, faster, less personality)
+    const useOpenRouter = !!OPENROUTER_API_KEY;
+    const apiUrl = useOpenRouter ? OPENROUTER_URL : MOONSHOT_URL;
+    const apiKey = useOpenRouter ? OPENROUTER_API_KEY : MOONSHOT_API_KEY;
+    const model = useOpenRouter ? pickModel(courseTitle) : MOONSHOT_MODEL;
+    const providerName = useOpenRouter ? `OpenRouter/${model.split("/")[1]}` : "Kimi";
+    console.log(`[Coach] Using ${providerName} for "${courseTitle || "unknown course"}"`);
+
+    if (apiKey) {
       try {
-        const kimiRes = await fetch(MOONSHOT_URL, {
+        const llmRes = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${MOONSHOT_API_KEY}`,
+            Authorization: `Bearer ${apiKey}`,
+            ...(useOpenRouter ? { "HTTP-Referer": "https://kairos.ai", "X-Title": "Kairos.ai Coach" } : {}),
           },
           body: JSON.stringify({
-            model: MOONSHOT_MODEL,
+            model,
             messages,
             stream: true,
             temperature: 0.7,
-            max_tokens: 400,
+            max_tokens: 300,
           }),
         });
 
-        if (!kimiRes.ok) {
-          const errText = await kimiRes.text();
-          console.error("[Coach] Kimi error:", kimiRes.status, errText);
-          throw new Error(`Kimi ${kimiRes.status}`);
+        if (!llmRes.ok) {
+          const errText = await llmRes.text();
+          console.error(`[Coach] ${providerName} error:`, llmRes.status, errText);
+          // If OpenRouter fails, try Kimi as fallback
+          if (useOpenRouter && MOONSHOT_API_KEY) {
+            console.log("[Coach] Falling back to Kimi...");
+            throw new Error(`${providerName} ${llmRes.status}`);
+          }
+          throw new Error(`${providerName} ${llmRes.status}`);
         }
 
-        if (!kimiRes.body) throw new Error("No body");
+        if (!llmRes.body) throw new Error("No body");
 
         // Transform SSE stream → plain text stream
-        const reader = kimiRes.body.getReader();
+        const reader = llmRes.body.getReader();
         const decoder = new TextDecoder();
         const encoder = new TextEncoder();
 
@@ -198,11 +227,50 @@ Respond concisely as Coach Alex:`;
           },
         });
       } catch (err) {
-        console.error("[Coach] Kimi failed, falling back:", err);
+        console.error(`[Coach] ${providerName} failed:`, err);
+
+        // If OpenRouter failed, try Kimi as second fallback
+        if (useOpenRouter && MOONSHOT_API_KEY) {
+          try {
+            const kimiRes = await fetch(MOONSHOT_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${MOONSHOT_API_KEY}` },
+              body: JSON.stringify({ model: MOONSHOT_MODEL, messages, stream: true, temperature: 0.7, max_tokens: 300 }),
+            });
+            if (kimiRes.ok && kimiRes.body) {
+              const reader = kimiRes.body.getReader();
+              const decoder = new TextDecoder();
+              const encoder = new TextEncoder();
+              const stream = new ReadableStream({
+                async pull(controller) {
+                  let buffer = "";
+                  while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) { controller.close(); return; }
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop() || "";
+                    for (const line of lines) {
+                      const trimmed = line.trim();
+                      if (!trimmed || !trimmed.startsWith("data: ")) continue;
+                      const data = trimmed.slice(6);
+                      if (data === "[DONE]") { controller.close(); return; }
+                      try { const p = JSON.parse(data); const c = p.choices?.[0]?.delta?.content; if (c) controller.enqueue(encoder.encode(c)); } catch {}
+                    }
+                  }
+                },
+                cancel() { reader.cancel(); },
+              });
+              return new Response(stream, { headers: { "Content-Type": "text/plain; charset=utf-8" } });
+            }
+          } catch (kimiErr) {
+            console.error("[Coach] Kimi fallback also failed:", kimiErr);
+          }
+        }
       }
     }
 
-    // Fallback: Gemini
+    // Final fallback: Gemini
     return await fallbackToGemini(body);
   } catch (error: unknown) {
     console.error("[Coach] All failed:", error);
