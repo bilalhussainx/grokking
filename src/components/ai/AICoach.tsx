@@ -464,7 +464,8 @@ export default function AICoach() {
     openPanel();
   }, [lessonContext, lastLessonId, saveNotes, openPanel, resetScrollMessages]);
 
-  // Auto-start voice coach when a lesson opens — greet then disconnect
+  // LESSON START HOOK — fires every time a new lesson opens
+  // Always sends a text greeting immediately (reliable, no voice dependency)
   const autoStartLessonRef = useRef<string | null>(null);
   useEffect(() => {
     if (!lessonContext) return;
@@ -473,29 +474,30 @@ export default function AICoach() {
     if (hasGreeted) return;
     autoStartLessonRef.current = lessonKey;
     setHasGreeted(true);
-
+    setCoachMode('text-monitoring');
     openPanel();
-    const timer = setTimeout(async () => {
-      try {
-        if (deepgram.isConnected) deepgram.stop();
-        setCoachMode('greeting');
-        await startVoice();
-        console.log("[Coach] Auto-started voice for greeting:", lessonContext.lessonTitle);
-      } catch (err) {
-        console.warn("[Coach] Voice auto-start failed, using text:", err);
-        setCoachMode('text-monitoring');
-        const hasCodingExercise = !!(lessonContext.starterCode);
-        const contentPreview = lessonContext.lessonContent?.slice(0, 300) || "";
-        sendEvent(
-          hasCodingExercise
-            ? `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". Lesson content starts with: "${contentPreview}". This lesson has a coding exercise. Greet them BY NAME if you know it, reference the specific topic, and ask if they want to dive into the code or get an overview first.`
-            : `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". Lesson content starts with: "${contentPreview}". Greet them BY NAME if you know it, reference the specific topic from the content, and ask a thought-provoking question about it.`,
-          'encouraging'
-        );
-      }
-    }, 500);
+
+    // Immediate text greeting — no delay, no voice dependency
+    const contentPreview = lessonContext.lessonContent?.slice(0, 500) || "";
+    const hasCodingExercise = !!(lessonContext.starterCode);
+
+    // Small delay to ensure lessonContextRef is updated
+    const timer = setTimeout(() => {
+      sendEvent(
+        `[LESSON_START HOOK] The student just opened a new lesson.
+Course: ${lessonContext.courseTitle}
+Module: ${lessonContext.moduleTitle}
+Lesson: ${lessonContext.lessonTitle}
+Has coding exercise: ${hasCodingExercise ? "YES — there's starter code to work with" : "NO — this is a reading/concept lesson"}
+Lesson content preview: "${contentPreview}"
+
+YOUR TASK: Greet the student by name. Reference THIS SPECIFIC lesson topic (not generic). ${hasCodingExercise ? "Ask if they want to walk through the code or try it themselves first." : "Highlight the most interesting concept from the preview and ask a thought-provoking question about it."} Keep it to 2-3 sentences. Be warm, specific, and engaging.`,
+        'encouraging'
+      );
+    }, 300);
+
     return () => clearTimeout(timer);
-  }, [lessonContext, hasGreeted, openPanel, startVoice, sendEvent, deepgram]);
+  }, [lessonContext, hasGreeted, openPanel, sendEvent]);
 
   // Code activity detection (text mode only)
   useEffect(() => {
