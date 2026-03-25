@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search } from "lucide-react";
+import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search, MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTopNav } from "@/contexts/TopNavContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -172,6 +172,18 @@ export default function TopNav({
             >
               {(user.user_metadata?.full_name || user.email || "U").charAt(0).toUpperCase()}
             </Link>
+            {typeof window !== "undefined" && !localStorage.getItem("survey-completed") && (
+              <Link
+                href="/survey.html"
+                target="_blank"
+                onClick={() => localStorage.setItem("survey-completed", "true")}
+                className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium hover:bg-violet-500/20 transition-colors"
+                title="Give feedback"
+              >
+                <MessageSquare className="w-3 h-3" />
+                Feedback
+              </Link>
+            )}
             <button
               onClick={() => signOut()}
               className="hidden sm:flex p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"

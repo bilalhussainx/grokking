@@ -15,6 +15,7 @@ import { getLanguageCourse } from "@/data/languages";
 import TopNav from "@/components/layout/TopNav";
 import GlobalSearch from "@/components/search/GlobalSearch";
 import ShortcutsHelp from "@/components/ui/ShortcutsHelp";
+import SurveyPrompt from "@/components/feedback/SurveyPrompt";
 import XPFlyUp from "@/components/gamification/XPFlyUp";
 import AchievementToast from "@/components/gamification/AchievementToast";
 import VariableReward from "@/components/gamification/VariableReward";
@@ -248,6 +249,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             <GlobalSearch />
             <ShortcutsHelp />
             <TranslationBarWrapper />
+            <SurveyPrompt />
           </AIStateProvider>
           </XPProvider>
         </AIProvider>
