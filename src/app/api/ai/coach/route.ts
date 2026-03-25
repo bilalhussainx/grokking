@@ -65,6 +65,7 @@ export async function POST(req: NextRequest) {
       lessonTitle,
       moduleTitle,
       courseTitle,
+      lessonContent,
       currentCode,
       starterCode,
       solutionCode,
@@ -103,21 +104,23 @@ export async function POST(req: NextRequest) {
       topics: extractTopics(event),
     }).catch(() => {});
 
-    const userPrompt = `[CURRENT LESSON]
+    const userPrompt = `[CURRENT LESSON — THIS IS WHAT THE STUDENT IS LOOKING AT RIGHT NOW]
 Course: ${courseTitle || "Unknown"}
 Module: ${moduleTitle || "Unknown"}
 Lesson: ${lessonTitle || "Unknown"}
-${starterCode ? `Starter Code:\n\`\`\`\n${starterCode}\n\`\`\`` : ""}
-${solutionCode ? `Solution (DO NOT reveal unless 3+ hints given):\n\`\`\`\n${solutionCode}\n\`\`\`` : ""}
+${lessonContent ? `\nLESSON CONTENT (the actual text the student is reading):\n${lessonContent}\n` : ""}
+${starterCode ? `STARTER CODE:\n\`\`\`\n${starterCode}\n\`\`\`` : ""}
+${solutionCode ? `SOLUTION (DO NOT reveal unless 3+ hints given):\n\`\`\`\n${solutionCode}\n\`\`\`` : ""}
 
 [STUDENT STATE]
 Hints given so far: ${hintsGiven || 0}
 ${currentCode ? `Student's current code:\n\`\`\`\n${currentCode}\n\`\`\`` : "No code written yet"}
 
-[EVENT]
+[EVENT — what just happened]
 ${event}
 ${memoryContext}
-Respond concisely as Coach Alex:`;
+
+CRITICAL: You have the FULL lesson content above. Reference SPECIFIC concepts, terms, and examples from it. Never say generic things like "good stuff" or "keep going." Always tie your response to the actual material.`;
 
     // Add language instruction if user chose a non-English language
     const langNames: Record<string, string> = { fr: "French", es: "Spanish", de: "German", hi: "Hindi", zh: "Mandarin", ja: "Japanese", it: "Italian", nl: "Dutch", pa: "Punjabi", pt: "Portuguese", ko: "Korean", ar: "Arabic", tr: "Turkish", ru: "Russian", ur: "Urdu" };

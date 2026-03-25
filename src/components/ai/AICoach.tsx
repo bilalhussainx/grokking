@@ -399,6 +399,7 @@ export default function AICoach() {
             lessonTitle: ctx.lessonTitle,
             moduleTitle: ctx.moduleTitle,
             courseTitle: ctx.courseTitle,
+            lessonContent: ctx.lessonContent?.slice(0, 3000),
             currentCode: currentCodeRef.current,
             starterCode: ctx.starterCode,
             solutionCode: ctx.solutionCode,
