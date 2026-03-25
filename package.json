@@ -16,6 +16,7 @@
   "dependencies": {
     "@11labs/react": "^0.2.0",
     "@google/generative-ai": "^0.24.1",
+    "@langfuse/openai": "^5.0.1",
     "@monaco-editor/react": "^4.7.0",
     "@paddle/paddle-js": "^1.6.2",
     "@paddle/paddle-node-sdk": "^3.6.0",
