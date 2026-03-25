@@ -481,6 +481,10 @@ export default function AICoach() {
         if (lastGreetedLessonRef.current === lessonKey) return;
         lastGreetedLessonRef.current = lessonKey;
 
+        // FORCE RESET everything for the new lesson
+        isStreamingRef.current = false; // Kill any in-flight stream
+        messagesRef.current = [];
+        setMessages([]);
         setHasGreeted(true);
         setCoachMode('text-monitoring');
         openPanel();
@@ -488,9 +492,7 @@ export default function AICoach() {
         const contentPreview = ctx.lessonContent?.slice(0, 500) || "";
         const hasCodingExercise = !!(ctx.starterCode);
 
-        // CRITICAL: Update the ref BEFORE firing sendEvent
-        // This is what was broken — sendEvent reads from lessonContextRef
-        // which was still null when the event bus fired
+        // Set ref BEFORE sendEvent reads it
         lessonContextRef.current = {
           courseSlug: '',
           lessonSlug: '',
@@ -501,6 +503,8 @@ export default function AICoach() {
           starterCode: ctx.starterCode,
           solutionCode: ctx.solutionCode,
         };
+
+        console.log(`[Coach] LESSON_OPENED: "${ctx.lessonTitle}" | content: ${ctx.lessonContent ? ctx.lessonContent.length + ' chars' : 'NONE'}`);
 
         setTimeout(() => {
           sendEvent(
