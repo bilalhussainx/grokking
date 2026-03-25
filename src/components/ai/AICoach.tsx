@@ -368,10 +368,15 @@ export default function AICoach() {
   }, [messages]);
 
   // Send event to coach API (text mode), stream response
+  const lastSendTimeRef = useRef(0);
   const sendEvent = useCallback(
     async (event: string, type: CoachMessage['type'] = 'encouraging') => {
+      // Dedupe: no two sends within 2 seconds
+      const now = Date.now();
+      if (now - lastSendTimeRef.current < 2000) return;
       if (isStreamingRef.current || !lessonContextRef.current) return;
 
+      lastSendTimeRef.current = now;
       isStreamingRef.current = true;
       setIsStreaming(true);
 
