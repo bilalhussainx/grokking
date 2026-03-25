@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/admin/', '/settings/', '/auth/'],
       },
     ],
-    sitemap: 'https://samsara.ai/sitemap.xml',
+    sitemap: 'https://kairos.ai/sitemap.xml',
   };
 }

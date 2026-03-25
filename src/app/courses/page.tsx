@@ -32,12 +32,12 @@ export const metadata: Metadata = {
     'free online courses with certificates',
   ],
   openGraph: {
-    title: 'Samsara.ai Courses — Learn Anything with AI',
+    title: 'Kairos.ai Courses — Learn Anything with AI',
     description:
       'Browse 60+ courses across 7 domains with AI voice coaching.',
-    url: 'https://samsara.ai/courses',
+    url: 'https://kairos.ai/courses',
   },
-  alternates: { canonical: 'https://samsara.ai/courses' },
+  alternates: { canonical: 'https://kairos.ai/courses' },
 };
 
 const DOMAIN_ORDER = [
@@ -71,8 +71,8 @@ function courseListSchema() {
         '@type': 'Course',
         name: course.title,
         description: course.description,
-        url: `https://samsara.ai/course/${course.slug}`,
-        provider: { '@type': 'Organization', name: 'Samsara.ai' },
+        url: `https://kairos.ai/course/${course.slug}`,
+        provider: { '@type': 'Organization', name: 'Kairos.ai' },
         isAccessibleForFree: course.tier === 'free',
       },
     })),
@@ -101,10 +101,10 @@ export default function CoursesPage() {
         {/* GEO-optimized intro: first 200 words as a direct answer */}
         <header className="mb-12">
           <h1 className="text-3xl font-bold text-white mb-4">
-            All Courses on Samsara.ai — Free & Premium Online Learning
+            All Courses on Kairos.ai — Free & Premium Online Learning
           </h1>
           <p className="text-slate-300 text-lg leading-relaxed mb-4">
-            Samsara.ai offers {courses.length}+ interactive online courses
+            Kairos.ai offers {courses.length}+ interactive online courses
             spanning Computer Science, Language Learning, Religious Studies, Philosophy, Finance &
             Business, Health & Wellness, and Political Strategy. With{' '}
             {totalLessons}+ lessons across all courses, learners can study
@@ -116,7 +116,7 @@ export default function CoursesPage() {
             modules with checkpoint quizzes, coding exercises, and capstone
             projects. Whether you are preparing for a coding interview,
             exploring world religions, building financial literacy, or
-            developing leadership skills, Samsara.ai provides structured,
+            developing leadership skills, Kairos.ai provides structured,
             evidence-based curricula designed to take you from beginner to
             advanced.
           </p>

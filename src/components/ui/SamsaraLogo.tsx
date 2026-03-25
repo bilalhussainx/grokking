@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-interface SamsaraLogoProps {
+interface KairosLogoProps {
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   showText?: boolean;
   animate?: boolean;
@@ -18,23 +18,23 @@ const sizes = {
   xl: { img: 128, text: "text-4xl", ring: 140 },
 };
 
-export default function SamsaraLogo({
+export default function KairosLogo({
   size = "md",
   showText = true,
   animate = true,
   className = "",
-}: SamsaraLogoProps) {
+}: KairosLogoProps) {
   const s = sizes[size];
 
   const logoImage = (
     <div className="relative" style={{ width: s.img, height: s.img }}>
-      {/* Animated glow ring */}
+      {/* Animated glow ring — navy + gold matching the Kairos logo */}
       {animate && (
         <motion.div
           className="absolute inset-0 rounded-full"
           style={{
             background:
-              "conic-gradient(from 0deg, #8B5CF6, #3B82F6, #06B6D4, #C8A23D, #8B5CF6)",
+              "conic-gradient(from 0deg, #1e3a5f, #c8a23d, #1e3a5f, #c8a23d, #1e3a5f)",
             filter: "blur(6px)",
             margin: -3,
           }}
@@ -44,17 +44,17 @@ export default function SamsaraLogo({
       )}
       {/* Logo image */}
       <Image
-        src="/samsara-logo.jpg"
-        alt="Samsara.ai"
+        src="/kairos-logo.jpg"
+        alt="Kairos.ai"
         width={s.img}
         height={s.img}
-        className="relative rounded-full object-cover ring-1 ring-white/10"
+        className="relative rounded-full object-cover ring-1 ring-white/10 bg-white"
         priority
       />
       {/* Subtle pulse overlay */}
       {animate && (
         <motion.div
-          className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-500/20 to-cyan-500/20"
+          className="absolute inset-0 rounded-full bg-gradient-to-br from-[#1e3a5f]/20 to-[#c8a23d]/20"
           animate={{ opacity: [0, 0.3, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -78,7 +78,7 @@ export default function SamsaraLogo({
         <span
           className={`${s.text} font-bold tracking-tight bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent`}
         >
-          Samsara
+          Kairos
           <span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">
             .ai
           </span>
@@ -88,8 +88,8 @@ export default function SamsaraLogo({
   );
 }
 
-/** Compact animated logo for nav bars — just the image with glow */
-export function SamsaraLogoIcon({
+/** Compact animated logo for nav bars */
+export function KairosLogoIcon({
   size = 28,
   animate = true,
 }: {
@@ -104,7 +104,7 @@ export function SamsaraLogoIcon({
           style={{
             inset: -2,
             background:
-              "conic-gradient(from 0deg, #8B5CF6, #3B82F6, #06B6D4, #C8A23D, #8B5CF6)",
+              "conic-gradient(from 0deg, #1e3a5f, #c8a23d, #1e3a5f, #c8a23d, #1e3a5f)",
             filter: "blur(4px)",
             opacity: 0.6,
           }}
@@ -113,11 +113,11 @@ export function SamsaraLogoIcon({
         />
       )}
       <Image
-        src="/samsara-logo.jpg"
-        alt="Samsara.ai"
+        src="/kairos-logo.jpg"
+        alt="Kairos.ai"
         width={size}
         height={size}
-        className="relative rounded-full object-cover ring-1 ring-white/10"
+        className="relative rounded-full object-cover ring-1 ring-white/10 bg-white"
         priority
       />
     </div>

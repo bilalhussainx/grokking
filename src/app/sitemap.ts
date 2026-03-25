@@ -3,7 +3,7 @@ import { courses } from '@/data';
 import { getAllLessons } from '@/data/types';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://samsara.ai';
+  const baseUrl = 'https://kairos.ai';
 
   // Static pages
   const staticPages = [

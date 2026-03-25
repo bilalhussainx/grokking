@@ -1,7 +1,7 @@
 // src/app/pricing/page.tsx
 import PricingCards from "@/components/pricing/PricingCards";
 
-export const metadata = { title: "Pricing — Samsara.ai" };
+export const metadata = { title: "Pricing — Kairos.ai" };
 
 export default function PricingPage() {
   return (

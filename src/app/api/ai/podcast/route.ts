@@ -42,7 +42,7 @@ HOSTS:
 - SAM: The curious student who asks insightful questions and connects ideas
 
 RULES:
-- Start with a brief intro: "Welcome to Samsara Learn, today we're covering..."
+- Start with a brief intro: "Welcome to Kairos Learn, today we're covering..."
 - Make it conversational and engaging — NOT a lecture
 - Include ALL key concepts from the lesson
 - Sam should ask "why" and "how" questions that a real student would ask

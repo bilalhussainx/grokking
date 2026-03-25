@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
-import SamsaraLogo from "@/components/ui/SamsaraLogo";
+import KairosLogo from "@/components/ui/SamsaraLogo";
 
 export default function SignupPage() {
   const { signInWithGoogle, signUpWithEmail, user } = useAuth();
@@ -73,7 +73,7 @@ export default function SignupPage() {
       <section className="flex min-h-screen items-center justify-center px-4 bg-[var(--background)]">
         <div className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 text-center">
           <div className="mx-auto mb-4">
-            <SamsaraLogo size="md" showText={false} />
+            <KairosLogo size="md" showText={false} />
           </div>
           <h2 className="text-xl font-semibold text-white mb-2">Verify your email</h2>
           <p className="text-sm text-white/50">We sent a confirmation link to <strong className="text-white/80">{email}</strong>.</p>
@@ -101,9 +101,9 @@ export default function SignupPage() {
         className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 shadow-xl backdrop-blur-sm"
       >
         <div className="flex flex-col items-center mb-8">
-          <SamsaraLogo size="lg" showText={false} className="mb-4" />
+          <KairosLogo size="lg" showText={false} className="mb-4" />
           <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
-            Join Samsara<span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">.ai</span>
+            Join Kairos<span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">.ai</span>
           </h1>
           <p className="text-sm text-white/50 mt-2">Start with 300 free AI credits + 1 month Pro access</p>
         </div>

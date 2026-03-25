@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Samsara.ai — Learn Anything with AI',
-    short_name: 'Samsara.ai',
+    name: 'Kairos.ai — Learn Anything with AI',
+    short_name: 'Kairos.ai',
     description: 'AI-powered learning platform with voice coaching. Master coding, philosophy, religion, finance, and more with personalized AI tutors.',
     start_url: '/',
     display: 'standalone',

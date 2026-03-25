@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description: langCourse.description,
       };
     }
-    return { title: 'Course | Samsara.ai' };
+    return { title: 'Course | Kairos.ai' };
   }
 
   const moduleCount = course.modules.length;
@@ -33,18 +33,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ...course.modules.map(m => m.title),
     ],
     openGraph: {
-      title: `${course.title} | Samsara.ai`,
+      title: `${course.title} | Kairos.ai`,
       description: course.description,
-      url: `https://samsara.ai/course/${course.slug}`,
+      url: `https://kairos.ai/course/${course.slug}`,
       type: 'website',
       images: [{ url: '/og-image.png', width: 1200, height: 630 }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${course.title} | Samsara.ai`,
+      title: `${course.title} | Kairos.ai`,
       description: course.description,
     },
-    alternates: { canonical: `https://samsara.ai/course/${course.slug}` },
+    alternates: { canonical: `https://kairos.ai/course/${course.slug}` },
   };
 }
 
@@ -63,9 +63,9 @@ export default async function CourseLayout({
   }
 
   const breadcrumbs = breadcrumbSchema([
-    { name: 'Home', url: 'https://samsara.ai' },
-    { name: 'Courses', url: 'https://samsara.ai/courses' },
-    { name: course.title, url: `https://samsara.ai/course/${course.slug}` },
+    { name: 'Home', url: 'https://kairos.ai' },
+    { name: 'Courses', url: 'https://kairos.ai/courses' },
+    { name: course.title, url: `https://kairos.ai/course/${course.slug}` },
   ]);
 
   return (

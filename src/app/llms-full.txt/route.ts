@@ -34,7 +34,7 @@ export async function GET() {
 
       return `### ${c.title}
 
-- URL: https://samsara.ai/course/${c.slug}
+- URL: https://kairos.ai/course/${c.slug}
 - Tier: ${c.tier === 'free' ? 'Free' : 'Premium (Pro)'}
 - Level: ${c.level || 'beginner'}
 - Modules: ${c.modules.length}
@@ -52,13 +52,13 @@ ${moduleDetails}`;
 ${courseBlocks}`;
   }).join('\n\n---\n\n');
 
-  const content = `# Samsara.ai — Full Course Catalog
+  const content = `# Kairos.ai — Full Course Catalog
 
-> Samsara.ai is an AI-powered learning platform with ${courses.length}+ courses and ${totalLessons}+ lessons across Computer Science, Religious Studies, Philosophy, Finance, Health & Wellness, and Political Strategy. This is the extended version of llms.txt with full course details including every module and lesson title.
+> Kairos.ai is an AI-powered learning platform with ${courses.length}+ courses and ${totalLessons}+ lessons across Computer Science, Religious Studies, Philosophy, Finance, Health & Wellness, and Political Strategy. This is the extended version of llms.txt with full course details including every module and lesson title.
 
 ## Platform Overview
 
-Samsara.ai provides structured, interactive courses with AI voice coaching. Each course is organized into modules containing individual lessons. Many courses include interactive coding exercises with in-browser execution, checkpoint quizzes, and capstone projects. AI voice coaches are available in 9 languages and provide real-time guidance throughout the learning experience.
+Kairos.ai provides structured, interactive courses with AI voice coaching. Each course is organized into modules containing individual lessons. Many courses include interactive coding exercises with in-browser execution, checkpoint quizzes, and capstone projects. AI voice coaches are available in 9 languages and provide real-time guidance throughout the learning experience.
 
 ### Key Features
 
@@ -78,12 +78,12 @@ ${courseDetails}
 
 ## Links
 
-- Homepage: https://samsara.ai
-- Course Catalog: https://samsara.ai/courses
-- FAQ: https://samsara.ai/faq
-- Pricing: https://samsara.ai/pricing
-- llms.txt (summary): https://samsara.ai/llms.txt
-- Support: support@samsara.ai
+- Homepage: https://kairos.ai
+- Course Catalog: https://kairos.ai/courses
+- FAQ: https://kairos.ai/faq
+- Pricing: https://kairos.ai/pricing
+- llms.txt (summary): https://kairos.ai/llms.txt
+- Support: support@kairos.ai
 `;
 
   return new NextResponse(content, {

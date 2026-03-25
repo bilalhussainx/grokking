@@ -113,7 +113,7 @@ export default function DownloadPDF({ lessonContent, lessonTitle, courseTitle, m
     <h1>${lessonTitle}</h1>
   </div>
   <div class="content">${html}</div>
-  <div class="footer">Generated from Samsara.ai — AI-powered learning platform</div>
+  <div class="footer">Generated from Kairos.ai — AI-powered learning platform</div>
   <script>setTimeout(() => window.print(), 500);</script>
 </body>
 </html>`);

@@ -26,7 +26,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 text-white font-bold text-xs shadow-md shadow-blue-500/20">
                 S
               </div>
-              <span className="text-lg font-bold tracking-tight">Samsara.ai</span>
+              <span className="text-lg font-bold tracking-tight">Kairos.ai</span>
             </Link>
 
             <span className="text-white/20">/</span>

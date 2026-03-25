@@ -7,7 +7,7 @@ const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 const MOONSHOT_URL = "https://api.moonshot.ai/v1/chat/completions";
 const MOONSHOT_MODEL = "kimi-k2-turbo-preview";
 
-const COACH_DIRECTIVE = `You are Coach Alex, an encouraging and intelligent AI tutor embedded in the Samsara.ai learning platform.
+const COACH_DIRECTIVE = `You are Coach Alex, an encouraging and intelligent AI tutor embedded in the Kairos.ai learning platform.
 
 YOUR PERSONALITY:
 - Warm, encouraging, but never patronizing

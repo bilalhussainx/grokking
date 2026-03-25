@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   if (!calleeLang && !skipGather) {
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Joanna">You have a translated call from Samsara.</Say>
+  <Say voice="Polly.Joanna">You have a translated call from Kairos.</Say>
   <Gather action="/api/call/connect?callerLang=${callerLang}&amp;callSidA=${callSidA}&amp;calleeLang=pending" method="POST" numDigits="1" timeout="10">
     <Say voice="Polly.Joanna">Press 1 for English. Press 2 for Spanish. Press 3 for French. Press 4 for German. Press 5 for Italian. Press 6 for Dutch. Press 7 for Japanese.</Say>
   </Gather>

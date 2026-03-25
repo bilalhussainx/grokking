@@ -16,10 +16,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://samsara.ai'),
+  metadataBase: new URL('https://kairos.ai'),
   title: {
-    default: 'Samsara.ai — Learn Anything with AI Coaching',
-    template: '%s | Samsara.ai',
+    default: 'Kairos.ai — Learn Anything with AI Coaching',
+    template: '%s | Kairos.ai',
   },
   description: 'Master coding, philosophy, religion, finance, and more with AI voice coaches. Interactive courses with Python exercises, checkpoint quizzes, and personalized learning paths.',
   keywords: [
@@ -32,21 +32,21 @@ export const metadata: Metadata = {
     'cybersecurity course', 'machine learning', 'leadership',
     'geopolitics', 'political strategy',
   ],
-  authors: [{ name: 'Samsara.ai' }],
-  creator: 'Samsara.ai',
-  publisher: 'Samsara.ai',
+  authors: [{ name: 'Kairos.ai' }],
+  creator: 'Kairos.ai',
+  publisher: 'Kairos.ai',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://samsara.ai',
-    siteName: 'Samsara.ai',
-    title: 'Samsara.ai — Learn Anything with AI Coaching',
+    url: 'https://kairos.ai',
+    siteName: 'Kairos.ai',
+    title: 'Kairos.ai — Learn Anything with AI Coaching',
     description: 'Master coding, philosophy, religion, finance, and more with AI voice coaches. 60+ interactive courses with personalized learning.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Samsara.ai Learning Platform' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Kairos.ai Learning Platform' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Samsara.ai — Learn Anything with AI Coaching',
+    title: 'Kairos.ai — Learn Anything with AI Coaching',
     description: 'Master coding, philosophy, religion, finance, and more with AI voice coaches.',
     images: ['/og-image.png'],
   },
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
   },
-  alternates: { canonical: 'https://samsara.ai' },
+  alternates: { canonical: 'https://kairos.ai' },
   verification: {},
 };
 
