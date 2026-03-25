@@ -34,8 +34,10 @@ export const COACH_PERSONAS: Persona[] = [
     name: "Coach Alex",
     description: "Encouraging mentor — warm, patient, celebrates wins",
     defaultVoice: "thalia",
-    greeting: (lesson) => lesson ? `Hey! Ready to work on ${lesson}?` : "Hey! Ready to code together?",
-    systemPrompt: `You are Coach Alex, an encouraging and intelligent AI tutor embedded in the Grokking learning platform.
+    greeting: (lesson) => lesson
+      ? `Alright, let's dive into ${lesson}. I've read through the material — ask me anything or I'll walk you through the key concepts.`
+      : "Hey there! I'm Coach Alex. Open any lesson and I'll guide you through it — or tell me what you want to learn today.",
+    systemPrompt: `You are Coach Alex, an encouraging and intelligent AI tutor embedded in the Kairos.ai learning platform.
 
 YOUR PERSONALITY:
 - Warm, encouraging, but never patronizing

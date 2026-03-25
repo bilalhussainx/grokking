@@ -146,7 +146,29 @@ CRITICAL: You have the FULL lesson content above. Reference SPECIFIC concepts, t
     const apiKey = useOpenRouter ? OPENROUTER_API_KEY : MOONSHOT_API_KEY;
     const model = useOpenRouter ? pickModel(courseTitle) : MOONSHOT_MODEL;
     const providerName = useOpenRouter ? `OpenRouter/${model.split("/")[1]}` : "Kimi";
-    console.log(`[Coach] Using ${providerName} for "${courseTitle || "unknown course"}"`);
+    console.log(`[Coach] Using ${providerName} for "${courseTitle || "unknown"}" / "${lessonTitle || "unknown"}"`);
+    console.log(`[Coach] Lesson content: ${lessonContent ? `${lessonContent.length} chars` : "MISSING — this is why responses are generic"}`);
+
+    // Trace for observability
+    const startTime = Date.now();
+    import("@/lib/trace").then(({ traceGeneration }) => {
+      traceGeneration({
+        userId: user.id,
+        name: "coach-text",
+        model,
+        input: {
+          systemPrompt: (COACH_DIRECTIVE + intelligenceContext + langInstruction).slice(0, 2000),
+          userMessage: userPrompt.slice(0, 1000),
+          lessonTitle: lessonTitle || undefined,
+          courseTitle: courseTitle || undefined,
+        },
+        metadata: {
+          hasLessonContent: !!lessonContent,
+          lessonContentLength: lessonContent?.length || 0,
+          provider: providerName,
+        },
+      });
+    }).catch(() => {});
 
     if (apiKey) {
       try {

@@ -264,6 +264,28 @@ APPROACH:
       })
       .then(() => {});
 
+    // Trace language voice session
+    import("@/lib/trace").then(({ traceGeneration }) => {
+      traceGeneration({
+        userId: user.id,
+        name: "language-voice-session",
+        model: "deepgram-agent/kimi-k2",
+        input: {
+          systemPrompt: fullSystemPrompt.slice(0, 2000),
+          userMessage: `Language session: ${languageName} (${proficiencyLevel})`,
+          lessonTitle: lessonTitle || undefined,
+        },
+        metadata: {
+          language,
+          proficiencyLevel,
+          personaId: persona.id,
+          personaName: persona.name,
+          voiceModel: deepgramVoice,
+          hasLessonContent: !!(effectiveLessonContext as { content?: string })?.content,
+        },
+      });
+    }).catch(() => {});
+
     // Return SAME format as /api/ai/voice-session
     return NextResponse.json({
       url: "wss://agent.deepgram.com/v1/agent/converse",

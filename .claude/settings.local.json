@@ -49,7 +49,8 @@
       "Bash(npx vercel:*)",
       "Bash(1)",
       "Bash(tee /tmp/vercel-build.log)",
-      "WebFetch(domain:www.twilio.com)"
+      "WebFetch(domain:www.twilio.com)",
+      "WebFetch(domain:langfuse.com)"
     ]
   }
 }

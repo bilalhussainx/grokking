@@ -222,6 +222,27 @@ Never say "How can I help?" — instead say "So in this lesson we're looking at 
     },
   };
 
+  // Trace voice session start
+  import("@/lib/trace").then(({ traceGeneration }) => {
+    traceGeneration({
+      userId: user.id,
+      name: "coach-voice-session",
+      model: "deepgram-agent/kimi-k2",
+      input: {
+        systemPrompt: contextPrompt.slice(0, 2000),
+        userMessage: `Voice session started: ${lessonTitle || "no lesson"}`,
+        lessonTitle: lessonTitle || undefined,
+        courseTitle: courseTitle || undefined,
+      },
+      metadata: {
+        voiceModel,
+        language,
+        personaId: persona.id,
+        hasLessonContent: !!lessonContext?.content,
+      },
+    });
+  }).catch(() => {});
+
   return Response.json({
     url: "wss://agent.deepgram.com/v1/agent/converse",
     key: DEEPGRAM_API_KEY,
