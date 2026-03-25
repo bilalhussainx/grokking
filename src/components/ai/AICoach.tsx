@@ -518,6 +518,41 @@ YOUR TASK: Greet the student by name. Reference THIS SPECIFIC lesson topic (not 
     setLastCodeLength(codeLen);
   }, [currentCode, lastCodeLength, lessonContext, sendEvent, deepgram.isConnected]);
 
+  // SILENCE DETECTION — if user is inactive for 45s, Coach proactively engages
+  const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const silenceCountRef = useRef(0);
+  useEffect(() => {
+    if (!lessonContext || !hasGreeted) return;
+
+    // Reset silence timer on any user activity
+    const resetSilence = () => {
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = setTimeout(() => {
+        if (isStreamingRef.current || deepgram.isConnected) return;
+        silenceCountRef.current += 1;
+        const count = silenceCountRef.current;
+
+        const prompts = [
+          `The student has been reading silently for 45 seconds. Check in naturally — ask if they have any questions about what they're reading, or offer to explain a concept from the lesson. Keep it short and warm.`,
+          `Still quiet. Share one interesting insight or "did you know" fact from the lesson content. Make it engaging and end with a question.`,
+          `The student seems to be deeply focused on reading. Give them space but offer: "Take your time — I'm here whenever you want to discuss anything or try an exercise."`,
+        ];
+        const prompt = prompts[Math.min(count - 1, prompts.length - 1)];
+        sendEvent(prompt, 'teaching');
+      }, 45000);
+    };
+
+    resetSilence();
+    // Reset on user typing or code changes
+    window.addEventListener("keydown", resetSilence);
+    window.addEventListener("click", resetSilence);
+    return () => {
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      window.removeEventListener("keydown", resetSilence);
+      window.removeEventListener("click", resetSilence);
+    };
+  }, [lessonContext, hasGreeted, sendEvent, deepgram.isConnected]);
+
   const handleHint = () => {
     hintsRef.current += 1;
     setHintsGiven(hintsRef.current);

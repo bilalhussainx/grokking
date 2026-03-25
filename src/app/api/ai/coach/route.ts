@@ -58,7 +58,17 @@ export async function POST(req: NextRequest) {
       language,
     } = body;
 
-    // Retrieve relevant memories for context (non-blocking — don't fail if memory is unavailable)
+    // RAG Intelligence — fetch everything we know about this user
+    let intelligenceContext = "";
+    try {
+      const { fetchUserIntelligence } = await import("@/lib/agent-intelligence");
+      const intel = await fetchUserIntelligence(user.id);
+      intelligenceContext = `\n${intel.promptContext}\n`;
+    } catch (err) {
+      console.warn("[Coach] Intelligence fetch failed:", err);
+    }
+
+    // Retrieve relevant memories for context
     let memoryContext = "";
     try {
       const memories = await searchMemories(user.id, `${event} ${lessonTitle || ""}`, {
@@ -68,9 +78,7 @@ export async function POST(req: NextRequest) {
       if (memories.length > 0) {
         memoryContext = `\n[RELEVANT PAST CONVERSATIONS]\n${memories.map((m) => `- ${m.summary || m.content.slice(0, 100)}`).join("\n")}\n`;
       }
-    } catch {
-      // Memory search is optional — continue without it
-    }
+    } catch {}
 
     // Store the user's message as memory (fire-and-forget)
     storeMemory(user.id, event, {
@@ -103,7 +111,7 @@ Respond concisely as Coach Alex:`;
       : "";
 
     const messages = [
-      { role: "system", content: COACH_DIRECTIVE + langInstruction },
+      { role: "system", content: COACH_DIRECTIVE + intelligenceContext + langInstruction },
       ...((history as { role: string; content: string }[]) || []).map(
         (m: { role: string; content: string }) => ({
           role: m.role === "assistant" ? "assistant" : "user",

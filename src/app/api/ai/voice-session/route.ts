@@ -123,28 +123,25 @@ export async function POST(req: NextRequest) {
     // silently continue without enthusiasm modifier
   }
 
-  // Fetch user profile for personalization
+  // RAG Intelligence — fetch full user context from database
   let userProfileContext = "";
   try {
-    const { data: userProfile } = await supabase
-      .from("user_profiles")
-      .select("full_name, native_language, learning_style, learning_interests, english_fluency")
-      .eq("id", user.id)
-      .single();
-    if (userProfile) {
-      const name = userProfile.full_name || "there";
-      const interests = userProfile.learning_interests;
-      const style = userProfile.learning_style;
-      userProfileContext = `\n\n## STUDENT PROFILE
-- Name: ${name} (use their name naturally in conversation!)
-- Native language: ${userProfile.native_language || "English"}
-- Learning style: ${style || "balanced"}
-- Interests: ${interests ? JSON.stringify(interests) : "not specified"}
-- English fluency: ${userProfile.english_fluency || "native"}
-
-PERSONALITY ADAPTATION: You're talking to ${name}. Be warm, use their name. If they prefer auditory learning, explain more verbally. If they prefer reading, be concise and direct them to the text. Match their energy.`;
-    }
-  } catch {}
+    const { fetchUserIntelligence } = await import("@/lib/agent-intelligence");
+    const intel = await fetchUserIntelligence(user.id);
+    userProfileContext = `\n${intel.promptContext}\n`;
+  } catch {
+    // Fallback to basic profile
+    try {
+      const { data: userProfile } = await supabase
+        .from("user_profiles")
+        .select("full_name")
+        .eq("id", user.id)
+        .single();
+      if (userProfile?.full_name) {
+        userProfileContext = `\n## STUDENT: ${userProfile.full_name}. Use their name.\n`;
+      }
+    } catch {}
+  }
 
   // Build context-aware prompt with full lesson material
   let contextPrompt = persona.systemPrompt + enthusiasmModifier + userProfileContext;
