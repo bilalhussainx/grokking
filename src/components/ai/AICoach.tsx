@@ -548,33 +548,39 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
   }, [subscribe]);
 
   useEffect(() => {
-    const scheduleCheckIn = () => {
+    const scheduleCheckIn = (delayMs?: number) => {
       if (checkInTimerRef.current) clearTimeout(checkInTimerRef.current);
+      const delay = delayMs || (checkInCountRef.current === 0 ? 15000 : 10000);
       checkInTimerRef.current = setTimeout(() => {
-        if (!checkInActiveRef.current || isStreamingRef.current || deepgram.isConnected) return;
-        const ctx = lessonContextRef.current; // Read FRESH ref value at timer fire time
+        if (!checkInActiveRef.current) return;
+
+        // If still streaming or voice is active, retry in 3 seconds instead of giving up
+        if (isStreamingRef.current || deepgram.isConnected) {
+          scheduleCheckIn(3000);
+          return;
+        }
+
+        const ctx = lessonContextRef.current;
+        if (!ctx) { scheduleCheckIn(); return; }
+
         checkInCountRef.current += 1;
         const count = checkInCountRef.current;
+        const lessonTitle = ctx.lessonTitle || "the current lesson";
+        const hasCoding = !!(ctx.starterCode);
 
-        // Context-aware prompts that feel like a real tutor observing
-        const lessonTitle = ctx?.lessonTitle || "their current page";
-        const hasCoding = !!(ctx?.starterCode);
         const prompts = [
-          // First check-in at 5 min — observational, specific
           hasCoding
-            ? `You notice the student has been working on "${lessonTitle}" for 5 minutes. As a good tutor would, make ONE specific observation about the exercise — a common mistake to watch for, or a pro tip about the pattern. Don't ask if they need help — just share the insight naturally like a colleague leaning over. 1-2 sentences.`
-            : `The student has been reading "${lessonTitle}" for 5 minutes. Share one surprising or counterintuitive insight from the lesson material that would make them go "huh, interesting." Don't ask if they need help. Just drop knowledge. 1-2 sentences.`,
-          // Second check-in at 10 min — push them forward
-          `The student has been on this lesson for a while. Suggest a concrete next step: "Hey, you've been on this a while — want to try the exercise?" or "Ready to move to the next section?" or "Want me to quiz you on what you've read so far?" Pick whichever fits the lesson type. Be casual.`,
-          // Third check-in at 15 min — recommendation
-          `The student has spent 15+ minutes here. Based on what they're studying, recommend a related course or suggest trying the Talk feature to practice conversationally. Be specific: "By the way, if you're into [topic], you might love the [specific course] — it goes deeper into [aspect]." Or: "Want to practice this in conversation? Try the Talk feature — you can discuss [topic] with an AI tutor."`,
+            ? `The student is reading "${lessonTitle}" and there's code to work with. Drop ONE specific insight — a common gotcha, a performance tip, or "most people miss this part." Don't ask if they need help. 1-2 sentences.`
+            : `The student is reading "${lessonTitle}". Pick the most interesting or counterintuitive thing from the lesson content and share it as a "did you know" or "here's what's wild about this." 1-2 sentences.`,
+          `Suggest a next action: "Want to try the exercise?" or "Ready for the next section?" or "I could quiz you on this." Be casual, not pushy.`,
+          `Recommend something specific: "If you're into this, check out [related course]" or "Try discussing this in Talk mode — it's a different experience." Use actual course names from the platform.`,
         ];
         const prompt = prompts[Math.min(count - 1, prompts.length - 1)];
+        console.log(`[Coach] Check-in #${count} firing for "${lessonTitle}"`);
         sendEvent(prompt, 'teaching');
 
-        // Schedule next check-in (5 min intervals)
         scheduleCheckIn();
-      }, 8 * 1000); // 8 seconds — quick enough to feel alive, not annoying
+      }, delay);
     };
 
     scheduleCheckIn();
