@@ -20,6 +20,7 @@ import LessonContent from "./LessonContent";
 import LessonNav from "./LessonNav";
 import { useAI } from "@/contexts/AIContext";
 import { useXP } from "@/contexts/XPContext";
+import { useAIState } from "@/contexts/AIStateContext";
 import { estimateReadingTime, formatReadingTime } from "@/lib/reading-time";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import ConceptBridges from "./ConceptBridges";
@@ -96,6 +97,7 @@ export default function LessonPage({
   const [contentTab, setContentTab] = useState<ContentTab>("lesson");
   const { setLessonContext, setCurrentCode, openPanel, isPanelOpen } = useAI();
   const { earnXP } = useXP();
+  const { setCurrentLesson, clearCurrentLesson } = useAIState();
 
   // Gamification overlays
   const [showDidYouKnow, setShowDidYouKnow] = useState(false);
@@ -154,7 +156,9 @@ export default function LessonPage({
       starterCode: lesson.starterCode,
       solutionCode: lesson.solutionCode,
     });
-    return () => setLessonContext(null);
+    // Also feed AIState for all agents
+    setCurrentLesson(courseTitle, moduleTitle, lesson.title, lesson.content, lesson.starterCode);
+    return () => { setLessonContext(null); clearCurrentLesson(); };
   }, [
     lesson.id,
     lesson.title,

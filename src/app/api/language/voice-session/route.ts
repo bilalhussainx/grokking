@@ -222,9 +222,6 @@ APPROACH:
           provider: {
             type: "deepgram",
             model: "nova-3",
-            // Use 'multi' for advanced learners who mostly speak the target language
-            // Use 'en' for beginners who mostly speak English with some target language
-            language: (proficiencyLevel === "B2" || proficiencyLevel === "C1" || proficiencyLevel === "C2") ? "multi" : "en",
           },
         },
         think: {

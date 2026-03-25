@@ -7,6 +7,7 @@ import { AIProvider, useAI } from "@/contexts/AIContext";
 import { XPProvider, useXP } from "@/contexts/XPContext";
 import { TopNavProvider } from "@/contexts/TopNavContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AIStateProvider } from "@/contexts/AIStateContext";
 import AICoach from "@/components/ai/AICoach";
 import SessionNotes from "@/components/ai/SessionNotes";
 import { TranslationBar } from "@/components/language/TranslationBar";
@@ -238,6 +239,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <TopNavProvider>
         <AIProvider>
           <XPProvider>
+          <AIStateProvider>
             <AppLayout>
               {children}
             </AppLayout>
@@ -246,6 +248,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             <GlobalSearch />
             <ShortcutsHelp />
             <TranslationBarWrapper />
+          </AIStateProvider>
           </XPProvider>
         </AIProvider>
       </TopNavProvider>
