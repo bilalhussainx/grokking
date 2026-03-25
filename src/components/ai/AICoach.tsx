@@ -481,19 +481,19 @@ export default function AICoach() {
         setCoachMode('greeting');
         await startVoice();
         console.log("[Coach] Auto-started voice for greeting:", lessonContext.lessonTitle);
-        // After greeting, the onGreetingDone callback will transition to text-monitoring
       } catch (err) {
         console.warn("[Coach] Voice auto-start failed, using text:", err);
         setCoachMode('text-monitoring');
         const hasCodingExercise = !!(lessonContext.starterCode);
+        const contentPreview = lessonContext.lessonContent?.slice(0, 300) || "";
         sendEvent(
           hasCodingExercise
-            ? `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". This lesson has a coding exercise. Welcome them, briefly introduce what the exercise is about, and ask if they want a walkthrough or to jump into coding.`
-            : `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". Welcome them, preview what the lesson covers, and ask: "Want me to walk you through the key points, or would you prefer to read first and ask questions?"`,
+            ? `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". Lesson content starts with: "${contentPreview}". This lesson has a coding exercise. Greet them BY NAME if you know it, reference the specific topic, and ask if they want to dive into the code or get an overview first.`
+            : `Student just opened "${lessonContext.lessonTitle}" in "${lessonContext.moduleTitle}". Lesson content starts with: "${contentPreview}". Greet them BY NAME if you know it, reference the specific topic from the content, and ask a thought-provoking question about it.`,
           'encouraging'
         );
       }
-    }, 1500);
+    }, 500);
     return () => clearTimeout(timer);
   }, [lessonContext, hasGreeted, openPanel, startVoice, sendEvent, deepgram]);
 

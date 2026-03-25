@@ -123,8 +123,31 @@ export async function POST(req: NextRequest) {
     // silently continue without enthusiasm modifier
   }
 
+  // Fetch user profile for personalization
+  let userProfileContext = "";
+  try {
+    const { data: userProfile } = await supabase
+      .from("user_profiles")
+      .select("full_name, native_language, learning_style, learning_interests, english_fluency")
+      .eq("id", user.id)
+      .single();
+    if (userProfile) {
+      const name = userProfile.full_name || "there";
+      const interests = userProfile.learning_interests;
+      const style = userProfile.learning_style;
+      userProfileContext = `\n\n## STUDENT PROFILE
+- Name: ${name} (use their name naturally in conversation!)
+- Native language: ${userProfile.native_language || "English"}
+- Learning style: ${style || "balanced"}
+- Interests: ${interests ? JSON.stringify(interests) : "not specified"}
+- English fluency: ${userProfile.english_fluency || "native"}
+
+PERSONALITY ADAPTATION: You're talking to ${name}. Be warm, use their name. If they prefer auditory learning, explain more verbally. If they prefer reading, be concise and direct them to the text. Match their energy.`;
+    }
+  } catch {}
+
   // Build context-aware prompt with full lesson material
-  let contextPrompt = persona.systemPrompt + enthusiasmModifier;
+  let contextPrompt = persona.systemPrompt + enthusiasmModifier + userProfileContext;
 
   // Language instruction — teach in the selected language
   if (language !== "en") {

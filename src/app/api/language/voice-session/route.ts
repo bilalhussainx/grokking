@@ -94,6 +94,17 @@ export async function POST(req: NextRequest) {
       : getDefaultPersona(language);
     const languageName = persona.languageName || language;
 
+    // Fetch user profile for personalized tutoring
+    let userName = user.user_metadata?.full_name || undefined;
+    try {
+      const { data: profile } = await supabase
+        .from("user_profiles")
+        .select("full_name, english_fluency")
+        .eq("id", user.id)
+        .single();
+      if (profile?.full_name) userName = profile.full_name;
+    } catch {}
+
     // Resolve lesson context — prefer client-provided context (has vocab/grammar)
     const effectiveLessonContext = clientLessonContext
       ? clientLessonContext
@@ -183,7 +194,6 @@ APPROACH:
 
     // Build greeting
     const level = proficiencyLevel as ProficiencyLevel;
-    const userName = user.user_metadata?.full_name || undefined;
     const greeting = persona.greeting(level, userName);
 
     // Combine system prompt with mode-specific additions
