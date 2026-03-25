@@ -464,40 +464,49 @@ export default function AICoach() {
     openPanel();
   }, [lessonContext, lastLessonId, saveNotes, openPanel, resetScrollMessages]);
 
-  // LESSON START HOOK — fires every time a new lesson opens
-  // Always sends a text greeting immediately (reliable, no voice dependency)
-  const autoStartLessonRef = useRef<string | null>(null);
+  // EVENT BUS SUBSCRIPTION — Coach listens for events from the app
+  // This is the SINGLE source of truth for lesson opens, code changes, etc.
+  // No more race conditions with useEffect + refs.
+  const { subscribe } = useAI();
+  const lastGreetedLessonRef = useRef<string | null>(null);
+
   useEffect(() => {
-    if (!lessonContext) return;
-    const lessonKey = `${lessonContext.courseTitle}/${lessonContext.lessonTitle}`;
-    if (autoStartLessonRef.current === lessonKey) return;
-    if (hasGreeted) return;
-    autoStartLessonRef.current = lessonKey;
-    setHasGreeted(true);
-    setCoachMode('text-monitoring');
-    openPanel();
+    const unsubscribe = subscribe((event) => {
+      if (event.type === "LESSON_OPENED") {
+        const ctx = event.lesson;
+        const lessonKey = `${ctx.courseTitle}/${ctx.lessonTitle}`;
 
-    // Immediate text greeting — no delay, no voice dependency
-    const contentPreview = lessonContext.lessonContent?.slice(0, 500) || "";
-    const hasCodingExercise = !!(lessonContext.starterCode);
+        // Don't re-greet the same lesson
+        if (lastGreetedLessonRef.current === lessonKey) return;
+        lastGreetedLessonRef.current = lessonKey;
 
-    // Small delay to ensure lessonContextRef is updated
-    const timer = setTimeout(() => {
-      sendEvent(
-        `[LESSON_START HOOK] The student just opened a new lesson.
-Course: ${lessonContext.courseTitle}
-Module: ${lessonContext.moduleTitle}
-Lesson: ${lessonContext.lessonTitle}
-Has coding exercise: ${hasCodingExercise ? "YES — there's starter code to work with" : "NO — this is a reading/concept lesson"}
+        setHasGreeted(true);
+        setCoachMode('text-monitoring');
+        openPanel();
+
+        const contentPreview = ctx.lessonContent?.slice(0, 500) || "";
+        const hasCodingExercise = !!(ctx.starterCode);
+
+        // Fire greeting with FULL context — no race condition possible
+        // because the event carries the data directly
+        setTimeout(() => {
+          sendEvent(
+            `[LESSON_OPENED EVENT] The student just opened a new lesson.
+Course: ${ctx.courseTitle}
+Module: ${ctx.moduleTitle}
+Lesson: ${ctx.lessonTitle}
+Has coding exercise: ${hasCodingExercise ? "YES" : "NO — reading/concept lesson"}
 Lesson content preview: "${contentPreview}"
 
-YOUR TASK: Greet the student by name. Reference THIS SPECIFIC lesson topic (not generic). ${hasCodingExercise ? "Ask if they want to walk through the code or try it themselves first." : "Highlight the most interesting concept from the preview and ask a thought-provoking question about it."} Keep it to 2-3 sentences. Be warm, specific, and engaging.`,
-        'encouraging'
-      );
-    }, 300);
+Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: walk through code or try solo?" : "Ask a thought-provoking question about the content."} 2-3 sentences max.`,
+            'encouraging'
+          );
+        }, 200);
+      }
+    });
 
-    return () => clearTimeout(timer);
-  }, [lessonContext, hasGreeted, openPanel, sendEvent]);
+    return unsubscribe;
+  }, [subscribe, openPanel, sendEvent]);
 
   // Code activity detection (text mode only)
   useEffect(() => {
