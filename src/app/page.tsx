@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Mic, BookOpen, ArrowRight, Sparkles, Star } from "lucide-react";
+import { Mic, BookOpen, ArrowRight, Sparkles, Star, Target, Users, Building2, MessageSquare, Map } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useXP } from "@/contexts/XPContext";
 import { courses } from "@/data";
@@ -557,10 +557,53 @@ export default function HomePage() {
           </div>
         </motion.div>
 
-        {/* ── SECTION 4: Featured Courses (Recommended + Premium + Free) ── */}
+        {/* ── SECTION 4: Interview Prep ── */}
+        <motion.div variants={item} className="mb-14">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white">
+              Practice Mock Interviews with AI
+            </h2>
+            <p className="mt-2 text-sm sm:text-base text-white/50 max-w-xl mx-auto">
+              Practice recruiter screens, technical interviews, system design rounds, and behavioral interviews with an AI interviewer that adapts to your level.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            {[
+              { icon: Users, label: "Recruiter Screen", desc: "15-min phone screen practice", href: "/interviews", color: "emerald" },
+              { icon: Target, label: "Technical Interview", desc: "Coding + problem solving", href: "/interviews", color: "blue" },
+              { icon: Building2, label: "System Design", desc: "Architecture whiteboard sessions", href: "/interviews", color: "violet" },
+              { icon: MessageSquare, label: "Behavioral", desc: "STAR method practice", href: "/interviews", color: "amber" },
+              { icon: Map, label: "Career Pathways", desc: "Role-based learning paths", href: "/pathways", color: "cyan" },
+            ].map((card) => {
+              const Icon = card.icon;
+              const colorMap: Record<string, string> = {
+                emerald: "border-emerald-500/20 hover:border-emerald-500/40 text-emerald-400",
+                blue: "border-blue-500/20 hover:border-blue-500/40 text-blue-400",
+                violet: "border-violet-500/20 hover:border-violet-500/40 text-violet-400",
+                amber: "border-amber-500/20 hover:border-amber-500/40 text-amber-400",
+                cyan: "border-cyan-500/20 hover:border-cyan-500/40 text-cyan-400",
+              };
+              return (
+                <Link key={card.label} href={card.href}>
+                  <motion.div
+                    className={`bg-slate-800/60 backdrop-blur-xl rounded-2xl border ${colorMap[card.color]} p-4 cursor-pointer h-full transition-all`}
+                    whileHover={{ scale: 1.03 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Icon className={`w-6 h-6 mb-2 ${colorMap[card.color].split(" ").pop()}`} />
+                    <h4 className="text-white text-sm font-semibold">{card.label}</h4>
+                    <p className="text-slate-400 text-xs mt-1">{card.desc}</p>
+                  </motion.div>
+                </Link>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* ── SECTION 5: Featured Courses (Recommended + Premium + Free) ── */}
         <FeaturedCourses interests={userInterests} />
 
-        {/* ── SECTION 5: Testimonials ── */}
+        {/* ── SECTION 6: Testimonials ── */}
         <Testimonials />
       </motion.div>
     </div>

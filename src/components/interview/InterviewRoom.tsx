@@ -35,7 +35,7 @@ export default function InterviewRoom() {
     );
   }
 
-  const showEditor = interviewType !== "behavioral";
+  const showEditor = interviewType !== "behavioral" && interviewType !== "recruiter";
 
   return (
     <div className="h-screen flex flex-col bg-[var(--background)]">

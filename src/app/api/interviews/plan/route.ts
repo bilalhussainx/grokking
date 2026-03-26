@@ -57,6 +57,58 @@ QUESTION CATEGORIES (mix from all of these):
 - "How do you securely store API tokens for 5 different services in a PM2-managed Node.js app?"
 
 Questions should feel like a real senior developer interview — specific, practical, expecting code snippets and concrete configurations in answers. Not theoretical architecture diagrams.`,
+  "recruiter-screen":
+    `Recruiter phone screen (15 minutes). This is a first-round screening call, NOT a technical deep-dive. Focus on motivation, culture fit, logistics, and communication skills.
+
+QUESTION CATEGORIES:
+1. INTRODUCTION: "Tell me about yourself" — expecting a concise 2-minute pitch
+2. MOTIVATION: "Why are you interested in this company/role?" — looking for research and genuine interest
+3. CAREER GOALS: "What are you looking for in your next role?" — alignment with position
+4. EXPERIENCE FIT: "Walk me through your most relevant experience" — brief, not technical
+5. SALARY & LOGISTICS: "What are your salary expectations?", "When can you start?", "Are you open to [remote/hybrid/onsite]?"
+6. AVAILABILITY: "Are you interviewing elsewhere?", "What's your timeline for making a decision?"
+7. CULTURE: "What kind of team environment do you thrive in?", "How do you handle feedback?"
+
+Keep questions conversational, warm, and screening-oriented. This is about fit, not technical depth.`,
+  "product-manager":
+    `Product Manager interview. Focus on product sense, analytical thinking, metrics-driven decision-making, and stakeholder communication.
+
+QUESTION CATEGORIES:
+1. PRODUCT SENSE: "How would you improve [popular product]?", "Design a product for [user segment]"
+2. METRICS & ANALYTICS: "What metrics would you track for [feature]?", "DAU dropped 20% — walk me through your investigation"
+3. PRIORITIZATION: "You have 5 feature requests and resources for 2 — how do you decide?", "Explain your prioritization framework (RICE, ICE, MoSCoW)"
+4. STRATEGY: "How would you enter [new market]?", "Competitor just launched X — what do you do?"
+5. STAKEHOLDER MANAGEMENT: "Engineering says the feature will take 3 months, business wants it in 1 — how do you handle this?"
+6. USER RESEARCH: "How do you validate a product idea before building?", "Walk me through a user interview you conducted"
+7. EXECUTION: "Describe a product you shipped from idea to launch", "How do you write a PRD?"
+
+Questions should test structured thinking, user empathy, and data-driven reasoning.`,
+  finance:
+    `Finance and investment banking interview. Focus on valuation, financial modeling, market knowledge, and quantitative reasoning.
+
+QUESTION CATEGORIES:
+1. VALUATION: "Walk me through a DCF analysis", "When would you use comparable company analysis vs precedent transactions?", "How do you calculate WACC?"
+2. ACCOUNTING: "Walk me through the three financial statements and how they connect", "A company buys a $100 asset — walk me through the impact on all three statements"
+3. MARKET SIZING: "How big is the U.S. coffee market?", "Estimate the revenue of [company]"
+4. M&A: "Walk me through an M&A deal process", "What makes an acquisition accretive vs dilutive?"
+5. CURRENT MARKETS: "What's happening in the markets right now?", "Tell me about a recent deal that caught your attention"
+6. BEHAVIORAL/FIT: "Why finance?", "Why investment banking specifically?", "Tell me about a time you worked under extreme time pressure"
+7. BRAINTEASERS: "If you had $1M to invest today, where would you put it and why?"
+
+Expect precise, structured answers with specific numbers and frameworks.`,
+  leadership:
+    `Tech Lead / Engineering Manager interview. Focus on leadership, people management, technical decision-making at scale, and organizational effectiveness.
+
+QUESTION CATEGORIES:
+1. TEAM MANAGEMENT: "How do you handle an underperforming engineer?", "Describe how you run 1:1s", "How do you give difficult feedback?"
+2. CONFLICT RESOLUTION: "Two senior engineers disagree on architecture — how do you resolve it?", "A product manager keeps changing requirements — what do you do?"
+3. TECHNICAL DECISION-MAKING: "How do you decide between building vs buying?", "Walk me through a technical decision you made that had significant trade-offs"
+4. HIRING & GROWTH: "How do you interview and evaluate engineering candidates?", "How do you create growth paths for your team?"
+5. PROJECT MANAGEMENT: "How do you handle a project that's falling behind schedule?", "Describe how you manage technical debt"
+6. CROSS-FUNCTIONAL: "How do you work with product and design?", "How do you communicate technical constraints to non-technical stakeholders?"
+7. CULTURE: "How do you build psychological safety on your team?", "How do you foster innovation while maintaining reliability?"
+
+Questions should probe real leadership experience, not hypotheticals. Look for specific examples and self-awareness.`,
 };
 
 const SYSTEM_PROMPT = `You are an expert technical interviewer. When given a job description, interview preset, and interview type, generate a structured interview question plan.
@@ -85,6 +137,7 @@ Guidelines:
 - For "technical" interview type: all questions should be type "technical"
 - For "behavioral" interview type: all questions should be type "behavioral"
 - For "mixed" interview type: mix roughly 60% technical and 40% behavioral
+- For "recruiter" interview type: all questions should be type "behavioral" — focus on motivation, culture fit, salary, availability, and logistics (no coding or technical deep-dives)
 - Each question should have 2-3 follow-up questions
 - The interviewerPersona should be a brief description (1-2 sentences)
 - timeAllocation values are in minutes and should sum to approximately 50`;

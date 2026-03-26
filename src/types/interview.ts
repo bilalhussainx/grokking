@@ -1,5 +1,5 @@
-export type InterviewPreset = 'frontend' | 'backend' | 'fullstack' | 'system-design' | 'dsa' | 'second-brain';
-export type InterviewType = 'technical' | 'behavioral' | 'mixed';
+export type InterviewPreset = 'frontend' | 'backend' | 'fullstack' | 'system-design' | 'dsa' | 'second-brain' | 'recruiter-screen' | 'product-manager' | 'finance' | 'leadership';
+export type InterviewType = 'technical' | 'behavioral' | 'mixed' | 'recruiter';
 
 export interface InterviewQuestion {
   id: number;

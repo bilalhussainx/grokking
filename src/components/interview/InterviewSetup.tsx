@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Monitor, Server, Layers, Network, Binary,
   FileText, Mic, Brain, MessageSquare, Loader2, ArrowRight, Cpu,
+  Phone, Lightbulb, TrendingUp, Users,
 } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
 import type { InterviewPreset, InterviewType } from "@/types/interview";
@@ -16,12 +17,17 @@ const PRESETS: { id: InterviewPreset; label: string; icon: typeof Monitor; desc:
   { id: "fullstack", label: "Full Stack", icon: Layers, desc: "End-to-end development" },
   { id: "system-design", label: "System Design", icon: Network, desc: "Scalability, distributed systems" },
   { id: "dsa", label: "DSA", icon: Binary, desc: "Algorithms & data structures" },
+  { id: "recruiter-screen", label: "Recruiter Screen", icon: Phone, desc: "15-min phone screen, culture fit, motivation" },
+  { id: "product-manager", label: "Product Manager", icon: Lightbulb, desc: "Product sense, metrics, prioritization" },
+  { id: "finance", label: "Finance / Banking", icon: TrendingUp, desc: "DCF, valuation, market questions" },
+  { id: "leadership", label: "Tech Lead / Manager", icon: Users, desc: "Leadership, team dynamics, conflict resolution" },
 ];
 
 const TYPES: { id: InterviewType; label: string; icon: typeof Mic; desc: string }[] = [
   { id: "technical", label: "Technical", icon: Brain, desc: "Coding & system design questions" },
   { id: "behavioral", label: "Behavioral", icon: MessageSquare, desc: "STAR method, soft skills" },
   { id: "mixed", label: "Mixed", icon: Mic, desc: "Behavioral intro + technical deep dive" },
+  { id: "recruiter", label: "Recruiter Screen", icon: Phone, desc: "Quick screen — motivation, salary, availability" },
 ];
 
 export default function InterviewSetup() {
@@ -144,7 +150,7 @@ export default function InterviewSetup() {
             <div className="w-7 h-7 rounded-full bg-violet-500/20 text-violet-400 flex items-center justify-center text-sm font-bold">2</div>
             <h2 className="text-lg font-semibold">Interview type</h2>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {TYPES.map((t) => (
               <button
                 key={t.id}
