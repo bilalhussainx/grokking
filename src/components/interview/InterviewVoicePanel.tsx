@@ -26,12 +26,18 @@ export default function InterviewVoicePanel({
   const sentTimeUp = useRef(false);
   const startedRef = useRef(false);
 
+  const lastAgentMsg = useRef("");
+
   const deepgramCallbacks = {
     onUserMessage: (text: string) => {
       addTranscriptEntry({ role: "user", text, timestamp: Date.now() });
     },
     onAgentMessage: (text: string) => {
-      addTranscriptEntry({ role: "agent", text, timestamp: Date.now() });
+      // Deduplicate repeated messages (Deepgram can echo the same intro)
+      const trimmed = text.trim();
+      if (trimmed === lastAgentMsg.current) return;
+      lastAgentMsg.current = trimmed;
+      addTranscriptEntry({ role: "agent", text: trimmed, timestamp: Date.now() });
     },
     onConnect: () => {
       // Send question plan as initial context

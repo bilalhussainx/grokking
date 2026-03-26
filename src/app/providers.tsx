@@ -46,8 +46,9 @@ function CoachSidebar() {
   const isLanguageCourse = useIsLanguageCourse();
   const pathname = usePathname();
   const isTalkPage = pathname?.startsWith("/talk");
+  const isInterviewPage = pathname?.startsWith("/interviews/") && pathname !== "/interviews";
   const isAuthPage = pathname === "/login" || pathname === "/signup" || pathname === "/onboarding";
-  const shouldHide = isLanguageCourse || isTalkPage || isAuthPage;
+  const shouldHide = isLanguageCourse || isTalkPage || isInterviewPage || isAuthPage;
   const [activeTab, setActiveTab] = useState<"coach" | "notes">("coach");
   const [hasBeenOpened, setHasBeenOpened] = useState(false);
 
