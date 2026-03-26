@@ -17,6 +17,7 @@ import ForgettingAlert from "@/components/gamification/ForgettingAlert";
 import VariableReward from "@/components/gamification/VariableReward";
 import { getDailyLoginReward } from "@/lib/rewards";
 import KairosLogo from "@/components/ui/SamsaraLogo";
+import Testimonials from "@/components/Testimonials";
 
 const container = {
   hidden: { opacity: 0 },
@@ -558,6 +559,9 @@ export default function HomePage() {
 
         {/* ── SECTION 4: Featured Courses (Recommended + Premium + Free) ── */}
         <FeaturedCourses interests={userInterests} />
+
+        {/* ── SECTION 5: Testimonials ── */}
+        <Testimonials />
       </motion.div>
     </div>
   );
