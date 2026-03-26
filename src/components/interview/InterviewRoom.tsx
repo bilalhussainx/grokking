@@ -94,9 +94,8 @@ export default function InterviewRoom() {
         </div>
       )}
 
-      {/* Main content */}
+      {/* Main content — SINGLE voice panel instance, CSS controls layout */}
       <div className="flex-1 flex min-h-0">
-        {/* Desktop: side-by-side layout */}
         {showEditor && (
           <div className="hidden md:block w-[55%] border-r border-white/[0.06] p-2">
             <InterviewEditor
@@ -106,31 +105,25 @@ export default function InterviewRoom() {
           </div>
         )}
 
-        {/* Desktop: voice panel */}
-        <div className={`hidden md:block ${showEditor ? "w-[45%]" : "w-full"}`}>
+        {/* Mobile: show editor when tab is "code" */}
+        {showEditor && mobileTab === "code" && (
+          <div className="md:hidden w-full h-full p-2">
+            <InterviewEditor
+              onCodeChange={handleCodeChange}
+              onOutputChange={handleOutputChange}
+            />
+          </div>
+        )}
+
+        {/* Voice panel — always mounted, hidden on mobile when code tab is active */}
+        <div className={`${
+          showEditor ? "md:w-[45%]" : "w-full"
+        } ${showEditor && mobileTab === "code" ? "hidden md:block" : "w-full md:w-auto"}`}>
           <InterviewVoicePanel
             codeRef={codeRef}
             outputRef={outputRef}
             onInterviewEnd={handleInterviewEnd}
           />
-        </div>
-
-        {/* Mobile: tabbed layout */}
-        <div className="md:hidden w-full">
-          {(!showEditor || mobileTab === "voice") ? (
-            <InterviewVoicePanel
-              codeRef={codeRef}
-              outputRef={outputRef}
-              onInterviewEnd={handleInterviewEnd}
-            />
-          ) : (
-            <div className="h-full p-2">
-              <InterviewEditor
-                onCodeChange={handleCodeChange}
-                onOutputChange={handleOutputChange}
-              />
-            </div>
-          )}
         </div>
       </div>
     </div>

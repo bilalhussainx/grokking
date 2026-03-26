@@ -40,12 +40,25 @@ export default function InterviewVoicePanel({
       addTranscriptEntry({ role: "agent", text: trimmed, timestamp: Date.now() });
     },
     onConnect: () => {
-      // Send question plan as initial context
-      if (questionPlan) {
-        deepgramRef.current?.sendPromptUpdate(
-          `You are conducting a ${interviewType || "technical"} interview. Here is your question plan:\n${JSON.stringify(questionPlan, null, 2)}\n\nRULES:\n- Ask questions one at a time. Wait for the candidate to respond.\n- When the candidate is coding, observe their approach and give guidance if stuck.\n- IMPORTANT: When the candidate struggles, TEACH THEM. Explain the correct answer clearly.\n- At 5 minutes remaining, wrap up with "Any questions for me?"\n- Start by briefly introducing yourself and the format, then ask the first question.`
-        );
-      }
+      // Send interview context to the Deepgram agent
+      const isFallback = questionPlan?.fallback;
+      const persona = questionPlan?.interviewerPersona || "professional interviewer";
+
+      const prompt = isFallback
+        ? `You are conducting a ${interviewType || "technical"} interview as a ${persona}.
+
+RULES:
+- Generate questions dynamically based on the conversation flow — adapt to what the candidate says.
+- Ask ONE question at a time. Wait for the candidate to respond before asking the next.
+- Start with easier questions, then increase difficulty based on their answers.
+- If they answer well, go deeper. If they struggle, TEACH THEM the correct approach.
+- Cover a range of topics relevant to the role.
+- At 5 minutes remaining, wrap up with "Any questions for me?"
+- Start by briefly introducing yourself and the interview format, then ask the first question.
+- Keep a natural, conversational tone — this should feel like a real interview, not a quiz.`
+        : `You are conducting a ${interviewType || "technical"} interview. Here is your question plan:\n${JSON.stringify(questionPlan, null, 2)}\n\nRULES:\n- Ask questions one at a time. Wait for the candidate to respond.\n- Adapt follow-up questions based on their answers — don't rigidly follow the plan.\n- When the candidate is coding, observe their approach and give guidance if stuck.\n- IMPORTANT: When the candidate struggles, TEACH THEM. Explain the correct answer clearly.\n- At 5 minutes remaining, wrap up with "Any questions for me?"\n- Start by briefly introducing yourself and the format, then ask the first question.`;
+
+      deepgramRef.current?.sendPromptUpdate(prompt);
 
       // Start countdown timer
       timerRef.current = setInterval(() => {

@@ -46,22 +46,43 @@ export default function InterviewSetup() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/interviews/plan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jobDescription: useCustom ? customJD.trim() : null,
-          preset: useCustom ? null : preset,
-          interviewType,
-        }),
-      });
+      // Race the plan API against a 5-second timeout
+      // If the API is slow, start with a lightweight fallback plan
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to generate interview plan");
+      let plan;
+      try {
+        const res = await fetch("/api/interviews/plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jobDescription: useCustom ? customJD.trim() : null,
+            preset: useCustom ? null : preset,
+            interviewType,
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+
+        if (res.ok) {
+          plan = await res.json();
+        }
+      } catch {
+        // Timeout or network error — use fallback
+        clearTimeout(timeout);
       }
 
-      const plan = await res.json();
+      // Fallback: let the Deepgram agent generate questions conversationally
+      if (!plan) {
+        plan = {
+          questions: [],
+          interviewerPersona: `Adaptive ${interviewType} interviewer for ${preset || "general"} role. Generate questions dynamically based on the conversation flow.`,
+          timeAllocation: { intro: 3, questions: 22, wrapUp: 5 },
+          fallback: true,
+        };
+      }
+
       const jd = useCustom ? customJD.trim() : `Preset: ${preset}`;
       const sessionId = startInterview({
         interviewType,
