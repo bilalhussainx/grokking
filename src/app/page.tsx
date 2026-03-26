@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Mic, BookOpen, ArrowRight, Sparkles, Star, Target, Users, Building2, MessageSquare, Map, Code2, Globe, GraduationCap, Zap, Shield, Brain, Server } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useXP } from "@/contexts/XPContext";
@@ -28,6 +28,43 @@ const item = {
   hidden: { y: 20, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
+
+// Cinematic scroll-reveal wrapper
+function ScrollReveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      initial={{ opacity: 0, y: 60 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98], delay }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// Animated counter for stats
+function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!isInView) return;
+    let start = 0;
+    const duration = 1500;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) { setCount(target); clearInterval(timer); }
+      else setCount(Math.floor(start));
+    }, 16);
+    return () => clearInterval(timer);
+  }, [isInView, target]);
+  return <span ref={ref}>{count}{suffix}</span>;
+}
 
 // Map onboarding interest IDs to actual course domain values
 const INTEREST_TO_DOMAIN: Record<string, string[]> = {
@@ -269,7 +306,7 @@ export default function HomePage() {
             </motion.div>
 
             {/* ── SECTION 2: TWO FEATURE PILLARS ── */}
-            <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-20">
+            <ScrollReveal className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-20">
               {/* Interview Coaching Pillar */}
               <motion.div
                 className="group relative overflow-hidden rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 via-slate-800/60 to-slate-900/80 backdrop-blur-xl p-7 md:p-8"
@@ -339,10 +376,10 @@ export default function HomePage() {
                   </Link>
                 </div>
               </motion.div>
-            </motion.div>
+            </ScrollReveal>
 
             {/* ── SECTION 3: INTERVIEW TYPES GRID ── */}
-            <motion.div variants={item} className="mb-20">
+            <ScrollReveal className="mb-20" delay={0.1}>
               <div className="text-center mb-8">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white">
                   Practice Every Interview Type
@@ -385,10 +422,10 @@ export default function HomePage() {
                   );
                 })}
               </div>
-            </motion.div>
+            </ScrollReveal>
 
             {/* ── SECTION 4: CAREER PATHWAYS PREVIEW ── */}
-            <motion.div variants={item} className="mb-20">
+            <ScrollReveal className="mb-20" delay={0.15}>
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-white">Career Pathways</h2>
@@ -423,10 +460,10 @@ export default function HomePage() {
                   </Link>
                 ))}
               </div>
-            </motion.div>
+            </ScrollReveal>
 
             {/* ── SECTION 5: TOP COURSES (curated, not all 69) ── */}
-            <motion.div variants={item} className="mb-20">
+            <ScrollReveal className="mb-20" delay={0.1}>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white">Top Courses</h2>
                 <Link
@@ -496,24 +533,24 @@ export default function HomePage() {
                   );
                 })}
               </div>
-            </motion.div>
+            </ScrollReveal>
 
             {/* ── SECTION 6: SOCIAL PROOF NUMBERS ── */}
-            <motion.div variants={item} className="mb-20">
+            <ScrollReveal className="mb-20" delay={0.1}>
               <div className="rounded-2xl border border-white/10 bg-slate-800/40 backdrop-blur-xl p-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                   {[
-                    { value: "69+", label: "Courses", icon: BookOpen },
-                    { value: "17", label: "Languages", icon: Globe },
-                    { value: "10", label: "Career Pathways", icon: Map },
-                    { value: "AI", label: "Voice Coaching", icon: Mic },
+                    { target: 69, suffix: "+", label: "Courses", icon: BookOpen },
+                    { target: 17, suffix: "", label: "Languages", icon: Globe },
+                    { target: 10, suffix: "", label: "Career Pathways", icon: Map },
+                    { target: 0, suffix: "AI", label: "Voice Coaching", icon: Mic },
                   ].map((stat) => {
                     const StatIcon = stat.icon;
                     return (
                       <div key={stat.label} className="text-center">
                         <StatIcon className="w-5 h-5 text-white/20 mx-auto mb-2" />
                         <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
-                          {stat.value}
+                          {stat.target > 0 ? <AnimatedCounter target={stat.target} suffix={stat.suffix} /> : stat.suffix}
                         </div>
                         <div className="text-xs text-white/40 mt-1 font-medium">{stat.label}</div>
                       </div>
@@ -521,10 +558,10 @@ export default function HomePage() {
                   })}
                 </div>
               </div>
-            </motion.div>
+            </ScrollReveal>
 
             {/* ── SECTION 7: FINAL CTA ── */}
-            <motion.div variants={item} className="mb-16">
+            <ScrollReveal className="mb-16" delay={0.1}>
               <div className="relative rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 via-slate-900/80 to-cyan-500/5 backdrop-blur-xl p-10 text-center overflow-hidden">
                 <div className="absolute inset-0 pointer-events-none">
                   <div className="absolute top-0 left-1/4 w-40 h-40 bg-violet-500/10 rounded-full blur-[80px]" />
@@ -546,7 +583,7 @@ export default function HomePage() {
                   </Link>
                 </div>
               </div>
-            </motion.div>
+            </ScrollReveal>
           </>
         )}
 
