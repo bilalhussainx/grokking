@@ -13,6 +13,7 @@ export interface InterviewPlan {
   questions: InterviewQuestion[];
   interviewerPersona: string;
   timeAllocation: { intro: number; questions: number; wrapUp: number };
+  fallback?: boolean;
 }
 
 export interface TranscriptEntry {
