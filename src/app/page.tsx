@@ -593,28 +593,53 @@ export default function HomePage() {
 
         {/* Hero for logged-in users */}
         {user && (
-          <motion.div variants={item} className="text-center mb-16 pt-4">
+          <motion.div variants={item} className="text-center mb-12 pt-4">
             <motion.div
-              className="flex justify-center mb-8"
+              className="flex justify-center mb-6"
               initial={{ scale: 0.6, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
               <KairosLogo size="xl" showText={false} />
             </motion.div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6">
-              <Sparkles className="w-3.5 h-3.5" />
-              69+ courses &middot; 17 languages &middot; AI voice coaching
-            </div>
-            <h1 className="text-4xl sm:text-6xl font-bold text-white tracking-tight leading-[1.1]">
-              Your AI tutor that<br />
-              <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
-                speaks your language.
-              </span>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-[1.2] mb-4">
+              Welcome back{profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}
             </h1>
-            <p className="mt-5 text-lg sm:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
-              Learn to code, speak French, study Islam, master finance — with an AI coach that explains in your language, adapts to your level, and talks back.
+            <p className="text-base text-white/50 max-w-xl mx-auto mb-8">
+              Practice interviews, talk with AI tutors, or continue your learning path.
             </p>
+
+            {/* Quick action row */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/interviews"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white text-sm font-semibold hover:from-violet-500 hover:to-cyan-500 transition-all shadow-lg shadow-violet-500/20 flex items-center gap-2"
+              >
+                <Target className="w-4 h-4" />
+                Mock Interview
+              </Link>
+              <Link
+                href="/talk"
+                className="px-5 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-semibold hover:bg-emerald-500/20 transition-all flex items-center gap-2"
+              >
+                <Mic className="w-4 h-4" />
+                Voice Tutoring
+              </Link>
+              <Link
+                href="/pathways"
+                className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm font-semibold hover:bg-white/10 hover:text-white transition-all flex items-center gap-2"
+              >
+                <Map className="w-4 h-4" />
+                Career Pathways
+              </Link>
+              <Link
+                href="/courses"
+                className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm font-semibold hover:bg-white/10 hover:text-white transition-all flex items-center gap-2"
+              >
+                <BookOpen className="w-4 h-4" />
+                All Courses
+              </Link>
+            </div>
           </motion.div>
         )}
 
