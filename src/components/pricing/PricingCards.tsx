@@ -1,166 +1,311 @@
 // src/components/pricing/PricingCards.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { initializePaddle, type Paddle } from "@paddle/paddle-js";
-import { Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Check, Crown, Sparkles, Zap, X } from "lucide-react";
 
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || "";
-const PADDLE_ENV = (process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT || "sandbox") as "sandbox" | "production";
-const PRO_MONTHLY_PRICE = process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_MONTHLY || "";
-const PRO_ANNUAL_PRICE = process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_ANNUAL || "";
+const PADDLE_ENV = (process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT || "sandbox") as
+  | "sandbox"
+  | "production";
+const PRO_MONTHLY_PRICE =
+  process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_MONTHLY || "";
+const PRO_ANNUAL_PRICE =
+  process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_ANNUAL || "";
 
-const FREE_FEATURES = [
-  "1-month free Pro trial on signup",
-  "300 AI credits to start",
-  "Preview first 3 lessons after trial ends",
-  "Code editor + auto-grading",
-  "Progress tracking",
+interface Feature {
+  text: string;
+  included: boolean;
+}
+
+const FREE_FEATURES: Feature[] = [
+  { text: "28 free courses", included: true },
+  { text: "300 AI credits/month", included: true },
+  { text: "Basic voice coaching", included: true },
+  { text: "Code editor + auto-grading", included: true },
+  { text: "Progress tracking & XP", included: true },
+  { text: "All 69 courses", included: false },
+  { text: "Unlimited AI credits", included: false },
+  { text: "Mock interview practice", included: false },
 ];
 
-const PRO_FEATURES = [
-  "All 13+ courses unlocked",
-  "500 AI credits/month",
-  "AI Coach voice sessions",
-  "Mock interview practice",
-  "Certificates of completion",
-  "Choose coach/interviewer voice",
-  "Priority support",
+const PRO_FEATURES: Feature[] = [
+  { text: "All 69 courses unlocked", included: true },
+  { text: "Unlimited AI credits", included: true },
+  { text: "Full voice coaching (17 languages)", included: true },
+  { text: "Mock interview practice", included: true },
+  { text: "AI Coach voice sessions", included: true },
+  { text: "Choose coach/interviewer voice", included: true },
+  { text: "Certificates of completion", included: true },
+  { text: "Priority support", included: true },
 ];
 
-const TEAM_FEATURES = [
-  "Everything in Pro",
-  "Classroom management",
-  "Student progress dashboard",
-  "Homework assignment",
-  "Team analytics",
-  "Admin controls",
+const TEAM_FEATURES: Feature[] = [
+  { text: "Everything in Pro", included: true },
+  { text: "Classroom management", included: true },
+  { text: "Student progress dashboard", included: true },
+  { text: "Homework assignment", included: true },
+  { text: "Team analytics", included: true },
+  { text: "Admin controls", included: true },
 ];
 
 export default function PricingCards() {
   const { user, profile } = useAuth();
-  const [annual, setAnnual] = useState(true);
+  const router = useRouter();
+  const [annual, setAnnual] = useState(false);
   const [paddleInstance, setPaddleInstance] = useState<Paddle | null>(null);
+  const [checkoutSuccess, setCheckoutSuccess] = useState(false);
 
-  const openCheckout = async (priceId: string) => {
-    let paddle = paddleInstance;
-    if (!paddle && PADDLE_CLIENT_TOKEN) {
-      paddle = (await initializePaddle({
-        token: PADDLE_CLIENT_TOKEN,
-        environment: PADDLE_ENV,
-      })) || null;
-      setPaddleInstance(paddle);
-    }
-    if (!paddle) return;
-
-    paddle.Checkout.open({
-      items: [{ priceId, quantity: 1 }],
-      customData: { userId: user?.id, plan: "pro" },
-      customer: user?.email ? { email: user.email } : undefined,
+  // Initialize Paddle once
+  useEffect(() => {
+    if (!PADDLE_CLIENT_TOKEN) return;
+    initializePaddle({
+      token: PADDLE_CLIENT_TOKEN,
+      environment: PADDLE_ENV,
+      eventCallback: (event) => {
+        if (event.name === "checkout.completed") {
+          setCheckoutSuccess(true);
+          // Redirect to success after a moment
+          setTimeout(() => router.push("/"), 2000);
+        }
+      },
+    }).then((instance) => {
+      if (instance) setPaddleInstance(instance);
     });
-  };
+  }, [router]);
 
-  const isPro = profile?.role === "pro" || profile?.role === "teacher" || profile?.role === "admin";
+  const openCheckout = useCallback(
+    (priceId: string) => {
+      if (!paddleInstance || !priceId) return;
+
+      paddleInstance.Checkout.open({
+        items: [{ priceId, quantity: 1 }],
+        customData: { userId: user?.id || "", plan: "pro" },
+        customer: user?.email ? { email: user.email } : undefined,
+      });
+    },
+    [paddleInstance, user]
+  );
+
+  const isPro =
+    profile?.role === "pro" ||
+    profile?.role === "teacher" ||
+    profile?.role === "admin";
+
+  const monthlyPrice = 10;
+  const annualMonthlyPrice = 8;
+  const annualTotalPrice = annualMonthlyPrice * 12;
+
+  if (checkoutSuccess) {
+    return (
+      <div className="max-w-md mx-auto text-center py-12">
+        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 flex items-center justify-center">
+          <Check className="w-10 h-10 text-emerald-400" />
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">
+          Welcome to Pro!
+        </h2>
+        <p className="text-white/50">
+          Your subscription is active. Redirecting to your dashboard...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
       {/* Annual/Monthly Toggle */}
       <div className="flex items-center justify-center gap-3 mb-12">
-        <span className={`text-sm ${!annual ? "text-white" : "text-white/40"}`}>Monthly</span>
+        <span
+          className={`text-sm font-medium transition-colors ${
+            !annual ? "text-white" : "text-white/40"
+          }`}
+        >
+          Monthly
+        </span>
         <button
           onClick={() => setAnnual(!annual)}
-          className={`relative w-12 h-6 rounded-full transition-colors ${annual ? "bg-violet-500" : "bg-white/20"}`}
+          className={`relative w-12 h-6 rounded-full transition-colors ${
+            annual ? "bg-violet-500" : "bg-white/20"
+          }`}
+          aria-label="Toggle annual billing"
         >
-          <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${annual ? "translate-x-6" : "translate-x-0.5"}`} />
+          <div
+            className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform ${
+              annual ? "translate-x-6" : "translate-x-0.5"
+            }`}
+          />
         </button>
-        <span className={`text-sm ${annual ? "text-white" : "text-white/40"}`}>Annual <span className="text-emerald-400 text-xs">(save 20%)</span></span>
+        <span
+          className={`text-sm font-medium transition-colors ${
+            annual ? "text-white" : "text-white/40"
+          }`}
+        >
+          Annual{" "}
+          <span className="text-emerald-400 text-xs font-semibold">
+            (save 20%)
+          </span>
+        </span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-        {/* Free Tier */}
-        <Card className="bg-white/[0.03] border-white/[0.08]">
-          <CardHeader>
-            <CardTitle className="text-white">Free</CardTitle>
-            <CardDescription>Start learning today</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-white mb-1">$0</div>
-            <div className="text-sm text-white/40 mb-6">forever</div>
-            <ul className="space-y-3 mb-8">
-              {FREE_FEATURES.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm text-white/70">
-                  <Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <Button variant="outline" className="w-full border-white/10" disabled={!!user}>
-              {user ? "Current Plan" : "Get Started"}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Pro Tier */}
-        <Card className="bg-violet-500/10 border-violet-500/30 relative">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-500 to-cyan-500 text-white text-xs font-semibold px-4 py-1 rounded-full">
-            MOST POPULAR
+        {/* ---------------------------------------------------------------- */}
+        {/* Free Plan */}
+        {/* ---------------------------------------------------------------- */}
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-8 flex flex-col">
+          <div className="mb-6">
+            <h3 className="text-xl font-bold text-white mb-1">Free</h3>
+            <p className="text-sm text-white/40">Start learning today</p>
           </div>
-          <CardHeader>
-            <CardTitle className="text-white">Pro</CardTitle>
-            <CardDescription>Unlimited learning + AI coaching</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-white mb-1">
-              ${annual ? "12" : "15"}<span className="text-lg text-white/40">/mo</span>
-            </div>
-            <div className="text-sm text-white/40 mb-6">
-              {annual ? "$144/year — save 20%" : "billed monthly"}
-            </div>
-            <ul className="space-y-3 mb-8">
-              {PRO_FEATURES.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm text-white/70">
-                  <Check className="w-4 h-4 text-violet-400 mt-0.5 shrink-0" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <Button
-              className="w-full bg-violet-500 hover:bg-violet-600"
-              onClick={() => openCheckout(annual ? PRO_ANNUAL_PRICE : PRO_MONTHLY_PRICE)}
-              disabled={isPro}
-            >
-              {isPro ? "Current Plan" : "Upgrade to Pro"}
-            </Button>
-          </CardContent>
-        </Card>
 
-        {/* Teams Tier */}
-        <Card className="bg-white/[0.03] border-white/[0.08]">
-          <CardHeader>
-            <CardTitle className="text-white">Teams</CardTitle>
-            <CardDescription>For classrooms and teams</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-white mb-1">
-              $10<span className="text-lg text-white/40">/seat/mo</span>
-            </div>
-            <div className="text-sm text-white/40 mb-6">min 5 seats</div>
-            <ul className="space-y-3 mb-8">
-              {TEAM_FEATURES.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm text-white/70">
-                  <Check className="w-4 h-4 text-cyan-400 mt-0.5 shrink-0" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <Button variant="outline" className="w-full border-white/10">
-              Contact Us
-            </Button>
-          </CardContent>
-        </Card>
+          <div className="mb-6">
+            <span className="text-5xl font-bold text-white">$0</span>
+            <span className="text-sm text-white/40 ml-1">forever</span>
+          </div>
+
+          <ul className="space-y-3 mb-8 flex-1">
+            {FREE_FEATURES.map((f) => (
+              <li
+                key={f.text}
+                className={`flex items-start gap-2.5 text-sm ${
+                  f.included ? "text-white/70" : "text-white/25"
+                }`}
+              >
+                {f.included ? (
+                  <Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                ) : (
+                  <X className="w-4 h-4 text-white/15 mt-0.5 shrink-0" />
+                )}
+                <span>{f.text}</span>
+              </li>
+            ))}
+          </ul>
+
+          <button
+            onClick={() => !user && router.push("/login")}
+            disabled={!!user}
+            className="w-full py-3 rounded-xl text-sm font-semibold transition-all border border-white/[0.1] bg-white/[0.05] text-white/60 hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {user ? "Current Plan" : "Get Started Free"}
+          </button>
+        </div>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* Pro Plan */}
+        {/* ---------------------------------------------------------------- */}
+        <div className="relative rounded-2xl border border-violet-500/30 bg-violet-500/[0.08] backdrop-blur-xl p-8 flex flex-col shadow-xl shadow-violet-500/5">
+          {/* Badge */}
+          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+            <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-violet-500 to-cyan-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-violet-500/30">
+              <Sparkles className="w-3 h-3" />
+              MOST POPULAR
+            </span>
+          </div>
+
+          <div className="mb-6 mt-2">
+            <h3 className="text-xl font-bold text-white mb-1">Pro</h3>
+            <p className="text-sm text-white/40">
+              Unlimited learning + AI coaching
+            </p>
+          </div>
+
+          <div className="mb-6">
+            <span className="text-5xl font-bold text-white">
+              ${annual ? annualMonthlyPrice : monthlyPrice}
+            </span>
+            <span className="text-sm text-white/40 ml-1">/mo</span>
+            {annual && (
+              <div className="text-sm text-white/40 mt-1">
+                ${annualTotalPrice}/year &mdash;{" "}
+                <span className="text-emerald-400">save 20%</span>
+              </div>
+            )}
+            {!annual && (
+              <div className="text-sm text-white/40 mt-1">billed monthly</div>
+            )}
+          </div>
+
+          <ul className="space-y-3 mb-8 flex-1">
+            {PRO_FEATURES.map((f) => (
+              <li
+                key={f.text}
+                className="flex items-start gap-2.5 text-sm text-white/70"
+              >
+                <Check className="w-4 h-4 text-violet-400 mt-0.5 shrink-0" />
+                <span>{f.text}</span>
+              </li>
+            ))}
+          </ul>
+
+          <button
+            onClick={() => {
+              if (!user) {
+                router.push("/login?redirect=/pricing");
+                return;
+              }
+              openCheckout(annual ? PRO_ANNUAL_PRICE : PRO_MONTHLY_PRICE);
+            }}
+            disabled={isPro}
+            className="w-full py-3 rounded-xl text-sm font-semibold transition-all bg-gradient-to-r from-violet-500 to-cyan-500 text-white hover:from-violet-400 hover:to-cyan-400 shadow-lg shadow-violet-500/25 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            <Crown className="w-4 h-4" />
+            {isPro ? "Current Plan" : "Upgrade to Pro"}
+          </button>
+        </div>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* Teams Plan */}
+        {/* ---------------------------------------------------------------- */}
+        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-8 flex flex-col">
+          <div className="mb-6">
+            <h3 className="text-xl font-bold text-white mb-1">Teams</h3>
+            <p className="text-sm text-white/40">For classrooms & teams</p>
+          </div>
+
+          <div className="mb-6">
+            <span className="text-5xl font-bold text-white">$10</span>
+            <span className="text-sm text-white/40 ml-1">/seat/mo</span>
+            <div className="text-sm text-white/40 mt-1">minimum 5 seats</div>
+          </div>
+
+          <ul className="space-y-3 mb-8 flex-1">
+            {TEAM_FEATURES.map((f) => (
+              <li
+                key={f.text}
+                className="flex items-start gap-2.5 text-sm text-white/70"
+              >
+                <Check className="w-4 h-4 text-cyan-400 mt-0.5 shrink-0" />
+                <span>{f.text}</span>
+              </li>
+            ))}
+          </ul>
+
+          <a
+            href="mailto:team@kairos.ai?subject=Teams%20Plan%20Inquiry"
+            className="block w-full py-3 rounded-xl text-sm font-semibold text-center transition-all border border-white/[0.1] bg-white/[0.05] text-white/60 hover:bg-white/10 hover:text-white"
+          >
+            Contact Us
+          </a>
+        </div>
+      </div>
+
+      {/* Trust badges */}
+      <div className="flex flex-wrap items-center justify-center gap-6 mt-12 text-xs text-white/30">
+        <span className="flex items-center gap-1.5">
+          <Zap className="w-3.5 h-3.5" />
+          Cancel anytime
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Check className="w-3.5 h-3.5" />
+          7-day money-back guarantee
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Check className="w-3.5 h-3.5" />
+          Secure payments via Paddle
+        </span>
       </div>
     </div>
   );
