@@ -4,18 +4,18 @@ import { ArrowLeft, Calendar, Clock, Share2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Why You Should Learn Algorithms in Your Native Language | KairosLearn Blog',
-  description: 'Research shows you learn 30% faster in your native language. Here's why KairosLearn supports 18 languages for coding education.',
+  description: 'Research suggests you learn more effectively in your native language. Here\'s why KairosLearn supports 17 languages for coding education.',
   keywords: 'multilingual coding, learn programming in spanish, learn coding in french, native language education, coding education',
 };
 
 export default function BlogPostPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Back link */}
         <Link
           href="/blog"
-          className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline mb-8"
+          className="inline-flex items-center text-cyan-400 hover:underline mb-8"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Blog
@@ -23,8 +23,8 @@ export default function BlogPostPage() {
 
         {/* Header */}
         <header className="mb-12">
-          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
-            <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-full text-xs font-medium">
+          <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
+            <span className="px-3 py-1 bg-violet-500/20 text-violet-400 rounded-full text-xs font-medium">
               Language Learning
             </span>
             <div className="flex items-center gap-1">
@@ -37,22 +37,22 @@ export default function BlogPostPage() {
             </div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">
             Why You Should Learn Algorithms in Your Native Language
           </h1>
 
-          <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-6">
+          <div className="flex items-center justify-between border-t border-white/10 pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-cyan-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold">BH</span>
               </div>
               <div>
-                <div className="font-semibold text-gray-900 dark:text-white">Bilal Hussain</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Founder, KairosLearn</div>
+                <div className="font-semibold text-white">Bilal Hussain</div>
+                <div className="text-sm text-gray-400">Founder, KairosLearn</div>
               </div>
             </div>
 
-            <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+            <button className="flex items-center gap-2 px-4 py-2 bg-slate-800/60 backdrop-blur-xl border border-white/10 rounded-lg text-gray-300 hover:bg-slate-800/80 hover:border-white/20 transition">
               <Share2 className="w-4 h-4" />
               Share
             </button>
@@ -60,16 +60,16 @@ export default function BlogPostPage() {
         </header>
 
         {/* Featured Image Placeholder */}
-        <div className="aspect-video bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl mb-12 flex items-center justify-center">
+        <div className="aspect-video bg-gradient-to-br from-violet-500 to-pink-600 rounded-2xl mb-12 flex items-center justify-center">
           <span className="text-white text-8xl">🌍</span>
         </div>
 
         {/* Content */}
-        <div className="prose prose-lg dark:prose-invert max-w-none">
+        <div className="prose prose-lg prose-invert max-w-none">
           <p className="lead">
-            Most coding education resources are in English. LeetCode, Codecademy, freeCodeCamp — all English-only.
+            Most coding education resources are in English. LeetCode, Codecademy, freeCodeCamp — all primarily English.
             But here's the uncomfortable truth: <strong>if you're learning algorithms in a language you don't think in,
-            you're learning 30% slower</strong>.
+            you're adding unnecessary cognitive load that slows you down</strong>.
           </p>
 
           <p>
@@ -95,8 +95,8 @@ export default function BlogPostPage() {
           </p>
 
           <p>
-            Research from the European Commission shows that students learn <strong>30% faster</strong> and retain
-            <strong>40% more information</strong> when taught in their native language vs. a second language.
+            Research in cognitive science and multilingual education consistently suggests that students learn more effectively
+            and retain more information when taught in their native language, as less working memory is consumed by translation.
           </p>
 
           <h2>Why Most Platforms Are English-Only</h2>
@@ -118,28 +118,27 @@ export default function BlogPostPage() {
           <h2>How KairosLearn Solves This</h2>
 
           <p>
-            That's why KairosLearn supports <strong>18 voice languages</strong>:
+            That's why KairosLearn supports <strong>17 voice languages</strong>:
           </p>
 
           <ul>
+            <li>🇺🇸 English</li>
             <li>🇪🇸 Spanish</li>
             <li>🇫🇷 French</li>
             <li>🇩🇪 German</li>
             <li>🇮🇹 Italian</li>
             <li>🇳🇱 Dutch</li>
             <li>🇯🇵 Japanese</li>
-            <li>🇨🇳 Mandarin</li>
             <li>🇮🇳 Hindi</li>
-            <li>🇧🇷 Portuguese</li>
-            <li>🇷🇺 Russian</li>
-            <li>🇰🇷 Korean</li>
-            <li>🇸🇦 Arabic</li>
-            <li>🇹🇷 Turkish</li>
-            <li>🇵🇱 Polish</li>
-            <li>🇸🇪 Swedish</li>
-            <li>🇳🇴 Norwegian</li>
-            <li>🇩🇰 Danish</li>
-            <li>🇫🇮 Finnish</li>
+            <li>🇮🇳 Bengali</li>
+            <li>🇮🇳 Tamil</li>
+            <li>🇮🇳 Telugu</li>
+            <li>🇮🇳 Gujarati</li>
+            <li>🇮🇳 Kannada</li>
+            <li>🇮🇳 Malayalam</li>
+            <li>🇮🇳 Marathi</li>
+            <li>🇮🇳 Punjabi</li>
+            <li>🇮🇳 Odia</li>
           </ul>
 
           <p>
@@ -152,32 +151,13 @@ export default function BlogPostPage() {
             When a French speaker asks about binary trees, it uses "arbre binaire" naturally, not awkwardly translated English.
           </p>
 
-          <h2>Real Student Impact</h2>
+          <h2>The Impact of Native Language Learning</h2>
 
           <p>
-            Here's what our users say:
+            Imagine finally understanding recursion because your AI tutor explains it using concepts and idioms
+            from your own language. That's the experience we're building at KairosLearn — and our early users
+            are already seeing the difference.
           </p>
-
-          <blockquote>
-            <p>
-              "Aprender React en español fue un cambio total. Finalmente entendí hooks después de meses de luchar con
-              tutoriales en inglés." — Miguel Rodriguez, Bootcamp Graduate
-            </p>
-          </blockquote>
-
-          <blockquote>
-            <p>
-              "J'ai appris le développement web en français avec KairosLearn. C'était tellement plus facile que d'essayer
-              de tout apprendre en anglais." — Emma Laurent, Self-Taught Developer
-            </p>
-          </blockquote>
-
-          <blockquote>
-            <p>
-              "मैं हिंदी में कोडिंग सीख रहा था और यह अविश्वसनीय था। आखिरकार मुझे algorithms समझ में आए।"
-              — Rajesh Kumar, CS Student
-            </p>
-          </blockquote>
 
           <h2>But Don't You Need English for Tech Jobs?</h2>
 
@@ -218,15 +198,15 @@ export default function BlogPostPage() {
           <h2>Languages We Support (And Why)</h2>
 
           <p>
-            We chose our 18 languages based on global developer populations and underserved markets:
+            We chose our 17 languages based on global developer populations and underserved markets:
           </p>
 
           <ul>
             <li><strong>Spanish:</strong> 500M+ speakers, huge Latin American developer community</li>
             <li><strong>French:</strong> 300M+ speakers, growing African tech scene</li>
             <li><strong>Hindi:</strong> 600M+ speakers, India's massive tech workforce</li>
-            <li><strong>Mandarin:</strong> 1B+ speakers, China's developer market</li>
-            <li><strong>Arabic:</strong> 400M+ speakers, Middle East tech boom</li>
+            <li><strong>10 Indic languages:</strong> Bengali, Tamil, Telugu, Gujarati, Kannada, Malayalam, Marathi, Punjabi, Odia — serving India's diverse developer community</li>
+            <li><strong>Japanese, German, Italian, Dutch:</strong> Established tech markets with strong demand for native-language learning</li>
           </ul>
 
           <p>
@@ -246,38 +226,38 @@ export default function BlogPostPage() {
           </p>
 
           <p>
-            <Link href="/talk" className="text-blue-600 dark:text-blue-400 underline">
+            <Link href="/talk" className="text-cyan-400 underline">
               Try a voice lesson in your language now (free, no signup required) →
             </Link>
           </p>
 
           <hr />
 
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             <strong>About the author:</strong> Bilal Hussain is the founder of KairosLearn. After teaching CS at Milton
-            Academy and seeing students struggle with English-only resources, he built an AI platform that tutors in 18
+            Academy and seeing students struggle with English-only resources, he built an AI platform that tutors in 17
             languages. He believes every student deserves to learn in the language they think in.
           </p>
         </div>
 
         {/* CTA */}
-        <div className="mt-16 p-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl text-white text-center">
+        <div className="mt-16 p-8 bg-gradient-to-r from-violet-600 to-cyan-600 rounded-2xl text-white text-center">
           <h2 className="text-3xl font-bold mb-4">
             Learn in Your Language
           </h2>
-          <p className="text-xl mb-8 text-purple-50">
-            Try KairosLearn free. Talk to Coach Alex in 18 languages.
+          <p className="text-xl mb-8 text-violet-50">
+            Try KairosLearn free. Talk to Coach Alex in 17 languages.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/courses"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition"
+              className="inline-flex items-center justify-center px-6 py-3 bg-white text-violet-600 rounded-lg font-semibold hover:bg-violet-50 transition"
             >
               Browse Courses
             </Link>
             <Link
               href="/talk"
-              className="inline-flex items-center justify-center px-6 py-3 bg-purple-700 text-white rounded-lg font-semibold hover:bg-purple-800 transition"
+              className="inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur text-white rounded-lg font-semibold hover:bg-white/20 transition"
             >
               Try Voice Tutoring
             </Link>
@@ -285,38 +265,38 @@ export default function BlogPostPage() {
         </div>
 
         {/* Related Posts */}
-        <div className="mt-16 border-t border-gray-200 dark:border-gray-700 pt-12">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        <div className="mt-16 border-t border-white/10 pt-12">
+          <h3 className="text-2xl font-bold text-white mb-6">
             Related Articles
           </h3>
           <div className="grid md:grid-cols-2 gap-6">
             <Link
               href="/blog/why-voice-based-ai-tutoring-works"
-              className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition"
+              className="p-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition"
             >
-              <div className="text-sm text-blue-600 dark:text-blue-400 font-medium mb-2">
+              <div className="text-sm text-violet-400 font-medium mb-2">
                 AI Education
               </div>
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+              <h4 className="font-semibold text-white mb-2">
                 Why Voice-Based AI Tutoring Works Better Than Text
               </h4>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
+              <p className="text-sm text-gray-300">
                 Research shows voice conversations improve retention by 40%...
               </p>
             </Link>
 
             <Link
               href="/comparison/vs-leetcode"
-              className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition"
+              className="p-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition"
             >
-              <div className="text-sm text-blue-600 dark:text-blue-400 font-medium mb-2">
+              <div className="text-sm text-violet-400 font-medium mb-2">
                 Platform Comparison
               </div>
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+              <h4 className="font-semibold text-white mb-2">
                 KairosLearn vs LeetCode
               </h4>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                Voice tutoring in 18 languages vs English-only problems...
+              <p className="text-sm text-gray-300">
+                Voice tutoring in 17 languages vs traditional problem-solving...
               </p>
             </Link>
           </div>

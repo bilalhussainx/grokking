@@ -39,7 +39,7 @@ export interface VoiceProviderConfig {
 // ============================================
 
 // ============================================
-// Full Language Support — 18 languages
+// Full Language Support — 17 languages
 // ============================================
 
 // Deepgram Aura-2 TTS: 7 languages with native-accent voices

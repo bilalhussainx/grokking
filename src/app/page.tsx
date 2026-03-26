@@ -498,7 +498,7 @@ export default function HomePage() {
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Talk</h2>
                 <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-4">
-                  Voice conversation with AI tutors in 18 languages.
+                  Voice conversation with AI tutors in 17 languages.
                 </p>
                 <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
                   Start Talking <ArrowRight className="w-4 h-4" />

@@ -4,7 +4,7 @@ import { Check, X, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'KairosLearn vs LeetCode - Which Coding Platform is Better?',
-  description: 'Compare KairosLearn and LeetCode for coding interview prep. KairosLearn offers AI voice tutoring in 18 languages, structured courses, and personalized learning paths.',
+  description: 'Compare KairosLearn and LeetCode for coding interview prep. KairosLearn offers AI voice tutoring in 17 languages, structured courses, and personalized learning paths.',
   keywords: 'kairoslearn vs leetcode, coding interview prep, ai tutoring, learn to code, programming courses',
 };
 
@@ -14,7 +14,7 @@ export default function VsLeetCodePage() {
       feature: 'AI Voice Tutoring',
       kairoslearn: true,
       leetcode: false,
-      description: 'Real-time voice conversations with AI tutor in 18 languages'
+      description: 'Real-time voice conversations with AI tutor in 17 languages'
     },
     {
       feature: 'Structured Courses',
@@ -24,8 +24,8 @@ export default function VsLeetCodePage() {
     },
     {
       feature: 'Multilingual Support',
-      kairoslearn: '18 languages',
-      leetcode: 'English only',
+      kairoslearn: '17 languages',
+      leetcode: 'Primarily English',
       description: 'Learn in Spanish, French, German, Japanese, Hindi, and more'
     },
     {
@@ -82,7 +82,7 @@ export default function VsLeetCodePage() {
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
             Both platforms help you prepare for coding interviews. But KairosLearn offers something LeetCode doesn't:
-            <strong> AI voice tutoring, structured learning paths, and support for 18 languages.</strong>
+            <strong> AI voice tutoring, structured learning paths, and support for 17 languages.</strong>
           </p>
           <Link 
             href="/pricing"
@@ -114,7 +114,7 @@ export default function VsLeetCodePage() {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {features.map((item, index) => (
-                  <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-750">
+                  <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4">
                       <div>
                         <div className="font-medium text-gray-900 dark:text-white">
@@ -281,7 +281,7 @@ export default function VsLeetCodePage() {
             </p>
             <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300 mb-8">
               <li>✅ AI voice tutoring</li>
-              <li>✅ 18 languages</li>
+              <li>✅ 17 languages</li>
               <li>✅ 2,284+ lessons</li>
               <li>✅ Free trial for premium</li>
             </ul>

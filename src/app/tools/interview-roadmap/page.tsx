@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Download, ArrowRight, CheckCircle } from 'lucide-react';
+import { Printer, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function InterviewRoadmapPage() {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+
     experience: 'beginner',
     targetCompany: 'general',
     timeframe: '3months',
@@ -114,23 +114,6 @@ export default function InterviewRoadmapPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  placeholder="john@example.com"
-                  required
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  We'll email you the roadmap + bonus interview tips
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
                   Your Experience Level
                 </label>
                 <select
@@ -194,7 +177,7 @@ export default function InterviewRoadmapPage() {
                 Your Personalized Roadmap is Ready, {formData.name}!
               </h2>
               <p className="text-gray-600 dark:text-gray-300">
-                We've also sent this to <strong>{formData.email}</strong> with bonus tips
+                Your roadmap is ready below! Bookmark this page to reference it later.
               </p>
             </div>
 
@@ -231,8 +214,8 @@ export default function InterviewRoadmapPage() {
                 onClick={() => window.print()}
                 className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
               >
-                <Download className="mr-2 w-5 h-5" />
-                Download PDF
+                <Printer className="mr-2 w-5 h-5" />
+                Print Roadmap
               </button>
               <Link
                 href="/courses"
@@ -249,7 +232,7 @@ export default function InterviewRoadmapPage() {
               Ready to Start Your Interview Prep Journey?
             </h3>
             <p className="text-xl mb-6 text-blue-50">
-              KairosLearn offers all the courses mentioned in your roadmap — with AI voice tutoring in 18 languages.
+              KairosLearn offers all the courses mentioned in your roadmap — with AI voice tutoring in 17 languages.
             </p>
             <Link
               href="/courses"

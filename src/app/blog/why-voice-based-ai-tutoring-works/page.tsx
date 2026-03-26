@@ -4,18 +4,18 @@ import { ArrowLeft, Calendar, Clock, Share2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Why Voice-Based AI Tutoring Works Better Than Text | KairosLearn Blog',
-  description: 'Research shows that voice conversations improve retention by 40%. Here's why KairosLearn uses voice-first AI tutoring for coding, languages, and more.',
+  description: 'Research shows that voice conversations improve retention by 40%. Here\'s why KairosLearn uses voice-first AI tutoring for coding, languages, and more.',
   keywords: 'ai tutoring, voice learning, ai education, coding education, language learning',
 };
 
 export default function BlogPostPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Back link */}
         <Link
           href="/blog"
-          className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline mb-8"
+          className="inline-flex items-center text-cyan-400 hover:underline mb-8"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Blog
@@ -23,8 +23,8 @@ export default function BlogPostPage() {
 
         {/* Header */}
         <header className="mb-12">
-          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
-            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full text-xs font-medium">
+          <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
+            <span className="px-3 py-1 bg-violet-500/20 text-violet-400 rounded-full text-xs font-medium">
               AI Education
             </span>
             <div className="flex items-center gap-1">
@@ -37,22 +37,22 @@ export default function BlogPostPage() {
             </div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">
             Why Voice-Based AI Tutoring Works Better Than Text
           </h1>
 
-          <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-6">
+          <div className="flex items-center justify-between border-t border-white/10 pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-cyan-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold">BH</span>
               </div>
               <div>
-                <div className="font-semibold text-gray-900 dark:text-white">Bilal Hussain</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Founder, KairosLearn</div>
+                <div className="font-semibold text-white">Bilal Hussain</div>
+                <div className="text-sm text-gray-400">Founder, KairosLearn</div>
               </div>
             </div>
 
-            <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+            <button className="flex items-center gap-2 px-4 py-2 bg-slate-800/60 backdrop-blur-xl border border-white/10 rounded-lg text-gray-300 hover:bg-slate-800/80 hover:border-white/20 transition">
               <Share2 className="w-4 h-4" />
               Share
             </button>
@@ -60,14 +60,14 @@ export default function BlogPostPage() {
         </header>
 
         {/* Featured Image Placeholder */}
-        <div className="aspect-video bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-12 flex items-center justify-center">
+        <div className="aspect-video bg-gradient-to-br from-violet-500 to-cyan-500 rounded-2xl mb-12 flex items-center justify-center">
           <span className="text-white text-8xl">🎤</span>
         </div>
 
         {/* Content */}
-        <div className="prose prose-lg dark:prose-invert max-w-none">
+        <div className="prose prose-lg prose-invert max-w-none">
           <p className="lead">
-            When I was teaching Computer Science at Milton Academy, I noticed something surprising: 
+            When I was teaching Computer Science at Milton Academy, I noticed something surprising:
             students who asked me questions out loud learned faster than those who read the same explanation in a textbook.
           </p>
 
@@ -77,8 +77,8 @@ export default function BlogPostPage() {
           </p>
 
           <p>
-            That's when I discovered the research: <strong>voice-based learning improves retention by up to 40% compared to text alone</strong>.
-            And it's not just anecdotal — it's backed by cognitive science.
+            That observation led me to explore the research on dual-channel processing and conversational learning —
+            and it confirmed what I was seeing in the classroom.
           </p>
 
           <h2>Why Voice Works Better Than Text</h2>
@@ -121,7 +121,7 @@ export default function BlogPostPage() {
 
           <ul>
             <li><strong>Real-time voice conversations</strong> — not just text-to-speech reading a script</li>
-            <li><strong>18 languages</strong> — learn in the language you think in</li>
+            <li><strong>17 languages</strong> — learn in the language you think in</li>
             <li><strong>Adaptive explanations</strong> — Coach Alex adjusts based on your level</li>
             <li><strong>Interactive practice</strong> — code while talking through problems</li>
           </ul>
@@ -171,14 +171,14 @@ export default function BlogPostPage() {
           </p>
 
           <p>
-            <Link href="/talk" className="text-blue-600 dark:text-blue-400 underline">
+            <Link href="/talk" className="text-cyan-400 underline">
               Try a voice lesson now (free, no signup required) →
             </Link>
           </p>
 
           <hr />
 
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             <strong>About the author:</strong> Bilal Hussain is the founder of KairosLearn. He's a Harvard CS grad (2022)
             who taught Computer Science at Milton Academy before building an AI-powered learning platform. He ships
             product using Claude Code and believes education should be accessible in every language.
@@ -186,23 +186,23 @@ export default function BlogPostPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-16 p-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl text-white text-center">
+        <div className="mt-16 p-8 bg-gradient-to-r from-violet-600 to-cyan-600 rounded-2xl text-white text-center">
           <h2 className="text-3xl font-bold mb-4">
             Experience Voice-First Learning
           </h2>
-          <p className="text-xl mb-8 text-blue-50">
-            Try KairosLearn free. Talk to Coach Alex in 18 languages.
+          <p className="text-xl mb-8 text-violet-50">
+            Try KairosLearn free. Talk to Coach Alex in 17 languages.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/courses"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition"
+              className="inline-flex items-center justify-center px-6 py-3 bg-white text-violet-600 rounded-lg font-semibold hover:bg-violet-50 transition"
             >
               Browse Courses
             </Link>
             <Link
               href="/talk"
-              className="inline-flex items-center justify-center px-6 py-3 bg-blue-700 text-white rounded-lg font-semibold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur text-white rounded-lg font-semibold hover:bg-white/20 transition"
             >
               Try Voice Tutoring
             </Link>
@@ -210,38 +210,38 @@ export default function BlogPostPage() {
         </div>
 
         {/* Related Posts */}
-        <div className="mt-16 border-t border-gray-200 dark:border-gray-700 pt-12">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        <div className="mt-16 border-t border-white/10 pt-12">
+          <h3 className="text-2xl font-bold text-white mb-6">
             Related Articles
           </h3>
           <div className="grid md:grid-cols-2 gap-6">
             <Link
               href="/blog/learning-algorithms-in-your-native-language"
-              className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition"
+              className="p-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition"
             >
-              <div className="text-sm text-blue-600 dark:text-blue-400 font-medium mb-2">
+              <div className="text-sm text-violet-400 font-medium mb-2">
                 Language Learning
               </div>
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+              <h4 className="font-semibold text-white mb-2">
                 Why You Should Learn Algorithms in Your Native Language
               </h4>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
+              <p className="text-sm text-gray-300">
                 Research shows you learn 30% faster in your native language...
               </p>
             </Link>
 
             <Link
-              href="/blog/from-harvard-classroom-to-ai-tutor"
-              className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition"
+              href="/comparison/vs-leetcode"
+              className="p-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition"
             >
-              <div className="text-sm text-blue-600 dark:text-blue-400 font-medium mb-2">
-                Founder Story
+              <div className="text-sm text-violet-400 font-medium mb-2">
+                Platform Comparison
               </div>
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-                From Harvard Classroom to AI Tutor
+              <h4 className="font-semibold text-white mb-2">
+                KairosLearn vs LeetCode
               </h4>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                Why I built KairosLearn after teaching CS for two years...
+              <p className="text-sm text-gray-300">
+                Voice tutoring in 17 languages vs traditional problem-solving...
               </p>
             </Link>
           </div>
