@@ -42,6 +42,7 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
   const [micMuted, setMicMuted] = useState(false);
   const [error, setError] = useState("");
 
+  const startingRef = useRef(false); // Ref-based guard against double start
   const wsRef = useRef<WebSocket | null>(null);
   const micCtxRef = useRef<AudioContext | null>(null);
   const workletRef = useRef<AudioWorkletNode | null>(null);
@@ -161,6 +162,7 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
     cleanupPlayback();
     if (wsRef.current) { wsRef.current.close(); wsRef.current = null; }
     cleanupMic();
+    startingRef.current = false;
     setIsConnected(false);
     setIsConnecting(false);
     setIsSpeaking(false);
@@ -169,7 +171,8 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
 
   const start = useCallback(
     async (config?: DeepgramAgentConfig) => {
-      if (isConnecting || isConnected) return;
+      if (isConnecting || isConnected || startingRef.current || wsRef.current) return;
+      startingRef.current = true;
 
       setIsConnecting(true);
       setError("");
@@ -350,6 +353,7 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
         ws.onclose = (e) => {
           console.log("[Deepgram] WebSocket closed:", e.code, e.reason);
           cleanupMic();
+          startingRef.current = false;
           setIsConnected(false);
           setIsConnecting(false);
           setIsSpeaking(false);
@@ -357,6 +361,7 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
         };
       } catch (err) {
         console.error("[Deepgram] Failed to start:", err);
+        startingRef.current = false;
         setError(`Failed to connect: ${err}`);
         setIsConnecting(false);
         callbacksRef.current?.onError?.(`${err}`);
