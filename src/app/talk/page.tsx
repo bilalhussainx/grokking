@@ -7,6 +7,7 @@ import { Mic, MicOff, Phone, PhoneOff, ChevronLeft, Volume2, Settings } from "lu
 import { useVoiceAgent, type VoiceAgentCallbacks } from "@/hooks/useVoiceAgent";
 import { getLanguagePersonas, getDefaultPersona, getSupportedLanguages, type LanguagePersona } from "@/lib/language-personas";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Message {
   id: string;
@@ -26,6 +27,38 @@ export default function TalkPage() {
 function TalkPageInner() {
   const searchParams = useSearchParams();
   const preselectedLang = searchParams.get("lang");
+  const { user, loading } = useAuth();
+
+  // Redirect unauthenticated users to signup
+  if (!loading && !user) {
+    return (
+      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
+        <div className="max-w-md text-center px-6">
+          <div className="w-20 h-20 bg-emerald-500/15 border border-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Mic className="w-10 h-10 text-emerald-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-white mb-3">Sign in to start talking</h1>
+          <p className="text-gray-400 mb-8">
+            Voice tutoring requires an account so Coach Alex can personalize your learning experience.
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/signup"
+              className="px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-lg font-semibold hover:from-violet-500 hover:to-cyan-500 transition text-center"
+            >
+              Create Free Account
+            </Link>
+            <Link
+              href="/login"
+              className="px-6 py-3 bg-slate-800/60 border border-white/10 text-white rounded-lg font-semibold hover:bg-slate-800/80 hover:border-white/20 transition text-center"
+            >
+              Sign In
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // State
   const [step, setStep] = useState<"select" | "talking">(preselectedLang ? "talking" : "select");

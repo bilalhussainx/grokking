@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Crown, Zap, BookOpen, Mic, Award, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PaywallModalProps {
   courseTitle: string;
@@ -35,8 +36,10 @@ const TRIGGER_MESSAGES = {
 
 export default function PaywallModal({ courseTitle, trigger, onClose }: PaywallModalProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const [hovering, setHovering] = useState(false);
   const msg = TRIGGER_MESSAGES[trigger];
+  const isLoggedOut = !user;
   const Icon = msg.icon;
 
   return (
@@ -81,17 +84,37 @@ export default function PaywallModal({ courseTitle, trigger, onClose }: PaywallM
           </div>
 
           {/* CTA */}
-          <button
-            onClick={() => router.push("/pricing")}
-            onMouseEnter={() => setHovering(true)}
-            onMouseLeave={() => setHovering(false)}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold text-sm hover:from-amber-400 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2"
-          >
-            <Crown className={`w-4 h-4 transition-transform ${hovering ? "scale-110" : ""}`} />
-            Upgrade to Pro — $10/mo
-          </button>
-
-          <p className="text-[10px] text-white/20 mt-3">Cancel anytime. 7-day money-back guarantee.</p>
+          {isLoggedOut ? (
+            <>
+              <button
+                onClick={() => router.push("/signup")}
+                onMouseEnter={() => setHovering(true)}
+                onMouseLeave={() => setHovering(false)}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-semibold text-sm hover:from-violet-500 hover:to-cyan-500 transition-all shadow-lg shadow-violet-500/25 flex items-center justify-center gap-2"
+              >
+                Create Free Account
+              </button>
+              <button
+                onClick={() => router.push("/login")}
+                className="w-full py-2.5 mt-2 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm hover:text-white hover:bg-white/10 transition-all"
+              >
+                Already have an account? Sign in
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => router.push("/pricing")}
+                onMouseEnter={() => setHovering(true)}
+                onMouseLeave={() => setHovering(false)}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold text-sm hover:from-amber-400 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2"
+              >
+                <Crown className={`w-4 h-4 transition-transform ${hovering ? "scale-110" : ""}`} />
+                Upgrade to Pro — $10/mo
+              </button>
+              <p className="text-[10px] text-white/20 mt-3">Cancel anytime. 7-day money-back guarantee.</p>
+            </>
+          )}
         </div>
       </div>
     </div>
