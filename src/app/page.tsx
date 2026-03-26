@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Mic, BookOpen, ArrowRight, Sparkles, Star, Target, Users, Building2, MessageSquare, Map } from "lucide-react";
+import { Mic, BookOpen, ArrowRight, Sparkles, Star, Target, Users, Building2, MessageSquare, Map, Code2, Globe, GraduationCap, Zap, Shield, Brain, Server } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useXP } from "@/contexts/XPContext";
 import { courses } from "@/data";
+import { pathways } from "@/data/pathways";
 import type { Course } from "@/data/types";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
 import { useRouter } from "next/navigation";
@@ -75,109 +76,8 @@ function scoreCourse(course: { title: string; slug: string; domain?: string; des
   return Math.min(score, 10);
 }
 
-function FeaturedCourses({ interests = [] }: { interests?: string[] }) {
-  const hasInterests = interests.length > 0;
-
-  // Score all courses by relevance
-  const scored = courses.map(c => ({ course: c, score: scoreCourse(c, interests) }));
-  const recommended = hasInterests
-    ? scored.filter(s => s.score > 0).sort((a, b) => b.score - a.score).map(s => s.course).slice(0, 9)
-    : [];
-  const recommendedIds = new Set(recommended.map(c => c.id));
-
-  // Remaining courses not in recommended
-  const remaining = courses.filter(c => !recommendedIds.has(c.id));
-  const premium = remaining.filter(c => c.tier === 'pro').slice(0, 6);
-  const free = remaining.filter(c => c.tier === 'free').slice(0, 6);
-
-  return (
-    <motion.div variants={item} className="mb-16">
-      {/* Recommended for You */}
-      {recommended.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-violet-400" />
-            Recommended for You
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {recommended.map((course) => (
-              <CourseCard key={course.id} course={course} accent="violet" />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* More to Explore — Premium */}
-      {premium.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Star className="w-4 h-4 text-yellow-400" />
-            {hasInterests ? "More to Explore" : "Premium Courses"}
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {premium.map((course) => (
-              <CourseCard key={course.id} course={course} accent="amber" />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Free Courses */}
-      {free.length > 0 && (
-        <div>
-          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
-            Free Courses
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {free.map((course) => (
-              <CourseCard key={course.id} course={course} accent="emerald" />
-            ))}
-          </div>
-        </div>
-      )}
-    </motion.div>
-  );
-}
-
-/** Reusable course card */
-function CourseCard({ course, accent }: { course: { id: string; slug: string; icon: string; title: string; description: string; tier: string; domain?: string; level?: string }; accent: "violet" | "amber" | "emerald" }) {
-  const colors = {
-    violet: { border: "border-violet-500/20 hover:border-violet-500/40", bg: "from-violet-500/5", badge: "bg-violet-500/15 text-violet-400 border-violet-500/20", tag: "bg-violet-500/10 text-violet-400" },
-    amber: { border: "border-yellow-500/20 hover:border-yellow-500/40", bg: "from-yellow-500/5", badge: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20", tag: "bg-slate-700/50 text-slate-400" },
-    emerald: { border: "border-emerald-500/20 hover:border-emerald-500/40", bg: "from-emerald-500/5", badge: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20", tag: "bg-slate-700/50 text-slate-400" },
-  }[accent];
-
-  return (
-    <Link href={`/course/${course.slug}`}>
-      <motion.div
-        className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${colors.bg} via-slate-800/80 to-slate-900/80 border ${colors.border} p-5 cursor-pointer h-full transition-all`}
-        whileHover={{ scale: 1.02 }}
-        transition={{ duration: 0.2 }}
-      >
-        <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-full ${colors.badge} text-xs font-semibold border`}>
-          {course.tier === 'pro' ? 'Premium' : 'Free'}
-        </div>
-        <div className="text-3xl mb-3">{course.icon}</div>
-        <h4 className="text-white font-semibold">{course.title}</h4>
-        <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
-        <div className="flex items-center gap-2 mt-3">
-          {course.domain && (
-            <span className={`px-2 py-0.5 rounded ${colors.tag} text-xs`}>
-              {course.domain.replace(/-/g, ' ')}
-            </span>
-          )}
-          {course.level && (
-            <span className="px-2 py-0.5 rounded bg-slate-700/50 text-slate-400 text-xs">{course.level}</span>
-          )}
-        </div>
-      </motion.div>
-    </Link>
-  );
-}
-
 export default function HomePage() {
-  const { user, profile, credits } = useAuth();
+  const { user, profile, credits, loading } = useAuth();
   const { earnXP, showXPFlyUp, lastXPAmount, pendingReward, dismissReward } = useXP();
   const router = useRouter();
   const [userInterests, setUserInterests] = useState<string[]>([]);
@@ -296,115 +196,388 @@ export default function HomePage() {
         initial="hidden"
         animate="visible"
       >
-        {/* ── HERO — Cinematic, value-first ── */}
-        <motion.div variants={item} className="text-center mb-16 pt-4">
-          <motion.div
-            className="flex justify-center mb-8"
-            initial={{ scale: 0.6, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <KairosLogo size="xl" showText={false} />
-          </motion.div>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6">
-            <Sparkles className="w-3.5 h-3.5" />
-            50+ courses &middot; 8 languages &middot; AI voice coaching
-          </div>
-          <h1 className="text-4xl sm:text-6xl font-bold text-white tracking-tight leading-[1.1]">
-            Your AI tutor that<br />
-            <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
-              speaks your language.
-            </span>
-          </h1>
-          <p className="mt-5 text-lg sm:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
-            Learn to code, speak French, study Islam, master finance — with an AI coach that explains in your language, adapts to your level, and talks back.
-          </p>
-          {!user && (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10">
-              <Link
-                href="/signup"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-base hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
-              >
-                Start Free — 300 AI Credits
-              </Link>
-              <Link
-                href="/talk"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white/70 font-medium text-base hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2"
-              >
-                <Mic className="w-4 h-4" />
-                Try a Voice Lesson
-              </Link>
-            </div>
-          )}
-        </motion.div>
+        {/* ====================================================================
+            NON-LOGGED-IN EXPERIENCE
+            ==================================================================== */}
+        {!user && !loading && (
+          <>
+            {/* ── SECTION 1: HERO ── */}
+            <motion.div variants={item} className="relative text-center mb-20 pt-8">
+              {/* Animated gradient orbs */}
+              <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+                <motion.div
+                  className="absolute top-0 left-1/4 w-72 h-72 bg-violet-500/15 rounded-full blur-[120px]"
+                  animate={{ x: [0, 30, 0], y: [0, -20, 0], scale: [1, 1.1, 1] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="absolute top-10 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-[120px]"
+                  animate={{ x: [0, -25, 0], y: [0, 25, 0], scale: [1, 1.15, 1] }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-96 h-60 bg-emerald-500/8 rounded-full blur-[100px]"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                />
+              </div>
 
-        {/* ── HOW IT WORKS — 3-step product flow ── */}
-        {!user && (
-          <motion.div variants={item} className="mb-16">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Step 1: Pick a course */}
               <motion.div
-                className="relative rounded-2xl border border-blue-500/15 bg-gradient-to-br from-blue-500/5 via-slate-900/80 to-slate-900/80 p-6"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
+                className="flex justify-center mb-8"
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
               >
-                <div className="absolute top-4 right-4 text-3xl font-bold text-blue-500/10">1</div>
-                <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
-                  <BookOpen className="w-6 h-6 text-blue-400" />
-                </div>
-                <h3 className="text-white font-semibold text-lg mb-2">Pick any course</h3>
-                <p className="text-white/50 text-sm leading-relaxed">Coding interviews, French, Islamic studies, personal finance — 50+ structured courses with exercises.</p>
+                <KairosLogo size="xl" showText={false} />
               </motion.div>
 
-              {/* Step 2: Talk to tutor */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6">
+                <Sparkles className="w-3.5 h-3.5" />
+                AI-powered mock interviews &middot; Voice coaching in 17 languages
+              </div>
+
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight leading-[1.1]">
+                <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+                  AI Interview Coach
+                </span>
+                <br />
+                <span className="text-white">+ Language Tutor</span>
+              </h1>
+
+              <p className="mt-6 text-lg sm:text-xl text-white/55 max-w-2xl mx-auto leading-relaxed">
+                Practice mock interviews and learn in 17 languages with real-time AI voice coaching.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10">
+                <Link
+                  href="/signup"
+                  className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-base hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 flex items-center justify-center gap-2"
+                >
+                  <Target className="w-4 h-4" />
+                  Start Mock Interview
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="/signup"
+                  className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white/70 font-medium text-base hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2"
+                >
+                  <Mic className="w-4 h-4" />
+                  Try Voice Tutoring
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* ── SECTION 2: TWO FEATURE PILLARS ── */}
+            <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-20">
+              {/* Interview Coaching Pillar */}
               <motion.div
-                className="relative rounded-2xl border border-emerald-500/15 bg-gradient-to-br from-emerald-500/5 via-slate-900/80 to-slate-900/80 p-6"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
+                className="group relative overflow-hidden rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 via-slate-800/60 to-slate-900/80 backdrop-blur-xl p-7 md:p-8"
+                whileHover={{ scale: 1.01, borderColor: "rgba(139, 92, 246, 0.4)" }}
+                transition={{ duration: 0.25 }}
               >
-                <div className="absolute top-4 right-4 text-3xl font-bold text-emerald-500/10">2</div>
-                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
-                  <Mic className="w-6 h-6 text-emerald-400" />
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-violet-500/10 rounded-full blur-3xl group-hover:bg-violet-500/20 transition-colors" />
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-2xl bg-violet-500/15 border border-violet-500/20 flex items-center justify-center mb-5">
+                    <Target className="w-7 h-7 text-violet-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-3">Interview Coaching</h2>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-start gap-3 text-sm text-white/60">
+                      <Users className="w-4 h-4 text-violet-400 mt-0.5 shrink-0" />
+                      <span>Practice recruiter screens, technical interviews, system design rounds</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-sm text-white/60">
+                      <Brain className="w-4 h-4 text-violet-400 mt-0.5 shrink-0" />
+                      <span>AI adapts to your level and teaches when you get stuck</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-sm text-white/60">
+                      <Shield className="w-4 h-4 text-violet-400 mt-0.5 shrink-0" />
+                      <span>10 role presets: Frontend, Backend, Full Stack, ML/AI, PM, Finance, and more</span>
+                    </li>
+                  </ul>
+                  <Link
+                    href="/signup"
+                    className="inline-flex items-center gap-2 text-violet-400 text-sm font-medium hover:text-violet-300 transition-colors"
+                  >
+                    Start Practicing <ArrowRight className="w-4 h-4" />
+                  </Link>
                 </div>
-                <h3 className="text-white font-semibold text-lg mb-2">Talk to your AI tutor</h3>
-                <p className="text-white/50 text-sm leading-relaxed">Voice conversations in 8 languages. Coach Alex explains concepts, gives hints, and adapts to your level.</p>
               </motion.div>
 
-              {/* Step 3: Master it */}
+              {/* Voice Tutoring Pillar */}
               <motion.div
-                className="relative rounded-2xl border border-violet-500/15 bg-gradient-to-br from-violet-500/5 via-slate-900/80 to-slate-900/80 p-6"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
+                className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-slate-800/60 to-slate-900/80 backdrop-blur-xl p-7 md:p-8"
+                whileHover={{ scale: 1.01, borderColor: "rgba(16, 185, 129, 0.4)" }}
+                transition={{ duration: 0.25 }}
               >
-                <div className="absolute top-4 right-4 text-3xl font-bold text-violet-500/10">3</div>
-                <div className="w-11 h-11 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-4">
-                  <Sparkles className="w-6 h-6 text-violet-400" />
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-colors" />
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center mb-5">
+                    <Mic className="w-7 h-7 text-emerald-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-3">Voice Tutoring</h2>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-start gap-3 text-sm text-white/60">
+                      <Globe className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                      <span>Learn coding, finance, philosophy in 17 languages</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-sm text-white/60">
+                      <MessageSquare className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                      <span>Real-time voice conversation with AI tutors</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-sm text-white/60">
+                      <Zap className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                      <span>Sub-second response time, natural conversation flow</span>
+                    </li>
+                  </ul>
+                  <Link
+                    href="/signup"
+                    className="inline-flex items-center gap-2 text-emerald-400 text-sm font-medium hover:text-emerald-300 transition-colors"
+                  >
+                    Try Voice Chat <ArrowRight className="w-4 h-4" />
+                  </Link>
                 </div>
-                <h3 className="text-white font-semibold text-lg mb-2">Master it your way</h3>
-                <p className="text-white/50 text-sm leading-relaxed">Track progress, earn XP, get personalized recommendations. Learn at your pace, in your language.</p>
               </motion.div>
-            </div>
-          </motion.div>
+            </motion.div>
+
+            {/* ── SECTION 3: INTERVIEW TYPES GRID ── */}
+            <motion.div variants={item} className="mb-20">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">
+                  Practice Every Interview Type
+                </h2>
+                <p className="mt-2 text-sm sm:text-base text-white/50 max-w-xl mx-auto">
+                  AI interviewers that adapt to your level, give real-time feedback, and teach you when you are stuck.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                {[
+                  { icon: Users, label: "Recruiter Screen", desc: "15-minute phone screen simulation with follow-up questions", href: "/signup", color: "emerald" },
+                  { icon: Code2, label: "Technical Interview", desc: "Live coding problems with AI that evaluates your approach", href: "/signup", color: "blue" },
+                  { icon: Building2, label: "System Design", desc: "Whiteboard-style architecture discussions at any seniority", href: "/signup", color: "violet" },
+                  { icon: MessageSquare, label: "Behavioral", desc: "STAR method practice with real-time coaching on delivery", href: "/signup", color: "amber" },
+                  { icon: Map, label: "Career Pathways", desc: "Role-based learning paths that combine courses + interviews", href: "/pathways", color: "cyan" },
+                ].map((card) => {
+                  const Icon = card.icon;
+                  const colorStyles: Record<string, { border: string; iconBg: string; iconColor: string }> = {
+                    emerald: { border: "border-emerald-500/20 hover:border-emerald-500/40", iconBg: "bg-emerald-500/10", iconColor: "text-emerald-400" },
+                    blue: { border: "border-blue-500/20 hover:border-blue-500/40", iconBg: "bg-blue-500/10", iconColor: "text-blue-400" },
+                    violet: { border: "border-violet-500/20 hover:border-violet-500/40", iconBg: "bg-violet-500/10", iconColor: "text-violet-400" },
+                    amber: { border: "border-amber-500/20 hover:border-amber-500/40", iconBg: "bg-amber-500/10", iconColor: "text-amber-400" },
+                    cyan: { border: "border-cyan-500/20 hover:border-cyan-500/40", iconBg: "bg-cyan-500/10", iconColor: "text-cyan-400" },
+                  };
+                  const cs = colorStyles[card.color];
+                  return (
+                    <Link key={card.label} href={card.href}>
+                      <motion.div
+                        className={`bg-slate-800/60 backdrop-blur-xl rounded-2xl border ${cs.border} p-5 cursor-pointer h-full transition-all`}
+                        whileHover={{ scale: 1.03 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className={`w-10 h-10 rounded-xl ${cs.iconBg} flex items-center justify-center mb-3`}>
+                          <Icon className={`w-5 h-5 ${cs.iconColor}`} />
+                        </div>
+                        <h4 className="text-white font-semibold mb-1">{card.label}</h4>
+                        <p className="text-slate-400 text-xs leading-relaxed">{card.desc}</p>
+                      </motion.div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+
+            {/* ── SECTION 4: CAREER PATHWAYS PREVIEW ── */}
+            <motion.div variants={item} className="mb-20">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-white">Career Pathways</h2>
+                  <p className="mt-1 text-sm text-white/50">Structured learning paths for specific roles</p>
+                </div>
+                <Link
+                  href="/pathways"
+                  className="text-sm text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 transition-colors"
+                >
+                  All pathways <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {pathways.slice(0, 4).map((pw) => (
+                  <Link key={pw.slug} href={`/pathways/${pw.slug}`}>
+                    <motion.div
+                      className="group rounded-2xl border border-white/10 bg-slate-800/60 backdrop-blur-xl p-5 h-full cursor-pointer hover:border-white/20 transition-all"
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="text-3xl mb-3">{pw.icon}</div>
+                      <h4 className="text-white font-semibold mb-1">{pw.title}</h4>
+                      <p className="text-xs text-white/40 mb-3">{pw.courses.length} courses &middot; {pw.estimatedWeeks} weeks</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {pw.roles.slice(0, 2).map((role) => (
+                          <span key={role} className="px-2 py-0.5 rounded-full bg-white/5 text-white/40 text-[10px] border border-white/5">
+                            {role}
+                          </span>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* ── SECTION 5: TOP COURSES (curated, not all 69) ── */}
+            <motion.div variants={item} className="mb-20">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">Top Courses</h2>
+                <Link
+                  href="/courses"
+                  className="text-sm text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 transition-colors"
+                >
+                  See all courses <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              {/* Interview Prep row */}
+              <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <Target className="w-3.5 h-3.5 text-violet-400" />
+                Interview Prep
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                {["coding-interview", "system-design", "behavioral-interview"].map((slug) => {
+                  const course = courses.find(c => c.slug === slug);
+                  if (!course) return null;
+                  return (
+                    <Link key={course.slug} href={`/course/${course.slug}`}>
+                      <motion.div
+                        className="group rounded-xl bg-gradient-to-br from-violet-500/5 via-slate-800/80 to-slate-900/80 border border-violet-500/20 hover:border-violet-500/40 p-5 h-full cursor-pointer transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <span className="text-3xl">{course.icon}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20'}`}>
+                            {course.tier === 'pro' ? 'PRO' : 'FREE'}
+                          </span>
+                        </div>
+                        <h4 className="text-white font-semibold">{course.title}</h4>
+                        <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
+                      </motion.div>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Most Popular row */}
+              <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <Star className="w-3.5 h-3.5 text-amber-400" />
+                Most Popular
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {["python-fundamentals", "react-development", "data-structures-algorithms"].map((slug) => {
+                  const course = courses.find(c => c.slug === slug);
+                  if (!course) return null;
+                  return (
+                    <Link key={course.slug} href={`/course/${course.slug}`}>
+                      <motion.div
+                        className="group rounded-xl bg-gradient-to-br from-cyan-500/5 via-slate-800/80 to-slate-900/80 border border-cyan-500/20 hover:border-cyan-500/40 p-5 h-full cursor-pointer transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <span className="text-3xl">{course.icon}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20'}`}>
+                            {course.tier === 'pro' ? 'PRO' : 'FREE'}
+                          </span>
+                        </div>
+                        <h4 className="text-white font-semibold">{course.title}</h4>
+                        <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
+                      </motion.div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+
+            {/* ── SECTION 6: SOCIAL PROOF NUMBERS ── */}
+            <motion.div variants={item} className="mb-20">
+              <div className="rounded-2xl border border-white/10 bg-slate-800/40 backdrop-blur-xl p-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                  {[
+                    { value: "69+", label: "Courses", icon: BookOpen },
+                    { value: "17", label: "Languages", icon: Globe },
+                    { value: "10", label: "Career Pathways", icon: Map },
+                    { value: "AI", label: "Voice Coaching", icon: Mic },
+                  ].map((stat) => {
+                    const StatIcon = stat.icon;
+                    return (
+                      <div key={stat.label} className="text-center">
+                        <StatIcon className="w-5 h-5 text-white/20 mx-auto mb-2" />
+                        <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                          {stat.value}
+                        </div>
+                        <div className="text-xs text-white/40 mt-1 font-medium">{stat.label}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* ── SECTION 7: FINAL CTA ── */}
+            <motion.div variants={item} className="mb-16">
+              <div className="relative rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 via-slate-900/80 to-cyan-500/5 backdrop-blur-xl p-10 text-center overflow-hidden">
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute top-0 left-1/4 w-40 h-40 bg-violet-500/10 rounded-full blur-[80px]" />
+                  <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-cyan-500/10 rounded-full blur-[80px]" />
+                </div>
+                <div className="relative z-10">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+                    Ready to ace your next interview?
+                  </h2>
+                  <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto mb-8">
+                    Get 300 free AI credits, access to all interview types, and voice coaching in 17 languages.
+                  </p>
+                  <Link
+                    href="/signup"
+                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-base hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
+                  >
+                    <GraduationCap className="w-5 h-5" />
+                    Create Free Account
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
 
-        {/* ── SOCIAL PROOF — Numbers bar ── */}
-        {!user && (
-          <motion.div variants={item} className="mb-14">
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 py-4">
-              {[
-                { value: "50+", label: "Courses" },
-                { value: "8", label: "Voice Languages" },
-                { value: "2,200+", label: "Lessons" },
-                { value: "Free", label: "1-Month Trial" },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs text-white/40 mt-1">{stat.label}</div>
-                </div>
-              ))}
+        {/* ====================================================================
+            LOGGED-IN EXPERIENCE
+            ==================================================================== */}
+
+        {/* Hero for logged-in users */}
+        {user && (
+          <motion.div variants={item} className="text-center mb-16 pt-4">
+            <motion.div
+              className="flex justify-center mb-8"
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <KairosLogo size="xl" showText={false} />
+            </motion.div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6">
+              <Sparkles className="w-3.5 h-3.5" />
+              69+ courses &middot; 17 languages &middot; AI voice coaching
             </div>
+            <h1 className="text-4xl sm:text-6xl font-bold text-white tracking-tight leading-[1.1]">
+              Your AI tutor that<br />
+              <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+                speaks your language.
+              </span>
+            </h1>
+            <p className="mt-5 text-lg sm:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
+              Learn to code, speak French, study Islam, master finance — with an AI coach that explains in your language, adapts to your level, and talks back.
+            </p>
           </motion.div>
         )}
 
@@ -422,7 +595,7 @@ export default function HomePage() {
             <div className="rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/5 to-orange-500/5 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-white">
-                  You're on a free 1-month Pro trial
+                  You&#39;re on a free 1-month Pro trial
                 </p>
                 <p className="text-xs text-white/50 mt-0.5">
                   Pro access and {credits} credits expire on{" "}
@@ -442,7 +615,175 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* ── SECTION 1: Continue Learning (logged-in users with progress) ── */}
+        {/* ── LOGGED-IN SECTION 2: Interview Coaches (HERO) ── */}
+        {user && (
+          <motion.div variants={item} className="mb-12">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-4">
+                <Target className="w-3.5 h-3.5" />
+                AI-Powered Practice
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+                Your Interview Coaches
+              </h2>
+              <p className="text-base text-white/50 max-w-xl mx-auto">
+                Pick a role and start practicing. The AI adapts to your level in real time.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                { icon: Globe, label: "Frontend Engineer", desc: "React, CSS, DOM, accessibility, and UI architecture questions.", color: "cyan", gradient: "from-cyan-500/10 via-cyan-500/5" },
+                { icon: Server, label: "Backend Engineer", desc: "APIs, databases, auth, caching, and server-side architecture.", color: "emerald", gradient: "from-emerald-500/10 via-emerald-500/5" },
+                { icon: Code2, label: "Full Stack Developer", desc: "End-to-end system questions spanning frontend and backend.", color: "violet", gradient: "from-violet-500/10 via-violet-500/5" },
+                { icon: Building2, label: "System Design", desc: "Whiteboard-style architecture rounds for senior roles.", color: "blue", gradient: "from-blue-500/10 via-blue-500/5" },
+                { icon: Users, label: "Recruiter Screen", desc: "15-minute phone screens: tell me about yourself, why this role, salary.", color: "amber", gradient: "from-amber-500/10 via-amber-500/5" },
+                { icon: MessageSquare, label: "Behavioral", desc: "STAR method practice: leadership, conflict, failure, teamwork.", color: "pink", gradient: "from-pink-500/10 via-pink-500/5" },
+              ].map((card) => {
+                const Icon = card.icon;
+                const borderColors: Record<string, string> = {
+                  cyan: "border-cyan-500/20 hover:border-cyan-500/50",
+                  emerald: "border-emerald-500/20 hover:border-emerald-500/50",
+                  violet: "border-violet-500/20 hover:border-violet-500/50",
+                  blue: "border-blue-500/20 hover:border-blue-500/50",
+                  amber: "border-amber-500/20 hover:border-amber-500/50",
+                  pink: "border-pink-500/20 hover:border-pink-500/50",
+                };
+                const iconColors: Record<string, string> = {
+                  cyan: "text-cyan-400 bg-cyan-500/15 border-cyan-500/20",
+                  emerald: "text-emerald-400 bg-emerald-500/15 border-emerald-500/20",
+                  violet: "text-violet-400 bg-violet-500/15 border-violet-500/20",
+                  blue: "text-blue-400 bg-blue-500/15 border-blue-500/20",
+                  amber: "text-amber-400 bg-amber-500/15 border-amber-500/20",
+                  pink: "text-pink-400 bg-pink-500/15 border-pink-500/20",
+                };
+                const ctaColors: Record<string, string> = {
+                  cyan: "text-cyan-400",
+                  emerald: "text-emerald-400",
+                  violet: "text-violet-400",
+                  blue: "text-blue-400",
+                  amber: "text-amber-400",
+                  pink: "text-pink-400",
+                };
+                return (
+                  <Link key={card.label} href="/interviews">
+                    <motion.div
+                      className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} to-slate-900/80 backdrop-blur-xl border ${borderColors[card.color]} p-6 cursor-pointer h-full min-h-[140px] transition-all`}
+                      whileHover={{ scale: 1.03 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-4 ${iconColors[card.color]}`}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <h4 className="text-white font-semibold text-base mb-1.5">{card.label}</h4>
+                      <p className="text-slate-400 text-sm leading-relaxed mb-4">{card.desc}</p>
+                      <div className={`flex items-center gap-1.5 text-sm font-medium ${ctaColors[card.color]} group-hover:gap-2.5 transition-all`}>
+                        Start Interview <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </motion.div>
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── LOGGED-IN SECTION 3: Quick Voice Practice (compact) ── */}
+        {user && (
+          <motion.div variants={item} className="mb-10">
+            <div className="flex items-center gap-4">
+              <Link href="/talk">
+                <motion.div
+                  className="shrink-0 flex items-center gap-2.5 px-5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium text-sm hover:bg-emerald-500/15 hover:border-emerald-500/30 transition-all cursor-pointer"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Mic className="w-4 h-4" />
+                  Voice Practice
+                </motion.div>
+              </Link>
+              <div className="flex gap-2 overflow-x-auto pb-1 snap-x scrollbar-hide">
+                {ALL_SUPPORTED_LANGUAGES
+                  .filter(l => l.code !== (typeof window !== 'undefined' ? localStorage.getItem('native-language') : 'en'))
+                  .filter(l => (l.code as string) !== 'en-IN')
+                  .slice(0, 8)
+                  .map((l) => (
+                  <Link key={l.code} href={`/talk?lang=${l.code}`} className="snap-start shrink-0">
+                    <motion.button
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300 text-xs hover:bg-slate-800 hover:border-slate-600 hover:text-white transition-all whitespace-nowrap"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      <span className="text-sm">{l.flag}</span>
+                      {l.name}
+                    </motion.button>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── LOGGED-IN SECTION 4: Career Pathways ── */}
+        {user && (
+          <motion.div variants={item} className="mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <Map className="w-3.5 h-3.5 text-cyan-400" />
+                Career Pathways
+              </h3>
+              <Link href="/pathways" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1">
+                View all <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {pathways.slice(0, 6).map((pathway) => {
+                const pathwayCourseProgress = pathway.courses.reduce((acc, slug) => {
+                  const p = courseProgress[slug];
+                  return acc + (p && p > 0 ? p : 0);
+                }, 0);
+                const avgProgress = pathway.courses.length > 0
+                  ? Math.round(pathwayCourseProgress / pathway.courses.length)
+                  : 0;
+                const hasStarted = avgProgress > 0;
+                return (
+                  <Link key={pathway.slug} href={`/pathways/${pathway.slug}`}>
+                    <motion.div
+                      className="rounded-xl bg-slate-800/60 backdrop-blur-xl border border-white/10 hover:border-cyan-500/30 p-4 cursor-pointer h-full transition-all"
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <span className="text-2xl">{pathway.icon}</span>
+                        {hasStarted && (
+                          <span className="text-xs font-medium text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full">
+                            {avgProgress}%
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="text-white text-sm font-semibold mb-1">{pathway.title}</h4>
+                      <p className="text-slate-500 text-xs line-clamp-2">{pathway.description}</p>
+                      <div className="flex items-center gap-2 mt-3">
+                        <span className="text-xs text-slate-600">{pathway.courses.length} courses</span>
+                        <span className="text-slate-700">-</span>
+                        <span className="text-xs text-slate-600">{pathway.estimatedWeeks} weeks</span>
+                      </div>
+                      {hasStarted && (
+                        <div className="w-full h-1 bg-slate-700/50 rounded-full overflow-hidden mt-2">
+                          <div
+                            className={`h-full rounded-full bg-gradient-to-r ${pathway.color}`}
+                            style={{ width: `${avgProgress}%` }}
+                          />
+                        </div>
+                      )}
+                    </motion.div>
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── LOGGED-IN SECTION 5: Continue Learning ── */}
         {user && inProgressCourses.length > 0 && (
           <motion.div variants={item} className="mb-10">
             <div className="flex items-center justify-between mb-4">
@@ -482,128 +823,48 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* ── SECTION 2: Two Action Cards (Talk + Learn) ── */}
-        <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-          {/* Talk Card */}
-          <Link href="/talk">
-            <motion.div
-              className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-slate-900/80 to-slate-900/80 backdrop-blur-sm p-6 md:p-8 cursor-pointer h-full"
-              whileHover={{ scale: 1.02, borderColor: "rgba(16, 185, 129, 0.4)" }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-colors" />
-              <div className="relative z-10">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center mb-4">
-                  <Mic className="w-6 h-6 md:w-7 md:h-7 text-emerald-400" />
-                </div>
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Talk</h2>
-                <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-4">
-                  Voice conversation with AI tutors in 17 languages.
-                </p>
-                <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
-                  Start Talking <ArrowRight className="w-4 h-4" />
-                </div>
-              </div>
-            </motion.div>
-          </Link>
-
-          {/* Learn Card */}
-          <Link href="/courses">
-            <motion.div
-              className="group relative overflow-hidden rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-slate-900/80 to-slate-900/80 backdrop-blur-sm p-6 md:p-8 cursor-pointer h-full"
-              whileHover={{ scale: 1.02, borderColor: "rgba(59, 130, 246, 0.4)" }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors" />
-              <div className="relative z-10">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center mb-4">
-                  <BookOpen className="w-6 h-6 md:w-7 md:h-7 text-blue-400" />
-                </div>
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Learn</h2>
-                <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-4">
-                  50+ courses in tech, languages, finance &amp; more.
-                </p>
-                <div className="flex items-center gap-2 text-blue-400 text-sm font-medium">
-                  Browse Courses <ArrowRight className="w-4 h-4" />
-                </div>
-              </div>
-            </motion.div>
-          </Link>
-        </motion.div>
-
-        {/* ── SECTION 3: Quick Voice Practice ── */}
-        <motion.div variants={item} className="mb-10">
-          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Mic className="w-3.5 h-3.5 text-emerald-400" />
-            Quick Voice Practice
-          </h3>
-          <div className="flex gap-2 overflow-x-auto pb-2 snap-x scrollbar-hide md:flex-wrap md:overflow-visible md:pb-0">
-            {ALL_SUPPORTED_LANGUAGES
-              .filter(l => l.code !== (typeof window !== 'undefined' ? localStorage.getItem('native-language') : 'en'))
-              .filter(l => (l.code as string) !== 'en-IN')
-              .slice(0, 8)
-              .map((l) => (
-              <Link key={l.code} href={`/talk?lang=${l.code}`} className="snap-start shrink-0">
-                <motion.button
-                  className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/50 text-slate-300 text-xs md:text-sm hover:bg-slate-800 hover:border-slate-600 hover:text-white transition-all whitespace-nowrap"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <span className="text-base md:text-lg">{l.flag}</span>
-                  {l.name}
-                </motion.button>
-              </Link>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* ── SECTION 4: Interview Prep ── */}
-        <motion.div variants={item} className="mb-14">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">
-              Practice Mock Interviews with AI
-            </h2>
-            <p className="mt-2 text-sm sm:text-base text-white/50 max-w-xl mx-auto">
-              Practice recruiter screens, technical interviews, system design rounds, and behavioral interviews with an AI interviewer that adapts to your level.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            {[
-              { icon: Users, label: "Recruiter Screen", desc: "15-min phone screen practice", href: "/interviews", color: "emerald" },
-              { icon: Target, label: "Technical Interview", desc: "Coding + problem solving", href: "/interviews", color: "blue" },
-              { icon: Building2, label: "System Design", desc: "Architecture whiteboard sessions", href: "/interviews", color: "violet" },
-              { icon: MessageSquare, label: "Behavioral", desc: "STAR method practice", href: "/interviews", color: "amber" },
-              { icon: Map, label: "Career Pathways", desc: "Role-based learning paths", href: "/pathways", color: "cyan" },
-            ].map((card) => {
-              const Icon = card.icon;
-              const colorMap: Record<string, string> = {
-                emerald: "border-emerald-500/20 hover:border-emerald-500/40 text-emerald-400",
-                blue: "border-blue-500/20 hover:border-blue-500/40 text-blue-400",
-                violet: "border-violet-500/20 hover:border-violet-500/40 text-violet-400",
-                amber: "border-amber-500/20 hover:border-amber-500/40 text-amber-400",
-                cyan: "border-cyan-500/20 hover:border-cyan-500/40 text-cyan-400",
-              };
-              return (
-                <Link key={card.label} href={card.href}>
-                  <motion.div
-                    className={`bg-slate-800/60 backdrop-blur-xl rounded-2xl border ${colorMap[card.color]} p-4 cursor-pointer h-full transition-all`}
-                    whileHover={{ scale: 1.03 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Icon className={`w-6 h-6 mb-2 ${colorMap[card.color].split(" ").pop()}`} />
-                    <h4 className="text-white text-sm font-semibold">{card.label}</h4>
-                    <p className="text-slate-400 text-xs mt-1">{card.desc}</p>
-                  </motion.div>
+        {/* ── LOGGED-IN SECTION 6: Featured Courses (compact -- 4 recommended) ── */}
+        {user && (() => {
+          const scored = courses.map(c => ({ course: c, score: scoreCourse(c, userInterests) }));
+          const topCourses = userInterests.length > 0
+            ? scored.filter(s => s.score > 0).sort((a, b) => b.score - a.score).map(s => s.course).slice(0, 4)
+            : courses.filter(c => c.tier === 'free').slice(0, 4);
+          return topCourses.length > 0 ? (
+            <motion.div variants={item} className="mb-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                  Recommended Courses
+                </h3>
+                <Link href="/courses" className="text-xs text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1">
+                  Browse all <ArrowRight className="w-3 h-3" />
                 </Link>
-              );
-            })}
-          </div>
-        </motion.div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {topCourses.map((course) => (
+                  <Link key={course.id} href={`/course/${course.slug}`}>
+                    <motion.div
+                      className="group rounded-xl bg-gradient-to-br from-violet-500/5 via-slate-800/80 to-slate-900/80 border border-violet-500/15 hover:border-violet-500/40 p-4 cursor-pointer h-full transition-all"
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-2xl">{course.icon}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20'}`}>
+                          {course.tier === 'pro' ? 'Pro' : 'Free'}
+                        </span>
+                      </div>
+                      <h4 className="text-white text-sm font-semibold mb-1">{course.title}</h4>
+                      <p className="text-slate-400 text-xs line-clamp-2">{course.description}</p>
+                    </motion.div>
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          ) : null;
+        })()}
 
-        {/* ── SECTION 5: Featured Courses (Recommended + Premium + Free) ── */}
-        <FeaturedCourses interests={userInterests} />
-
-        {/* ── SECTION 6: Testimonials ── */}
+        {/* ── Testimonials (all users) ── */}
         <Testimonials />
       </motion.div>
     </div>
