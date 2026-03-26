@@ -77,14 +77,24 @@ export default function InterviewSetup() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-white">
-      <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold mb-3">
-            <span className="gradient-text-subtle">Mock Interview</span>
+        <div className="mb-10 text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-violet-500/20 to-cyan-500/20 border border-violet-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Mic className="w-8 h-8 text-violet-400" />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3">
+            AI Mock Interview
           </h1>
-          <p className="text-white/50 text-lg">Practice with an AI interviewer. 30 minutes. Voice only.</p>
+          <p className="text-white/50 text-base sm:text-lg max-w-lg mx-auto">
+            Practice with a real-time AI interviewer that listens, responds, and teaches. 30 minutes. Voice-first.
+          </p>
+        </div>
+
+        {/* Tips banner */}
+        <div className="mb-8 bg-slate-800/40 backdrop-blur rounded-xl border border-white/5 p-4 text-sm text-white/40">
+          <span className="text-white/60 font-medium">Tips:</span> Use headphones for best results. Speak clearly and take your time. The AI interviewer will teach you when you're stuck.
         </div>
 
         {/* Step 1: Choose role / paste JD */}
@@ -180,7 +190,7 @@ export default function InterviewSetup() {
         <button
           onClick={handleStart}
           disabled={!canStart}
-          className="w-full py-4 rounded-xl text-base font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-400 hover:to-violet-500 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
+          className="w-full py-4 rounded-xl text-base font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40"
         >
           {loading ? (
             <>
