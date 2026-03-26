@@ -44,6 +44,15 @@ export default function InterviewVoicePanel({
       const isFallback = questionPlan?.fallback;
       const persona = questionPlan?.interviewerPersona || "professional interviewer";
 
+      const silenceRules = `
+SILENCE HANDLING (CRITICAL):
+- If the candidate goes silent for more than 5-8 seconds, DO NOT just wait forever.
+- After ~5 seconds of silence, gently nudge: rephrase the question in simpler terms, give a hint, or ask "Would you like me to rephrase that?" or "Take your time — want a hint to get started?"
+- If still silent after another 5 seconds, break the question into smaller parts: "Let's start simpler — what's the first thing you'd think about?"
+- Be a proactive coach: guide them through the thought process, don't just wait for a perfect answer.
+- Keep the interview moving naturally — long silences kill the learning experience.
+- NEVER repeat the exact same question verbatim. Always rephrase, simplify, or offer a different angle.`;
+
       const prompt = isFallback
         ? `You are conducting a ${interviewType || "technical"} interview as a ${persona}.
 
@@ -55,8 +64,9 @@ RULES:
 - Cover a range of topics relevant to the role.
 - At 5 minutes remaining, wrap up with "Any questions for me?"
 - Start by briefly introducing yourself and the interview format, then ask the first question.
-- Keep a natural, conversational tone — this should feel like a real interview, not a quiz.`
-        : `You are conducting a ${interviewType || "technical"} interview. Here is your question plan:\n${JSON.stringify(questionPlan, null, 2)}\n\nRULES:\n- Ask questions one at a time. Wait for the candidate to respond.\n- Adapt follow-up questions based on their answers — don't rigidly follow the plan.\n- When the candidate is coding, observe their approach and give guidance if stuck.\n- IMPORTANT: When the candidate struggles, TEACH THEM. Explain the correct answer clearly.\n- At 5 minutes remaining, wrap up with "Any questions for me?"\n- Start by briefly introducing yourself and the format, then ask the first question.`;
+- Keep a natural, conversational tone — this should feel like a real interview, not a quiz.
+${silenceRules}`
+        : `You are conducting a ${interviewType || "technical"} interview. Here is your question plan:\n${JSON.stringify(questionPlan, null, 2)}\n\nRULES:\n- Ask questions one at a time. Wait for the candidate to respond.\n- Adapt follow-up questions based on their answers — don't rigidly follow the plan.\n- When the candidate is coding, observe their approach and give guidance if stuck.\n- IMPORTANT: When the candidate struggles, TEACH THEM. Explain the correct answer clearly.\n- At 5 minutes remaining, wrap up with "Any questions for me?"\n- Start by briefly introducing yourself and the format, then ask the first question.\n${silenceRules}`;
 
       deepgramRef.current?.sendPromptUpdate(prompt);
 
