@@ -1,6 +1,27 @@
+"use client";
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+// Hide footer on these routes (full-screen app pages)
+const HIDDEN_ROUTES = [
+  '/course/',
+  '/talk',
+  '/interviews/',
+  '/classrooms/',
+  '/writing/',
+  '/sessions/',
+  '/onboarding',
+  '/placement/',
+];
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  // Hide on full-screen app routes
+  const shouldHide = HIDDEN_ROUTES.some(route => pathname.startsWith(route));
+  if (shouldHide) return null;
+
   return (
     <footer className="border-t border-white/10 bg-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -11,7 +32,8 @@ export default function Footer() {
               <li><Link href="/courses" className="hover:text-white transition">Courses</Link></li>
               <li><Link href="/talk" className="hover:text-white transition">Voice Tutoring</Link></li>
               <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
-              <li><Link href="/tools/interview-roadmap" className="hover:text-white transition">Interview Roadmap</Link></li>
+              <li><Link href="/interviews" className="hover:text-white transition">Mock Interviews</Link></li>
+              <li><Link href="/pathways" className="hover:text-white transition">Career Pathways</Link></li>
             </ul>
           </div>
           <div>
@@ -19,6 +41,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-gray-400">
               <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
               <li><Link href="/comparison/vs-leetcode" className="hover:text-white transition">vs LeetCode</Link></li>
+              <li><Link href="/tools/interview-roadmap" className="hover:text-white transition">Interview Roadmap</Link></li>
               <li><Link href="/about" className="hover:text-white transition">About</Link></li>
             </ul>
           </div>
