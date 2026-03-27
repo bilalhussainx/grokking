@@ -56,7 +56,9 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
   },
   alternates: { canonical: 'https://kairoslearn.com' },
-  verification: {},
+  verification: {
+    google: 'KNMPohxROF74CLkjabDN0V0iiaeRPJ9WvQIObQik8HA',
+  },
 };
 
 export default function RootLayout({
