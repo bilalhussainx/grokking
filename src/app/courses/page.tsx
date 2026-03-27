@@ -98,32 +98,34 @@ export default function CoursesPage() {
       <JsonLd data={courseListSchema()} />
 
       <div className="max-w-5xl mx-auto px-4 py-12">
-        {/* GEO-optimized intro: first 200 words as a direct answer */}
+        {/* Clean header with stat badges */}
         <header className="mb-12">
-          <h1 className="text-3xl font-bold text-white mb-4">
-            All Courses on Kairos.ai — Free & Premium Online Learning
+          <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-3">
+            Course Catalog
           </h1>
-          <p className="text-slate-300 text-lg leading-relaxed mb-4">
-            Kairos.ai offers {courses.length}+ interactive online courses
-            spanning Computer Science, Language Learning, Religious Studies, Philosophy, Finance &
-            Business, Health & Wellness, and Political Strategy. With{' '}
-            {totalLessons}+ lessons across all courses, learners can study
-            everything from Python programming and system design to Islamic
-            studies, Stoic philosophy, meditation, and investing.{' '}
-            {freeCourses} courses are completely free. Every course includes an
-            AI voice coach that provides real-time explanations, hints on
-            exercises, and personalized feedback. Courses are structured into
-            modules with checkpoint quizzes, coding exercises, and capstone
-            projects. Whether you are preparing for a coding interview,
-            exploring world religions, building financial literacy, or
-            developing leadership skills, Kairos.ai provides structured,
-            evidence-based curricula designed to take you from beginner to
-            advanced.
+          <p className="text-white/50 text-base max-w-xl mb-6">
+            {courses.length}+ courses with AI voice coaching. Browse by domain or start learning immediately.
           </p>
-          <p className="text-slate-400 text-base leading-relaxed">
-            Browse the full catalog below, organized by domain. Each course
-            page includes detailed module breakdowns, lesson previews, and the
-            option to start learning immediately with AI coaching.
+
+          {/* Stat badges */}
+          <div className="flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium">
+              {courses.length}+ courses
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium">
+              {totalLessons}+ lessons
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+              {freeCourses} free
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+              AI voice coaching
+            </span>
+          </div>
+
+          {/* SEO text — visually hidden but crawlable */}
+          <p className="sr-only">
+            Kairos.ai offers {courses.length}+ interactive online courses spanning Computer Science, Language Learning, Religious Studies, Philosophy, Finance & Business, Health & Wellness, and Political Strategy. With {totalLessons}+ lessons, learners can study everything from Python and system design to Islamic studies, Stoic philosophy, meditation, and investing. {freeCourses} courses are completely free with AI voice coaching.
           </p>
         </header>
 
@@ -134,10 +136,15 @@ export default function CoursesPage() {
           const label = DOMAIN_LABELS[domain] || domain;
 
           return (
-            <section key={domain} className="mb-12">
-              <h2 className="text-2xl font-bold text-white mb-6 border-b border-slate-700/50 pb-3">
-                {label}
-              </h2>
+            <section key={domain} className="mb-14">
+              <div className="flex items-center gap-3 mb-5">
+                <h2 className="text-xl font-bold text-white">
+                  {label}
+                </h2>
+                <span className="text-xs text-white/30 bg-white/5 px-2 py-0.5 rounded-full">
+                  {domainCourses.length}
+                </span>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {domainCourses.map((course) => {
                   const lessonCount = getAllLessons(course).length;
@@ -147,32 +154,36 @@ export default function CoursesPage() {
                       href={`/course/${course.slug}`}
                       className="group block"
                     >
-                      <article className="rounded-2xl border border-slate-700/30 bg-slate-800/30 p-5 hover:bg-slate-800/50 hover:border-blue-500/25 transition-all h-full">
+                      <article className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 hover:bg-white/[0.05] hover:border-white/[0.12] transition-all duration-200 h-full hover:-translate-y-0.5">
                         <div className="flex items-start justify-between mb-3">
-                          <span className="text-3xl" role="img" aria-label={course.title}>
+                          <span className="text-2xl" role="img" aria-label={course.title}>
                             {course.icon}
                           </span>
                           <span
-                            className={`text-xs px-2 py-0.5 rounded-full ${
+                            className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                               course.tier === 'pro'
-                                ? 'bg-violet-500/10 text-violet-400'
-                                : 'bg-emerald-500/10 text-emerald-400'
+                                ? 'bg-violet-500/10 text-violet-400 border border-violet-500/20'
+                                : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                             }`}
                           >
                             {course.tier === 'pro' ? 'Pro' : 'Free'}
                           </span>
                         </div>
-                        <h3 className="text-white font-semibold mb-2 group-hover:text-blue-400 transition-colors">
+                        <h3 className="text-white font-semibold text-[15px] mb-1.5 group-hover:text-violet-400 transition-colors">
                           {course.title}
                         </h3>
-                        <p className="text-slate-400 text-sm leading-relaxed mb-3">
+                        <p className="text-white/40 text-sm leading-relaxed mb-3 line-clamp-2">
                           {course.description}
                         </p>
-                        <div className="flex items-center gap-3 text-xs text-slate-500">
+                        <div className="flex items-center gap-2 text-[11px] text-white/25 font-medium">
                           <span>{course.modules.length} modules</span>
+                          <span className="text-white/10">&middot;</span>
                           <span>{lessonCount} lessons</span>
                           {course.level && (
-                            <span className="capitalize">{course.level}</span>
+                            <>
+                              <span className="text-white/10">&middot;</span>
+                              <span className="capitalize">{course.level}</span>
+                            </>
                           )}
                         </div>
                       </article>
