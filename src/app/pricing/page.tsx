@@ -25,7 +25,7 @@ export default function PricingPage() {
 
         <div className="relative z-10 text-center max-w-2xl mx-auto">
           <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-6">
-            <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-violet-400 bg-clip-text text-transparent">
+            <span className="text-white">
               Simple Pricing
             </span>
           </h1>

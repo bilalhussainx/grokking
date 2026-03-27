@@ -20,33 +20,90 @@ import VariableReward from "@/components/gamification/VariableReward";
 import WelcomeModal from "@/components/onboarding/WelcomeModal";
 import { getDailyLoginReward } from "@/lib/rewards";
 import KairosLogo from "@/components/ui/SamsaraLogo";
-import Testimonials from "@/components/Testimonials";
+
 
 const container = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.1 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
 };
 const item = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeOut" as const } },
+  hidden: { y: 30, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { duration: 0.7, ease: [0.25, 0.4, 0.25, 1] as const } },
 };
 
-// Cinematic scroll-reveal wrapper
-function ScrollReveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+// Professional spring configs
+const springSmooth = { type: "spring" as const, stiffness: 100, damping: 20, mass: 0.8 };
+const springSnappy = { type: "spring" as const, stiffness: 300, damping: 30 };
+
+// Cinematic scroll-reveal with multiple animation variants
+type RevealDirection = "up" | "left" | "right" | "scale" | "blur";
+function ScrollReveal({ children, className = "", delay = 0, direction = "up", stagger = false }: {
+  children: React.ReactNode; className?: string; delay?: number; direction?: RevealDirection; stagger?: boolean;
+}) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const isInView = useInView(ref, { once: true, margin: "-60px" });
+
+  const directionMap: Record<RevealDirection, { initial: Record<string, number | string>; animate: Record<string, number | string> }> = {
+    up: { initial: { opacity: 0, y: 50 }, animate: { opacity: 1, y: 0 } },
+    left: { initial: { opacity: 0, x: -60 }, animate: { opacity: 1, x: 0 } },
+    right: { initial: { opacity: 0, x: 60 }, animate: { opacity: 1, x: 0 } },
+    scale: { initial: { opacity: 0, scale: 0.9 }, animate: { opacity: 1, scale: 1 } },
+    blur: { initial: { opacity: 0, filter: "blur(12px)" }, animate: { opacity: 1, filter: "blur(0px)" } },
+  };
+  const d = directionMap[direction];
+
   return (
     <motion.div
       ref={ref}
       className={className}
-      initial={{ opacity: 0, y: 60 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98], delay }}
+      initial={d.initial}
+      animate={isInView ? d.animate : {}}
+      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay }}
     >
       {children}
     </motion.div>
   );
 }
+
+// Word-by-word blur reveal (cinematic headline effect)
+function BlurReveal({ text, className = "", delay = 0 }: { text: string; className?: string; delay?: number }) {
+  return (
+    <span className={className}>
+      {text.split(" ").map((word, i) => (
+        <motion.span
+          key={i}
+          className="inline-block mr-[0.25em]"
+          initial={{ opacity: 0, filter: "blur(8px)", y: 8 }}
+          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          transition={{ duration: 0.4, delay: delay + i * 0.08, ease: "easeOut" }}
+        >
+          {word}
+        </motion.span>
+      ))}
+    </span>
+  );
+}
+
+// Staggered children reveal for grids
+function StaggerReveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-40px" });
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08, delayChildren: delay } } }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+const staggerChild = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.4, 0.25, 1] as const } },
+};
 
 // Animated counter for stats
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
@@ -246,82 +303,116 @@ export default function HomePage() {
           <>
             {/* ── SECTION 1: HERO ── */}
             <motion.div variants={item} className="relative text-center mb-20 pt-8">
-              {/* Animated gradient orbs */}
+              {/* Cinematic grid background */}
+              <div
+                className="absolute -z-20 inset-0 h-[600px] w-full opacity-30
+                bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)]
+                bg-[size:4rem_4rem]
+                [mask-image:radial-gradient(ellipse_80%_60%_at_50%_20%,#000_40%,transparent_100%)]"
+              />
+              {/* Cinematic animated gradient orbs */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
                 <motion.div
                   className="absolute top-0 left-1/4 w-72 h-72 bg-violet-500/15 rounded-full blur-[120px]"
-                  animate={{ x: [0, 30, 0], y: [0, -20, 0], scale: [1, 1.1, 1] }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                  animate={{ x: [0, 40, -10, 0], y: [0, -30, 10, 0], scale: [1, 1.2, 0.95, 1] }}
+                  transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
                   className="absolute top-10 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-[120px]"
-                  animate={{ x: [0, -25, 0], y: [0, 25, 0], scale: [1, 1.15, 1] }}
-                  transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                  animate={{ x: [0, -35, 15, 0], y: [0, 30, -15, 0], scale: [1, 1.15, 1.05, 1] }}
+                  transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
                   className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-96 h-60 bg-emerald-500/8 rounded-full blur-[100px]"
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  animate={{ scale: [1, 1.08, 0.98, 1], opacity: [0.8, 1, 0.7, 0.8] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                 />
               </div>
 
+              {/* Logo with cinematic scale-up */}
               <motion.div
                 className="flex justify-center mb-8"
-                initial={{ scale: 0.6, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                initial={{ scale: 0.3, opacity: 0, filter: "blur(20px)" }}
+                animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
               >
                 <KairosLogo size="xl" showText={false} />
               </motion.div>
 
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6">
+              {/* Badge slides in */}
+              <motion.div
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6"
+                initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.4, 0.25, 1] }}
+              >
                 <Sparkles className="w-3.5 h-3.5" />
                 AI-powered mock interviews &middot; Voice coaching in 17 languages
-              </div>
+              </motion.div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight leading-[1.1]">
-                <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
-                  AI Interview Coach
-                </span>
+              {/* Hero text with word-by-word blur reveal */}
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1]">
+                <BlurReveal
+                  text="AI Interview Coach"
+                  className="bg-gradient-to-r from-violet-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent"
+                  delay={0.3}
+                />
                 <br />
-                <span className="text-white">+ Language Tutor</span>
+                <BlurReveal
+                  text="+ Language Tutor"
+                  className="text-white"
+                  delay={0.6}
+                />
               </h1>
 
-              <p className="mt-6 text-lg sm:text-xl text-white/55 max-w-2xl mx-auto leading-relaxed">
+              {/* Subtitle fades in */}
+              <motion.p
+                className="mt-6 text-lg sm:text-xl text-white/55 max-w-2xl mx-auto leading-relaxed"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
+              >
                 Practice mock interviews and learn in 17 languages with real-time AI voice coaching.
-              </p>
+              </motion.p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10">
+              {/* CTAs slide up with spring */}
+              <motion.div
+                className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.65, ease: [0.25, 0.4, 0.25, 1] }}
+              >
                 <Link
                   href="/signup"
-                  className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-base hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 flex items-center justify-center gap-2"
+                  className="group w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-base hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
                 >
                   <Target className="w-4 h-4" />
                   Start Mock Interview
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
                 <Link
                   href="/signup"
-                  className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white/70 font-medium text-base hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2"
+                  className="group w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white/70 font-medium text-base hover:bg-white/10 hover:text-white hover:border-white/20 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
                 >
                   <Mic className="w-4 h-4" />
                   Try Voice Tutoring
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
-              </div>
+              </motion.div>
             </motion.div>
 
             {/* ── SECTION 2: TWO FEATURE PILLARS ── */}
-            <ScrollReveal className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-20">
+            <StaggerReveal className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-20" delay={0.1}>
               {/* Interview Coaching Pillar */}
               <motion.div
+                variants={staggerChild}
                 className="group relative overflow-hidden rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 via-slate-800/60 to-slate-900/80 backdrop-blur-xl p-7 md:p-8"
-                whileHover={{ scale: 1.01, borderColor: "rgba(139, 92, 246, 0.4)" }}
-                transition={{ duration: 0.25 }}
+                whileHover={{ scale: 1.02, borderColor: "rgba(139, 92, 246, 0.5)", y: -4 }}
+                transition={springSnappy}
               >
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-violet-500/10 rounded-full blur-3xl group-hover:bg-violet-500/20 transition-colors" />
                 <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-violet-500/15 border border-violet-500/20 flex items-center justify-center mb-5">
+                  <div className="w-14 h-14 rounded-xl bg-violet-500/15 border border-violet-500/20 flex items-center justify-center mb-5">
                     <Target className="w-7 h-7 text-violet-400" />
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-3">Interview Coaching</h2>
@@ -350,13 +441,14 @@ export default function HomePage() {
 
               {/* Voice Tutoring Pillar */}
               <motion.div
+                variants={staggerChild}
                 className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-slate-800/60 to-slate-900/80 backdrop-blur-xl p-7 md:p-8"
-                whileHover={{ scale: 1.01, borderColor: "rgba(16, 185, 129, 0.4)" }}
-                transition={{ duration: 0.25 }}
+                whileHover={{ scale: 1.02, borderColor: "rgba(16, 185, 129, 0.5)", y: -4 }}
+                transition={springSnappy}
               >
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-colors" />
                 <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center mb-5">
+                  <div className="w-14 h-14 rounded-xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center mb-5">
                     <Mic className="w-7 h-7 text-emerald-400" />
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-3">Voice Tutoring</h2>
@@ -382,10 +474,10 @@ export default function HomePage() {
                   </Link>
                 </div>
               </motion.div>
-            </ScrollReveal>
+            </StaggerReveal>
 
             {/* ── SECTION 3: INTERVIEW TYPES GRID ── */}
-            <ScrollReveal className="mb-20" delay={0.1}>
+            <ScrollReveal className="mb-20" delay={0.1} direction="up">
               <div className="text-center mb-8">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white">
                   Practice Every Interview Type
@@ -394,7 +486,7 @@ export default function HomePage() {
                   AI interviewers that adapt to your level, give real-time feedback, and teach you when you are stuck.
                 </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              <StaggerReveal className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4" delay={0.15}>
                 {[
                   { icon: Users, label: "Recruiter Screen", desc: "15-minute phone screen simulation with follow-up questions", href: "/signup", color: "emerald" },
                   { icon: Code2, label: "Technical Interview", desc: "Live coding problems with AI that evaluates your approach", href: "/signup", color: "blue" },
@@ -414,9 +506,10 @@ export default function HomePage() {
                   return (
                     <Link key={card.label} href={card.href}>
                       <motion.div
+                        variants={staggerChild}
                         className={`bg-slate-800/60 backdrop-blur-xl rounded-2xl border ${cs.border} p-5 cursor-pointer h-full transition-all`}
-                        whileHover={{ scale: 1.03 }}
-                        transition={{ duration: 0.2 }}
+                        whileHover={{ scale: 1.04, y: -6 }}
+                        transition={springSnappy}
                       >
                         <div className={`w-10 h-10 rounded-xl ${cs.iconBg} flex items-center justify-center mb-3`}>
                           <Icon className={`w-5 h-5 ${cs.iconColor}`} />
@@ -427,11 +520,11 @@ export default function HomePage() {
                     </Link>
                   );
                 })}
-              </div>
+              </StaggerReveal>
             </ScrollReveal>
 
             {/* ── SECTION 4: CAREER PATHWAYS PREVIEW ── */}
-            <ScrollReveal className="mb-20" delay={0.15}>
+            <ScrollReveal className="mb-20" direction="left">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-white">Career Pathways</h2>
@@ -542,9 +635,9 @@ export default function HomePage() {
             </ScrollReveal>
 
             {/* ── SECTION 6: SOCIAL PROOF NUMBERS ── */}
-            <ScrollReveal className="mb-20" delay={0.1}>
+            <ScrollReveal className="mb-20" direction="scale">
               <div className="rounded-2xl border border-white/10 bg-slate-800/40 backdrop-blur-xl p-8">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <StaggerReveal className="grid grid-cols-2 md:grid-cols-4 gap-8" delay={0.1}>
                   {[
                     { target: 69, suffix: "+", label: "Courses", icon: BookOpen },
                     { target: 17, suffix: "", label: "Languages", icon: Globe },
@@ -553,25 +646,33 @@ export default function HomePage() {
                   ].map((stat) => {
                     const StatIcon = stat.icon;
                     return (
-                      <div key={stat.label} className="text-center">
+                      <motion.div key={stat.label} variants={staggerChild} className="text-center">
                         <StatIcon className="w-5 h-5 text-white/20 mx-auto mb-2" />
-                        <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                        <div className="text-3xl sm:text-4xl font-bold text-white">
                           {stat.target > 0 ? <AnimatedCounter target={stat.target} suffix={stat.suffix} /> : stat.suffix}
                         </div>
                         <div className="text-xs text-white/40 mt-1 font-medium">{stat.label}</div>
-                      </div>
+                      </motion.div>
                     );
                   })}
-                </div>
+                </StaggerReveal>
               </div>
             </ScrollReveal>
 
             {/* ── SECTION 7: FINAL CTA ── */}
-            <ScrollReveal className="mb-16" delay={0.1}>
+            <ScrollReveal className="mb-16" direction="scale">
               <div className="relative rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 via-slate-900/80 to-cyan-500/5 backdrop-blur-xl p-10 text-center overflow-hidden">
                 <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-0 left-1/4 w-40 h-40 bg-violet-500/10 rounded-full blur-[80px]" />
-                  <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-cyan-500/10 rounded-full blur-[80px]" />
+                  <motion.div
+                    className="absolute top-0 left-1/4 w-40 h-40 bg-violet-500/10 rounded-full blur-[80px]"
+                    animate={{ x: [0, 20, 0], y: [0, -15, 0] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <motion.div
+                    className="absolute bottom-0 right-1/4 w-40 h-40 bg-cyan-500/10 rounded-full blur-[80px]"
+                    animate={{ x: [0, -20, 0], y: [0, 15, 0] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                  />
                 </div>
                 <div className="relative z-10">
                   <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
@@ -582,7 +683,7 @@ export default function HomePage() {
                   </p>
                   <Link
                     href="/signup"
-                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-base hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
+                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-base hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:-translate-y-0.5 active:translate-y-0"
                   >
                     <GraduationCap className="w-5 h-5" />
                     Create Free Account
@@ -599,60 +700,79 @@ export default function HomePage() {
 
         {/* Hero for logged-in users */}
         {user && (
-          <motion.div variants={item} className="text-center mb-12 pt-4">
+          <motion.div variants={item} className="relative text-center mb-12 pt-4">
+            {/* Subtle grid bg for logged-in too */}
+            <div
+              className="absolute -z-10 inset-0 h-[400px] w-full opacity-15
+              bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)]
+              bg-[size:4rem_4rem]
+              [mask-image:radial-gradient(ellipse_70%_50%_at_50%_20%,#000_30%,transparent_100%)]"
+            />
             <motion.div
               className="flex justify-center mb-6"
-              initial={{ scale: 0.6, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              initial={{ scale: 0.5, opacity: 0, filter: "blur(12px)" }}
+              animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
               <KairosLogo size="xl" showText={false} />
             </motion.div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-[1.2] mb-4">
+            <motion.h1
+              className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-[1.2] mb-4"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+            >
               Welcome back{profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}
-            </h1>
-            <p className="text-base text-white/50 max-w-xl mx-auto mb-8">
+            </motion.h1>
+            <motion.p
+              className="text-base text-white/50 max-w-xl mx-auto mb-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+            >
               Practice interviews, talk with AI tutors, or continue your learning path.
-            </p>
+            </motion.p>
 
-            {/* Quick action row */}
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link
-                href="/interviews"
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 text-white text-sm font-semibold hover:from-violet-500 hover:to-cyan-500 transition-all shadow-lg shadow-violet-500/20 flex items-center gap-2"
-              >
-                <Target className="w-4 h-4" />
-                Mock Interview
-              </Link>
-              <Link
-                href="/talk"
-                className="px-5 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-semibold hover:bg-emerald-500/20 transition-all flex items-center gap-2"
-              >
-                <Mic className="w-4 h-4" />
-                Voice Tutoring
-              </Link>
-              <Link
-                href="/pathways"
-                className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm font-semibold hover:bg-white/10 hover:text-white transition-all flex items-center gap-2"
-              >
-                <Map className="w-4 h-4" />
-                Career Pathways
-              </Link>
-              <Link
-                href="/courses"
-                className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/60 text-sm font-semibold hover:bg-white/10 hover:text-white transition-all flex items-center gap-2"
-              >
-                <BookOpen className="w-4 h-4" />
-                All Courses
-              </Link>
-              <button
-                onClick={() => openPanel()}
-                className="px-5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold hover:bg-amber-500/20 transition-all flex items-center gap-2"
-              >
-                <MessageSquare className="w-4 h-4" />
-                Chat with Coach Alex
-              </button>
-            </div>
+            {/* Quick action row — staggered entrance */}
+            <motion.div
+              className="flex flex-wrap items-center justify-center gap-3"
+              initial="hidden"
+              animate="visible"
+              variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06, delayChildren: 0.4 } } }}
+            >
+              {[
+                { href: "/interviews", icon: Target, label: "Mock Interview", style: "bg-gradient-to-r from-violet-600 to-cyan-600 text-white shadow-lg shadow-violet-500/20 hover:from-violet-500 hover:to-cyan-500" },
+                { href: "/talk", icon: Mic, label: "Voice Tutoring", style: "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20" },
+                { href: "/pathways", icon: Map, label: "Career Pathways", style: "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white" },
+                { href: "/courses", icon: BookOpen, label: "All Courses", style: "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white" },
+              ].map((action) => {
+                const ActionIcon = action.icon;
+                return (
+                  <motion.div
+                    key={action.label}
+                    variants={{ hidden: { opacity: 0, y: 12, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1 } }}
+                  >
+                    <Link
+                      href={action.href}
+                      className={`group px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 ${action.style}`}
+                    >
+                      <ActionIcon className="w-4 h-4" />
+                      {action.label}
+                      <ArrowRight className="w-3.5 h-3.5 opacity-0 -ml-1 group-hover:opacity-100 group-hover:ml-0 transition-all" />
+                    </Link>
+                  </motion.div>
+                );
+              })}
+              <motion.div variants={{ hidden: { opacity: 0, y: 12, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1 } }}>
+                <button
+                  onClick={() => openPanel()}
+                  className="group px-5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold hover:bg-amber-500/20 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  Chat with Coach Alex
+                </button>
+              </motion.div>
+            </motion.div>
           </motion.div>
         )}
 
@@ -743,8 +863,8 @@ export default function HomePage() {
                   <Link key={card.label} href="/interviews">
                     <motion.div
                       className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} to-slate-900/80 backdrop-blur-xl border ${borderColors[card.color]} p-6 cursor-pointer h-full min-h-[140px] transition-all`}
-                      whileHover={{ scale: 1.03 }}
-                      transition={{ duration: 0.2 }}
+                      whileHover={{ scale: 1.03, y: -4 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
                     >
                       <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-4 ${iconColors[card.color]}`}>
                         <Icon className="w-6 h-6" />
@@ -939,8 +1059,7 @@ export default function HomePage() {
           ) : null;
         })()}
 
-        {/* ── Testimonials (all users) ── */}
-        <Testimonials />
+        {/* Testimonials removed — will add real user feedback when available */}
       </motion.div>
     </div>
   );

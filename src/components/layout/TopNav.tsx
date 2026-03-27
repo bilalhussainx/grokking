@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search, MessageSquare } from "lucide-react";
+import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search, MessageSquare, Star, Gem } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTopNav } from "@/contexts/TopNavContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -47,8 +47,8 @@ export default function TopNav({
 
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <KairosLogoIcon size={28} />
-          <span className="text-lg font-bold tracking-tight hidden sm:inline bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">Kairos<span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">.ai</span></span>
-          <span className="text-lg font-bold tracking-tight sm:hidden bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">S.</span>
+          <span className="text-lg font-bold tracking-tight hidden sm:inline text-white">Kairos<span className="text-amber-400">.ai</span></span>
+          <span className="text-lg font-bold tracking-tight sm:hidden text-amber-400">K.</span>
         </Link>
 
         {courseTitle && (
@@ -86,7 +86,7 @@ export default function TopNav({
               className="flex items-center gap-1 px-2 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-semibold cursor-default"
               title={`Level ${level}`}
             >
-              &#11088; Lv.{level}
+              <Star className="w-3 h-3" /> Lv.{level}
             </div>
             {xpMultiplier > 1 && (
               <div
@@ -103,7 +103,7 @@ export default function TopNav({
             className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold cursor-default"
             title={`${gems} gems`}
           >
-            &#128142; {gems}
+            <Gem className="w-3 h-3" /> {gems}
           </div>
         )}
         {user && <CreditBadge />}

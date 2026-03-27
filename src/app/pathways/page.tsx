@@ -35,7 +35,7 @@ export default function PathwaysPage() {
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
             Pick your{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+            <span className="text-violet-400">
               career path
             </span>
           </h1>

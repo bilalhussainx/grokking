@@ -4,6 +4,8 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +35,7 @@ function LoginForm() {
     : ""
   );
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Redirect if already logged in
   if (user) {
@@ -54,18 +57,33 @@ function LoginForm() {
   };
 
   return (
-    <section className="flex min-h-screen items-center justify-center px-4 py-16 bg-[var(--background)]">
-      <form
+    <section className="flex min-h-screen items-center justify-center px-4 py-16 bg-[var(--background)] relative overflow-hidden">
+      {/* Subtle grid background */}
+      <div
+        className="absolute inset-0 opacity-20
+        bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)]
+        bg-[size:4rem_4rem]
+        [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_30%,transparent_100%)]"
+      />
+      <motion.form
         onSubmit={handleEmailLogin}
-        className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 shadow-xl backdrop-blur-sm"
+        className="relative w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 shadow-2xl backdrop-blur-sm"
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="flex flex-col items-center mb-8">
+        <motion.div
+          className="flex flex-col items-center mb-8"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+        >
           <KairosLogo size="lg" showText={false} className="mb-4" />
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
-            Kairos<span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">.ai</span>
+          <h1 className="text-2xl font-bold text-white">
+            Kairos<span className="text-amber-400">.ai</span>
           </h1>
           <p className="text-sm text-white/50 mt-2">Sign in to continue learning</p>
-        </div>
+        </motion.div>
 
         <Button
           type="button"
@@ -98,6 +116,7 @@ function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
+              autoFocus
               className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
             />
           </div>
@@ -108,15 +127,24 @@ function LoginForm() {
                 Forgot password?
               </Link>
             </div>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Your password"
-              required
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Your password"
+                required
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           {error && (
@@ -142,7 +170,7 @@ function LoginForm() {
             Get Started Free — 300 Credits
           </Link>
         </div>
-      </form>
+      </motion.form>
     </section>
   );
 }

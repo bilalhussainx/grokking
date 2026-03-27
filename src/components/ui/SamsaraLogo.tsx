@@ -76,10 +76,10 @@ export default function KairosLogo({
         transition={{ delay: 0.2, duration: 0.5 }}
       >
         <span
-          className={`${s.text} font-bold tracking-tight bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent`}
+          className={`${s.text} font-bold tracking-tight text-white`}
         >
           Kairos
-          <span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">
+          <span className="text-amber-400">
             .ai
           </span>
         </span>
