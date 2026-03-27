@@ -65,17 +65,17 @@ function ScrollReveal({ children, className = "", delay = 0, direction = "up", s
   );
 }
 
-// Word-by-word blur reveal (cinematic headline effect)
+// Word-by-word cinematic reveal (opacity + Y slide per word)
 function BlurReveal({ text, className = "", delay = 0 }: { text: string; className?: string; delay?: number }) {
   return (
-    <span className={className}>
+    <span>
       {text.split(" ").map((word, i) => (
         <motion.span
           key={i}
-          className="inline-block mr-[0.25em]"
-          initial={{ opacity: 0, filter: "blur(8px)", y: 8 }}
-          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-          transition={{ duration: 0.4, delay: delay + i * 0.08, ease: "easeOut" }}
+          className={`inline-block mr-[0.25em] ${className}`}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: delay + i * 0.1, ease: [0.25, 0.4, 0.25, 1] }}
         >
           {word}
         </motion.span>
