@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Mic, BookOpen, ArrowRight, Sparkles, Star, Target, Users, Building2, MessageSquare, Map, Code2, Globe, GraduationCap, Zap, Shield, Brain, Server } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAI } from "@/contexts/AIContext";
 import { useXP } from "@/contexts/XPContext";
 import { courses } from "@/data";
 import { pathways } from "@/data/pathways";
@@ -16,6 +17,7 @@ import { useCourseProgress } from "@/hooks/useCourseProgress";
 import ProgressRing from "@/components/ui/ProgressRing";
 import ForgettingAlert from "@/components/gamification/ForgettingAlert";
 import VariableReward from "@/components/gamification/VariableReward";
+import WelcomeModal from "@/components/onboarding/WelcomeModal";
 import { getDailyLoginReward } from "@/lib/rewards";
 import KairosLogo from "@/components/ui/SamsaraLogo";
 import Testimonials from "@/components/Testimonials";
@@ -116,6 +118,7 @@ function scoreCourse(course: { title: string; slug: string; domain?: string; des
 export default function HomePage() {
   const { user, profile, credits, loading } = useAuth();
   const { earnXP, showXPFlyUp, lastXPAmount, pendingReward, dismissReward } = useXP();
+  const { openPanel } = useAI();
   const router = useRouter();
   const [userInterests, setUserInterests] = useState<string[]>([]);
   const [dailyXPAwarded, setDailyXPAwarded] = useState(false);
@@ -205,6 +208,9 @@ export default function HomePage() {
     <div className="min-h-screen bg-[var(--background)]">
       {/* Variable reward popup */}
       <VariableReward reward={pendingReward} onDismiss={dismissReward} />
+
+      {/* First-time welcome modal */}
+      {user && <WelcomeModal userName={profile?.full_name} />}
 
       {/* XP fly-up on daily login */}
       {showXPFlyUp > 0 && dailyXPAwarded && (
@@ -639,6 +645,13 @@ export default function HomePage() {
                 <BookOpen className="w-4 h-4" />
                 All Courses
               </Link>
+              <button
+                onClick={() => openPanel()}
+                className="px-5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold hover:bg-amber-500/20 transition-all flex items-center gap-2"
+              >
+                <MessageSquare className="w-4 h-4" />
+                Chat with Coach Alex
+              </button>
             </div>
           </motion.div>
         )}

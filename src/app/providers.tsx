@@ -67,7 +67,7 @@ function CoachSidebar() {
   if (shouldHide) return null;
 
   // Don't mount coach until it's been opened at least once or there's a lesson
-  if (!hasBeenOpened && !lessonContext) return null;
+  if (!hasBeenOpened && !lessonContext && !isPanelOpen) return null;
 
   const tabBar = (
     <div className="flex border-b border-white/[0.06] shrink-0">

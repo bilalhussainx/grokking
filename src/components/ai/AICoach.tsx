@@ -374,13 +374,22 @@ export default function AICoach() {
       // Dedupe: no two sends within 2 seconds
       const now = Date.now();
       if (now - lastSendTimeRef.current < 2000) return;
-      if (isStreamingRef.current || !lessonContextRef.current) return;
+      if (isStreamingRef.current) return;
 
       lastSendTimeRef.current = now;
       isStreamingRef.current = true;
       setIsStreaming(true);
 
-      const ctx = lessonContextRef.current;
+      const ctx = lessonContextRef.current || {
+        lessonTitle: 'General Chat',
+        moduleTitle: '',
+        courseTitle: '',
+        lessonContent: '',
+        starterCode: '',
+        solutionCode: '',
+        courseSlug: '',
+        lessonSlug: '',
+      };
       const history = messagesRef.current
         .filter((m) => m.text.length > 0)
         .slice(-10)
@@ -975,7 +984,7 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
         {messages.length === 0 && !isStreaming && !isVoiceActive && coachMode === 'text-monitoring' && (
           <div className="flex flex-col items-center justify-center h-full text-center opacity-40">
             <GraduationCap className="w-8 h-8 mb-2" />
-            <p className="text-xs">Coach Alex is reading along with you</p>
+            <p className="text-xs">{lessonContext ? 'Coach Alex is reading along with you' : 'Ask me anything — coding, interview prep, or any topic'}</p>
             <p className="text-[10px] mt-1">Tap the mic or type below to chat</p>
           </div>
         )}

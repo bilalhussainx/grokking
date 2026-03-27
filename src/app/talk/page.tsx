@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, MicOff, Phone, PhoneOff, ChevronLeft, Volume2, Settings } from "lucide-react";
+import { Mic, MicOff, Phone, PhoneOff, ChevronLeft, Volume2, Settings, MessageSquare, Code, BookOpen, Briefcase, MessagesSquare } from "lucide-react";
 import { useVoiceAgent, type VoiceAgentCallbacks } from "@/hooks/useVoiceAgent";
 import { getLanguagePersonas, getDefaultPersona, getSupportedLanguages, type LanguagePersona } from "@/lib/language-personas";
 import Link from "next/link";
@@ -61,8 +61,10 @@ function TalkPageInner() {
   }
 
   // State
-  const [step, setStep] = useState<"select" | "talking">(preselectedLang ? "talking" : "select");
+  const [step, setStep] = useState<"select" | "topic" | "talking">(preselectedLang ? "topic" : "select");
   const [selectedLang, setSelectedLang] = useState(preselectedLang || "");
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [customTopic, setCustomTopic] = useState("");
   const [selectedPersona, setSelectedPersona] = useState<LanguagePersona | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessionTime, setSessionTime] = useState(0);
@@ -105,12 +107,28 @@ function TalkPageInner() {
     }
   }, [preselectedLang, selectedPersona]);
 
+  const selectLanguage = useCallback((lang: string) => {
+    const persona = getDefaultPersona(lang);
+    setSelectedPersona(persona);
+    setSelectedLang(lang);
+    setSelectedTopic(null);
+    setCustomTopic("");
+    setStep("topic");
+  }, []);
+
   const startConversation = useCallback(
-    async (lang: string) => {
-      const persona = getDefaultPersona(lang);
-      setSelectedPersona(persona);
-      setSelectedLang(lang);
+    async (topic: string) => {
+      const lang = selectedLang;
+      const persona = selectedPersona || getDefaultPersona(lang);
       setStep("talking");
+
+      // Build topic-aware system prompt
+      let systemPrompt = persona.systemPrompt;
+      if (topic) {
+        systemPrompt = `The user wants to discuss: "${topic}". Guide the conversation around this topic while staying in your tutor role.\n\n${systemPrompt}`;
+      } else {
+        systemPrompt = `The user chose to chat freely. Start by asking them what they would like to learn about today.\n\n${systemPrompt}`;
+      }
 
       // Show 3-2-1 countdown
       setCountdown(3);
@@ -124,7 +142,7 @@ function TalkPageInner() {
       try {
         await agent.start({
           personaId: persona.id,
-          systemPrompt: persona.systemPrompt,
+          systemPrompt,
           voiceProvider: persona.defaultVoice.provider as "kokoro" | "sarvam" | "deepgram",
           voiceId: persona.defaultVoice.voiceId,
           language: lang,
@@ -134,7 +152,7 @@ function TalkPageInner() {
         console.error("Failed to start voice agent:", err);
       }
     },
-    [agent]
+    [agent, selectedLang, selectedPersona]
   );
 
   const endConversation = useCallback(() => {
@@ -161,6 +179,8 @@ function TalkPageInner() {
     setSessionTime(0);
     setSelectedPersona(null);
     setSelectedLang("");
+    setSelectedTopic(null);
+    setCustomTopic("");
   }, [agent, messages, selectedLang]);
 
   // ─── Select Language Screen ───
@@ -200,7 +220,7 @@ function TalkPageInner() {
             {languages.map((lang) => (
               <motion.button
                 key={lang.code}
-                onClick={() => startConversation(lang.code)}
+                onClick={() => selectLanguage(lang.code)}
                 className="flex items-center gap-4 p-5 rounded-2xl bg-slate-800/40 border border-slate-700/40 hover:bg-slate-800/70 hover:border-slate-600 transition-all text-left"
                 variants={{
                   hidden: { opacity: 0, y: 12 },
@@ -217,6 +237,119 @@ function TalkPageInner() {
               </motion.button>
             ))}
           </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Topic Selection Screen ───
+  if (step === "topic") {
+    const langName = { es: "Spanish", fr: "French", de: "German", it: "Italian", nl: "Dutch", ja: "Japanese", hi: "Hindi", en: "English" }[selectedLang] || selectedLang;
+    const topicSuggestions = [
+      { label: "Help me with coding", icon: Code, value: "Help me with coding" },
+      { label: "Practice conversation", icon: MessageSquare, value: "Practice conversation" },
+      { label: "Explain a concept", icon: BookOpen, value: "Explain a concept" },
+      { label: "Interview prep", icon: Briefcase, value: "Interview prep" },
+      { label: "Just chat freely", icon: MessagesSquare, value: "" },
+    ];
+
+    const activeTopic = customTopic || (selectedTopic ?? "");
+    const canStart = selectedTopic !== null || customTopic.length > 0;
+
+    return (
+      <div className="min-h-screen bg-[var(--background)] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-800/50">
+          <button
+            onClick={() => {
+              setStep("select");
+              setSelectedTopic(null);
+              setCustomTopic("");
+            }}
+            className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h1 className="text-lg font-semibold text-white">What would you like to learn about?</h1>
+            <p className="text-sm text-slate-500">{langName} session</p>
+          </div>
+        </div>
+
+        {/* Topic Selection */}
+        <div className="flex-1 px-4 py-8 max-w-lg mx-auto w-full">
+          <motion.div
+            className="space-y-3"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+            }}
+          >
+            {topicSuggestions.map((topic) => {
+              const isActive = selectedTopic === topic.value && customTopic.length === 0;
+
+              return (
+                <motion.button
+                  key={topic.label}
+                  onClick={() => {
+                    setSelectedTopic(topic.value);
+                    setCustomTopic("");
+                  }}
+                  className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all text-left ${
+                    isActive
+                      ? "bg-violet-500/15 border-violet-500/40 text-white"
+                      : "bg-slate-800/60 backdrop-blur-xl border-white/10 text-slate-300 hover:bg-slate-800/80 hover:border-white/20"
+                  }`}
+                  variants={{
+                    hidden: { opacity: 0, y: 10 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    isActive
+                      ? "bg-violet-500/20 text-violet-400"
+                      : "bg-slate-700/50 text-slate-400"
+                  }`}>
+                    <topic.icon className="w-5 h-5" />
+                  </div>
+                  <span className="font-medium">{topic.label}</span>
+                </motion.button>
+              );
+            })}
+          </motion.div>
+
+          {/* Custom topic input */}
+          <div className="mt-6">
+            <input
+              type="text"
+              value={customTopic}
+              onChange={(e) => {
+                setCustomTopic(e.target.value);
+                if (e.target.value.length > 0) {
+                  setSelectedTopic(e.target.value);
+                } else {
+                  setSelectedTopic(null);
+                }
+              }}
+              placeholder="Or type your own topic..."
+              className="w-full px-4 py-3 rounded-xl bg-slate-800/60 backdrop-blur-xl border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/20 transition-all"
+            />
+          </div>
+
+          {/* Start button */}
+          <motion.button
+            onClick={() => startConversation(activeTopic)}
+            disabled={!canStart}
+            className="w-full mt-8 py-4 rounded-xl font-semibold text-white transition-all bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Start Talking
+          </motion.button>
         </div>
       </div>
     );
