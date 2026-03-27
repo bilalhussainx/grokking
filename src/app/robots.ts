@@ -6,9 +6,9 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/admin/', '/settings/', '/auth/'],
+        disallow: ['/api/', '/admin/', '/settings/'],
       },
     ],
-    sitemap: 'https://kairos.ai/sitemap.xml',
+    sitemap: 'https://kairoslearn.com/sitemap.xml',
   };
 }
