@@ -195,6 +195,15 @@ function CoachFAB() {
  * Coach is always mounted (never unmounted) to preserve voice connection.
  */
 function AppLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isCinematicPage = pathname === "/landing";
+
+  // Cinematic landing page needs full document scroll (GSAP ScrollTrigger)
+  // — no TopNav, no Coach sidebar, no overflow-hidden wrapper
+  if (isCinematicPage) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <TopNav />
