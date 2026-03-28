@@ -79,7 +79,7 @@ export default function PathwayDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-black">
       <motion.div
         className="max-w-4xl mx-auto px-4 pt-16 pb-24"
         variants={container}
@@ -100,7 +100,7 @@ export default function PathwayDetailPage() {
         {/* Hero */}
         <motion.div
           variants={item}
-          className="relative overflow-hidden rounded-2xl bg-slate-800/60 backdrop-blur-xl border border-white/10 p-8 mb-8"
+          className="relative overflow-hidden rounded-2xl bg-[#141414] border border-white/10 p-8 mb-8"
         >
           {/* Background glow */}
           <div
@@ -155,12 +155,12 @@ export default function PathwayDetailPage() {
                     key={type}
                     className={`px-3 py-1 rounded-lg text-sm border ${
                       type === "technical"
-                        ? "bg-cyan-500/10 border-cyan-500/20 text-cyan-400"
+                        ? "bg-[#D4AF37]/10 border-[#D4AF37]/20 text-[#D4AF37]"
                         : type === "system-design"
-                          ? "bg-violet-500/10 border-violet-500/20 text-violet-400"
+                          ? "bg-[#D4AF37]/10 border-[#D4AF37]/20 text-[#D4AF37]"
                           : type === "behavioral"
                             ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
-                            : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                            : "bg-white/5 border-white/10 text-white/70"
                     }`}
                   >
                     {interviewLabel[type] || type}
@@ -171,7 +171,7 @@ export default function PathwayDetailPage() {
 
             {/* Progress bar (authenticated users only) */}
             {user && (
-              <div className="rounded-xl bg-slate-900/60 border border-white/5 p-4">
+              <div className="rounded-xl bg-black/40 border border-white/5 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-white/70">
                     Your progress
@@ -180,9 +180,9 @@ export default function PathwayDetailPage() {
                     {completedCourses}/{totalCourses} courses completed
                   </span>
                 </div>
-                <div className="w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
                   <motion.div
-                    className={`h-full rounded-full bg-gradient-to-r ${pathway.color}`}
+                    className="h-full rounded-full bg-[#D4AF37]"
                     initial={{ width: 0 }}
                     animate={{ width: `${overallProgress}%` }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
@@ -217,10 +217,10 @@ export default function PathwayDetailPage() {
                 >
                   <Link href={`/course/${course.slug}`}>
                     <div
-                      className={`relative overflow-hidden rounded-xl bg-slate-800/60 backdrop-blur-xl border p-5 cursor-pointer transition-all ${
+                      className={`relative overflow-hidden rounded-xl bg-[#141414] border p-5 cursor-pointer transition-all ${
                         isCompleted
-                          ? "border-emerald-500/20 hover:border-emerald-500/40"
-                          : "border-white/10 hover:border-white/20"
+                          ? "border-[#D4AF37]/20 hover:border-[#D4AF37]/40"
+                          : "border-white/10 hover:border-[#D4AF37]/30"
                       }`}
                     >
                       <div className="flex items-start gap-4">
@@ -228,7 +228,7 @@ export default function PathwayDetailPage() {
                         <div
                           className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold ${
                             isCompleted
-                              ? "bg-emerald-500/15 text-emerald-400"
+                              ? "bg-[#D4AF37]/15 text-[#D4AF37]"
                               : "bg-white/5 text-white/30"
                           }`}
                         >
@@ -247,7 +247,7 @@ export default function PathwayDetailPage() {
                               {course.title}
                             </h3>
                             {course.tier === "pro" && (
-                              <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-yellow-500/15 text-yellow-400 border border-yellow-500/20">
+                              <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/20">
                                 PRO
                               </span>
                             )}
@@ -259,9 +259,9 @@ export default function PathwayDetailPage() {
                           {/* Progress for started courses */}
                           {user && isStarted && !isCompleted && (
                             <div className="mt-2.5 flex items-center gap-3">
-                              <div className="flex-1 h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+                              <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
                                 <div
-                                  className="h-full bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full"
+                                  className="h-full bg-[#D4AF37] rounded-full"
                                   style={{ width: `${progress}%` }}
                                 />
                               </div>
@@ -287,11 +287,11 @@ export default function PathwayDetailPage() {
         <motion.div variants={item}>
           <Link href={`/interviews?pathway=${pathway.slug}`}>
             <div
-              className={`group relative overflow-hidden rounded-2xl bg-gradient-to-r ${pathway.color} p-[1px] cursor-pointer`}
+              className="group relative overflow-hidden rounded-2xl border border-[#D4AF37]/30 p-[1px] cursor-pointer"
             >
-              <div className="rounded-2xl bg-slate-900/90 backdrop-blur-xl px-6 py-5 flex items-center justify-between">
+              <div className="rounded-2xl bg-[#141414] px-6 py-5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <PlayCircle className="w-6 h-6 text-white/80" />
+                  <PlayCircle className="w-6 h-6 text-[#D4AF37]" />
                   <div>
                     <h3 className="text-base font-semibold text-white">
                       Start Interview Practice

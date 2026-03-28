@@ -102,8 +102,8 @@ export default function PricingCards() {
   if (checkoutSuccess) {
     return (
       <div className="max-w-md mx-auto text-center py-12">
-        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 flex items-center justify-center">
-          <Check className="w-10 h-10 text-emerald-400" />
+        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 flex items-center justify-center">
+          <Check className="w-10 h-10 text-[#D4AF37]" />
         </div>
         <h2 className="text-2xl font-bold text-white mb-2">
           Welcome to Pro!
@@ -129,7 +129,7 @@ export default function PricingCards() {
         <button
           onClick={() => setAnnual(!annual)}
           className={`relative w-12 h-6 rounded-full transition-colors ${
-            annual ? "bg-violet-500" : "bg-white/20"
+            annual ? "bg-[#D4AF37]" : "bg-white/20"
           }`}
           aria-label="Toggle annual billing"
         >
@@ -145,7 +145,7 @@ export default function PricingCards() {
           }`}
         >
           Annual{" "}
-          <span className="text-emerald-400 text-xs font-semibold">
+          <span className="text-[#D4AF37] text-xs font-semibold">
             (save 20%)
           </span>
         </span>
@@ -155,7 +155,7 @@ export default function PricingCards() {
         {/* ---------------------------------------------------------------- */}
         {/* Free Plan */}
         {/* ---------------------------------------------------------------- */}
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-8 flex flex-col">
+        <div className="rounded-2xl border border-white/10 bg-[#141414] p-8 flex flex-col">
           <div className="mb-6">
             <h3 className="text-xl font-bold text-white mb-1">Free</h3>
             <p className="text-sm text-white/40">Start learning today</p>
@@ -175,7 +175,7 @@ export default function PricingCards() {
                 }`}
               >
                 {f.included ? (
-                  <Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                  <Check className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
                 ) : (
                   <X className="w-4 h-4 text-white/15 mt-0.5 shrink-0" />
                 )}
@@ -187,7 +187,7 @@ export default function PricingCards() {
           <button
             onClick={() => !user && router.push("/login")}
             disabled={!!user}
-            className="w-full py-3 rounded-xl text-sm font-semibold transition-all border border-white/[0.1] bg-white/[0.05] text-white/60 hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-3 rounded-xl text-sm font-semibold transition-all border border-white/10 bg-transparent text-white/60 hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {user ? "Current Plan" : "Get Started Free"}
           </button>
@@ -196,10 +196,10 @@ export default function PricingCards() {
         {/* ---------------------------------------------------------------- */}
         {/* Pro Plan */}
         {/* ---------------------------------------------------------------- */}
-        <div className="relative rounded-2xl border border-violet-500/30 bg-violet-500/[0.08] backdrop-blur-xl p-8 flex flex-col shadow-xl shadow-violet-500/5">
+        <div className="relative rounded-2xl border border-[#D4AF37]/30 bg-[#D4AF37]/[0.05] backdrop-blur-xl p-8 flex flex-col shadow-xl shadow-[#D4AF37]/5">
           {/* Badge */}
           <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-            <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-violet-500 to-cyan-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-violet-500/30">
+            <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#D4AF37] to-[#C4A030] text-black text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-[#D4AF37]/30">
               <Sparkles className="w-3 h-3" />
               MOST POPULAR
             </span>
@@ -220,7 +220,7 @@ export default function PricingCards() {
             {annual && (
               <div className="text-sm text-white/40 mt-1">
                 ${annualTotalPrice}/year &mdash;{" "}
-                <span className="text-emerald-400">save 20%</span>
+                <span className="text-[#D4AF37]">save 20%</span>
               </div>
             )}
             {!annual && (
@@ -234,7 +234,7 @@ export default function PricingCards() {
                 key={f.text}
                 className="flex items-start gap-2.5 text-sm text-white/70"
               >
-                <Check className="w-4 h-4 text-violet-400 mt-0.5 shrink-0" />
+                <Check className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
                 <span>{f.text}</span>
               </li>
             ))}
@@ -249,7 +249,7 @@ export default function PricingCards() {
               openCheckout(annual ? PRO_ANNUAL_PRICE : PRO_MONTHLY_PRICE);
             }}
             disabled={isPro}
-            className="w-full py-3 rounded-xl text-sm font-semibold transition-all bg-gradient-to-r from-violet-500 to-cyan-500 text-white hover:from-violet-400 hover:to-cyan-400 shadow-lg shadow-violet-500/25 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3 rounded-xl text-sm font-semibold transition-all bg-[#D4AF37] text-black hover:bg-[#C4A030] shadow-lg shadow-[#D4AF37]/25 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <Crown className="w-4 h-4" />
             {isPro ? "Current Plan" : "Upgrade to Pro"}
@@ -259,7 +259,7 @@ export default function PricingCards() {
         {/* ---------------------------------------------------------------- */}
         {/* Teams Plan */}
         {/* ---------------------------------------------------------------- */}
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-8 flex flex-col">
+        <div className="rounded-2xl border border-white/10 bg-[#141414] p-8 flex flex-col">
           <div className="mb-6">
             <h3 className="text-xl font-bold text-white mb-1">Teams</h3>
             <p className="text-sm text-white/40">For classrooms & teams</p>
@@ -277,7 +277,7 @@ export default function PricingCards() {
                 key={f.text}
                 className="flex items-start gap-2.5 text-sm text-white/70"
               >
-                <Check className="w-4 h-4 text-cyan-400 mt-0.5 shrink-0" />
+                <Check className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
                 <span>{f.text}</span>
               </li>
             ))}
@@ -285,7 +285,7 @@ export default function PricingCards() {
 
           <a
             href="mailto:team@kairos.ai?subject=Teams%20Plan%20Inquiry"
-            className="block w-full py-3 rounded-xl text-sm font-semibold text-center transition-all border border-white/[0.1] bg-white/[0.05] text-white/60 hover:bg-white/10 hover:text-white"
+            className="block w-full py-3 rounded-xl text-sm font-semibold text-center transition-all border border-white/10 bg-transparent text-white/60 hover:bg-white/10 hover:text-white"
           >
             Contact Us
           </a>

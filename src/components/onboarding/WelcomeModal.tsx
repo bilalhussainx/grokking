@@ -18,12 +18,12 @@ const actions = [
       "AI interviewer adapts to your level. Choose a role and start practicing.",
     href: "/interviews",
     icon: Target,
-    accent: "violet",
-    bg: "from-violet-500/10 to-violet-600/5",
-    border: "border-violet-500/20 hover:border-violet-500/40",
-    iconBg: "bg-violet-500/15",
-    iconColor: "text-violet-400",
-    arrowColor: "text-violet-400",
+    accent: "gold",
+    bg: "from-[#D4AF37]/10 to-[#D4AF37]/5",
+    border: "border-[#D4AF37]/20 hover:border-[#D4AF37]/40",
+    iconBg: "bg-[#D4AF37]/10",
+    iconColor: "text-[#D4AF37]",
+    arrowColor: "text-[#D4AF37]",
   },
   {
     title: "Talk to an AI Tutor",
@@ -31,12 +31,12 @@ const actions = [
       "Voice conversation in 17 languages. Pick a topic and start talking.",
     href: "/talk",
     icon: Mic,
-    accent: "emerald",
-    bg: "from-emerald-500/10 to-emerald-600/5",
-    border: "border-emerald-500/20 hover:border-emerald-500/40",
-    iconBg: "bg-emerald-500/15",
-    iconColor: "text-emerald-400",
-    arrowColor: "text-emerald-400",
+    accent: "gold",
+    bg: "from-[#D4AF37]/10 to-[#D4AF37]/5",
+    border: "border-[#D4AF37]/20 hover:border-[#D4AF37]/40",
+    iconBg: "bg-[#D4AF37]/10",
+    iconColor: "text-[#D4AF37]",
+    arrowColor: "text-[#D4AF37]",
   },
   {
     title: "Take a Course",
@@ -44,12 +44,12 @@ const actions = [
       "69+ courses in coding, finance, philosophy, and more. Learn at your pace.",
     href: "/courses",
     icon: BookOpen,
-    accent: "cyan",
-    bg: "from-cyan-500/10 to-cyan-600/5",
-    border: "border-cyan-500/20 hover:border-cyan-500/40",
-    iconBg: "bg-cyan-500/15",
-    iconColor: "text-cyan-400",
-    arrowColor: "text-cyan-400",
+    accent: "gold",
+    bg: "from-[#D4AF37]/10 to-[#D4AF37]/5",
+    border: "border-[#D4AF37]/20 hover:border-[#D4AF37]/40",
+    iconBg: "bg-[#D4AF37]/10",
+    iconColor: "text-[#D4AF37]",
+    arrowColor: "text-[#D4AF37]",
   },
 ];
 
@@ -94,7 +94,7 @@ export default function WelcomeModal({ userName }: WelcomeModalProps) {
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -103,14 +103,14 @@ export default function WelcomeModal({ userName }: WelcomeModalProps) {
 
           {/* Card */}
           <motion.div
-            className="relative w-full max-w-lg rounded-2xl border border-white/10 bg-slate-800/60 backdrop-blur-xl shadow-2xl shadow-black/40 overflow-hidden"
+            className="relative w-full max-w-lg rounded-2xl border border-white/10 bg-[#141414] shadow-2xl shadow-black/40 overflow-hidden"
             initial={{ opacity: 0, scale: 0.92, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 30 }}
             transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
           >
             {/* Gradient glow at top */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-cyan-500 to-emerald-500" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#D4AF37] via-[#C4A030] to-[#8B7355]" />
 
             <div className="p-6 sm:p-8">
               {/* Header */}
@@ -161,7 +161,7 @@ export default function WelcomeModal({ userName }: WelcomeModalProps) {
               <div className="mt-5 text-center">
                 <button
                   onClick={dismiss}
-                  className="text-sm text-white/35 hover:text-white/60 transition-colors"
+                  className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors"
                 >
                   Skip
                 </button>

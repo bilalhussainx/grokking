@@ -14,7 +14,7 @@ import KairosLogo from "@/components/ui/SamsaraLogo";
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[var(--background)]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
       <LoginForm />
     </Suspense>
   );
@@ -57,7 +57,7 @@ function LoginForm() {
   };
 
   return (
-    <section className="flex min-h-screen items-center justify-center px-4 py-16 bg-[var(--background)] relative overflow-hidden">
+    <section className="flex min-h-screen items-center justify-center px-4 py-16 bg-black relative overflow-hidden">
       {/* Subtle grid background */}
       <div
         className="absolute inset-0 opacity-20
@@ -67,7 +67,7 @@ function LoginForm() {
       />
       <motion.form
         onSubmit={handleEmailLogin}
-        className="relative w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 shadow-2xl backdrop-blur-sm"
+        className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-[#141414] p-8 shadow-2xl backdrop-blur-sm"
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -88,7 +88,7 @@ function LoginForm() {
         <Button
           type="button"
           variant="outline"
-          className="w-full flex items-center justify-center gap-3 mb-4 h-11 border-white/10 hover:bg-white/5"
+          className="w-full flex items-center justify-center gap-3 mb-4 h-11 border-white/20 bg-transparent text-white hover:bg-white/5"
           onClick={signInWithGoogle}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 262" className="w-5 h-5">
@@ -117,13 +117,13 @@ function LoginForm() {
               placeholder="you@example.com"
               required
               autoFocus
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+              className="bg-transparent border-white/20 text-white placeholder:text-white/30 focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20"
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password" className="text-white/70">Password</Label>
-              <Link href="/forgot-password" className="text-xs text-violet-400 hover:underline">
+              <Link href="/forgot-password" className="text-xs text-[#D4AF37] hover:underline">
                 Forgot password?
               </Link>
             </div>
@@ -135,7 +135,7 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Your password"
                 required
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/30 pr-10"
+                className="bg-transparent border-white/20 text-white placeholder:text-white/30 pr-10 focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20"
               />
               <button
                 type="button"
@@ -151,7 +151,7 @@ function LoginForm() {
             <p className="text-xs text-red-400 bg-red-500/10 rounded-md p-2">{error}</p>
           )}
 
-          <Button type="submit" className="w-full h-11" disabled={loading}>
+          <Button type="submit" className="w-full h-11 bg-[#D4AF37] text-black font-semibold rounded-lg hover:bg-[#C4A030]" disabled={loading}>
             {loading ? "Signing in..." : "Sign In"}
           </Button>
         </div>
@@ -159,13 +159,13 @@ function LoginForm() {
         <div className="text-center mt-6 space-y-3">
           <p className="text-sm text-white/40">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-violet-400 hover:underline font-medium">
+            <Link href="/signup" className="text-[#D4AF37] hover:underline font-medium">
               Sign up
             </Link>
           </p>
           <Link
             href="/signup"
-            className="block w-full py-2.5 rounded-lg bg-gradient-to-r from-violet-500/20 to-cyan-500/20 border border-violet-500/30 text-violet-400 text-sm font-semibold hover:from-violet-500/30 hover:to-cyan-500/30 transition-all text-center"
+            className="block w-full py-2.5 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37] text-sm font-semibold hover:bg-[#D4AF37]/20 transition-all text-center"
           >
             Get Started Free — 300 Credits
           </Link>

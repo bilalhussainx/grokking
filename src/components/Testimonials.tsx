@@ -54,7 +54,7 @@ export default function Testimonials() {
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             What learners are saying
           </h2>
-          <p className="text-xl text-gray-300">
+          <p className="text-xl text-white/50">
             Hear from students learning with AI voice tutoring
           </p>
         </div>
@@ -63,7 +63,7 @@ export default function Testimonials() {
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-white/20 transition"
+              className="bg-[#141414] rounded-2xl p-6 border border-white/10 hover:border-white/20 transition"
             >
               {/* Rating */}
               <div className="flex items-center gap-1 mb-4">
@@ -72,22 +72,22 @@ export default function Testimonials() {
                     key={i}
                     className={`w-5 h-5 ${
                       i < testimonial.rating
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'fill-slate-600 text-slate-600'
+                        ? 'fill-[#D4AF37] text-[#D4AF37]'
+                        : 'fill-white/10 text-white/10'
                     }`}
                   />
                 ))}
               </div>
 
               {/* Quote */}
-              <p className="text-gray-300 mb-6 leading-relaxed">
+              <p className="text-white/70 mb-6 leading-relaxed">
                 &ldquo;{testimonial.text}&rdquo;
               </p>
 
               {/* Author */}
               <div className="flex items-center gap-3 border-t border-white/10 pt-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-cyan-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-lg">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#D4AF37] to-[#8B7355] rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-black font-bold text-lg">
                     {testimonial.name.split(' ').map(n => n[0]).join('')}
                   </span>
                 </div>
@@ -95,10 +95,10 @@ export default function Testimonials() {
                   <div className="font-semibold text-white">
                     {testimonial.name}
                   </div>
-                  <div className="text-sm text-gray-400">
+                  <div className="text-sm text-white/40">
                     {testimonial.role}
                   </div>
-                  <div className="text-xs text-cyan-400 mt-1">
+                  <div className="text-xs text-[#D4AF37] mt-1">
                     {testimonial.course}
                   </div>
                 </div>
@@ -111,7 +111,7 @@ export default function Testimonials() {
         <div className="mt-12 text-center">
           <Link
             href="/courses"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white rounded-lg font-semibold transition"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#D4AF37] hover:bg-[#C4A030] text-black rounded-lg font-semibold transition"
           >
             Start learning for free
             <ArrowRight className="w-5 h-5" />

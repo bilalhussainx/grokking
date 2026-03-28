@@ -33,7 +33,7 @@ const blogPosts = [
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-black">
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="text-center">
@@ -53,17 +53,17 @@ export default function BlogPage() {
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="group bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition overflow-hidden"
+              className="group bg-[#141414] rounded-2xl border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition overflow-hidden"
             >
               {/* Image placeholder */}
-              <div className="aspect-video bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
+              <div className="aspect-video bg-gradient-to-br from-[#D4AF37] to-[#8B7355] flex items-center justify-center">
                 <span className="text-white text-6xl">📝</span>
               </div>
 
               {/* Content */}
               <div className="p-6">
                 <div className="flex items-center gap-4 text-sm text-gray-400 mb-3">
-                  <span className="px-3 py-1 bg-violet-500/20 text-violet-400 rounded-full text-xs font-medium">
+                  <span className="px-3 py-1 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full text-xs font-medium">
                     {post.category}
                   </span>
                   <div className="flex items-center gap-1">
@@ -72,7 +72,7 @@ export default function BlogPage() {
                   </div>
                 </div>
 
-                <h2 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition">
+                <h2 className="text-xl font-bold text-white mb-3 group-hover:text-[#D4AF37] transition">
                   {post.title}
                 </h2>
 
@@ -89,7 +89,7 @@ export default function BlogPage() {
                       year: 'numeric',
                     })}
                   </div>
-                  <div className="flex items-center gap-1 text-cyan-400 group-hover:gap-2 transition-all">
+                  <div className="flex items-center gap-1 text-[#D4AF37] group-hover:gap-2 transition-all">
                     Read more
                     <ArrowRight className="w-4 h-4" />
                   </div>
@@ -102,22 +102,22 @@ export default function BlogPage() {
 
       {/* Newsletter CTA */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-gradient-to-r from-violet-600 to-cyan-600 rounded-2xl p-8 text-white text-center">
+        <div className="bg-[#D4AF37] rounded-2xl p-8 text-black text-center">
           <h2 className="text-3xl font-bold mb-4">
             Never Miss an Update
           </h2>
-          <p className="text-xl mb-8 text-violet-50">
+          <p className="text-xl mb-8 text-black/80">
             Get weekly insights on AI education, coding tips, and learning strategies delivered to your inbox.
           </p>
           <form className="max-w-md mx-auto flex gap-2">
             <input
               type="email"
               placeholder="Your email address"
-              className="flex-1 px-4 py-3 rounded-lg bg-white/10 backdrop-blur text-white placeholder-white/60 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+              className="flex-1 px-4 py-3 rounded-lg bg-black/10 text-black placeholder-black/50 border border-black/20 focus:outline-none focus:ring-2 focus:ring-black/30"
             />
             <button
               type="submit"
-              className="px-6 py-3 bg-white text-violet-600 rounded-lg font-semibold hover:bg-violet-50 transition"
+              className="px-6 py-3 bg-black text-[#D4AF37] rounded-lg font-semibold hover:bg-black/80 transition"
             >
               Subscribe
             </button>

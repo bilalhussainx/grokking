@@ -73,7 +73,7 @@ export default function VsLeetCodePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-black">
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="text-center">
@@ -86,7 +86,7 @@ export default function VsLeetCodePage() {
           </p>
           <Link
             href="/pricing"
-            className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-lg font-semibold hover:from-violet-500 hover:to-cyan-500 transition"
+            className="inline-flex items-center justify-center px-6 py-3 bg-[#D4AF37] text-black rounded-lg font-semibold hover:bg-[#D4AF37]/90 transition"
           >
             Try KairosLearn Free
             <ArrowRight className="ml-2 w-5 h-5" />
@@ -96,15 +96,15 @@ export default function VsLeetCodePage() {
 
       {/* Quick Comparison */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+        <div className="bg-[#141414] rounded-2xl border border-white/10 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-slate-700/50">
+                <tr className="bg-[#141414]">
                   <th className="px-6 py-4 text-left text-sm font-semibold text-white">
                     Feature
                   </th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-cyan-400">
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-[#D4AF37]">
                     KairosLearn
                   </th>
                   <th className="px-6 py-4 text-center text-sm font-semibold text-white">
@@ -114,7 +114,7 @@ export default function VsLeetCodePage() {
               </thead>
               <tbody className="divide-y divide-white/10">
                 {features.map((item, index) => (
-                  <tr key={index} className="hover:bg-slate-700/30 transition">
+                  <tr key={index} className="hover:bg-white/5 transition">
                     <td className="px-6 py-4">
                       <div>
                         <div className="font-medium text-white">
@@ -128,7 +128,7 @@ export default function VsLeetCodePage() {
                     <td className="px-6 py-4 text-center">
                       {typeof item.kairoslearn === 'boolean' ? (
                         item.kairoslearn ? (
-                          <Check className="w-6 h-6 text-emerald-400 mx-auto" />
+                          <Check className="w-6 h-6 text-[#D4AF37] mx-auto" />
                         ) : (
                           <X className="w-6 h-6 text-gray-600 mx-auto" />
                         )
@@ -141,7 +141,7 @@ export default function VsLeetCodePage() {
                     <td className="px-6 py-4 text-center">
                       {typeof item.leetcode === 'boolean' ? (
                         item.leetcode ? (
-                          <Check className="w-6 h-6 text-emerald-400 mx-auto" />
+                          <Check className="w-6 h-6 text-[#D4AF37] mx-auto" />
                         ) : (
                           <X className="w-6 h-6 text-gray-600 mx-auto" />
                         )
@@ -166,7 +166,7 @@ export default function VsLeetCodePage() {
         </h2>
 
         <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition">
+          <div className="bg-[#141414] rounded-2xl p-8 border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
             <h3 className="text-2xl font-bold text-white mb-4">
               🎤 Voice-First Learning
             </h3>
@@ -179,7 +179,7 @@ export default function VsLeetCodePage() {
             </p>
           </div>
 
-          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition">
+          <div className="bg-[#141414] rounded-2xl p-8 border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
             <h3 className="text-2xl font-bold text-white mb-4">
               🌍 17 Languages, Not Just English
             </h3>
@@ -191,7 +191,7 @@ export default function VsLeetCodePage() {
             </p>
           </div>
 
-          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition">
+          <div className="bg-[#141414] rounded-2xl p-8 border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
             <h3 className="text-2xl font-bold text-white mb-4">
               📚 Structured Courses, Not Just Problems
             </h3>
@@ -204,7 +204,7 @@ export default function VsLeetCodePage() {
             </p>
           </div>
 
-          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition">
+          <div className="bg-[#141414] rounded-2xl p-8 border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
             <h3 className="text-2xl font-bold text-white mb-4">
               🚀 Beyond Coding
             </h3>
@@ -226,7 +226,7 @@ export default function VsLeetCodePage() {
         </h2>
 
         <div className="space-y-6">
-          <div className="bg-violet-500/10 border-l-4 border-violet-500 rounded-lg p-6">
+          <div className="bg-[#D4AF37]/10 border-l-4 border-[#D4AF37] rounded-lg p-6">
             <h3 className="text-xl font-bold text-white mb-3">
               Choose KairosLearn if you:
             </h3>
@@ -240,7 +240,7 @@ export default function VsLeetCodePage() {
             </ul>
           </div>
 
-          <div className="bg-slate-800/60 backdrop-blur-xl border-l-4 border-gray-500 rounded-lg p-6 border border-white/10">
+          <div className="bg-[#141414] border-l-4 border-gray-500 rounded-lg p-6 border border-white/10">
             <h3 className="text-xl font-bold text-white mb-3">
               Choose LeetCode if you:
             </h3>
@@ -269,11 +269,11 @@ export default function VsLeetCodePage() {
         </h2>
 
         <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-violet-500/30 hover:border-violet-500/50 transition">
+          <div className="bg-[#141414] rounded-2xl p-8 border border-[#D4AF37]/30 hover:border-[#D4AF37]/50 transition">
             <h3 className="text-2xl font-bold text-white mb-4">
               KairosLearn
             </h3>
-            <div className="text-4xl font-bold text-violet-400 mb-4">
+            <div className="text-4xl font-bold text-[#D4AF37] mb-4">
               Free
             </div>
             <p className="text-gray-400 mb-6">
@@ -287,13 +287,13 @@ export default function VsLeetCodePage() {
             </ul>
             <Link
               href="/pricing"
-              className="block text-center px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-lg font-semibold hover:from-violet-500 hover:to-cyan-500 transition"
+              className="block text-center px-6 py-3 bg-[#D4AF37] text-black rounded-lg font-semibold hover:bg-[#D4AF37]/90 transition"
             >
               Start Free
             </Link>
           </div>
 
-          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-white/10">
+          <div className="bg-[#141414] rounded-2xl p-8 border border-white/10">
             <h3 className="text-2xl font-bold text-white mb-4">
               LeetCode
             </h3>
@@ -313,7 +313,7 @@ export default function VsLeetCodePage() {
               href="https://leetcode.com/subscribe"
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-center px-6 py-3 bg-slate-700/60 border border-white/10 text-white rounded-lg font-semibold hover:bg-slate-700/80 hover:border-white/20 transition"
+              className="block text-center px-6 py-3 bg-white/5 border border-white/10 text-white rounded-lg font-semibold hover:bg-white/10 hover:border-white/20 transition"
             >
               Visit LeetCode
             </a>
@@ -323,24 +323,24 @@ export default function VsLeetCodePage() {
 
       {/* Final CTA */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-gradient-to-r from-violet-600 to-cyan-600 rounded-2xl p-8 text-white text-center">
+        <div className="bg-[#D4AF37] rounded-2xl p-8 text-black text-center">
           <h2 className="text-3xl font-bold mb-4">
             Ready to Learn with AI Voice Tutoring?
           </h2>
-          <p className="text-xl mb-8 text-violet-50">
+          <p className="text-xl mb-8 text-black/80">
             Try KairosLearn free. No credit card required. 28 courses completely free.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/courses"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-violet-600 rounded-lg font-semibold hover:bg-violet-50 transition"
+              className="inline-flex items-center justify-center px-6 py-3 bg-black text-[#D4AF37] rounded-lg font-semibold hover:bg-black/80 transition"
             >
               Browse Courses
               <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link
               href="/talk"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur text-white rounded-lg font-semibold hover:bg-white/20 transition"
+              className="inline-flex items-center justify-center px-6 py-3 bg-black/10 text-black rounded-lg font-semibold hover:bg-black/20 transition"
             >
               Try Voice Tutoring
             </Link>

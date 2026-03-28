@@ -16,12 +16,12 @@ export const metadata: Metadata = {
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-black">
       {/* Hero */}
       <section className="relative pt-24 pb-16 px-4 overflow-hidden">
         {/* Gradient orbs */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-20 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-20 right-1/4 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 text-center max-w-2xl mx-auto">
           <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-6">
@@ -51,7 +51,7 @@ export default function PricingPage() {
           {FAQ_ITEMS.map(({ q, a }) => (
             <details
               key={q}
-              className="group rounded-xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl overflow-hidden"
+              className="group rounded-xl border border-white/10 bg-[#141414] overflow-hidden"
             >
               <summary className="cursor-pointer px-6 py-4 text-sm font-medium text-white/80 hover:text-white transition-colors list-none flex items-center justify-between">
                 {q}

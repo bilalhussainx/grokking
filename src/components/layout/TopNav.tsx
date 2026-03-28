@@ -32,13 +32,13 @@ export default function TopNav({
   const onToggleSidebar = propOnToggleSidebar ?? overrides.onToggleSidebar;
 
   return (
-    <nav className="sticky top-0 z-50 h-14 flex items-center justify-between px-4 bg-[var(--background)]/60 backdrop-blur-2xl border-b border-[var(--border)]">
+    <nav className="sticky top-0 z-50 h-14 flex items-center justify-between px-4 bg-black/90 backdrop-blur-2xl border-b border-white/10">
       {/* Left section */}
       <div className="flex items-center gap-3 min-w-0">
         {onToggleSidebar && (
           <button
             onClick={onToggleSidebar}
-            className="lg:hidden p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"
+            className="lg:hidden p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-[#D4AF37] transition-colors"
             aria-label="Toggle sidebar"
           >
             <Menu className="w-5 h-5" />
@@ -54,7 +54,7 @@ export default function TopNav({
         {courseTitle && (
           <>
             <span className="hidden sm:block text-white/20">/</span>
-            <div className="hidden sm:flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] truncate">
+            <div className="hidden sm:flex items-center gap-1.5 text-sm text-white/60 truncate">
               <BookOpen className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">{courseTitle}</span>
             </div>
@@ -72,7 +72,7 @@ export default function TopNav({
                 style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
               />
             </div>
-            <span className="text-xs font-medium text-[var(--muted-foreground)] tabular-nums">
+            <span className="text-xs font-medium text-white/60 tabular-nums">
               {Math.round(progress)}%
             </span>
           </div>
@@ -83,7 +83,7 @@ export default function TopNav({
         {user && (
           <div className="hidden sm:flex items-center gap-1">
             <div
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-semibold cursor-default"
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold cursor-default"
               title={`Level ${level}`}
             >
               <Star className="w-3 h-3" /> Lv.{level}
@@ -100,7 +100,7 @@ export default function TopNav({
         )}
         {user && (
           <div
-            className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold cursor-default"
+            className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold cursor-default"
             title={`${gems} gems`}
           >
             <Gem className="w-3 h-3" /> {gems}
@@ -112,7 +112,7 @@ export default function TopNav({
         {user && profile?.role === "student" && (
           <Link
             href="/pricing"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-300 text-xs font-medium hover:from-amber-500/30 hover:to-orange-500/30 transition-all"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#C4A030] transition-all"
           >
             <Crown className="w-3.5 h-3.5" />
             <span>Upgrade</span>
@@ -123,7 +123,7 @@ export default function TopNav({
           onClick={() => {
             window.dispatchEvent(new CustomEvent("open-global-search"));
           }}
-          className="flex items-center gap-2 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-white/5 border border-white/10 text-[var(--muted-foreground)] text-xs hover:bg-white/10 hover:text-[var(--foreground)] transition-all"
+          className="flex items-center gap-2 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs hover:bg-white/10 hover:text-[#D4AF37] transition-all"
           title="Search courses and lessons (Ctrl+K)"
         >
           <Search className="w-3.5 h-3.5" />
@@ -135,7 +135,7 @@ export default function TopNav({
 
         <Link
           href="/talk"
-          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-all"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition-all"
           title="Start a voice conversation"
         >
           <Mic className="w-3.5 h-3.5" />
@@ -144,7 +144,7 @@ export default function TopNav({
 
         <Link
           href="/courses"
-          className="hidden sm:flex p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"
+          className="hidden sm:flex p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-[#D4AF37] transition-colors"
           aria-label="Browse Courses"
           title="Browse Courses"
         >
@@ -153,7 +153,7 @@ export default function TopNav({
 
         <button
           onClick={toggleDarkMode}
-          className="hidden sm:flex p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"
+          className="hidden sm:flex p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-[#D4AF37] transition-colors"
           aria-label="Toggle dark mode"
         >
           {isDark ? (
@@ -167,7 +167,7 @@ export default function TopNav({
           <div className="flex items-center gap-2">
             <Link
               href="/settings"
-              className="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-white text-xs font-bold shadow-md shadow-violet-500/20 hover:ring-2 hover:ring-violet-400/50 transition-all"
+              className="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#D4AF37] to-[#8B7355] text-black text-xs font-bold shadow-md shadow-[#D4AF37]/20 hover:ring-2 hover:ring-[#D4AF37]/50 transition-all"
               title="Settings"
             >
               {(user.user_metadata?.full_name || user.email || "U").charAt(0).toUpperCase()}
@@ -177,7 +177,7 @@ export default function TopNav({
                 href="/survey.html"
                 target="_blank"
                 onClick={() => localStorage.setItem("survey-completed", "true")}
-                className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium hover:bg-violet-500/20 transition-colors"
+                className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition-colors"
                 title="Give feedback"
               >
                 <MessageSquare className="w-3 h-3" />
@@ -186,7 +186,7 @@ export default function TopNav({
             )}
             <button
               onClick={() => signOut()}
-              className="hidden sm:flex p-1.5 rounded-lg text-[var(--muted-foreground)] hover:bg-white/10 hover:text-[var(--foreground)] transition-colors"
+              className="hidden sm:flex p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-[#D4AF37] transition-colors"
               aria-label="Log out"
             >
               <LogOut className="w-[18px] h-[18px]" />
@@ -198,13 +198,13 @@ export default function TopNav({
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="hidden sm:inline-block px-3 py-1.5 rounded-lg text-white/60 text-sm font-medium hover:text-white hover:bg-white/5 transition-all"
+              className="hidden sm:inline-block px-3 py-1.5 rounded-lg text-white/60 text-sm font-medium hover:text-[#D4AF37] hover:bg-white/5 transition-all"
             >
               Sign In
             </Link>
             <Link
               href="/signup"
-              className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 text-white text-sm font-medium hover:opacity-90 transition-opacity"
+              className="px-4 py-2 rounded-lg bg-[#D4AF37] text-black text-sm font-semibold hover:bg-[#C4A030] transition-colors"
             >
               Sign Up
             </Link>

@@ -282,7 +282,7 @@ export default function HomePage() {
           <div className={`px-4 py-2 rounded-xl border font-bold text-lg shadow-lg ${
             dailyLoginReward?.isJackpot
               ? "bg-yellow-500/20 border-yellow-500/30 text-yellow-300 shadow-yellow-500/10"
-              : "bg-violet-500/20 border-violet-500/30 text-violet-300 shadow-violet-500/10"
+              : "bg-white/10 border-white/20 text-[#D4AF37]"
           }`}>
             {dailyLoginReward
               ? dailyLoginReward.message
@@ -313,17 +313,17 @@ export default function HomePage() {
               {/* Cinematic animated gradient orbs */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
                 <motion.div
-                  className="absolute top-0 left-1/4 w-72 h-72 bg-violet-500/15 rounded-full blur-[120px]"
+                  className="absolute top-0 left-1/4 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-[120px]"
                   animate={{ x: [0, 40, -10, 0], y: [0, -30, 10, 0], scale: [1, 1.2, 0.95, 1] }}
                   transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
-                  className="absolute top-10 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-[120px]"
+                  className="absolute top-10 right-1/4 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-[120px]"
                   animate={{ x: [0, -35, 15, 0], y: [0, 30, -15, 0], scale: [1, 1.15, 1.05, 1] }}
                   transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
-                  className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-96 h-60 bg-emerald-500/8 rounded-full blur-[100px]"
+                  className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-96 h-60 bg-white/5 rounded-full blur-[100px]"
                   animate={{ scale: [1, 1.08, 0.98, 1], opacity: [0.8, 1, 0.7, 0.8] }}
                   transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                 />
@@ -341,7 +341,7 @@ export default function HomePage() {
 
               {/* Badge slides in */}
               <motion.div
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 text-[#D4AF37] text-xs font-medium mb-6"
                 initial={{ opacity: 0, y: 10, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.4, 0.25, 1] }}
@@ -354,15 +354,23 @@ export default function HomePage() {
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1]">
                 <BlurReveal
                   text="AI Interview Coach"
-                  className="bg-gradient-to-r from-violet-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent"
+                  className="text-white"
                   delay={0.3}
                 />
                 <br />
-                <BlurReveal
-                  text="+ Language Tutor"
-                  className="text-white"
-                  delay={0.6}
-                />
+                <span className="inline-block">
+                  <BlurReveal
+                    text="+"
+                    className="text-white"
+                    delay={0.6}
+                  />
+                  {" "}
+                  <BlurReveal
+                    text="Language Tutor"
+                    className="italic text-[#D4AF37]"
+                    delay={0.7}
+                  />
+                </span>
               </h1>
 
               {/* Subtitle fades in */}
@@ -384,7 +392,7 @@ export default function HomePage() {
               >
                 <Link
                   href="/signup"
-                  className="group w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-base hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
+                  className="group w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-base hover:bg-[#C4A030] transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
                 >
                   <Target className="w-4 h-4" />
                   Start Mock Interview
@@ -392,7 +400,7 @@ export default function HomePage() {
                 </Link>
                 <Link
                   href="/signup"
-                  className="group w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white/70 font-medium text-base hover:bg-white/10 hover:text-white hover:border-white/20 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
+                  className="group w-full sm:w-auto px-8 py-3.5 rounded-xl border border-white/20 text-white font-medium text-base hover:border-[#D4AF37]/50 hover:bg-white/5 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
                 >
                   <Mic className="w-4 h-4" />
                   Try Voice Tutoring
@@ -406,33 +414,33 @@ export default function HomePage() {
               {/* Interview Coaching Pillar */}
               <motion.div
                 variants={staggerChild}
-                className="group relative overflow-hidden rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 via-slate-800/60 to-slate-900/80 backdrop-blur-xl p-7 md:p-8"
-                whileHover={{ scale: 1.02, borderColor: "rgba(139, 92, 246, 0.5)", y: -4 }}
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#141414] p-7 md:p-8"
+                whileHover={{ scale: 1.02, borderColor: "rgba(212, 175, 55, 0.4)", y: -4 }}
                 transition={springSnappy}
               >
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-violet-500/10 rounded-full blur-3xl group-hover:bg-violet-500/20 transition-colors" />
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#D4AF37]/5 rounded-full blur-3xl group-hover:bg-[#D4AF37]/10 transition-colors" />
                 <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-xl bg-violet-500/15 border border-violet-500/20 flex items-center justify-center mb-5">
-                    <Target className="w-7 h-7 text-violet-400" />
+                  <div className="w-14 h-14 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center mb-5">
+                    <Target className="w-7 h-7 text-[#D4AF37]" />
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-3">Interview Coaching</h2>
                   <ul className="space-y-3 mb-6">
                     <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Users className="w-4 h-4 text-violet-400 mt-0.5 shrink-0" />
+                      <Users className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
                       <span>Practice recruiter screens, technical interviews, system design rounds</span>
                     </li>
                     <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Brain className="w-4 h-4 text-violet-400 mt-0.5 shrink-0" />
+                      <Brain className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
                       <span>AI adapts to your level and teaches when you get stuck</span>
                     </li>
                     <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Shield className="w-4 h-4 text-violet-400 mt-0.5 shrink-0" />
+                      <Shield className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
                       <span>10 role presets: Frontend, Backend, Full Stack, ML/AI, PM, Finance, and more</span>
                     </li>
                   </ul>
                   <Link
                     href="/signup"
-                    className="inline-flex items-center gap-2 text-violet-400 text-sm font-medium hover:text-violet-300 transition-colors"
+                    className="inline-flex items-center gap-2 text-[#D4AF37] text-sm font-medium hover:text-[#C4A030] transition-colors"
                   >
                     Start Practicing <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -442,33 +450,33 @@ export default function HomePage() {
               {/* Voice Tutoring Pillar */}
               <motion.div
                 variants={staggerChild}
-                className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-slate-800/60 to-slate-900/80 backdrop-blur-xl p-7 md:p-8"
-                whileHover={{ scale: 1.02, borderColor: "rgba(16, 185, 129, 0.5)", y: -4 }}
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#141414] p-7 md:p-8"
+                whileHover={{ scale: 1.02, borderColor: "rgba(212, 175, 55, 0.4)", y: -4 }}
                 transition={springSnappy}
               >
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-colors" />
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors" />
                 <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center mb-5">
-                    <Mic className="w-7 h-7 text-emerald-400" />
+                  <div className="w-14 h-14 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center mb-5">
+                    <Mic className="w-7 h-7 text-[#D4AF37]" />
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-3">Voice Tutoring</h2>
                   <ul className="space-y-3 mb-6">
                     <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Globe className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                      <Globe className="w-4 h-4 text-white/70 mt-0.5 shrink-0" />
                       <span>Learn coding, finance, philosophy in 17 languages</span>
                     </li>
                     <li className="flex items-start gap-3 text-sm text-white/60">
-                      <MessageSquare className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                      <MessageSquare className="w-4 h-4 text-white/70 mt-0.5 shrink-0" />
                       <span>Real-time voice conversation with AI tutors</span>
                     </li>
                     <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Zap className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                      <Zap className="w-4 h-4 text-white/70 mt-0.5 shrink-0" />
                       <span>Sub-second response time, natural conversation flow</span>
                     </li>
                   </ul>
                   <Link
                     href="/signup"
-                    className="inline-flex items-center gap-2 text-emerald-400 text-sm font-medium hover:text-emerald-300 transition-colors"
+                    className="inline-flex items-center gap-2 text-[#D4AF37] text-sm font-medium hover:text-[#C4A030] transition-colors"
                   >
                     Try Voice Chat <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -495,24 +503,16 @@ export default function HomePage() {
                   { icon: Map, label: "Career Pathways", desc: "Role-based learning paths that combine courses + interviews", href: "/pathways", color: "cyan" },
                 ].map((card) => {
                   const Icon = card.icon;
-                  const colorStyles: Record<string, { border: string; iconBg: string; iconColor: string }> = {
-                    emerald: { border: "border-emerald-500/20 hover:border-emerald-500/40", iconBg: "bg-emerald-500/10", iconColor: "text-emerald-400" },
-                    blue: { border: "border-blue-500/20 hover:border-blue-500/40", iconBg: "bg-blue-500/10", iconColor: "text-blue-400" },
-                    violet: { border: "border-violet-500/20 hover:border-violet-500/40", iconBg: "bg-violet-500/10", iconColor: "text-violet-400" },
-                    amber: { border: "border-amber-500/20 hover:border-amber-500/40", iconBg: "bg-amber-500/10", iconColor: "text-amber-400" },
-                    cyan: { border: "border-cyan-500/20 hover:border-cyan-500/40", iconBg: "bg-cyan-500/10", iconColor: "text-cyan-400" },
-                  };
-                  const cs = colorStyles[card.color];
                   return (
                     <Link key={card.label} href={card.href}>
                       <motion.div
                         variants={staggerChild}
-                        className={`bg-slate-800/60 backdrop-blur-xl rounded-2xl border ${cs.border} p-5 cursor-pointer h-full transition-all`}
+                        className="bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 rounded-2xl p-5 cursor-pointer h-full transition-all"
                         whileHover={{ scale: 1.04, y: -6 }}
                         transition={springSnappy}
                       >
-                        <div className={`w-10 h-10 rounded-xl ${cs.iconBg} flex items-center justify-center mb-3`}>
-                          <Icon className={`w-5 h-5 ${cs.iconColor}`} />
+                        <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center mb-3">
+                          <Icon className="w-5 h-5 text-[#D4AF37]" />
                         </div>
                         <h4 className="text-white font-semibold mb-1">{card.label}</h4>
                         <p className="text-slate-400 text-xs leading-relaxed">{card.desc}</p>
@@ -532,7 +532,7 @@ export default function HomePage() {
                 </div>
                 <Link
                   href="/pathways"
-                  className="text-sm text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 transition-colors"
+                  className="text-sm text-[#D4AF37] hover:text-[#C4A030] font-medium flex items-center gap-1 transition-colors"
                 >
                   All pathways <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -541,7 +541,7 @@ export default function HomePage() {
                 {pathways.slice(0, 4).map((pw) => (
                   <Link key={pw.slug} href={`/pathways/${pw.slug}`}>
                     <motion.div
-                      className="group rounded-2xl border border-white/10 bg-slate-800/60 backdrop-blur-xl p-5 h-full cursor-pointer hover:border-white/20 transition-all"
+                      className="group rounded-2xl border border-white/10 bg-[#141414] p-5 h-full cursor-pointer hover:border-[#D4AF37]/40 transition-all"
                       whileHover={{ scale: 1.02 }}
                       transition={{ duration: 0.2 }}
                     >
@@ -567,7 +567,7 @@ export default function HomePage() {
                 <h2 className="text-2xl sm:text-3xl font-bold text-white">Top Courses</h2>
                 <Link
                   href="/courses"
-                  className="text-sm text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 transition-colors"
+                  className="text-sm text-[#D4AF37] hover:text-[#C4A030] font-medium flex items-center gap-1 transition-colors"
                 >
                   See all courses <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -575,7 +575,7 @@ export default function HomePage() {
 
               {/* Interview Prep row */}
               <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Target className="w-3.5 h-3.5 text-violet-400" />
+                <Target className="w-3.5 h-3.5 text-[#D4AF37]" />
                 Interview Prep
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -585,13 +585,13 @@ export default function HomePage() {
                   return (
                     <Link key={course.slug} href={`/course/${course.slug}`}>
                       <motion.div
-                        className="group rounded-xl bg-gradient-to-br from-violet-500/5 via-slate-800/80 to-slate-900/80 border border-violet-500/20 hover:border-violet-500/40 p-5 h-full cursor-pointer transition-all"
+                        className="group rounded-xl bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 p-5 h-full cursor-pointer transition-all"
                         whileHover={{ scale: 1.02 }}
                         transition={{ duration: 0.2 }}
                       >
                         <div className="flex items-start justify-between mb-2">
                           <span className="text-3xl">{course.icon}</span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20'}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'border-white/20 text-white/70'}`}>
                             {course.tier === 'pro' ? 'PRO' : 'FREE'}
                           </span>
                         </div>
@@ -605,7 +605,7 @@ export default function HomePage() {
 
               {/* Most Popular row */}
               <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Star className="w-3.5 h-3.5 text-amber-400" />
+                <Star className="w-3.5 h-3.5 text-[#D4AF37]" />
                 Most Popular
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -615,13 +615,13 @@ export default function HomePage() {
                   return (
                     <Link key={course.slug} href={`/course/${course.slug}`}>
                       <motion.div
-                        className="group rounded-xl bg-gradient-to-br from-cyan-500/5 via-slate-800/80 to-slate-900/80 border border-cyan-500/20 hover:border-cyan-500/40 p-5 h-full cursor-pointer transition-all"
+                        className="group rounded-xl bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 p-5 h-full cursor-pointer transition-all"
                         whileHover={{ scale: 1.02 }}
                         transition={{ duration: 0.2 }}
                       >
                         <div className="flex items-start justify-between mb-2">
                           <span className="text-3xl">{course.icon}</span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20'}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'border-white/20 text-white/70'}`}>
                             {course.tier === 'pro' ? 'PRO' : 'FREE'}
                           </span>
                         </div>
@@ -636,7 +636,7 @@ export default function HomePage() {
 
             {/* ── SECTION 6: SOCIAL PROOF NUMBERS ── */}
             <ScrollReveal className="mb-20" direction="scale">
-              <div className="rounded-2xl border border-white/10 bg-slate-800/40 backdrop-blur-xl p-8">
+              <div className="rounded-2xl border border-white/10 bg-[#141414] p-8">
                 <StaggerReveal className="grid grid-cols-2 md:grid-cols-4 gap-8" delay={0.1}>
                   {[
                     { value: "69+", label: "Courses", icon: BookOpen },
@@ -659,15 +659,15 @@ export default function HomePage() {
 
             {/* ── SECTION 7: FINAL CTA ── */}
             <ScrollReveal className="mb-16" direction="scale">
-              <div className="relative rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 via-slate-900/80 to-cyan-500/5 backdrop-blur-xl p-10 text-center overflow-hidden">
+              <div className="relative rounded-2xl border border-white/10 bg-[#141414] p-10 text-center overflow-hidden">
                 <div className="absolute inset-0 pointer-events-none">
                   <motion.div
-                    className="absolute top-0 left-1/4 w-40 h-40 bg-violet-500/10 rounded-full blur-[80px]"
+                    className="absolute top-0 left-1/4 w-40 h-40 bg-[#D4AF37]/8 rounded-full blur-[80px]"
                     animate={{ x: [0, 20, 0], y: [0, -15, 0] }}
                     transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                   />
                   <motion.div
-                    className="absolute bottom-0 right-1/4 w-40 h-40 bg-cyan-500/10 rounded-full blur-[80px]"
+                    className="absolute bottom-0 right-1/4 w-40 h-40 bg-[#D4AF37]/5 rounded-full blur-[80px]"
                     animate={{ x: [0, -20, 0], y: [0, 15, 0] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                   />
@@ -681,7 +681,7 @@ export default function HomePage() {
                   </p>
                   <Link
                     href="/signup"
-                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-base hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:-translate-y-0.5 active:translate-y-0"
+                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-base hover:bg-[#C4A030] transition-all hover:-translate-y-0.5 active:translate-y-0"
                   >
                     <GraduationCap className="w-5 h-5" />
                     Create Free Account
@@ -739,10 +739,10 @@ export default function HomePage() {
               variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06, delayChildren: 0.4 } } }}
             >
               {[
-                { href: "/interviews", icon: Target, label: "Mock Interview", style: "bg-gradient-to-r from-violet-600 to-cyan-600 text-white shadow-lg shadow-violet-500/20 hover:from-violet-500 hover:to-cyan-500" },
-                { href: "/talk", icon: Mic, label: "Voice Tutoring", style: "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20" },
-                { href: "/pathways", icon: Map, label: "Career Pathways", style: "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white" },
-                { href: "/courses", icon: BookOpen, label: "All Courses", style: "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white" },
+                { href: "/interviews", icon: Target, label: "Mock Interview", style: "bg-[#D4AF37] text-black font-semibold" },
+                { href: "/talk", icon: Mic, label: "Voice Tutoring", style: "border border-white/20 text-white hover:border-[#D4AF37]/50 hover:bg-white/5" },
+                { href: "/pathways", icon: Map, label: "Career Pathways", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
+                { href: "/courses", icon: BookOpen, label: "All Courses", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
               ].map((action) => {
                 const ActionIcon = action.icon;
                 return (
@@ -764,7 +764,7 @@ export default function HomePage() {
               <motion.div variants={{ hidden: { opacity: 0, y: 12, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1 } }}>
                 <button
                   onClick={() => openPanel()}
-                  className="group px-5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold hover:bg-amber-500/20 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
+                  className="group px-5 py-2.5 rounded-xl border border-[#D4AF37]/30 text-[#D4AF37] text-sm font-semibold hover:bg-[#D4AF37]/10 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
                 >
                   <MessageSquare className="w-4 h-4" />
                   Chat with Coach Alex
@@ -812,7 +812,7 @@ export default function HomePage() {
         {user && (
           <motion.div variants={item} className="mb-12">
             <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 text-[#D4AF37] text-xs font-medium mb-4">
                 <Target className="w-3.5 h-3.5" />
                 AI-Powered Practice
               </div>
@@ -825,51 +825,27 @@ export default function HomePage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
-                { icon: Globe, label: "Frontend Engineer", desc: "React, CSS, DOM, accessibility, and UI architecture questions.", color: "cyan", gradient: "from-cyan-500/10 via-cyan-500/5" },
-                { icon: Server, label: "Backend Engineer", desc: "APIs, databases, auth, caching, and server-side architecture.", color: "emerald", gradient: "from-emerald-500/10 via-emerald-500/5" },
-                { icon: Code2, label: "Full Stack Developer", desc: "End-to-end system questions spanning frontend and backend.", color: "violet", gradient: "from-violet-500/10 via-violet-500/5" },
-                { icon: Building2, label: "System Design", desc: "Whiteboard-style architecture rounds for senior roles.", color: "blue", gradient: "from-blue-500/10 via-blue-500/5" },
-                { icon: Users, label: "Recruiter Screen", desc: "15-minute phone screens: tell me about yourself, why this role, salary.", color: "amber", gradient: "from-amber-500/10 via-amber-500/5" },
-                { icon: MessageSquare, label: "Behavioral", desc: "STAR method practice: leadership, conflict, failure, teamwork.", color: "pink", gradient: "from-pink-500/10 via-pink-500/5" },
+                { icon: Globe, label: "Frontend Engineer", desc: "React, CSS, DOM, accessibility, and UI architecture questions." },
+                { icon: Server, label: "Backend Engineer", desc: "APIs, databases, auth, caching, and server-side architecture." },
+                { icon: Code2, label: "Full Stack Developer", desc: "End-to-end system questions spanning frontend and backend." },
+                { icon: Building2, label: "System Design", desc: "Whiteboard-style architecture rounds for senior roles." },
+                { icon: Users, label: "Recruiter Screen", desc: "15-minute phone screens: tell me about yourself, why this role, salary." },
+                { icon: MessageSquare, label: "Behavioral", desc: "STAR method practice: leadership, conflict, failure, teamwork." },
               ].map((card) => {
                 const Icon = card.icon;
-                const borderColors: Record<string, string> = {
-                  cyan: "border-cyan-500/20 hover:border-cyan-500/50",
-                  emerald: "border-emerald-500/20 hover:border-emerald-500/50",
-                  violet: "border-violet-500/20 hover:border-violet-500/50",
-                  blue: "border-blue-500/20 hover:border-blue-500/50",
-                  amber: "border-amber-500/20 hover:border-amber-500/50",
-                  pink: "border-pink-500/20 hover:border-pink-500/50",
-                };
-                const iconColors: Record<string, string> = {
-                  cyan: "text-cyan-400 bg-cyan-500/15 border-cyan-500/20",
-                  emerald: "text-emerald-400 bg-emerald-500/15 border-emerald-500/20",
-                  violet: "text-violet-400 bg-violet-500/15 border-violet-500/20",
-                  blue: "text-blue-400 bg-blue-500/15 border-blue-500/20",
-                  amber: "text-amber-400 bg-amber-500/15 border-amber-500/20",
-                  pink: "text-pink-400 bg-pink-500/15 border-pink-500/20",
-                };
-                const ctaColors: Record<string, string> = {
-                  cyan: "text-cyan-400",
-                  emerald: "text-emerald-400",
-                  violet: "text-violet-400",
-                  blue: "text-blue-400",
-                  amber: "text-amber-400",
-                  pink: "text-pink-400",
-                };
                 return (
                   <Link key={card.label} href="/interviews">
                     <motion.div
-                      className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} to-slate-900/80 backdrop-blur-xl border ${borderColors[card.color]} p-6 cursor-pointer h-full min-h-[140px] transition-all`}
+                      className="group relative overflow-hidden rounded-2xl bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 p-6 cursor-pointer h-full min-h-[140px] transition-all"
                       whileHover={{ scale: 1.03, y: -4 }}
                       transition={{ type: "spring", stiffness: 300, damping: 25 }}
                     >
-                      <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-4 ${iconColors[card.color]}`}>
+                      <div className="w-12 h-12 rounded-xl border border-[#D4AF37]/20 flex items-center justify-center mb-4 bg-[#D4AF37]/10 text-[#D4AF37]">
                         <Icon className="w-6 h-6" />
                       </div>
                       <h4 className="text-white font-semibold text-base mb-1.5">{card.label}</h4>
                       <p className="text-slate-400 text-sm leading-relaxed mb-4">{card.desc}</p>
-                      <div className={`flex items-center gap-1.5 text-sm font-medium ${ctaColors[card.color]} group-hover:gap-2.5 transition-all`}>
+                      <div className="flex items-center gap-1.5 text-sm font-medium text-[#D4AF37] group-hover:gap-2.5 transition-all">
                         Start Interview <ArrowRight className="w-4 h-4" />
                       </div>
                     </motion.div>
@@ -886,7 +862,7 @@ export default function HomePage() {
             <div className="space-y-3">
               <Link href="/talk">
                 <motion.div
-                  className="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium text-sm hover:bg-emerald-500/15 hover:border-emerald-500/30 transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl border border-white/20 text-white hover:border-[#D4AF37]/50 hover:bg-white/5 font-medium text-sm transition-all cursor-pointer"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
@@ -921,10 +897,10 @@ export default function HomePage() {
           <motion.div variants={item} className="mb-10">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                <Map className="w-3.5 h-3.5 text-cyan-400" />
+                <Map className="w-3.5 h-3.5 text-[#D4AF37]" />
                 Career Pathways
               </h3>
-              <Link href="/pathways" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1">
+              <Link href="/pathways" className="text-xs text-[#D4AF37] hover:text-[#C4A030] transition-colors flex items-center gap-1">
                 View all <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
@@ -941,14 +917,14 @@ export default function HomePage() {
                 return (
                   <Link key={pathway.slug} href={`/pathways/${pathway.slug}`}>
                     <motion.div
-                      className="rounded-xl bg-slate-800/60 backdrop-blur-xl border border-white/10 hover:border-cyan-500/30 p-4 cursor-pointer h-full transition-all"
+                      className="rounded-xl bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 p-4 cursor-pointer h-full transition-all"
                       whileHover={{ scale: 1.02 }}
                       transition={{ duration: 0.2 }}
                     >
                       <div className="flex items-start justify-between mb-2">
                         <span className="text-2xl">{pathway.icon}</span>
                         {hasStarted && (
-                          <span className="text-xs font-medium text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full">
+                          <span className="text-xs font-medium text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-0.5 rounded-full">
                             {avgProgress}%
                           </span>
                         )}
@@ -981,7 +957,7 @@ export default function HomePage() {
           <motion.div variants={item} className="mb-10">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
+                <ArrowRight className="w-3.5 h-3.5 text-white/70" />
                 Continue Learning
               </h3>
               <span className="text-xs text-slate-600">{inProgressCourses.length} course{inProgressCourses.length > 1 ? "s" : ""} in progress</span>
@@ -992,7 +968,7 @@ export default function HomePage() {
                 const encouragement = progress >= 75 ? "Almost there!" : progress >= 50 ? "Halfway done!" : progress >= 25 ? "Great start!" : "Keep going!";
                 return (
                   <Link key={course.slug} href={`/course/${course.slug}`}>
-                    <div className="rounded-xl bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-slate-700/40 p-4 hover:bg-slate-800/80 hover:border-emerald-500/30 transition-all cursor-pointer h-full">
+                    <div className="rounded-xl bg-[#141414] border border-white/10 p-4 hover:border-[#D4AF37]/40 transition-all cursor-pointer h-full">
                       <div className="flex items-start justify-between mb-3">
                         <span className="text-3xl">{course.icon}</span>
                         <ProgressRing progress={progress} size={36} strokeWidth={2.5} />
@@ -1000,13 +976,13 @@ export default function HomePage() {
                       <div className="text-sm font-semibold text-white mb-1">{course.title}</div>
                       <div className="w-full h-1.5 bg-slate-700/50 rounded-full overflow-hidden mb-2">
                         <div
-                          className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full transition-all"
+                          className="h-full bg-[#D4AF37] rounded-full transition-all"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-slate-500">{Math.round(progress)}% complete</span>
-                        <span className="text-xs text-emerald-400 font-medium">{encouragement}</span>
+                        <span className="text-xs text-[#D4AF37] font-medium">{encouragement}</span>
                       </div>
                     </div>
                   </Link>
@@ -1026,10 +1002,10 @@ export default function HomePage() {
             <motion.div variants={item} className="mb-10">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
                   Recommended Courses
                 </h3>
-                <Link href="/courses" className="text-xs text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1">
+                <Link href="/courses" className="text-xs text-[#D4AF37] hover:text-[#C4A030] transition-colors flex items-center gap-1">
                   Browse all <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
@@ -1037,13 +1013,13 @@ export default function HomePage() {
                 {topCourses.map((course) => (
                   <Link key={course.id} href={`/course/${course.slug}`}>
                     <motion.div
-                      className="group rounded-xl bg-gradient-to-br from-violet-500/5 via-slate-800/80 to-slate-900/80 border border-violet-500/15 hover:border-violet-500/40 p-4 cursor-pointer h-full transition-all"
+                      className="group rounded-xl bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 p-4 cursor-pointer h-full transition-all"
                       whileHover={{ scale: 1.02 }}
                       transition={{ duration: 0.2 }}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-2xl">{course.icon}</span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20'}`}>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'border-white/20 text-white/70'}`}>
                           {course.tier === 'pro' ? 'Pro' : 'Free'}
                         </span>
                       </div>

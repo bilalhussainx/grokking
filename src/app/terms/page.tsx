@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-black">
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <h1 className="text-4xl font-bold text-white mb-4">Terms of Service</h1>
         <p className="text-gray-400 mb-12">Last updated: March 26, 2026</p>
@@ -16,7 +16,7 @@ export default function TermsOfServicePage() {
         <div className="prose prose-lg prose-invert max-w-none">
           <h2>1. Acceptance of Terms</h2>
           <p>
-            By accessing or using KairosLearn at <Link href="/" className="text-cyan-400">kairoslearn.com</Link>,
+            By accessing or using KairosLearn at <Link href="/" className="text-[#D4AF37]">kairoslearn.com</Link>,
             you agree to be bound by these Terms of Service. If you do not agree, do not use the platform.
           </p>
 
@@ -94,7 +94,7 @@ export default function TermsOfServicePage() {
           <p>
             We may suspend or terminate your account if you violate these terms. You may delete your account at
             any time through your account settings. Upon deletion, your personal data will be removed per our{' '}
-            <Link href="/privacy" className="text-cyan-400">Privacy Policy</Link>.
+            <Link href="/privacy" className="text-[#D4AF37]">Privacy Policy</Link>.
           </p>
 
           <h2>11. Changes to Terms</h2>
@@ -112,7 +112,7 @@ export default function TermsOfServicePage() {
           <h2>13. Contact</h2>
           <p>
             Questions about these Terms? Contact us at:{' '}
-            <a href="mailto:bilalhussain.v1@gmail.com" className="text-cyan-400">bilalhussain.v1@gmail.com</a>
+            <a href="mailto:bilalhussain.v1@gmail.com" className="text-[#D4AF37]">bilalhussain.v1@gmail.com</a>
           </p>
         </div>
       </article>

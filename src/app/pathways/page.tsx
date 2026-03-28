@@ -20,7 +20,7 @@ const item = {
 
 export default function PathwaysPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-black">
       <motion.div
         className="max-w-6xl mx-auto px-4 pt-20 pb-24"
         variants={container}
@@ -29,13 +29,13 @@ export default function PathwaysPage() {
       >
         {/* Hero */}
         <motion.div variants={item} className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium mb-6">
             <Briefcase className="w-3.5 h-3.5" />
             {pathways.length} Career Pathways
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
             Pick your{" "}
-            <span className="text-violet-400">
+            <span className="text-[#D4AF37]">
               career path
             </span>
           </h1>
@@ -53,7 +53,7 @@ export default function PathwaysPage() {
           {pathways.map((pathway) => (
             <motion.div key={pathway.id} variants={item}>
               <Link href={`/pathways/${pathway.slug}`}>
-                <div className="group relative overflow-hidden rounded-2xl bg-slate-800/60 backdrop-blur-xl border border-white/10 p-6 h-full cursor-pointer transition-all hover:border-white/20 hover:bg-slate-800/80">
+                <div className="group relative overflow-hidden rounded-2xl bg-[#141414] border border-white/10 p-6 h-full cursor-pointer transition-all hover:border-[#D4AF37]/30 hover:bg-white/5">
                   {/* Gradient glow */}
                   <div
                     className={`absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl opacity-10 bg-gradient-to-br ${pathway.color} group-hover:opacity-20 transition-opacity`}

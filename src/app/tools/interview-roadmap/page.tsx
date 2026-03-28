@@ -76,11 +76,11 @@ export default function InterviewRoadmapPage() {
   const currentRoadmap = roadmaps[formData.experience as keyof typeof roadmaps][formData.timeframe as keyof typeof roadmaps['beginner']];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-black">
       {/* Hero */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="text-center">
-          <div className="inline-block px-4 py-2 bg-violet-500/20 text-violet-400 rounded-full text-sm font-medium mb-6">
+          <div className="inline-block px-4 py-2 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full text-sm font-medium mb-6">
             Free Tool · No Credit Card Required
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">
@@ -96,7 +96,7 @@ export default function InterviewRoadmapPage() {
       {!showRoadmap ? (
         /* Form */
         <section className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          <form onSubmit={handleSubmit} className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-white/10">
+          <form onSubmit={handleSubmit} className="bg-[#141414] rounded-2xl p-8 border border-white/10">
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
@@ -106,7 +106,7 @@ export default function InterviewRoadmapPage() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-white/10 rounded-lg bg-slate-700/50 text-white placeholder-gray-400 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-white/20 rounded-lg bg-transparent text-white placeholder-gray-400 focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/50"
                   placeholder="John Doe"
                   required
                 />
@@ -119,7 +119,7 @@ export default function InterviewRoadmapPage() {
                 <select
                   value={formData.experience}
                   onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                  className="w-full px-4 py-3 border border-white/10 rounded-lg bg-slate-700/50 text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-white/20 rounded-lg bg-transparent text-white focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/50"
                 >
                   <option value="beginner">Beginner (New to coding interviews)</option>
                   <option value="intermediate">Intermediate (Some DSA knowledge)</option>
@@ -134,7 +134,7 @@ export default function InterviewRoadmapPage() {
                 <select
                   value={formData.targetCompany}
                   onChange={(e) => setFormData({ ...formData, targetCompany: e.target.value })}
-                  className="w-full px-4 py-3 border border-white/10 rounded-lg bg-slate-700/50 text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-white/20 rounded-lg bg-transparent text-white focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/50"
                 >
                   <option value="general">General Tech Companies</option>
                   <option value="faang">FAANG (Meta, Amazon, Apple, Netflix, Google)</option>
@@ -150,7 +150,7 @@ export default function InterviewRoadmapPage() {
                 <select
                   value={formData.timeframe}
                   onChange={(e) => setFormData({ ...formData, timeframe: e.target.value })}
-                  className="w-full px-4 py-3 border border-white/10 rounded-lg bg-slate-700/50 text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-white/20 rounded-lg bg-transparent text-white focus:border-[#D4AF37]/50 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/50"
                 >
                   <option value="3months">3 Months (Intensive)</option>
                   <option value="6months">6 Months (Balanced)</option>
@@ -159,7 +159,7 @@ export default function InterviewRoadmapPage() {
 
               <button
                 type="submit"
-                className="w-full px-6 py-4 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-lg font-semibold hover:from-violet-500 hover:to-cyan-500 transition flex items-center justify-center"
+                className="w-full px-6 py-4 bg-[#D4AF37] text-black rounded-lg font-semibold hover:bg-[#D4AF37]/90 transition flex items-center justify-center"
               >
                 Generate My Roadmap
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -170,9 +170,9 @@ export default function InterviewRoadmapPage() {
       ) : (
         /* Roadmap */
         <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-white/10">
+          <div className="bg-[#141414] rounded-2xl p-8 border border-white/10">
             <div className="text-center mb-8">
-              <CheckCircle className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
+              <CheckCircle className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-white mb-2">
                 Your Personalized Roadmap is Ready, {formData.name}!
               </h2>
@@ -187,10 +187,10 @@ export default function InterviewRoadmapPage() {
               </h3>
               <div className="space-y-4">
                 {currentRoadmap.map((phase, index) => (
-                  <div key={index} className="border border-white/10 rounded-lg p-4 hover:bg-slate-700/30 transition">
+                  <div key={index} className="border border-white/10 rounded-lg p-4 hover:bg-white/5 transition">
                     <div className="flex items-start gap-4">
-                      <div className="w-16 h-16 bg-violet-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-xl font-bold text-violet-400">{phase.week}</span>
+                      <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-xl font-bold text-[#D4AF37]">{phase.week}</span>
                       </div>
                       <div className="flex-1">
                         <h4 className="font-semibold text-white mb-2">{phase.topic}</h4>
@@ -212,14 +212,14 @@ export default function InterviewRoadmapPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => window.print()}
-                className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-lg font-semibold hover:from-violet-500 hover:to-cyan-500 transition"
+                className="inline-flex items-center justify-center px-6 py-3 bg-[#D4AF37] text-black rounded-lg font-semibold hover:bg-[#D4AF37]/90 transition"
               >
                 <Printer className="mr-2 w-5 h-5" />
                 Print Roadmap
               </button>
               <Link
                 href="/courses"
-                className="inline-flex items-center justify-center px-6 py-3 bg-slate-700/60 border border-white/10 text-white rounded-lg font-semibold hover:bg-slate-700/80 hover:border-white/20 transition"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white/5 border border-white/10 text-white rounded-lg font-semibold hover:bg-white/10 hover:border-white/20 transition"
               >
                 Start Learning on KairosLearn
               </Link>
@@ -227,16 +227,16 @@ export default function InterviewRoadmapPage() {
           </div>
 
           {/* CTA */}
-          <div className="mt-12 bg-gradient-to-r from-violet-600 to-cyan-600 rounded-2xl p-8 text-white text-center">
+          <div className="mt-12 bg-[#D4AF37] rounded-2xl p-8 text-black text-center">
             <h3 className="text-2xl font-bold mb-4">
               Ready to Start Your Interview Prep Journey?
             </h3>
-            <p className="text-xl mb-6 text-violet-50">
+            <p className="text-xl mb-6 text-black/80">
               KairosLearn offers all the courses mentioned in your roadmap — with AI voice tutoring in 17 languages.
             </p>
             <Link
               href="/courses"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-violet-600 rounded-lg font-semibold hover:bg-violet-50 transition"
+              className="inline-flex items-center justify-center px-6 py-3 bg-black text-[#D4AF37] rounded-lg font-semibold hover:bg-black/80 transition"
             >
               Explore Courses
               <ArrowRight className="ml-2 w-5 h-5" />

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-black">
       {/* Hero Section */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="text-center">
@@ -25,7 +25,7 @@ export default function AboutPage() {
 
       {/* Founder Story */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-white/10">
+        <div className="bg-[#141414] rounded-2xl p-8 border border-white/10">
           <h2 className="text-3xl font-bold text-white mb-6">
             From Harvard Classroom to AI-Powered Learning
           </h2>
@@ -67,7 +67,7 @@ export default function AboutPage() {
 
             <p className="text-gray-300 leading-relaxed">
               We're raising our pre-seed round now to bring this to 1 million students worldwide. If you're an investor,
-              partner, or just believe in this vision — <Link href="/pricing" className="text-cyan-400 underline">try the platform</Link> or <a href="mailto:bilalhussain.v1@gmail.com" className="text-cyan-400 underline">reach out</a>.
+              partner, or just believe in this vision — <Link href="/pricing" className="text-[#D4AF37] underline">try the platform</Link> or <a href="mailto:bilalhussain.v1@gmail.com" className="text-[#D4AF37] underline">reach out</a>.
             </p>
           </div>
         </div>
@@ -80,9 +80,9 @@ export default function AboutPage() {
         </h2>
 
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition">
-            <div className="w-12 h-12 bg-violet-500/20 rounded-lg flex items-center justify-center mb-4">
-              <Users className="w-6 h-6 text-violet-400" />
+          <div className="bg-[#141414] rounded-2xl p-6 border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
+            <div className="w-12 h-12 bg-[#D4AF37]/10 rounded-lg flex items-center justify-center mb-4">
+              <Users className="w-6 h-6 text-[#D4AF37]" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">
               Education for Everyone
@@ -93,9 +93,9 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition">
-            <div className="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center mb-4">
-              <Sparkles className="w-6 h-6 text-cyan-400" />
+          <div className="bg-[#141414] rounded-2xl p-6 border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
+            <div className="w-12 h-12 bg-[#D4AF37]/10 rounded-lg flex items-center justify-center mb-4">
+              <Sparkles className="w-6 h-6 text-[#D4AF37]" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">
               AI-Native from Day One
@@ -106,9 +106,9 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition">
-            <div className="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center mb-4">
-              <GraduationCap className="w-6 h-6 text-emerald-400" />
+          <div className="bg-[#141414] rounded-2xl p-6 border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
+            <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center mb-4">
+              <GraduationCap className="w-6 h-6 text-white/70" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">
               Evidence-Based Learning
@@ -127,9 +127,9 @@ export default function AboutPage() {
         </h2>
 
         <div className="flex flex-col items-center">
-          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-white/10 text-center max-w-md">
-            <div className="w-24 h-24 bg-gradient-to-br from-violet-500 to-cyan-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <span className="text-3xl font-bold text-white">BH</span>
+          <div className="bg-[#141414] rounded-2xl p-8 border border-white/10 text-center max-w-md">
+            <div className="w-24 h-24 bg-[#D4AF37] rounded-full mx-auto mb-4 flex items-center justify-center">
+              <span className="text-3xl font-bold text-black">BH</span>
             </div>
             <h3 className="text-2xl font-bold text-white mb-2">
               Bilal Hussain
@@ -148,13 +148,13 @@ export default function AboutPage() {
                 href="https://linkedin.com/in/bilalhussain"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-cyan-400 hover:underline"
+                className="text-[#D4AF37] hover:underline"
               >
                 LinkedIn
               </a>
               <a
                 href="mailto:bilalhussain.v1@gmail.com"
-                className="text-cyan-400 hover:underline"
+                className="text-[#D4AF37] hover:underline"
               >
                 Email
               </a>
@@ -165,7 +165,7 @@ export default function AboutPage() {
 
       {/* Traction (Pre-seed pitch section) */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-gradient-to-r from-violet-600 to-cyan-600 rounded-2xl p-8 text-white">
+        <div className="bg-[#D4AF37] rounded-2xl p-8 text-black">
           <h2 className="text-3xl font-bold mb-6 text-center">
             Building the Future of AI Education
           </h2>
@@ -173,37 +173,37 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-4 gap-6 text-center mb-8">
             <div>
               <div className="text-4xl font-bold mb-2">69+</div>
-              <div className="text-violet-100">Interactive Courses</div>
+              <div className="text-black/70">Interactive Courses</div>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">2,284+</div>
-              <div className="text-violet-100">Structured Lessons</div>
+              <div className="text-black/70">Structured Lessons</div>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">17</div>
-              <div className="text-violet-100">Voice Languages</div>
+              <div className="text-black/70">Voice Languages</div>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">28</div>
-              <div className="text-violet-100">Free Courses</div>
+              <div className="text-black/70">Free Courses</div>
             </div>
           </div>
 
           <div className="text-center">
-            <p className="text-lg mb-6 text-violet-50">
+            <p className="text-lg mb-6 text-black/80">
               <strong>We're raising $500K–$1.5M in pre-seed funding</strong> to scale to 1M users and expand our course library.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/pricing"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white text-violet-600 rounded-lg font-semibold hover:bg-violet-50 transition"
+                className="inline-flex items-center justify-center px-6 py-3 bg-black text-[#D4AF37] rounded-lg font-semibold hover:bg-black/80 transition"
               >
                 Try the Platform
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
               <a
                 href="mailto:bilalhussain.v1@gmail.com?subject=KairosLearn Investment Inquiry"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur text-white rounded-lg font-semibold hover:bg-white/20 transition"
+                className="inline-flex items-center justify-center px-6 py-3 bg-black/10 text-black rounded-lg font-semibold hover:bg-black/20 transition"
               >
                 Investor Deck
               </a>
@@ -223,14 +223,14 @@ export default function AboutPage() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/courses"
-            className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-lg font-semibold hover:from-violet-500 hover:to-cyan-500 transition"
+            className="inline-flex items-center justify-center px-6 py-3 bg-[#D4AF37] text-black rounded-lg font-semibold hover:bg-[#D4AF37]/90 transition"
           >
             Explore Courses
             <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
           <a
             href="mailto:bilalhussain.v1@gmail.com"
-            className="inline-flex items-center justify-center px-6 py-3 bg-slate-800/60 backdrop-blur-xl border border-white/10 text-white rounded-lg font-semibold hover:bg-slate-800/80 hover:border-white/20 transition"
+            className="inline-flex items-center justify-center px-6 py-3 bg-[#141414] border border-white/10 text-white rounded-lg font-semibold hover:bg-white/5 hover:border-[#D4AF37]/30 transition"
           >
             Get in Touch
           </a>

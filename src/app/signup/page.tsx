@@ -73,8 +73,8 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <section className="flex min-h-screen items-center justify-center px-4 bg-[var(--background)]">
-        <div className="w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 text-center">
+      <section className="flex min-h-screen items-center justify-center px-4 bg-black">
+        <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#141414] p-8 text-center">
           <div className="mx-auto mb-4">
             <KairosLogo size="md" showText={false} />
           </div>
@@ -89,7 +89,7 @@ export default function SignupPage() {
             >
               {loading ? "Sending..." : "Resend confirmation email"}
             </button>
-            <Link href="/login" className="text-violet-400 text-sm hover:underline block">Back to login</Link>
+            <Link href="/login" className="text-[#D4AF37] text-sm hover:underline block">Back to login</Link>
           </div>
           <p className="text-[10px] text-white/20 mt-4">Check your spam folder if you don't see the email within a few minutes.</p>
         </div>
@@ -98,7 +98,7 @@ export default function SignupPage() {
   }
 
   return (
-    <section className="flex min-h-screen items-center justify-center px-4 py-16 bg-[var(--background)] relative overflow-hidden">
+    <section className="flex min-h-screen items-center justify-center px-4 py-16 bg-black relative overflow-hidden">
       <div
         className="absolute inset-0 opacity-20
         bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)]
@@ -107,7 +107,7 @@ export default function SignupPage() {
       />
       <motion.form
         onSubmit={handleSignup}
-        className="relative w-full max-w-sm rounded-xl border border-white/[0.08] bg-white/[0.03] p-8 shadow-2xl backdrop-blur-sm"
+        className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-[#141414] p-8 shadow-2xl backdrop-blur-sm"
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -128,7 +128,7 @@ export default function SignupPage() {
         <Button
           type="button"
           variant="outline"
-          className="w-full flex items-center justify-center gap-3 mb-4 h-11 border-white/10 hover:bg-white/5"
+          className="w-full flex items-center justify-center gap-3 mb-4 h-11 border-white/20 bg-transparent text-white hover:bg-white/5"
           onClick={signInWithGoogle}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 262" className="w-5 h-5">
@@ -149,16 +149,16 @@ export default function SignupPage() {
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name" className="text-white/70">Full Name</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required autoFocus className="bg-white/5 border-white/10 text-white placeholder:text-white/30" />
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required autoFocus className="bg-transparent border-white/20 text-white placeholder:text-white/30 focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-white/70">Email</Label>
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required className="bg-white/5 border-white/10 text-white placeholder:text-white/30" />
+            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required className="bg-transparent border-white/20 text-white placeholder:text-white/30 focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password" className="text-white/70">Password</Label>
             <div className="relative">
-              <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 6 characters" required minLength={6} className="bg-white/5 border-white/10 text-white placeholder:text-white/30 pr-10" />
+              <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 6 characters" required minLength={6} className="bg-transparent border-white/20 text-white placeholder:text-white/30 pr-10 focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20" />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -181,10 +181,10 @@ export default function SignupPage() {
               id="nativeLanguage"
               value={nativeLanguage}
               onChange={(e) => setNativeLanguage(e.target.value)}
-              className="w-full h-10 px-3 rounded-md bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+              className="w-full h-10 px-3 rounded-lg bg-transparent border border-white/20 text-white text-sm focus:outline-none focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20"
             >
               {NATIVE_LANGUAGES.map(lang => (
-                <option key={lang.code} value={lang.code} className="bg-slate-900">{lang.name}</option>
+                <option key={lang.code} value={lang.code} className="bg-[#141414]">{lang.name}</option>
               ))}
             </select>
             <p className="text-[10px] text-white/30">Coach Alex will explain lessons in your language</p>
@@ -197,21 +197,21 @@ export default function SignupPage() {
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
               placeholder="e.g., INVESTOR-ABC123"
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/30 font-mono"
+              className="bg-transparent border-white/20 text-white placeholder:text-white/30 font-mono focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20"
             />
             <p className="text-[10px] text-white/30">Have an invite code? Enter it for Pro access + bonus credits</p>
           </div>
 
           {error && <p className="text-xs text-red-400 bg-red-500/10 rounded-md p-2">{error}</p>}
 
-          <Button type="submit" className="w-full h-11" disabled={loading}>
+          <Button type="submit" className="w-full h-11 bg-[#D4AF37] text-black font-semibold rounded-lg hover:bg-[#C4A030]" disabled={loading}>
             {loading ? "Creating account..." : "Create Account"}
           </Button>
         </div>
 
         <p className="text-center text-sm text-white/40 mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-violet-400 hover:underline">Sign in</Link>
+          <Link href="/login" className="text-[#D4AF37] hover:underline">Sign in</Link>
         </p>
       </motion.form>
     </section>

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-black">
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <h1 className="text-4xl font-bold text-white mb-4">Privacy Policy</h1>
         <p className="text-gray-400 mb-12">Last updated: March 26, 2026</p>
@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
           <p>
             KairosLearn (&ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;) is committed to protecting your privacy.
             This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our
-            platform at <Link href="/" className="text-cyan-400">kairoslearn.com</Link>.
+            platform at <Link href="/" className="text-[#D4AF37]">kairoslearn.com</Link>.
           </p>
 
           <h2>2. Information We Collect</h2>
@@ -95,7 +95,7 @@ export default function PrivacyPolicyPage() {
           <h2>10. Contact Us</h2>
           <p>
             If you have questions about this Privacy Policy or your data, contact us at:{' '}
-            <a href="mailto:bilalhussain.v1@gmail.com" className="text-cyan-400">bilalhussain.v1@gmail.com</a>
+            <a href="mailto:bilalhussain.v1@gmail.com" className="text-[#D4AF37]">bilalhussain.v1@gmail.com</a>
           </p>
         </div>
       </article>

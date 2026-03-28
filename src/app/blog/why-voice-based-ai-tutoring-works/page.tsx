@@ -10,12 +10,12 @@ export const metadata: Metadata = {
 
 export default function BlogPostPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-black">
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Back link */}
         <Link
           href="/blog"
-          className="inline-flex items-center text-cyan-400 hover:underline mb-8"
+          className="inline-flex items-center text-[#D4AF37] hover:underline mb-8"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Blog
@@ -24,7 +24,7 @@ export default function BlogPostPage() {
         {/* Header */}
         <header className="mb-12">
           <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
-            <span className="px-3 py-1 bg-violet-500/20 text-violet-400 rounded-full text-xs font-medium">
+            <span className="px-3 py-1 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full text-xs font-medium">
               AI Education
             </span>
             <div className="flex items-center gap-1">
@@ -43,8 +43,8 @@ export default function BlogPostPage() {
 
           <div className="flex items-center justify-between border-t border-white/10 pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-cyan-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">BH</span>
+              <div className="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center">
+                <span className="text-black font-bold">BH</span>
               </div>
               <div>
                 <div className="font-semibold text-white">Bilal Hussain</div>
@@ -52,7 +52,7 @@ export default function BlogPostPage() {
               </div>
             </div>
 
-            <button className="flex items-center gap-2 px-4 py-2 bg-slate-800/60 backdrop-blur-xl border border-white/10 rounded-lg text-gray-300 hover:bg-slate-800/80 hover:border-white/20 transition">
+            <button className="flex items-center gap-2 px-4 py-2 bg-[#141414] border border-white/10 rounded-lg text-gray-300 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
               <Share2 className="w-4 h-4" />
               Share
             </button>
@@ -60,7 +60,7 @@ export default function BlogPostPage() {
         </header>
 
         {/* Featured Image Placeholder */}
-        <div className="aspect-video bg-gradient-to-br from-violet-500 to-cyan-500 rounded-2xl mb-12 flex items-center justify-center">
+        <div className="aspect-video bg-gradient-to-br from-[#D4AF37] to-[#8B7355] rounded-2xl mb-12 flex items-center justify-center">
           <span className="text-white text-8xl">🎤</span>
         </div>
 
@@ -171,7 +171,7 @@ export default function BlogPostPage() {
           </p>
 
           <p>
-            <Link href="/talk" className="text-cyan-400 underline">
+            <Link href="/talk" className="text-[#D4AF37] underline">
               Try a voice lesson now (free, no signup required) →
             </Link>
           </p>
@@ -186,23 +186,23 @@ export default function BlogPostPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-16 p-8 bg-gradient-to-r from-violet-600 to-cyan-600 rounded-2xl text-white text-center">
+        <div className="mt-16 p-8 bg-[#D4AF37] rounded-2xl text-black text-center">
           <h2 className="text-3xl font-bold mb-4">
             Experience Voice-First Learning
           </h2>
-          <p className="text-xl mb-8 text-violet-50">
+          <p className="text-xl mb-8 text-black/80">
             Try KairosLearn free. Talk to Coach Alex in 17 languages.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/courses"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-violet-600 rounded-lg font-semibold hover:bg-violet-50 transition"
+              className="inline-flex items-center justify-center px-6 py-3 bg-black text-[#D4AF37] rounded-lg font-semibold hover:bg-black/80 transition"
             >
               Browse Courses
             </Link>
             <Link
               href="/talk"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur text-white rounded-lg font-semibold hover:bg-white/20 transition"
+              className="inline-flex items-center justify-center px-6 py-3 bg-black/10 text-black rounded-lg font-semibold hover:bg-black/20 transition"
             >
               Try Voice Tutoring
             </Link>
@@ -217,9 +217,9 @@ export default function BlogPostPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <Link
               href="/blog/learning-algorithms-in-your-native-language"
-              className="p-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition"
+              className="p-4 bg-[#141414] rounded-2xl border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition"
             >
-              <div className="text-sm text-violet-400 font-medium mb-2">
+              <div className="text-sm text-[#D4AF37] font-medium mb-2">
                 Language Learning
               </div>
               <h4 className="font-semibold text-white mb-2">
@@ -232,9 +232,9 @@ export default function BlogPostPage() {
 
             <Link
               href="/comparison/vs-leetcode"
-              className="p-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/10 hover:bg-slate-800/80 hover:border-white/20 transition"
+              className="p-4 bg-[#141414] rounded-2xl border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition"
             >
-              <div className="text-sm text-violet-400 font-medium mb-2">
+              <div className="text-sm text-[#D4AF37] font-medium mb-2">
                 Platform Comparison
               </div>
               <h4 className="font-semibold text-white mb-2">
