@@ -76,17 +76,17 @@ export default function InterviewRoadmapPage() {
   const currentRoadmap = roadmaps[formData.experience as keyof typeof roadmaps][formData.timeframe as keyof typeof roadmaps['beginner']];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
       {/* Hero */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="text-center">
-          <div className="inline-block px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium mb-6">
+          <div className="inline-block px-4 py-2 bg-violet-500/20 text-violet-400 rounded-full text-sm font-medium mb-6">
             Free Tool · No Credit Card Required
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">
             CS Interview Prep Roadmap Generator
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Get a personalized study plan for your coding interview prep. Tell us your experience level and timeline,
             and we'll generate a week-by-week roadmap with specific resources.
           </p>
@@ -96,30 +96,30 @@ export default function InterviewRoadmapPage() {
       {!showRoadmap ? (
         /* Form */
         <section className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl">
+          <form onSubmit={handleSubmit} className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-white/10">
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Your Name
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-white/10 rounded-lg bg-slate-700/50 text-white placeholder-gray-400 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                   placeholder="John Doe"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Your Experience Level
                 </label>
                 <select
                   value={formData.experience}
                   onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-white/10 rounded-lg bg-slate-700/50 text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 >
                   <option value="beginner">Beginner (New to coding interviews)</option>
                   <option value="intermediate">Intermediate (Some DSA knowledge)</option>
@@ -128,13 +128,13 @@ export default function InterviewRoadmapPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Target Company Type
                 </label>
                 <select
                   value={formData.targetCompany}
                   onChange={(e) => setFormData({ ...formData, targetCompany: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-white/10 rounded-lg bg-slate-700/50 text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 >
                   <option value="general">General Tech Companies</option>
                   <option value="faang">FAANG (Meta, Amazon, Apple, Netflix, Google)</option>
@@ -144,13 +144,13 @@ export default function InterviewRoadmapPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   How much time do you have?
                 </label>
                 <select
                   value={formData.timeframe}
                   onChange={(e) => setFormData({ ...formData, timeframe: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-white/10 rounded-lg bg-slate-700/50 text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 >
                   <option value="3months">3 Months (Intensive)</option>
                   <option value="6months">6 Months (Balanced)</option>
@@ -159,7 +159,7 @@ export default function InterviewRoadmapPage() {
 
               <button
                 type="submit"
-                className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center"
+                className="w-full px-6 py-4 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-lg font-semibold hover:from-violet-500 hover:to-cyan-500 transition flex items-center justify-center"
               >
                 Generate My Roadmap
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -170,31 +170,31 @@ export default function InterviewRoadmapPage() {
       ) : (
         /* Roadmap */
         <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl">
+          <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-white/10">
             <div className="text-center mb-8">
-              <CheckCircle className="w-16 h-16 text-green-600 dark:text-green-400 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <CheckCircle className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
+              <h2 className="text-3xl font-bold text-white mb-2">
                 Your Personalized Roadmap is Ready, {formData.name}!
               </h2>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-300">
                 Your roadmap is ready below! Bookmark this page to reference it later.
               </p>
             </div>
 
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              <h3 className="text-xl font-semibold text-white mb-4">
                 📅 {formData.timeframe === '3months' ? '12-Week' : '24-Week'} Plan for {formData.experience.charAt(0).toUpperCase() + formData.experience.slice(1)} Level
               </h3>
               <div className="space-y-4">
                 {currentRoadmap.map((phase, index) => (
-                  <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div key={index} className="border border-white/10 rounded-lg p-4 hover:bg-slate-700/30 transition">
                     <div className="flex items-start gap-4">
-                      <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-xl font-bold text-blue-600 dark:text-blue-400">{phase.week}</span>
+                      <div className="w-16 h-16 bg-violet-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-xl font-bold text-violet-400">{phase.week}</span>
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{phase.topic}</h4>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <h4 className="font-semibold text-white mb-2">{phase.topic}</h4>
+                        <div className="text-sm text-gray-400">
                           <strong>Resources:</strong>
                           <ul className="list-disc list-inside mt-1">
                             {phase.resources.map((resource, idx) => (
@@ -212,14 +212,14 @@ export default function InterviewRoadmapPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => window.print()}
-                className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-lg font-semibold hover:from-violet-500 hover:to-cyan-500 transition"
               >
                 <Printer className="mr-2 w-5 h-5" />
                 Print Roadmap
               </button>
               <Link
                 href="/courses"
-                className="inline-flex items-center justify-center px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                className="inline-flex items-center justify-center px-6 py-3 bg-slate-700/60 border border-white/10 text-white rounded-lg font-semibold hover:bg-slate-700/80 hover:border-white/20 transition"
               >
                 Start Learning on KairosLearn
               </Link>
@@ -227,16 +227,16 @@ export default function InterviewRoadmapPage() {
           </div>
 
           {/* CTA */}
-          <div className="mt-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white text-center">
+          <div className="mt-12 bg-gradient-to-r from-violet-600 to-cyan-600 rounded-2xl p-8 text-white text-center">
             <h3 className="text-2xl font-bold mb-4">
               Ready to Start Your Interview Prep Journey?
             </h3>
-            <p className="text-xl mb-6 text-blue-50">
+            <p className="text-xl mb-6 text-violet-50">
               KairosLearn offers all the courses mentioned in your roadmap — with AI voice tutoring in 17 languages.
             </p>
             <Link
               href="/courses"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition"
+              className="inline-flex items-center justify-center px-6 py-3 bg-white text-violet-600 rounded-lg font-semibold hover:bg-violet-50 transition"
             >
               Explore Courses
               <ArrowRight className="ml-2 w-5 h-5" />
