@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import Confetti from "@/components/gamification/Confetti";
 import {
   Code2, TrendingUp, Languages, Brain,
   Clock, Zap, Rocket, Mic, Search, GraduationCap, Keyboard,
@@ -118,6 +119,7 @@ export default function WelcomeWizard({ userName, onComplete }: WelcomeWizardPro
   const [interests, setInterests] = useState<Set<Interest>>(new Set());
   const [pace, setPace] = useState<Pace | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
   const router = useRouter();
 
   const toggleInterest = (id: Interest) => {
@@ -136,22 +138,26 @@ export default function WelcomeWizard({ userName, onComplete }: WelcomeWizardPro
     localStorage.setItem("learning_interests", JSON.stringify([...interests]));
     localStorage.setItem("learning_pace", pace ?? "30min");
 
-    // Navigate FIRST, then complete (so component doesn't unmount before navigation)
-    const target = selectedCourse || recommended[0]?.slug;
-    if (target === "__talk__") {
-      router.push("/talk");
-    } else if (target) {
-      router.push(`/course/${target}`);
-    } else {
-      router.push("/courses");
-    }
+    // Trigger confetti celebration
+    setShowConfetti(true);
 
-    // Delay onComplete so router.push has time to start
-    setTimeout(() => onComplete(), 100);
+    // Navigate after a brief confetti moment
+    setTimeout(() => {
+      const target = selectedCourse || recommended[0]?.slug;
+      if (target === "__talk__") {
+        router.push("/talk");
+      } else if (target) {
+        router.push(`/course/${target}`);
+      } else {
+        router.push("/courses");
+      }
+      setTimeout(() => onComplete(), 100);
+    }, 600);
   };
 
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center bg-[var(--background)]">
+      <Confetti trigger={showConfetti} />
       <div className="w-full max-w-md mx-4">
         {/* Progress dots */}
         <div className="flex items-center justify-center gap-2 mb-8">
