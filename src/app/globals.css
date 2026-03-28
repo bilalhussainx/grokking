@@ -349,3 +349,130 @@ pre code.hljs {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   Cinematic Landing Page — Variables, Keyframes & Utility Classes
+   All prefixed with "cine-" to avoid conflicts with existing styles
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --cine-bg:     #05080d;
+  --cine-bg2:    #0c1120;
+  --cine-cream:  #f2ede3;
+  --cine-cream2: rgba(242, 237, 227, 0.6);
+  --cine-cream3: rgba(242, 237, 227, 0.28);
+  --cine-gold:   #d4a84b;
+  --cine-gold2:  rgba(212, 168, 75, 0.22);
+  --cine-gold3:  rgba(212, 168, 75, 0.07);
+  --cine-border: rgba(242, 237, 227, 0.09);
+
+  --font-cine-display: var(--font-cormorant), Georgia, serif;
+  --font-cine-body:    var(--font-dm-sans), -apple-system, sans-serif;
+}
+
+/* -- Cinematic Keyframes -- */
+
+@keyframes cine-grain {
+  0%,100% { transform: translate(0, 0); }
+  10%     { transform: translate(-4%, -4%); }
+  20%     { transform: translate(-8%, 4%); }
+  30%     { transform: translate(4%, -8%); }
+  40%     { transform: translate(-4%, 12%); }
+  50%     { transform: translate(-8%, 4%); }
+  60%     { transform: translate(12%, 0); }
+  70%     { transform: translate(0, 8%); }
+  80%     { transform: translate(-12%, 0); }
+  90%     { transform: translate(8%, 4%); }
+}
+
+@keyframes cine-scrollDrop {
+  0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
+  45%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  50%  { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+
+@keyframes cine-pRing {
+  0%   { transform: scale(0.82); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: scale(1.08); opacity: 0; }
+}
+
+@keyframes cine-langFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+/* -- Cinematic Grain Overlay -- */
+.cine-grain {
+  position: fixed;
+  inset: -150%;
+  width: 400%;
+  height: 400%;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: cine-grain 0.6s steps(1) infinite;
+}
+
+/* -- Cinematic Buttons -- */
+.cine-btn-primary {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cine-bg);
+  background: var(--cine-cream);
+  border: none;
+  padding: 17px 42px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.3s, transform 0.2s;
+}
+.cine-btn-primary:hover {
+  background: var(--cine-gold);
+  transform: translateY(-1px);
+}
+
+.cine-btn-outline {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cine-cream2);
+  background: transparent;
+  border: 1px solid rgba(242, 237, 227, 0.18);
+  padding: 17px 42px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s;
+}
+.cine-btn-outline:hover {
+  border-color: var(--cine-cream2);
+  color: var(--cine-cream);
+}
+
+/* -- Cinematic Section Labels -- */
+.cine-sec-label {
+  font-size: 10.5px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--cine-gold);
+  margin-bottom: 22px;
+}
+
+.cine-sec-title {
+  font-family: var(--font-cine-display);
+  font-size: clamp(38px, 4.5vw, 58px);
+  font-weight: 300;
+  line-height: 1.1;
+  margin-bottom: 72px;
+  color: var(--cine-cream);
+}
+.cine-sec-title em {
+  font-style: italic;
+  color: var(--cine-gold);
+}
