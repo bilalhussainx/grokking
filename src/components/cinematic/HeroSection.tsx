@@ -83,7 +83,7 @@ export default function HeroSection() {
         </p>
 
         <div className={styles.ctas} id="hc">
-          <Link href="/signup" className="cine-btn-primary">Start Mock Interview</Link>
+          <Link href="/interviews" className="cine-btn-primary">Start Mock Interview</Link>
           <Link href="/pathways" className="cine-btn-outline">Explore Career Pathways</Link>
         </div>
       </div>

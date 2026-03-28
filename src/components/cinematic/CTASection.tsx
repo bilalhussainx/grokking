@@ -48,8 +48,11 @@ export default function CTASection() {
       </h2>
 
       <div className={styles.ctas}>
-        <Link href="/signup" className="cine-btn-primary">
-          Create Free Account
+        <Link href="/interviews" className="cine-btn-primary">
+          Try a Mock Interview — Free
+        </Link>
+        <Link href="/talk" className="cine-btn-outline">
+          Or talk to an AI tutor
         </Link>
       </div>
     </section>

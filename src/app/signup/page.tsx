@@ -1,7 +1,7 @@
 // src/app/signup/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -10,50 +10,70 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
 import KairosLogo from "@/components/ui/SamsaraLogo";
 
 export default function SignupPage() {
   const { signInWithGoogle, signUpWithEmail, user } = useAuth();
   const router = useRouter();
+  const nameRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [nativeLanguage, setNativeLanguage] = useState("en");
-  const [inviteCode, setInviteCode] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Use all 18 supported languages from voice-provider-router
-  const NATIVE_LANGUAGES = ALL_SUPPORTED_LANGUAGES.map(l => ({
-    code: l.code, name: `${l.flag} ${l.name} (${l.native})`,
-  }));
+  useEffect(() => {
+    nameRef.current?.focus();
+  }, []);
 
   if (user) {
     router.replace("/");
     return null;
   }
 
+  const validateFields = (): boolean => {
+    const errors: typeof fieldErrors = {};
+    if (!name.trim()) {
+      errors.name = "Name is required";
+    }
+    if (!email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = "Enter a valid email address";
+    }
+    if (!password) {
+      errors.password = "Password is required";
+    } else if (password.length < 6) {
+      errors.password = "Must be at least 6 characters";
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+    setFieldErrors({});
+
+    if (!validateFields()) return;
+
+    setLoading(true);
     const result = await signUpWithEmail(email, password, name);
     if (result.error) {
-      setError(result.error);
+      // Map common server errors to specific fields
+      const msg = result.error.toLowerCase();
+      if (msg.includes("email") || msg.includes("already registered")) {
+        setFieldErrors({ email: result.error });
+      } else if (msg.includes("password")) {
+        setFieldErrors({ password: result.error });
+      } else {
+        setError(result.error);
+      }
       setLoading(false);
     } else {
-      // Save native language for immediate use
-      localStorage.setItem('coach-language', nativeLanguage);
-      localStorage.setItem('native-language', nativeLanguage);
-
-      // Save invite code to localStorage — will be redeemed after login when cookies are ready
-      if (inviteCode.trim()) {
-        localStorage.setItem('pending-invite-code', inviteCode.trim());
-      }
-
       if (result.confirmed) {
         window.location.href = "/onboarding";
       } else {
@@ -91,16 +111,10 @@ export default function SignupPage() {
             </button>
             <Link href="/login" className="text-[#D4AF37] text-sm hover:underline block">Back to login</Link>
           </div>
-          <p className="text-[10px] text-white/20 mt-4">Check your spam folder if you don't see the email within a few minutes.</p>
+          <p className="text-[10px] text-white/20 mt-4">Check your spam folder if you don&#39;t see the email within a few minutes.</p>
         </div>
       </section>
     );
-  }
-
-  // Redirect logged-in users to dashboard
-  if (user) {
-    router.replace("/");
-    return null;
   }
 
   return (
@@ -111,15 +125,14 @@ export default function SignupPage() {
         bg-[size:4rem_4rem]
         [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_30%,transparent_100%)]"
       />
-      <motion.form
-        onSubmit={handleSignup}
+      <motion.div
         className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-[#141414] p-8 shadow-2xl backdrop-blur-sm"
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       >
         <motion.div
-          className="flex flex-col items-center mb-8"
+          className="flex flex-col items-center mb-6"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.15 }}
@@ -131,10 +144,10 @@ export default function SignupPage() {
           <p className="text-sm text-white/50 mt-2">Start with 300 free AI credits + 1 month Pro access</p>
         </motion.div>
 
+        {/* Google OAuth — primary action */}
         <Button
           type="button"
-          variant="outline"
-          className="w-full flex items-center justify-center gap-3 mb-4 h-11 border-white/20 bg-transparent text-white hover:bg-white/5"
+          className="w-full flex items-center justify-center gap-3 h-12 border-2 border-[#D4AF37] bg-transparent text-white font-semibold rounded-lg hover:bg-[#D4AF37]/10 transition-colors"
           onClick={signInWithGoogle}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 262" className="w-5 h-5">
@@ -146,30 +159,58 @@ export default function SignupPage() {
           <span>Continue with Google</span>
         </Button>
 
+        {/* Divider */}
         <div className="flex items-center my-6">
           <div className="h-px flex-1 bg-white/10" />
           <span className="px-3 text-xs text-white/30">or</span>
           <div className="h-px flex-1 bg-white/10" />
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
+        {/* Email signup form — 3 fields only */}
+        <form onSubmit={handleSignup} className="space-y-4">
+          <div className="space-y-1.5">
             <Label htmlFor="name" className="text-white/70">Full Name</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required autoFocus className="bg-transparent border-white/20 text-white placeholder:text-white/30 focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20" />
+            <Input
+              ref={nameRef}
+              id="name"
+              value={name}
+              onChange={(e) => { setName(e.target.value); setFieldErrors(prev => ({ ...prev, name: undefined })); }}
+              placeholder="Your name"
+              className={`bg-transparent border-white/20 text-white placeholder:text-white/30 focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20 ${fieldErrors.name ? "border-red-500/60" : ""}`}
+            />
+            {fieldErrors.name && <p className="text-xs text-red-400 mt-0.5">{fieldErrors.name}</p>}
           </div>
-          <div className="space-y-2">
+
+          <div className="space-y-1.5">
             <Label htmlFor="email" className="text-white/70">Email</Label>
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required className="bg-transparent border-white/20 text-white placeholder:text-white/30 focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20" />
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setFieldErrors(prev => ({ ...prev, email: undefined })); }}
+              placeholder="you@example.com"
+              className={`bg-transparent border-white/20 text-white placeholder:text-white/30 focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20 ${fieldErrors.email ? "border-red-500/60" : ""}`}
+            />
+            {fieldErrors.email && <p className="text-xs text-red-400 mt-0.5">{fieldErrors.email}</p>}
           </div>
-          <div className="space-y-2">
+
+          <div className="space-y-1.5">
             <Label htmlFor="password" className="text-white/70">Password</Label>
             <div className="relative">
-              <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 6 characters" required minLength={6} className="bg-transparent border-white/20 text-white placeholder:text-white/30 pr-10 focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20" />
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); setFieldErrors(prev => ({ ...prev, password: undefined })); }}
+                placeholder="Min 6 characters"
+                className={`bg-transparent border-white/20 text-white placeholder:text-white/30 pr-10 focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20 ${fieldErrors.password ? "border-red-500/60" : ""}`}
+              />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            {password.length > 0 && (
+            {fieldErrors.password && <p className="text-xs text-red-400 mt-0.5">{fieldErrors.password}</p>}
+            {!fieldErrors.password && password.length > 0 && (
               <div className="flex gap-1 mt-1">
                 {[1, 2, 3, 4].map((level) => (
                   <div key={level} className={`h-1 flex-1 rounded-full transition-colors ${
@@ -181,45 +222,19 @@ export default function SignupPage() {
               </div>
             )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="nativeLanguage" className="text-white/70">I speak</Label>
-            <select
-              id="nativeLanguage"
-              value={nativeLanguage}
-              onChange={(e) => setNativeLanguage(e.target.value)}
-              className="w-full h-10 px-3 rounded-lg bg-transparent border border-white/20 text-white text-sm focus:outline-none focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20"
-            >
-              {NATIVE_LANGUAGES.map(lang => (
-                <option key={lang.code} value={lang.code} className="bg-[#141414]">{lang.name}</option>
-              ))}
-            </select>
-            <p className="text-[10px] text-white/30">Coach Alex will explain lessons in your language</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="inviteCode" className="text-white/70">Invite Code <span className="text-white/30">(optional)</span></Label>
-            <Input
-              id="inviteCode"
-              value={inviteCode}
-              onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-              placeholder="e.g., INVESTOR-ABC123"
-              className="bg-transparent border-white/20 text-white placeholder:text-white/30 font-mono focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/20"
-            />
-            <p className="text-[10px] text-white/30">Have an invite code? Enter it for Pro access + bonus credits</p>
-          </div>
 
           {error && <p className="text-xs text-red-400 bg-red-500/10 rounded-md p-2">{error}</p>}
 
           <Button type="submit" className="w-full h-11 bg-[#D4AF37] text-black font-semibold rounded-lg hover:bg-[#C4A030]" disabled={loading}>
             {loading ? "Creating account..." : "Create Account"}
           </Button>
-        </div>
+        </form>
 
         <p className="text-center text-sm text-white/40 mt-6">
           Already have an account?{" "}
           <Link href="/login" className="text-[#D4AF37] hover:underline">Sign in</Link>
         </p>
-      </motion.form>
+      </motion.div>
     </section>
   );
 }
