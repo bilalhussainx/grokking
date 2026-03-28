@@ -15,43 +15,26 @@
   --color-brand-700: #1d4ed8;
 }
 
-/* ── Dark-First Design System ── */
+/* ── Dark-First Design System (Black + Gold) ── */
 :root {
-  --background: #030712;
-  --foreground: #e2e8f0;
+  --background: #000000;
+  --foreground: #f0ece2;
   --muted: rgba(255, 255, 255, 0.06);
-  --muted-foreground: #94a3b8;
+  --muted-foreground: #a0a0a0;
   --border: rgba(255, 255, 255, 0.08);
-  --card: rgba(255, 255, 255, 0.05);
-  --card-hover: rgba(255, 255, 255, 0.08);
-  --accent: #3b82f6;
-  --accent-light: rgba(59, 130, 246, 0.15);
-  --glass-bg: rgba(255, 255, 255, 0.05);
+  --card: #141414;
+  --card-hover: #1a1a1a;
+  --accent: #D4AF37;
+  --accent-light: rgba(212, 175, 55, 0.15);
+  --glass-bg: #141414;
   --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  --glow-blue: rgba(59, 130, 246, 0.4);
-  --glow-purple: rgba(139, 92, 246, 0.3);
-  --glow-pink: rgba(236, 72, 153, 0.3);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --glow-blue: rgba(212, 175, 55, 0.2);
+  --glow-purple: rgba(212, 175, 55, 0.15);
+  --glow-pink: rgba(212, 175, 55, 0.1);
 }
 
-/* ── Light Mode Override ── */
-.light {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --border: #e2e8f0;
-  --card: #ffffff;
-  --card-hover: #f8fafc;
-  --accent: #2563eb;
-  --accent-light: #dbeafe;
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  --glow-blue: rgba(59, 130, 246, 0.15);
-  --glow-purple: rgba(139, 92, 246, 0.1);
-  --glow-pink: rgba(236, 72, 153, 0.1);
-}
+/* Light mode removed — platform is dark-only */
 
 * {
   border-color: var(--border);
