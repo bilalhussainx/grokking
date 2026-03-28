@@ -639,18 +639,16 @@ export default function HomePage() {
               <div className="rounded-2xl border border-white/10 bg-slate-800/40 backdrop-blur-xl p-8">
                 <StaggerReveal className="grid grid-cols-2 md:grid-cols-4 gap-8" delay={0.1}>
                   {[
-                    { target: 69, suffix: "+", label: "Courses", icon: BookOpen },
-                    { target: 17, suffix: "", label: "Languages", icon: Globe },
-                    { target: 10, suffix: "", label: "Career Pathways", icon: Map },
-                    { target: 0, suffix: "AI", label: "Voice Coaching", icon: Mic },
+                    { value: "69+", label: "Courses", icon: BookOpen },
+                    { value: "17", label: "Languages", icon: Globe },
+                    { value: "10", label: "Career Pathways", icon: Map },
+                    { value: "AI", label: "Voice Coaching", icon: Mic },
                   ].map((stat) => {
                     const StatIcon = stat.icon;
                     return (
                       <motion.div key={stat.label} variants={staggerChild} className="text-center">
                         <StatIcon className="w-5 h-5 text-white/20 mx-auto mb-2" />
-                        <div className="text-3xl sm:text-4xl font-bold text-white">
-                          {stat.target > 0 ? <AnimatedCounter target={stat.target} suffix={stat.suffix} /> : stat.suffix}
-                        </div>
+                        <div className="text-3xl sm:text-4xl font-bold text-white">{stat.value}</div>
                         <div className="text-xs text-white/40 mt-1 font-medium">{stat.label}</div>
                       </motion.div>
                     );
