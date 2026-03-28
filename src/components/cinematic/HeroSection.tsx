@@ -22,18 +22,15 @@ export default function HeroSection() {
       gsap.registerPlugin(ScrollTrigger)
 
       ctx = gsap.context(() => {
-        // Entrance timeline
-        gsap.set(['#he', '#hs', '#hc', '#scroll-ind'], { opacity: 0, y: 18 })
-        gsap.set(['#hl1', '#hl2'], { y: '105%' })
-
+        // Entrance timeline — initial states set in CSS to avoid FOUC
         gsap
           .timeline({ defaults: { ease: 'power3.out' } })
-          .to('#he',         { opacity: 1, y: 0, duration: 1.1 },  0.5)
-          .to('#hl1',        { y: '0%',          duration: 1.3 },  0.7)
-          .to('#hl2',        { y: '0%',          duration: 1.3 },  0.88)
-          .to('#hs',         { opacity: 1, y: 0, duration: 1.0 },  1.1)
-          .to('#hc',         { opacity: 1, y: 0, duration: 0.9 },  1.25)
-          .to('#scroll-ind', { opacity: 1, y: 0, duration: 0.8 },  1.5)
+          .to('#he',         { opacity: 1, y: 0, duration: 1.1 },  0.2)
+          .to('#hl1',        { y: '0%',          duration: 1.3 },  0.35)
+          .to('#hl2',        { y: '0%',          duration: 1.3 },  0.5)
+          .to('#hs',         { opacity: 1, y: 0, duration: 1.0 },  0.7)
+          .to('#hc',         { opacity: 1, y: 0, duration: 0.9 },  0.85)
+          .to('#scroll-ind', { opacity: 1, y: 0, duration: 0.8 },  1.1)
 
         // Scroll parallax
         const heroEl = document.getElementById('hero')
