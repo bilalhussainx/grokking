@@ -40,6 +40,30 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
   const pathname = request.nextUrl.pathname;
 
+  // Redirect non-logged-in users from / to /landing (cinematic page)
+  if (pathname === "/") {
+    const supabaseCheck = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll(); },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              request.cookies.set(name, value);
+              response.cookies.set(name, value, options);
+            });
+          },
+        },
+      }
+    );
+    const { data: { user: homeUser } } = await supabaseCheck.auth.getUser();
+    if (!homeUser) {
+      return NextResponse.redirect(new URL("/landing", request.url));
+    }
+    return response;
+  }
+
   // Skip public routes
   if (isPublicRoute(pathname)) return response;
 
