@@ -97,6 +97,12 @@ export default function SignupPage() {
     );
   }
 
+  // Redirect logged-in users to dashboard
+  if (user) {
+    router.replace("/");
+    return null;
+  }
+
   return (
     <section className="flex min-h-screen items-center justify-center px-4 py-16 bg-black relative overflow-hidden">
       <div
