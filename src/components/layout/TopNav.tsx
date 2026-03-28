@@ -123,7 +123,7 @@ export default function TopNav({
           onClick={() => {
             window.dispatchEvent(new CustomEvent("open-global-search"));
           }}
-          className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[var(--muted-foreground)] text-xs hover:bg-white/10 hover:text-[var(--foreground)] transition-all"
+          className="flex items-center gap-2 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-white/5 border border-white/10 text-[var(--muted-foreground)] text-xs hover:bg-white/10 hover:text-[var(--foreground)] transition-all"
           title="Search courses and lessons (Ctrl+K)"
         >
           <Search className="w-3.5 h-3.5" />
@@ -135,7 +135,7 @@ export default function TopNav({
 
         <Link
           href="/talk"
-          className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-all"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-all"
           title="Start a voice conversation"
         >
           <Mic className="w-3.5 h-3.5" />
@@ -167,7 +167,7 @@ export default function TopNav({
           <div className="flex items-center gap-2">
             <Link
               href="/settings"
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-white text-xs font-bold shadow-md shadow-violet-500/20 hover:ring-2 hover:ring-violet-400/50 transition-all"
+              className="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-white text-xs font-bold shadow-md shadow-violet-500/20 hover:ring-2 hover:ring-violet-400/50 transition-all"
               title="Settings"
             >
               {(user.user_metadata?.full_name || user.email || "U").charAt(0).toUpperCase()}

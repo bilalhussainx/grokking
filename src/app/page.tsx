@@ -883,10 +883,10 @@ export default function HomePage() {
         {/* ── LOGGED-IN SECTION 3: Quick Voice Practice (compact) ── */}
         {user && (
           <motion.div variants={item} className="mb-10">
-            <div className="flex items-center gap-4">
+            <div className="space-y-3">
               <Link href="/talk">
                 <motion.div
-                  className="shrink-0 flex items-center gap-2.5 px-5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium text-sm hover:bg-emerald-500/15 hover:border-emerald-500/30 transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium text-sm hover:bg-emerald-500/15 hover:border-emerald-500/30 transition-all cursor-pointer"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
@@ -894,15 +894,15 @@ export default function HomePage() {
                   Voice Practice
                 </motion.div>
               </Link>
-              <div className="flex gap-2 overflow-x-auto pb-1 snap-x scrollbar-hide">
+              <div className="flex flex-wrap gap-2">
                 {ALL_SUPPORTED_LANGUAGES
                   .filter(l => l.code !== (typeof window !== 'undefined' ? localStorage.getItem('native-language') : 'en'))
                   .filter(l => (l.code as string) !== 'en-IN')
                   .slice(0, 8)
                   .map((l) => (
-                  <Link key={l.code} href={`/talk?lang=${l.code}`} className="snap-start shrink-0">
+                  <Link key={l.code} href={`/talk?lang=${l.code}`}>
                     <motion.button
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300 text-xs hover:bg-slate-800 hover:border-slate-600 hover:text-white transition-all whitespace-nowrap"
+                      className="flex items-center gap-1.5 px-3 py-2.5 min-h-[44px] rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300 text-xs hover:bg-slate-800 hover:border-slate-600 hover:text-white transition-all"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.97 }}
                     >
