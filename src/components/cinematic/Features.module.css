@@ -13,10 +13,14 @@
 .card {
   padding: 48px 40px;
   background: rgba(255,255,255,0.018);
-  border: 1px solid var(--cine-border);
+  border: 1px solid var(--cine-border, rgba(242, 237, 227, 0.09));
   transform: translateY(36px);
   opacity: 0;
   transition: background 0.35s, border-color 0.35s, transform 0.35s;
+  animation: cardFallback 0s 2s forwards;
+}
+@keyframes cardFallback {
+  to { opacity: 1; transform: translateY(0); }
 }
 .card:hover {
   background: rgba(212,168,75,0.04);
@@ -28,21 +32,21 @@
   width: 38px; height: 38px;
   border: 1px solid var(--cine-gold2);
   display: flex; align-items: center; justify-content: center;
-  color: var(--cine-gold);
+  color: var(--cine-gold, #d4a84b);
   font-size: 17px;
   margin-bottom: 28px;
 }
 
 .title {
-  font-family: var(--font-cine-display);
+  font-family: var(--font-cine-display, Georgia, serif);
   font-size: 23px; font-weight: 400;
   margin-bottom: 14px;
-  color: var(--cine-cream);
+  color: var(--cine-cream, #f2ede3);
 }
 
 .desc {
   font-size: 14px; font-weight: 300;
-  line-height: 1.85; color: var(--cine-cream2);
+  line-height: 1.85; color: var(--cine-cream2, rgba(242, 237, 227, 0.6));
 }
 
 @media (max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } }

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function LandingPage() {
   return (
-    <main style={{ background: 'var(--cine-bg)', color: 'var(--cine-cream)', fontFamily: 'var(--font-cine-body)', fontWeight: 300, overflowX: 'hidden' }}>
+    <main style={{ background: 'var(--cine-bg, #05080d)', color: 'var(--cine-cream, #f2ede3)', fontFamily: 'var(--font-cine-body, -apple-system, sans-serif)', fontWeight: 300, overflowX: 'hidden' }}>
       {/* Film grain overlay */}
       <div className="cine-grain" aria-hidden="true" />
 
