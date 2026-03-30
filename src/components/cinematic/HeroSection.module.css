@@ -30,7 +30,7 @@
   position: absolute;
   bottom: 0; left: 0; right: 0;
   height: 220px;
-  background: linear-gradient(to bottom, transparent, var(--cine-bg));
+  background: linear-gradient(to bottom, transparent, var(--cine-bg, #05080d));
   pointer-events: none;
 }
 
@@ -51,7 +51,7 @@
   font-weight: 400;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--cine-gold);
+  color: var(--cine-gold, #d4a84b);
   margin-bottom: 36px;
   opacity: 0;
   transform: translateY(18px);
@@ -62,18 +62,18 @@
   content: '';
   width: 44px;
   height: 1px;
-  background: var(--cine-gold);
+  background: var(--cine-gold, #d4a84b);
   opacity: 0.45;
 }
 
 .headline {
-  font-family: var(--font-cine-display);
+  font-family: var(--font-cine-display, Georgia, serif);
   font-size: clamp(68px, 9.5vw, 128px);
   font-weight: 300;
   line-height: 0.92;
   letter-spacing: -0.02em;
   margin-bottom: 36px;
-  color: var(--cine-cream);
+  color: var(--cine-cream, #f2ede3);
 }
 .clipLine {
   display: block;
@@ -87,14 +87,14 @@
 }
 .headline em {
   font-style: italic;
-  color: var(--cine-gold);
+  color: var(--cine-gold, #d4a84b);
 }
 
 .sub {
   font-size: clamp(15px, 2vw, 18px);
   font-weight: 300;
   line-height: 1.75;
-  color: var(--cine-cream2);
+  color: var(--cine-cream2, rgba(242, 237, 227, 0.6));
   max-width: 560px;
   margin: 0 auto 52px;
   opacity: 0;
@@ -128,12 +128,12 @@
   font-size: 9.5px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--cine-cream3);
+  color: var(--cine-cream3, rgba(242, 237, 227, 0.28));
 }
 .scrollLine {
   width: 1px;
   height: 56px;
-  background: linear-gradient(to bottom, transparent, var(--cine-gold));
+  background: linear-gradient(to bottom, transparent, var(--cine-gold, #d4a84b));
   animation: cine-scrollDrop 2.2s ease infinite;
 }
 

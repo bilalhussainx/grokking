@@ -18,7 +18,7 @@
   top: 0; left: 50%;
   transform: translateX(-50%);
   width: 1px; height: 80px;
-  background: linear-gradient(to bottom, transparent, var(--cine-gold));
+  background: linear-gradient(to bottom, transparent, var(--cine-gold, #d4a84b));
 }
 
 .eyebrow {
@@ -27,7 +27,7 @@
 }
 
 .title {
-  font-family: var(--font-cine-display);
+  font-family: var(--font-cine-display, Georgia, serif);
   font-size: clamp(56px, 8vw, 108px);
   font-weight: 300;
   line-height: 0.94;
@@ -35,9 +35,9 @@
   max-width: 880px;
   margin: 0 auto 52px;
   position: relative; z-index: 1;
-  color: var(--cine-cream);
+  color: var(--cine-cream, #f2ede3);
 }
-.title em { font-style: italic; color: var(--cine-gold); }
+.title em { font-style: italic; color: var(--cine-gold, #d4a84b); }
 
 .ctas {
   display: flex;
