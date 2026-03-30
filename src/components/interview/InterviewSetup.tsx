@@ -9,6 +9,7 @@ import {
   Phone, Lightbulb, TrendingUp, Users, Headphones, Clock, Sparkles,
 } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
+import { useAuth } from "@/contexts/AuthContext";
 import type { InterviewPreset, InterviewType } from "@/types/interview";
 
 const PRESETS: { id: InterviewPreset; label: string; icon: typeof Monitor; desc: string; color: string }[] = [
@@ -43,6 +44,7 @@ const cardVariant = {
 export default function InterviewSetup() {
   const router = useRouter();
   const { startInterview } = useInterview();
+  const { user } = useAuth();
   const [preset, setPreset] = useState<InterviewPreset | null>(null);
   const [customJD, setCustomJD] = useState("");
   const [interviewType, setInterviewType] = useState<InterviewType>("technical");
@@ -56,34 +58,46 @@ export default function InterviewSetup() {
     setLoading(true);
     setError("");
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
-
       let plan;
-      try {
-        const res = await fetch("/api/interviews/plan", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            jobDescription: useCustom ? customJD.trim() : null,
-            preset: useCustom ? null : preset,
-            interviewType,
-          }),
-          signal: controller.signal,
-        });
-        clearTimeout(timeout);
-        if (res.ok) plan = await res.json();
-      } catch {
-        clearTimeout(timeout);
-      }
 
-      if (!plan) {
+      if (!user) {
+        // Guest mode — instant start with fallback plan, no API call or credit deduction
         plan = {
           questions: [],
           interviewerPersona: `Adaptive ${interviewType} interviewer for ${preset || "general"} role. Generate questions dynamically based on the conversation flow.`,
           timeAllocation: { intro: 3, questions: 22, wrapUp: 5 },
           fallback: true,
         };
+      } else {
+        // Authenticated — try to fetch a tailored plan
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+
+        try {
+          const res = await fetch("/api/interviews/plan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              jobDescription: useCustom ? customJD.trim() : null,
+              preset: useCustom ? null : preset,
+              interviewType,
+            }),
+            signal: controller.signal,
+          });
+          clearTimeout(timeout);
+          if (res.ok) plan = await res.json();
+        } catch {
+          clearTimeout(timeout);
+        }
+
+        if (!plan) {
+          plan = {
+            questions: [],
+            interviewerPersona: `Adaptive ${interviewType} interviewer for ${preset || "general"} role. Generate questions dynamically based on the conversation flow.`,
+            timeAllocation: { intro: 3, questions: 22, wrapUp: 5 },
+            fallback: true,
+          };
+        }
       }
 
       const jd = useCustom ? customJD.trim() : `Preset: ${preset}`;

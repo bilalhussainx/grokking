@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, RotateCcw, ArrowLeft, Trophy, TrendingUp, AlertTriangle } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
+import { useAuth } from "@/contexts/AuthContext";
+import SignupPrompt from "@/components/auth/SignupPrompt";
 
 function ScoreBar({ label, score }: { label: string; score: number }) {
   const pct = (score / 10) * 100;
@@ -29,8 +31,18 @@ function ScoreBar({ label, score }: { label: string; score: number }) {
 export default function InterviewScorecard() {
   const router = useRouter();
   const { transcript, questionPlan, finalCode, interviewType, scorecard, setScorecard } = useInterview();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(!scorecard);
   const [error, setError] = useState("");
+  const [showSignupPrompt, setShowSignupPrompt] = useState(false);
+
+  // Show signup prompt for guest users after a short delay
+  useEffect(() => {
+    if (!user && transcript.length > 0) {
+      const timer = setTimeout(() => setShowSignupPrompt(true), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [user, transcript.length]);
 
   const fetchScore = async () => {
     setLoading(true);
@@ -108,6 +120,12 @@ export default function InterviewScorecard() {
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-white">
+      <SignupPrompt
+        show={showSignupPrompt}
+        onDismiss={() => setShowSignupPrompt(false)}
+        title="Great interview!"
+        message="Sign up to save your results, track your progress, and practice unlimited interviews."
+      />
       <div className="max-w-3xl mx-auto px-6 py-10">
         <button
           onClick={() => router.push("/interviews")}
