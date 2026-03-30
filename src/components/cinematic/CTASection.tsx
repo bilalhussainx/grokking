@@ -1,57 +1,69 @@
 'use client'
 
-import { useEffect } from 'react'
 import Link from 'next/link'
-import styles from './CTASection.module.css'
 
 export default function CTASection() {
-  useEffect(() => {
-    let ctx: { revert: () => void }
-
-    const init = async () => {
-      const { gsap }          = await import('gsap')
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
-      gsap.registerPlugin(ScrollTrigger)
-
-      ctx = gsap.context(() => {
-        gsap.set('.' + styles.title, { opacity: 0, y: 56 })
-
-        ScrollTrigger.create({
-          trigger: '#cine-cta',
-          start: 'top 78%',
-          onEnter: () => {
-            gsap.to('.' + styles.title, {
-              opacity: 1, y: 0, duration: 1.3, ease: 'power3.out',
-            })
-            gsap.from('.' + styles.ctas, {
-              opacity: 0, y: 28, duration: 0.9, delay: 0.35, ease: 'power2.out',
-            })
-          },
-        })
-      })
-    }
-
-    init()
-    return () => ctx?.revert()
-  }, [])
-
   return (
-    <section id="cine-cta" className={styles.section}>
-      <div className={styles.glow} aria-hidden="true" />
-      <div className={styles.line} aria-hidden="true" />
+    <section style={{
+      padding: '120px 24px',
+      textAlign: 'center' as const,
+      position: 'relative' as const,
+    }}>
+      <p style={{
+        fontSize: 11,
+        letterSpacing: '0.3em',
+        textTransform: 'uppercase' as const,
+        color: '#d4a84b',
+        marginBottom: 28,
+      }}>Begin Today</p>
 
-      <p className={`cine-sec-label ${styles.eyebrow}`}>Begin Today</p>
-
-      <h2 className={styles.title}>
+      <h2 style={{
+        fontFamily: 'Georgia, serif',
+        fontSize: 'clamp(40px, 6vw, 72px)',
+        fontWeight: 300,
+        lineHeight: 1,
+        letterSpacing: '-0.01em',
+        marginBottom: 48,
+        color: '#f2ede3',
+      }}>
         Ready to ace your<br />
-        next <em>interview?</em>
+        next <em style={{ fontStyle: 'italic', color: '#d4a84b' }}>interview?</em>
       </h2>
 
-      <div className={styles.ctas}>
-        <Link href="/interviews" className="cine-btn-primary">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' as const }}>
+        <Link
+          href="/interviews"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '16px 36px',
+            background: '#d4a84b',
+            color: '#05080d',
+            fontWeight: 600,
+            fontSize: 14,
+            letterSpacing: '0.04em',
+            textDecoration: 'none',
+            borderRadius: 4,
+          }}
+        >
           Try a Mock Interview — Free
         </Link>
-        <Link href="/talk" className="cine-btn-outline">
+        <Link
+          href="/talk"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '16px 36px',
+            background: 'transparent',
+            color: '#f2ede3',
+            fontWeight: 400,
+            fontSize: 14,
+            letterSpacing: '0.04em',
+            textDecoration: 'none',
+            border: '1px solid rgba(242, 237, 227, 0.2)',
+            borderRadius: 4,
+          }}
+        >
           Or talk to an AI tutor
         </Link>
       </div>

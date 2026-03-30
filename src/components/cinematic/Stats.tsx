@@ -1,62 +1,44 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import styles from './Stats.module.css'
-
 const STATS = [
-  { id: 'cs1', target: 69,   suffix: '+',  label: 'Courses' },
-  { id: 'cs2', target: 17,   suffix: '',   label: 'Languages' },
-  { id: 'cs3', target: 10,   suffix: '',   label: 'Career Pathways' },
-  { id: 'cs4', target: 2000, suffix: '+',  label: 'Lessons' },
+  { value: '69+', label: 'Courses' },
+  { value: '17', label: 'Languages' },
+  { value: '10', label: 'Career Pathways' },
+  { value: '2000+', label: 'Lessons' },
 ]
 
-function countUp(el: HTMLElement, target: number, suffix: string, durationMs: number) {
-  let n = 0
-  const step = target / (durationMs / 16)
-  const interval = setInterval(() => {
-    n = Math.min(n + step, target)
-    el.textContent = Math.floor(n) + suffix
-    if (n >= target) clearInterval(interval)
-  }, 16)
-}
-
 export default function Stats() {
-  const triggered = useRef(false)
-
-  useEffect(() => {
-    let ctx: { revert: () => void }
-
-    const init = async () => {
-      const { gsap }          = await import('gsap')
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
-      gsap.registerPlugin(ScrollTrigger)
-
-      ctx = gsap.context(() => {
-        ScrollTrigger.create({
-          trigger: '#cine-stats',
-          start: 'top 82%',
-          onEnter: () => {
-            if (triggered.current) return
-            triggered.current = true
-            STATS.forEach(({ id, target, suffix }, i) => {
-              const el = document.getElementById(id)
-              if (el) countUp(el, target, suffix, 1200 + i * 200)
-            })
-          },
-        })
-      })
-    }
-
-    init()
-    return () => ctx?.revert()
-  }, [])
-
   return (
-    <div id="cine-stats" className={styles.grid}>
-      {STATS.map(({ id, target, suffix, label }) => (
-        <div key={id} className={styles.item}>
-          <span id={id} className={styles.num}>0{suffix}</span>
-          <p className={styles.label}>{label}</p>
+    <div style={{
+      margin: '0 24px',
+      padding: '80px 0',
+      borderTop: '1px solid rgba(242, 237, 227, 0.09)',
+      borderBottom: '1px solid rgba(242, 237, 227, 0.09)',
+      display: 'grid',
+      gridTemplateColumns: 'repeat(4, 1fr)',
+    }}>
+      {STATS.map(({ value, label }, i) => (
+        <div key={label} style={{
+          textAlign: 'center' as const,
+          padding: 20,
+          borderRight: i < 3 ? '1px solid rgba(242, 237, 227, 0.09)' : 'none',
+        }}>
+          <span style={{
+            fontFamily: 'Georgia, serif',
+            fontSize: 'clamp(52px, 6.5vw, 88px)',
+            fontWeight: 300,
+            lineHeight: 1,
+            color: '#d4a84b',
+            display: 'block',
+            marginBottom: 12,
+          }}>{value}</span>
+          <p style={{
+            fontSize: 11,
+            fontWeight: 400,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase' as const,
+            color: 'rgba(242, 237, 227, 0.6)',
+          }}>{label}</p>
         </div>
       ))}
     </div>

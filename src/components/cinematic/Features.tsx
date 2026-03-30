@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
 import styles from './Features.module.css'
 
 const FEATURES = [
@@ -37,43 +36,27 @@ const FEATURES = [
 ]
 
 export default function Features() {
-  useEffect(() => {
-    let ctx: { revert: () => void }
-
-    const init = async () => {
-      const { gsap }          = await import('gsap')
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
-      gsap.registerPlugin(ScrollTrigger)
-
-      ctx = gsap.context(() => {
-        ScrollTrigger.create({
-          trigger: '#cine-features',
-          start: 'top 72%',
-          onEnter: () =>
-            gsap.to('.' + styles.card, {
-              opacity: 1, y: 0,
-              stagger: 0.1, duration: 0.85, ease: 'power2.out',
-            }),
-        })
-      })
-    }
-
-    init()
-    return () => ctx?.revert()
-  }, [])
-
   return (
-    <section id="cine-features" className={styles.section}>
-      <p className="cine-sec-label">Platform Features</p>
-      <h2 className="cine-sec-title">
-        Everything you need to <em>ace</em> the interview
+    <section style={{ padding: '100px 24px', maxWidth: 1440, margin: '0 auto' }}>
+      <p style={{ textAlign: 'center', fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase' as const, color: '#d4a84b', marginBottom: 12 }}>Platform Features</p>
+      <h2 style={{ textAlign: 'center', fontFamily: 'Georgia, serif', fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 300, marginBottom: 60, color: '#f2ede3' }}>
+        Everything you need to <em style={{ fontStyle: 'italic', color: '#d4a84b' }}>ace</em> the interview
       </h2>
       <div className={styles.grid}>
         {FEATURES.map(({ icon, title, desc }) => (
-          <div key={title} className={styles.card}>
-            <div className={styles.icon}>{icon}</div>
-            <h3 className={styles.title}>{title}</h3>
-            <p className={styles.desc}>{desc}</p>
+          <div key={title} style={{
+            padding: '48px 40px',
+            background: 'rgba(255,255,255,0.018)',
+            border: '1px solid rgba(242, 237, 227, 0.09)',
+          }}>
+            <div style={{
+              width: 38, height: 38,
+              border: '1px solid rgba(212, 168, 75, 0.22)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#d4a84b', fontSize: 17, marginBottom: 28,
+            }}>{icon}</div>
+            <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 23, fontWeight: 400, marginBottom: 14, color: '#f2ede3' }}>{title}</h3>
+            <p style={{ fontSize: 14, fontWeight: 300, lineHeight: 1.85, color: 'rgba(242, 237, 227, 0.6)' }}>{desc}</p>
           </div>
         ))}
       </div>

@@ -21,11 +21,13 @@ const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const ok = await deductCredits(user.id, CREDIT_COSTS.voice_session, "voice_session");
-  if (!ok) {
-    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+  // Allow guest access for trial sessions — skip credit deduction
+  if (user) {
+    const ok = await deductCredits(user.id, CREDIT_COSTS.voice_session, "voice_session");
+    if (!ok) {
+      return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+    }
   }
 
   if (!DEEPGRAM_API_KEY) {
@@ -88,14 +90,13 @@ export async function POST(req: NextRequest) {
   };
   const langName = LANGUAGE_NAMES[language] || "English";
 
-  // Fetch engagement signals for coach enthusiasm
+  // Fetch engagement signals for coach enthusiasm (authenticated users only)
   let enthusiasmModifier = "";
-  try {
+  if (user) try {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const todayISO = todayStart.toISOString();
 
-    // Parallel DB queries (was sequential — saved 50-100ms)
     const [lessonsResult, profileResult, xpResult] = await Promise.all([
       supabase.from("xp_transactions").select("*", { count: "exact", head: true }).eq("user_id", user.id).eq("action", "lesson_complete").gte("created_at", todayISO),
       supabase.from("user_profiles").select("login_streak").eq("id", user.id).single(),
@@ -123,9 +124,9 @@ export async function POST(req: NextRequest) {
     // silently continue without enthusiasm modifier
   }
 
-  // RAG Intelligence — fetch full user context from database
+  // RAG Intelligence — fetch full user context from database (authenticated users only)
   let userProfileContext = "";
-  try {
+  if (user) try {
     const { fetchUserIntelligence } = await import("@/lib/agent-intelligence");
     const intel = await fetchUserIntelligence(user.id);
     userProfileContext = `\n${intel.promptContext}\n`;
@@ -222,8 +223,8 @@ Never say "How can I help?" — instead say "So in this lesson we're looking at 
     },
   };
 
-  // Trace voice session start
-  import("@/lib/trace").then(({ traceGeneration }) => {
+  // Trace voice session start (authenticated users only)
+  if (user) import("@/lib/trace").then(({ traceGeneration }) => {
     traceGeneration({
       userId: user.id,
       name: "coach-voice-session",

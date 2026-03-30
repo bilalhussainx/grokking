@@ -106,26 +106,9 @@ const staggerChild = {
 };
 
 // Animated counter for stats
+// Static counter — no animation, always shows correct values
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
-  const [count, setCount] = useState(target); // Start with target as fallback
-  const [hasAnimated, setHasAnimated] = useState(false);
-  useEffect(() => {
-    if (!isInView || hasAnimated) return;
-    setHasAnimated(true);
-    setCount(0); // Reset to 0 then count up
-    let start = 0;
-    const duration = 1500;
-    const step = target / (duration / 16);
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= target) { setCount(target); clearInterval(timer); }
-      else setCount(Math.floor(start));
-    }, 16);
-    return () => clearInterval(timer);
-  }, [isInView, target, hasAnimated]);
-  return <span ref={ref}>{count}{suffix}</span>;
+  return <span>{target}{suffix}</span>;
 }
 
 // Map onboarding interest IDs to actual course domain values
