@@ -76,8 +76,8 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    // API routes return 401
-    if (pathname.startsWith("/api/")) {
+    // API routes return 401 — except voice session (allows guest trial)
+    if (pathname.startsWith("/api/") && pathname !== "/api/ai/voice-session") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     // Page routes redirect to login
