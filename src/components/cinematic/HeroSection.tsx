@@ -64,27 +64,27 @@ export default function HeroSection() {
       <div className={styles.bottomFade} aria-hidden="true" />
 
       <div ref={contentRef} className={styles.content} id="hero-content">
-        <p className={styles.eyebrow} id="he">AI Interview Coach & Voice Tutor</p>
+        <p className={styles.eyebrow} id="he">The only AI interviewer that teaches you back</p>
 
         <h1 className={styles.headline}>
           <span className={styles.clipLine}>
-            <span className={styles.clipInner} id="hl1">Ace your next</span>
+            <span className={styles.clipInner} id="hl1">Your AI interview</span>
           </span>
           <span className={styles.clipLine}>
             <span className={styles.clipInner} id="hl2">
-              <em>interview.</em>
+              <em>coach.</em>
             </span>
           </span>
         </h1>
 
         <p className={styles.sub} id="hs">
-          Practice mock interviews and learn in 17&nbsp;languages with real-time AI voice coaching.
-          Career pathways for every tech role.
+          Mock interviews with an AI that adapts to your level, teaches when you&apos;re stuck, and speaks 17&nbsp;languages.
+          10&nbsp;role types. Real-time voice feedback. $10/mo.
         </p>
 
         <div className={styles.ctas} id="hc">
-          <Link href="/interviews" className="cine-btn-primary">Start Mock Interview</Link>
-          <Link href="/pathways" className="cine-btn-outline">Explore Career Pathways</Link>
+          <Link href="/interviews" className="cine-btn-primary">Try a Mock Interview — Free</Link>
+          <Link href="/courses" className="cine-btn-outline">Browse 69+ Courses</Link>
         </div>
       </div>
 

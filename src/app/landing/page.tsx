@@ -6,9 +6,9 @@ import Stats from '@/components/cinematic/Stats'
 import CTASection from '@/components/cinematic/CTASection'
 
 export const metadata: Metadata = {
-  title: 'KairosLearn — AI Interview Coach & Voice Tutor',
+  title: 'KairosLearn — The AI Interview Coach That Teaches',
   description:
-    'Practice mock interviews and learn in 17 languages with real-time AI voice coaching. 69+ courses, 10 career pathways.',
+    'Mock interviews with AI that adapts to your level and teaches when you\'re stuck. 17 languages, 10 role types, real-time voice feedback. Try free.',
 }
 
 export default function LandingPage() {

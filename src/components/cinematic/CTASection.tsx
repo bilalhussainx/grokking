@@ -26,8 +26,8 @@ export default function CTASection() {
         marginBottom: 48,
         color: '#f2ede3',
       }}>
-        Ready to ace your<br />
-        next <em style={{ fontStyle: 'italic', color: '#d4a84b' }}>interview?</em>
+        Your next interview<br />
+        starts <em style={{ fontStyle: 'italic', color: '#d4a84b' }}>here.</em>
       </h2>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' as const }}>

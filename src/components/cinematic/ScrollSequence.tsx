@@ -6,26 +6,26 @@ import styles from './ScrollSequence.module.css'
 const PANELS = [
   {
     id:  'seq-p1',
-    num: '01 — The Interview',
-    heading: <>Practice with AI that <em>teaches</em></>,
+    num: '01 — The Coach',
+    heading: <>AI that teaches, not just <em>tests</em></>,
     body:
-      'Our AI interviewer adapts to your level, asks role-specific questions, and teaches you when you\'re stuck. Recruiter screens, technical rounds, system design — all voice-first.',
+      'Other platforms throw questions at you. Ours explains the answer when you\'re stuck, adapts difficulty in real-time, and gives feedback a human interviewer would. Frontend, backend, system design, behavioral — 10 role types.',
     visual: 'pulse',
   },
   {
     id:  'seq-p2',
-    num: '02 — The Voice',
-    heading: <>Learn in your <em>language</em></>,
+    num: '02 — 17 Languages',
+    heading: <>Interview in your <em>language</em></>,
     body:
-      'Real-time voice tutoring in 17 languages. Hindi, Spanish, French, Japanese, and 13 more. Sub-second response time with AI tutors that speak like natives.',
+      'The only interview platform that speaks Hindi, Spanish, French, Japanese, and 13 more. Voice coaching with sub-second response time. Because your first language shouldn\'t hold you back.',
     visual: 'langs',
   },
   {
     id:  'seq-p3',
     num: '03 — The Path',
-    heading: <>Courses that lead <em>somewhere</em></>,
+    heading: <>From course to <em>offer</em></>,
     body:
-      '10 career pathways from Frontend to ML/AI. Each pathway groups courses, tracks progress, and connects to mock interviews for that role.',
+      '69 courses across 10 career pathways. Learn the fundamentals, practice with mock interviews, track your progress. Everything you need from day one to job offer.',
     visual: 'path',
   },
 ]

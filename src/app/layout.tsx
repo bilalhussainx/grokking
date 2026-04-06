@@ -19,10 +19,10 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://kairoslearn.com'),
   title: {
-    default: 'KairosLearn — AI Interview Coach & Voice Tutor',
+    default: 'KairosLearn — The AI Interview Coach That Teaches',
     template: '%s | KairosLearn',
   },
-  description: 'Practice mock interviews and learn in 17 languages with AI voice coaching. 69+ courses in coding, finance, philosophy, and more. Career pathways for Frontend, Backend, Full Stack, ML/AI, and Data Science.',
+  description: 'The only AI interview coach that teaches when you\'re stuck — not just tests you. Mock interviews in 17 languages with real-time voice feedback. 69+ courses, 10 career pathways. Try free.',
   keywords: [
     'AI mock interview', 'interview prep', 'coding interview practice',
     'AI voice tutor', 'learn programming', 'system design interview',
@@ -40,14 +40,14 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://kairoslearn.com',
     siteName: 'KairosLearn',
-    title: 'KairosLearn — AI Interview Coach & Voice Tutor',
-    description: 'Practice mock interviews and learn in 17 languages with real-time AI voice coaching. 69+ courses, 10 career pathways.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'KairosLearn - AI Interview Coach & Voice Tutor' }],
+    title: 'KairosLearn — The AI Interview Coach That Teaches',
+    description: 'The only AI interview coach that teaches when you\'re stuck. Mock interviews in 17 languages. Try free.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'KairosLearn - The AI Interview Coach That Teaches' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KairosLearn — AI Interview Coach & Voice Tutor',
-    description: 'Practice mock interviews and learn in 17 languages with real-time AI voice coaching.',
+    title: 'KairosLearn — The AI Interview Coach That Teaches',
+    description: 'The only AI interview coach that teaches when you\'re stuck. Mock interviews in 17 languages. Try free.',
     images: ['/og-image.png'],
   },
   robots: {
