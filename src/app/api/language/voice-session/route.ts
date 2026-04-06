@@ -9,6 +9,11 @@ const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 const CREDIT_COST_VOICE_MINUTE = 3;
 
+// Handle CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204 });
+}
+
 // Deepgram Aura-2 native language voices (verified model IDs)
 // Each language gets a native-accent voice so TTS sounds like a real speaker
 const DEEPGRAM_VOICES_FEMALE: Record<string, string> = {
@@ -42,10 +47,7 @@ export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+  // Allow guest access for trial sessions — skip credit deduction
   if (!DEEPGRAM_API_KEY) {
     return NextResponse.json({ error: "Deepgram API key not configured" }, { status: 500 });
   }
@@ -78,13 +80,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Deduct credits
-  const ok = await deductCredits(user.id, CREDIT_COST_VOICE_MINUTE, "voice_session_start");
-  if (!ok) {
-    return NextResponse.json(
-      { error: "Insufficient credits. Voice sessions cost 3 credits per minute." },
-      { status: 402 }
-    );
+  // Deduct credits (authenticated users only — guests get trial access)
+  if (user) {
+    const ok = await deductCredits(user.id, CREDIT_COST_VOICE_MINUTE, "voice_session_start");
+    if (!ok) {
+      return NextResponse.json(
+        { error: "Insufficient credits. Voice sessions cost 3 credits per minute." },
+        { status: 402 }
+      );
+    }
   }
 
   try {
@@ -95,8 +99,8 @@ export async function POST(req: NextRequest) {
     const languageName = persona.languageName || language;
 
     // Fetch user profile for personalized tutoring
-    let userName = user.user_metadata?.full_name || undefined;
-    try {
+    let userName = user?.user_metadata?.full_name || undefined;
+    if (user) try {
       const { data: profile } = await supabase
         .from("user_profiles")
         .select("full_name, english_fluency")
@@ -119,37 +123,39 @@ export async function POST(req: NextRequest) {
         : undefined;
 
     // Build RAG context (includes checkpoint automatically)
-    const agentContext = await buildAgentContext({
+    const agentContext = user ? await buildAgentContext({
       userId: user.id,
       targetLanguage: language,
       lessonContext: effectiveLessonContext,
       persona,
-    });
+    }) : { systemPromptContext: persona.systemPrompt || "", profile: { totalPracticeMinutes: 0, lessonsCompleted: 0 } };
 
     // Mode-specific system prompt additions
     let modePromptAddition = '';
 
     if (mode === 'free-form') {
       // Fetch checkpoint for free-form resume context
-      const checkpoint = await getConversationCheckpoint(user.id, language);
-      if (checkpoint) {
-        modePromptAddition = buildResumeContext(checkpoint);
-      } else if (agentContext.profile.totalPracticeMinutes > 0) {
-        // User has practiced before but no checkpoint — create initial one
-        const initialCheckpoint: ConversationCheckpoint = {
-          schemaVersion: 1,
-          lastTopicId: 'general-greeting',
-          lastTopicName: 'Greetings and Introductions',
-          topicProgress: 'started',
-          nextTopicId: 'daily-routines',
-          nextTopicName: 'Daily Routines',
-          lastExchangeSummary: '',
-          vocabInProgress: [],
-          mistakePatterns: [],
-          totalExchangesOnTopic: 0,
-          lastSessionTimestamp: new Date().toISOString(),
-        };
-        await updateConversationCheckpoint(user.id, language, initialCheckpoint);
+      if (user) {
+        const checkpoint = await getConversationCheckpoint(user.id, language);
+        if (checkpoint) {
+          modePromptAddition = buildResumeContext(checkpoint);
+        } else if (agentContext.profile.totalPracticeMinutes > 0) {
+          // User has practiced before but no checkpoint — create initial one
+          const initialCheckpoint: ConversationCheckpoint = {
+            schemaVersion: 1,
+            lastTopicId: 'general-greeting',
+            lastTopicName: 'Greetings and Introductions',
+            topicProgress: 'started',
+            nextTopicId: 'daily-routines',
+            nextTopicName: 'Daily Routines',
+            lastExchangeSummary: '',
+            vocabInProgress: [],
+            mistakePatterns: [],
+            totalExchangesOnTopic: 0,
+            lastSessionTimestamp: new Date().toISOString(),
+          };
+          await updateConversationCheckpoint(user.id, language, initialCheckpoint);
+        }
       }
     } else if (mode === 'placement') {
       modePromptAddition = `
@@ -246,26 +252,28 @@ APPROACH:
       },
     };
 
-    // Log session start
-    await supabase
-      .from("language_sessions")
-      .insert({
-        user_id: user.id,
-        target_language: language,
-        persona_id: persona.id,
-        scenario: scenario || "free_practice",
-        lesson_id: lessonTitle || null,
-        duration_seconds: 0,
-        transcript: [],
-        mistakes_found: [],
-        new_vocab: [],
-        proficiency_delta: 0,
-        agent_summary: "",
-      })
-      .then(() => {});
+    // Log session start (authenticated users only)
+    if (user) {
+      supabase
+        .from("language_sessions")
+        .insert({
+          user_id: user.id,
+          target_language: language,
+          persona_id: persona.id,
+          scenario: scenario || "free_practice",
+          lesson_id: lessonTitle || null,
+          duration_seconds: 0,
+          transcript: [],
+          mistakes_found: [],
+          new_vocab: [],
+          proficiency_delta: 0,
+          agent_summary: "",
+        })
+        .then(() => {});
+    }
 
-    // Trace language voice session
-    import("@/lib/trace").then(({ traceGeneration }) => {
+    // Trace language voice session (authenticated users only)
+    if (user) import("@/lib/trace").then(({ traceGeneration }) => {
       traceGeneration({
         userId: user.id,
         name: "language-voice-session",
@@ -304,12 +312,14 @@ APPROACH:
   } catch (error) {
     console.error("[Language Voice Session] Error:", error);
 
-    // Refund credits on error
-    await supabase.rpc("add_credits", {
-      p_user_id: user.id,
-      p_amount: CREDIT_COST_VOICE_MINUTE,
-      p_action: "voice_session_refund",
-    });
+    // Refund credits on error (authenticated users only)
+    if (user) {
+      await supabase.rpc("add_credits", {
+        p_user_id: user.id,
+        p_amount: CREDIT_COST_VOICE_MINUTE,
+        p_action: "voice_session_refund",
+      });
+    }
 
     return NextResponse.json(
       { error: "Failed to start voice session", details: String(error) },

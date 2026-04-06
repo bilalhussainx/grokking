@@ -265,15 +265,20 @@ ${silenceRules}`
       )}
 
       {deepgram.error && (
-        <div className="px-3 py-2 bg-red-500/10 border-b border-red-500/20 flex items-center gap-2">
-          <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
-          <span className="text-xs text-red-400">{deepgram.error}</span>
-          <button
-            onClick={() => deepgram.start({ mode: "interviewer", personaId: "interviewer-mentor" })}
-            className="ml-auto text-xs text-red-400 underline hover:text-red-300"
-          >
-            Reconnect
-          </button>
+        <div className="px-3 py-2 bg-red-500/10 border-b border-red-500/20">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+            <span className="text-xs text-red-400">{deepgram.error}</span>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <button
+              onClick={() => deepgram.start({ mode: "interviewer", personaId: "interviewer-mentor" })}
+              className="text-xs bg-white/10 hover:bg-white/15 text-white/80 px-3 py-1 rounded transition-colors"
+            >
+              Retry connection
+            </button>
+            <span className="text-xs text-white/30">Voice connection failed — check your microphone permissions and try again.</span>
+          </div>
         </div>
       )}
 

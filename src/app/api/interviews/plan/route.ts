@@ -7,6 +7,11 @@ const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 const MOONSHOT_URL = "https://api.moonshot.ai/v1/chat/completions";
 const MOONSHOT_MODEL = "kimi-k2-turbo-preview";
 
+// Handle CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204 });
+}
+
 const PRESET_DESCRIPTIONS: Record<InterviewPreset, string> = {
   frontend:
     "Frontend engineering: HTML, CSS, JavaScript, React, browser APIs, performance, accessibility",

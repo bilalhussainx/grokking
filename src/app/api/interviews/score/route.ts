@@ -51,14 +51,21 @@ Scoring Guidelines:
 - strengths: 2-4 specific things the candidate did well
 - improvements: 2-4 specific, actionable areas to improve`;
 
+// Handle CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204 });
+}
+
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const ok = await deductCredits(user.id, CREDIT_COSTS.interview_score, "interview_score");
-  if (!ok) {
-    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+  // Allow guest scoring (trial flow) — skip credit deduction for guests
+  if (user) {
+    const ok = await deductCredits(user.id, CREDIT_COSTS.interview_score, "interview_score");
+    if (!ok) {
+      return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+    }
   }
 
   try {

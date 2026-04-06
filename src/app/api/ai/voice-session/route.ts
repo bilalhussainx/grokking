@@ -12,6 +12,18 @@ import { getCoachEnthusiasm } from "@/lib/rewards";
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 
+// Handle CORS preflight — browsers send OPTIONS before POST with credentials
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
+
 /**
  * Returns the Deepgram Voice Agent WebSocket config.
  * Supports persona and voice selection.

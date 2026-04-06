@@ -77,7 +77,13 @@ export async function middleware(request: NextRequest) {
 
   if (!user) {
     // API routes return 401 — except voice session (allows guest trial)
-    if (pathname.startsWith("/api/") && pathname !== "/api/ai/voice-session") {
+    // Allow guest access to voice sessions and interview scoring (guest trial flow)
+    const guestApiRoutes = [
+      "/api/ai/voice-session",
+      "/api/language/voice-session",
+      "/api/interviews/score",
+    ];
+    if (pathname.startsWith("/api/") && !guestApiRoutes.includes(pathname)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     // Page routes redirect to login
