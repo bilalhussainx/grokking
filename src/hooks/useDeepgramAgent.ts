@@ -219,8 +219,19 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
         });
 
         if (!resp.ok) {
-          const data = await resp.json().catch(() => ({}));
-          throw new Error(data.error || `API error ${resp.status}`);
+          const text = await resp.text().catch(() => "");
+          let errMsg = `API error ${resp.status}`;
+          try {
+            const data = JSON.parse(text);
+            if (data.error) errMsg = data.error;
+          } catch { /* not JSON */ }
+          console.error("[useDeepgramAgent] Voice session fetch failed:", {
+            endpoint,
+            status: resp.status,
+            statusText: resp.statusText,
+            body: text.slice(0, 500),
+          });
+          throw new Error(errMsg);
         }
 
         const { url, key, settings } = await resp.json();

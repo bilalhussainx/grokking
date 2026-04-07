@@ -5,14 +5,26 @@ import { getLanguagePersona, getDefaultPersona, type ProficiencyLevel } from "@/
 import { buildAgentContext, getConversationCheckpoint, buildResumeContext, updateConversationCheckpoint } from "@/lib/language-agent";
 import type { ConversationCheckpoint } from "@/data/language-types";
 
+// Force Node.js runtime and disable caching for guest reliability
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 const CREDIT_COST_VOICE_MINUTE = 3;
 
 // Handle CORS preflight
 export async function OPTIONS() {
-  return new NextResponse(null, { status: 204 });
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS, GET",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
 }
+
 
 // Deepgram Aura-2 native language voices (verified model IDs)
 // Each language gets a native-accent voice so TTS sounds like a real speaker

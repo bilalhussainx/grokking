@@ -9,6 +9,12 @@ import {
 } from "@/lib/voice-personas";
 import { getCoachEnthusiasm } from "@/lib/rewards";
 
+// Force Node.js runtime — this route uses dynamic imports of node-only libs
+// (e.g. @/lib/agent-intelligence, @/lib/trace) that fail under Edge.
+export const runtime = "nodejs";
+// Disable caching — guest sessions must always hit the handler fresh
+export const dynamic = "force-dynamic";
+
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 
@@ -18,10 +24,18 @@ export async function OPTIONS() {
     status: 204,
     headers: {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Methods": "POST, OPTIONS, GET",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
   });
+}
+
+// Some clients/proxies probe with GET — return 200 with a hint instead of 405
+export async function GET() {
+  return NextResponse.json(
+    { ok: true, hint: "POST to start a voice session" },
+    { status: 200 }
+  );
 }
 
 /**
@@ -31,8 +45,10 @@ export async function OPTIONS() {
  * Kimi K2 Turbo is the LLM brain (OpenAI-compatible).
  */
 export async function POST(req: NextRequest) {
+  console.log("[voice-session] POST received");
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
+  console.log("[voice-session] auth check:", user ? `user=${user.id.slice(0, 8)}` : "guest");
 
   // Allow guest access for trial sessions — skip credit deduction
   if (user) {
