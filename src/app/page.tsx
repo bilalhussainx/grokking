@@ -13,6 +13,7 @@ import type { Course } from "@/data/types";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
 import { useRouter } from "next/navigation";
 import LearningStats from "@/components/gamification/LearningStats";
+import DailyMissions from "@/components/gamification/DailyMissions";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
 import ProgressRing from "@/components/ui/ProgressRing";
 import ForgettingAlert from "@/components/gamification/ForgettingAlert";
@@ -795,6 +796,13 @@ export default function HomePage() {
                 </button>
               </motion.div>
             </motion.div>
+          </motion.div>
+        )}
+
+        {/* Daily Missions — retention hook (per audit 2026-04-07) */}
+        {user && (
+          <motion.div variants={item} className="mb-6">
+            <DailyMissions />
           </motion.div>
         )}
 

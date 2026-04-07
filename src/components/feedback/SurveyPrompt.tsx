@@ -81,14 +81,20 @@ export default function SurveyPrompt() {
 
             {/* CTAs */}
             <div className="flex gap-2 mt-4">
-              <Link
+              {/*
+                Plain <a> tag — Next.js <Link> tries to prefetch survey.html
+                as an RSC payload which 404s because it's a static file in
+                public/, not an app-router page. (Bug fix 2026-04-07)
+              */}
+              <a
                 href="/survey.html"
                 target="_blank"
+                rel="noopener noreferrer"
                 onClick={goToSurvey}
                 className="flex-1 py-2 rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 text-white text-xs font-semibold text-center hover:opacity-90 transition-opacity"
               >
                 Take Survey
-              </Link>
+              </a>
               <button
                 onClick={dismiss}
                 className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white/50 text-xs hover:bg-white/10 transition-colors"

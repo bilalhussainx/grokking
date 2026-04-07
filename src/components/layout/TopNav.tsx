@@ -191,16 +191,19 @@ export default function TopNav({
               {(user.user_metadata?.full_name || user.email || "U").charAt(0).toUpperCase()}
             </Link>
             {typeof window !== "undefined" && !localStorage.getItem("survey-completed") && (
-              <Link
+              // Plain <a> — Next.js <Link> prefetches as RSC and 404s on
+              // static files in public/. (Bug fix 2026-04-07)
+              <a
                 href="/survey.html"
                 target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => localStorage.setItem("survey-completed", "true")}
                 className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition-colors"
                 title="Give feedback"
               >
                 <MessageSquare className="w-3 h-3" />
                 Feedback
-              </Link>
+              </a>
             )}
             <button
               onClick={() => signOut()}
