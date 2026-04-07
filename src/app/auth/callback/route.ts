@@ -19,9 +19,13 @@ export async function GET(req: NextRequest) {
       type: type === "email" ? "email" : type === "recovery" ? "recovery" : "signup",
     });
     if (!error) {
-      // New signup confirmed — send to onboarding
+      // New signup confirmed — send to onboarding with the new=1 flag
+      // so the onboarding page knows to clear stale localStorage and
+      // render the form for a fresh user. (Bug fix 2026-04-07: this was
+      // missing the flag which caused mismatched state between OAuth and
+      // email confirmation flows.)
       if (type === "signup" || type === "email") {
-        return NextResponse.redirect(`${origin}/onboarding`);
+        return NextResponse.redirect(`${origin}/onboarding?new=1`);
       }
       return NextResponse.redirect(`${origin}${next}`);
     }
