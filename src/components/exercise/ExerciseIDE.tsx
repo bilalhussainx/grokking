@@ -99,8 +99,11 @@ export default function ExerciseIDE({
   const hResize = useResize(28, "horizontal");
   const vResize = useResize(60, "vertical");
 
-  // Responsive detection
+  // Responsive detection — SSR-safe (Bug fix 2026-04-07: was crashing
+  // mobile clients on hydration because window.innerWidth was read in
+  // an effect that fired before the window was guaranteed to exist)
   useEffect(() => {
+    if (typeof window === "undefined") return;
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     window.addEventListener("resize", check);

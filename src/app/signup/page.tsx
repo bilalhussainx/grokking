@@ -75,7 +75,12 @@ export default function SignupPage() {
       setLoading(false);
     } else {
       if (result.confirmed) {
-        window.location.href = "/onboarding";
+        // Bug fix 2026-04-07: window.location.href was a full-page hard
+        // redirect that bypassed Next's client router and could leave the
+        // app in an inconsistent state if /onboarding threw on first
+        // mount. Use the router so we stay client-side and inherit the
+        // app's error boundary.
+        router.push("/onboarding?new=1");
       } else {
         setSuccess(true);
       }

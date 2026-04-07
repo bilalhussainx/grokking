@@ -115,8 +115,16 @@ function OnboardingInner() {
         }),
       });
       if (!saveResp.ok) {
+        // Bug fix 2026-04-07: previously this just logged the error and
+        // continued to the redirect, which caused an infinite loop —
+        // localStorage said "onboarding_complete=true" but the DB said
+        // false, so / would redirect back to /onboarding which would
+        // redirect back to / on the localStorage check.
         const errData = await saveResp.json().catch(() => ({}));
         console.error("[Onboarding] Failed to save preferences:", errData);
+        alert("We couldn't save your preferences. Please try again.");
+        setSaving(false);
+        return;
       }
 
       // Also save to localStorage for immediate coach use

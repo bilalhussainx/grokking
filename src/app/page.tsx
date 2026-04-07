@@ -206,8 +206,12 @@ export default function HomePage() {
             setUserInterests(prefs.learning_interests);
           }
         } else {
-          // Onboarding not completed — redirect to onboarding
-          router.push('/onboarding');
+          // Onboarding not completed — redirect to onboarding with the
+          // ?new=1 flag so the onboarding page clears stale localStorage
+          // and renders the form fresh. (Bug fix 2026-04-07: without the
+          // flag, an unfinished onboarding could loop if localStorage and
+          // DB disagreed.)
+          router.push('/onboarding?new=1');
         }
       })
       .catch(() => {});
