@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
-import { Mic, BookOpen, ArrowRight, Sparkles, Star, Target, Users, Building2, MessageSquare, Map, Code2, Globe, GraduationCap, Zap, Shield, Brain, Server } from "lucide-react";
+import { Mic, BookOpen, ArrowRight, Sparkles, Star, Target, Users, Building2, MessageSquare, Map, Code2, Globe, GraduationCap, Zap, Shield, Brain, Server, Clock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAI } from "@/contexts/AIContext";
 import { useXP } from "@/contexts/XPContext";
@@ -14,6 +14,7 @@ import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
 import { useRouter } from "next/navigation";
 import LearningStats from "@/components/gamification/LearningStats";
 import DailyMissions from "@/components/gamification/DailyMissions";
+import StreakCalendar from "@/components/gamification/StreakCalendar";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
 import ProgressRing from "@/components/ui/ProgressRing";
 import ForgettingAlert from "@/components/gamification/ForgettingAlert";
@@ -770,6 +771,7 @@ export default function HomePage() {
                 { href: "/college-interviews", icon: GraduationCap, label: "College Interview", style: "bg-[#D4AF37] text-black font-semibold" },
                 { href: "/interviews", icon: Target, label: "Tech Interview", style: "border border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10" },
                 { href: "/talk", icon: Mic, label: "Voice Tutoring", style: "border border-white/20 text-white hover:border-[#D4AF37]/50 hover:bg-white/5" },
+                { href: "/history", icon: Clock, label: "Your Sessions", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
                 { href: "/pathways", icon: Map, label: "Career Pathways", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
                 { href: "/courses", icon: BookOpen, label: "All Courses", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
               ].map((action) => {
@@ -803,10 +805,44 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* Daily Missions — retention hook (per audit 2026-04-07) */}
-        {user && (
+        {/* Continue where you left off — shown above missions when relevant.
+            Per audit 2026-04-07: "Continue where you left off section missing" */}
+        {user && inProgressCourses.length > 0 && (
           <motion.div variants={item} className="mb-6">
-            <DailyMissions />
+            <Link
+              href={`/course/${inProgressCourses[0].slug}`}
+              className="block rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-r from-[#1a1610] to-[#141414] p-5 hover:border-[#D4AF37]/60 transition-all group"
+            >
+              <div className="flex items-center gap-4">
+                <span className="text-4xl">{inProgressCourses[0].icon}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] uppercase tracking-wider text-[#D4AF37] mb-1 font-semibold">Continue where you left off</p>
+                  <h3 className="text-lg font-bold text-white truncate">{inProgressCourses[0].title}</h3>
+                  <div className="flex items-center gap-3 mt-2">
+                    <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden max-w-xs">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] rounded-full"
+                        style={{ width: `${courseProgress[inProgressCourses[0].slug] || 0}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-white/50">{Math.round(courseProgress[inProgressCourses[0].slug] || 0)}% complete</span>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-[#D4AF37] group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          </motion.div>
+        )}
+
+        {/* Daily Missions + Streak Calendar — retention hooks (per audit 2026-04-07) */}
+        {user && (
+          <motion.div variants={item} className="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2">
+              <DailyMissions />
+            </div>
+            <div>
+              <StreakCalendar />
+            </div>
           </motion.div>
         )}
 

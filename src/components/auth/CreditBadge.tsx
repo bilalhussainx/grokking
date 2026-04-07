@@ -4,12 +4,21 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Coins } from "lucide-react";
 
+// Per audit 2026-04-07: "Credits unclear: 300 credits shown but no
+// indication of burn rate." Native title attribute gives users an
+// instant tooltip on hover without adding any new dependency.
+const CREDIT_TOOLTIP =
+  "Credits power voice features. ~10/interview · ~3/min voice tutoring · text coach is free. Renews monthly.";
+
 export default function CreditBadge() {
   const { credits, user } = useAuth();
   if (!user) return null;
 
   return (
-    <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+    <div
+      className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium cursor-help"
+      title={CREDIT_TOOLTIP}
+    >
       <Coins className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
       <span>{typeof credits === 'number' && credits > 9999 ? `${Math.floor(credits/1000)}k` : credits}</span>
     </div>
