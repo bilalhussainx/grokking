@@ -12,7 +12,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { GraduationCap, Loader2, ArrowRight, Globe2, Sparkles } from "lucide-react";
+import { GraduationCap, Loader2, ArrowRight, Globe2, Sparkles, Mic, MessageSquare, Headphones } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAllCollegePersonas } from "@/data/college-interviewer-personas";
@@ -57,6 +57,7 @@ export default function CollegeInterviewSetup() {
   const [recentInfluence, setRecentInfluence] = useState("");
   const [whyThisSchool, setWhyThisSchool] = useState("");
   const [feedbackLanguage, setFeedbackLanguage] = useState<string>("en");
+  const [inputMode, setInputMode] = useState<'voice' | 'text'>("voice");
   const [loading, setLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   const [error, setError] = useState("");
@@ -177,6 +178,7 @@ export default function CollegeInterviewSetup() {
         collegePersonaId,
         applicantProfile,
         feedbackLanguage,
+        inputMode,
       });
       router.push(`/college-interviews/${sessionId}`);
     } catch (err) {
@@ -357,6 +359,49 @@ export default function CollegeInterviewSetup() {
           <p className="text-[10px] text-white/30 mt-2 leading-relaxed">
             Interview is always in English (matches the real thing). Your scorecard and feedback will be in this language.
           </p>
+        </motion.div>
+
+        {/* Voice / Text mode (audit 2026-04-07: text fallback for users without mic) */}
+        <motion.div
+          className="mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.32 }}
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-6 h-6 rounded-full bg-white/[0.06] border border-white/[0.1] text-white/50 flex items-center justify-center text-xs font-bold">
+              <Headphones className="w-3 h-3" />
+            </div>
+            <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Interview mode</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => setInputMode("voice")}
+              className={`p-3.5 rounded-xl border text-left transition-colors ${
+                inputMode === "voice"
+                  ? "bg-violet-500/10 border-violet-500/30 ring-1 ring-violet-500/20"
+                  : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]"
+              }`}
+            >
+              <Mic className={`w-4 h-4 mb-2 ${inputMode === "voice" ? "text-violet-400" : "text-white/30"}`} />
+              <div className={`text-[13px] font-semibold mb-0.5 ${inputMode === "voice" ? "text-white" : "text-white/70"}`}>Voice</div>
+              <div className="text-[10px] text-white/30 leading-tight">Speak your answers — most realistic</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setInputMode("text")}
+              className={`p-3.5 rounded-xl border text-left transition-colors ${
+                inputMode === "text"
+                  ? "bg-violet-500/10 border-violet-500/30 ring-1 ring-violet-500/20"
+                  : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]"
+              }`}
+            >
+              <MessageSquare className={`w-4 h-4 mb-2 ${inputMode === "text" ? "text-violet-400" : "text-white/30"}`} />
+              <div className={`text-[13px] font-semibold mb-0.5 ${inputMode === "text" ? "text-white" : "text-white/70"}`}>Text</div>
+              <div className="text-[10px] text-white/30 leading-tight">No mic needed — type your answers</div>
+            </button>
+          </div>
         </motion.div>
 
         {/* Error */}

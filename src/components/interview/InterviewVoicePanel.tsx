@@ -6,6 +6,7 @@ import { useInterview } from "@/contexts/InterviewContext";
 import type { TranscriptEntry } from "@/types/interview";
 import { saveSessionNote } from "@/lib/sessionNotes";
 import { useVoiceAgent } from "@/hooks/useVoiceAgent";
+import { markMissionComplete } from "@/lib/dailyMissions";
 
 interface InterviewVoicePanelProps {
   codeRef: React.MutableRefObject<string>;
@@ -101,6 +102,8 @@ ${silenceRules}`
   useEffect(() => {
     if (startedRef.current) return;
     startedRef.current = true;
+    // Mark daily mission "complete a mock interview" — auto-detect
+    markMissionComplete("mock-interview");
     const timer = setTimeout(() => {
       voiceAgent.start({
         personaId: "interviewer-mentor",

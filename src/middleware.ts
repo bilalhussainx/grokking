@@ -21,7 +21,7 @@ const PUBLIC_ROUTES = [
 ];
 
 // Route prefixes that are always public
-const PUBLIC_PREFIXES = ["/ref/", "/_next/", "/favicon", "/api/webhooks/", "/api/admin/", "/api/courses/", "/api/submissions", "/api/call/", "/talk", "/call", "/career", "/admin/survey", "/landing", "/blog", "/about", "/comparison", "/pathways", "/tools", "/privacy", "/terms", "/interviews", "/college-interviews", "/history", "/faq"];
+const PUBLIC_PREFIXES = ["/ref/", "/_next/", "/favicon", "/api/webhooks/", "/api/admin/", "/api/courses/", "/api/submissions", "/api/call/", "/talk", "/call", "/career", "/admin/survey", "/landing", "/blog", "/about", "/comparison", "/pathways", "/tools", "/privacy", "/terms", "/interviews", "/college-interviews", "/history", "/achievements", "/leaderboard", "/faq"];
 
 function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.includes(pathname)) return true;
@@ -76,11 +76,13 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    // Allow guest access to voice sessions and interview scoring (guest trial flow)
+    // Allow guest access to voice sessions, interview scoring, and the
+    // text-only interview endpoint (guest trial flow).
     const guestApiRoutes = [
       "/api/ai/voice-session",
       "/api/language/voice-session",
       "/api/interviews/score",
+      "/api/interviews/text-message",
     ];
 
     // API routes: return 401 (non-whitelisted) or pass through (whitelisted)

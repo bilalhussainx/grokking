@@ -7,10 +7,10 @@
 //
 // Spec: P0 retention fix per KAIROSLEARN_COMPREHENSIVE_AUDIT.md (2026-04-07)
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Target, Mic, BookOpen, CheckCircle2, Circle, Flame, Trophy } from "lucide-react";
+import { Target, Mic, BookOpen, CheckCircle2, Flame, Trophy } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useXP } from "@/contexts/XPContext";
 
@@ -64,14 +64,14 @@ export default function DailyMissions() {
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [showCelebration, setShowCelebration] = useState(false);
 
-  // Load + reset daily
-  useEffect(() => {
+  // Load + reset daily — and listen for auto-completion events from
+  // anywhere in the app (lib/dailyMissions.markMissionComplete).
+  const reload = useCallback(() => {
     if (typeof window === "undefined") return;
     try {
       const storedDate = localStorage.getItem(STORAGE_DATE_KEY);
       const today = todayString();
       if (storedDate !== today) {
-        // New day — reset
         localStorage.setItem(STORAGE_DATE_KEY, today);
         localStorage.setItem(STORAGE_KEY, "[]");
         setCompleted(new Set());
@@ -80,11 +80,24 @@ export default function DailyMissions() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         try {
-          setCompleted(new Set(JSON.parse(stored)));
+          const next = new Set<string>(JSON.parse(stored));
+          setCompleted(next);
+          if (next.size === DAILY_MISSIONS.length) {
+            setShowCelebration(true);
+            setTimeout(() => setShowCelebration(false), 4000);
+          }
         } catch {}
       }
     } catch {}
   }, []);
+
+  useEffect(() => {
+    reload();
+    if (typeof window === "undefined") return;
+    const handler = () => reload();
+    window.addEventListener("daily-mission-complete", handler);
+    return () => window.removeEventListener("daily-mission-complete", handler);
+  }, [reload]);
 
   const markComplete = (mission: Mission) => {
     if (completed.has(mission.id)) return;

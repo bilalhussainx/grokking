@@ -6,11 +6,12 @@ import { Code2, Mic, ArrowLeft } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
 import InterviewEditor from "./InterviewEditor";
 import InterviewVoicePanel from "./InterviewVoicePanel";
+import InterviewTextPanel from "./InterviewTextPanel";
 import Link from "next/link";
 
 export default function InterviewRoom() {
   const router = useRouter();
-  const { sessionId, interviewType, preset, questionPlan } = useInterview();
+  const { sessionId, interviewType, preset, questionPlan, inputMode } = useInterview();
   const codeRef = useRef("");
   const outputRef = useRef("");
   const [mobileTab, setMobileTab] = useState<"voice" | "code">("voice");
@@ -119,11 +120,22 @@ export default function InterviewRoom() {
         <div className={`${
           showEditor ? "md:w-[45%]" : "w-full"
         } ${showEditor && mobileTab === "code" ? "hidden md:block" : "w-full md:w-auto"}`}>
-          <InterviewVoicePanel
-            codeRef={codeRef}
-            outputRef={outputRef}
-            onInterviewEnd={handleInterviewEnd}
-          />
+          {/* Render the right panel based on inputMode picked at setup time.
+              Spec: 2026-04-07 audit P0 — text-only fallback for users
+              without a microphone. */}
+          {inputMode === "text" ? (
+            <InterviewTextPanel
+              codeRef={codeRef}
+              outputRef={outputRef}
+              onInterviewEnd={handleInterviewEnd}
+            />
+          ) : (
+            <InterviewVoicePanel
+              codeRef={codeRef}
+              outputRef={outputRef}
+              onInterviewEnd={handleInterviewEnd}
+            />
+          )}
         </div>
       </div>
     </div>

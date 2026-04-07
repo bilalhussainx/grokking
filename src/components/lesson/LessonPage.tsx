@@ -233,6 +233,12 @@ export default function LessonPage({
       // 1. Lesson complete
       await earnXP("lesson_complete", lesson.slug);
 
+      // Mark daily mission "finish a lesson" — auto-detect (audit 2026-04-07)
+      try {
+        const { markMissionComplete } = await import("@/lib/dailyMissions");
+        markMissionComplete("lesson-complete");
+      } catch {}
+
       // 2. Check module completion
       if (currentModule) {
         const allModuleLessonsDone = currentModule.lessons.every((l) =>

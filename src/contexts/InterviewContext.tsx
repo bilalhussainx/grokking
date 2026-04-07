@@ -41,6 +41,8 @@ interface InterviewState {
     whyThisSchool?: string;
   };
   feedbackLanguage?: string;        // for college: scorecard translation target
+  // Text-only mode for users without microphone (audit 2026-04-07)
+  inputMode: 'voice' | 'text';
 }
 
 interface InterviewContextValue extends InterviewState {
@@ -55,6 +57,7 @@ interface InterviewContextValue extends InterviewState {
     collegePersonaId?: string;
     applicantProfile?: InterviewState['applicantProfile'];
     feedbackLanguage?: string;
+    inputMode?: 'voice' | 'text';
   }) => string;
   addTranscriptEntry: (entry: TranscriptEntry) => void;
   setFinalCode: (code: string) => void;
@@ -77,6 +80,7 @@ const defaultState: InterviewState = {
   collegePersonaId: undefined,
   applicantProfile: undefined,
   feedbackLanguage: "en",
+  inputMode: "voice",
 };
 
 const InterviewCtx = createContext<InterviewContextValue | null>(null);
@@ -120,6 +124,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
       collegePersonaId?: string;
       applicantProfile?: InterviewState['applicantProfile'];
       feedbackLanguage?: string;
+      inputMode?: 'voice' | 'text';
     }) => {
       const sessionId = `interview-${Date.now()}-${Math.random()
         .toString(36)
@@ -139,6 +144,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         collegePersonaId: params.collegePersonaId,
         applicantProfile: params.applicantProfile,
         feedbackLanguage: params.feedbackLanguage || "en",
+        inputMode: params.inputMode || "voice",
       };
       setState(newState);
       // Write synchronously so the next page can rehydrate immediately

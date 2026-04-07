@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
-import { Mic, BookOpen, ArrowRight, Sparkles, Star, Target, Users, Building2, MessageSquare, Map, Code2, Globe, GraduationCap, Zap, Shield, Brain, Server, Clock } from "lucide-react";
+import { Mic, BookOpen, ArrowRight, Sparkles, Star, Target, Users, Building2, MessageSquare, Map, Code2, Globe, GraduationCap, Zap, Shield, Brain, Server, Clock, Trophy } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAI } from "@/contexts/AIContext";
 import { useXP } from "@/contexts/XPContext";
@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import LearningStats from "@/components/gamification/LearningStats";
 import DailyMissions from "@/components/gamification/DailyMissions";
 import StreakCalendar from "@/components/gamification/StreakCalendar";
+import AchievementsShowcase from "@/components/gamification/AchievementsShowcase";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
 import ProgressRing from "@/components/ui/ProgressRing";
 import ForgettingAlert from "@/components/gamification/ForgettingAlert";
@@ -772,7 +773,7 @@ export default function HomePage() {
                 { href: "/interviews", icon: Target, label: "Tech Interview", style: "border border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10" },
                 { href: "/talk", icon: Mic, label: "Voice Tutoring", style: "border border-white/20 text-white hover:border-[#D4AF37]/50 hover:bg-white/5" },
                 { href: "/history", icon: Clock, label: "Your Sessions", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
-                { href: "/pathways", icon: Map, label: "Career Pathways", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
+                { href: "/leaderboard", icon: Trophy, label: "Leaderboard", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
                 { href: "/courses", icon: BookOpen, label: "All Courses", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
               ].map((action) => {
                 const ActionIcon = action.icon;
@@ -834,14 +835,16 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* Daily Missions + Streak Calendar — retention hooks (per audit 2026-04-07) */}
+        {/* Daily Missions + Streak Calendar + Achievements — retention hooks
+            (per audit 2026-04-07) */}
         {user && (
           <motion.div variants={item} className="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="lg:col-span-2">
               <DailyMissions />
             </div>
-            <div>
+            <div className="space-y-4">
               <StreakCalendar />
+              <AchievementsShowcase />
             </div>
           </motion.div>
         )}

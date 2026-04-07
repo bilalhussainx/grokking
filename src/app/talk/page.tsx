@@ -111,6 +111,10 @@ function TalkPageInner() {
       setCountdown(null);
 
       try {
+        // Mark daily mission "talk to AI tutor" — auto-detect
+        const { markMissionComplete } = await import("@/lib/dailyMissions");
+        markMissionComplete("voice-tutor");
+
         await agent.start({
           personaId: persona.id,
           systemPrompt,
