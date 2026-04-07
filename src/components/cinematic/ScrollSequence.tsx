@@ -6,19 +6,19 @@ import styles from './ScrollSequence.module.css'
 const PANELS = [
   {
     id:  'seq-p1',
-    num: '01 — The Coach',
-    heading: <>AI that teaches, not just <em>tests</em></>,
+    num: '01 — Your Language',
+    heading: <>The interview, in <em>Hindi</em></>,
     body:
-      'Other platforms throw questions at you. Ours explains the answer when you\'re stuck, adapts difficulty in real-time, and gives feedback a human interviewer would. Frontend, backend, system design, behavioral — 10 role types.',
-    visual: 'pulse',
+      'Pramp, Interviewing.io, LeetCode — all English-only. We\'re the first AI interview coach that speaks Hindi, Tamil, Bengali, Punjabi, Spanish, Portuguese, and 11 more. Practice in the language you actually think in.',
+    visual: 'langs',
   },
   {
     id:  'seq-p2',
-    num: '02 — 17 Languages',
-    heading: <>Interview in your <em>language</em></>,
+    num: '02 — The Coach',
+    heading: <>AI that teaches, not just <em>tests</em></>,
     body:
-      'The only interview platform that speaks Hindi, Spanish, French, Japanese, and 13 more. Voice coaching with sub-second response time. Because your first language shouldn\'t hold you back.',
-    visual: 'langs',
+      'Stuck on a question? Our AI explains the answer, adapts difficulty in real-time, and gives feedback a human interviewer would. Frontend, backend, system design, behavioral — 10 role types. Voice-first.',
+    visual: 'pulse',
   },
   {
     id:  'seq-p3',

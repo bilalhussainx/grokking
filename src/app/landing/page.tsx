@@ -6,9 +6,9 @@ import Stats from '@/components/cinematic/Stats'
 import CTASection from '@/components/cinematic/CTASection'
 
 export const metadata: Metadata = {
-  title: 'KairosLearn — The AI Interview Coach That Teaches',
+  title: 'KairosLearn — Practice Tech Interviews in Your Language',
   description:
-    'Mock interviews with AI that adapts to your level and teaches when you\'re stuck. 17 languages, 10 role types, real-time voice feedback. Try free.',
+    'The only AI interview coach that speaks Hindi, Tamil, Bengali, Spanish, and 13 more languages. Practice frontend, backend, system design in the language you think in. $10/mo. Try free.',
 }
 
 export default function LandingPage() {

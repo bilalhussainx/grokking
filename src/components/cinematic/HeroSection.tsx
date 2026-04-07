@@ -64,22 +64,21 @@ export default function HeroSection() {
       <div className={styles.bottomFade} aria-hidden="true" />
 
       <div ref={contentRef} className={styles.content} id="hero-content">
-        <p className={styles.eyebrow} id="he">The only AI interviewer that teaches you back</p>
+        <p className={styles.eyebrow} id="he">Hindi · Tamil · Bengali · Punjabi · Spanish · Portuguese · 11 more</p>
 
         <h1 className={styles.headline}>
           <span className={styles.clipLine}>
-            <span className={styles.clipInner} id="hl1">Your AI interview</span>
+            <span className={styles.clipInner} id="hl1">Practice tech interviews</span>
           </span>
           <span className={styles.clipLine}>
             <span className={styles.clipInner} id="hl2">
-              <em>coach.</em>
+              in <em>your language.</em>
             </span>
           </span>
         </h1>
 
         <p className={styles.sub} id="hs">
-          Mock interviews with an AI that adapts to your level, teaches when you&apos;re stuck, and speaks 17&nbsp;languages.
-          10&nbsp;role types. Real-time voice feedback. $10/mo.
+          The only AI interview coach that speaks 17 languages. Practice frontend, backend, system design, and behavioral rounds with an AI that teaches you when you&apos;re stuck — in Hindi, Tamil, Spanish, or whatever language you think in. $10/mo.
         </p>
 
         <div className={styles.ctas} id="hc">

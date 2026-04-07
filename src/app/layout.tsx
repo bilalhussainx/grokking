@@ -19,10 +19,10 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://kairoslearn.com'),
   title: {
-    default: 'KairosLearn — The AI Interview Coach That Teaches',
+    default: 'KairosLearn — Practice Tech Interviews in Your Language',
     template: '%s | KairosLearn',
   },
-  description: 'The only AI interview coach that teaches when you\'re stuck — not just tests you. Mock interviews in 17 languages with real-time voice feedback. 69+ courses, 10 career pathways. Try free.',
+  description: 'The only AI interview coach that speaks 17 languages — Hindi, Tamil, Bengali, Spanish, Portuguese, and more. Practice frontend, backend, system design, and behavioral rounds in the language you think in. $10/mo. Try free.',
   keywords: [
     'AI mock interview', 'interview prep', 'coding interview practice',
     'AI voice tutor', 'learn programming', 'system design interview',
@@ -40,14 +40,14 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://kairoslearn.com',
     siteName: 'KairosLearn',
-    title: 'KairosLearn — The AI Interview Coach That Teaches',
-    description: 'The only AI interview coach that teaches when you\'re stuck. Mock interviews in 17 languages. Try free.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'KairosLearn - The AI Interview Coach That Teaches' }],
+    title: 'KairosLearn — Practice Tech Interviews in Your Language',
+    description: 'The only AI interview coach that speaks Hindi, Tamil, Bengali, Spanish, and 13 more. Practice in the language you think in. $10/mo.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'KairosLearn - Practice Tech Interviews in Your Language' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KairosLearn — The AI Interview Coach That Teaches',
-    description: 'The only AI interview coach that teaches when you\'re stuck. Mock interviews in 17 languages. Try free.',
+    title: 'KairosLearn — Practice Tech Interviews in Your Language',
+    description: 'The only AI interview coach that speaks Hindi, Tamil, Bengali, Spanish, and 13 more. Practice in the language you think in. $10/mo.',
     images: ['/og-image.png'],
   },
   robots: {
