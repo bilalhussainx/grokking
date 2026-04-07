@@ -76,17 +76,25 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    // API routes return 401 — except voice session (allows guest trial)
     // Allow guest access to voice sessions and interview scoring (guest trial flow)
     const guestApiRoutes = [
       "/api/ai/voice-session",
       "/api/language/voice-session",
       "/api/interviews/score",
     ];
-    if (pathname.startsWith("/api/") && !guestApiRoutes.includes(pathname)) {
+
+    // API routes: return 401 (non-whitelisted) or pass through (whitelisted)
+    // CRITICAL: must NOT fall through to the page redirect below — that would
+    // turn a POST /api/* into a redirect to /login, and /login (a page) returns
+    // 405 for POST requests, surfacing as the dreaded "API error 405".
+    if (pathname.startsWith("/api/")) {
+      if (guestApiRoutes.includes(pathname)) {
+        return response; // whitelisted — let the route handler run
+      }
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    // Page routes redirect to login
+
+    // Page routes: redirect to login
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
