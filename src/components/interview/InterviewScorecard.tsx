@@ -30,7 +30,7 @@ function ScoreBar({ label, score }: { label: string; score: number }) {
 
 export default function InterviewScorecard() {
   const router = useRouter();
-  const { transcript, questionPlan, finalCode, interviewType, scorecard, setScorecard, preset, language, companyPersonaId } = useInterview();
+  const { transcript, questionPlan, finalCode, interviewType, scorecard, setScorecard, preset, language, companyPersonaId, category } = useInterview();
   const { user } = useAuth();
   const [loading, setLoading] = useState(!scorecard);
   const [error, setError] = useState("");
@@ -56,6 +56,8 @@ export default function InterviewScorecard() {
           // Spec: 2026-04-07-multilingual-interviews-design.md — these enable
           // history writes for the question variation engine.
           preset, language, companyPersonaId,
+          // College fields are present but the tech scorecard ignores them
+          category: category || "tech",
         }),
       });
       if (!res.ok) {

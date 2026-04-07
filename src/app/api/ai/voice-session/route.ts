@@ -76,7 +76,16 @@ export async function POST(req: NextRequest) {
     companyPersonaId,
     questionPlan,
     interviewType,
+    // College vertical (spec: 2026-04-07-college-admissions-interviews-design.md)
+    category,                  // "tech" | "college"
+    collegePersonaId,
+    applicantProfile,
   } = body;
+
+  // For college interviews, force English voice. The spec says the interview
+  // is conducted in English (matches reality); only the post-interview
+  // scorecard is translated to the user's chosen language.
+  const effectiveLanguage = (mode === "interviewer" && category === "college") ? "en" : language;
 
   // Select persona
   const persona =
@@ -108,8 +117,8 @@ export async function POST(req: NextRequest) {
     od: "aura-2-thalia-en",
   };
   const voice = getVoice(voiceId || persona.defaultVoice);
-  const voiceModel = language !== "en"
-    ? LANGUAGE_VOICES[language] || "aura-2-thalia-en"
+  const voiceModel = effectiveLanguage !== "en"
+    ? LANGUAGE_VOICES[effectiveLanguage] || "aura-2-thalia-en"
     : voice.deepgramModel;
 
   // Language names for the system prompt
@@ -179,9 +188,22 @@ export async function POST(req: NextRequest) {
   // Build context-aware prompt with full lesson material
   let contextPrompt = persona.systemPrompt + enthusiasmModifier + userProfileContext;
 
-  // ── Interview mode: prepend company persona + code-mixing language adapter ──
-  // (Spec: 2026-04-07-multilingual-interviews-design.md)
-  if (mode === "interviewer" && companyPersonaId) {
+  // ── Interview mode: prepend company OR college persona + code-mixing adapter ──
+  // (Spec: 2026-04-07-multilingual-interviews-design.md and ...college-admissions...)
+  if (mode === "interviewer" && category === "college" && collegePersonaId) {
+    // ─── College admissions interview ───
+    try {
+      const { getCollegePersona } = await import("@/data/college-interviewer-personas");
+      const { buildCollegePersonaPrompt } = await import("@/lib/college-interview-prompt-builders");
+      const collegePersona = getCollegePersona(collegePersonaId);
+      if (collegePersona) {
+        const collegeBlock = buildCollegePersonaPrompt(collegePersona, applicantProfile);
+        contextPrompt = collegeBlock + "\n\n" + userProfileContext;
+      }
+    } catch (e) {
+      console.error("[voice-session] Failed to build college persona prompt, falling back:", e);
+    }
+  } else if (mode === "interviewer" && companyPersonaId) {
     try {
       const { getCompanyPersona } = await import("@/data/interview-personas");
       const { buildInterviewerSystemPrompt } = await import("@/lib/interview-prompt-builders");

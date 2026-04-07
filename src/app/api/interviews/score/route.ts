@@ -78,6 +78,10 @@ export async function POST(req: NextRequest) {
       preset,
       language = "en",
       companyPersonaId,
+      // College vertical (spec: 2026-04-07-college-admissions-interviews-design.md)
+      category = "tech",
+      collegePersonaId,
+      feedbackLanguage = "en",
     }: {
       transcript: TranscriptEntry[];
       questionPlan: InterviewPlan;
@@ -86,6 +90,9 @@ export async function POST(req: NextRequest) {
       preset?: string;
       language?: string;
       companyPersonaId?: string;
+      category?: 'tech' | 'college';
+      collegePersonaId?: string;
+      feedbackLanguage?: string;
     } = body;
 
     if (!transcript || !questionPlan) {
@@ -96,17 +103,20 @@ export async function POST(req: NextRequest) {
     }
 
     // Write asked questions to history (best-effort, authenticated users only).
-    // Spec: 2026-04-07-multilingual-interviews-design.md — sliding window of 50.
-    if (user && preset && interviewType && questionPlan.questions?.length) {
+    // Spec keys history rows by category so tech and college pools stay separate.
+    const historyPreset = category === "college" ? (collegePersonaId || "unknown") : preset;
+    const historyType = category === "college" ? "college" : interviewType;
+    if (user && historyPreset && historyType && questionPlan.questions?.length) {
       try {
         const rows = questionPlan.questions.map((q: { text: string; type?: string }) => ({
           user_id: user.id,
-          preset,
-          interview_type: interviewType,
-          company_persona_id: companyPersonaId || null,
+          preset: historyPreset,
+          interview_type: historyType,
+          company_persona_id: category === "college" ? collegePersonaId : (companyPersonaId || null),
           language,
           question_text: q.text,
           question_topic: q.type || null,
+          category,
         }));
         await supabase.from("interview_question_history").insert(rows);
       } catch (e) {
@@ -140,7 +150,29 @@ export async function POST(req: NextRequest) {
       )
       .join("\n\n");
 
-    const userPrompt = `Please evaluate this ${interviewType} interview.
+    // Pick the system prompt and user prompt based on category
+    let systemPromptForScoring = SYSTEM_PROMPT;
+    let userPrompt: string;
+
+    if (category === "college") {
+      try {
+        const { COLLEGE_SCORECARD_SYSTEM_PROMPT } = await import("@/lib/college-interview-prompt-builders");
+        systemPromptForScoring = COLLEGE_SCORECARD_SYSTEM_PROMPT;
+      } catch (e) {
+        console.error("[Interview Score] Failed to load college scorecard prompt:", e);
+      }
+
+      userPrompt = `Please evaluate this college admissions alumni interview.
+
+QUESTION PLAN:
+${formattedQuestions}
+
+FULL INTERVIEW TRANSCRIPT:
+${formattedTranscript}
+
+Score the candidate using the 5-dimension college rubric (communication, intellectualCuriosity, authenticity, schoolFit, maturity). Pull DIRECT QUOTES from the transcript when possible. The 'whatTheyWouldWriteInTheReport' field is the most important field — make it feel like a real alumni report excerpt. Return the JSON scorecard now.`;
+    } else {
+      userPrompt = `Please evaluate this ${interviewType} interview.
 
 ORIGINAL QUESTION PLAN:
 ${formattedQuestions}
@@ -158,6 +190,7 @@ ${finalCode}
 }
 
 Score the candidate's performance and return the JSON scorecard now.`;
+    }
 
     const kimiRes = await fetch(MOONSHOT_URL, {
       method: "POST",
@@ -168,7 +201,7 @@ Score the candidate's performance and return the JSON scorecard now.`;
       body: JSON.stringify({
         model: MOONSHOT_MODEL,
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: systemPromptForScoring },
           { role: "user", content: userPrompt },
         ],
         stream: false,
@@ -205,6 +238,55 @@ Score the candidate's performance and return the JSON scorecard now.`;
         { error: "Failed to parse scorecard from AI response" },
         { status: 500 }
       );
+    }
+
+    // College vertical: translate the scorecard text fields if requested
+    if (category === "college" && feedbackLanguage && feedbackLanguage !== "en") {
+      try {
+        const { buildTranslationPrompt } = await import("@/lib/college-interview-prompt-builders");
+        const langNames: Record<string, string> = {
+          es: "Spanish", fr: "French", de: "German", it: "Italian",
+          nl: "Dutch", ja: "Japanese", hi: "Hindi", pa: "Punjabi",
+        };
+        const langName = langNames[feedbackLanguage] || feedbackLanguage;
+        const translationPrompt = buildTranslationPrompt(scorecard, feedbackLanguage, langName);
+
+        const tRes = await fetch(MOONSHOT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${MOONSHOT_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: MOONSHOT_MODEL,
+            messages: [
+              { role: "system", content: "You are a precise translator. Return only valid JSON." },
+              { role: "user", content: translationPrompt },
+            ],
+            stream: false,
+            temperature: 0.2,
+            max_tokens: 3000,
+          }),
+        });
+
+        if (tRes.ok) {
+          const tData = await tRes.json();
+          let translated = tData.choices?.[0]?.message?.content || "";
+          translated = translated
+            .replace(/^```(?:json)?\s*/i, "")
+            .replace(/\s*```$/, "")
+            .trim();
+          try {
+            const translatedScorecard = JSON.parse(translated);
+            // Keep the original English version available too for fallback display
+            return NextResponse.json({ ...translatedScorecard, _englishOriginal: scorecard });
+          } catch {
+            console.warn("[Interview Score] Translation parse failed; returning English scorecard");
+          }
+        }
+      } catch (e) {
+        console.warn("[Interview Score] Translation failed (non-fatal):", e);
+      }
     }
 
     return NextResponse.json(scorecard);

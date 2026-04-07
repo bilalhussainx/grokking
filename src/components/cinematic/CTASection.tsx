@@ -49,7 +49,7 @@ export default function CTASection() {
           Try a Mock Interview — Free
         </Link>
         <Link
-          href="/talk"
+          href="/college-interviews"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -64,9 +64,17 @@ export default function CTASection() {
             borderRadius: 4,
           }}
         >
-          Or talk to an AI tutor
+          Or practice a college interview
         </Link>
       </div>
+      <p style={{
+        marginTop: 24,
+        fontSize: 11,
+        color: 'rgba(242, 237, 227, 0.4)',
+        letterSpacing: '0.04em',
+      }}>
+        Tech interviews: 14 FAANG personas · College interviews: Harvard, Yale, Stanford, MIT, +6
+      </p>
     </section>
   )
 }

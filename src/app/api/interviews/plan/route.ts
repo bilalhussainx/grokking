@@ -166,24 +166,51 @@ export async function POST(req: NextRequest) {
       interviewType,
       language = "en",
       companyPersonaId,
+      // College vertical (spec: 2026-04-07-college-admissions-interviews-design.md)
+      category = "tech",
+      collegePersonaId,
+      applicantProfile,
+      whyThisSchool,
     }: {
       jobDescription: string;
       preset: InterviewPreset;
       interviewType: InterviewType;
       language?: string;
       companyPersonaId?: string;
+      category?: 'tech' | 'college';
+      collegePersonaId?: string;
+      applicantProfile?: {
+        intendedMajor?: string;
+        topProjectTitle?: string;
+        topProjectDescription?: string;
+        recentInfluence?: string;
+      };
+      whyThisSchool?: string;
     } = body;
 
-    if (!preset || !interviewType) {
-      return NextResponse.json(
-        { error: "preset and interviewType are required" },
-        { status: 400 }
-      );
+    // Validation differs by category
+    if (category === "college") {
+      if (!collegePersonaId) {
+        return NextResponse.json(
+          { error: "collegePersonaId is required for category=college" },
+          { status: 400 }
+        );
+      }
+    } else {
+      if (!preset || !interviewType) {
+        return NextResponse.json(
+          { error: "preset and interviewType are required" },
+          { status: 400 }
+        );
+      }
     }
 
-    // Fetch the user's last 50 questions for this (preset, interview_type) bucket
-    // so the planner can avoid repeats. Skip silently for guests or on errors —
-    // history is best-effort, the plan must always be returned.
+    // History exclusion bucket is keyed by:
+    //   tech: (user, preset, interview_type)
+    //   college: (user, collegePersonaId, "college")  -- preset = persona id, type = "college"
+    const historyPreset = category === "college" ? (collegePersonaId || "unknown") : preset;
+    const historyType = category === "college" ? "college" : interviewType;
+
     let exclusionList: string[] = [];
     if (user) {
       try {
@@ -191,8 +218,9 @@ export async function POST(req: NextRequest) {
           .from("interview_question_history")
           .select("question_text")
           .eq("user_id", user.id)
-          .eq("preset", preset)
-          .eq("interview_type", interviewType)
+          .eq("category", category)
+          .eq("preset", historyPreset)
+          .eq("interview_type", historyType)
           .order("asked_at", { ascending: false })
           .limit(50);
         if (history && history.length > 0) {
@@ -203,25 +231,52 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const presetDescription = PRESET_DESCRIPTIONS[preset] || preset;
-
-    // Resolve company persona context (lazy import keeps the bundle slim)
-    let companyContext = "";
-    if (companyPersonaId && companyPersonaId !== "generic") {
-      try {
-        const { getCompanyPersona } = await import("@/data/interview-personas");
-        const persona = getCompanyPersona(companyPersonaId);
-        companyContext = `\n\nThe interview must reflect the style of ${persona.company} ${persona.level}. Signature topics they care about: ${persona.signatureTopics.join("; ")}. Generate questions that match this company's known style and difficulty (hardness ${persona.hardness}/10).`;
-      } catch {
-        // ignore if persona module fails
-      }
-    }
-
     const exclusionBlock = exclusionList.length > 0
       ? `\n\nThe candidate has already been asked the following questions in previous sessions. Do NOT repeat any of these. Generate fresh questions covering different angles or topics:\n${exclusionList.map((q, i) => `${i + 1}. ${q}`).join("\n")}\n\nIMPORTANT: Vary topics and question phrasing — the candidate should not feel they have seen this before.`
       : "";
 
-    const userPrompt = `Generate an interview question plan for the following:
+    let userPrompt: string;
+
+    if (category === "college") {
+      // ── College admissions interview plan ──
+      let collegeContext = "";
+      try {
+        const { getCollegePersona } = await import("@/data/college-interviewer-personas");
+        const persona = getCollegePersona(collegePersonaId!);
+        if (persona) {
+          collegeContext = `\nSchool: ${persona.fullName}\nThis is an alumni admissions interview for ${persona.school}. The school cares about: ${persona.schoolFitTopics.join('; ')}.\nQuestion themes the alumni interviewer typically explores: ${persona.signatureQuestionThemes.join('; ')}.\nCommon anti-patterns: ${persona.antiPatterns.join('; ')}.`;
+        }
+      } catch {}
+
+      const profileBlock = applicantProfile
+        ? `\n\nThe candidate has shared this about themselves (use it to PERSONALIZE questions):
+- Intended major: ${applicantProfile.intendedMajor || 'not specified'}
+- Top project / extracurricular: ${applicantProfile.topProjectTitle || 'not specified'}
+- Project description: ${applicantProfile.topProjectDescription || 'not specified'}
+- Recent influence: ${applicantProfile.recentInfluence || 'not specified'}
+- Why this school: ${whyThisSchool || 'not specified'}`
+        : '';
+
+      userPrompt = `Generate an alumni interview question plan for a high school applicant.
+${collegeContext}${profileBlock}${exclusionBlock}
+
+Generate 5-7 questions in the alumni interview format. All questions should be type "behavioral" (college alumni interviews are not technical). The questions must be SPECIFIC to the candidate's profile when possible — reference their intended major, top project, and recent influence directly. Question text in the plan must be in English.
+
+Return the JSON question plan now.`;
+    } else {
+      // ── Tech interview plan (existing path) ──
+      const presetDescription = PRESET_DESCRIPTIONS[preset] || preset;
+
+      let companyContext = "";
+      if (companyPersonaId && companyPersonaId !== "generic") {
+        try {
+          const { getCompanyPersona } = await import("@/data/interview-personas");
+          const persona = getCompanyPersona(companyPersonaId);
+          companyContext = `\n\nThe interview must reflect the style of ${persona.company} ${persona.level}. Signature topics they care about: ${persona.signatureTopics.join("; ")}. Generate questions that match this company's known style and difficulty (hardness ${persona.hardness}/10).`;
+        } catch {}
+      }
+
+      userPrompt = `Generate an interview question plan for the following:
 
 Interview Preset: ${preset}
 Preset Focus: ${presetDescription}
@@ -230,6 +285,7 @@ Interview Language: ${language}
 ${jobDescription ? `Job Description:\n${jobDescription}` : "No specific job description provided — use a generic senior software engineer role."}${companyContext}${exclusionBlock}
 
 Return the JSON question plan now. The question text in the plan must be in English (it is a structural document — the interviewer will render it in ${language} at speak time).`;
+    }
 
     if (!MOONSHOT_API_KEY) {
       return NextResponse.json(
