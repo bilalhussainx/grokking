@@ -4,6 +4,11 @@ import { getLanguagePersona, getDefaultPersona, type ProficiencyLevel } from "@/
 const SARVAM_API_KEY = process.env.SARVAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
+
+// LLM brain — OpenRouter primary (Claude Sonnet 4.5), Kimi fallback.
+// Spec: 2026-04-07 OpenRouter parity with Coach Alex
+const VOICE_LLM_MODEL = process.env.OPENROUTER_VOICE_MODEL || "anthropic/claude-sonnet-4.5";
 
 const SARVAM_LANGUAGES = ['hi', 'pa'];
 const SARVAM_STT_LANGUAGES = ['pa'];
@@ -284,16 +289,24 @@ IMPORTANT: Focus conversation on the lesson topic above. Create scenarios where 
 
         let responseText = '';
 
-        if (MOONSHOT_API_KEY) {
+        // OpenRouter primary, Kimi fallback
+        const useOpenRouter = !!OPENROUTER_API_KEY;
+        const llmUrl = useOpenRouter
+          ? 'https://openrouter.ai/api/v1/chat/completions'
+          : 'https://api.moonshot.ai/v1/chat/completions';
+        const llmKey = useOpenRouter ? OPENROUTER_API_KEY : MOONSHOT_API_KEY;
+        const llmModel = useOpenRouter ? VOICE_LLM_MODEL : 'kimi-k2-turbo-preview';
+
+        if (llmKey) {
           // Use streaming to get text faster
-          const llmResp = await fetch('https://api.moonshot.ai/v1/chat/completions', {
+          const llmResp = await fetch(llmUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${MOONSHOT_API_KEY}`,
+              Authorization: `Bearer ${llmKey}`,
             },
             body: JSON.stringify({
-              model: 'kimi-k2-turbo-preview',
+              model: llmModel,
               messages,
               temperature: 0.7,
               max_tokens: 80,

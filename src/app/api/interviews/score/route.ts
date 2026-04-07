@@ -7,6 +7,13 @@ const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 const MOONSHOT_URL = "https://api.moonshot.ai/v1/chat/completions";
 const MOONSHOT_MODEL = "kimi-k2-turbo-preview";
 
+// OpenRouter primary for scoring (Claude Sonnet 4.5 — best at nuanced
+// behavioral feedback and writing the "what they would write" report mock).
+// Kimi fallback if OPENROUTER_API_KEY is missing.
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const SCORE_MODEL = process.env.OPENROUTER_SCORE_MODEL || "anthropic/claude-sonnet-4.5";
+
 const SYSTEM_PROMPT = `You are an expert technical interview evaluator. Given a full interview transcript, the original question plan, and optionally a code submission, score the candidate's performance.
 
 Return ONLY valid JSON (no markdown fences, no extra text) with this exact shape:
@@ -124,12 +131,18 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (!MOONSHOT_API_KEY) {
+    if (!OPENROUTER_API_KEY && !MOONSHOT_API_KEY) {
       return NextResponse.json(
-        { error: "MOONSHOT_API_KEY not configured" },
+        { error: "No LLM API key configured (OPENROUTER_API_KEY or MOONSHOT_API_KEY)" },
         { status: 500 }
       );
     }
+
+    // OpenRouter primary, Kimi fallback
+    const useOpenRouter = !!OPENROUTER_API_KEY;
+    const llmUrl = useOpenRouter ? OPENROUTER_URL : MOONSHOT_URL;
+    const llmKey = useOpenRouter ? OPENROUTER_API_KEY : MOONSHOT_API_KEY;
+    const llmModel = useOpenRouter ? SCORE_MODEL : MOONSHOT_MODEL;
 
     // Truncate transcript to last 100 entries if too long
     const truncatedTranscript = transcript.slice(-100);
@@ -192,14 +205,14 @@ ${finalCode}
 Score the candidate's performance and return the JSON scorecard now.`;
     }
 
-    const kimiRes = await fetch(MOONSHOT_URL, {
+    const kimiRes = await fetch(llmUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${MOONSHOT_API_KEY}`,
+        Authorization: `Bearer ${llmKey}`,
       },
       body: JSON.stringify({
-        model: MOONSHOT_MODEL,
+        model: llmModel,
         messages: [
           { role: "system", content: systemPromptForScoring },
           { role: "user", content: userPrompt },
@@ -212,9 +225,9 @@ Score the candidate's performance and return the JSON scorecard now.`;
 
     if (!kimiRes.ok) {
       const errText = await kimiRes.text();
-      console.error("[Interview Score] Kimi error:", kimiRes.status, errText);
+      console.error("[Interview Score] LLM error:", kimiRes.status, errText);
       return NextResponse.json(
-        { error: `Kimi API error: ${kimiRes.status}` },
+        { error: `LLM API error: ${kimiRes.status}` },
         { status: 502 }
       );
     }
@@ -251,14 +264,14 @@ Score the candidate's performance and return the JSON scorecard now.`;
         const langName = langNames[feedbackLanguage] || feedbackLanguage;
         const translationPrompt = buildTranslationPrompt(scorecard, feedbackLanguage, langName);
 
-        const tRes = await fetch(MOONSHOT_URL, {
+        const tRes = await fetch(llmUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${MOONSHOT_API_KEY}`,
+            Authorization: `Bearer ${llmKey}`,
           },
           body: JSON.stringify({
-            model: MOONSHOT_MODEL,
+            model: llmModel,
             messages: [
               { role: "system", content: "You are a precise translator. Return only valid JSON." },
               { role: "user", content: translationPrompt },

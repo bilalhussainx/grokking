@@ -17,6 +17,12 @@ export const dynamic = "force-dynamic";
 
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
+
+// Voice agent LLM brain — OpenRouter primary, Kimi fallback.
+// Defaults to Claude Sonnet 4.5 for the most natural voice (Kimi sounds robotic).
+// Override per-deployment via OPENROUTER_VOICE_MODEL env var if needed.
+const VOICE_LLM_MODEL = process.env.OPENROUTER_VOICE_MODEL || "anthropic/claude-sonnet-4.5";
 
 // Handle CORS preflight — browsers send OPTIONS before POST with credentials
 export async function OPTIONS() {
@@ -290,19 +296,36 @@ Never say "How can I help?" — instead say "So in this lesson we're looking at 
           model: "nova-3",
         },
       },
-      think: {
-        provider: {
-          type: "open_ai",
-          model: "kimi-k2-turbo-preview",
-        },
-        endpoint: {
-          url: "https://api.moonshot.ai/v1/chat/completions",
-          headers: {
-            authorization: `Bearer ${MOONSHOT_API_KEY}`,
+      // OpenRouter primary (Claude Sonnet 4.5 — natural conversation),
+      // Kimi/Moonshot fallback if OPENROUTER_API_KEY is missing.
+      // Spec: 2026-04-07-llm-router-design (Coach Alex parity)
+      think: OPENROUTER_API_KEY
+        ? {
+            provider: {
+              type: "open_ai",
+              model: VOICE_LLM_MODEL,
+            },
+            endpoint: {
+              url: "https://openrouter.ai/api/v1/chat/completions",
+              headers: {
+                authorization: `Bearer ${OPENROUTER_API_KEY}`,
+              },
+            },
+            prompt: contextPrompt,
+          }
+        : {
+            provider: {
+              type: "open_ai",
+              model: "kimi-k2-turbo-preview",
+            },
+            endpoint: {
+              url: "https://api.moonshot.ai/v1/chat/completions",
+              headers: {
+                authorization: `Bearer ${MOONSHOT_API_KEY}`,
+              },
+            },
+            prompt: contextPrompt,
           },
-        },
-        prompt: contextPrompt,
-      },
       speak: {
         provider: {
           type: "deepgram",
@@ -318,7 +341,7 @@ Never say "How can I help?" — instead say "So in this lesson we're looking at 
     traceGeneration({
       userId: user.id,
       name: "coach-voice-session",
-      model: "deepgram-agent/kimi-k2",
+      model: OPENROUTER_API_KEY ? `deepgram-agent/openrouter/${VOICE_LLM_MODEL}` : "deepgram-agent/kimi-k2",
       input: {
         systemPrompt: contextPrompt.slice(0, 2000),
         userMessage: `Voice session started: ${lessonTitle || "no lesson"}`,

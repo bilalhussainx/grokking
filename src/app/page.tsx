@@ -333,26 +333,26 @@ export default function HomePage() {
                 transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.4, 0.25, 1] }}
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                AI-powered mock interviews &middot; Voice coaching in 17 languages
+                FAANG mock interviews &middot; College alumni interviews &middot; 9 voice languages
               </motion.div>
 
               {/* Hero text with word-by-word blur reveal */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1]">
                 <BlurReveal
-                  text="AI Interview Coach"
+                  text="From Harvard to Google."
                   className="text-white"
                   delay={0.3}
                 />
                 <br />
                 <span className="inline-block">
                   <BlurReveal
-                    text="+"
+                    text="One AI"
                     className="text-white"
                     delay={0.6}
                   />
                   {" "}
                   <BlurReveal
-                    text="Language Tutor"
+                    text="interview coach."
                     className="italic text-[#D4AF37]"
                     delay={0.7}
                   />
@@ -366,7 +366,7 @@ export default function HomePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
               >
-                Practice mock interviews and learn in 17 languages with real-time AI voice coaching.
+                Practice your <strong className="text-white/80">Harvard alumni interview</strong> in the morning, your <strong className="text-white/80">Google L4 system design</strong> in the afternoon. AI personas trained on real reports — in your native language.
               </motion.p>
 
               {/* CTAs slide up with spring */}
@@ -377,27 +377,64 @@ export default function HomePage() {
                 transition={{ duration: 0.7, delay: 0.65, ease: [0.25, 0.4, 0.25, 1] }}
               >
                 <Link
-                  href="/signup"
+                  href="/college-interviews"
                   className="group w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-base hover:bg-[#C4A030] transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
                 >
-                  <Target className="w-4 h-4" />
-                  Start Mock Interview
+                  <GraduationCap className="w-4 h-4" />
+                  Practice College Interview
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
                 <Link
-                  href="/signup"
+                  href="/interviews"
                   className="group w-full sm:w-auto px-8 py-3.5 rounded-xl border border-white/20 text-white font-medium text-base hover:border-[#D4AF37]/50 hover:bg-white/5 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
                 >
-                  <Mic className="w-4 h-4" />
-                  Try Voice Tutoring
+                  <Target className="w-4 h-4" />
+                  Practice Tech Interview
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </motion.div>
             </motion.div>
 
-            {/* ── SECTION 2: TWO FEATURE PILLARS ── */}
-            <StaggerReveal className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-20" delay={0.1}>
-              {/* Interview Coaching Pillar */}
+            {/* ── SECTION 2: THREE FEATURE PILLARS ── */}
+            <StaggerReveal className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-20" delay={0.1}>
+              {/* College Interview Coaching Pillar — NEW, FEATURED FIRST */}
+              <motion.div
+                variants={staggerChild}
+                className="group relative overflow-hidden rounded-2xl border-2 border-[#D4AF37]/30 bg-gradient-to-br from-[#1a1610] to-[#141414] p-7 md:p-8"
+                whileHover={{ scale: 1.02, borderColor: "rgba(212, 175, 55, 0.6)", y: -4 }}
+                transition={springSnappy}
+              >
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#D4AF37]/10 rounded-full blur-3xl group-hover:bg-[#D4AF37]/20 transition-colors" />
+                <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-[10px] font-bold uppercase tracking-wider">New</div>
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center mb-5">
+                    <GraduationCap className="w-7 h-7 text-[#D4AF37]" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-3">College Admissions</h2>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-start gap-3 text-sm text-white/60">
+                      <Building2 className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
+                      <span>Practice the real Harvard, Yale, Stanford, MIT alumni interview</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-sm text-white/60">
+                      <Brain className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
+                      <span>AI personalizes questions to your project, major, and essays</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-sm text-white/60">
+                      <Globe className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
+                      <span>Interview in English, get feedback in your native language (9 langs)</span>
+                    </li>
+                  </ul>
+                  <Link
+                    href="/college-interviews"
+                    className="inline-flex items-center gap-2 text-[#D4AF37] text-sm font-bold hover:text-[#C4A030] transition-colors"
+                  >
+                    Practice College Interview <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </motion.div>
+
+              {/* Tech Interview Coaching Pillar */}
               <motion.div
                 variants={staggerChild}
                 className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#141414] p-7 md:p-8"
@@ -409,11 +446,11 @@ export default function HomePage() {
                   <div className="w-14 h-14 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center mb-5">
                     <Target className="w-7 h-7 text-[#D4AF37]" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-3">Interview Coaching</h2>
+                  <h2 className="text-2xl font-bold text-white mb-3">Tech Interviews</h2>
                   <ul className="space-y-3 mb-6">
                     <li className="flex items-start gap-3 text-sm text-white/60">
                       <Users className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
-                      <span>Practice recruiter screens, technical interviews, system design rounds</span>
+                      <span>14 FAANG personas: Google L4, Meta E4, Amazon SDE II, Stripe, Anthropic</span>
                     </li>
                     <li className="flex items-start gap-3 text-sm text-white/60">
                       <Brain className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
@@ -421,14 +458,14 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-start gap-3 text-sm text-white/60">
                       <Shield className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
-                      <span>10 role presets: Frontend, Backend, Full Stack, ML/AI, PM, Finance, and more</span>
+                      <span>Frontend, Backend, System Design, Behavioral, ML/AI, PM, Finance</span>
                     </li>
                   </ul>
                   <Link
-                    href="/signup"
+                    href="/interviews"
                     className="inline-flex items-center gap-2 text-[#D4AF37] text-sm font-medium hover:text-[#C4A030] transition-colors"
                   >
-                    Start Practicing <ArrowRight className="w-4 h-4" />
+                    Practice Tech Interview <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </motion.div>
@@ -449,7 +486,7 @@ export default function HomePage() {
                   <ul className="space-y-3 mb-6">
                     <li className="flex items-start gap-3 text-sm text-white/60">
                       <Globe className="w-4 h-4 text-white/70 mt-0.5 shrink-0" />
-                      <span>Learn coding, finance, philosophy in 17 languages</span>
+                      <span>Learn coding, finance, philosophy in 9 native voice languages</span>
                     </li>
                     <li className="flex items-start gap-3 text-sm text-white/60">
                       <MessageSquare className="w-4 h-4 text-white/70 mt-0.5 shrink-0" />
@@ -457,11 +494,11 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-start gap-3 text-sm text-white/60">
                       <Zap className="w-4 h-4 text-white/70 mt-0.5 shrink-0" />
-                      <span>Sub-second response time, natural conversation flow</span>
+                      <span>Sub-second response, powered by Claude Sonnet 4.5</span>
                     </li>
                   </ul>
                   <Link
-                    href="/signup"
+                    href="/talk"
                     className="inline-flex items-center gap-2 text-[#D4AF37] text-sm font-medium hover:text-[#C4A030] transition-colors"
                   >
                     Try Voice Chat <ArrowRight className="w-4 h-4" />
@@ -725,7 +762,8 @@ export default function HomePage() {
               variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06, delayChildren: 0.4 } } }}
             >
               {[
-                { href: "/interviews", icon: Target, label: "Mock Interview", style: "bg-[#D4AF37] text-black font-semibold" },
+                { href: "/college-interviews", icon: GraduationCap, label: "College Interview", style: "bg-[#D4AF37] text-black font-semibold" },
+                { href: "/interviews", icon: Target, label: "Tech Interview", style: "border border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10" },
                 { href: "/talk", icon: Mic, label: "Voice Tutoring", style: "border border-white/20 text-white hover:border-[#D4AF37]/50 hover:bg-white/5" },
                 { href: "/pathways", icon: Map, label: "Career Pathways", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
                 { href: "/courses", icon: BookOpen, label: "All Courses", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },

@@ -11,7 +11,12 @@ export const dynamic = "force-dynamic";
 
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const CREDIT_COST_VOICE_MINUTE = 3;
+
+// Voice agent LLM brain — OpenRouter primary (Claude Sonnet 4.5), Kimi fallback.
+// Override per-deployment via OPENROUTER_VOICE_MODEL env var.
+const VOICE_LLM_MODEL = process.env.OPENROUTER_VOICE_MODEL || "anthropic/claude-sonnet-4.5";
 
 // Handle CORS preflight
 export async function OPTIONS() {
@@ -242,19 +247,25 @@ APPROACH:
             model: "nova-3",
           },
         },
-        think: {
-          provider: {
-            type: "open_ai",
-            model: "kimi-k2-turbo-preview",
-          },
-          endpoint: {
-            url: "https://api.moonshot.ai/v1/chat/completions",
-            headers: {
-              authorization: `Bearer ${MOONSHOT_API_KEY}`,
+        // OpenRouter primary (Claude Sonnet 4.5 for natural voice),
+        // Kimi/Moonshot fallback if OPENROUTER_API_KEY is missing.
+        think: OPENROUTER_API_KEY
+          ? {
+              provider: { type: "open_ai", model: VOICE_LLM_MODEL },
+              endpoint: {
+                url: "https://openrouter.ai/api/v1/chat/completions",
+                headers: { authorization: `Bearer ${OPENROUTER_API_KEY}` },
+              },
+              prompt: fullSystemPrompt,
+            }
+          : {
+              provider: { type: "open_ai", model: "kimi-k2-turbo-preview" },
+              endpoint: {
+                url: "https://api.moonshot.ai/v1/chat/completions",
+                headers: { authorization: `Bearer ${MOONSHOT_API_KEY}` },
+              },
+              prompt: fullSystemPrompt,
             },
-          },
-          prompt: fullSystemPrompt,
-        },
         speak: {
           provider: {
             type: "deepgram",

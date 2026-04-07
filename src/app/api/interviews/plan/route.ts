@@ -7,6 +7,12 @@ const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 const MOONSHOT_URL = "https://api.moonshot.ai/v1/chat/completions";
 const MOONSHOT_MODEL = "kimi-k2-turbo-preview";
 
+// OpenRouter primary for question planning (fast + great at structured JSON).
+// Kimi fallback if OPENROUTER_API_KEY is missing.
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const PLAN_MODEL = process.env.OPENROUTER_PLAN_MODEL || "openai/gpt-4o-mini";
+
 // Handle CORS preflight
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204 });
@@ -287,21 +293,27 @@ ${jobDescription ? `Job Description:\n${jobDescription}` : "No specific job desc
 Return the JSON question plan now. The question text in the plan must be in English (it is a structural document — the interviewer will render it in ${language} at speak time).`;
     }
 
-    if (!MOONSHOT_API_KEY) {
+    if (!OPENROUTER_API_KEY && !MOONSHOT_API_KEY) {
       return NextResponse.json(
-        { error: "MOONSHOT_API_KEY not configured" },
+        { error: "No LLM API key configured (OPENROUTER_API_KEY or MOONSHOT_API_KEY)" },
         { status: 500 }
       );
     }
 
-    const kimiRes = await fetch(MOONSHOT_URL, {
+    // OpenRouter primary, Kimi fallback
+    const useOpenRouter = !!OPENROUTER_API_KEY;
+    const llmUrl = useOpenRouter ? OPENROUTER_URL : MOONSHOT_URL;
+    const llmKey = useOpenRouter ? OPENROUTER_API_KEY : MOONSHOT_API_KEY;
+    const llmModel = useOpenRouter ? PLAN_MODEL : MOONSHOT_MODEL;
+
+    const kimiRes = await fetch(llmUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${MOONSHOT_API_KEY}`,
+        Authorization: `Bearer ${llmKey}`,
       },
       body: JSON.stringify({
-        model: MOONSHOT_MODEL,
+        model: llmModel,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userPrompt },
