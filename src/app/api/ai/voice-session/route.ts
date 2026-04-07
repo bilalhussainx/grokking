@@ -72,6 +72,10 @@ export async function POST(req: NextRequest) {
     mode = "coach", // "coach" | "interviewer"
     language = "en",
     lessonContext,
+    // Interview mode extras
+    companyPersonaId,
+    questionPlan,
+    interviewType,
   } = body;
 
   // Select persona
@@ -174,6 +178,42 @@ export async function POST(req: NextRequest) {
 
   // Build context-aware prompt with full lesson material
   let contextPrompt = persona.systemPrompt + enthusiasmModifier + userProfileContext;
+
+  // ── Interview mode: prepend company persona + code-mixing language adapter ──
+  // (Spec: 2026-04-07-multilingual-interviews-design.md)
+  if (mode === "interviewer" && companyPersonaId) {
+    try {
+      const { getCompanyPersona } = await import("@/data/interview-personas");
+      const { buildInterviewerSystemPrompt } = await import("@/lib/interview-prompt-builders");
+      const companyPersona = getCompanyPersona(companyPersonaId);
+      const interviewerBlock = buildInterviewerSystemPrompt(companyPersona, language);
+      // Replace the base coach/interviewer persona prompt with the company-specific
+      // interviewer block — the company persona is more specific and should win.
+      contextPrompt = interviewerBlock + "\n\n" + enthusiasmModifier + userProfileContext;
+    } catch (e) {
+      console.error("[voice-session] Failed to build company persona prompt, falling back:", e);
+      // Fall through to the existing default interviewer prompt
+    }
+  } else if (mode === "interviewer" && language !== "en") {
+    // No company persona, but non-English language — still apply code-mixing adapter
+    try {
+      const { getInterviewerCodeMixingPrompt } = await import("@/lib/interview-prompt-builders");
+      const codeMixBlock = getInterviewerCodeMixingPrompt(language);
+      if (codeMixBlock) contextPrompt += "\n\n" + codeMixBlock;
+    } catch (e) {
+      console.error("[voice-session] Failed to apply code-mixing adapter:", e);
+    }
+  }
+
+  // Append the question plan when provided (interviewer mode only)
+  if (mode === "interviewer" && questionPlan) {
+    try {
+      const planJson = typeof questionPlan === "string" ? questionPlan : JSON.stringify(questionPlan);
+      contextPrompt += `\n\n## QUESTION PLAN\nUse this as the structure for the interview. Adapt follow-ups based on the candidate's answers — do not robotically read them in order. Question text is in English; render it in ${language === "en" ? "English" : "the target language with code-mixing"} when speaking.\n\nInterview type: ${interviewType || "technical"}\n\n${planJson}`;
+    } catch {
+      // Ignore plan formatting errors
+    }
+  }
 
   // Language instruction — teach in the selected language
   if (language !== "en") {

@@ -80,28 +80,42 @@ export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
     orchestratedAgent.stop();
     setCurrentConfig(config);
 
+    // Determine the effective mode for downstream calls.
+    // 'interviewer' triggers interview prompt builders in the API routes.
+    const isInterviewer = config.mode === 'interviewer';
+
     if (isSarvamLanguage(config.language)) {
-      // Use orchestrated pipeline for Hindi/Punjabi
+      // Use orchestrated pipeline for Hindi/Punjabi (Sarvam TTS)
       await orchestratedAgent.start({
         language: config.language,
         personaId: config.personaId,
         proficiencyLevel: config.proficiencyLevel,
         lessonTitle: config.lessonTitle,
         lessonContext: config.lessonContext,
+        // Interview mode passthrough
+        mode: isInterviewer ? 'interviewer' : 'language',
+        companyPersonaId: config.companyPersonaId,
+        questionPlan: config.questionPlan,
+        interviewType: config.interviewType,
       });
     } else {
-      // Use Deepgram Agent for Latin/CJK
+      // Use Deepgram Agent for Latin/CJK languages
       await deepgramAgent.start({
         lessonTitle: config.lessonTitle,
         moduleTitle: config.moduleTitle,
         courseTitle: config.courseTitle,
         personaId: config.personaId,
         voiceId: config.voiceId,
-        mode: config.mode === 'coach' ? 'coach' : 'language',
+        // CRITICAL: preserve 'interviewer' mode so the route applies persona + code-mix prompts
+        mode: isInterviewer ? 'interviewer' : (config.mode === 'coach' ? 'coach' : 'language'),
         language: config.language,
         systemPrompt: config.systemPrompt,
         proficiencyLevel: config.proficiencyLevel,
         lessonContext: config.lessonContext,
+        // Interview mode passthrough
+        companyPersonaId: config.companyPersonaId,
+        questionPlan: config.questionPlan,
+        interviewType: config.interviewType,
       });
     }
   }, [deepgramAgent, orchestratedAgent]);

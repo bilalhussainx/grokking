@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: 'KairosLearn — Practice Tech Interviews in Your Language',
     template: '%s | KairosLearn',
   },
-  description: 'The only AI interview coach that speaks 17 languages — Hindi, Tamil, Bengali, Spanish, Portuguese, and more. Practice frontend, backend, system design, and behavioral rounds in the language you think in. $10/mo. Try free.',
+  description: 'The only AI interview coach with native voices in 9 languages — English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, Punjabi. Practice the real Google, Meta, Stripe, Anthropic interview loops in the language you think in. $10/mo. Try free.',
   keywords: [
     'AI mock interview', 'interview prep', 'coding interview practice',
     'AI voice tutor', 'learn programming', 'system design interview',
@@ -41,13 +41,13 @@ export const metadata: Metadata = {
     url: 'https://kairoslearn.com',
     siteName: 'KairosLearn',
     title: 'KairosLearn — Practice Tech Interviews in Your Language',
-    description: 'The only AI interview coach that speaks Hindi, Tamil, Bengali, Spanish, and 13 more. Practice in the language you think in. $10/mo.',
+    description: '9 native voice languages. 14 real company interview loops. $10/mo. Try free.',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'KairosLearn - Practice Tech Interviews in Your Language' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'KairosLearn — Practice Tech Interviews in Your Language',
-    description: 'The only AI interview coach that speaks Hindi, Tamil, Bengali, Spanish, and 13 more. Practice in the language you think in. $10/mo.',
+    description: '9 native voice languages. 14 real company interview loops. $10/mo. Try free.',
     images: ['/og-image.png'],
   },
   robots: {

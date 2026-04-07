@@ -164,10 +164,14 @@ export async function POST(req: NextRequest) {
       jobDescription,
       preset,
       interviewType,
+      language = "en",
+      companyPersonaId,
     }: {
       jobDescription: string;
       preset: InterviewPreset;
       interviewType: InterviewType;
+      language?: string;
+      companyPersonaId?: string;
     } = body;
 
     if (!preset || !interviewType) {
@@ -177,16 +181,55 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Fetch the user's last 50 questions for this (preset, interview_type) bucket
+    // so the planner can avoid repeats. Skip silently for guests or on errors —
+    // history is best-effort, the plan must always be returned.
+    let exclusionList: string[] = [];
+    if (user) {
+      try {
+        const { data: history } = await supabase
+          .from("interview_question_history")
+          .select("question_text")
+          .eq("user_id", user.id)
+          .eq("preset", preset)
+          .eq("interview_type", interviewType)
+          .order("asked_at", { ascending: false })
+          .limit(50);
+        if (history && history.length > 0) {
+          exclusionList = history.map((r: { question_text: string }) => r.question_text);
+        }
+      } catch (e) {
+        console.warn("[Interview Plan] Failed to fetch history (continuing):", e);
+      }
+    }
+
     const presetDescription = PRESET_DESCRIPTIONS[preset] || preset;
+
+    // Resolve company persona context (lazy import keeps the bundle slim)
+    let companyContext = "";
+    if (companyPersonaId && companyPersonaId !== "generic") {
+      try {
+        const { getCompanyPersona } = await import("@/data/interview-personas");
+        const persona = getCompanyPersona(companyPersonaId);
+        companyContext = `\n\nThe interview must reflect the style of ${persona.company} ${persona.level}. Signature topics they care about: ${persona.signatureTopics.join("; ")}. Generate questions that match this company's known style and difficulty (hardness ${persona.hardness}/10).`;
+      } catch {
+        // ignore if persona module fails
+      }
+    }
+
+    const exclusionBlock = exclusionList.length > 0
+      ? `\n\nThe candidate has already been asked the following questions in previous sessions. Do NOT repeat any of these. Generate fresh questions covering different angles or topics:\n${exclusionList.map((q, i) => `${i + 1}. ${q}`).join("\n")}\n\nIMPORTANT: Vary topics and question phrasing — the candidate should not feel they have seen this before.`
+      : "";
 
     const userPrompt = `Generate an interview question plan for the following:
 
 Interview Preset: ${preset}
 Preset Focus: ${presetDescription}
 Interview Type: ${interviewType}
-${jobDescription ? `Job Description:\n${jobDescription}` : "No specific job description provided — use a generic senior software engineer role."}
+Interview Language: ${language}
+${jobDescription ? `Job Description:\n${jobDescription}` : "No specific job description provided — use a generic senior software engineer role."}${companyContext}${exclusionBlock}
 
-Return the JSON question plan now.`;
+Return the JSON question plan now. The question text in the plan must be in English (it is a structural document — the interviewer will render it in ${language} at speak time).`;
 
     if (!MOONSHOT_API_KEY) {
       return NextResponse.json(
@@ -208,8 +251,11 @@ Return the JSON question plan now.`;
           { role: "user", content: userPrompt },
         ],
         stream: false,
-        temperature: 0.7,
+        // Higher temperature for question variation; the exclusion list keeps it grounded
+        temperature: 0.85,
         max_tokens: 4000,
+        // Pass a unique seed each call so even identical inputs produce varied output
+        seed: Date.now() + Math.floor(Math.random() * 1_000_000),
       }),
     });
 

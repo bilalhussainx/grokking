@@ -75,11 +75,17 @@ export async function POST(req: NextRequest) {
       questionPlan,
       finalCode,
       interviewType,
+      preset,
+      language = "en",
+      companyPersonaId,
     }: {
       transcript: TranscriptEntry[];
       questionPlan: InterviewPlan;
       finalCode?: string;
       interviewType: InterviewType;
+      preset?: string;
+      language?: string;
+      companyPersonaId?: string;
     } = body;
 
     if (!transcript || !questionPlan) {
@@ -87,6 +93,25 @@ export async function POST(req: NextRequest) {
         { error: "transcript and questionPlan are required" },
         { status: 400 }
       );
+    }
+
+    // Write asked questions to history (best-effort, authenticated users only).
+    // Spec: 2026-04-07-multilingual-interviews-design.md — sliding window of 50.
+    if (user && preset && interviewType && questionPlan.questions?.length) {
+      try {
+        const rows = questionPlan.questions.map((q: { text: string; type?: string }) => ({
+          user_id: user.id,
+          preset,
+          interview_type: interviewType,
+          company_persona_id: companyPersonaId || null,
+          language,
+          question_text: q.text,
+          question_topic: q.type || null,
+        }));
+        await supabase.from("interview_question_history").insert(rows);
+      } catch (e) {
+        console.warn("[interviews/score] Failed to write history (non-fatal):", e);
+      }
     }
 
     if (!MOONSHOT_API_KEY) {

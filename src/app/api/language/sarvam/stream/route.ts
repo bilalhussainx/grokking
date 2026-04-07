@@ -54,6 +54,11 @@ export async function POST(req: NextRequest) {
         const historyJson = formData.get('conversationHistory') as string | null;
         const lessonContextJson = formData.get('lessonContext') as string | null;
         const lessonTitle = formData.get('lessonTitle') as string | null;
+        // Interview mode (spec: 2026-04-07-multilingual-interviews-design.md)
+        const mode = (formData.get('mode') as string | null) || 'language';
+        const companyPersonaId = formData.get('companyPersonaId') as string | null;
+        const questionPlanJson = formData.get('questionPlan') as string | null;
+        const interviewType = formData.get('interviewType') as string | null;
 
         const lessonContext = lessonContextJson ? JSON.parse(lessonContextJson) : null;
 
@@ -74,13 +79,33 @@ export async function POST(req: NextRequest) {
         if (!audioBlob || audioBlob.size < 500) {
           if (isGreeting && (!audioBlob || audioBlob.size < 500)) {
             // Generate greeting without requiring audio input
-            const persona = personaId
-              ? getLanguagePersona(personaId) || getDefaultPersona(language)
-              : getDefaultPersona(language);
-            const greetingText = persona.greeting(
-              (proficiencyLevel || 'A1') as any,
-              undefined
-            );
+            let greetingText: string;
+
+            if (mode === 'interviewer') {
+              // Interview mode: use the company persona's openingLine, code-mixed if needed
+              try {
+                const { getCompanyPersona } = await import('@/data/interview-personas');
+                const companyPersona = getCompanyPersona(companyPersonaId || 'generic');
+                // For Hindi/Punjabi, prepend a code-mixed opener
+                const codeMixIntro = language === 'hi'
+                  ? 'Hi, namaste! '
+                  : language === 'pa'
+                    ? 'Sat sri akal! '
+                    : '';
+                greetingText = codeMixIntro + companyPersona.openingLine;
+              } catch {
+                greetingText = 'Hi, welcome to your mock interview. Are you ready to start?';
+              }
+            } else {
+              // Language learning mode (existing behavior)
+              const persona = personaId
+                ? getLanguagePersona(personaId) || getDefaultPersona(language)
+                : getDefaultPersona(language);
+              greetingText = persona.greeting(
+                (proficiencyLevel || 'A1') as any,
+                undefined
+              );
+            }
 
             send({ type: 'response', text: greetingText });
 
@@ -196,7 +221,35 @@ export async function POST(req: NextRequest) {
           return idx >= lo && idx <= hi;
         }) || persona.adaptiveRules[0];
 
-        let systemPrompt = `${persona.systemPrompt}
+        let systemPrompt: string;
+
+        if (mode === 'interviewer') {
+          // ── Interview mode: build company persona + code-mix prompt ──
+          // (Spec: 2026-04-07-multilingual-interviews-design.md)
+          try {
+            const { getCompanyPersona } = await import('@/data/interview-personas');
+            const { buildInterviewerSystemPrompt } = await import('@/lib/interview-prompt-builders');
+            const companyPersona = getCompanyPersona(companyPersonaId || 'generic');
+            const interviewerBlock = buildInterviewerSystemPrompt(companyPersona, language);
+
+            const planBlock = questionPlanJson
+              ? `\n\n## QUESTION PLAN\nUse this as the structure for the interview. Adapt follow-ups based on the candidate's answers — do not robotically read them in order.\n\nInterview type: ${interviewType || 'technical'}\n\n${questionPlanJson}`
+              : '';
+
+            systemPrompt = `${interviewerBlock}${planBlock}
+
+VOICE CONVERSATION RULES:
+- Keep responses to 1-2 short sentences. This is voice — short and punchy.
+- ${scriptGuide[language] || 'Respond naturally in the target language mixed with English for technical terms.'}
+- This goes through TTS. Write exactly how it should be spoken aloud.
+- No markdown, no asterisks, no emojis, no parenthetical notes.`;
+          } catch (e) {
+            console.error('[SarvamStream] Failed to build interviewer prompt, falling back:', e);
+            systemPrompt = `You are a senior software interviewer conducting a mock interview in ${language}. Mix English freely for technical terms (React, hashmap, O(n), API). Keep responses to 1-2 short sentences. Ask one question at a time and adapt to the candidate's answers.`;
+          }
+        } else {
+          // ── Language learning mode (existing behavior) ──
+          systemPrompt = `${persona.systemPrompt}
 
 ADAPTIVE RULES for ${level} student:
 - Native language ratio: ${(rule.nativeLanguageRatio * 100).toFixed(0)}% English, ${((1 - rule.nativeLanguageRatio) * 100).toFixed(0)}% target language
@@ -209,6 +262,7 @@ VOICE CONVERSATION RULES:
 - ${scriptGuide[language] || 'Respond naturally in the target language mixed with English.'}
 - This goes through TTS. Write exactly how it should be spoken aloud.
 - No markdown, no asterisks, no emojis, no parenthetical notes.`;
+        }
 
         if (lessonContext) {
           systemPrompt += `\n\n## CURRENT LESSON CONTEXT

@@ -30,7 +30,7 @@ function ScoreBar({ label, score }: { label: string; score: number }) {
 
 export default function InterviewScorecard() {
   const router = useRouter();
-  const { transcript, questionPlan, finalCode, interviewType, scorecard, setScorecard } = useInterview();
+  const { transcript, questionPlan, finalCode, interviewType, scorecard, setScorecard, preset, language, companyPersonaId } = useInterview();
   const { user } = useAuth();
   const [loading, setLoading] = useState(!scorecard);
   const [error, setError] = useState("");
@@ -51,7 +51,12 @@ export default function InterviewScorecard() {
       const res = await fetch("/api/interviews/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript, questionPlan, finalCode, interviewType }),
+        body: JSON.stringify({
+          transcript, questionPlan, finalCode, interviewType,
+          // Spec: 2026-04-07-multilingual-interviews-design.md — these enable
+          // history writes for the question variation engine.
+          preset, language, companyPersonaId,
+        }),
       });
       if (!res.ok) {
         const data = await res.json();

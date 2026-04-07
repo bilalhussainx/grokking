@@ -5,7 +5,7 @@ import { Mic, MicOff, PhoneOff, AlertCircle } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
 import type { TranscriptEntry } from "@/types/interview";
 import { saveSessionNote } from "@/lib/sessionNotes";
-import { useDeepgramAgent } from "@/hooks/useDeepgramAgent";
+import { useVoiceAgent } from "@/hooks/useVoiceAgent";
 
 interface InterviewVoicePanelProps {
   codeRef: React.MutableRefObject<string>;
@@ -18,7 +18,7 @@ export default function InterviewVoicePanel({
   outputRef,
   onInterviewEnd,
 }: InterviewVoicePanelProps) {
-  const { questionPlan, addTranscriptEntry, transcript, setFinalCode, interviewType } = useInterview();
+  const { questionPlan, addTranscriptEntry, transcript, setFinalCode, interviewType, language, companyPersonaId } = useInterview();
   const [timeLeft, setTimeLeft] = useState(30 * 60);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -28,7 +28,7 @@ export default function InterviewVoicePanel({
 
   const lastAgentMsg = useRef("");
 
-  const deepgramCallbacks = {
+  const voiceAgentCallbacks = {
     onUserMessage: (text: string) => {
       addTranscriptEntry({ role: "user", text, timestamp: Date.now() });
     },
@@ -68,7 +68,7 @@ RULES:
 ${silenceRules}`
         : `You are conducting a ${interviewType || "technical"} interview. Here is your question plan:\n${JSON.stringify(questionPlan, null, 2)}\n\nRULES:\n- Ask questions one at a time. Wait for the candidate to respond.\n- Adapt follow-up questions based on their answers — don't rigidly follow the plan.\n- When the candidate is coding, observe their approach and give guidance if stuck.\n- IMPORTANT: When the candidate struggles, TEACH THEM. Explain the correct answer clearly.\n- At 5 minutes remaining, wrap up with "Any questions for me?"\n- Start by briefly introducing yourself and the format, then ask the first question.\n${silenceRules}`;
 
-      deepgramRef.current?.sendPromptUpdate(prompt);
+      voiceAgentRef.current?.sendPromptUpdate(prompt);
 
       // Start countdown timer
       timerRef.current = setInterval(() => {
@@ -86,22 +86,32 @@ ${silenceRules}`
     },
   };
 
-  const deepgram = useDeepgramAgent(deepgramCallbacks);
-  const deepgramRef = useRef(deepgram);
-  deepgramRef.current = deepgram;
+  const voiceAgent = useVoiceAgent(voiceAgentCallbacks);
+  const voiceAgentRef = useRef(voiceAgent);
+  voiceAgentRef.current = voiceAgent;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [transcript]);
 
   // Auto-start session
+  // Spec: 2026-04-07-multilingual-interviews-design.md — pass language,
+  // companyPersonaId, and the question plan so the voice agent can build
+  // the full interviewer prompt server-side (Deepgram or Sarvam path).
   useEffect(() => {
     if (startedRef.current) return;
     startedRef.current = true;
     const timer = setTimeout(() => {
-      deepgram.start({
-        mode: "interviewer",
+      voiceAgent.start({
         personaId: "interviewer-mentor",
+        systemPrompt: "",                    // not used in interviewer mode
+        voiceProvider: "deepgram",           // overridden by router for hi/pa
+        voiceId: "",
+        language: language || "en",
+        mode: "interviewer",
+        companyPersonaId: companyPersonaId || "generic",
+        questionPlan: questionPlan || undefined,
+        interviewType: interviewType || "technical",
       });
     }, 500);
     return () => clearTimeout(timer);
@@ -110,18 +120,18 @@ ${silenceRules}`
 
   // Send code context updates periodically
   useEffect(() => {
-    if (!deepgram.isConnected) return;
+    if (!voiceAgent.isConnected) return;
 
     const interval = setInterval(() => {
       if (codeRef.current) {
-        deepgram.sendPromptUpdate(
+        voiceAgent.sendPromptUpdate(
           `CANDIDATE'S CURRENT CODE:\n\`\`\`\n${codeRef.current}\n\`\`\`\nOUTPUT: ${outputRef.current || "(not run yet)"}`
         );
       }
     }, 8000);
 
     return () => clearInterval(interval);
-  }, [deepgram.isConnected, deepgram, codeRef, outputRef]);
+  }, [voiceAgent.isConnected, voiceAgent, codeRef, outputRef]);
 
   // Save interview transcript as session notes
   const saveInterviewNotes = useCallback(() => {
@@ -160,23 +170,23 @@ ${silenceRules}`
 
   // Time warnings
   useEffect(() => {
-    if (timeLeft === 5 * 60 && !sentFiveMinWarning.current && deepgram.isConnected) {
+    if (timeLeft === 5 * 60 && !sentFiveMinWarning.current && voiceAgent.isConnected) {
       sentFiveMinWarning.current = true;
-      deepgram.sendPromptUpdate("TIME CHECK: 5 minutes remaining. Start wrapping up. Ask if the candidate has any questions.");
+      voiceAgent.sendPromptUpdate("TIME CHECK: 5 minutes remaining. Start wrapping up. Ask if the candidate has any questions.");
     }
 
     if (timeLeft === 0 && !sentTimeUp.current) {
       sentTimeUp.current = true;
-      deepgram.sendPromptUpdate("TIME'S UP. Say 'That wraps up our time today. Thanks for the interview.' then stop.");
+      voiceAgent.sendPromptUpdate("TIME'S UP. Say 'That wraps up our time today. Thanks for the interview.' then stop.");
       setTimeout(() => {
         if (timerRef.current) clearInterval(timerRef.current);
         setFinalCode(codeRef.current);
         saveInterviewNotes();
-        deepgram.stop();
+        voiceAgent.stop();
         onInterviewEnd();
       }, 10000);
     }
-  }, [timeLeft, deepgram, codeRef, setFinalCode, onInterviewEnd, saveInterviewNotes]);
+  }, [timeLeft, voiceAgent, codeRef, setFinalCode, onInterviewEnd, saveInterviewNotes]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -189,9 +199,9 @@ ${silenceRules}`
     if (timerRef.current) clearInterval(timerRef.current);
     setFinalCode(codeRef.current);
     saveInterviewNotes();
-    deepgram.stop();
+    voiceAgent.stop();
     onInterviewEnd();
-  }, [deepgram, codeRef, setFinalCode, onInterviewEnd, saveInterviewNotes]);
+  }, [voiceAgent, codeRef, setFinalCode, onInterviewEnd, saveInterviewNotes]);
 
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
@@ -200,8 +210,8 @@ ${silenceRules}`
   };
 
   const isUrgent = timeLeft <= 5 * 60;
-  const connected = deepgram.isConnected;
-  const connecting = deepgram.isConnecting;
+  const connected = voiceAgent.isConnected;
+  const connecting = voiceAgent.isConnecting;
 
   return (
     <div className="flex flex-col h-full bg-[var(--background)]">
@@ -220,18 +230,18 @@ ${silenceRules}`
       {connected && (
         <div className="px-3 py-2 border-b border-white/[0.06] flex items-center gap-2">
           <button
-            onClick={() => deepgram.toggleMic()}
+            onClick={() => voiceAgent.toggleMic()}
             className={`p-2 rounded-lg transition-colors ${
-              deepgram.micMuted
+              voiceAgent.micMuted
                 ? "bg-red-500/20 text-red-400 border border-red-500/30"
                 : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
             }`}
           >
-            {deepgram.micMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            {voiceAgent.micMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </button>
 
           <div className="flex-1 flex items-center justify-center">
-            {deepgram.isSpeaking ? (
+            {voiceAgent.isSpeaking ? (
               <div className="flex items-center gap-1.5">
                 <div className="flex gap-0.5">
                   {[3, 4, 2.5, 3.5].map((h, i) => (
@@ -248,7 +258,7 @@ ${silenceRules}`
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                 <span className="text-[11px] text-emerald-400 font-medium">
-                  {deepgram.micMuted ? "Mic muted" : "Listening..."}
+                  {voiceAgent.micMuted ? "Mic muted" : "Listening..."}
                 </span>
               </div>
             )}
@@ -264,15 +274,25 @@ ${silenceRules}`
         </div>
       )}
 
-      {deepgram.error && (
+      {voiceAgent.error && (
         <div className="px-3 py-2 bg-red-500/10 border-b border-red-500/20">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
-            <span className="text-xs text-red-400">{deepgram.error}</span>
+            <span className="text-xs text-red-400">{voiceAgent.error}</span>
           </div>
           <div className="flex items-center gap-2 mt-2">
             <button
-              onClick={() => deepgram.start({ mode: "interviewer", personaId: "interviewer-mentor" })}
+              onClick={() => voiceAgent.start({
+                personaId: "interviewer-mentor",
+                systemPrompt: "",
+                voiceProvider: "deepgram",
+                voiceId: "",
+                language: language || "en",
+                mode: "interviewer",
+                companyPersonaId: companyPersonaId || "generic",
+                questionPlan: questionPlan || undefined,
+                interviewType: interviewType || "technical",
+              })}
               className="text-xs bg-white/10 hover:bg-white/15 text-white/80 px-3 py-1 rounded transition-colors"
             >
               Retry connection

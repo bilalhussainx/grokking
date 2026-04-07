@@ -27,6 +27,9 @@ interface InterviewState {
   transcript: TranscriptEntry[];
   finalCode: string;
   scorecard: InterviewScorecard | null;
+  // Multilingual + company persona (spec: 2026-04-07-multilingual-interviews-design.md)
+  language: string;            // "en", "es", "hi", etc.
+  companyPersonaId: string;    // "generic" or e.g. "google-l4"
 }
 
 interface InterviewContextValue extends InterviewState {
@@ -35,6 +38,8 @@ interface InterviewContextValue extends InterviewState {
     preset: InterviewPreset;
     jobDescription: string;
     questionPlan: InterviewPlan;
+    language?: string;
+    companyPersonaId?: string;
   }) => string;
   addTranscriptEntry: (entry: TranscriptEntry) => void;
   setFinalCode: (code: string) => void;
@@ -51,6 +56,8 @@ const defaultState: InterviewState = {
   transcript: [],
   finalCode: "",
   scorecard: null,
+  language: "en",
+  companyPersonaId: "generic",
 };
 
 const InterviewCtx = createContext<InterviewContextValue | null>(null);
@@ -88,6 +95,8 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
       preset: InterviewPreset;
       jobDescription: string;
       questionPlan: InterviewPlan;
+      language?: string;
+      companyPersonaId?: string;
     }) => {
       const sessionId = `interview-${Date.now()}-${Math.random()
         .toString(36)
@@ -101,6 +110,8 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         transcript: [],
         finalCode: "",
         scorecard: null,
+        language: params.language || "en",
+        companyPersonaId: params.companyPersonaId || "generic",
       };
       setState(newState);
       // Write synchronously so the next page can rehydrate immediately

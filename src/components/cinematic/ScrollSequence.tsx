@@ -9,7 +9,7 @@ const PANELS = [
     num: '01 — Your Language',
     heading: <>The interview, in <em>Hindi</em></>,
     body:
-      'Pramp, Interviewing.io, LeetCode — all English-only. We\'re the first AI interview coach that speaks Hindi, Tamil, Bengali, Punjabi, Spanish, Portuguese, and 11 more. Practice in the language you actually think in.',
+      'Pramp, Interviewing.io, LeetCode — all English-only. We are the only AI interview coach with native voices in 9 languages: English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, and Punjabi. Practice in the language you actually think in.',
     visual: 'langs',
   },
   {
@@ -30,7 +30,7 @@ const PANELS = [
   },
 ]
 
-const LANGS = ['Hindi', 'Espa\u00f1ol', 'Fran\u00e7ais', 'Japanese', 'Bengali', 'Tamil', 'Punjabi']
+const LANGS = ['English', 'Espa\u00f1ol', 'Fran\u00e7ais', 'Deutsch', 'Italiano', 'Nederlands', '\u65e5\u672c\u8a9e', '\u0939\u093f\u0928\u094d\u0926\u0940', '\u0a2a\u0a70\u0a1c\u0a3e\u0a2c\u0a40']
 
 function PulseVisual() {
   return (

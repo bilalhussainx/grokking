@@ -24,6 +24,10 @@ interface DeepgramAgentConfig {
     solutionCode?: string;
   };
   apiEndpoint?: string; // Override: defaults to /api/ai/voice-session
+  // Interview mode (spec: 2026-04-07-multilingual-interviews-design.md)
+  companyPersonaId?: string;
+  questionPlan?: unknown;
+  interviewType?: string;
 }
 
 interface DeepgramAgentCallbacks {
@@ -215,6 +219,10 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
             systemPrompt: config?.systemPrompt,
             proficiencyLevel: config?.proficiencyLevel,
             lessonContext: config?.lessonContext,
+            // Interview mode passthrough
+            companyPersonaId: config?.companyPersonaId,
+            questionPlan: config?.questionPlan,
+            interviewType: config?.interviewType,
           }),
         });
 

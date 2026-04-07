@@ -7,10 +7,25 @@ import {
   Monitor, Server, Layers, Network, Binary,
   FileText, Mic, Brain, MessageSquare, Loader2, ArrowRight, Cpu,
   Phone, Lightbulb, TrendingUp, Users, Headphones, Clock, Sparkles,
+  Globe, Building2,
 } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
 import { useAuth } from "@/contexts/AuthContext";
 import type { InterviewPreset, InterviewType } from "@/types/interview";
+import { getAllInterviewPersonas } from "@/data/interview-personas";
+
+// 9 honest native-voice languages — spec: 2026-04-07-multilingual-interviews-design.md
+const LANGUAGES: { code: string; label: string; nativeLabel: string }[] = [
+  { code: "en", label: "English",   nativeLabel: "English" },
+  { code: "es", label: "Spanish",   nativeLabel: "Español" },
+  { code: "fr", label: "French",    nativeLabel: "Français" },
+  { code: "de", label: "German",    nativeLabel: "Deutsch" },
+  { code: "it", label: "Italian",   nativeLabel: "Italiano" },
+  { code: "nl", label: "Dutch",     nativeLabel: "Nederlands" },
+  { code: "ja", label: "Japanese",  nativeLabel: "日本語" },
+  { code: "hi", label: "Hindi",     nativeLabel: "हिन्दी" },
+  { code: "pa", label: "Punjabi",   nativeLabel: "ਪੰਜਾਬੀ" },
+];
 
 const PRESETS: { id: InterviewPreset; label: string; icon: typeof Monitor; desc: string; color: string }[] = [
   { id: "second-brain", label: "Second Brain / MCP", icon: Cpu, desc: "MCP, Obsidian, Slack, Missive, Claude Code", color: "cyan" },
@@ -48,9 +63,13 @@ export default function InterviewSetup() {
   const [preset, setPreset] = useState<InterviewPreset | null>(null);
   const [customJD, setCustomJD] = useState("");
   const [interviewType, setInterviewType] = useState<InterviewType>("technical");
+  const [language, setLanguage] = useState<string>("en");
+  const [companyPersonaId, setCompanyPersonaId] = useState<string>("generic");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [useCustom, setUseCustom] = useState(false);
+
+  const allPersonas = getAllInterviewPersonas();
 
   const canStart = (useCustom ? customJD.trim().length > 20 : preset !== null) && !loading;
 
@@ -81,6 +100,8 @@ export default function InterviewSetup() {
               jobDescription: useCustom ? customJD.trim() : null,
               preset: useCustom ? null : preset,
               interviewType,
+              language,
+              companyPersonaId,
             }),
             signal: controller.signal,
           });
@@ -106,6 +127,8 @@ export default function InterviewSetup() {
         preset: preset || "fullstack",
         jobDescription: jd,
         questionPlan: plan,
+        language,
+        companyPersonaId,
       });
       router.push(`/interviews/${sessionId}`);
     } catch (err) {
@@ -275,6 +298,65 @@ export default function InterviewSetup() {
                 </motion.button>
               );
             })}
+          </div>
+        </motion.div>
+
+        {/* Company persona + Language — spec: 2026-04-07-multilingual-interviews-design.md */}
+        <motion.div
+          className="mb-10 grid grid-cols-1 sm:grid-cols-2 gap-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          {/* Company picker */}
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-6 h-6 rounded-full bg-white/[0.06] border border-white/[0.1] text-white/50 flex items-center justify-center text-xs font-bold">
+                <Building2 className="w-3 h-3" />
+              </div>
+              <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Company style</h2>
+              <span className="text-[10px] text-white/30">optional</span>
+            </div>
+            <select
+              value={companyPersonaId}
+              onChange={(e) => setCompanyPersonaId(e.target.value)}
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/90 focus:outline-none focus:border-violet-500/40 focus:bg-white/[0.05] transition-colors appearance-none cursor-pointer"
+            >
+              {allPersonas.map((p) => (
+                <option key={p.id} value={p.id} className="bg-slate-900 text-white">
+                  {p.id === "generic" ? "Generic interviewer" : `${p.company} ${p.level}`}
+                </option>
+              ))}
+            </select>
+            <p className="text-[10px] text-white/30 mt-2 leading-relaxed">
+              Pick a company to match its real interview style — pacing, hint policy, behavioral weight, signature topics.
+            </p>
+          </div>
+
+          {/* Language picker */}
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-6 h-6 rounded-full bg-white/[0.06] border border-white/[0.1] text-white/50 flex items-center justify-center text-xs font-bold">
+                <Globe className="w-3 h-3" />
+              </div>
+              <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Language</h2>
+            </div>
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/90 focus:outline-none focus:border-violet-500/40 focus:bg-white/[0.05] transition-colors appearance-none cursor-pointer"
+            >
+              {LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code} className="bg-slate-900 text-white">
+                  {l.nativeLabel} {l.code !== "en" ? `(${l.label})` : ""}
+                </option>
+              ))}
+            </select>
+            <p className="text-[10px] text-white/30 mt-2 leading-relaxed">
+              {language === "en"
+                ? "Native English voice."
+                : "Natural code-mixing — technical terms stay in English, the rest in your language."}
+            </p>
           </div>
         </motion.div>
 

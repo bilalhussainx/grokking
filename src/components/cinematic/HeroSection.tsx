@@ -64,7 +64,7 @@ export default function HeroSection() {
       <div className={styles.bottomFade} aria-hidden="true" />
 
       <div ref={contentRef} className={styles.content} id="hero-content">
-        <p className={styles.eyebrow} id="he">Hindi · Tamil · Bengali · Punjabi · Spanish · Portuguese · 11 more</p>
+        <p className={styles.eyebrow} id="he">English · Español · Français · Deutsch · Italiano · Nederlands · 日本語 · हिन्दी · ਪੰਜਾਬੀ</p>
 
         <h1 className={styles.headline}>
           <span className={styles.clipLine}>
@@ -78,7 +78,7 @@ export default function HeroSection() {
         </h1>
 
         <p className={styles.sub} id="hs">
-          The only AI interview coach that speaks 17 languages. Practice frontend, backend, system design, and behavioral rounds with an AI that teaches you when you&apos;re stuck — in Hindi, Tamil, Spanish, or whatever language you think in. $10/mo.
+          The only AI interview coach that runs in 9 native voice languages. Practice the real Google L4, Meta E4, Stripe, Anthropic, and 10 other company loops — in English, Hindi, Spanish, Japanese, or whatever language you think in. $10/mo.
         </p>
 
         <div className={styles.ctas} id="hc">

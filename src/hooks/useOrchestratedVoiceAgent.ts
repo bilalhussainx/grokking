@@ -25,6 +25,11 @@ interface SarvamAgentConfig {
     vocabulary: string[];
     grammarFocus: string[];
   };
+  // Interview mode (spec: 2026-04-07-multilingual-interviews-design.md)
+  mode?: 'language' | 'interviewer';
+  companyPersonaId?: string;
+  questionPlan?: unknown;     // Will be JSON.stringified
+  interviewType?: string;
 }
 
 interface SarvamAgentCallbacks {
@@ -140,6 +145,11 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
       if (config.lessonTitle) form.append('lessonTitle', config.lessonTitle);
       if (config.lessonContext) form.append('lessonContext', JSON.stringify(config.lessonContext));
       form.append('conversationHistory', JSON.stringify(conversationRef.current.slice(-10)));
+      // Interview mode
+      if (config.mode) form.append('mode', config.mode);
+      if (config.companyPersonaId) form.append('companyPersonaId', config.companyPersonaId);
+      if (config.questionPlan) form.append('questionPlan', typeof config.questionPlan === 'string' ? config.questionPlan : JSON.stringify(config.questionPlan));
+      if (config.interviewType) form.append('interviewType', config.interviewType);
 
       const resp = await fetch('/api/language/sarvam/stream', {
         method: 'POST',
@@ -323,6 +333,11 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
           if (config.lessonContext) greetingForm.append('lessonContext', JSON.stringify(config.lessonContext));
           greetingForm.append('conversationHistory', JSON.stringify([]));
           greetingForm.append('greeting', 'true');
+          // Interview mode (so the greeting uses the company persona's openingLine)
+          if (config.mode) greetingForm.append('mode', config.mode);
+          if (config.companyPersonaId) greetingForm.append('companyPersonaId', config.companyPersonaId);
+          if (config.questionPlan) greetingForm.append('questionPlan', typeof config.questionPlan === 'string' ? config.questionPlan : JSON.stringify(config.questionPlan));
+          if (config.interviewType) greetingForm.append('interviewType', config.interviewType);
 
           const greetingResp = await fetch('/api/language/sarvam/stream', {
             method: 'POST',

@@ -8,7 +8,7 @@ import CTASection from '@/components/cinematic/CTASection'
 export const metadata: Metadata = {
   title: 'KairosLearn — Practice Tech Interviews in Your Language',
   description:
-    'The only AI interview coach that speaks Hindi, Tamil, Bengali, Spanish, and 13 more languages. Practice frontend, backend, system design in the language you think in. $10/mo. Try free.',
+    'The only AI interview coach with native voices in 9 languages — English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, Punjabi. 14 real company personas (Google L4, Meta E4, Stripe, Anthropic). $10/mo. Try free.',
 }
 
 export default function LandingPage() {

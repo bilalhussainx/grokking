@@ -1536,11 +1536,15 @@ export interface VoiceAgentConfig {
     solutionCode?: string;
   };
   proficiencyLevel?: ProficiencyLevel;
-  mode?: 'free-form' | 'lesson-practice' | 'placement' | 'coach';
+  mode?: 'free-form' | 'lesson-practice' | 'placement' | 'coach' | 'interviewer' | 'language';
   // Deepgram-specific
   lessonTitle?: string;
   moduleTitle?: string;
   courseTitle?: string;
+  // Interview mode (spec: 2026-04-07-multilingual-interviews-design.md)
+  companyPersonaId?: string;
+  questionPlan?: unknown;
+  interviewType?: string;
 }
 
 // Adapter: normalize both persona types into a common voice config
