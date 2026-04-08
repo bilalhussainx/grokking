@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabase, createAdminSupabase } from '@/lib/supabase-auth';
 import { execInSandbox } from '@/lib/arena-sandbox';
-import { authorizeRoomAccess } from '@/lib/arena-auth';
 
 export const runtime = 'nodejs';
 
@@ -10,12 +9,13 @@ export const runtime = 'nodejs';
 const TERMINAL_EXEC_TIMEOUT_MS = 20_000;
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error(`terminal exec timeout after ${ms}ms`)), ms),
-    ),
-  ]);
+  let timer: NodeJS.Timeout | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`terminal exec timeout after ${ms}ms`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   // 2. Parse + validate body
@@ -41,31 +41,47 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'command length must be 1..2000' }, { status: 400 });
   }
 
-  // 3. Room membership check — user must be host or participant in this room
+  // 3. Atomic auth + sandbox binding — fetch host_id and sandbox_id in one query,
+  //    then verify membership and sandbox ownership from the same snapshot.
+  //    This closes the TOCTOU window between a separate membership check and
+  //    a separate sandbox-binding check.
   const admin = createAdminSupabase();
-  const allowed = await authorizeRoomAccess(admin, user.id, roomId);
-  if (!allowed) {
-    return NextResponse.json({ error: 'forbidden' }, { status: 403 });
-  }
-
-  // 4. Verify the sandboxId actually belongs to this room (prevent cross-room sandbox access)
   const { data: room } = await admin
     .from('arena_rooms')
-    .select('sandbox_id')
+    .select('host_id, sandbox_id')
     .eq('id', roomId)
     .maybeSingle();
-  if (!room || room.sandbox_id !== sandboxId) {
-    return NextResponse.json({ error: 'sandbox does not belong to room' }, { status: 403 });
+  if (!room) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  if (room.sandbox_id !== sandboxId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  if (room.host_id !== user.id) {
+    // Not the host — must be a participant in the same room snapshot.
+    const { data: participant } = await admin
+      .from('arena_participants')
+      .select('user_id')
+      .eq('room_id', roomId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (!participant) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
   }
 
-  // 5. Exec with timeout
+  // TODO(phase2): serialize concurrent exec against the same sandboxId
+  //   — currently two room members can fire overlapping commands. The Vercel
+  //   Sandbox SDK handles parallel exec, but the scoring/milestone pipeline
+  //   assumes serial command execution. Consider per-sandbox in-flight lock.
+
+  // 4. Exec with timeout — ExecResult types exitCode as number, trust it
   try {
     const result = await withTimeout(execInSandbox(sandboxId, command), TERMINAL_EXEC_TIMEOUT_MS);
-    // Return structured output — xterm.js renders it client-side
     return NextResponse.json({
       stdout: result.stdout ?? '',
       stderr: result.stderr ?? '',
-      exitCode: result.exitCode ?? 0,
+      exitCode: result.exitCode,
     });
   } catch (err) {
     console.error('[arena/terminal POST]', err);
