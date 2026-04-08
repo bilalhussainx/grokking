@@ -261,7 +261,22 @@ ACTIVE MODE
 └─────────────┴───────────────────────────────┴───────────────────────┘
 ```
 
-For **data science track**: Monaco + terminal replaced by Jupyter notebook panel (`@jupyterlab/services` → kernel WebSocket in sandbox). Plots and DataFrames render inline.
+### IDE Mode A — Claude Code CLI (Engineering Track)
+
+The terminal is the primary interface. Claude Code CLI (`@anthropic-ai/claude-code`) is pre-installed in the sandbox. The user runs commands like:
+
+```bash
+claude "add JWT middleware to my Express routes"
+claude "write tests for src/routes/user.ts"
+```
+
+Claude Code executes inside the sandbox — reads/writes files, runs commands — while the Monaco editor and file tree update in real time (polling `/api/arena/files` every 2s). The interviewer panel watches terminal output via WebSocket and triggers questions on commits and completions.
+
+### IDE Mode B — Data Science (DS Track)
+
+Monaco + terminal are replaced by a Jupyter notebook panel. `@jupyterlab/services` connects to a Jupyter kernel gateway running inside the sandbox (Python 3.13 + numpy/pandas/sklearn/torch pre-installed). The candidate works in cells; plots and DataFrames render inline. Dr. Priya Sharma (or Wei Zhang) acts as the interviewer, watching which cells execute and asking questions about methodology.
+
+The mode is determined by the challenge's `track` field — the IDE component tree switches entirely based on this value, no toggle needed.
 
 ---
 
