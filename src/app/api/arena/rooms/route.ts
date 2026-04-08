@@ -11,35 +11,61 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { challengeId, personaId, settings } = await req.json();
-  if (!challengeId || !personaId) {
-    return NextResponse.json({ error: 'challengeId and personaId required' }, { status: 400 });
+  // Fix 7: strict type validation on input
+  const body = await req.json().catch(() => ({}));
+  const challengeId = typeof body.challengeId === 'string' ? body.challengeId : null;
+  const personaId = typeof body.personaId === 'string' ? body.personaId : null;
+  const settings = body.settings && typeof body.settings === 'object' ? body.settings : null;
+
+  if (!challengeId) {
+    return NextResponse.json({ error: 'challengeId (string) required' }, { status: 400 });
   }
 
   const admin = createAdminSupabase();
-  const { data, error } = await admin
-    .from('arena_rooms')
-    .insert({
-      host_id: user.id,
-      challenge_id: challengeId,
-      persona_id: personaId,
-      join_code: generateJoinCode(),
-      status: 'lobby',
-      settings: settings ?? {},
-    })
-    .select()
-    .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  // Fix 4: retry loop on join code unique-constraint violation (Postgres code 23505)
+  const MAX_JOIN_CODE_ATTEMPTS = 5;
+  let room = null;
+  let lastError: unknown = null;
+  for (let i = 0; i < MAX_JOIN_CODE_ATTEMPTS; i++) {
+    const joinCode = generateJoinCode();
+    const { data, error } = await admin
+      .from('arena_rooms')
+      .insert({
+        host_id: user.id,
+        challenge_id: challengeId,
+        persona_id: personaId ?? 'alex-chen',
+        join_code: joinCode,
+        status: 'lobby',
+        settings: settings ?? {},
+      })
+      .select()
+      .single();
 
-  // Add host as participant
-  await admin.from('arena_participants').insert({
-    room_id: data.id,
+    if (!error) { room = data; break; }
+    if ((error as { code?: string }).code !== '23505') { lastError = error; break; } // not a unique violation
+    lastError = error;
+  }
+
+  if (!room) {
+    // Fix 6: no internal error details in response
+    console.error('[arena/rooms POST] failed to insert room', lastError);
+    return NextResponse.json({ error: 'Failed to create room' }, { status: 500 });
+  }
+
+  // Fix 9: await participant insert and clean up orphaned room on failure
+  const { error: participantErr } = await admin.from('arena_participants').insert({
+    room_id: room.id,
     user_id: user.id,
     role: 'host',
   });
+  if (participantErr) {
+    await admin.from('arena_rooms').delete().eq('id', room.id);
+    console.error('[arena/rooms POST] failed to add host as participant', participantErr);
+    return NextResponse.json({ error: 'Failed to create room' }, { status: 500 });
+  }
 
-  return NextResponse.json(data);
+  return NextResponse.json(room);
 }
 
 export async function GET(req: NextRequest) {

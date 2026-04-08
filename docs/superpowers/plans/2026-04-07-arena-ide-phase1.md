@@ -1281,35 +1281,60 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { challengeId, personaId, settings } = await req.json();
-  if (!challengeId || !personaId) {
-    return NextResponse.json({ error: 'challengeId and personaId required' }, { status: 400 });
+  // Strict type validation on input
+  const body = await req.json().catch(() => ({}));
+  const challengeId = typeof body.challengeId === 'string' ? body.challengeId : null;
+  const personaId = typeof body.personaId === 'string' ? body.personaId : null;
+  const settings = body.settings && typeof body.settings === 'object' ? body.settings : null;
+
+  if (!challengeId) {
+    return NextResponse.json({ error: 'challengeId (string) required' }, { status: 400 });
   }
 
   const admin = createAdminSupabase();
-  const { data, error } = await admin
-    .from('arena_rooms')
-    .insert({
-      host_id: user.id,
-      challenge_id: challengeId,
-      persona_id: personaId,
-      join_code: generateJoinCode(),
-      status: 'lobby',
-      settings: settings ?? {},
-    })
-    .select()
-    .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  // Retry loop on join code unique-constraint violation (Postgres code 23505)
+  const MAX_JOIN_CODE_ATTEMPTS = 5;
+  let room = null;
+  let lastError: unknown = null;
+  for (let i = 0; i < MAX_JOIN_CODE_ATTEMPTS; i++) {
+    const joinCode = generateJoinCode();
+    const { data, error } = await admin
+      .from('arena_rooms')
+      .insert({
+        host_id: user.id,
+        challenge_id: challengeId,
+        persona_id: personaId ?? 'alex-chen',
+        join_code: joinCode,
+        status: 'lobby',
+        settings: settings ?? {},
+      })
+      .select()
+      .single();
 
-  // Add host as participant
-  await admin.from('arena_participants').insert({
-    room_id: data.id,
+    if (!error) { room = data; break; }
+    if ((error as { code?: string }).code !== '23505') { lastError = error; break; } // not a unique violation
+    lastError = error;
+  }
+
+  if (!room) {
+    console.error('[arena/rooms POST] failed to insert room', lastError);
+    return NextResponse.json({ error: 'Failed to create room' }, { status: 500 });
+  }
+
+  // Await participant insert; clean up orphaned room on failure
+  const { error: participantErr } = await admin.from('arena_participants').insert({
+    room_id: room.id,
     user_id: user.id,
     role: 'host',
   });
+  if (participantErr) {
+    await admin.from('arena_rooms').delete().eq('id', room.id);
+    console.error('[arena/rooms POST] failed to add host as participant', participantErr);
+    return NextResponse.json({ error: 'Failed to create room' }, { status: 500 });
+  }
 
-  return NextResponse.json(data);
+  return NextResponse.json(room);
 }
 
 export async function GET(req: NextRequest) {
@@ -1359,13 +1384,21 @@ import { createServerSupabase, createAdminSupabase } from '@/lib/supabase-auth';
 import { provisionSandbox, teardownSandbox } from '@/lib/arena-sandbox';
 import { getChallenge } from '@/data/arena-challenges';
 
+// Used as an atomic lock while provisioning is in flight.
+// Once provisioning succeeds this is replaced with the real sandboxId.
+const PROVISIONING_PLACEHOLDER = '__provisioning__';
+
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { roomId } = await req.json();
-  if (!roomId) return NextResponse.json({ error: 'roomId required' }, { status: 400 });
+  // Strict type validation on input
+  const body = await req.json().catch(() => ({}));
+  const roomId = typeof body.roomId === 'string' ? body.roomId : null;
+  if (!roomId) {
+    return NextResponse.json({ error: 'roomId (string) required' }, { status: 400 });
+  }
 
   const admin = createAdminSupabase();
 
@@ -1378,47 +1411,111 @@ export async function POST(req: NextRequest) {
     .single();
   if (!participant) return NextResponse.json({ error: 'Not in room' }, { status: 403 });
 
-  // Get challenge starter repo
-  const { data: room } = await admin
+  // Atomic compare-and-swap — set sandbox_id to placeholder only if currently NULL.
+  // This prevents two simultaneous POST requests from both provisioning a sandbox.
+  const { data: claimed, error: claimErr } = await admin
     .from('arena_rooms')
-    .select('challenge_id')
+    .update({ sandbox_id: PROVISIONING_PLACEHOLDER })
     .eq('id', roomId)
-    .single();
+    .is('sandbox_id', null)
+    .select('id, challenge_id')
+    .maybeSingle();
 
-  const challenge = room?.challenge_id ? getChallenge(room.challenge_id) : undefined;
+  if (claimErr || !claimed) {
+    // Room not found or sandbox already claimed / being provisioned
+    return NextResponse.json(
+      { error: 'Room sandbox already claimed or not found' },
+      { status: 409 },
+    );
+  }
+
+  const challenge = claimed.challenge_id ? getChallenge(claimed.challenge_id) : undefined;
+
+  let sandboxId: string;
+  try {
+    sandboxId = await provisionSandbox(challenge?.starterRepo);
+  } catch (err) {
+    // Release the lock so the client can retry
+    await admin.from('arena_rooms').update({ sandbox_id: null }).eq('id', roomId);
+    console.error('[arena/sandbox POST] provision failed', err);
+    return NextResponse.json({ error: 'Sandbox provisioning failed' }, { status: 500 });
+  }
 
   try {
-    const sandboxId = await provisionSandbox(challenge?.starterRepo);
+    await admin
+      .from('arena_rooms')
+      .update({
+        sandbox_id: sandboxId,
+        status: 'active',
+        starts_at: new Date().toISOString(),
+      })
+      .eq('id', roomId);
 
-    // Store sandbox ID on participant
     await admin
       .from('arena_participants')
       .update({ sandbox_id: sandboxId })
       .eq('room_id', roomId)
       .eq('user_id', user.id);
-
-    // Update room status to active
-    await admin
-      .from('arena_rooms')
-      .update({ status: 'active', starts_at: new Date().toISOString(), sandbox_id: sandboxId })
-      .eq('id', roomId);
-
-    return NextResponse.json({ sandboxId });
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+  } catch (dbErr) {
+    // Compensating teardown on DB failure to avoid sandbox leak
+    console.error('[arena/sandbox POST] DB update failed after provision, tearing down', dbErr);
+    try {
+      await teardownSandbox(sandboxId);
+    } catch (tdErr) {
+      console.error('[arena/sandbox POST] compensating teardown failed', tdErr);
+    }
+    await admin.from('arena_rooms').update({ sandbox_id: null }).eq('id', roomId);
+    return NextResponse.json({ error: 'Sandbox setup failed' }, { status: 500 });
   }
+
+  return NextResponse.json({ sandboxId });
 }
 
 export async function DELETE(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const sandboxId = searchParams.get('sandboxId');
+  if (!sandboxId) return NextResponse.json({ error: 'sandboxId required' }, { status: 400 });
+
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { sandboxId } = await req.json();
-  if (!sandboxId) return NextResponse.json({ error: 'sandboxId required' }, { status: 400 });
+  // Authorization: caller must be the room host OR the participant whose sandbox_id matches
+  const admin = createAdminSupabase();
 
-  await teardownSandbox(sandboxId);
-  return NextResponse.json({ ok: true });
+  const { data: room } = await admin
+    .from('arena_rooms')
+    .select('id, host_id, sandbox_id')
+    .eq('sandbox_id', sandboxId)
+    .maybeSingle();
+
+  const { data: participantOwner } = await admin
+    .from('arena_participants')
+    .select('user_id, room_id')
+    .eq('sandbox_id', sandboxId)
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  const isHost = room?.host_id === user.id;
+  const isOwner = !!participantOwner;
+
+  if (!isHost && !isOwner) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  try {
+    await teardownSandbox(sandboxId);
+    if (room) {
+      await admin
+        .from('arena_rooms')
+        .update({ sandbox_id: null, status: 'finished' })
+        .eq('id', room.id);
+    }
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error('[arena/sandbox DELETE] teardown failed', err);
+    return NextResponse.json({ error: 'Teardown failed' }, { status: 500 });
+  }
 }
 ```
 
