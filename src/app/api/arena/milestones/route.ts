@@ -4,6 +4,7 @@ import { authorizeRoomAccess } from '@/lib/arena-auth';
 import { checkAllMilestones } from '@/lib/arena-milestones';
 import { getChallenge } from '@/data/arena-challenges';
 import { execInSandbox } from '@/lib/arena-sandbox';
+import { emitScoreEvent } from '@/lib/arena-scoring';
 
 const TEST_TIMEOUT_MS = 15_000;
 const EXEC_TIMEOUT_MS = 5_000;
@@ -127,16 +128,62 @@ export async function GET(req: NextRequest) {
     previewUrl = (room as { preview_url?: string } | null)?.preview_url ?? undefined;
   }
 
+  let statuses;
   try {
-    const statuses = await checkAllMilestones(challenge.milestones, {
+    statuses = await checkAllMilestones(challenge.milestones, {
       files,
       lastTestOutput: testResult.stdout,
       commitMessages,
       previewUrl,
     });
-    return NextResponse.json({ milestones: statuses });
   } catch (err) {
     console.error('[arena/milestones GET] checkAllMilestones failed', err);
     return NextResponse.json({ error: 'Milestone check failed' }, { status: 500 });
   }
+
+  // Server-side score emission for newly-completed milestones.
+  // Schema has no milestone_id column, so we dedupe via metadata->>'milestoneId'.
+  // Wrapped in try/catch — DB failures must not break the milestones response.
+  if (roomId) {
+    try {
+      const admin = createAdminSupabase();
+      const { data: existingEvents } = await admin
+        .from('arena_score_events')
+        .select('metadata')
+        .eq('room_id', roomId)
+        .eq('user_id', user.id)
+        .eq('event_type', 'milestone_complete');
+
+      const emittedIds = new Set<string>();
+      for (const row of existingEvents ?? []) {
+        const md = (row as { metadata?: { milestoneId?: string } }).metadata;
+        if (md?.milestoneId) emittedIds.add(md.milestoneId);
+      }
+
+      const newlyComplete = statuses.filter(
+        s => s.complete && !emittedIds.has(s.id),
+      );
+
+      for (const m of newlyComplete) {
+        const def = challenge.milestones.find(d => d.id === m.id);
+        const xp = def?.xp ?? m.xp ?? 0;
+        try {
+          await emitScoreEvent(roomId, user.id, 'milestone_complete', xp, {
+            milestoneId: m.id,
+            title: m.title,
+          });
+        } catch (emitErr) {
+          console.error(
+            '[arena/milestones GET] emitScoreEvent failed for',
+            m.id,
+            emitErr,
+          );
+        }
+      }
+    } catch (err) {
+      console.error('[arena/milestones GET] score emission stage failed', err);
+    }
+  }
+
+  return NextResponse.json({ milestones: statuses });
 }
