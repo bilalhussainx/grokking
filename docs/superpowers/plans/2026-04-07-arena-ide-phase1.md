@@ -920,10 +920,14 @@ export async function getGitLog(sandboxId: string): Promise<string> {
 
 // Auto-commit all changes
 export async function autoCommit(sandboxId: string, message?: string): Promise<void> {
+  if (message !== undefined && message.length > 1000) {
+    throw new Error('autoCommit message must be ≤1000 characters');
+  }
   try {
     const msg = message ?? `auto: ${new Date().toISOString()}`;
+    const safeMsg = msg.replace(/'/g, "'\\''");
     await execInSandbox(sandboxId,
-      `cd /workspace && git add -A && git diff --cached --quiet || git commit -m "${msg}"`
+      `cd /workspace && git add -A && git diff --cached --quiet || git commit -m '${safeMsg}'`
     );
   } catch (e: unknown) {
     const errMsg = e instanceof Error ? e.message : String(e);
