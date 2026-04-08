@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS arena_challenges (
 CREATE TABLE IF NOT EXISTS arena_rooms (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   host_id      UUID REFERENCES auth.users NOT NULL,
-  challenge_id TEXT REFERENCES arena_challenges,
+  challenge_id TEXT REFERENCES arena_challenges ON DELETE SET NULL,
   persona_id   TEXT NOT NULL DEFAULT 'alex-chen',
   join_code    TEXT UNIQUE NOT NULL,
   status       TEXT DEFAULT 'lobby' CHECK (status IN ('lobby','active','judging','finished')),
@@ -42,8 +42,8 @@ CREATE TABLE IF NOT EXISTS arena_participants (
 -- Score events (append-only ledger)
 CREATE TABLE IF NOT EXISTS arena_score_events (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  room_id    UUID REFERENCES arena_rooms,
-  user_id    UUID REFERENCES auth.users,
+  room_id    UUID REFERENCES arena_rooms ON DELETE CASCADE,
+  user_id    UUID REFERENCES auth.users ON DELETE CASCADE,
   event_type TEXT NOT NULL,
   points     INT NOT NULL,
   metadata   JSONB DEFAULT '{}',
@@ -53,8 +53,8 @@ CREATE TABLE IF NOT EXISTS arena_score_events (
 -- Interviewer conversation log
 CREATE TABLE IF NOT EXISTS arena_interviewer_log (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  room_id    UUID REFERENCES arena_rooms,
-  user_id    UUID REFERENCES auth.users,
+  room_id    UUID REFERENCES arena_rooms ON DELETE CASCADE,
+  user_id    UUID REFERENCES auth.users ON DELETE CASCADE,
   role       TEXT CHECK (role IN ('interviewer','participant')),
   content    TEXT NOT NULL,
   trigger    TEXT,
@@ -64,8 +64,8 @@ CREATE TABLE IF NOT EXISTS arena_interviewer_log (
 -- Final scorecards
 CREATE TABLE IF NOT EXISTS arena_scorecards (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  room_id           UUID REFERENCES arena_rooms UNIQUE,
-  user_id           UUID REFERENCES auth.users,
+  room_id           UUID REFERENCES arena_rooms ON DELETE CASCADE UNIQUE,
+  user_id           UUID REFERENCES auth.users ON DELETE CASCADE,
   total_score       INT,
   code_score        INT,
   explanation_score INT,
@@ -75,6 +75,12 @@ CREATE TABLE IF NOT EXISTS arena_scorecards (
   ai_verdict        TEXT,
   created_at        TIMESTAMPTZ DEFAULT now()
 );
+
+-- Indexes for frequent lookups
+CREATE INDEX IF NOT EXISTS idx_arena_score_events_room ON arena_score_events(room_id);
+CREATE INDEX IF NOT EXISTS idx_arena_score_events_user ON arena_score_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_arena_participants_user ON arena_participants(user_id);
+CREATE INDEX IF NOT EXISTS idx_arena_interviewer_log_room ON arena_interviewer_log(room_id);
 
 -- RLS
 ALTER TABLE arena_challenges ENABLE ROW LEVEL SECURITY;
@@ -86,11 +92,18 @@ ALTER TABLE arena_scorecards ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Anyone reads challenges" ON arena_challenges FOR SELECT USING (true);
 CREATE POLICY "Service manages challenges" ON arena_challenges FOR ALL USING (true);
-CREATE POLICY "Users see own rooms" ON arena_rooms FOR SELECT USING (auth.uid() = host_id);
+CREATE POLICY "Users see own rooms" ON arena_rooms FOR SELECT USING (
+  auth.uid() = host_id
+  OR id IN (SELECT room_id FROM arena_participants WHERE user_id = auth.uid())
+);
 CREATE POLICY "Service manages rooms" ON arena_rooms FOR ALL USING (true);
 CREATE POLICY "Users see own participation" ON arena_participants FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Service manages participants" ON arena_participants FOR ALL USING (true);
-CREATE POLICY "Users see room scores" ON arena_score_events FOR SELECT USING (true);
+CREATE POLICY "Users see room scores" ON arena_score_events FOR SELECT USING (
+  auth.uid() = user_id
+  OR room_id IN (SELECT room_id FROM arena_participants WHERE user_id = auth.uid())
+  OR room_id IN (SELECT id FROM arena_rooms WHERE host_id = auth.uid())
+);
 CREATE POLICY "Service inserts scores" ON arena_score_events FOR INSERT WITH CHECK (true);
 CREATE POLICY "Users see own log" ON arena_interviewer_log FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Service manages log" ON arena_interviewer_log FOR ALL USING (true);
