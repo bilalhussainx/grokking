@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   ChevronRight,
   ChevronDown,
@@ -174,29 +174,54 @@ export function ArenaFileTree({ sandboxId, onFileSelect, selectedPath }: ArenaFi
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const inFlightRef = useRef(false);
+  const abortRef = useRef<AbortController | null>(null);
+
   const refresh = useCallback(async () => {
+    // Skip if a fetch is already in progress — prevents request stacking
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setLoading(true);
+
     try {
-      const res = await fetch(`/api/arena/files?sandboxId=${encodeURIComponent(sandboxId)}`);
+      const res = await fetch(
+        `/api/arena/files?sandboxId=${encodeURIComponent(sandboxId)}`,
+        { signal: controller.signal }
+      );
+      if (controller.signal.aborted) return;
+
       if (!res.ok) {
         const json = await res.json().catch(() => ({}));
+        if (controller.signal.aborted) return;
         setError(json.error ?? 'Failed to load files');
         return;
       }
+
       const json: { files: FileEntry[] } = await res.json();
+      if (controller.signal.aborted) return;
       setTree(buildTree(json.files ?? []));
       setError(null);
-    } catch {
-      setError('Network error');
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        setError('Network error');
+      }
     } finally {
+      inFlightRef.current = false;
       setLoading(false);
     }
   }, [sandboxId]);
 
-  // Initial load + 3-second polling
+  // Initial load + 3-second polling; abort on unmount or sandboxId change
   useEffect(() => {
     refresh();
     const interval = setInterval(refresh, 3000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      abortRef.current?.abort();
+    };
   }, [refresh]);
 
   const handleToggle = useCallback((path: string) => {

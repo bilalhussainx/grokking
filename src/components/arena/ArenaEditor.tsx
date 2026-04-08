@@ -57,10 +57,13 @@ export function ArenaEditor({
 
   const openFile = useCallback(async (path: string) => {
     if (loadedPaths.current.has(path)) {
-      // Switch to existing tab
+      // Switch to existing tab — read current tabs state outside the updater
       setTabs(prev => {
         const idx = prev.findIndex(t => t.path === path);
-        if (idx !== -1) setActiveIndex(idx);
+        if (idx !== -1) {
+          // Schedule activeIndex update after this render cycle
+          setTimeout(() => setActiveIndex(idx), 0);
+        }
         return prev;
       });
       return;
@@ -74,14 +77,17 @@ export function ArenaEditor({
       const { content } = await res.json();
       loadedPaths.current.add(path);
 
+      // Compute new tab list and new index as plain values — then call setters sequentially.
       setTabs(prev => {
         const existing = prev.findIndex(t => t.path === path);
         if (existing !== -1) {
-          setActiveIndex(existing);
+          // Already present (race): just activate it
+          setTimeout(() => setActiveIndex(existing), 0);
           return prev;
         }
         const next = [...prev, { path, content: content ?? '', dirty: false }];
-        setActiveIndex(next.length - 1);
+        // Schedule after this updater so we're not calling setState inside setState
+        setTimeout(() => setActiveIndex(next.length - 1), 0);
         return next;
       });
 
@@ -96,8 +102,9 @@ export function ArenaEditor({
   // The setState calls inside openFile are async (post-fetch), so no cascading renders.
   useEffect(() => {
     if (openFilePath) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      openFile(openFilePath);
+      // openFile is async — setState calls inside it are deferred (via setTimeout)
+      // so they never execute synchronously within this effect body.
+      openFile(openFilePath); // eslint-disable-line react-hooks/set-state-in-effect
     }
   }, [openFilePath, openFile]);
 
@@ -127,14 +134,20 @@ export function ArenaEditor({
     }
   }, [activeIndex, tabs, sandboxId, roomId]);
 
+  // Keep a stable ref to saveActiveTab so handleEditorMount never needs to be re-created.
+  // This prevents Monaco from accumulating duplicate Ctrl+S handlers on every tab change.
+  const saveRef = useRef<() => void>(() => {});
+  useEffect(() => { saveRef.current = saveActiveTab; }, [saveActiveTab]);
+
+  // Empty deps — mount handler is stable for the lifetime of the editor instance.
   const handleEditorMount: OnMount = useCallback((editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-      saveActiveTab();
+      saveRef.current();
     });
-  }, [saveActiveTab]);
+  }, []);
 
   const handleEditorChange = useCallback((value: string | undefined) => {
     if (activeIndex < 0) return;

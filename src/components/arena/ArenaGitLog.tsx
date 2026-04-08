@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { GitCommit } from 'lucide-react';
 
 interface Commit {
@@ -27,29 +27,47 @@ function timeAgo(ts: number): string {
 export function ArenaGitLog({ sandboxId, roomId }: ArenaGitLogProps) {
   const [commits, setCommits] = useState<Commit[]>([]);
 
-  useEffect(() => {
-    let cancelled = false;
+  const inFlightRef = useRef(false);
+  const abortRef = useRef<AbortController | null>(null);
 
+  useEffect(() => {
     const fetchLog = async () => {
+      // Skip if a fetch is already in progress
+      if (inFlightRef.current) return;
+      inFlightRef.current = true;
+
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       try {
         const res = await fetch('/api/arena/git-log', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sandboxId, roomId }),
+          signal: controller.signal,
         });
-        if (!res.ok || cancelled) return;
+        // Check abort before consuming body
+        if (controller.signal.aborted) return;
+        if (!res.ok) return;
         const { commits: data } = await res.json() as { commits: Commit[] };
-        if (!cancelled) setCommits(data ?? []);
-      } catch {
-        // silently ignore network errors — git log is non-critical
+        // Check abort before updating state
+        if (controller.signal.aborted) return;
+        setCommits(data ?? []);
+      } catch (err) {
+        // silently ignore AbortError and network errors — git log is non-critical
+        if ((err as Error).name !== 'AbortError') {
+          // non-abort errors: leave existing commits in place
+        }
+      } finally {
+        inFlightRef.current = false;
       }
     };
 
     fetchLog();
     const interval = setInterval(fetchLog, 10_000);
     return () => {
-      cancelled = true;
       clearInterval(interval);
+      abortRef.current?.abort();
     };
   }, [sandboxId, roomId]);
 

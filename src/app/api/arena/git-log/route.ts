@@ -4,6 +4,20 @@ import { getGitLog } from '@/lib/arena-sandbox';
 
 export const runtime = 'nodejs';
 
+// Parity with /api/arena/terminal which uses 20 s for exec; git log is simpler,
+// so 5 s is sufficient and prevents hanging connections on unresponsive sandboxes.
+const GIT_LOG_TIMEOUT_MS = 5_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timer: NodeJS.Timeout | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`git-log timeout after ${ms}ms`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
+}
+
 interface Commit {
   hash: string;
   message: string;
@@ -81,13 +95,13 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // 4. Fetch git log — return empty array on any error (no git history is valid)
+  // 4. Fetch git log with timeout — return empty array on any error (no git history is valid)
   try {
-    const raw = await getGitLog(sandboxId);
+    const raw = await withTimeout(getGitLog(sandboxId), GIT_LOG_TIMEOUT_MS);
     const commits = parseGitLog(raw);
     return NextResponse.json({ commits });
   } catch {
-    // Fresh sandbox with no commits, git not initialised, etc.
+    // Fresh sandbox with no commits, git not initialised, timeout, etc.
     return NextResponse.json({ commits: [] });
   }
 }

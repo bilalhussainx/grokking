@@ -10,6 +10,9 @@ interface ArenaTerminalProps {
 
 export function ArenaTerminal({ sandboxId, roomId, onOutput }: ArenaTerminalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const termRef = useRef<any>(null);
+  const resizeHandlerRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -42,7 +45,12 @@ export function ArenaTerminal({ sandboxId, roomId, onOutput }: ArenaTerminalProp
       term.open(containerRef.current);
       fit.fit();
 
+      // Hoist term and resize handler into refs so the synchronous cleanup
+      // function returned by useEffect can reach them (the .then() return
+      // value is discarded by React — it never sees cleanups inside .then()).
+      termRef.current = term;
       const handleResize = () => fit.fit();
+      resizeHandlerRef.current = handleResize;
       window.addEventListener('resize', handleResize);
 
       term.write('\x1b[32m● Arena terminal (POST relay — no interactive TTY)\x1b[0m\r\n$ ');
@@ -113,18 +121,21 @@ export function ArenaTerminal({ sandboxId, roomId, onOutput }: ArenaTerminalProp
           term.write(key);
         }
       });
-
-      return () => {
-        disposed = true;
-        window.removeEventListener('resize', handleResize);
-        term.dispose();
-      };
     }).catch(() => {
       // xterm load failure — silently ignore in environments without it
     });
 
+    // Synchronous cleanup: React calls this when sandboxId/roomId change or on unmount.
+    // Because .then() return values are ignored by React, dispose/removeEventListener
+    // must live here, reaching the terminal via refs set inside the .then() callback.
     return () => {
       disposed = true;
+      if (resizeHandlerRef.current) {
+        window.removeEventListener('resize', resizeHandlerRef.current);
+        resizeHandlerRef.current = null;
+      }
+      termRef.current?.dispose();
+      termRef.current = null;
     };
   // Re-create terminal if sandboxId or roomId changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
