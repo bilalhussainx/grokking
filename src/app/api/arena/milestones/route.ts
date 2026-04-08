@@ -4,7 +4,7 @@ import { authorizeRoomAccess } from '@/lib/arena-auth';
 import { checkAllMilestones } from '@/lib/arena-milestones';
 import { getChallenge } from '@/data/arena-challenges';
 import { execInSandbox } from '@/lib/arena-sandbox';
-import { emitScoreEvent } from '@/lib/arena-scoring';
+import { SCORE_VALUES } from '@/lib/arena-scoring';
 
 const TEST_TIMEOUT_MS = 15_000;
 const EXEC_TIMEOUT_MS = 5_000;
@@ -166,18 +166,31 @@ export async function GET(req: NextRequest) {
 
       for (const m of newlyComplete) {
         const def = challenge.milestones.find(d => d.id === m.id);
-        const xp = def?.xp ?? m.xp ?? 0;
-        try {
-          await emitScoreEvent(roomId, user.id, 'milestone_complete', xp, {
-            milestoneId: m.id,
-            title: m.title,
+        const xp = def?.xp ?? m.xp ?? SCORE_VALUES.milestone_complete ?? 0;
+        // Direct insert (bypassing emitScoreEvent) so we can see the Postgres
+        // error code. A partial unique index on
+        // (room_id, user_id, metadata->>'milestoneId') where
+        // event_type='milestone_complete' closes the duplicate-XP race between
+        // concurrent polls — the loser gets 23505 and we treat it as a no-op.
+        const { error: insertErr } = await admin
+          .from('arena_score_events')
+          .insert({
+            room_id: roomId,
+            user_id: user.id,
+            event_type: 'milestone_complete',
+            points: xp,
+            metadata: { milestoneId: m.id, title: m.title },
           });
-        } catch (emitErr) {
-          console.error(
-            '[arena/milestones GET] emitScoreEvent failed for',
-            m.id,
-            emitErr,
-          );
+        if (insertErr) {
+          if ((insertErr as { code?: string }).code === '23505') {
+            // Another concurrent request already inserted this milestone — fine.
+          } else {
+            console.error(
+              '[arena/milestones GET] milestone score insert failed for',
+              m.id,
+              insertErr,
+            );
+          }
         }
       }
     } catch (err) {

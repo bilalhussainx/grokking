@@ -30,13 +30,20 @@ export function ArenaInterviewer({ roomId: roomIdProp }: ArenaInterviewerProps) 
   const abortRef = useRef<AbortController | null>(null);
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  // Mirror `loading` into a ref so sendTrigger can guard against concurrent
+  // requests WITHOUT depending on the loading state. If sendTrigger had
+  // `loading` in its deps, its identity would flip on every request and the
+  // idle-timer effect (which depends on sendTrigger) would restart the 30s
+  // countdown on every send.
+  const loadingRef = useRef(false);
 
   // Send a trigger to the interviewer endpoint
   const sendTrigger = useCallback(
     async (trigger: string, participantMessage?: string) => {
       if (!roomId || !personaId) return;
-      if (loading) return;
+      if (loadingRef.current) return;
 
+      loadingRef.current = true;
       setLoading(true);
       setError(null);
 
@@ -79,10 +86,11 @@ export function ArenaInterviewer({ roomId: roomIdProp }: ArenaInterviewerProps) 
           setError('Network error');
         }
       } finally {
+        loadingRef.current = false;
         setLoading(false);
       }
     },
-    [roomId, personaId, loading],
+    [roomId, personaId],
   );
 
   // Submit user-typed message
