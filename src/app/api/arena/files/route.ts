@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabase, createAdminSupabase } from '@/lib/supabase-auth';
-import { listFiles, readFile, writeFile } from '@/lib/arena-sandbox';
-import { emitScoreEvent, isFileSaveAllowed } from '@/lib/arena-scoring';
+import { listFiles, readFile, writeFile, assertSafePath } from '@/lib/arena-sandbox';
+import { emitScoreEvent } from '@/lib/arena-scoring';
 
 /** Resolve the room that owns sandboxId and verify the caller is a participant. */
 async function authorizeFilesAccess(
@@ -102,8 +102,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'File write failed' }, { status: 500 });
   }
 
-  // Emit score event for file save (rate-limited inside emitScoreEvent / isFileSaveAllowed)
-  if (roomId && isFileSaveAllowed(user.id)) {
+  // Emit score event for file save (rate-limited inside emitScoreEvent)
+  if (roomId) {
     try {
       await emitScoreEvent(roomId, user.id, 'file_save');
     } catch (err) {
@@ -134,21 +134,16 @@ export async function DELETE(req: NextRequest) {
   const allowed = await authorizeFilesAccess(sandboxId, user.id);
   if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  // Import execInSandbox to delete the file. assertSafePath is applied inside readFile/writeFile
-  // but for delete we invoke rm via execInSandbox after manually validating the path type.
+  // Validate path strictly before passing to the shell command.
+  let safePath: string;
+  try {
+    safePath = assertSafePath(filePath);
+  } catch {
+    return NextResponse.json({ error: 'Invalid file path' }, { status: 400 });
+  }
+
   try {
     const { execInSandbox } = await import('@/lib/arena-sandbox');
-    // assertSafePath is not exported; use the lib's own path validation by reading first to
-    // verify the path is safe, then remove. Alternatively, import path and replicate the check.
-    // Since assertSafePath is internal, we rely on the fact that execInSandbox is called with
-    // a user-supplied path that must pass through the same validation used in readFile.
-    // We guard here against obvious traversal at route level.
-    if (filePath.includes('..') || filePath.startsWith('/')) {
-      return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
-    }
-    // Use writeFile pattern: delegate path safety to arena-sandbox internals via execInSandbox
-    // by constructing the rm command carefully (no shell expansion possible with single-quoted path).
-    const safePath = `/workspace/${filePath.replace(/'/g, '')}`;
     await execInSandbox(sandboxId, `rm -rf '${safePath}'`);
     return NextResponse.json({ ok: true });
   } catch (err) {

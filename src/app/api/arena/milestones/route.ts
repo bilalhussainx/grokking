@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabase, createAdminSupabase } from '@/lib/supabase-auth';
+import { authorizeRoomAccess } from '@/lib/arena-auth';
 import { checkAllMilestones } from '@/lib/arena-milestones';
 import { getChallenge } from '@/data/arena-challenges';
 import { execInSandbox } from '@/lib/arena-sandbox';
 
-/** Verify the caller is a participant in the given room. */
-async function authorizeRoomAccess(roomId: string, userId: string): Promise<boolean> {
-  const admin = createAdminSupabase();
-  const { data: participant } = await admin
-    .from('arena_participants')
-    .select('user_id')
-    .eq('room_id', roomId)
-    .eq('user_id', userId)
-    .maybeSingle();
-  return !!participant;
+const TEST_TIMEOUT_MS = 15_000;
+const EXEC_TIMEOUT_MS = 5_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`exec timeout after ${ms}ms`)), ms),
+    ),
+  ]);
 }
 
 // GET /api/arena/milestones?sandboxId=...&challengeId=...&roomId=...
@@ -38,7 +39,8 @@ export async function GET(req: NextRequest) {
   // Authorization: roomId is optional but if provided we verify participation.
   // If not provided, we fall back to sandbox-level ownership check via arena_participants.
   if (roomId) {
-    const allowed = await authorizeRoomAccess(roomId, user.id);
+    const admin = createAdminSupabase();
+    const allowed = await authorizeRoomAccess(admin, user.id, roomId);
     if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   } else {
     // No roomId — verify via participant sandbox ownership
@@ -83,16 +85,23 @@ export async function GET(req: NextRequest) {
 
   try {
     [filesResult, testResult, gitResult] = await Promise.all([
-      execInSandbox(
-        sandboxId,
-        'find /workspace -not -path "*/node_modules/*" -not -path "*/.git/*" -type f | sed "s|/workspace/||"',
+      withTimeout(
+        execInSandbox(
+          sandboxId,
+          'find /workspace -not -path "*/node_modules/*" -not -path "*/.git/*" -type f | sed "s|/workspace/||"',
+        ),
+        EXEC_TIMEOUT_MS,
       ),
-      execInSandbox(sandboxId, 'cd /workspace && npm test 2>&1 | tail -20').catch(
-        () => ({ stdout: '', stderr: '', exitCode: 1 }),
-      ),
-      execInSandbox(
-        sandboxId,
-        'cd /workspace && git log --format="%H|%at|%s" 2>/dev/null | head -20',
+      withTimeout(
+        execInSandbox(sandboxId, 'cd /workspace && npm test 2>&1 | tail -20'),
+        TEST_TIMEOUT_MS,
+      ).catch(() => ({ stdout: '', stderr: '', exitCode: 1 })),
+      withTimeout(
+        execInSandbox(
+          sandboxId,
+          'cd /workspace && git log --format="%H|%at|%s" 2>/dev/null | head -20',
+        ),
+        EXEC_TIMEOUT_MS,
       ).catch(() => ({ stdout: '', stderr: '', exitCode: 0 })),
     ]);
   } catch (err) {

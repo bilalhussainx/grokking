@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabase, createAdminSupabase } from '@/lib/supabase-auth';
+import { authorizeRoomAccess } from '@/lib/arena-auth';
 import { getPersona } from '@/lib/arena-personas';
 import { emitScoreEvent, SCORE_VALUES } from '@/lib/arena-scoring';
 
@@ -9,16 +10,13 @@ if (!process.env.OPENROUTER_API_KEY) {
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-/** Verify the caller is a participant in the given room. */
-async function authorizeRoomAccess(roomId: string, userId: string): Promise<boolean> {
-  const admin = createAdminSupabase();
-  const { data: participant } = await admin
-    .from('arena_participants')
-    .select('user_id')
-    .eq('room_id', roomId)
-    .eq('user_id', userId)
-    .maybeSingle();
-  return !!participant;
+/** Sanitize user-supplied participant message before prompt interpolation. */
+function sanitizeParticipantMessage(msg: string): string {
+  return msg
+    .replace(/[\[\]"\n\r\t]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 500);
 }
 
 // POST /api/arena/interviewer — generate an interviewer response via OpenRouter
@@ -51,14 +49,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const allowed = await authorizeRoomAccess(roomId, user.id);
+  const admin = createAdminSupabase();
+  const allowed = await authorizeRoomAccess(admin, user.id, roomId);
   if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const persona = getPersona(personaId);
   // getPersona always returns a value (falls back to first persona) but personaId
   // is still validated above so this will always resolve to a real match or the default.
-
-  const admin = createAdminSupabase();
 
   // Retrieve recent conversation history (last 10 messages, reversed to chronological order)
   const { data: history } = await admin
@@ -124,7 +121,7 @@ export async function POST(req: NextRequest) {
     }
     default:
       triggerMessage = participantMessage
-        ? `[Candidate said: "${participantMessage.slice(0, 500)}"]`
+        ? `[Candidate said: "${sanitizeParticipantMessage(participantMessage)}"]`
         : '[SYSTEM: Check in with the candidate.]';
   }
 

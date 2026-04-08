@@ -15,7 +15,7 @@ const vercel = new Vercel({ bearerToken: process.env.VERCEL_SANDBOX_TOKEN });
 const WORKSPACE_ROOT = '/workspace';
 
 /** Reject paths that escape /workspace or contain shell metacharacters. */
-function assertSafePath(rawPath: string): string {
+export function assertSafePath(rawPath: string): string {
   if (typeof rawPath !== 'string' || rawPath.length === 0) {
     throw new Error('Invalid file path: empty');
   }

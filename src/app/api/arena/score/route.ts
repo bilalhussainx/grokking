@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabase, createAdminSupabase } from '@/lib/supabase-auth';
+import { authorizeRoomAccess } from '@/lib/arena-auth';
 import { emitScoreEvent, getRunningTotal, SCORE_VALUES } from '@/lib/arena-scoring';
-
-/** Verify the caller is a participant in the given room. */
-async function authorizeRoomAccess(roomId: string, userId: string): Promise<boolean> {
-  const admin = createAdminSupabase();
-  const { data: participant } = await admin
-    .from('arena_participants')
-    .select('user_id')
-    .eq('room_id', roomId)
-    .eq('user_id', userId)
-    .maybeSingle();
-  return !!participant;
-}
 
 // POST /api/arena/score — emit a score event and return the updated total
 // Body: { roomId, eventType, metadata? }
@@ -46,7 +35,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const allowed = await authorizeRoomAccess(roomId, user.id);
+  const allowed = await authorizeRoomAccess(createAdminSupabase(), user.id, roomId);
   if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   try {
@@ -71,7 +60,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'roomId (string) required' }, { status: 400 });
   }
 
-  const allowed = await authorizeRoomAccess(roomId, user.id);
+  const allowed = await authorizeRoomAccess(createAdminSupabase(), user.id, roomId);
   if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   try {
