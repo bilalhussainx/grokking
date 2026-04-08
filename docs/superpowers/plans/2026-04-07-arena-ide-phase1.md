@@ -262,6 +262,8 @@ export interface ArenaPersona {
   questionBank: Question[];
 }
 
+// Model IDs follow OpenRouter slugs. Verify current availability at
+// https://openrouter.ai/models before deploying — IDs can be deprecated.
 export const ARENA_PERSONAS: ArenaPersona[] = [
   {
     id: 'alex-chen',
@@ -272,7 +274,7 @@ export const ARENA_PERSONAS: ArenaPersona[] = [
     field: 'backend',
     personality: 'strict',
     judgingStyle: 'rubric-strict',
-    model: 'anthropic/claude-opus-4',
+    model: 'anthropic/claude-opus-4.6',
     questionBank: [
       { text: 'What does the time complexity of your current approach look like?', type: 'concept', trigger: 'commit' },
       { text: 'How would you scale this to handle 10 million requests per second?', type: 'system-design', trigger: 'deploy' },
@@ -356,7 +358,7 @@ Responses ≤ 3 sentences.`,
     field: 'fullstack',
     personality: 'pressure-test',
     judgingStyle: 'speed-weighted',
-    model: 'google/gemini-pro-1.5',
+    model: 'google/gemini-2.5-pro',
     questionBank: [
       { text: 'You have 5 minutes left. What is the most critical thing you have not built?', type: 'tradeoff', trigger: 'periodic' },
       { text: 'Would you ship this to production? Justify it.', type: 'tradeoff', trigger: 'deploy' },
@@ -533,7 +535,12 @@ export const SCORE_VALUES: Record<string, number> = {
 
 // Cap file_save events to prevent spam
 const FILE_SAVE_CAP_PER_MIN = 20;
-const fileSaveCounts: Map<string, { count: number; resetAt: number }> = new Map();
+// NOTE: This in-memory counter is INSTANCE-LOCAL. In serverless (Vercel), each
+// function instance has its own Map, so the rate limit does not hold globally.
+// This is acceptable for Phase 1 (low-traffic dev/demo) but MUST be moved to a
+// shared store (Redis / Supabase RPC with advisory lock) before production launch.
+// TODO(arena): replace with durable rate-limit store before multi-user beta.
+const fileSaveCounts = new Map<string, { count: number; resetAt: number }>();
 
 export function isFileSaveAllowed(userId: string): boolean {
   const now = Date.now();
@@ -565,13 +572,16 @@ export async function emitScoreEvent(
     return { points: 0, total: await getRunningTotal(roomId, userId) };
   }
 
-  await supabase.from('arena_score_events').insert({
+  const { error: insertError } = await supabase.from('arena_score_events').insert({
     room_id: roomId,
     user_id: userId,
     event_type: eventType,
     points,
     metadata: metadata ?? {},
   });
+  if (insertError) {
+    throw new Error(`Failed to emit score event: ${insertError.message}`);
+  }
 
   const total = await getRunningTotal(roomId, userId);
   return { points, total };
@@ -598,10 +608,14 @@ export interface CommitAnalysis {
   commitMessages: string[];
 }
 
+/**
+ * Parse output of `git log --shortstat --format='%H|%at|%s'`.
+ * The output is paragraph-style: each commit produces a header line
+ * `HASH|TIMESTAMP|SUBJECT` followed by an optional `--shortstat` line
+ * like ` 2 files changed, 10 insertions(+), 3 deletions(-)`.
+ */
 export function parseGitLog(gitLogOutput: string): CommitAnalysis {
   const lines = gitLogOutput.trim().split('\n').filter(Boolean);
-  // Format expected: "HASH|TIMESTAMP|SUBJECT|+added|-deleted"
-  // e.g. from: git log --format="%H|%at|%s" --shortstat
   const commits = lines
     .filter(l => l.includes('|'))
     .map(l => {

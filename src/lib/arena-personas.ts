@@ -22,6 +22,8 @@ export interface ArenaPersona {
   questionBank: Question[];
 }
 
+// Model IDs follow OpenRouter slugs. Verify current availability at
+// https://openrouter.ai/models before deploying — IDs can be deprecated.
 export const ARENA_PERSONAS: ArenaPersona[] = [
   {
     id: 'alex-chen',
@@ -32,7 +34,7 @@ export const ARENA_PERSONAS: ArenaPersona[] = [
     field: 'backend',
     personality: 'strict',
     judgingStyle: 'rubric-strict',
-    model: 'anthropic/claude-opus-4',
+    model: 'anthropic/claude-opus-4.6',
     questionBank: [
       { text: 'What does the time complexity of your current approach look like?', type: 'concept', trigger: 'commit' },
       { text: 'How would you scale this to handle 10 million requests per second?', type: 'system-design', trigger: 'deploy' },
@@ -116,7 +118,7 @@ Responses ≤ 3 sentences.`,
     field: 'fullstack',
     personality: 'pressure-test',
     judgingStyle: 'speed-weighted',
-    model: 'google/gemini-pro-1.5',
+    model: 'google/gemini-2.5-pro',
     questionBank: [
       { text: 'You have 5 minutes left. What is the most critical thing you have not built?', type: 'tradeoff', trigger: 'periodic' },
       { text: 'Would you ship this to production? Justify it.', type: 'tradeoff', trigger: 'deploy' },
