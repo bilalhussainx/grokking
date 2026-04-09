@@ -41,9 +41,14 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // E2E test bypass — Playwright sets this env to disable auth in CI runs.
-  // Never enable in production. The env var is read at build/runtime only;
-  // requests still pass through the rest of middleware for routing.
-  if (process.env.E2E_BYPASS_AUTH === "1") return response;
+  // Hard-gated to non-production to prevent accidental prod exposure even
+  // if the env var leaks into a deploy environment.
+  if (
+    process.env.NODE_ENV !== "production" &&
+    process.env.E2E_BYPASS_AUTH === "1"
+  ) {
+    return response;
+  }
 
   // Redirect non-logged-in users from / to /landing (cinematic page)
   if (pathname === "/") {

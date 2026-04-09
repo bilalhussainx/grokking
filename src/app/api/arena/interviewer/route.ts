@@ -4,10 +4,6 @@ import { authorizeRoomAccess } from '@/lib/arena-auth';
 import { getPersona } from '@/lib/arena-personas';
 import { emitScoreEvent, SCORE_VALUES } from '@/lib/arena-scoring';
 
-if (!process.env.OPENROUTER_API_KEY) {
-  throw new Error('OPENROUTER_API_KEY is required');
-}
-
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 /** Sanitize user-supplied participant message before prompt interpolation. */
@@ -27,6 +23,14 @@ function sanitizeParticipantMessage(msg: string): string {
 //   participantMessage?
 // }
 export async function POST(req: NextRequest) {
+  if (!process.env.OPENROUTER_API_KEY) {
+    console.error('[arena/interviewer] OPENROUTER_API_KEY is not set');
+    return NextResponse.json(
+      { error: 'Interviewer is not configured on this deployment' },
+      { status: 500 },
+    );
+  }
+
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
