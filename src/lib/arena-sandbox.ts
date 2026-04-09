@@ -1,18 +1,36 @@
 // Vercel Sandbox SDK wrapper.
-// Docs: https://vercel.com/docs/vercel-sandbox
+// Docs: https://vercel.com/docs/vercel-sandbox/sdk-reference
+//
+// NOTE: The correct package is `@vercel/sandbox` (not `@vercel/sdk`, which is
+// Vercel's platform management SDK for deployments/teams/projects and has no
+// sandbox namespace). Task 3 originally imported the wrong package, causing a
+// runtime crash: "Cannot read properties of undefined (reading 'create')".
+//
+// Auth: The SDK reads `VERCEL_OIDC_TOKEN` automatically (populated by
+// `vercel env pull` during local dev and injected in Vercel production). As a
+// fallback we support `VERCEL_SANDBOX_TOKEN` — the env var name this codebase
+// has historically used — and forward it to the SDK as an access token. If
+// neither is set and we're in local dev, creation will fail at runtime with a
+// clear SDK error.
 
 import path from 'node:path';
-import { Vercel } from '@vercel/sdk';
-
-if (!process.env.VERCEL_SANDBOX_TOKEN) {
-  throw new Error(
-    'VERCEL_SANDBOX_TOKEN is required for arena-sandbox. Set it in .env.local or Vercel dashboard.'
-  );
-}
-
-const vercel = new Vercel({ bearerToken: process.env.VERCEL_SANDBOX_TOKEN });
+import { Sandbox } from '@vercel/sandbox';
 
 const WORKSPACE_ROOT = '/workspace';
+
+/** Build sandbox create options, forwarding VERCEL_SANDBOX_TOKEN as token if set. */
+function buildCreateOptions<T extends Record<string, unknown>>(base: T): T & { token?: string; teamId?: string; projectId?: string } {
+  const opts: Record<string, unknown> = { ...base };
+  // Prefer explicit token env var; OIDC token is picked up automatically by the SDK.
+  const token = process.env.VERCEL_SANDBOX_TOKEN || process.env.VERCEL_TOKEN;
+  if (token) {
+    opts.token = token;
+    // Access-token auth requires team/project IDs.
+    if (process.env.VERCEL_TEAM_ID) opts.teamId = process.env.VERCEL_TEAM_ID;
+    if (process.env.VERCEL_PROJECT_ID) opts.projectId = process.env.VERCEL_PROJECT_ID;
+  }
+  return opts as T & { token?: string; teamId?: string; projectId?: string };
+}
 
 /** Reject paths that escape /workspace or contain shell metacharacters. */
 export function assertSafePath(rawPath: string): string {
@@ -55,31 +73,48 @@ export interface ExecResult {
   exitCode: number;
 }
 
+/** Run a raw shell command inside the sandbox via `sh -c`. Returns captured output. */
+async function runShell(sandbox: Sandbox, command: string, cwd: string = WORKSPACE_ROOT): Promise<ExecResult> {
+  const result = await sandbox.runCommand({
+    cmd: 'sh',
+    args: ['-c', command],
+    cwd,
+  });
+  const [stdout, stderr] = await Promise.all([result.stdout(), result.stderr()]);
+  return {
+    stdout: stdout ?? '',
+    stderr: stderr ?? '',
+    exitCode: result.exitCode,
+  };
+}
+
 // Provision a new sandbox. Returns the sandboxId.
 export async function provisionSandbox(starterRepo?: string): Promise<string> {
   try {
-    // @ts-expect-error — SDK types may lag behind API
-    const sandbox = await vercel.sandbox.create({
-      runtime: 'node24',
-      timeoutSeconds: 3600,     // 1 hour max, can extend
-    });
+    const sandbox = await Sandbox.create(buildCreateOptions({
+      runtime: 'node24' as const,
+      timeout: 60 * 60 * 1000,     // 1 hour in ms
+    }));
 
-    const sandboxId: string = sandbox.id;
+    const sandboxId = sandbox.sandboxId;
+
+    // Ensure /workspace exists (Sandbox default cwd is /vercel/sandbox).
+    await runShell(sandbox, 'mkdir -p /workspace', '/');
 
     if (starterRepo) {
       const safeUrl = assertSafeRepoUrl(starterRepo);
       // Clone starter repo into /workspace
-      await execInSandbox(sandboxId,
+      await runShell(sandbox,
         `git clone '${safeUrl}' /workspace && cd /workspace && npm install 2>&1 | tail -5`
       );
     } else {
-      await execInSandbox(sandboxId,
-        'mkdir -p /workspace && cd /workspace && npm init -y && git init && git add -A && git commit -m "init: scaffold"'
+      await runShell(sandbox,
+        'cd /workspace && npm init -y && git init && git add -A && git commit -m "init: scaffold"'
       );
     }
 
     // Install claude CLI for hybrid mode
-    await execInSandbox(sandboxId,
+    await runShell(sandbox,
       'npm install -g @anthropic-ai/claude-code 2>&1 | tail -3'
     );
 
@@ -93,13 +128,8 @@ export async function provisionSandbox(starterRepo?: string): Promise<string> {
 // Execute a shell command in the sandbox. Returns stdout/stderr/exitCode.
 export async function execInSandbox(sandboxId: string, command: string): Promise<ExecResult> {
   try {
-    // @ts-expect-error — SDK types
-    const result = await vercel.sandbox.exec(sandboxId, { command, cwd: '/workspace' });
-    return {
-      stdout: result.stdout ?? '',
-      stderr: result.stderr ?? '',
-      exitCode: result.exitCode ?? 0,
-    };
+    const sandbox = await Sandbox.get(buildCreateOptions({ sandboxId }));
+    return await runShell(sandbox, command);
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     throw new Error(`execInSandbox failed [sandbox=${sandboxId}]: ${msg}`);
@@ -127,9 +157,12 @@ export async function listFiles(sandboxId: string): Promise<SandboxFile[]> {
 export async function readFile(sandboxId: string, filePath: string): Promise<string> {
   try {
     const safePath = assertSafePath(filePath);
-    const result = await execInSandbox(sandboxId, `cat '${safePath}'`);
-    if (result.exitCode !== 0) throw new Error(`File not found: ${filePath}`);
-    return result.stdout;
+    const sandbox = await Sandbox.get(buildCreateOptions({ sandboxId }));
+    const buffer = await sandbox.readFileToBuffer({ path: safePath });
+    if (buffer === null) {
+      throw new Error(`File not found: ${filePath}`);
+    }
+    return buffer.toString('utf-8');
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     throw new Error(`readFile failed [sandbox=${sandboxId}, path=${filePath}]: ${msg}`);
@@ -140,11 +173,13 @@ export async function readFile(sandboxId: string, filePath: string): Promise<str
 export async function writeFile(sandboxId: string, filePath: string, content: string): Promise<void> {
   try {
     const safePath = assertSafePath(filePath);
-    // Use base64 to avoid shell escaping issues.
-    // Single-quote the base64 string: base64 alphabet never contains ', so this is safe.
-    const encoded = Buffer.from(content).toString('base64');
-    const cmd = `mkdir -p "$(dirname '${safePath}')" && echo '${encoded}' | base64 -d > '${safePath}'`;
-    await execInSandbox(sandboxId, cmd);
+    const sandbox = await Sandbox.get(buildCreateOptions({ sandboxId }));
+    // Ensure parent directory exists first — mkDir is a no-op if it already does.
+    const parentDir = path.posix.dirname(safePath);
+    if (parentDir && parentDir !== '/' && parentDir !== WORKSPACE_ROOT) {
+      await sandbox.mkDir(parentDir);
+    }
+    await sandbox.writeFiles([{ path: safePath, content: Buffer.from(content, 'utf-8') }]);
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     throw new Error(`writeFile failed [sandbox=${sandboxId}, path=${filePath}]: ${msg}`);
@@ -184,8 +219,8 @@ export async function autoCommit(sandboxId: string, message?: string): Promise<v
 // Teardown — idempotent: 404/not-found errors are swallowed.
 export async function teardownSandbox(sandboxId: string): Promise<void> {
   try {
-    // @ts-expect-error — SDK types
-    await vercel.sandbox.delete({ sandboxId });
+    const sandbox = await Sandbox.get(buildCreateOptions({ sandboxId }));
+    await sandbox.stop();
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     // Idempotent: ignore not-found errors.
@@ -204,45 +239,57 @@ export async function provisionDataScienceSandbox(starterNotebookUrl?: string): 
   kernelGatewayUrl: string;
 }> {
   try {
-    // @ts-expect-error — SDK types may lag behind API
-    const sandbox = await vercel.sandbox.create({
-      runtime: 'python3.13',
-      timeoutSeconds: 5400,  // 90 minutes max for DS sessions
-    });
+    // Expose port 8888 at creation time so sandbox.domain(8888) can resolve a public URL.
+    const sandbox = await Sandbox.create(buildCreateOptions({
+      runtime: 'python3.13' as const,
+      timeout: 90 * 60 * 1000,  // 90 minutes in ms
+      ports: [8888],
+    }));
 
-    const sandboxId: string = sandbox.id;
+    const sandboxId = sandbox.sandboxId;
+
+    // Ensure /workspace exists.
+    await runShell(sandbox, 'mkdir -p /workspace', '/');
 
     // Install DS stack + jupyter_kernel_gateway
-    await execInSandbox(sandboxId,
+    await runShell(sandbox,
       'pip install --quiet jupyter_kernel_gateway numpy pandas scikit-learn torch matplotlib seaborn 2>&1 | tail -5'
     );
 
-    // Start Jupyter kernel gateway on port 8888 in background
-    await execInSandbox(sandboxId,
-      'nohup jupyter kernelgateway --ip=0.0.0.0 --port=8888 --KernelGatewayApp.allow_origin="*" > /tmp/jkg.log 2>&1 &'
-    );
+    // Start Jupyter kernel gateway on port 8888 (detached so it keeps running).
+    await sandbox.runCommand({
+      cmd: 'sh',
+      args: ['-c', 'nohup jupyter kernelgateway --ip=0.0.0.0 --port=8888 --KernelGatewayApp.allow_origin="*" > /tmp/jkg.log 2>&1 &'],
+      cwd: WORKSPACE_ROOT,
+      detached: true,
+    });
 
     // Clone or create starter notebook
     if (starterNotebookUrl) {
-      await execInSandbox(sandboxId, `wget -O /workspace/challenge.ipynb "${starterNotebookUrl}"`);
+      await runShell(sandbox, `wget -O /workspace/challenge.ipynb "${starterNotebookUrl}"`);
     } else {
-      await execInSandbox(sandboxId, `mkdir -p /workspace && cat > /workspace/challenge.ipynb << 'NBEOF'
-{
- "cells": [
-  {"cell_type":"markdown","metadata":{},"source":["# Challenge\\n","Read the brief above. Use the cells below to work."]},
-  {"cell_type":"code","metadata":{},"source":["import numpy as np\\nimport pandas as pd\\nprint('Ready!')"],"outputs":[],"execution_count":null}
- ],
- "metadata": {"kernelspec":{"display_name":"Python 3","language":"python","name":"python3"},"language_info":{"name":"python","version":"3.13.0"}},
- "nbformat":4,"nbformat_minor":5
-}
-NBEOF`);
+      const starterNotebook = JSON.stringify({
+        cells: [
+          { cell_type: 'markdown', metadata: {}, source: ['# Challenge\n', 'Read the brief above. Use the cells below to work.'] },
+          { cell_type: 'code', metadata: {}, source: ["import numpy as np\nimport pandas as pd\nprint('Ready!')"], outputs: [], execution_count: null },
+        ],
+        metadata: {
+          kernelspec: { display_name: 'Python 3', language: 'python', name: 'python3' },
+          language_info: { name: 'python', version: '3.13.0' },
+        },
+        nbformat: 4,
+        nbformat_minor: 5,
+      });
+      await sandbox.writeFiles([
+        { path: '/workspace/challenge.ipynb', content: Buffer.from(starterNotebook, 'utf-8') },
+      ]);
     }
 
-    // Resolve the public WebSocket URL for the kernel gateway.
-    // Vercel Sandbox exposes ports via its API — poll until port 8888 is ready.
-    // @ts-expect-error — SDK types
-    const portInfo = await vercel.sandbox.getPort(sandboxId, 8888);
-    const kernelGatewayUrl = portInfo?.url ?? `ws://sandbox-${sandboxId}.vercel-sandbox.com:8888`;
+    // Resolve the public URL for the kernel gateway port. `sandbox.domain()`
+    // returns an https:// URL; Jupyter kernel gateway clients want wss:// for
+    // the WebSocket endpoint, so we rewrite the scheme.
+    const httpUrl = sandbox.domain(8888);
+    const kernelGatewayUrl = httpUrl.replace(/^https:\/\//, 'wss://').replace(/^http:\/\//, 'ws://');
 
     return { sandboxId, kernelGatewayUrl };
   } catch (e: unknown) {
