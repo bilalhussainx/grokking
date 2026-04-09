@@ -102,11 +102,12 @@ function LobbyInner() {
           </div>
         )}
 
-        <form onSubmit={handleStart} className="space-y-5">
+        <form onSubmit={handleStart} className="space-y-5" data-testid="arena-lobby-form">
           <Field label="Challenge">
             <select
               value={challengeId}
               onChange={e => setChallengeId(e.target.value)}
+              data-testid="arena-lobby-challenge"
               className="w-full rounded-lg bg-slate-900/80 border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"
             >
               {ARENA_CHALLENGES.map(c => (
@@ -126,6 +127,7 @@ function LobbyInner() {
             <select
               value={personaId}
               onChange={e => setPersonaId(e.target.value)}
+              data-testid="arena-lobby-persona"
               className="w-full rounded-lg bg-slate-900/80 border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-indigo-400"
             >
               {PERSONA_OPTIONS.map(p => (
@@ -135,7 +137,7 @@ function LobbyInner() {
           </Field>
 
           <Field label="Track">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2" data-testid="arena-lobby-track">
               {TRACKS.map(t => (
                 <button
                   type="button"
@@ -155,7 +157,7 @@ function LobbyInner() {
 
           <div className="grid grid-cols-2 gap-4">
             <Field label="Mode">
-              <div className="flex gap-2">
+              <div className="flex gap-2" data-testid="arena-lobby-mode">
                 {(['passive', 'active'] as Mode[]).map(m => (
                   <button
                     type="button"
@@ -174,7 +176,7 @@ function LobbyInner() {
             </Field>
 
             <Field label="Duration">
-              <div className="flex gap-2">
+              <div className="flex gap-2" data-testid="arena-lobby-duration">
                 {DURATIONS.map(d => (
                   <button
                     type="button"
