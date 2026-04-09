@@ -40,6 +40,11 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
   const pathname = request.nextUrl.pathname;
 
+  // E2E test bypass — Playwright sets this env to disable auth in CI runs.
+  // Never enable in production. The env var is read at build/runtime only;
+  // requests still pass through the rest of middleware for routing.
+  if (process.env.E2E_BYPASS_AUTH === "1") return response;
+
   // Redirect non-logged-in users from / to /landing (cinematic page)
   if (pathname === "/") {
     // Quick cookie check — Supabase stores auth in sb-*-auth-token cookies
