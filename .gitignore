@@ -59,3 +59,6 @@ USER_STUDY_IMPLEMENTATION_PLAN.md
 # Test artifacts
 test-results/
 tests/screenshots/
+
+# Git worktrees
+.worktrees/
