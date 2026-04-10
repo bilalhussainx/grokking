@@ -73,34 +73,30 @@ export async function POST(req: NextRequest) {
       language,
     } = body;
 
-    // RAG Intelligence — fetch everything we know about this user
-    let intelligenceContext = "";
+    // Unified agent context — knowledge graph + agent memories + domain knowledge
+    let agentContextStr = "";
     try {
-      const { fetchUserIntelligence } = await import("@/lib/agent-intelligence");
-      const intel = await fetchUserIntelligence(user.id);
-      intelligenceContext = `\n${intel.promptContext}\n`;
+      const { buildAgentContext } = await import("@/lib/agent-context");
+      const ctx = await buildAgentContext(user.id, "coach", `${event} ${lessonTitle || ""}`, {
+        courseSlug: body.courseSlug,
+      });
+      agentContextStr = `\n${ctx.promptContext}\n`;
     } catch (err) {
-      console.warn("[Coach] Intelligence fetch failed:", err);
+      console.warn("[Coach] Agent context build failed, falling back to legacy:", err);
+      // Fallback to legacy intelligence if new system fails
+      try {
+        const { fetchUserIntelligence } = await import("@/lib/agent-intelligence");
+        const intel = await fetchUserIntelligence(user.id);
+        agentContextStr = `\n${intel.promptContext}\n`;
+      } catch {}
     }
 
-    // Retrieve relevant memories for context
-    let memoryContext = "";
-    try {
-      const memories = await searchMemories(user.id, `${event} ${lessonTitle || ""}`, {
-        courseSlug: body.courseSlug,
-        limit: 3,
+    // Store memory + extract facts (fire-and-forget, non-blocking)
+    import("@/lib/agent-memory-store").then(({ storeAgentMemory }) => {
+      storeAgentMemory(user.id, "coach", event, {
+        role: "user",
+        metadata: { courseSlug: body.courseSlug, lessonSlug: body.lessonSlug },
       });
-      if (memories.length > 0) {
-        memoryContext = `\n[RELEVANT PAST CONVERSATIONS]\n${memories.map((m) => `- ${m.summary || m.content.slice(0, 100)}`).join("\n")}\n`;
-      }
-    } catch {}
-
-    // Store the user's message as memory (fire-and-forget)
-    storeMemory(user.id, event, {
-      courseSlug: body.courseSlug,
-      lessonSlug: body.lessonSlug,
-      role: "user",
-      topics: extractTopics(event),
     }).catch(() => {});
 
     const userPrompt = `[CURRENT LESSON — THIS IS WHAT THE STUDENT IS LOOKING AT RIGHT NOW]
@@ -117,7 +113,6 @@ ${currentCode ? `Student's current code:\n\`\`\`\n${currentCode}\n\`\`\`` : "No 
 
 [EVENT — what just happened]
 ${event}
-${memoryContext}
 
 CRITICAL: You have the FULL lesson content above. Reference SPECIFIC concepts, terms, and examples from it. Never say generic things like "good stuff" or "keep going." Always tie your response to the actual material.`;
 
@@ -128,7 +123,7 @@ CRITICAL: You have the FULL lesson content above. Reference SPECIFIC concepts, t
       : "";
 
     const messages = [
-      { role: "system", content: COACH_DIRECTIVE + intelligenceContext + langInstruction },
+      { role: "system", content: COACH_DIRECTIVE + agentContextStr + langInstruction },
       ...((history as { role: string; content: string }[]) || []).map(
         (m: { role: string; content: string }) => ({
           role: m.role === "assistant" ? "assistant" : "user",
@@ -147,8 +142,8 @@ CRITICAL: You have the FULL lesson content above. Reference SPECIFIC concepts, t
     const providerName = useOpenRouter ? `OpenRouter/${model.split("/")[1]}` : "Kimi";
     console.log(`[Coach] Model: ${providerName} | Course: ${courseTitle || "?"} | Lesson: ${lessonTitle || "?"}`);
     console.log(`[Coach] Lesson content: ${lessonContent ? `${lessonContent.length} chars ✓` : "⚠️ MISSING"}`);
-    console.log(`[Coach] Intelligence: ${intelligenceContext ? `${intelligenceContext.length} chars ✓` : "⚠️ MISSING"}`);
-    console.log(`[Coach] System prompt total: ${(COACH_DIRECTIVE + intelligenceContext + langInstruction).length} chars`);
+    console.log(`[Coach] Agent context: ${agentContextStr ? `${agentContextStr.length} chars ✓` : "⚠️ MISSING"}`);
+    console.log(`[Coach] System prompt total: ${(COACH_DIRECTIVE + agentContextStr + langInstruction).length} chars`);
     console.log(`[Coach] User prompt first 200: ${userPrompt.slice(0, 200)}`);
 
     // Trace for observability
@@ -159,7 +154,7 @@ CRITICAL: You have the FULL lesson content above. Reference SPECIFIC concepts, t
         name: "coach-text",
         model,
         input: {
-          systemPrompt: (COACH_DIRECTIVE + intelligenceContext + langInstruction).slice(0, 2000),
+          systemPrompt: (COACH_DIRECTIVE + agentContextStr + langInstruction).slice(0, 2000),
           userMessage: userPrompt.slice(0, 1000),
           lessonTitle: lessonTitle || undefined,
           courseTitle: courseTitle || undefined,
@@ -246,6 +241,17 @@ CRITICAL: You have the FULL lesson content above. Reference SPECIFIC concepts, t
             reader.cancel();
           },
         });
+
+        // Extract facts from user message (fire-and-forget)
+        import("@/lib/fact-extractor").then(({ extractAndStoreFacts }) => {
+          extractAndStoreFacts({
+            userId: user.id,
+            agentType: "coach",
+            userMessage: event,
+            assistantMessage: "", // We don't have it yet (streaming)
+            metadata: { courseSlug: body.courseSlug, lessonSlug: body.lessonSlug },
+          });
+        }).catch(() => {});
 
         return new Response(stream, {
           headers: {
