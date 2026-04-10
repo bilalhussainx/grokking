@@ -1,3 +1,5 @@
+import type { InterviewStructure } from '@/types/interview';
+
 // Company-specific interviewer personas grounded in Glassdoor / Levels.fyi /
 // Blind / r/cscareerquestions / interviewing.io reports.
 //
@@ -34,6 +36,7 @@ export interface CompanyPersona {
   codeFormat: CodeFormat;
   rubricWeights: RubricWeights;
   insiderNote: string;            // what real engineers say sets this company apart
+  sessionStructure: InterviewStructure;
 }
 
 // Sentinel "no specific company" persona — falls back to the generic interviewer
@@ -66,6 +69,19 @@ export const GENERIC_PERSONA: CompanyPersona = {
   codeFormat: 'coderpad',
   rubricWeights: { coding: 0.55, design: 0.25, behavioral: 0.2 },
   insiderNote: 'Default persona. Use when the user has not picked a specific company.',
+  sessionStructure: {
+    totalMinutes: 45,
+    phases: [
+      { name: 'Coding', minutes: 35, questionCount: 2, format: 'live_coding' as const, difficultyProgression: 'adaptive' as const },
+      { name: 'Behavioral', minutes: 10, questionCount: 2, format: 'discussion' as const, difficultyProgression: 'fixed' as const },
+    ],
+    interviewerBehavior: {
+      silenceThresholdSec: 30,
+      hintStyle: 'direct' as const,
+      followUpDepth: 3,
+      evaluationFocus: ['problem-solving', 'communication', 'code-quality'],
+    },
+  },
 };
 
 export const COMPANY_PERSONAS: CompanyPersona[] = [
@@ -102,6 +118,19 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'no-execution-doc',
     rubricWeights: { coding: 0.7, design: 0.15, behavioral: 0.15 },
     insiderNote: 'Hiring committee is anonymous and decides — your interviewer writes detailed notes, not a yes/no. Vague positive feedback usually means downlevel or reject. Drive the conversation.',
+    sessionStructure: {
+      totalMinutes: 45,
+      phases: [
+        { name: 'Coding', minutes: 40, questionCount: 2, format: 'live_coding' as const, difficultyProgression: 'escalating' as const },
+        { name: 'Googleyness', minutes: 5, questionCount: 1, format: 'discussion' as const, difficultyProgression: 'fixed' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 30,
+        hintStyle: 'socratic' as const,
+        followUpDepth: 5,
+        evaluationFocus: ['algorithmic-thinking', 'code-correctness', 'communication', 'edge-cases'],
+      },
+    },
   },
   {
     id: 'meta-e4',
@@ -137,6 +166,18 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'coderpad',
     rubricWeights: { coding: 0.5, design: 0.25, behavioral: 0.25 },
     insiderNote: 'Meta scores explicitly as unblocked / minor hints / major hints / could not solve. One major-hints round usually equals no hire at E4. The behavioral round is real and people fail it.',
+    sessionStructure: {
+      totalMinutes: 35,
+      phases: [
+        { name: 'Coding Round', minutes: 35, questionCount: 2, format: 'live_coding' as const, difficultyProgression: 'fixed' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 20,
+        hintStyle: 'direct' as const,
+        followUpDepth: 2,
+        evaluationFocus: ['speed', 'bug-free-code', 'testing', 'optimization'],
+      },
+    },
   },
   {
     id: 'amazon-sde2',
@@ -172,6 +213,20 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'coderpad',
     rubricWeights: { coding: 0.35, design: 0.25, behavioral: 0.4 },
     insiderNote: 'You need 2-3 STAR stories per LP. The Bar Raiser will dig 3 levels deep — "why did you choose that?" → "what was the alternative?" → "what would you do differently?". The Bar Raiser can override the hiring manager.',
+    sessionStructure: {
+      totalMinutes: 60,
+      phases: [
+        { name: 'Leadership Principle Deep-Dive', minutes: 25, questionCount: 2, format: 'star_method' as const, difficultyProgression: 'fixed' as const },
+        { name: 'Coding', minutes: 25, questionCount: 1, format: 'live_coding' as const, difficultyProgression: 'adaptive' as const },
+        { name: 'Design Discussion', minutes: 10, questionCount: 1, format: 'discussion' as const, difficultyProgression: 'fixed' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 15,
+        hintStyle: 'direct' as const,
+        followUpDepth: 3,
+        evaluationFocus: ['leadership-principles', 'measurable-impact', 'ownership', 'coding'],
+      },
+    },
   },
   {
     id: 'apple-ict3',
@@ -205,6 +260,20 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'whiteboard',
     rubricWeights: { coding: 0.3, design: 0.5, behavioral: 0.2 },
     insiderNote: 'Apple does not have a unified hiring committee. The hiring manager has enormous discretion. Two ICT3 candidates can have completely different experiences depending on the team. This persona is the general archetype — Core OS, Services, and ML teams behave very differently.',
+    sessionStructure: {
+      totalMinutes: 60,
+      phases: [
+        { name: 'Project Deep-Dive', minutes: 30, questionCount: 1, format: 'discussion' as const, difficultyProgression: 'escalating' as const },
+        { name: 'Systems Coding', minutes: 25, questionCount: 1, format: 'whiteboard' as const, difficultyProgression: 'adaptive' as const },
+        { name: 'Wrap-Up', minutes: 5, questionCount: 1, format: 'discussion' as const, difficultyProgression: 'fixed' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 30,
+        hintStyle: 'socratic' as const,
+        followUpDepth: 5,
+        evaluationFocus: ['depth-of-knowledge', 'systems-thinking', 'under-the-hood', 'production-debugging'],
+      },
+    },
   },
   {
     id: 'microsoft-sde2',
@@ -239,6 +308,19 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'coderpad',
     rubricWeights: { coding: 0.6, design: 0.2, behavioral: 0.2 },
     insiderNote: 'Microsoft genuinely grades on collaboration and how you use hints. The "AS-AP" final round with a senior leader is the real gate — doing well in 4 rounds and bombing AS-AP equals no offer.',
+    sessionStructure: {
+      totalMinutes: 45,
+      phases: [
+        { name: 'Coding', minutes: 35, questionCount: 2, format: 'live_coding' as const, difficultyProgression: 'adaptive' as const },
+        { name: 'Collaboration Chat', minutes: 10, questionCount: 2, format: 'discussion' as const, difficultyProgression: 'fixed' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 45,
+        hintStyle: 'direct' as const,
+        followUpDepth: 2,
+        evaluationFocus: ['collaboration', 'hint-utilization', 'growth-mindset', 'code-clarity'],
+      },
+    },
   },
   {
     id: 'netflix-senior',
@@ -272,6 +354,19 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'take-home',
     rubricWeights: { coding: 0.25, design: 0.35, behavioral: 0.4 },
     insiderNote: 'Netflix uses the "keeper test" — would I fight to keep this person? It starts in the interview. There is no "maybe" at Netflix. If an interviewer is lukewarm, it is a no.',
+    sessionStructure: {
+      totalMinutes: 60,
+      phases: [
+        { name: 'System Design', minutes: 30, questionCount: 1, format: 'system_design' as const, difficultyProgression: 'escalating' as const },
+        { name: 'Judgment & Culture', minutes: 30, questionCount: 3, format: 'discussion' as const, difficultyProgression: 'adaptive' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 30,
+        hintStyle: 'socratic' as const,
+        followUpDepth: 4,
+        evaluationFocus: ['independent-judgment', 'system-thinking', 'candor', 'senior-presence'],
+      },
+    },
   },
   {
     id: 'stripe-l2',
@@ -306,6 +401,19 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'coderpad',
     rubricWeights: { coding: 0.5, design: 0.25, behavioral: 0.25 },
     insiderNote: 'Stripe famously does a "bug squash" round — real codebase, planted bugs, you read and fix. People who only practiced LeetCode fail this. They watch HOW you use docs.',
+    sessionStructure: {
+      totalMinutes: 45,
+      phases: [
+        { name: 'API Integration', minutes: 35, questionCount: 1, format: 'live_coding' as const, difficultyProgression: 'escalating' as const },
+        { name: 'Error Handling Discussion', minutes: 10, questionCount: 2, format: 'discussion' as const, difficultyProgression: 'fixed' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 45,
+        hintStyle: 'coded' as const,
+        followUpDepth: 3,
+        evaluationFocus: ['correctness-first', 'error-handling', 'reading-specs', 'testing'],
+      },
+    },
   },
   {
     id: 'anthropic-mts',
@@ -340,6 +448,20 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'take-home',
     rubricWeights: { coding: 0.4, design: 0.25, behavioral: 0.2, domain: 0.15 },
     insiderNote: 'The values interview is real and weighty. Anthropic has rejected strong engineers for not engaging seriously with safety questions. Read the Constitutional AI paper, the Responsible Scaling Policy, and recent interpretability work before interviewing.',
+    sessionStructure: {
+      totalMinutes: 60,
+      phases: [
+        { name: 'Values & Motivation', minutes: 15, questionCount: 2, format: 'discussion' as const, difficultyProgression: 'fixed' as const },
+        { name: 'Practical Coding', minutes: 30, questionCount: 1, format: 'live_coding' as const, difficultyProgression: 'adaptive' as const },
+        { name: 'Paper/Domain Discussion', minutes: 15, questionCount: 2, format: 'discussion' as const, difficultyProgression: 'escalating' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 30,
+        hintStyle: 'socratic' as const,
+        followUpDepth: 4,
+        evaluationFocus: ['safety-understanding', 'practical-python', 'research-engagement', 'values-alignment'],
+      },
+    },
   },
   {
     id: 'openai-swe',
@@ -374,6 +496,19 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'coderpad',
     rubricWeights: { coding: 0.5, design: 0.25, behavioral: 0.1, domain: 0.15 },
     insiderNote: 'OpenAI cares more about shipping velocity than mission-rigor compared to Anthropic. They want builders who go from idea to deployed in days, not weeks.',
+    sessionStructure: {
+      totalMinutes: 45,
+      phases: [
+        { name: 'Build Something', minutes: 40, questionCount: 1, format: 'live_coding' as const, difficultyProgression: 'escalating' as const },
+        { name: 'Ship Discussion', minutes: 5, questionCount: 1, format: 'discussion' as const, difficultyProgression: 'fixed' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 15,
+        hintStyle: 'direct' as const,
+        followUpDepth: 2,
+        evaluationFocus: ['shipping-velocity', 'pragmatism', 'end-to-end-thinking', 'opinions'],
+      },
+    },
   },
   {
     id: 'nvidia-swe',
@@ -408,6 +543,19 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'coderpad',
     rubricWeights: { coding: 0.6, design: 0.25, behavioral: 0.15 },
     insiderNote: 'Nvidia loops are highly team-specific — CUDA, DriveOS, and DLSS teams look very different. The behavioral component is light. This is a "can you do the work" company.',
+    sessionStructure: {
+      totalMinutes: 45,
+      phases: [
+        { name: 'Systems Coding', minutes: 35, questionCount: 2, format: 'live_coding' as const, difficultyProgression: 'escalating' as const },
+        { name: 'Hardware Discussion', minutes: 10, questionCount: 2, format: 'discussion' as const, difficultyProgression: 'fixed' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 30,
+        hintStyle: 'socratic' as const,
+        followUpDepth: 4,
+        evaluationFocus: ['hardware-awareness', 'performance-reasoning', 'memory-layout', 'parallelism'],
+      },
+    },
   },
   {
     id: 'databricks-swe',
@@ -440,6 +588,19 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'coderpad',
     rubricWeights: { coding: 0.4, design: 0.35, behavioral: 0.1, domain: 0.15 },
     insiderNote: 'Many candidates report Databricks as harder than Google. Practice distributed systems design specifically — designing a job scheduler or distributed file format is more typical than designing TinyURL.',
+    sessionStructure: {
+      totalMinutes: 50,
+      phases: [
+        { name: 'Coding', minutes: 30, questionCount: 2, format: 'live_coding' as const, difficultyProgression: 'escalating' as const },
+        { name: 'Distributed Systems Design', minutes: 20, questionCount: 1, format: 'system_design' as const, difficultyProgression: 'escalating' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 20,
+        hintStyle: 'socratic' as const,
+        followUpDepth: 3,
+        evaluationFocus: ['distributed-systems', 'scalability', 'data-flow', 'bottleneck-analysis'],
+      },
+    },
   },
   {
     id: 'airbnb-swe',
@@ -473,6 +634,19 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'coderpad',
     rubricWeights: { coding: 0.35, design: 0.25, behavioral: 0.25, domain: 0.15 },
     insiderNote: 'Airbnb has a dedicated Core Values interview run by someone outside the hiring team. Treat it like Amazon LP prep — have stories ready about Champion the Mission and Be a Host.',
+    sessionStructure: {
+      totalMinutes: 45,
+      phases: [
+        { name: 'Iterative Build', minutes: 35, questionCount: 1, format: 'live_coding' as const, difficultyProgression: 'escalating' as const },
+        { name: 'Core Values', minutes: 10, questionCount: 2, format: 'star_method' as const, difficultyProgression: 'fixed' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 30,
+        hintStyle: 'direct' as const,
+        followUpDepth: 3,
+        evaluationFocus: ['code-quality', 'refactoring', 'naming', 'iterative-improvement'],
+      },
+    },
   },
   {
     id: 'uber-sde2',
@@ -505,6 +679,19 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'coderpad',
     rubricWeights: { coding: 0.4, design: 0.3, behavioral: 0.2, domain: 0.1 },
     insiderNote: 'Expect at least one "design a real Uber-like system" round. Uber specifically wants to see you reason about geo-indexing, eventual consistency, and high-throughput updates.',
+    sessionStructure: {
+      totalMinutes: 45,
+      phases: [
+        { name: 'Coding', minutes: 25, questionCount: 1, format: 'live_coding' as const, difficultyProgression: 'adaptive' as const },
+        { name: 'System Design', minutes: 20, questionCount: 1, format: 'system_design' as const, difficultyProgression: 'escalating' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 25,
+        hintStyle: 'direct' as const,
+        followUpDepth: 3,
+        evaluationFocus: ['geo-awareness', 'operational-thinking', 'pragmatism', 'concurrency'],
+      },
+    },
   },
   {
     id: 'linkedin-swe',
@@ -537,6 +724,20 @@ export const COMPANY_PERSONAS: CompanyPersona[] = [
     codeFormat: 'coderpad',
     rubricWeights: { coding: 0.5, design: 0.25, behavioral: 0.15, domain: 0.1 },
     insiderNote: 'LinkedIn has a clear rubric and trained interviewers. The host manager round is a real signal — they want to know if they personally would manage you happily.',
+    sessionStructure: {
+      totalMinutes: 50,
+      phases: [
+        { name: 'Coding', minutes: 30, questionCount: 2, format: 'live_coding' as const, difficultyProgression: 'adaptive' as const },
+        { name: 'System Design', minutes: 15, questionCount: 1, format: 'system_design' as const, difficultyProgression: 'fixed' as const },
+        { name: 'Host Manager Chat', minutes: 5, questionCount: 1, format: 'discussion' as const, difficultyProgression: 'fixed' as const },
+      ],
+      interviewerBehavior: {
+        silenceThresholdSec: 30,
+        hintStyle: 'direct' as const,
+        followUpDepth: 3,
+        evaluationFocus: ['structured-approach', 'scalability', 'collaboration', 'code-clarity'],
+      },
+    },
   },
 ];
 
