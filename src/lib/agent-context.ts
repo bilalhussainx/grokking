@@ -125,7 +125,8 @@ async function getIdentity(userId: string): Promise<AgentContext["identity"]> {
     admin
       .from("xp_transactions")
       .select("xp_amount")
-      .eq("user_id", userId),
+      .eq("user_id", userId)
+      .limit(500),
   ]);
 
   const profile = profileResult.data;

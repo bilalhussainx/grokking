@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   // Simple API key protection for cron jobs
   const authHeader = req.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET || "";
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -107,10 +107,17 @@ export async function POST(req: NextRequest) {
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + expiresInDays);
 
+        // Delete any existing cache entry for this domain+entity+url before inserting
+        await admin
+          .from("knowledge_cache")
+          .delete()
+          .eq("domain", domain)
+          .eq("entity", entity.toLowerCase())
+          .eq("source_url", result.url);
+
         const { error: insertErr } = await admin
           .from("knowledge_cache")
-          .upsert(
-            {
+          .insert({
               domain,
               entity: entity.toLowerCase(),
               content,
@@ -119,9 +126,7 @@ export async function POST(req: NextRequest) {
               indexed_at: new Date().toISOString(),
               expires_at: expiresAt.toISOString(),
               metadata: { title: result.title, score: result.score },
-            },
-            { onConflict: "id" }
-          );
+            });
 
         if (!insertErr) inserted++;
       }

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-auth";
 import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
-import { storeMemory, searchMemories, extractTopics } from "@/lib/memory";
+// Legacy memory imports preserved for backward compatibility — dual-write bridge active
+// import { storeMemory, searchMemories, extractTopics } from "@/lib/memory";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
