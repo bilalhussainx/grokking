@@ -42,6 +42,7 @@ interface TextInterviewBody {
   interviewType?: string;
   conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }>;
   isGreeting?: boolean;             // if true, agent generates first message
+  sessionId?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -66,7 +67,17 @@ export async function POST(req: NextRequest) {
     interviewType = "technical",
     conversationHistory = [],
     isGreeting = false,
+    sessionId,
   } = body;
+
+  // Load session if provided
+  let session = null;
+  if (sessionId && user) {
+    try {
+      const { getSession } = await import("@/lib/interview-session");
+      session = await getSession(sessionId, user.id);
+    } catch {}
+  }
 
   // Build the system prompt using the same builders the voice path uses
   let systemPrompt = "";
@@ -90,6 +101,23 @@ export async function POST(req: NextRequest) {
 
   if (!systemPrompt) {
     systemPrompt = `You are conducting a ${interviewType} interview. Ask one question at a time and adapt to the candidate's answers. Keep responses to 2-4 sentences — this is a text chat, not a lecture.`;
+  }
+
+  // Agent context for memory-aware interviews
+  let agentContextStr = "";
+  if (user) {
+    try {
+      const { buildAgentContext } = await import("@/lib/agent-context");
+      const ctx = await buildAgentContext(user.id, "interviewer", `interview ${companyPersonaId || ""}`, {
+        companyId: companyPersonaId,
+      });
+      agentContextStr = `\n${ctx.promptContext}\n`;
+    } catch {}
+  }
+
+  // Inject agent context before text mode rules
+  if (agentContextStr) {
+    systemPrompt += agentContextStr;
   }
 
   // Append the question plan if provided
@@ -158,6 +186,14 @@ export async function POST(req: NextRequest) {
 
     const llmData = await llmRes.json();
     const reply: string = llmData.choices?.[0]?.message?.content?.trim() || "";
+
+    // Record turn in session (fire-and-forget)
+    if (session && sessionId && user) {
+      const lastUserMsg = conversationHistory[conversationHistory.length - 1]?.content || "";
+      import("@/lib/interview-session").then(({ recordTurn }) => {
+        recordTurn(sessionId, lastUserMsg, reply).catch(() => {});
+      }).catch(() => {});
+    }
 
     if (!reply) {
       return NextResponse.json(
