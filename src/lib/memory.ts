@@ -2,6 +2,7 @@
 // Uses Gemini text-embedding-004 for embeddings and Supabase pgvector for storage
 
 import { createAdminSupabase } from "@/lib/supabase-auth";
+import { storeAgentMemory } from "@/lib/agent-memory-store";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 
@@ -87,6 +88,18 @@ export async function storeMemory(
     console.error("[Memory] Store error:", error);
     return null;
   }
+
+  // Dual-write to new agent_memories table (non-blocking)
+  storeAgentMemory(userId, "coach", content, {
+    role: opts.role,
+    summary: opts.summary,
+    metadata: {
+      courseSlug: opts.courseSlug || null,
+      lessonSlug: opts.lessonSlug || null,
+      topics: opts.topics || [],
+      source: "legacy_bridge",
+    },
+  }).catch(() => {});
 
   return data;
 }
