@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
       category = "tech",
       collegePersonaId,
       feedbackLanguage = "en",
+      sessionId,
     }: {
       transcript: TranscriptEntry[];
       questionPlan: InterviewPlan;
@@ -100,6 +101,7 @@ export async function POST(req: NextRequest) {
       category?: 'tech' | 'college';
       collegePersonaId?: string;
       feedbackLanguage?: string;
+      sessionId?: string;
     } = body;
 
     if (!transcript || !questionPlan) {
@@ -251,6 +253,37 @@ Score the candidate's performance and return the JSON scorecard now.`;
         { error: "Failed to parse scorecard from AI response" },
         { status: 500 }
       );
+    }
+
+    // Persist to interview_performance and write facts to knowledge graph
+    if (user && sessionId) {
+      import("@/lib/interview-session").then(({ endSession }) => {
+        endSession(sessionId, user.id, scorecard).catch((err: unknown) => {
+          console.warn("[Interview Score] Failed to persist session:", err);
+        });
+      }).catch(() => {});
+    } else if (user) {
+      // No session — still write performance facts to knowledge graph
+      import("@/lib/knowledge-graph").then(({ upsertFact }) => {
+        for (const improvement of (scorecard.improvements || []).slice(0, 3)) {
+          upsertFact(user.id, {
+            subject: user.id,
+            predicate: "weak_at",
+            object: improvement.slice(0, 100),
+            confidence: 0.6,
+            sourceAgent: "interviewer",
+          }).catch(() => {});
+        }
+        for (const strength of (scorecard.strengths || []).slice(0, 3)) {
+          upsertFact(user.id, {
+            subject: user.id,
+            predicate: "strong_at",
+            object: strength.slice(0, 100),
+            confidence: 0.6,
+            sourceAgent: "interviewer",
+          }).catch(() => {});
+        }
+      }).catch(() => {});
     }
 
     // College vertical: translate the scorecard text fields if requested
