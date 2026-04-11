@@ -5,19 +5,19 @@
 export type DiplomaCategory = "coding-course" | "tech-interview";
 
 export interface MockInterviewRow {
-  problemSlug: string;
+  problem_slug: string;
   score: number;
-  createdAt: string;
+  created_at: string;
 }
 
 export interface CourseCompletionRow {
-  courseId: string;
-  completedAt: string;
+  ref_id: string;      // courseId
+  created_at: string;
 }
 
 export interface DiplomaCriteriaContext {
   userId: string;
-  mockInterviews: MockInterviewRow[];
+  mocks: MockInterviewRow[];
   courseCompletions: CourseCompletionRow[];
 }
 
@@ -30,9 +30,8 @@ export interface EligibilityResult {
 export interface DiplomaDefinition {
   id: string;                 // stable kebab-case, lives forever once shipped
   title: string;
-  category: DiplomaCategory;
   description: string;
-  imageUrl: string;           // /credentials/diplomas/<id>.svg
-  rubricSummary: string;
+  category: DiplomaCategory;
+  imagePath: string;          // /credentials/diplomas/<id>.svg
   evaluate: (ctx: DiplomaCriteriaContext) => EligibilityResult;
 }
