@@ -96,8 +96,12 @@ export interface InterviewProblem {
   description: string;
   constraints: string | null;
   examples: Array<{ input: string; output: string; explanation?: string }>;
+  functionName: string | null;
   starterCodePython: string | null;
   starterCodeJava: string | null;
+  starterCodeJs: string | null;
+  solutionCodePython: string | null;
+  solutionCodeJava: string | null;
   topics: string[];
   companyTags: string[];
   pattern: string | null;
