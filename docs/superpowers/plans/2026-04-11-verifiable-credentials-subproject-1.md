@@ -2009,22 +2009,40 @@ git commit -m "feat(credentials): /credentials page with eligibility grid + Priv
 
 **Files:** none — this is a manual verification gate.
 
-- [ ] **Step 1: Seed eligible data for a test user**
+- [x] **Step 1: Seed eligible data for a test user**
 
-Pick a Pro test user. In Supabase SQL editor (or via psql):
+> **Note (2026-04-11 smoke test):** the original SQL below referenced an
+> `interview_session_results` table that does not exist. The real schema
+> reads from `interview_performance` joined with `interview_sessions`
+> (see `src/lib/credential-eligibility.ts`). For the smoke test we took
+> the simpler path and seeded a course-completion diploma instead:
+>
+> ```bash
+> # CREDENTIALS_PRO_ALLOWLIST in .env.local must be the user's UUID (not email)
+> node --env-file=.env.local scripts/credentials-seed-test-data.mjs
+> ```
+>
+> That inserts a `course_complete` row into `xp_transactions` for
+> `python-fundamentals`, making the user eligible for the
+> **Python Fundamentals** diploma. This is sufficient to exercise the
+> full mint pipeline end-to-end.
+
+Original (stale — kept for reference): pick a Pro test user, in Supabase SQL editor (or via psql):
 
 ```sql
 -- Replace <TEST_USER_ID> with the real uuid
+-- NOTE: `interview_session_results` does not exist; this SQL is historical.
+-- Use the seed script above instead, or write equivalent inserts into
+-- `interview_sessions` + `interview_performance` if you need mock-interview
+-- diplomas like `google-swe-mock-mastery`.
 INSERT INTO interview_session_results (user_id, problem_slug, score, created_at)
 SELECT '<TEST_USER_ID>', 'google-arrays-' || g, 85, now() - (g || ' days')::interval
 FROM generate_series(1, 10) g;
 ```
 
-This makes them eligible for `google-swe-mock-mastery` (10 google mocks, avg 85 ≥ 80).
+- [x] **Step 2: Sign in as the test user, visit /credentials**
 
-- [ ] **Step 2: Sign in as the test user, visit /credentials**
-
-Expected: the `google-swe-mock-mastery` card shows the Mint button. All others show ineligibility reasons.
+Expected: the eligible diploma card shows the Mint button. All others show ineligibility reasons.
 
 - [ ] **Step 3: Click "Connect" → Privy modal → email/Google sign-in**
 

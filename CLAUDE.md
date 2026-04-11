@@ -698,3 +698,34 @@ npx supabase gen types typescript --local > src/lib/database.types.ts
 11. **RUN 2+ TAVILY SEARCHES per concept** — all content must be research-backed
 12. **Health courses MUST include medical disclaimer** — "educational, not medical advice"
 13. **Use Gemini embeddings** for recommendation matching — never hardcode suggestions
+
+---
+
+## Verifiable Credentials (Sub-project 1 — 2026-04-11)
+
+Testnet acceptance achieved 2026-04-11.
+
+- **Chain:** Base Sepolia
+- **Registry contract:** `0xdAA100EE3CbaAF192183B74Eb5B9A42CbEEabE5D`
+  (ERC-5192 soulbound, symbol `KLVC`, name "KairosLearn")
+- **Issuer wallet:** `0xAd7ebF20d3CfDa2deF8230Ca9F32B11d2bC4DC4A`
+  (private key in `.env.local` as `ISSUER_PRIVATE_KEY`, **testnet only** — cold wallet deferred to SP2)
+- **First successful mint:** `python-fundamentals` → tokenId 2
+  - Tx: https://sepolia.basescan.org/tx/0xbd6077427fdee8bc92b095eae8b3ae03318c0fb875d46aadd23cba61fb4a8968
+  - Recipient: `0x6c1495c268B83CD78c02184f0197Ad187B176304` (Privy embedded wallet bound to user `9655631c-3bbd-4ee2-82d5-6b2ba805b9c4`)
+  - IPFS metadata: `ipfs://QmeFcoLGcpm6d5deVE6Sp95xFXQsJbm1Pkfa8ZAAndJ5kY`
+    (verified via public gateway — name/image/category/evidence all match catalog + seed source row)
+- **Client flow:** Privy login → embedded wallet → `POST /api/credentials/wallet` (upsert `user_wallets`) → `/credentials` eligibility grid → `POST /api/credentials/mint` → viem `writeContract` → Pinata pin → `issued_credentials` marked `minted`.
+- **Pro gating (`src/lib/credentials-pro-gate.ts`):**
+  1. **Primary (prod):** reads `user_subscriptions` — passes if `status IN ('active','trialing')` and `plan='pro'`. This is the same Paddle-backed table used by the 2026-03-26 billing integration, so any Pro subscriber automatically gets credentials access with **zero manual configuration**.
+  2. **Override (`CREDENTIALS_PRO_ALLOWLIST` env var):** comma-separated Supabase user UUIDs (**NOT emails**). Checked *before* the subscription lookup. **This is a dev/testnet escape hatch**, not a prod gating mechanism — it lets maintainers grant themselves access without a real Paddle subscription. Do NOT use it as a general "grant Pro access to user X" tool on prod; that belongs in `user_subscriptions` via the billing flow. Safe to leave unset on Vercel (or set only to maintainer UUIDs for internal testing).
+- **Eligibility source of truth:** `src/lib/credential-eligibility.ts` reads `interview_performance ⨝ interview_sessions` (NOT the non-existent `interview_session_results` referenced in the original plan) and `xp_transactions` where `action='course_complete'`.
+- **Known gotchas discovered during SP1 smoke test:**
+  1. `@pinata/sdk` v2 default export is a **class** — must be `new PinataCtor({ pinataJWTKey })`, not called as a function. Symptom: "Cannot call a class as a function" 500 on mint. Fixed in `src/lib/credential-ipfs.ts`.
+  2. `DiplomaMinted` event ABI order in viem must match the Solidity contract: `(address to, uint256 tokenId, string diplomaId, string uri)`. Any reordering changes topic0 and `decodeEventLog` silently fails. Symptom: tx succeeds on-chain but DB row stays `failed` with "DiplomaMinted event not found in receipt". Fixed in `src/lib/credential-issuer.ts`.
+  3. `useCredentialWallet` needed a `useRef` dedupe keyed on `(privyDid, walletAddress)` to survive React 18 Strict Mode's double-invoke cleanup, otherwise the UI gets permanently stuck on "Linking…" even after the POST succeeds. Fixed in `src/hooks/useCredentialWallet.ts`.
+  4. Plan doc `docs/superpowers/plans/2026-04-11-verifiable-credentials-subproject-1.md:2016` referenced `interview_session_results` which does not exist. Now flagged inline in the plan; the seed script `scripts/credentials-seed-test-data.mjs` is the working path.
+  5. Turbopack + a stray `C:\Users\bilal\package.json` at the user's home dir caused tailwind resolution failures ("Can't resolve 'tailwindcss' in 'C:\\Users\\bilal\\Downloads'") because Turbopack walked up past the project root. Renamed the offending parent `package.json` to `.bak` as a workaround. Consider pinning `turbopack.root` more aggressively in `next.config.ts` or setting `outputFileTracingRoot` if this recurs.
+  6. Privy Google OAuth "Access blocked" on localhost — unrelated to the credentials flow. Fallback: use email OTP in the Privy modal. Fix requires adding `http://localhost:3000` to Authorized JavaScript origins on the Privy-configured Google OAuth client in Google Cloud Console.
+- **Deferred to Sub-project 2:** public `/verify/[tokenId]` page (verifier UX), cold issuer wallet, external_url wiring.
+- **Deferred to Sub-project 3:** batch Merkle publishing, multi-credential types, catalog beyond coding/tech-interview.
