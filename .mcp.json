@@ -1,5 +1,14 @@
 {
   "mcpServers": {
+    "samsara": {
+      "command": "node",
+      "args": ["./mcp-samsara/dist/index.js"],
+      "env": {
+        "MOONSHOT_API_KEY": "${MOONSHOT_API_KEY}",
+        "GEMINI_API_KEY": "${GEMINI_API_KEY}"
+      },
+      "autoStart": false
+    },
     "mempalace": {
       "command": "python",
       "args": ["-m", "mempalace.mcp_server"],
