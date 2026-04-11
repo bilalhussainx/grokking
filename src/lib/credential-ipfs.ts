@@ -28,20 +28,23 @@ function normalizeGatewayHost(raw: string | undefined): string {
   return host || fallback;
 }
 
-function getPinataClient() {
+type PinataClient = {
+  pinJSONToIPFS: (
+    body: unknown,
+    options?: { pinataMetadata?: { name?: string } },
+  ) => Promise<{ IpfsHash: string; PinSize: number; Timestamp: string }>;
+};
+
+function getPinataClient(): PinataClient {
   const jwt = process.env.PINATA_JWT;
   if (!jwt) {
     throw new Error("PINATA_JWT missing");
   }
-  // @pinata/sdk v2 supports JWT via pinataJWTKey
-  return (pinataSDK as unknown as {
-    (opts: { pinataJWTKey: string }): {
-      pinJSONToIPFS: (
-        body: unknown,
-        options?: { pinataMetadata?: { name?: string } },
-      ) => Promise<{ IpfsHash: string; PinSize: number; Timestamp: string }>;
-    };
-  })({ pinataJWTKey: jwt });
+  // @pinata/sdk v2 exports a class; must be instantiated with `new`.
+  const PinataCtor = pinataSDK as unknown as new (opts: {
+    pinataJWTKey: string;
+  }) => PinataClient;
+  return new PinataCtor({ pinataJWTKey: jwt });
 }
 
 export async function pinJson(

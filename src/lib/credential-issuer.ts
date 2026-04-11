@@ -34,8 +34,8 @@ export const SBT_REGISTRY_ABI = [
     type: "event",
     name: "DiplomaMinted",
     inputs: [
-      { name: "tokenId", type: "uint256", indexed: true },
       { name: "to", type: "address", indexed: true },
+      { name: "tokenId", type: "uint256", indexed: true },
       { name: "diplomaId", type: "string", indexed: false },
       { name: "uri", type: "string", indexed: false },
     ],

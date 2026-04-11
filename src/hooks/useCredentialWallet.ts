@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 
 export interface CredentialWalletState {
@@ -31,6 +31,7 @@ export function useCredentialWallet(): CredentialWalletState {
   const [linkedToSupabase, setLinkedToSupabase] = useState(false);
   const [linking, setLinking] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
+  const linkAttemptKey = useRef<string | null>(null);
 
   // Privy creates an embedded wallet on login for users without a wallet.
   const embedded = wallets.find((w) => w.walletClientType === "privy");
@@ -39,9 +40,14 @@ export function useCredentialWallet(): CredentialWalletState {
 
   useEffect(() => {
     if (!ready || !authenticated || !walletAddress || !privyDid) return;
-    if (linkedToSupabase || linking) return;
+    if (linkedToSupabase) return;
 
-    let cancelled = false;
+    // Dedupe across React 18 Strict Mode's double-invoke by keying on the
+    // (privyDid, walletAddress) pair. The POST is an idempotent upsert anyway.
+    const key = `${privyDid}:${walletAddress}`;
+    if (linkAttemptKey.current === key) return;
+    linkAttemptKey.current = key;
+
     setLinking(true);
     setLinkError(null);
 
@@ -56,20 +62,15 @@ export function useCredentialWallet(): CredentialWalletState {
           const body = await resp.json().catch(() => ({}));
           throw new Error(body.error ?? `HTTP ${resp.status}`);
         }
-        if (!cancelled) setLinkedToSupabase(true);
+        setLinkedToSupabase(true);
       } catch (err) {
-        if (!cancelled) {
-          setLinkError(err instanceof Error ? err.message : String(err));
-        }
+        setLinkError(err instanceof Error ? err.message : String(err));
+        linkAttemptKey.current = null;
       } finally {
-        if (!cancelled) setLinking(false);
+        setLinking(false);
       }
     })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [ready, authenticated, walletAddress, privyDid, linkedToSupabase, linking]);
+  }, [ready, authenticated, walletAddress, privyDid, linkedToSupabase]);
 
   return {
     ready,
