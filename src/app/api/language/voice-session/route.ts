@@ -219,9 +219,25 @@ APPROACH:
     const level = proficiencyLevel as ProficiencyLevel;
     const greeting = persona.greeting(level, userName);
 
+    // Pull the persistent language profile (sub-project 4) — vocab due for review,
+    // grammar errors, assessed level. Falls through silently if unavailable.
+    let languageProfileBlock = "";
+    if (user) {
+      try {
+        const { ensureProfile, formatProfileForPrompt } = await import("@/lib/language-profile");
+        const profile = await ensureProfile(user.id, language, proficiencyLevel as "A1" | "A2" | "B1" | "B2" | "C1" | "C2");
+        if (profile) {
+          languageProfileBlock = "\n\n" + formatProfileForPrompt(profile, languageName);
+        }
+      } catch (err) {
+        console.warn("[voice-session] language profile load failed:", err);
+      }
+    }
+
     // Combine system prompt with mode-specific additions
     const fullSystemPrompt = agentContext.systemPromptContext
       + (modePromptAddition ? '\n' + modePromptAddition : '')
+      + languageProfileBlock
       + `\n\nIMPORTANT: Start the conversation with this greeting: "${greeting}". Say it naturally as your first response when the user connects.`
       + `\n\nSPEECH RECOGNITION NOTE: The student is a language learner. Their speech may be transcribed imperfectly — accented ${languageName} words may appear as English phonetic approximations. Be generous in interpreting what they say. Never say "I didn't understand" — always try to work with what they said.`
       + `\n\nCRITICAL LATENCY RULE: Keep ALL responses to 1-2 sentences MAX. This is voice — short is better. Never give a paragraph. One thought per response, then wait for the student.`;

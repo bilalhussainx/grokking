@@ -45,15 +45,28 @@ export interface VoiceAgentHook {
 export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
   const [currentConfig, setCurrentConfig] = useState<VoiceAgentConfig | null>(null);
   const callbacksRef = useRef(callbacks);
+  // Transcript buffer for sub-project 4 session analysis (language tutor only)
+  const transcriptRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
+  const sessionLanguageRef = useRef<string | null>(null);
 
   useEffect(() => {
     callbacksRef.current = callbacks;
   }, [callbacks]);
 
+  const handleUserMessage = useCallback((text: string) => {
+    if (text?.trim()) transcriptRef.current.push({ role: "user", content: text });
+    callbacksRef.current?.onUserMessage?.(text);
+  }, []);
+
+  const handleAgentMessage = useCallback((text: string) => {
+    if (text?.trim()) transcriptRef.current.push({ role: "assistant", content: text });
+    callbacksRef.current?.onAgentMessage?.(text);
+  }, []);
+
   // Deepgram agent for Latin/CJK languages
   const deepgramAgent = useDeepgramAgent({
-    onUserMessage: callbacks?.onUserMessage,
-    onAgentMessage: callbacks?.onAgentMessage,
+    onUserMessage: handleUserMessage,
+    onAgentMessage: handleAgentMessage,
     onConnect: callbacks?.onConnect,
     onDisconnect: callbacks?.onDisconnect,
     onError: callbacks?.onError,
@@ -62,8 +75,8 @@ export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
 
   // Orchestrated agent for Indic languages
   const orchestratedAgent = useOrchestratedVoiceAgent({
-    onUserMessage: callbacks?.onUserMessage,
-    onAgentMessage: callbacks?.onAgentMessage,
+    onUserMessage: handleUserMessage,
+    onAgentMessage: handleAgentMessage,
     onConnect: callbacks?.onConnect,
     onDisconnect: callbacks?.onDisconnect,
     onError: callbacks?.onError,
@@ -79,6 +92,8 @@ export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
     deepgramAgent.stop();
     orchestratedAgent.stop();
     setCurrentConfig(config);
+    transcriptRef.current = [];
+    sessionLanguageRef.current = config.mode === 'interviewer' ? null : config.language;
 
     // Determine the effective mode for downstream calls.
     // 'interviewer' triggers interview prompt builders in the API routes.
@@ -124,6 +139,20 @@ export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
     deepgramAgent.stop();
     orchestratedAgent.stop();
     setCurrentConfig(null);
+
+    // Sub-project 4: fire-and-forget post-session analysis for language tutor.
+    // Skipped for interviewer mode (which has its own scoring pipeline).
+    const lang = sessionLanguageRef.current;
+    const transcript = transcriptRef.current;
+    sessionLanguageRef.current = null;
+    transcriptRef.current = [];
+    if (lang && transcript.length >= 2) {
+      fetch("/api/language/analyze-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ language: lang, transcript }),
+      }).catch(() => {});
+    }
   }, [deepgramAgent, orchestratedAgent]);
 
   const toggleMic = useCallback(() => {

@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { getLanguagePersona, getDefaultPersona, type ProficiencyLevel } from "@/lib/language-personas";
+import { createServerSupabase } from "@/lib/supabase-auth";
 
 const SARVAM_API_KEY = process.env.SARVAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
@@ -254,6 +255,22 @@ VOICE CONVERSATION RULES:
           }
         } else {
           // ── Language learning mode (existing behavior) ──
+          // Sub-project 4: inject persistent language profile (vocab due, errors, level)
+          let languageProfileBlock = "";
+          try {
+            const supabase = await createServerSupabase();
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+              const { ensureProfile, formatProfileForPrompt } = await import("@/lib/language-profile");
+              const profile = await ensureProfile(user.id, language, level as "A1" | "A2" | "B1" | "B2" | "C1" | "C2");
+              if (profile) {
+                languageProfileBlock = "\n\n" + formatProfileForPrompt(profile, persona.languageName || language);
+              }
+            }
+          } catch (err) {
+            console.warn("[SarvamStream] language profile load failed:", err);
+          }
+
           systemPrompt = `${persona.systemPrompt}
 
 ADAPTIVE RULES for ${level} student:
@@ -266,7 +283,7 @@ VOICE CONVERSATION RULES:
 - Keep responses to 1 SHORT sentence. Maximum 2 sentences.
 - ${scriptGuide[language] || 'Respond naturally in the target language mixed with English.'}
 - This goes through TTS. Write exactly how it should be spoken aloud.
-- No markdown, no asterisks, no emojis, no parenthetical notes.`;
+- No markdown, no asterisks, no emojis, no parenthetical notes.${languageProfileBlock}`;
         }
 
         if (lessonContext) {
