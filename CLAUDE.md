@@ -716,7 +716,9 @@ Testnet acceptance achieved 2026-04-11.
   - IPFS metadata: `ipfs://QmeFcoLGcpm6d5deVE6Sp95xFXQsJbm1Pkfa8ZAAndJ5kY`
     (verified via public gateway — name/image/category/evidence all match catalog + seed source row)
 - **Client flow:** Privy login → embedded wallet → `POST /api/credentials/wallet` (upsert `user_wallets`) → `/credentials` eligibility grid → `POST /api/credentials/mint` → viem `writeContract` → Pinata pin → `issued_credentials` marked `minted`.
-- **Pro gating:** `CREDENTIALS_PRO_ALLOWLIST` in `.env.local` takes comma-separated Supabase user UUIDs (**NOT emails**). Enforced in `src/lib/credentials-pro-gate.ts`.
+- **Pro gating (`src/lib/credentials-pro-gate.ts`):**
+  1. **Primary (prod):** reads `user_subscriptions` — passes if `status IN ('active','trialing')` and `plan='pro'`. This is the same Paddle-backed table used by the 2026-03-26 billing integration, so any Pro subscriber automatically gets credentials access with **zero manual configuration**.
+  2. **Override (`CREDENTIALS_PRO_ALLOWLIST` env var):** comma-separated Supabase user UUIDs (**NOT emails**). Checked *before* the subscription lookup. **This is a dev/testnet escape hatch**, not a prod gating mechanism — it lets maintainers grant themselves access without a real Paddle subscription. Do NOT use it as a general "grant Pro access to user X" tool on prod; that belongs in `user_subscriptions` via the billing flow. Safe to leave unset on Vercel (or set only to maintainer UUIDs for internal testing).
 - **Eligibility source of truth:** `src/lib/credential-eligibility.ts` reads `interview_performance ⨝ interview_sessions` (NOT the non-existent `interview_session_results` referenced in the original plan) and `xp_transactions` where `action='course_complete'`.
 - **Known gotchas discovered during SP1 smoke test:**
   1. `@pinata/sdk` v2 default export is a **class** — must be `new PinataCtor({ pinataJWTKey })`, not called as a function. Symptom: "Cannot call a class as a function" 500 on mint. Fixed in `src/lib/credential-ipfs.ts`.
