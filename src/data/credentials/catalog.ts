@@ -59,7 +59,7 @@ function evalCourse(
   return {
     eligible,
     reason: eligible
-      ? `Completed ${courseTitle} on ${completion!.created_at.slice(0, 10)}`
+      ? `Completed ${courseTitle} (${courseId}) on ${completion!.created_at.slice(0, 10)}`
       : `Complete the ${courseTitle} course to unlock (no completion row found for ${courseId})`,
     evidence: {
       courseId,
