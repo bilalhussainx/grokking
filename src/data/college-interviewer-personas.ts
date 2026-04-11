@@ -437,3 +437,68 @@ export function getCollegePersona(id: string): CollegePersona | null {
 export function getAllCollegePersonas(): CollegePersona[] {
   return COLLEGE_PERSONAS;
 }
+
+// ─── Adaptive session arc ────────────────────────────────────────────────────
+// 4-session progression for university admissions coaching. The session number
+// is tracked in the user's knowledge graph (predicate: "college_session_count")
+// and bumped after each completed session. The persona's behavior shifts to
+// match where the candidate is in their prep journey.
+
+export interface SessionStructure {
+  sessionNumber: number;
+  label: string;
+  focus: string;
+  behaviorRules: string[];
+}
+
+export const COLLEGE_SESSION_STRUCTURES: SessionStructure[] = [
+  {
+    sessionNumber: 1,
+    label: "Assess Narrative",
+    focus: "Get to know the candidate. Identify their core story, motivations, and gaps.",
+    behaviorRules: [
+      "Start broad — let the candidate define what matters to them",
+      "Listen for the through-line in their activities and interests",
+      "Note any rehearsed answers and gently probe past them",
+      "End by summarizing the narrative you heard back to them and asking if it feels accurate",
+    ],
+  },
+  {
+    sessionNumber: 2,
+    label: "Weak Areas",
+    focus: "Drill into the specific gaps surfaced in Session 1. Push hard where they were vague.",
+    behaviorRules: [
+      "Reference what they said in the previous session — they should feel remembered",
+      "Pick 2-3 weak spots from the knowledge-graph facts and dig in",
+      "Be more direct than Session 1 — they trust you now",
+      "Give one concrete piece of feedback before ending",
+    ],
+  },
+  {
+    sessionNumber: 3,
+    label: "Full Mock",
+    focus: "Run a complete mock interview at real intensity. No coaching mid-session.",
+    behaviorRules: [
+      "Treat this exactly like a real alumni interview — no warm-ups, no hints",
+      "Use the school's actual question themes",
+      "Score them honestly at the end on all rubric dimensions",
+      "Compare their answers to where they were in Session 1 — call out growth",
+    ],
+  },
+  {
+    sessionNumber: 4,
+    label: "Essay Coaching",
+    focus: "Shift from interview to essays. Use what you learned about their story.",
+    behaviorRules: [
+      "Their narrative is now clear from sessions 1-3 — refer to it",
+      "Ask which essay prompt they are working on, then ask them to read their current draft aloud",
+      "Push for specificity and voice, not structure",
+      "End with one concrete revision they should make tonight",
+    ],
+  },
+];
+
+export function getSessionStructure(sessionNumber: number): SessionStructure {
+  const idx = Math.min(Math.max(sessionNumber, 1), COLLEGE_SESSION_STRUCTURES.length) - 1;
+  return COLLEGE_SESSION_STRUCTURES[idx];
+}

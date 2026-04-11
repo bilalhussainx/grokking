@@ -74,6 +74,21 @@ export async function POST(req: NextRequest) {
       language,
     } = body;
 
+    // Domain coach: pick teaching methodology + system prompt extension + fact extractors
+    const { getDomainCoach, extractDomainFacts } = await import("@/lib/domain-coaches");
+    const domainCoach = getDomainCoach(body.courseSlug || courseTitle);
+    const domainExtension = domainCoach.systemPromptExtension
+      ? `\n\n${domainCoach.systemPromptExtension}\n`
+      : "";
+
+    // Mine the user's last message for domain-specific facts (fire-and-forget)
+    const lastUserTurn = (history as { role: string; content: string }[] | undefined)
+      ?.filter((m) => m.role === "user")
+      .slice(-1)[0]?.content;
+    if (lastUserTurn) {
+      extractDomainFacts(user.id, domainCoach, lastUserTurn).catch(() => {});
+    }
+
     // Unified agent context — knowledge graph + agent memories + domain knowledge
     let agentContextStr = "";
     try {
@@ -124,7 +139,7 @@ CRITICAL: You have the FULL lesson content above. Reference SPECIFIC concepts, t
       : "";
 
     const messages = [
-      { role: "system", content: COACH_DIRECTIVE + agentContextStr + langInstruction },
+      { role: "system", content: COACH_DIRECTIVE + domainExtension + agentContextStr + langInstruction },
       ...((history as { role: string; content: string }[]) || []).map(
         (m: { role: string; content: string }) => ({
           role: m.role === "assistant" ? "assistant" : "user",
@@ -144,7 +159,7 @@ CRITICAL: You have the FULL lesson content above. Reference SPECIFIC concepts, t
     console.log(`[Coach] Model: ${providerName} | Course: ${courseTitle || "?"} | Lesson: ${lessonTitle || "?"}`);
     console.log(`[Coach] Lesson content: ${lessonContent ? `${lessonContent.length} chars ✓` : "⚠️ MISSING"}`);
     console.log(`[Coach] Agent context: ${agentContextStr ? `${agentContextStr.length} chars ✓` : "⚠️ MISSING"}`);
-    console.log(`[Coach] System prompt total: ${(COACH_DIRECTIVE + agentContextStr + langInstruction).length} chars`);
+    console.log(`[Coach] System prompt total: ${(COACH_DIRECTIVE + domainExtension + agentContextStr + langInstruction).length} chars`);
     console.log(`[Coach] User prompt first 200: ${userPrompt.slice(0, 200)}`);
 
     // Trace for observability
@@ -155,7 +170,7 @@ CRITICAL: You have the FULL lesson content above. Reference SPECIFIC concepts, t
         name: "coach-text",
         model,
         input: {
-          systemPrompt: (COACH_DIRECTIVE + agentContextStr + langInstruction).slice(0, 2000),
+          systemPrompt: (COACH_DIRECTIVE + domainExtension + agentContextStr + langInstruction).slice(0, 2000),
           userMessage: userPrompt.slice(0, 1000),
           lessonTitle: lessonTitle || undefined,
           courseTitle: courseTitle || undefined,

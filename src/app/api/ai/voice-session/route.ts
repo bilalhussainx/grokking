@@ -200,10 +200,15 @@ export async function POST(req: NextRequest) {
     // ─── College admissions interview ───
     try {
       const { getCollegePersona } = await import("@/data/college-interviewer-personas");
-      const { buildCollegePersonaPrompt } = await import("@/lib/college-interview-prompt-builders");
+      const { buildCollegePersonaPrompt, loadCollegeSessionContext } = await import(
+        "@/lib/college-interview-prompt-builders"
+      );
       const collegePersona = getCollegePersona(collegePersonaId);
       if (collegePersona) {
-        const collegeBlock = buildCollegePersonaPrompt(collegePersona, applicantProfile);
+        const sessionCtx = user
+          ? await loadCollegeSessionContext(user.id, collegePersona.id, collegePersona.school)
+          : undefined;
+        const collegeBlock = buildCollegePersonaPrompt(collegePersona, applicantProfile, sessionCtx);
         contextPrompt = collegeBlock + "\n\n" + userProfileContext;
       }
     } catch (e) {

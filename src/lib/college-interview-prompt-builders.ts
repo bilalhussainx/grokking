@@ -10,6 +10,7 @@
 // Spec: docs/superpowers/specs/2026-04-07-college-admissions-interviews-design.md
 
 import type { CollegePersona } from '@/data/college-interviewer-personas';
+import { getSessionStructure } from '@/data/college-interviewer-personas';
 
 export interface ApplicantProfile {
   intendedMajor?: string;
@@ -17,6 +18,17 @@ export interface ApplicantProfile {
   topProjectDescription?: string;
   recentInfluence?: string;
   whyThisSchool?: string;
+}
+
+export interface CollegeSessionContext {
+  /** Which session this is (1=assess, 2=weak areas, 3=full mock, 4=essays) */
+  sessionNumber?: number;
+  /** Knowledge cache hits about this school (acceptance rate, themes, etc.) */
+  schoolKnowledge?: string[];
+  /** Knowledge graph facts about this candidate from prior sessions */
+  candidateFacts?: string[];
+  /** Notes from the previous session, if any */
+  previousSessionNotes?: string;
 }
 
 type SubStyle = 'recent-grad' | 'older-alum' | 'subject-specialist';
@@ -51,6 +63,7 @@ function getStyleDescription(style: SubStyle): string {
 export function buildCollegePersonaPrompt(
   persona: CollegePersona,
   profile?: ApplicantProfile,
+  sessionCtx?: CollegeSessionContext,
 ): string {
   const style = pickSubStyle();
   const openingLine = getOpeningLineForStyle(persona, style);
@@ -59,6 +72,10 @@ export function buildCollegePersonaPrompt(
   const profileBlock = profile
     ? buildApplicantProfileBlock(profile)
     : '\n## CANDIDATE CONTEXT\nNo profile information provided. Ask open-ended questions to learn about the candidate.\n';
+
+  const sessionBlock = buildSessionBlock(sessionCtx);
+  const schoolKnowledgeBlock = buildSchoolKnowledgeBlock(persona.school, sessionCtx?.schoolKnowledge);
+  const candidateFactsBlock = buildCandidateFactsBlock(sessionCtx?.candidateFacts);
 
   return `## INTERVIEWER IDENTITY
 You are a ${persona.fullName} alumni interviewer conducting a real admissions interview with a high school applicant. This is an alumni interview — informational and conversational, not adversarial. Your goal is to get to know the candidate and write a thoughtful report for the admissions office.
@@ -71,6 +88,9 @@ ${styleDesc}
 After the opening, transition naturally based on what the candidate says.
 
 ${profileBlock}
+${sessionBlock}
+${candidateFactsBlock}
+${schoolKnowledgeBlock}
 
 ## SCHOOL-SPECIFIC CONTEXT — ${persona.school}
 You care deeply about whether this candidate would thrive at ${persona.school}. The things that matter most for ${persona.school} fit:
@@ -97,6 +117,117 @@ ${persona.antiPatterns.map(a => `- ${a}`).join('\n')}
 - Sound like a real human alum, not a structured interview bot.
 - If the candidate goes silent for 5+ seconds, gently nudge: "Take your time" or rephrase the question.
 `;
+}
+
+/**
+ * Load adaptive session context for a college persona: session number, candidate
+ * facts from the knowledge graph, and school knowledge from the cache. Bumps the
+ * session counter as a side effect (fire-and-forget).
+ *
+ * Server-side only — uses createAdminSupabase via knowledge-graph + agent-context.
+ */
+export async function loadCollegeSessionContext(
+  userId: string,
+  personaId: string,
+  schoolName: string,
+): Promise<CollegeSessionContext> {
+  const ctx: CollegeSessionContext = {
+    sessionNumber: 1,
+    candidateFacts: [],
+    schoolKnowledge: [],
+  };
+
+  try {
+    const { getCurrentFacts, upsertFact } = await import('@/lib/knowledge-graph');
+    const allFacts = await getCurrentFacts(userId, { limit: 50 });
+
+    const sessionFact = allFacts.find(
+      (f) => f.predicate === 'college_session_count' && f.object.startsWith(`${personaId}:`),
+    );
+    if (sessionFact) {
+      const n = parseInt(sessionFact.object.split(':')[1] || '0', 10);
+      ctx.sessionNumber = Math.min(n + 1, 4);
+    }
+
+    ctx.candidateFacts = allFacts
+      .filter((f) =>
+        ['intended_major', 'top_project', 'weak_at', 'strong_at', 'values', 'previous_answer'].includes(
+          f.predicate,
+        ),
+      )
+      .slice(0, 8)
+      .map((f) => `${f.predicate.replace(/_/g, ' ')}: ${f.object}`);
+
+    const notesFact = allFacts.find(
+      (f) => f.predicate === 'previous_session_notes' && f.object.startsWith(`${personaId}:`),
+    );
+    if (notesFact) {
+      ctx.previousSessionNotes = notesFact.object.slice(personaId.length + 1);
+    }
+
+    upsertFact(userId, {
+      subject: 'user',
+      predicate: 'college_session_count',
+      object: `${personaId}:${ctx.sessionNumber}`,
+      confidence: 1.0,
+      sourceAgent: 'university_coach',
+    }).catch(() => {});
+  } catch {}
+
+  try {
+    const { buildAgentContext } = await import('@/lib/agent-context');
+    const agentCtx = await buildAgentContext(userId, 'university_coach', `${schoolName} interview`, {});
+    const match = agentCtx.promptContext.match(/## REAL-WORLD KNOWLEDGE[\s\S]*?(?=\n##|$)/);
+    if (match) {
+      ctx.schoolKnowledge = match[0]
+        .split('\n')
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.slice(2).trim())
+        .slice(0, 5);
+    }
+  } catch {}
+
+  return ctx;
+}
+
+function buildSessionBlock(ctx?: CollegeSessionContext): string {
+  if (!ctx?.sessionNumber || ctx.sessionNumber < 1) return '';
+  const structure = getSessionStructure(ctx.sessionNumber);
+  const lines: string[] = [
+    '',
+    `## SESSION ${structure.sessionNumber} OF 4 — ${structure.label.toUpperCase()}`,
+    structure.focus,
+    '',
+    'Behavior rules for this session:',
+    ...structure.behaviorRules.map((r) => `- ${r}`),
+  ];
+  if (ctx.previousSessionNotes) {
+    lines.push('', `Notes from the previous session: ${ctx.previousSessionNotes}`);
+  }
+  lines.push('');
+  return lines.join('\n');
+}
+
+function buildCandidateFactsBlock(facts?: string[]): string {
+  if (!facts || facts.length === 0) return '';
+  return [
+    '',
+    '## WHAT YOU REMEMBER ABOUT THIS CANDIDATE (from prior sessions)',
+    'You have met this candidate before. Refer to these details naturally — do not list them back, but use them to ask sharper, more personal questions:',
+    ...facts.map((f) => `- ${f}`),
+    '',
+  ].join('\n');
+}
+
+function buildSchoolKnowledgeBlock(school: string, knowledge?: string[]): string {
+  if (!knowledge || knowledge.length === 0) return '';
+  return [
+    '',
+    `## REAL-WORLD ${school.toUpperCase()} INTELLIGENCE (from knowledge cache)`,
+    'Use these specific facts when relevant. Do not dump them — weave them in naturally:',
+    ...knowledge.map((k) => `- ${k}`),
+    '',
+  ].join('\n');
 }
 
 function buildApplicantProfileBlock(profile: ApplicantProfile): string {

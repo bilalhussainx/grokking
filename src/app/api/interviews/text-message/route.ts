@@ -84,10 +84,15 @@ export async function POST(req: NextRequest) {
   try {
     if (category === "college" && collegePersonaId) {
       const { getCollegePersona } = await import("@/data/college-interviewer-personas");
-      const { buildCollegePersonaPrompt } = await import("@/lib/college-interview-prompt-builders");
+      const { buildCollegePersonaPrompt, loadCollegeSessionContext } = await import(
+        "@/lib/college-interview-prompt-builders"
+      );
       const persona: CollegePersona | null = getCollegePersona(collegePersonaId);
       if (persona) {
-        systemPrompt = buildCollegePersonaPrompt(persona, applicantProfile);
+        const sessionCtx = user
+          ? await loadCollegeSessionContext(user.id, persona.id, persona.school)
+          : undefined;
+        systemPrompt = buildCollegePersonaPrompt(persona, applicantProfile, sessionCtx);
       }
     } else if (category === "tech" && companyPersonaId) {
       const { getCompanyPersona } = await import("@/data/interview-personas");
