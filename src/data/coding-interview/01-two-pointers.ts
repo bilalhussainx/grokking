@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const twoPointersModule: Module = {
   id: "two-pointers",
   title: "Two Pointers",
-  description:
-    "Learn the two pointers technique to efficiently solve problems involving sorted arrays and pair searching.",
+  description: "Learn the two pointers technique to efficiently solve problems involving sorted arrays and pair searching.",
   lessons: [
     {
       id: "two-pointers-intro",

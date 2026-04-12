@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const chatSystemModule: Module = {
   id: "sd-chat-system",
   title: "Design a Chat System",
-  description:
-    "Design a real-time messaging platform — WebSocket connections, message delivery, presence, and group chat.",
+  description: "Design a real-time messaging platform — WebSocket connections, message delivery, presence, and group chat.",
   lessons: [
     {
       id: "sd-chat-1",

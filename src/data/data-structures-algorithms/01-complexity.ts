@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const complexityModule: Module = {
   id: "complexity-analysis",
   title: "Complexity Analysis",
-  description:
-    "Understand Big-O notation, time and space complexity analysis, and learn to benchmark and optimize algorithm performance.",
+  description: "Understand Big-O notation, time and space complexity analysis, and learn to benchmark and optimize algorithm performance.",
   lessons: [
     {
       id: "complexity-intro",

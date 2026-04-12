@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const projectsModule: Module = {
   id: "projects",
   title: "Mini Projects",
-  description:
-    "Apply everything you have learned to build real mini-projects: a todo list, contact book, and calculator.",
+  description: "Apply everything you have learned to build real mini-projects: a todo list, contact book, and calculator.",
   lessons: [
     {
       id: "projects-overview",

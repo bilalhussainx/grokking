@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const mergerModelModule: Module = {
   id: "fm-merger",
   title: "Merger Model",
-  description:
-    "Build a merger model to analyze accretion/dilution, synergies, and purchase price allocation.",
+  description: "Build a merger model to analyze accretion/dilution, synergies, and purchase price allocation.",
   lessons: [
     {
       id: "fm-merger-accretion-dilution",
@@ -96,9 +95,9 @@ Many deals are dilutive in Year 1 (due to transaction costs and integration expe
 
 | Metric | Year 1 | Year 2 | Year 3 |
 |--------|--------|--------|--------|
-| Standalone EPS | \$5.00 | \$5.40 | \$5.83 |
-| Pro Forma EPS | \$4.85 | \$5.60 | \$6.15 |
-| Accretion / (Dilution) | (\$0.15) | \$0.20 | \$0.32 |
+| Standalone EPS | $5.00 | $5.40 | $5.83 |
+| Pro Forma EPS | $4.85 | $5.60 | $6.15 |
+| Accretion / (Dilution) | ($0.15) | $0.20 | $0.32 |
 | Accretion / (Dilution) % | (3.0%) | 3.7% | 5.5% |
 
 The board will want to see the breakeven year — when the deal turns from dilutive to accretive.
@@ -374,12 +373,12 @@ The headline output — presented prominently on the first page:
 
 | Metric | Year 1 | Year 2 | Year 3 |
 |--------|--------|--------|--------|
-| Acquirer Standalone EPS | \$4.50 | \$4.86 | \$5.25 |
-| Pro Forma EPS (GAAP) | \$4.35 | \$5.02 | \$5.55 |
-| Accretion / (Dilution) | (\$0.15) | \$0.16 | \$0.30 |
+| Acquirer Standalone EPS | $4.50 | $4.86 | $5.25 |
+| Pro Forma EPS (GAAP) | $4.35 | $5.02 | $5.55 |
+| Accretion / (Dilution) | ($0.15) | $0.16 | $0.30 |
 | % Accretion / (Dilution) | (3.3%) | 3.3% | 5.7% |
-| Pro Forma EPS (Adjusted) | \$4.65 | \$5.32 | \$5.85 |
-| Adj. Accretion / (Dilution) | \$0.15 | \$0.46 | \$0.60 |
+| Pro Forma EPS (Adjusted) | $4.65 | $5.32 | $5.85 |
+| Adj. Accretion / (Dilution) | $0.15 | $0.46 | $0.60 |
 | Adj. % | 3.3% | 9.5% | 11.4% |
 
 Show both GAAP and adjusted (excluding acquisition-related amortization) because boards evaluate both.
@@ -448,10 +447,10 @@ Context for the price being offered:
 
 | Benchmark | Target Price | Premium |
 |-----------|-------------|---------|
-| Current share price | \$45.00 | 33% |
-| 30-day VWAP | \$43.50 | 38% |
-| 52-week high | \$50.00 | 20% |
-| Analyst consensus PT | \$48.00 | 25% |
+| Current share price | $45.00 | 33% |
+| 30-day VWAP | $43.50 | 38% |
+| 52-week high | $50.00 | 20% |
+| Analyst consensus PT | $48.00 | 25% |
 | Comparable deal average | N/A | 30% average |
 
 ### Presenting to the Board

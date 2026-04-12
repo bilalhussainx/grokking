@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const formsModule: Module = {
   id: "forms",
   title: "Forms & Validation",
-  description:
-    "Master form handling in React by building form state managers, validation engines, and multi-step form wizards from scratch.",
+  description: "Master form handling in React by building form state managers, validation engines, and multi-step form wizards from scratch.",
   lessons: [
     {
       id: "forms-intro",

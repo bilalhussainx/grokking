@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const keyConceptsModule: Module = {
   id: "sd-key-concepts",
   title: "Key Concepts in Distributed Systems",
-  description:
-    "Essential distributed systems theory: CAP theorem, consistent hashing, message queues, sharding, and replication.",
+  description: "Essential distributed systems theory: CAP theorem, consistent hashing, message queues, sharding, and replication.",
   lessons: [
     {
       id: "sd-kc-1",

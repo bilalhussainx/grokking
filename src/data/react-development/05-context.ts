@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const contextModule: Module = {
   id: "context",
   title: "Context API",
-  description:
-    "Solve prop drilling by implementing React's Context API from scratch, then build a theme system and auth context on top of it.",
+  description: "Solve prop drilling by implementing React's Context API from scratch, then build a theme system and auth context on top of it.",
   lessons: [
     {
       id: "context-intro",

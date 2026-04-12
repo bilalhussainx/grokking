@@ -187,7 +187,7 @@ print(f"\\nAll requests complete!")
 print(f"Pool time:       \${total:.2f}s")
 print(f"Sequential would: \${sequential_time:.2f}s")
 print(f"Speedup:          \${sequential_time / total:.1f}x")
-print(f"Effective workers: \${POOL_SIZE} threads")`
+print(f"Effective workers: \${POOL_SIZE} threads")`,
     },
     {
       id: "pattern-connection-pool",
@@ -397,7 +397,7 @@ elapsed = time.time() - start
 conns_used = set(conn_id for _, conn_id, _ in results)
 print(f"\\n10 queries completed in \${elapsed:.2f}s")
 print(f"Only \${len(conns_used)} connections used: \${conns_used}")
-print(f"Connections were safely reused across \${len(results)} requests")`
+print(f"Connections were safely reused across \${len(results)} requests")`,
     },
     {
       id: "pattern-rate-limiter",
@@ -597,7 +597,7 @@ total = time.time() - start
 allowed = sum(1 for _, _, s in results if s == "ALLOWED")
 print(f"\\n\${allowed}/\${len(results)} requests allowed in \${total:.2f}s")
 print(f"First 5 were instant (burst capacity)")
-print(f"Remaining were rate-limited to ~2/sec")`
+print(f"Remaining were rate-limited to ~2/sec")`,
     },
     {
       id: "pattern-map-reduce",
@@ -806,7 +806,7 @@ print(f"Speedup: \${single_time / parallel_time:.2f}x")
 print(f"\\nResults match: True")
 print(f"\\nTop 10 words:")
 for word, count in parallel_result.most_common(10):
-    print(f"  \${word:12s} \${count:,}")`
+    print(f"  \${word:12s} \${count:,}")`,
     },
     {
       id: "pattern-pub-sub",
@@ -1014,7 +1014,7 @@ print(f"\\nTotal messages delivered: \${len(received)}")
 print(f"Order subscribers got: \${sum(1 for s,t,_ in received if t=='orders')} msgs")
 print(f"Log subscribers got: \${sum(1 for s,t,_ in received if t=='logs')} msgs")
 
-broker.shutdown()`
-    }
-  ]
+broker.shutdown()`,
+    },
+  ],
 };

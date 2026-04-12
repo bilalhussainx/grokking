@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const fastSlowPointersModule: Module = {
   id: "fast-slow-pointers",
   title: "Fast & Slow Pointers",
-  description:
-    "Master Floyd's cycle detection algorithm and the tortoise-and-hare technique for linked lists and number sequences.",
+  description: "Master Floyd's cycle detection algorithm and the tortoise-and-hare technique for linked lists and number sequences.",
   lessons: [
     {
       id: "fast-slow-intro",

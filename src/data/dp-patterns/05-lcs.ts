@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const lcsModule: Module = {
   id: "lcs-pattern",
   title: "Longest Common Substring Pattern",
-  description:
-    "Master the LCS family of problems: longest common substring, subsequence, edit operations, and increasing subsequences.",
+  description: "Master the LCS family of problems: longest common substring, subsequence, edit operations, and increasing subsequences.",
   lessons: [
     {
       id: "lcs-intro",

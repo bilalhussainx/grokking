@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const rateLimiterModule: Module = {
   id: "sd-09",
   title: "Design a Rate Limiter",
-  description:
-    "Design a distributed rate limiter that protects APIs from abuse using various algorithms and a Redis-backed architecture.",
+  description: "Design a distributed rate limiter that protects APIs from abuse using various algorithms and a Redis-backed architecture.",
   lessons: [
     {
       id: "sd-09-01",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const stacksQueuesModule: Module = {
   id: "stacks-queues",
   title: "Stacks & Queues",
-  description:
-    "Understand stack and queue data structures, implement them from scratch, and solve classic problems using these fundamental tools.",
+  description: "Understand stack and queue data structures, implement them from scratch, and solve classic problems using these fundamental tools.",
   lessons: [
     {
       id: "stacks-queues-stack",

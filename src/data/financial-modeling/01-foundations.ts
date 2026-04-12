@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const foundationsModule: Module = {
   id: "fm-foundations",
   title: "Financial Modeling Foundations",
-  description:
-    "Learn the principles, design standards, and best practices that underpin every professional financial model.",
+  description: "Learn the principles, design standards, and best practices that underpin every professional financial model.",
   lessons: [
     {
       id: "fm-foundations-what-is",
@@ -426,7 +425,7 @@ Prevention is better than detection:
 ### The Cost of Errors
 
 Real-world modeling errors have had serious consequences:
-- London Whale (JPMorgan, 2012): A spreadsheet error contributed to \$6 billion in trading losses
+- London Whale (JPMorgan, 2012): A spreadsheet error contributed to $6 billion in trading losses
 - Reinhart-Rogoff (2013): An Excel error in an influential economics paper affected policy debates
 - Numerous M&A and IPO errors have led to mispriced deals, litigation, and career consequences
 

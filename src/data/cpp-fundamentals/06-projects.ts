@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const cppProjectsModule: Module = {
   id: "cpp-projects",
   title: "Projects",
-  description:
-    "Apply everything you have learned — build a memory pool allocator, expression parser, and mini database engine.",
+  description: "Apply everything you have learned — build a memory pool allocator, expression parser, and mini database engine.",
   lessons: [
     {
       id: "cpp-projects-intro",

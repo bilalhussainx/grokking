@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const webCrawlerModule: Module = {
   id: "sd-07",
   title: "Design a Web Crawler",
-  description:
-    "Design a scalable web crawler that can systematically browse the internet, handle politeness policies, and deduplicate content.",
+  description: "Design a scalable web crawler that can systematically browse the internet, handle politeness policies, and deduplicate content.",
   lessons: [
     {
       id: "sd-07-01",

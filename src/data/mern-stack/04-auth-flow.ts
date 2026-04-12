@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const authFlowModule: Module = {
   id: "mern-auth-flow",
   title: "Full-Stack Auth",
-  description:
-    "Implement JWT-based authentication across the full stack -- backend token generation, login/register UI, and protected routes.",
+  description: "Implement JWT-based authentication across the full stack -- backend token generation, login/register UI, and protected routes.",
   lessons: [
     {
       id: "jwt-backend",

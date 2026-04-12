@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const loopsModule: Module = {
   id: "loops",
   title: "Loops",
-  description:
-    "Master for loops, while loops, range(), and loop control with break and continue.",
+  description: "Master for loops, while loops, range(), and loop control with break and continue.",
   lessons: [
     {
       id: "loops-intro",
@@ -273,9 +272,9 @@ def find_in_table(n, target):
 # Test cases
 print(multiplication_table(3))
 # Expected:
-# 1\t2\t3
-# 2\t4\t6
-# 3\t6\t9
+# 1	2	3
+# 2	4	6
+# 3	6	9
 
 print(times_table_for(5, 5))
 # Expected: ['5 x 1 = 5', '5 x 2 = 10', '5 x 3 = 15', '5 x 4 = 20', '5 x 5 = 25']
@@ -317,9 +316,9 @@ def find_in_table(n, target):
 # Test cases
 print(multiplication_table(3))
 # Expected:
-# 1\t2\t3
-# 2\t4\t6
-# 3\t6\t9
+# 1	2	3
+# 2	4	6
+# 3	6	9
 
 print(times_table_for(5, 5))
 # Expected: ['5 x 1 = 5', '5 x 2 = 10', '5 x 3 = 15', '5 x 4 = 20', '5 x 5 = 25']

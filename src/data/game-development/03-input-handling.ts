@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const inputHandlingModule: Module = {
   id: "input-handling",
   title: "Player Input",
-  description:
-    "Handle keyboard and mouse events to let players control the action — from key tracking to smooth movement.",
+  description: "Handle keyboard and mouse events to let players control the action — from key tracking to smooth movement.",
   lessons: [
     {
       id: "keyboard-events",

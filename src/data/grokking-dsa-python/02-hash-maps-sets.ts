@@ -3,10 +3,8 @@ import { Module } from "../types";
 export const hashMapsSetsModule: Module = {
   id: "hash-maps-sets",
   title: "Hash Maps & Sets",
-  description:
-    "Master O(1) lookup with Python dictionaries and sets. Learn the counting pattern, the complement pattern, and how sets eliminate duplicates instantly.",
+  description: "Master O(1) lookup with Python dictionaries and sets. Learn the counting pattern, the complement pattern, and how sets eliminate duplicates instantly.",
   lessons: [
-    // ─── Lesson 1: Dictionaries Deep Dive ───
     {
       id: "dictionaries-deep-dive",
       slug: "dictionaries-deep-dive",
@@ -256,8 +254,6 @@ print(merge_dicts({"a": 5}, {}))
 # Expected: {'a': 5}
 `,
     },
-
-    // ─── Lesson 2: Sets — Fast Membership Testing ───
     {
       id: "sets-fast-membership",
       slug: "sets-fast-membership",
@@ -485,8 +481,6 @@ print(first_unique_char("aabbc"))
 # Expected: 4
 `,
     },
-
-    // ─── Lesson 3: The Complement Pattern (Two Sum) ───
     {
       id: "complement-pattern",
       slug: "complement-pattern",
@@ -724,8 +718,6 @@ print(two_sum_all_pairs([5], 10))
 # Expected: []
 `,
     },
-
-    // ─── Lesson 4: Module Checkpoint ───
     {
       id: "hash-maps-sets-checkpoint",
       slug: "hash-maps-sets-checkpoint",

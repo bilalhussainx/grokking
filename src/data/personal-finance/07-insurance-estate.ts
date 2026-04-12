@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const insuranceEstateModule: Module = {
   id: "pf-insurance",
   title: "Insurance & Estate Planning",
-  description:
-    "Protect what you have built with insurance and estate planning — from health coverage to generational wealth. Resources: Investopedia, NerdWallet, Nolo Estate Planning, Khan Academy.",
+  description: "Protect what you have built with insurance and estate planning — from health coverage to generational wealth. Resources: Investopedia, NerdWallet, Nolo Estate Planning, Khan Academy.",
   lessons: [
     {
       id: "pf-health-insurance",
@@ -18,29 +17,29 @@ Health insurance is one of the most complex and important aspects of personal fi
 
 | Term | Definition | Example |
 |------|-----------|---------|
-| **Premium** | Monthly cost for coverage | \\\$350/month |
-| **Deductible** | Amount you pay before insurance kicks in | \\\$2,000/year |
-| **Copay** | Fixed amount per visit or service | \\\$25 per doctor visit |
+| **Premium** | Monthly cost for coverage | \\$350/month |
+| **Deductible** | Amount you pay before insurance kicks in | \\$2,000/year |
+| **Copay** | Fixed amount per visit or service | \\$25 per doctor visit |
 | **Coinsurance** | Your percentage share after deductible | 20% of costs |
-| **Out-of-pocket maximum** | Most you pay in a year (then insurance covers 100%) | \\\$8,000/year |
+| **Out-of-pocket maximum** | Most you pay in a year (then insurance covers 100%) | \\$8,000/year |
 | **Network** | Doctors/hospitals that accept your plan at negotiated rates | In-network vs out-of-network |
 
 ### How It Works: A Medical Scenario
 
-You have a plan with: \\\$300/month premium, \\\$2,000 deductible, 20% coinsurance, \\\$7,000 out-of-pocket maximum.
+You have a plan with: \\$300/month premium, \\$2,000 deductible, 20% coinsurance, \\$7,000 out-of-pocket maximum.
 
-You break your arm. Total bill: \\\$15,000.
+You break your arm. Total bill: \\$15,000.
 
 | Phase | You Pay | Insurance Pays |
 |-------|---------|----------------|
-| **Premiums (12 months)** | \\\$3,600 | — |
-| **Deductible (first \\\$2,000)** | \\\$2,000 | \\\$0 |
-| **Coinsurance (20% of remaining \\\$13,000)** | \\\$2,600 | \\\$10,400 |
-| **After out-of-pocket max (\\\$7,000 reached)** | \\\$0 | Covers rest |
+| **Premiums (12 months)** | \\$3,600 | — |
+| **Deductible (first \\$2,000)** | \\$2,000 | \\$0 |
+| **Coinsurance (20% of remaining \\$13,000)** | \\$2,600 | \\$10,400 |
+| **After out-of-pocket max (\\$7,000 reached)** | \\$0 | Covers rest |
 
-Your total cost: \\\$3,600 (premiums) + \\\$4,600 (deductible + coinsurance up to max) = **\\\$8,200**
+Your total cost: \\$3,600 (premiums) + \\$4,600 (deductible + coinsurance up to max) = **\\$8,200**
 
-Without insurance: **\\\$15,000** — and that is a relatively minor procedure.
+Without insurance: **\\$15,000** — and that is a relatively minor procedure.
 
 ### Types of Health Insurance Plans
 
@@ -57,7 +56,7 @@ Without insurance: **\\\$15,000** — and that is a relatively minor procedure.
 - Best for people who want flexibility
 
 **HDHP (High-Deductible Health Plan):**
-- Higher deductible (\\\$1,600+ individual, \\\$3,200+ family in 2024)
+- Higher deductible (\\$1,600+ individual, \\$3,200+ family in 2024)
 - Lower premiums
 - Qualifies for HSA (Health Savings Account)
 - Best for healthy people who want to save on premiums and invest via HSA
@@ -75,8 +74,8 @@ The Affordable Care Act (ACA) created health insurance marketplaces (healthcare.
 
 Most Americans (about 155 million) get health insurance through their employer. The employer typically pays 70-80% of the premium:
 
-- Average employer plan premium (2023, per KFF): \\\$8,435/year individual, \\\$23,968/year family
-- Employee share: approximately \\\$1,400/year individual, \\\$6,575/year family
+- Average employer plan premium (2023, per KFF): \\$8,435/year individual, \\$23,968/year family
+- Employee share: approximately \\$1,400/year individual, \\$6,575/year family
 
 Employer plans are usually cheaper than marketplace plans due to group rates and employer subsidies.
 
@@ -86,12 +85,12 @@ Tom, 32, is healthy and rarely visits the doctor. His employer offers two plans:
 
 | Feature | PPO Plan | HDHP with HSA |
 |---------|----------|---------------|
-| Monthly premium | \\\$400 | \\\$200 |
-| Deductible | \\\$500 | \\\$3,000 |
-| Annual premium cost | \\\$4,800 | \\\$2,400 |
-| HSA employer contribution | N/A | \\\$500 |
+| Monthly premium | \\$400 | \\$200 |
+| Deductible | \\$500 | \\$3,000 |
+| Annual premium cost | \\$4,800 | \\$2,400 |
+| HSA employer contribution | N/A | \\$500 |
 
-If Tom has fewer than 2 doctor visits/year, the HDHP saves \\\$2,400 in premiums plus he gets a \\\$500 HSA contribution and triple-tax-advantaged investing. If he has a major medical event, the out-of-pocket maximum protects him.
+If Tom has fewer than 2 doctor visits/year, the HDHP saves \\$2,400 in premiums plus he gets a \\$500 HSA contribution and triple-tax-advantaged investing. If he has a major medical event, the out-of-pocket maximum protects him.
 
 For most healthy young adults, the HDHP + HSA combination is financially optimal.
 
@@ -146,14 +145,14 @@ Coverage needed =
 - Existing assets (savings, investments, other insurance)
 \`\`\`
 
-**Example:** Earning \\\$80,000 with two young children, \\\$200,000 mortgage, \\\$30,000 student loans:
-- Income replacement: \\\$80,000 x 18 years = \\\$1,440,000
-- Debts: \\\$230,000
-- College: \\\$200,000
-- Funeral: \\\$15,000
-- Minus savings/investments: -\\\$100,000
-- **Coverage needed: approximately \\\$1,785,000**
-- Round to: \\\$2,000,000 policy
+**Example:** Earning \\$80,000 with two young children, \\$200,000 mortgage, \\$30,000 student loans:
+- Income replacement: \\$80,000 x 18 years = \\$1,440,000
+- Debts: \\$230,000
+- College: \\$200,000
+- Funeral: \\$15,000
+- Minus savings/investments: -\\$100,000
+- **Coverage needed: approximately \\$1,785,000**
+- Round to: \\$2,000,000 policy
 
 ### Term Life Insurance
 
@@ -163,9 +162,9 @@ Term life provides coverage for a specific period (10, 20, or 30 years). If you 
 
 | Coverage | 20-Year Term | 30-Year Term |
 |----------|-------------|-------------|
-| \\\$500,000 | ~\\\$22/month | ~\\\$30/month |
-| \\\$1,000,000 | ~\\\$35/month | ~\\\$50/month |
-| \\\$2,000,000 | ~\\\$60/month | ~\\\$85/month |
+| \\$500,000 | ~\\$22/month | ~\\$30/month |
+| \\$1,000,000 | ~\\$35/month | ~\\$50/month |
+| \\$2,000,000 | ~\\$60/month | ~\\$85/month |
 
 **Pros:** Very affordable, simple to understand, covers the years when dependents need protection most.
 
@@ -179,8 +178,8 @@ Whole life provides coverage for your entire life (as long as premiums are paid)
 
 | Coverage | Monthly Premium |
 |----------|----------------|
-| \\\$500,000 | ~\\\$350-500/month |
-| \\\$1,000,000 | ~\\\$700-1,000/month |
+| \\$500,000 | ~\\$350-500/month |
+| \\$1,000,000 | ~\\$700-1,000/month |
 
 **Pros:** Lifetime coverage, cash value accumulation, guaranteed death benefit, potential dividends.
 
@@ -193,22 +192,22 @@ The most common advice from fee-only financial planners: **buy term life insuran
 **Comparison over 30 years:**
 
 **Option A — Whole Life:**
-- Premium: \\\$500/month for \\\$500,000 policy
-- Cash value after 30 years: approximately \\\$140,000
-- Death benefit: \\\$500,000
+- Premium: \\$500/month for \\$500,000 policy
+- Cash value after 30 years: approximately \\$140,000
+- Death benefit: \\$500,000
 
 **Option B — Term Life + Invest:**
-- Term premium: \\\$30/month for \\\$500,000 policy
-- Invest the \\\$470/month difference in index funds at 8%
-- Investment value after 30 years: approximately **\\\$710,000**
-- Plus \\\$500,000 death benefit during the term
+- Term premium: \\$30/month for \\$500,000 policy
+- Invest the \\$470/month difference in index funds at 8%
+- Investment value after 30 years: approximately **\\$710,000**
+- Plus \\$500,000 death benefit during the term
 
 Option B produces five times the cash value while providing the same death benefit. This is why most financial educators (Dave Ramsey, Suze Orman, the Bogleheads community) recommend term over whole.
 
 ### When Whole Life Might Make Sense
 
 In limited situations, whole life has a role:
-- **Estate planning for very high net worth** (\\\$10M+): provides liquidity to pay estate taxes
+- **Estate planning for very high net worth** (\\$10M+): provides liquidity to pay estate taxes
 - **Special needs dependents**: lifelong coverage for a child who will always need support
 - **Business succession planning**: guaranteed payout for buy-sell agreements
 - **Already maxed all tax-advantaged accounts**: the cash value grows tax-deferred
@@ -249,15 +248,15 @@ Auto insurance is legally required in almost every state, and renters insurance 
 ### Understanding Liability Limits
 
 Liability coverage is expressed as three numbers: 100/300/100 means:
-- \\\$100,000 per person for bodily injury
-- \\\$300,000 per accident for bodily injury
-- \\\$100,000 per accident for property damage
+- \\$100,000 per person for bodily injury
+- \\$300,000 per accident for bodily injury
+- \\$100,000 per accident for property damage
 
 **Minimum coverage** (e.g., 25/50/25) is often insufficient. A serious accident can easily exceed those limits, leaving you personally liable. Most financial experts recommend at least 100/300/100.
 
 ### How to Save on Auto Insurance
 
-1. **Increase your deductible**: Going from \\\$500 to \\\$1,000 deductible can save 15-25% on premiums
+1. **Increase your deductible**: Going from \\$500 to \\$1,000 deductible can save 15-25% on premiums
 2. **Bundle home/renters + auto**: Typically saves 10-20%
 3. **Shop around annually**: Rates vary dramatically between companies for the same coverage
 4. **Ask about discounts**: Good driver, good student, low mileage, defensive driving, paperless billing
@@ -265,30 +264,30 @@ Liability coverage is expressed as three numbers: 100/300/100 means:
 
 ### Real-World Example: The Coverage Decision
 
-Alex drives a 2015 Honda Civic worth approximately \\\$12,000:
-- Current annual premium: \\\$1,800 (full coverage, \\\$500 deductible)
-- If Alex raises deductible to \\\$1,000: saves ~\\\$300/year
-- If Alex drops collision/comprehensive (car worth \\\$12,000, paying \\\$600/year for these): keeps the coverage because the car value is 20x the premium cost
+Alex drives a 2015 Honda Civic worth approximately \\$12,000:
+- Current annual premium: \\$1,800 (full coverage, \\$500 deductible)
+- If Alex raises deductible to \\$1,000: saves ~\\$300/year
+- If Alex drops collision/comprehensive (car worth \\$12,000, paying \\$600/year for these): keeps the coverage because the car value is 20x the premium cost
 
-In 3 years, when the car is worth \\\$8,000 and collision/comp costs \\\$650:
+In 3 years, when the car is worth \\$8,000 and collision/comp costs \\$650:
 - Ratio: 12x — getting closer to the drop threshold
 - Alex might switch to liability-only and self-insure the car's value
 
 ### Umbrella Insurance
 
-For high-net-worth individuals, an **umbrella policy** provides additional liability coverage (typically \\\$1-5 million) above your auto and homeowners limits. It is remarkably cheap:
-- \\\$1 million umbrella: ~\\\$150-300/year
-- \\\$2 million umbrella: ~\\\$200-400/year
+For high-net-worth individuals, an **umbrella policy** provides additional liability coverage (typically \\$1-5 million) above your auto and homeowners limits. It is remarkably cheap:
+- \\$1 million umbrella: ~\\$150-300/year
+- \\$2 million umbrella: ~\\$200-400/year
 
 If your net worth exceeds your auto/home liability limits, an umbrella policy protects your assets from lawsuits.
 
 ### Renters Insurance: The Most Overlooked Coverage
 
-Only about 55% of renters carry renters insurance, despite it being incredibly affordable (average: \\\$15-30/month). It covers:
+Only about 55% of renters carry renters insurance, despite it being incredibly affordable (average: \\$15-30/month). It covers:
 
-**Personal property**: Theft, fire, water damage, vandalism — covers your belongings up to the policy limit (typically \\\$20,000-50,000).
+**Personal property**: Theft, fire, water damage, vandalism — covers your belongings up to the policy limit (typically \\$20,000-50,000).
 
-**Liability**: If someone is injured in your apartment, covers legal expenses and medical bills (typically \\\$100,000).
+**Liability**: If someone is injured in your apartment, covers legal expenses and medical bills (typically \\$100,000).
 
 **Additional living expenses**: If your apartment becomes uninhabitable (fire, flood), covers hotel and food costs while you find new housing.
 
@@ -303,31 +302,31 @@ Only about 55% of renters carry renters insurance, despite it being incredibly a
 ### Real-World Example: Why You Need Renters Insurance
 
 Sarah's apartment building catches fire from a neighbor's unit. She loses:
-- Laptop: \\\$1,200
-- Clothing: \\\$3,000
-- Furniture: \\\$4,000
-- Electronics: \\\$2,500
-- Kitchen items: \\\$800
-- **Total: \\\$11,500**
+- Laptop: \\$1,200
+- Clothing: \\$3,000
+- Furniture: \\$4,000
+- Electronics: \\$2,500
+- Kitchen items: \\$800
+- **Total: \\$11,500**
 
-With renters insurance (\\\$20/month, \\\$500 deductible): Sarah pays \\\$500, insurance covers \\\$11,000.
+With renters insurance (\\$20/month, \\$500 deductible): Sarah pays \\$500, insurance covers \\$11,000.
 
-Without renters insurance: Sarah pays \\\$11,500 out of pocket — plus hotel costs for temporary housing.
+Without renters insurance: Sarah pays \\$11,500 out of pocket — plus hotel costs for temporary housing.
 
 The landlord's insurance covers the building, NOT your belongings.
 
 ### Replacement Cost vs Actual Cash Value
 
-| Type | How It Pays | Example (5-year-old laptop, paid \\\$1,500) |
+| Type | How It Pays | Example (5-year-old laptop, paid \\$1,500) |
 |------|-----------|------------------------------------------|
-| **Replacement cost** | Cost to buy a comparable new item | Pays \\\$1,400 (current price of equivalent laptop) |
-| **Actual cash value** | Depreciated value | Pays \\\$500 (original price minus 5 years of depreciation) |
+| **Replacement cost** | Cost to buy a comparable new item | Pays \\$1,400 (current price of equivalent laptop) |
+| **Actual cash value** | Depreciated value | Pays \\$500 (original price minus 5 years of depreciation) |
 
 Always choose **replacement cost** coverage — it costs slightly more per month but pays significantly more in a claim.
 
 ### Key Takeaway
 
-Auto insurance is mandatory but should be optimized through higher deductibles, shopping around, and appropriate coverage levels. Renters insurance is optional but incredibly valuable at just \\\$15-30/month. Both protect you from financial catastrophes that would otherwise set you back years.
+Auto insurance is mandatory but should be optimized through higher deductibles, shopping around, and appropriate coverage levels. Renters insurance is optional but incredibly valuable at just \\$15-30/month. Both protect you from financial catastrophes that would otherwise set you back years.
 
 *Resources: NerdWallet Auto Insurance Guide, The Zebra Insurance Comparison, Investopedia Renters Insurance, NAIC (National Association of Insurance Commissioners).*`,
     },
@@ -369,10 +368,10 @@ A trust holds your assets during your lifetime and transfers them to beneficiari
 | Probate required | Yes | No |
 | Public record | Yes | No (private) |
 | Effective during incapacity | No | Yes |
-| Cost to create | \\\$200-500 | \\\$1,000-3,000 |
+| Cost to create | \\$200-500 | \\$1,000-3,000 |
 | Complexity | Simple | Moderate |
 
-**When a trust makes sense:** Owning real estate, having assets over \\\$100,000, wanting privacy, or living in a state with expensive probate (California, Florida).
+**When a trust makes sense:** Owning real estate, having assets over \\$100,000, wanting privacy, or living in a state with expensive probate (California, Florida).
 
 **3. Durable Power of Attorney (POA)**
 
@@ -399,9 +398,9 @@ Two components:
 ### Real-World Example: The Cost of No Plan
 
 David, 42, dies unexpectedly in a car accident. He has:
-- \\\$400,000 home (owned jointly with wife)
-- \\\$200,000 401(k) (ex-wife listed as beneficiary — never updated after remarriage)
-- \\\$50,000 savings account (in his name only)
+- \\$400,000 home (owned jointly with wife)
+- \\$200,000 401(k) (ex-wife listed as beneficiary — never updated after remarriage)
+- \\$50,000 savings account (in his name only)
 - Two minor children
 
 **What happens:**
@@ -414,16 +413,16 @@ If David had spent 2 hours updating his beneficiary designations and creating ba
 
 ### Estate Taxes: Who Pays?
 
-For 2024, the federal estate tax exemption is **\\\$13.61 million per person** (\\\$27.22 million for married couples). Estates below this threshold pay no federal estate tax. Only about 0.1% of estates are affected.
+For 2024, the federal estate tax exemption is **\\$13.61 million per person** (\\$27.22 million for married couples). Estates below this threshold pay no federal estate tax. Only about 0.1% of estates are affected.
 
 However, some states have lower thresholds:
-- Oregon: \\\$1 million
-- Massachusetts: \\\$2 million
-- New York: \\\$6.94 million
+- Oregon: \\$1 million
+- Massachusetts: \\$2 million
+- New York: \\$6.94 million
 
 ### Getting Started: Minimum Viable Estate Plan
 
-1. **Create a will** — Online services (Trust & Will, LegalZoom, Nolo) cost \\\$100-300
+1. **Create a will** — Online services (Trust & Will, LegalZoom, Nolo) cost \\$100-300
 2. **Designate beneficiaries** on all financial accounts
 3. **Set up healthcare directive** and durable POA
 4. **Organize documents** and tell your executor/trustee where to find them
@@ -446,7 +445,7 @@ Generational wealth is financial assets passed from one generation to the next �
 ### The Wealth Gap Reality
 
 According to the Federal Reserve's 2022 Survey of Consumer Finances:
-- Median family net worth in the U.S.: \\\$192,900
+- Median family net worth in the U.S.: \\$192,900
 - Families that received an inheritance have 2.5x the median net worth
 - Only about 20% of Americans receive a meaningful inheritance
 
@@ -503,8 +502,8 @@ You cannot pour from an empty cup. Follow the principles from this course:
 ### Real-World Example: The Two Families
 
 **The Martinez Family:**
-- Parents invest \\\$500/month in index funds starting at age 30
-- By 65: approximately \\\$1,130,000
+- Parents invest \\$500/month in index funds starting at age 30
+- By 65: approximately \\$1,130,000
 - They teach their children about budgeting, investing, and compound interest
 - At death, children inherit remaining portfolio (tax-advantaged through stepped-up basis)
 - Children continue investing and add to the family's wealth
@@ -522,8 +521,8 @@ Over three generations, the wealth gap between these families grows exponentiall
 
 | Strategy | Benefit | 2024 Limit |
 |----------|---------|------------|
-| **Annual gift exclusion** | Gift without triggering gift tax | \\\$18,000 per recipient per year |
-| **529 contributions** | Tax-free education funding | \\\$18,000/year (or \\\$90,000 superfunded over 5 years) |
+| **Annual gift exclusion** | Gift without triggering gift tax | \\$18,000 per recipient per year |
+| **529 contributions** | Tax-free education funding | \\$18,000/year (or \\$90,000 superfunded over 5 years) |
 | **Roth IRA conversion** | Tax-free inheritance | Based on contribution limits |
 | **Irrevocable life insurance trust** | Death benefit outside taxable estate | Varies |
 | **Family limited partnership** | Discounted asset transfers | Complex, needs attorney |
@@ -546,7 +545,7 @@ Age-appropriate financial education is the highest-return investment you can mak
 
 Generational wealth is not about creating a trust-fund lifestyle. It is about giving each successive generation a better starting point — less debt, more education, earlier investing, and the financial literacy to make wise decisions.
 
-A \\\$100,000 inheritance invested at 8% for 40 years becomes \\\$2.17 million. That is the potential of compound growth across generations — if the recipients know how to manage it.
+A \\$100,000 inheritance invested at 8% for 40 years becomes \\$2.17 million. That is the potential of compound growth across generations — if the recipients know how to manage it.
 
 ### Key Takeaway
 

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const listsModule: Module = {
   id: "lists",
   title: "Lists",
-  description:
-    "Master Python lists — indexing, slicing, common methods, and working with 2D lists (matrices).",
+  description: "Master Python lists — indexing, slicing, common methods, and working with 2D lists (matrices).",
   lessons: [
     {
       id: "lists-intro",

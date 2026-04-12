@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const savingInvestingModule: Module = {
   id: "pf-saving",
   title: "Saving & Investing",
-  description:
-    "Transition from saving to investing — learn about asset classes, index funds, dollar-cost averaging, and building a portfolio. Resources: Investopedia, Bogleheads Wiki, Khan Academy, A Random Walk Down Wall Street by Burton Malkiel.",
+  description: "Transition from saving to investing — learn about asset classes, index funds, dollar-cost averaging, and building a portfolio. Resources: Investopedia, Bogleheads Wiki, Khan Academy, A Random Walk Down Wall Street by Burton Malkiel.",
   lessons: [
     {
       id: "pf-savings-accounts-cds",
@@ -26,15 +25,15 @@ A savings account is a deposit account at a bank or credit union that pays inter
 | High-Yield (online) | 4.00-5.25% | No branches, FDIC insured, higher rates |
 | Money Market Account | 3.50-5.00% | Check-writing, debit card, tiered rates |
 
-The difference between a traditional and high-yield savings account is staggering. On a \\\$10,000 balance:
-- Traditional (0.05% APY): \\\$5/year in interest
-- High-Yield (5.00% APY): \\\$500/year in interest
+The difference between a traditional and high-yield savings account is staggering. On a \\$10,000 balance:
+- Traditional (0.05% APY): \\$5/year in interest
+- High-Yield (5.00% APY): \\$500/year in interest
 
 **That is 100 times more** for the same FDIC-insured safety.
 
 ### FDIC Insurance
 
-The Federal Deposit Insurance Corporation (FDIC) insures deposits up to **\\\$250,000 per depositor, per bank, per ownership category**. This means even if the bank fails, your money is guaranteed by the U.S. government. Credit unions have equivalent coverage through the NCUA.
+The Federal Deposit Insurance Corporation (FDIC) insures deposits up to **\\$250,000 per depositor, per bank, per ownership category**. This means even if the bank fails, your money is guaranteed by the U.S. government. Credit unions have equivalent coverage through the NCUA.
 
 ### Certificates of Deposit (CDs)
 
@@ -56,8 +55,8 @@ A CD locks your money for a fixed term (3 months to 5 years) in exchange for a g
 
 A CD ladder lets you earn higher rates while maintaining periodic liquidity:
 
-1. Divide \\\$10,000 into five equal parts
-2. Buy CDs of 1, 2, 3, 4, and 5-year terms (\\\$2,000 each)
+1. Divide \\$10,000 into five equal parts
+2. Buy CDs of 1, 2, 3, 4, and 5-year terms (\\$2,000 each)
 3. When the 1-year CD matures, reinvest it in a new 5-year CD
 4. Now you have a CD maturing every year, plus you earn the higher 5-year rates
 
@@ -65,11 +64,11 @@ This strategy balances the higher yields of long-term CDs with the flexibility o
 
 ### Real-World Example: When to Use Which
 
-**Emergency fund (\\\$15,000):** High-yield savings account. You need instant access.
+**Emergency fund (\\$15,000):** High-yield savings account. You need instant access.
 
-**Known expense in 6 months (vacation \\\$3,000):** 6-month CD or HYSA. Lock in a rate if the CD pays more.
+**Known expense in 6 months (vacation \\$3,000):** 6-month CD or HYSA. Lock in a rate if the CD pays more.
 
-**Down payment in 2 years (\\\$40,000):** CD ladder or HYSA. The money must be safe and available on your timeline.
+**Down payment in 2 years (\\$40,000):** CD ladder or HYSA. The money must be safe and available on your timeline.
 
 **Retirement in 30 years:** NOT a savings account or CD. Inflation will erode your purchasing power. This money needs to be invested (covered in next lessons).
 
@@ -85,7 +84,7 @@ This strategy balances the higher yields of long-term CDs with the flexibility o
 
 ### The Inflation Problem
 
-With inflation averaging 3% historically, a savings account earning 2% actually **loses** 1% in purchasing power per year. \\\$10,000 earning 2% grows to \\\$10,200, but if prices rose 3%, you need \\\$10,300 to buy the same goods. You are falling behind.
+With inflation averaging 3% historically, a savings account earning 2% actually **loses** 1% in purchasing power per year. \\$10,000 earning 2% grows to \\$10,200, but if prices rose 3%, you need \\$10,300 to buy the same goods. You are falling behind.
 
 This is why savings accounts are for short-term needs and investing is for long-term wealth building.
 
@@ -105,15 +104,15 @@ Investing is putting money to work with the expectation of earning a return over
 
 ### Why Invest?
 
-The math is simple but powerful. Assume you save \\\$500/month for 30 years:
+The math is simple but powerful. Assume you save \\$500/month for 30 years:
 
 | Strategy | Annual Return | Result After 30 Years |
 |----------|-------------|---------------------|
-| Under the mattress | 0% | \\\$180,000 |
-| Savings account | 2% | \\\$244,692 |
-| Bond portfolio | 5% | \\\$416,129 |
-| Stock market | 8% | \\\$745,180 |
-| Aggressive growth | 10% | \\\$1,130,244 |
+| Under the mattress | 0% | \\$180,000 |
+| Savings account | 2% | \\$244,692 |
+| Bond portfolio | 5% | \\$416,129 |
+| Stock market | 8% | \\$745,180 |
+| Aggressive growth | 10% | \\$1,130,244 |
 
 Same contribution, radically different outcomes. The difference is compounding returns.
 
@@ -167,7 +166,7 @@ When you buy a share of Apple stock, you own a tiny piece of Apple Inc. If Apple
 A bond is essentially an IOU. The U.S. government issues Treasury bonds, considered the safest investment in the world. Corporations issue bonds too, at higher interest rates because they carry more risk.
 
 **Key bond terms:**
-- **Face value (par):** The amount repaid at maturity (typically \\\$1,000)
+- **Face value (par):** The amount repaid at maturity (typically \\$1,000)
 - **Coupon rate:** The annual interest rate paid
 - **Maturity date:** When the principal is returned
 - **Yield:** The effective return based on the price you pay
@@ -184,16 +183,16 @@ You cannot earn stock-like returns with bond-like risk. Anyone who promises othe
 
 ### Real-World Example: The Long View
 
-If you had invested \\\$10,000 in the S&P 500 in 1993 and left it untouched:
-- By 2003 (10 years): approximately \\\$23,000
-- By 2013 (20 years): approximately \\\$46,000
-- By 2023 (30 years): approximately \\\$172,000
+If you had invested \\$10,000 in the S&P 500 in 1993 and left it untouched:
+- By 2003 (10 years): approximately \\$23,000
+- By 2013 (20 years): approximately \\$46,000
+- By 2023 (30 years): approximately \\$172,000
 
 This includes the dot-com crash, the 2008 financial crisis, and the 2020 COVID crash. The market recovered every time.
 
 ### Getting Started
 
-You do not need thousands of dollars to begin investing. Most brokerages (Fidelity, Schwab, Vanguard) have no minimums and offer fractional shares. You can buy \\\$50 of an S&P 500 index fund today.
+You do not need thousands of dollars to begin investing. Most brokerages (Fidelity, Schwab, Vanguard) have no minimums and offer fractional shares. You can buy \\$50 of an S&P 500 index fund today.
 
 The biggest risk is not investing at all — leaving your money in a savings account while inflation erodes its value year after year.
 
@@ -233,7 +232,7 @@ Both can track the same index, but they differ in structure:
 | Feature | Index Mutual Fund | ETF |
 |---------|------------------|-----|
 | Trading | End of day (NAV price) | Throughout the day (like a stock) |
-| Minimum investment | Often \\\$1,000-3,000 | Price of one share (or fractional) |
+| Minimum investment | Often \\$1,000-3,000 | Price of one share (or fractional) |
 | Tax efficiency | Good | Slightly better |
 | Automatic investing | Easy to automate | Requires manual purchase (usually) |
 | Expense ratios | Very low | Very low |
@@ -255,16 +254,16 @@ The few managers who outperform in one period rarely do so consistently. And you
 
 Expense ratios are the annual fee charged by a fund, expressed as a percentage of assets. The difference between an active fund and an index fund is dramatic:
 
-| Fund Type | Typical Expense Ratio | Fee on \\\$100,000 |
+| Fund Type | Typical Expense Ratio | Fee on \\$100,000 |
 |-----------|---------------------|-----------------|
-| Active mutual fund | 0.75-1.50% | \\\$750-1,500/year |
-| Index fund (Vanguard) | 0.03-0.10% | \\\$30-100/year |
+| Active mutual fund | 0.75-1.50% | \\$750-1,500/year |
+| Index fund (Vanguard) | 0.03-0.10% | \\$30-100/year |
 
-Over 30 years on a \\\$500,000 portfolio, the difference between a 1% fee and a 0.03% fee is approximately **\\\$300,000** in lost returns. Fees compound just like returns — but against you.
+Over 30 years on a \\$500,000 portfolio, the difference between a 1% fee and a 0.03% fee is approximately **\\$300,000** in lost returns. Fees compound just like returns — but against you.
 
 ### Real-World Example: The Bet
 
-In 2007, Warren Buffett made a public \\\$1 million bet that the S&P 500 index fund would outperform a basket of hedge funds over 10 years. By 2017, the S&P 500 fund had returned 125.8% cumulatively, while the hedge funds returned an average of 36%. Buffett won decisively, donating the winnings to charity.
+In 2007, Warren Buffett made a public \\$1 million bet that the S&P 500 index fund would outperform a basket of hedge funds over 10 years. By 2017, the S&P 500 fund had returned 125.8% cumulatively, while the hedge funds returned an average of 36%. Buffett won decisively, donating the winnings to charity.
 
 ### The Three-Fund Portfolio
 
@@ -310,23 +309,23 @@ Dollar-cost averaging (DCA) is the practice of investing a fixed amount of money
 
 Instead of investing a lump sum all at once, you spread your purchases over time:
 
-**Example: Investing \\\$500/month in an S&P 500 index fund**
+**Example: Investing \\$500/month in an S&P 500 index fund**
 
 | Month | Price Per Share | Shares Bought |
 |-------|----------------|---------------|
-| January | \\\$50.00 | 10.0 |
-| February | \\\$45.00 | 11.1 |
-| March | \\\$40.00 | 12.5 |
-| April | \\\$42.00 | 11.9 |
-| May | \\\$48.00 | 10.4 |
-| June | \\\$52.00 | 9.6 |
+| January | \\$50.00 | 10.0 |
+| February | \\$45.00 | 11.1 |
+| March | \\$40.00 | 12.5 |
+| April | \\$42.00 | 11.9 |
+| May | \\$48.00 | 10.4 |
+| June | \\$52.00 | 9.6 |
 
-**Total invested:** \\\$3,000
+**Total invested:** \\$3,000
 **Total shares:** 65.5
-**Average cost per share:** \\\$45.80
-**Current value (at \\\$52):** \\\$3,406
+**Average cost per share:** \\$45.80
+**Current value (at \\$52):** \\$3,406
 
-Notice that your average cost (\\\$45.80) is lower than the simple average of the prices (\\\$46.17). This is because you automatically buy **more shares when prices are low** and fewer shares when prices are high.
+Notice that your average cost (\\$45.80) is lower than the simple average of the prices (\\$46.17). This is because you automatically buy **more shares when prices are low** and fewer shares when prices are high.
 
 ### Why DCA Works Psychologically
 
@@ -346,19 +345,19 @@ Research by Vanguard (2012) found that lump sum investing outperforms DCA about 
 - DCA produces **lower volatility** and **less regret risk**
 - Most people do not have a lump sum — they earn and invest monthly (natural DCA)
 
-The psychological benefit of DCA is substantial. If you invest \\\$60,000 as a lump sum and the market drops 20% next month, you have lost \\\$12,000 on paper and will likely panic. If you are DCA-ing \\\$5,000/month, a 20% drop means you buy next month's shares at a 20% discount.
+The psychological benefit of DCA is substantial. If you invest \\$60,000 as a lump sum and the market drops 20% next month, you have lost \\$12,000 on paper and will likely panic. If you are DCA-ing \\$5,000/month, a 20% drop means you buy next month's shares at a 20% discount.
 
 ### Real-World Example: The 2008 Financial Crisis
 
-Imagine two investors starting in January 2007, each planning to invest \\\$60,000 in the S&P 500:
+Imagine two investors starting in January 2007, each planning to invest \\$60,000 in the S&P 500:
 
-**Lump Sum Laura** invests all \\\$60,000 on January 1, 2007. By March 2009, her portfolio is worth about \\\$30,000 — a gut-wrenching 50% loss. Many investors in her position sold in panic.
+**Lump Sum Laura** invests all \\$60,000 on January 1, 2007. By March 2009, her portfolio is worth about \\$30,000 — a gut-wrenching 50% loss. Many investors in her position sold in panic.
 
-**DCA Dan** invests \\\$1,000/month starting January 2007. By March 2009, he has invested \\\$27,000 and his portfolio is worth about \\\$19,000 — still painful, but he has been buying shares at deeply discounted prices throughout the crash.
+**DCA Dan** invests \\$1,000/month starting January 2007. By March 2009, he has invested \\$27,000 and his portfolio is worth about \\$19,000 — still painful, but he has been buying shares at deeply discounted prices throughout the crash.
 
 By December 2012 (6 years in):
-- Laura's portfolio: approximately \\\$85,000 (recovered and grown)
-- Dan's portfolio: approximately \\\$90,000 (benefited from buying cheap shares during the crash)
+- Laura's portfolio: approximately \\$85,000 (recovered and grown)
+- Dan's portfolio: approximately \\$90,000 (benefited from buying cheap shares during the crash)
 
 Dan's DCA strategy outperformed because the crash allowed him to accumulate discounted shares.
 
@@ -443,16 +442,16 @@ This is a guideline, not a rule. Adjust based on your specific risk tolerance, g
 ### Real-World Example: Two Portfolios in 2008
 
 **Portfolio A (90/10 — Aggressive):**
-- 2007 value: \\\$100,000
-- 2008-2009 crash: dropped to \\\$55,000 (-45%)
-- Recovery to \\\$100,000: took until 2012 (3 years)
-- Value by 2023: approximately \\\$400,000
+- 2007 value: \\$100,000
+- 2008-2009 crash: dropped to \\$55,000 (-45%)
+- Recovery to \\$100,000: took until 2012 (3 years)
+- Value by 2023: approximately \\$400,000
 
 **Portfolio B (60/40 — Moderate):**
-- 2007 value: \\\$100,000
-- 2008-2009 crash: dropped to \\\$72,000 (-28%)
-- Recovery to \\\$100,000: took until 2010 (1 year)
-- Value by 2023: approximately \\\$280,000
+- 2007 value: \\$100,000
+- 2008-2009 crash: dropped to \\$72,000 (-28%)
+- Recovery to \\$100,000: took until 2010 (1 year)
+- Value by 2023: approximately \\$280,000
 
 Portfolio A ended with more money, but Portfolio B had a much smoother ride. If the Portfolio A investor panicked and sold at the bottom, they locked in a 45% loss and never recovered.
 

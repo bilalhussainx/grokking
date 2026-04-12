@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const youtubeModule: Module = {
   id: "sd-11",
   title: "Design YouTube",
-  description:
-    "Design a video sharing platform supporting upload, transcoding, adaptive streaming, and content delivery at global scale.",
+  description: "Design a video sharing platform supporting upload, transcoding, adaptive streaming, and content delivery at global scale.",
   lessons: [
     {
       id: "sd-11-01",

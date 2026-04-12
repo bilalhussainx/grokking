@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const canvasBasicsModule: Module = {
   id: "canvas-basics",
   title: "Canvas & Drawing",
-  description:
-    "Learn HTML5 Canvas fundamentals for game graphics — rectangles, circles, text, images, and animation.",
+  description: "Learn HTML5 Canvas fundamentals for game graphics — rectangles, circles, text, images, and animation.",
   lessons: [
     {
       id: "canvas-setup",

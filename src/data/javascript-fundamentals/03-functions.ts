@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const functionsModule: Module = {
   id: "js-functions",
   title: "Functions & Closures",
-  description:
-    "Explore function declarations, arrow functions, higher-order functions, callbacks, and the power of closures.",
+  description: "Explore function declarations, arrow functions, higher-order functions, callbacks, and the power of closures.",
   lessons: [
     {
       id: "js-functions-intro",

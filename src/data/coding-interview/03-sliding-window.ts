@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const slidingWindowModule: Module = {
   id: "sliding-window",
   title: "Sliding Window",
-  description:
-    "Learn the sliding window technique for efficiently processing contiguous subarrays and substrings.",
+  description: "Learn the sliding window technique for efficiently processing contiguous subarrays and substrings.",
   lessons: [
     {
       id: "sliding-window-intro",
@@ -41,7 +40,7 @@ The **sliding window** pattern maintains a subset of elements (a "window") as it
 
 ### Complexity
 
-Most sliding-window problems are solved in **O(n)** time with **O(1)** or **O(k)** extra space, compared to the O(n \u00d7 k) or O(n\u00b2) brute force.
+Most sliding-window problems are solved in **O(n)** time with **O(1)** or **O(k)** extra space, compared to the O(n × k) or O(n²) brute force.
 
 \`\`\`mermaid
 graph LR

@@ -141,7 +141,7 @@ if ratio > 1.0:
     print("Threading is SLOWER due to GIL contention!")
     print("For CPU-bound work, use multiprocessing instead.")
 else:
-    print("Threading was faster (unusual for CPU-bound work).")`
+    print("Threading was faster (unusual for CPU-bound work).")`,
     },
     {
       id: "python-threading",
@@ -305,7 +305,7 @@ print(f"\\nAll downloads complete!")
 print(f"Total data: \${total_kb} KB")
 print(f"Threaded time:    \${elapsed:.2f}s")
 print(f"Sequential would: \${sequential_time:.2f}s")
-print(f"Speedup: \${sequential_time / elapsed:.1f}x")`
+print(f"Speedup: \${sequential_time / elapsed:.1f}x")`,
     },
     {
       id: "python-multiprocessing",
@@ -466,7 +466,7 @@ if __name__ == "__main__":
     speedup = seq_time / par_time if par_time > 0 else 0
     print(f"\\nSpeedup: \${speedup:.2f}x")
     print(f"True parallelism bypasses the GIL!")
-    print(f"Each process ran in its own PID with its own interpreter.")`
+    print(f"Each process ran in its own PID with its own interpreter.")`,
     },
     {
       id: "python-asyncio",
@@ -650,7 +650,7 @@ async def main():
     print(f"Speedup:    \${seq_time / con_time:.1f}x")
     print(f"\\nAll results: \${[r['api'] for r in con_results]}")
 
-asyncio.run(main())`
+asyncio.run(main())`,
     },
     {
       id: "python-futures",
@@ -853,7 +853,7 @@ sequential_time = sum(d for _, d in urls)
 print(f"\\nTotal time:      \${total:.2f}s")
 print(f"Sequential would: \${sequential_time:.2f}s")
 print(f"Speedup:          \${sequential_time / total:.1f}x")
-print(f"\\nResults came in completion order, not submission order!")`
-    }
-  ]
+print(f"\\nResults came in completion order, not submission order!")`,
+    },
+  ],
 };

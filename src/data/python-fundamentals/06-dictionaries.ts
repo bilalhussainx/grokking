@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const dictionariesModule: Module = {
   id: "dictionaries",
   title: "Dictionaries",
-  description:
-    "Learn to use Python dictionaries for key-value storage, iteration, and solving real-world data problems.",
+  description: "Learn to use Python dictionaries for key-value storage, iteration, and solving real-world data problems.",
   lessons: [
     {
       id: "dicts-intro",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const realEstateModule: Module = {
   id: "fm-real-estate",
   title: "Real Estate Financial Modeling",
-  description:
-    "Build real estate financial models for property cash flow analysis, development pro formas, and investment returns.",
+  description: "Build real estate financial models for property cash flow analysis, development pro formas, and investment returns.",
   lessons: [
     {
       id: "fm-real-estate-property-cf",
@@ -56,7 +55,7 @@ Expressed as a percentage of GPR:
 
 **Other Income**
 Ancillary revenue streams vary by property type:
-- Residential: Parking (\$50-200/month/space), laundry, storage, pet fees
+- Residential: Parking ($50-200/month/space), laundry, storage, pet fees
 - Office: Parking, conference room fees, tenant improvement reimbursements
 - Retail: Percentage rent (rent tied to tenant sales), Common Area Maintenance (CAM) reimbursements
 

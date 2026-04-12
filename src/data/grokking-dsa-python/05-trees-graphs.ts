@@ -3,10 +3,8 @@ import { Module } from "../types";
 export const treesGraphsModule: Module = {
   id: "trees-graphs",
   title: "Trees & Graphs",
-  description:
-    "Understand binary trees, master DFS and BFS traversals, and learn how graphs generalize trees. These structures power databases, file systems, social networks, and navigation systems.",
+  description: "Understand binary trees, master DFS and BFS traversals, and learn how graphs generalize trees. These structures power databases, file systems, social networks, and navigation systems.",
   lessons: [
-    // ─── Lesson 1: Binary Trees Fundamentals ───
     {
       id: "binary-trees-fundamentals",
       slug: "binary-trees-fundamentals",
@@ -272,8 +270,6 @@ print(tree_height(TreeNode(42)))
 # Expected: 0
 `,
     },
-
-    // ─── Lesson 2: BFS / Level-Order Traversal ───
     {
       id: "bfs-level-order",
       slug: "bfs-level-order",
@@ -556,8 +552,6 @@ print(max_per_level(None))
 # Expected: []
 `,
     },
-
-    // ─── Lesson 3: Graph Basics & BFS/DFS ───
     {
       id: "graph-basics-bfs-dfs",
       slug: "graph-basics-bfs-dfs",
@@ -883,8 +877,6 @@ print(has_path(graph1, 'A', 'D'))
 # Expected: True
 `,
     },
-
-    // ─── Lesson 4: Module Checkpoint ───
     {
       id: "trees-graphs-checkpoint",
       slug: "trees-graphs-checkpoint",

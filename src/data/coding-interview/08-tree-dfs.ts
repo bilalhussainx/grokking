@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const treeDFSModule: Module = {
   id: "tree-dfs",
   title: "Tree Depth First Search",
-  description:
-    "Explore recursive and iterative DFS techniques for solving path-based tree problems.",
+  description: "Explore recursive and iterative DFS techniques for solving path-based tree problems.",
   lessons: [
     {
       id: "tree-dfs-intro",

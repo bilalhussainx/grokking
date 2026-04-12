@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const bitwiseXORModule: Module = {
   id: "bitwise-xor",
   title: "Bitwise XOR",
-  description:
-    "Leverage XOR properties to solve problems involving unique elements, bit manipulation, and binary transformations.",
+  description: "Leverage XOR properties to solve problems involving unique elements, bit manipulation, and binary transformations.",
   lessons: [
     {
       id: "bitwise-xor-intro",

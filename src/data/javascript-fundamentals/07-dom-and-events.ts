@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const domAndEventsModule: Module = {
   id: "js-dom-events",
   title: "DOM & Events (Simulated)",
-  description:
-    "Learn DOM and event concepts through simulated implementations: event emitters, virtual DOM diffing, and state management.",
+  description: "Learn DOM and event concepts through simulated implementations: event emitters, virtual DOM diffing, and state management.",
   lessons: [
     {
       id: "js-dom-events-intro",

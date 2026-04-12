@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const collectionsModule: Module = {
   id: "csharp-collections",
   title: "Collections",
-  description:
-    "Work with C# collections — arrays, List<T>, Dictionary, HashSet, and LINQ for querying data.",
+  description: "Work with C# collections — arrays, List<T>, Dictionary, HashSet, and LINQ for querying data.",
   lessons: [
     {
       id: "csharp-list-arrays",

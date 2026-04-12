@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const projectsModule: Module = {
   id: "wd-portfolio-projects",
   title: "Portfolio Projects",
-  description:
-    "Apply everything you have learned by building three portfolio-worthy projects: a landing page, a portfolio site, and a responsive blog layout.",
+  description: "Apply everything you have learned by building three portfolio-worthy projects: a landing page, a portfolio site, and a responsive blog layout.",
   lessons: [
     {
       id: "landing-page-project",

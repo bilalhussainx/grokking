@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const arraysModule: Module = {
   id: "js-arrays",
   title: "Arrays & Destructuring",
-  description:
-    "Master array methods, destructuring, the spread operator, and common array manipulation patterns.",
+  description: "Master array methods, destructuring, the spread operator, and common array manipulation patterns.",
   lessons: [
     {
       id: "js-arrays-intro",

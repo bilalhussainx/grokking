@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const twitterModule: Module = {
   id: "sd-twitter",
   title: "Design Twitter",
-  description:
-    "Design a microblogging platform — tweet publishing, timeline generation, search, and trending topics.",
+  description: "Design a microblogging platform — tweet publishing, timeline generation, search, and trending topics.",
   lessons: [
     {
       id: "sd-tw-1",

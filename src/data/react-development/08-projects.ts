@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const projectsModule: Module = {
   id: "projects",
   title: "Applied Projects",
-  description:
-    "Put it all together with three capstone projects: a Virtual DOM, a Form Validator engine, and a Mini Router.",
+  description: "Put it all together with three capstone projects: a Virtual DOM, a Form Validator engine, and a Mini Router.",
   lessons: [
     {
       id: "projects-intro",

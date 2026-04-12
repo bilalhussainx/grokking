@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const effectsModule: Module = {
   id: "effects",
   title: "useEffect & Side Effects",
-  description:
-    "Understand side effects in React by building effect systems, cleanup handlers, and dependency tracking from scratch.",
+  description: "Understand side effects in React by building effect systems, cleanup handlers, and dependency tracking from scratch.",
   lessons: [
     {
       id: "effects-intro",

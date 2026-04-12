@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const subsetsModule: Module = {
   id: "subsets",
   title: "Subsets",
-  description:
-    "Master the Subsets pattern using BFS-based generation to enumerate subsets, permutations, and combinatorial structures.",
+  description: "Master the Subsets pattern using BFS-based generation to enumerate subsets, permutations, and combinatorial structures.",
   lessons: [
     {
       id: "subsets-intro",

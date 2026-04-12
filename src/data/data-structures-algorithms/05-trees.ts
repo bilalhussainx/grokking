@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const treesModule: Module = {
   id: "trees",
   title: "Trees",
-  description:
-    "Build binary search trees, master tree traversals, understand AVL self-balancing, and solve classic tree interview problems.",
+  description: "Build binary search trees, master tree traversals, understand AVL self-balancing, and solve classic tree interview problems.",
   lessons: [
     {
       id: "trees-bst",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const linkedListReversalModule: Module = {
   id: "linked-list-reversal",
   title: "In-place Reversal of a Linked List",
-  description:
-    "Master in-place linked list reversal — full reversal, sub-list reversal, and k-group variants.",
+  description: "Master in-place linked list reversal — full reversal, sub-list reversal, and k-group variants.",
   lessons: [
     {
       id: "ll-reversal-intro",

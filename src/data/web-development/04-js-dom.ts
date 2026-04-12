@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const jsDomModule: Module = {
   id: "js-dom",
   title: "JavaScript & DOM",
-  description:
-    "Learn to make web pages interactive with JavaScript event handling, DOM manipulation, and small hands-on projects.",
+  description: "Learn to make web pages interactive with JavaScript event handling, DOM manipulation, and small hands-on projects.",
   lessons: [
     {
       id: "js-events",

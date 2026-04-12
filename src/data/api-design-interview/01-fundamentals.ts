@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const fundamentalsModule: Module = {
   id: "api-fundamentals",
   title: "API Design Fundamentals",
-  description:
-    "Master the foundational principles of API design — REST, GraphQL, gRPC, versioning, and authentication patterns that interviewers expect you to know.",
+  description: "Master the foundational principles of API design — REST, GraphQL, gRPC, versioning, and authentication patterns that interviewers expect you to know.",
   lessons: [
     {
       id: "intro-api-design-interviews",

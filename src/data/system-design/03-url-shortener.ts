@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const urlShortenerModule: Module = {
   id: "sd-url-shortener",
   title: "Design a URL Shortener",
-  description:
-    "Walk through designing a service like bit.ly — from requirements and estimation to scaling strategies.",
+  description: "Walk through designing a service like bit.ly — from requirements and estimation to scaling strategies.",
   lessons: [
     {
       id: "sd-url-1",

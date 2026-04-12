@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const cppBasicsModule: Module = {
   id: "cpp-basics",
   title: "Variables, Types & I/O",
-  description:
-    "Learn C++ fundamentals — variables, the type system, memory layout, and input parsing — through Python exercises that mirror C++ concepts.",
+  description: "Learn C++ fundamentals — variables, the type system, memory layout, and input parsing — through Python exercises that mirror C++ concepts.",
   lessons: [
     {
       id: "cpp-basics-intro",

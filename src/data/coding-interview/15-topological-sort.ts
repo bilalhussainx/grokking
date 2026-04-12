@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const topologicalSortModule: Module = {
   id: "topological-sort",
   title: "Topological Sort",
-  description:
-    "Learn Kahn's algorithm for ordering tasks with dependencies, detecting cycles, and finding all valid orderings in DAGs.",
+  description: "Learn Kahn's algorithm for ordering tasks with dependencies, detecting cycles, and finding all valid orderings in DAGs.",
   lessons: [
     {
       id: "topological-sort-intro",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const asyncModule: Module = {
   id: "js-async",
   title: "Async JavaScript",
-  description:
-    "Understand Promises, async/await, error handling, and common asynchronous patterns in modern JavaScript.",
+  description: "Understand Promises, async/await, error handling, and common asynchronous patterns in modern JavaScript.",
   lessons: [
     {
       id: "js-async-intro",

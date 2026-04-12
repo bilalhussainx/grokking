@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const fundamentalsModule: Module = {
   id: "sd-fundamentals",
   title: "System Design Fundamentals",
-  description:
-    "Core building blocks every system designer needs: scaling, load balancing, caching, databases, and networking.",
+  description: "Core building blocks every system designer needs: scaling, load balancing, caching, databases, and networking.",
   lessons: [
     {
       id: "sd-fund-1",

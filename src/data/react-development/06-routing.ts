@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const routingModule: Module = {
   id: "routing",
   title: "React Router",
-  description:
-    "Understand client-side routing by building a router from scratch — route matching, parameterized routes, navigation, and nested layouts.",
+  description: "Understand client-side routing by building a router from scratch — route matching, parameterized routes, navigation, and nested layouts.",
   lessons: [
     {
       id: "routing-intro",

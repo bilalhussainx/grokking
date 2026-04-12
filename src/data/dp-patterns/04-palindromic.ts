@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const palindromicModule: Module = {
   id: "palindromic-pattern",
   title: "Palindromic Subsequence Pattern",
-  description:
-    "Master problems involving palindromic subsequences and substrings using interval DP techniques.",
+  description: "Master problems involving palindromic subsequences and substrings using interval DP techniques.",
   lessons: [
     {
       id: "palindromic-intro",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const htmlModule: Module = {
   id: "html-basics",
   title: "HTML Basics",
-  description:
-    "Learn the building blocks of the web: HTML document structure, common elements, forms, and semantic HTML.",
+  description: "Learn the building blocks of the web: HTML document structure, common elements, forms, and semantic HTML.",
   lessons: [
     {
       id: "html-structure",

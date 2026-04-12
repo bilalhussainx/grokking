@@ -176,7 +176,7 @@ for i in range(10):
         all_pass = False
     print(f"  Test \${i+1}: {result} [{status}]")
 
-print(f"\\nAll tests passed: \${all_pass}")`
+print(f"\\nAll tests passed: \${all_pass}")`,
     },
     {
       id: "interview-foobar",
@@ -365,7 +365,7 @@ for n in [1, 3, 5, 10]:
         all_pass = False
     print(f"  n=\${n}: \${result[:30]}{'...' if len(result) > 30 else ''} [{'PASS' if passed else 'FAIL'}]")
 
-print(f"\\nAll tests passed: \${all_pass}")`
+print(f"\\nAll tests passed: \${all_pass}")`,
     },
     {
       id: "interview-h2o",
@@ -565,7 +565,7 @@ for n in [1, 3, 5, 10]:
     print(f"  \${n} molecules (\${n*3} threads): \${result[:30]}{'...' if len(result) > 30 else ''}")
     print(f"    H=\${result.count('H')}, O=\${result.count('O')}, Valid=\${valid}")
 
-print(f"\\nAll tests passed: \${all_pass}")`
+print(f"\\nAll tests passed: \${all_pass}")`,
     },
     {
       id: "interview-traffic-light",
@@ -739,7 +739,7 @@ for t in threads:
 
 print(f"\\n\${len(cars)} cars passed safely")
 print(f"Light switched \${light.switches} times")
-print(f"No collisions — mutual exclusion guaranteed")`
+print(f"No collisions — mutual exclusion guaranteed")`,
     },
     {
       id: "interview-blocking-queue",
@@ -960,7 +960,7 @@ for t in threads:
 print(f"\\nProduced: \${len(produced)} items")
 print(f"Consumed: \${len(consumed)} items")
 print(f"Queue empty: \${q.size() == 0}")
-print(f"All items accounted for: \${sorted(produced) == sorted(consumed)}")`
+print(f"All items accounted for: \${sorted(produced) == sorted(consumed)}")`,
     },
     {
       id: "interview-web-crawler",
@@ -1198,7 +1198,7 @@ for url in urls:
 # Sequential comparison
 seq_time = len(urls) * 0.1
 print(f"\\nSequential would take: ~\${seq_time:.2f}s")
-print(f"Parallel speedup: ~\${seq_time / elapsed:.1f}x")`
-    }
-  ]
+print(f"Parallel speedup: ~\${seq_time / elapsed:.1f}x")`,
+    },
+  ],
 };

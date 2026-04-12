@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const dynamicProgrammingModule: Module = {
   id: "dynamic-programming",
   title: "Dynamic Programming",
-  description:
-    "Master dynamic programming through memoization and tabulation, solving classic optimization and counting problems.",
+  description: "Master dynamic programming through memoization and tabulation, solving classic optimization and counting problems.",
   lessons: [
     {
       id: "dp-intro",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const databasesModule: Module = {
   id: "databases",
   title: "Databases",
-  description:
-    "Work with MongoDB and Mongoose: learn document modeling, schema design, and CRUD operations.",
+  description: "Work with MongoDB and Mongoose: learn document modeling, schema design, and CRUD operations.",
   lessons: [
     {
       id: "mongodb-basics",

@@ -205,7 +205,7 @@ print(f"Time: {time.time() - start:.3f}s")
 print(f"Produced: \${len(produced)} items")
 print(f"Consumed: \${len(consumed)} items")
 print(f"Queue remaining: \${len(q)}")
-print(f"All accounted for: \${len(produced) == len(consumed) + len(q)}")`
+print(f"All accounted for: \${len(produced) == len(consumed) + len(q)}")`,
     },
     {
       id: "concurrent-hash-map",
@@ -424,7 +424,7 @@ for t in writers + readers + deleters:
 print(f"Time: {time.time() - start:.3f}s")
 print(f"Operations — puts: \${ops['puts']}, gets: \${ops['gets']}, deletes: \${ops['deletes']}")
 print(f"Final size: \${cmap.size()}")
-print(f"Segments: \${cmap.num_segments}")`
+print(f"Segments: \${cmap.num_segments}")`,
     },
     {
       id: "blocking-queue",
@@ -635,7 +635,7 @@ for t in producers + consumers:
     t.join()
 
 print(f"\\nProduced: \${stats['produced']}, Consumed: \${stats['consumed']}")
-print(f"Queue remaining: \${bq.size()}")`
+print(f"Queue remaining: \${bq.size()}")`,
     },
     {
       id: "lock-free-stack",
@@ -856,7 +856,7 @@ print(f"Stack size after pop: \${stack.size()}")
 print(f"Items popped: \${len(popped_items)}")
 print(f"Pop time: {pop_time:.3f}s")
 print(f"Total CAS attempts: \${stack.cas_attempts}, failures: \${stack.cas_failures}")
-print(f"Retry rate: \${stack.cas_failures / max(1, stack.cas_attempts) * 100:.1f}%")`
+print(f"Retry rate: \${stack.cas_failures / max(1, stack.cas_attempts) * 100:.1f}%")`,
     },
     {
       id: "thread-pool",
@@ -1067,7 +1067,7 @@ total = time.time() - start
 
 print(f"\\nCompleted \${len(results)} tasks in {total:.2f}s")
 print(f"With 4 workers and 0.5s/task: expected ~\${20 * 0.5 / 4:.1f}s")
-print(f"Speedup vs sequential: \${20 * 0.5 / total:.1f}x")`
-    }
-  ]
+print(f"Speedup vs sequential: \${20 * 0.5 / total:.1f}x")`,
+    },
+  ],
 };

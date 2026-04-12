@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const sortingModule: Module = {
   id: "sorting-algorithms",
   title: "Sorting Algorithms",
-  description:
-    "Implement and compare classic sorting algorithms: bubble sort, selection sort, merge sort, and quicksort.",
+  description: "Implement and compare classic sorting algorithms: bubble sort, selection sort, merge sort, and quicksort.",
   lessons: [
     {
       id: "sorting-bubble-selection",

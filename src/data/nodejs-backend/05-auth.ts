@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const authModule: Module = {
   id: "authentication",
   title: "Authentication",
-  description:
-    "Implement secure authentication: JWT tokens, password hashing with bcrypt, and protected route middleware.",
+  description: "Implement secure authentication: JWT tokens, password hashing with bcrypt, and protected route middleware.",
   lessons: [
     {
       id: "jwt-auth",

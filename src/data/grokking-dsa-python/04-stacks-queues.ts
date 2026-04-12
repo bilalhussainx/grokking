@@ -3,10 +3,8 @@ import { Module } from "../types";
 export const stacksQueuesModule: Module = {
   id: "stacks-queues",
   title: "Stacks & Queues",
-  description:
-    "Master LIFO and FIFO data structures, learn the monotonic stack pattern for next-greater-element problems, and use queues for BFS — the foundation of graph traversal.",
+  description: "Master LIFO and FIFO data structures, learn the monotonic stack pattern for next-greater-element problems, and use queues for BFS — the foundation of graph traversal.",
   lessons: [
-    // ─── Lesson 1: Stacks — LIFO ───
     {
       id: "stacks-lifo",
       slug: "stacks-lifo",
@@ -269,8 +267,6 @@ print(reverse_string_stack(""))
 # Expected: (empty string)
 `,
     },
-
-    // ─── Lesson 2: Queues — FIFO ───
     {
       id: "queues-fifo",
       slug: "queues-fifo",
@@ -535,8 +531,6 @@ print(generate_binary(3))
 # Expected: ['1', '10', '11']
 `,
     },
-
-    // ─── Lesson 3: Monotonic Stack ───
     {
       id: "monotonic-stack",
       slug: "monotonic-stack",
@@ -783,8 +777,6 @@ print(daily_temperatures([30, 20, 10]))
 # Expected: [0, 0, 0]
 `,
     },
-
-    // ─── Lesson 4: Module Checkpoint ───
     {
       id: "stacks-queues-checkpoint",
       slug: "stacks-queues-checkpoint",
