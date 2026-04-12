@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const knapsackModule: Module = {
   id: "knapsack-pattern",
   title: "0/1 Knapsack Pattern",
-  description:
-    "Learn the 0/1 Knapsack pattern and apply it to subset selection problems where each item can be included or excluded.",
+  description: "Learn the 0/1 Knapsack pattern and apply it to subset selection problems where each item can be included or excluded.",
   lessons: [
     {
       id: "knapsack-intro",

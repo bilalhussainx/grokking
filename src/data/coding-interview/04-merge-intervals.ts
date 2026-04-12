@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const mergeIntervalsModule: Module = {
   id: "merge-intervals",
   title: "Merge Intervals",
-  description:
-    "Learn to handle overlapping intervals — merging, inserting, and finding intersections efficiently.",
+  description: "Learn to handle overlapping intervals — merging, inserting, and finding intersections efficiently.",
   lessons: [
     {
       id: "merge-intervals-intro",

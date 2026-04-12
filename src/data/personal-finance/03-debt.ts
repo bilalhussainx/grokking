@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const debtModule: Module = {
   id: "pf-debt",
   title: "Debt Management",
-  description:
-    "Understand the different types of debt, how credit works, and strategies to eliminate debt efficiently. Resources: Investopedia, Dave Ramsey, Experian, Khan Academy.",
+  description: "Understand the different types of debt, how credit works, and strategies to eliminate debt efficiently. Resources: Investopedia, Dave Ramsey, Experian, Khan Academy.",
   lessons: [
     {
       id: "pf-good-vs-bad-debt",
@@ -41,9 +40,9 @@ Bad debt is borrowing to purchase **depreciating assets or consumable goods** �
 
 Some debt falls in between:
 
-**Auto loans** can be acceptable if the vehicle is necessary for earning income and the payment is reasonable (under 10% of take-home pay, with a loan term of 4 years or less). A \\\$15,000 reliable used car financed at 5% is very different from a \\\$60,000 luxury vehicle at 7%.
+**Auto loans** can be acceptable if the vehicle is necessary for earning income and the payment is reasonable (under 10% of take-home pay, with a loan term of 4 years or less). A \\$15,000 reliable used car financed at 5% is very different from a \\$60,000 luxury vehicle at 7%.
 
-**Student loans** become bad debt when the degree does not increase earning potential enough to justify the cost. Borrowing \\\$200,000 for a degree leading to a \\\$35,000 salary is a poor return on investment.
+**Student loans** become bad debt when the degree does not increase earning potential enough to justify the cost. Borrowing \\$200,000 for a degree leading to a \\$35,000 salary is a poor return on investment.
 
 ### The Interest Rate Test
 
@@ -54,13 +53,13 @@ A simple framework: if the interest rate on the debt is **lower** than the retur
 
 ### Real-World Example: The Debt Spectrum
 
-Consider three friends who each borrow \\\$30,000:
+Consider three friends who each borrow \\$30,000:
 
-**Alex** borrows for a home down payment supplement via a 5% personal loan. The home appreciates 4% annually. Over 10 years, the property gains \\\$60,000+ in value. The loan cost about \\\$8,000 in interest. **Net positive.**
+**Alex** borrows for a home down payment supplement via a 5% personal loan. The home appreciates 4% annually. Over 10 years, the property gains \\$60,000+ in value. The loan cost about \\$8,000 in interest. **Net positive.**
 
-**Jordan** borrows for a master's degree at 6% interest. The degree increases salary from \\\$50,000 to \\\$75,000. The extra \\\$25,000/year easily covers the loan. **Net positive.**
+**Jordan** borrows for a master's degree at 6% interest. The degree increases salary from \\$50,000 to \\$75,000. The extra \\$25,000/year easily covers the loan. **Net positive.**
 
-**Taylor** borrows via credit cards at 22% APR for furniture, vacations, and dining. The items are consumed or depreciated. Minimum payments stretch the payoff to 15+ years with \\\$40,000+ in interest. **Net negative.**
+**Taylor** borrows via credit cards at 22% APR for furniture, vacations, and dining. The items are consumed or depreciated. Minimum payments stretch the payoff to 15+ years with \\$40,000+ in interest. **Net negative.**
 
 ### The Debt-to-Income Ratio
 
@@ -125,7 +124,7 @@ Credit utilization is the ratio of your balance to your credit limit:
 Utilization = Balance / Credit Limit x 100
 \`\`\`
 
-**Example:** You have a credit card with a \\\$10,000 limit and a \\\$2,500 balance. Your utilization is 25%.
+**Example:** You have a credit card with a \\$10,000 limit and a \\$2,500 balance. Your utilization is 25%.
 
 - **0-9%**: Excellent impact on score
 - **10-29%**: Good
@@ -155,15 +154,15 @@ You are entitled to **one free credit report per year** from each bureau at **An
 
 ### Real-World Example: Score Impact
 
-Sarah has a 750 credit score. She is shopping for a \\\$300,000 30-year fixed mortgage.
+Sarah has a 750 credit score. She is shopping for a \\$300,000 30-year fixed mortgage.
 
 | Credit Score | Estimated APR | Monthly Payment | Total Interest Paid |
 |-------------|--------------|----------------|-------------------|
-| 750+ | 6.5% | \\\$1,896 | \\\$382,560 |
-| 680 | 7.1% | \\\$2,014 | \\\$425,040 |
-| 620 | 7.8% | \\\$2,155 | \\\$475,800 |
+| 750+ | 6.5% | \\$1,896 | \\$382,560 |
+| 680 | 7.1% | \\$2,014 | \\$425,040 |
+| 620 | 7.8% | \\$2,155 | \\$475,800 |
 
-The difference between a 750 and 620 score costs **\\\$93,240 over the life of the loan**. Your credit score is literally worth tens of thousands of dollars.
+The difference between a 750 and 620 score costs **\\$93,240 over the life of the loan**. Your credit score is literally worth tens of thousands of dollars.
 
 ### How to Improve Your Credit Score
 
@@ -191,18 +190,18 @@ When you have multiple debts, the order in which you pay them off matters. The t
 
 **Strategy:** Pay minimum on all debts. Direct all extra money to the debt with the **highest interest rate**. Once that is paid off, roll the payment to the next highest rate.
 
-**Example — Four debts, \\\$500/month extra to throw at debt:**
+**Example — Four debts, \\$500/month extra to throw at debt:**
 
 | Debt | Balance | APR | Minimum |
 |------|---------|-----|---------|
-| Credit Card A | \\\$5,000 | 22% | \\\$100 |
-| Credit Card B | \\\$2,000 | 18% | \\\$50 |
-| Car Loan | \\\$12,000 | 6% | \\\$250 |
-| Student Loan | \\\$25,000 | 5% | \\\$280 |
+| Credit Card A | \\$5,000 | 22% | \\$100 |
+| Credit Card B | \\$2,000 | 18% | \\$50 |
+| Car Loan | \\$12,000 | 6% | \\$250 |
+| Student Loan | \\$25,000 | 5% | \\$280 |
 
 **Avalanche order:** Credit Card A (22%) first, then Credit Card B (18%), then Car Loan (6%), then Student Loan (5%).
 
-You direct \\\$500 extra to Credit Card A (\\\$600/month total). Once it is paid off in about 9 months, you redirect that \\\$600 to Credit Card B, creating a \\\$650/month payment. And so on.
+You direct \\$500 extra to Credit Card A (\\$600/month total). Once it is paid off in about 9 months, you redirect that \\$600 to Credit Card B, creating a \\$650/month payment. And so on.
 
 **Pros:** Minimizes total interest paid. Mathematically, this is the cheapest way out of debt.
 **Cons:** If the highest-rate debt has a large balance, it may take a long time to see the first debt eliminated.
@@ -213,9 +212,9 @@ You direct \\\$500 extra to Credit Card A (\\\$600/month total). Once it is paid
 
 **Using the same debts:**
 
-**Snowball order:** Credit Card B (\\\$2,000) first, then Credit Card A (\\\$5,000), then Car Loan (\\\$12,000), then Student Loan (\\\$25,000).
+**Snowball order:** Credit Card B (\\$2,000) first, then Credit Card A (\\$5,000), then Car Loan (\\$12,000), then Student Loan (\\$25,000).
 
-You direct \\\$500 extra to Credit Card B (\\\$550/month total). It is paid off in about 4 months — a quick win! Then you redirect that \\\$550 to Credit Card A, and so on.
+You direct \\$500 extra to Credit Card B (\\$550/month total). It is paid off in about 4 months — a quick win! Then you redirect that \\$550 to Credit Card A, and so on.
 
 **Pros:** Quick wins build motivation. Research published in the *Harvard Business Review* found that people who pay off small debts first are more likely to eliminate all their debt.
 **Cons:** You pay more in total interest because higher-rate debts accrue interest longer.
@@ -234,18 +233,18 @@ graph TD
 
 ### Head-to-Head Comparison
 
-Using the example above with \\\$500/month extra:
+Using the example above with \\$500/month extra:
 
 | Method | Total Interest Paid | Time to Debt-Free | First Debt Eliminated |
 |--------|--------------------|--------------------|----------------------|
-| Avalanche | \\\$5,120 | 38 months | 9 months |
-| Snowball | \\\$5,680 | 39 months | 4 months |
+| Avalanche | \\$5,120 | 38 months | 9 months |
+| Snowball | \\$5,680 | 39 months | 4 months |
 
-The avalanche saves \\\$560 in interest and finishes one month sooner. But the snowball provides a psychological victory 5 months earlier.
+The avalanche saves \\$560 in interest and finishes one month sooner. But the snowball provides a psychological victory 5 months earlier.
 
 ### Real-World Example: The Psychology Factor
 
-Marcus had \\\$38,000 in debt across six accounts. He tried the avalanche method for four months but felt demoralized — his largest high-interest debt barely budged. He switched to the snowball method and paid off his smallest debt (\\\$800 store credit card) in six weeks. The rush of crossing a debt off his list motivated him to attack the next one. Eighteen months later, Marcus was debt-free.
+Marcus had \\$38,000 in debt across six accounts. He tried the avalanche method for four months but felt demoralized — his largest high-interest debt barely budged. He switched to the snowball method and paid off his smallest debt (\\$800 store credit card) in six weeks. The rush of crossing a debt off his list motivated him to attack the next one. Eighteen months later, Marcus was debt-free.
 
 The mathematically perfect plan you abandon is worse than the suboptimal plan you complete.
 
@@ -253,7 +252,7 @@ The mathematically perfect plan you abandon is worse than the suboptimal plan yo
 
 Some financial advisors recommend a hybrid:
 
-1. **First**, pay off any debt under \\\$500 regardless of interest rate (quick win).
+1. **First**, pay off any debt under \\$500 regardless of interest rate (quick win).
 2. **Then**, switch to the avalanche method for remaining debts.
 3. **If motivation drops**, knock out the next smallest balance for a psychological boost.
 
@@ -268,7 +267,7 @@ Some financial advisors recommend a hybrid:
 
 ### The Real Enemy: Minimum Payments
 
-Both methods share a critical requirement: paying **more** than the minimum. Minimum payments are designed to maximize interest revenue for the lender. On a \\\$10,000 credit card at 20% APR with minimum payments (2% of balance), payoff takes over 30 years and costs \\\$16,000+ in interest.
+Both methods share a critical requirement: paying **more** than the minimum. Minimum payments are designed to maximize interest revenue for the lender. On a \\$10,000 credit card at 20% APR with minimum payments (2% of balance), payoff takes over 30 years and costs \\$16,000+ in interest.
 
 ### Key Takeaway
 
@@ -284,7 +283,7 @@ Both the avalanche and snowball methods work. The avalanche saves money; the sno
       title: "Student Loans: Repayment Strategies",
       content: `## Student Loans: Repayment Strategies
 
-Student loan debt in the United States totals over \\\$1.77 trillion, held by approximately 43.5 million borrowers (Federal Reserve, 2023). The average borrower owes around \\\$37,000. Understanding your repayment options is essential for managing this debt effectively.
+Student loan debt in the United States totals over \\$1.77 trillion, held by approximately 43.5 million borrowers (Federal Reserve, 2023). The average borrower owes around \\$37,000. Understanding your repayment options is essential for managing this debt effectively.
 
 ### Federal vs Private Student Loans
 
@@ -328,7 +327,7 @@ Requirements:
 - 120 qualifying payments (do not need to be consecutive)
 - Must be on an IDR plan
 
-**Real-World Example:** Aisha is a public school teacher with \\\$60,000 in federal loans. On the SAVE plan, her payment is \\\$250/month. After 10 years of payments totaling \\\$30,000, her remaining balance of approximately \\\$42,000 is forgiven tax-free through PSLF. Without PSLF, she would have paid over \\\$72,000 total.
+**Real-World Example:** Aisha is a public school teacher with \\$60,000 in federal loans. On the SAVE plan, her payment is \\$250/month. After 10 years of payments totaling \\$30,000, her remaining balance of approximately \\$42,000 is forgiven tax-free through PSLF. Without PSLF, she would have paid over \\$72,000 total.
 
 ### Refinancing: When It Makes Sense
 
@@ -353,7 +352,7 @@ If you want to eliminate student loans fast:
 1. **Pay more than the minimum** — Specify that extra payments go to **principal**, not future payments
 2. **Use the avalanche method** — Target the highest-rate loan first
 3. **Refinance high-rate loans** — If it makes sense per the criteria above
-4. **Employer assistance** — Some employers offer student loan repayment benefits (up to \\\$5,250/year tax-free through 2025)
+4. **Employer assistance** — Some employers offer student loan repayment benefits (up to \\$5,250/year tax-free through 2025)
 5. **Side income** — Dedicate freelance or gig income entirely to loans
 
 ### The Forgiveness vs Payoff Decision
@@ -393,10 +392,10 @@ A mortgage is a loan used to purchase real estate, where the property itself ser
 
 A fixed-rate mortgage locks in your interest rate for the entire loan term. Your payment never changes.
 
-**Example:** \\\$300,000 loan at 6.5% fixed for 30 years
-- Monthly payment: \\\$1,896 (principal + interest)
-- Total paid over 30 years: \\\$682,633
-- Total interest: \\\$382,633
+**Example:** \\$300,000 loan at 6.5% fixed for 30 years
+- Monthly payment: \\$1,896 (principal + interest)
+- Total paid over 30 years: \\$682,633
+- Total interest: \\$382,633
 
 **Pros:**
 - Predictable payments — easy to budget
@@ -417,8 +416,8 @@ An ARM starts with a lower fixed rate for an introductory period, then adjusts p
 - **7/1 ARM:** Fixed for 7 years, then adjusts annually
 - **10/1 ARM:** Fixed for 10 years, then adjusts annually
 
-**Example:** \\\$300,000 loan, 5/1 ARM starting at 5.5%
-- Years 1-5: \\\$1,703/month
+**Example:** \\$300,000 loan, 5/1 ARM starting at 5.5%
+- Years 1-5: \\$1,703/month
 - Year 6+: Adjusts based on index (could go up to 7-8% or higher)
 
 **Pros:**
@@ -440,40 +439,40 @@ An ARM starts with a lower fixed rate for an introductory period, then adjusts p
 | Total interest paid | Much less | Much more |
 | Flexibility | Less (locked into higher payment) | More (can always pay extra) |
 
-**Example on \\\$300,000 loan:**
-- 30-year at 6.5%: \\\$1,896/month, \\\$382,633 total interest
-- 15-year at 5.8%: \\\$2,511/month, \\\$151,937 total interest
+**Example on \\$300,000 loan:**
+- 30-year at 6.5%: \\$1,896/month, \\$382,633 total interest
+- 15-year at 5.8%: \\$2,511/month, \\$151,937 total interest
 
-The 15-year mortgage costs \\\$615 more per month but saves **\\\$230,696** in interest.
+The 15-year mortgage costs \\$615 more per month but saves **\\$230,696** in interest.
 
 ### Understanding Amortization
 
 Amortization is the process of paying off a loan through regular payments. Here is the critical insight: **in the early years, most of your payment goes to interest, not principal.**
 
-**Year 1 of a \\\$300,000, 30-year, 6.5% mortgage:**
-- Monthly payment: \\\$1,896
-- Month 1 interest: \\\$1,625 (85.7% of payment!)
-- Month 1 principal: \\\$271 (14.3%)
+**Year 1 of a \\$300,000, 30-year, 6.5% mortgage:**
+- Monthly payment: \\$1,896
+- Month 1 interest: \\$1,625 (85.7% of payment!)
+- Month 1 principal: \\$271 (14.3%)
 
 **Year 15 (halfway through):**
-- Monthly payment: \\\$1,896 (same)
-- Month 180 interest: \\\$1,091 (57.5%)
-- Month 180 principal: \\\$805 (42.5%)
+- Monthly payment: \\$1,896 (same)
+- Month 180 interest: \\$1,091 (57.5%)
+- Month 180 principal: \\$805 (42.5%)
 
 **Year 28 (near the end):**
-- Monthly payment: \\\$1,896 (same)
-- Month 336 interest: \\\$288 (15.2%)
-- Month 336 principal: \\\$1,608 (84.8%)
+- Monthly payment: \\$1,896 (same)
+- Month 336 interest: \\$288 (15.2%)
+- Month 336 principal: \\$1,608 (84.8%)
 
 This front-loading of interest is why extra principal payments in the early years are so powerful — they reduce the balance that future interest is calculated on.
 
 ### The Down Payment Decision
 
-| Down Payment | Amount on \\\$400K Home | PMI Required? | Monthly Savings |
+| Down Payment | Amount on \\$400K Home | PMI Required? | Monthly Savings |
 |-------------|----------------------|--------------|----------------|
-| 3% | \\\$12,000 | Yes | N/A (baseline) |
-| 10% | \\\$40,000 | Yes | ~\\\$160/month less |
-| 20% | \\\$80,000 | No | ~\\\$340/month less + no PMI |
+| 3% | \\$12,000 | Yes | N/A (baseline) |
+| 10% | \\$40,000 | Yes | ~\\$160/month less |
+| 20% | \\$80,000 | No | ~\\$340/month less + no PMI |
 
 **PMI (Private Mortgage Insurance)** is required when the down payment is less than 20%. It typically costs 0.5-1% of the loan amount annually and protects the *lender*, not you.
 

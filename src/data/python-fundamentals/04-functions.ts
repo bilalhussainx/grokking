@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const functionsModule: Module = {
   id: "functions",
   title: "Functions",
-  description:
-    "Learn to define reusable blocks of code with def, parameters, return values, and understand variable scope.",
+  description: "Learn to define reusable blocks of code with def, parameters, return values, and understand variable scope.",
   lessons: [
     {
       id: "functions-intro",

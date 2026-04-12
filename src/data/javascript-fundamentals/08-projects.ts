@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const projectsModule: Module = {
   id: "js-projects",
   title: "Mini Projects",
-  description:
-    "Apply everything you have learned by building real-world utilities: a task queue, a mini lodash library, and a URL parser.",
+  description: "Apply everything you have learned by building real-world utilities: a task queue, a mini lodash library, and a URL parser.",
   lessons: [
     {
       id: "js-projects-intro",

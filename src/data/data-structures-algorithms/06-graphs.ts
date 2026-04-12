@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const graphsModule: Module = {
   id: "graphs",
   title: "Graphs",
-  description:
-    "Learn graph representations, implement BFS and DFS traversals, and solve shortest path problems with Dijkstra's algorithm.",
+  description: "Learn graph representations, implement BFS and DFS traversals, and solve shortest path problems with Dijkstra's algorithm.",
   lessons: [
     {
       id: "graphs-representations",

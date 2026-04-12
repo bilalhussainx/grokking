@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const treeBFSModule: Module = {
   id: "tree-bfs",
   title: "Tree Breadth First Search",
-  description:
-    "Learn level-order traversal using queues — process trees level by level for a variety of problems.",
+  description: "Learn level-order traversal using queues — process trees level by level for a variety of problems.",
   lessons: [
     {
       id: "tree-bfs-intro",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const projectsModule: Module = {
   id: "mini-projects",
   title: "Mini Projects",
-  description:
-    "Apply everything you have learned to build a rate limiter, a task queue, and a mini Express-like framework from scratch.",
+  description: "Apply everything you have learned to build a rate limiter, a task queue, and a mini Express-like framework from scratch.",
   lessons: [
     {
       id: "project-rate-limiter",

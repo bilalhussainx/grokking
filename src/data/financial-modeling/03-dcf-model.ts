@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const dcfModelModule: Module = {
   id: "fm-dcf",
   title: "DCF Model",
-  description:
-    "Build a complete DCF valuation model from revenue build to equity bridge.",
+  description: "Build a complete DCF valuation model from revenue build to equity bridge.",
   lessons: [
     {
       id: "fm-dcf-revenue-build",

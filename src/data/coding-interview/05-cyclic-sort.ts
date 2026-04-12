@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const cyclicSortModule: Module = {
   id: "cyclic-sort",
   title: "Cyclic Sort",
-  description:
-    "Use cyclic sort to solve problems where numbers are in a known range — find missing, duplicate, or misplaced elements in O(n) time.",
+  description: "Use cyclic sort to solve problems where numbers are in a known range — find missing, duplicate, or misplaced elements in O(n) time.",
   lessons: [
     {
       id: "cyclic-sort-intro",

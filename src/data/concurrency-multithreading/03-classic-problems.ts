@@ -178,7 +178,7 @@ for t in producers + consumers:
     t.join()
 
 print(f"\\nProduced: \${produced_count['value']}, Consumed: \${consumed_count['value']}")
-print(f"Buffer remaining: \${list(pc.buffer)}")`
+print(f"Buffer remaining: \${list(pc.buffer)}")`,
     },
     {
       id: "readers-writers",
@@ -362,7 +362,7 @@ for t in readers + writers:
     t.start()
 for t in readers + writers:
     t.join()
-print("\\nDone! All readers and writers completed.")`
+print("\\nDone! All readers and writers completed.")`,
     },
     {
       id: "dining-philosophers",
@@ -515,7 +515,7 @@ for t in threads:
 
 print(f"\\nMeals eaten: \${eat_count}")
 print(f"Total meals: \${sum(eat_count)} (expected: \${NUM_PHILOSOPHERS * 3})")
-print("No deadlock! Lock ordering prevents circular wait.")`
+print("No deadlock! Lock ordering prevents circular wait.")`,
     },
     {
       id: "sleeping-barber",
@@ -692,7 +692,7 @@ time.sleep(1)  # Let last haircut finish
 print(f"\\n=== Results ===")
 print(f"Customers served: \${stats['served']}")
 print(f"Customers turned away: \${stats['turned_away']}")
-print(f"Total: \${stats['served'] + stats['turned_away']} / \${NUM_CUSTOMERS}")`
+print(f"Total: \${stats['served'] + stats['turned_away']} / \${NUM_CUSTOMERS}")`,
     },
     {
       id: "cigarette-smokers",
@@ -854,7 +854,7 @@ time.sleep(1)  # Let last smoker finish
 print(f"\\n=== Results after \${ROUNDS} rounds ===")
 for ingredient, count in smoke_count.items():
     print(f"  Smoker with {ingredient}: smoked \${count} times")
-print(f"  Total: \${sum(smoke_count.values())} (expected: \${ROUNDS})")`
-    }
-  ]
+print(f"  Total: \${sum(smoke_count.values())} (expected: \${ROUNDS})")`,
+    },
+  ],
 };

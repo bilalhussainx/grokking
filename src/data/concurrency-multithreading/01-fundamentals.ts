@@ -112,7 +112,7 @@ t2.join()
 # and both write back the same result — losing one update.
 print(f"Expected: 200000")
 print(f"Actual:   \${counter}")
-print(f"Lost updates: \${200000 - counter}")`
+print(f"Lost updates: \${200000 - counter}")`,
     },
     {
       id: "processes-threads-coroutines",
@@ -251,7 +251,7 @@ process_end = time.time()
 
 print(f"Thread time:  \${thread_end - thread_start:.4f}s")
 print(f"Process time: \${process_end - process_start:.4f}s")
-print(f"Processes are ~\${(process_end - process_start) / (thread_end - thread_start):.1f}x slower to create")`
+print(f"Processes are ~\${(process_end - process_start) / (thread_end - thread_start):.1f}x slower to create")`,
     },
     {
       id: "thread-lifecycle-states",
@@ -391,7 +391,7 @@ def background_task():
 daemon = threading.Thread(target=background_task, daemon=True, name="Daemon-1")
 daemon.start()
 time.sleep(1)
-print("Main thread exiting — daemon will be killed automatically")`
+print("Main thread exiting — daemon will be killed automatically")`,
     },
     {
       id: "race-conditions-critical-sections",
@@ -564,7 +564,7 @@ for i in range(5):
 
 print("\\n--- Safe (with Lock) ---")
 for i in range(5):
-    test_account(BankAccountSafe, f"Run {i+1}")`
+    test_account(BankAccountSafe, f"Run {i+1}")`,
     },
     {
       id: "deadlock-livelock-starvation",
@@ -739,7 +739,7 @@ t1.start()
 t2.start()
 t1.join()
 t2.join()
-print("No deadlock! Lock ordering prevents circular wait.")`
-    }
-  ]
+print("No deadlock! Lock ordering prevents circular wait.")`,
+    },
+  ],
 };

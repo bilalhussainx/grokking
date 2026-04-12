@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const variablesAndTypesModule: Module = {
   id: "variables-and-types",
   title: "Variables & Data Types",
-  description:
-    "Learn how Python stores data — variables, strings, numbers, booleans, and how to convert between types.",
+  description: "Learn how Python stores data — variables, strings, numbers, booleans, and how to convert between types.",
   lessons: [
     {
       id: "variables-intro",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const frontendSetupModule: Module = {
   id: "mern-frontend-setup",
   title: "Frontend Setup",
-  description:
-    "Scaffold a React frontend with Vite, connect it to your Express API, and add client-side routing.",
+  description: "Scaffold a React frontend with Vite, connect it to your Express API, and add client-side routing.",
   lessons: [
     {
       id: "react-with-vite",

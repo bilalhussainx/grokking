@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const googleDocsModule: Module = {
   id: "sd-12",
   title: "Design Google Docs",
-  description:
-    "Design a real-time collaborative document editor supporting concurrent editing, conflict resolution, version history, and sharing permissions.",
+  description: "Design a real-time collaborative document editor supporting concurrent editing, conflict resolution, version history, and sharing permissions.",
   lessons: [
     {
       id: "sd-12-01",

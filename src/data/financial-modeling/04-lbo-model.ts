@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const lboModelModule: Module = {
   id: "fm-lbo",
   title: "LBO Model",
-  description:
-    "Build a leveraged buyout model from sources and uses through debt schedules, cash flow sweeps, and returns analysis.",
+  description: "Build a leveraged buyout model from sources and uses through debt schedules, cash flow sweeps, and returns analysis.",
   lessons: [
     {
       id: "fm-lbo-sources-uses",

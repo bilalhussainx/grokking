@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const backendSetupModule: Module = {
   id: "mern-backend-setup",
   title: "Backend Setup",
-  description:
-    "Set up an Express server, connect to MongoDB, and build your first REST routes.",
+  description: "Set up an Express server, connect to MongoDB, and build your first REST routes.",
   lessons: [
     {
       id: "express-server",

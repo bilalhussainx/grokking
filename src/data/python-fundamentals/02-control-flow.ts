@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const controlFlowModule: Module = {
   id: "control-flow",
   title: "Control Flow",
-  description:
-    "Master if/elif/else statements and comparison operators to make your programs make decisions.",
+  description: "Master if/elif/else statements and comparison operators to make your programs make decisions.",
   lessons: [
     {
       id: "control-flow-intro",

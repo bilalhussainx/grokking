@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const projectsModule: Module = {
   id: "csharp-projects",
   title: "Mini Projects",
-  description:
-    "Apply everything you have learned by building real C# projects — a bank account system, grade tracker, and inventory manager.",
+  description: "Apply everything you have learned by building real C# projects — a bank account system, grade tracker, and inventory manager.",
   lessons: [
     {
       id: "csharp-project-bank",

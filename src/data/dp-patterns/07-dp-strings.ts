@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const dpStringsModule: Module = {
   id: "dp-strings-pattern",
   title: "DP on Strings & Sequences",
-  description:
-    "Solve advanced DP problems on strings including edit distance, interleaving, and pattern matching.",
+  description: "Solve advanced DP problems on strings including edit distance, interleaving, and pattern matching.",
   lessons: [
     {
       id: "dp-strings-intro",

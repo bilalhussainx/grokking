@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const mcmModule: Module = {
   id: "mcm-pattern",
   title: "Matrix Chain Multiplication Pattern",
-  description:
-    "Learn the interval DP pattern through matrix chain multiplication and related partition problems.",
+  description: "Learn the interval DP pattern through matrix chain multiplication and related partition problems.",
   lessons: [
     {
       id: "mcm-intro",

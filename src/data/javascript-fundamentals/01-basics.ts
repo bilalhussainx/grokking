@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const basicsModule: Module = {
   id: "js-basics",
   title: "Variables & Data Types",
-  description:
-    "Learn about variables (let, const, var), primitive data types, type coercion, and template literals in modern JavaScript.",
+  description: "Learn about variables (let, const, var), primitive data types, type coercion, and template literals in modern JavaScript.",
   lessons: [
     {
       id: "js-basics-intro",

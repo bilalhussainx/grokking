@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const oopBasicsModule: Module = {
   id: "oop-basics",
   title: "OOP Basics",
-  description:
-    "Introduction to Object-Oriented Programming — classes, objects, methods, __init__, and inheritance.",
+  description: "Introduction to Object-Oriented Programming — classes, objects, methods, __init__, and inheritance.",
   lessons: [
     {
       id: "oop-intro",

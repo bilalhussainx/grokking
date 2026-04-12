@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const threeStatementModule: Module = {
   id: "fm-three-statement",
   title: "Three-Statement Model",
-  description:
-    "Build a complete three-statement financial model — connecting income statement, balance sheet, and cash flow statement.",
+  description: "Build a complete three-statement financial model — connecting income statement, balance sheet, and cash flow statement.",
   lessons: [
     {
       id: "fm-three-statement-income",

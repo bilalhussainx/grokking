@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const topKElementsModule: Module = {
   id: "top-k-elements",
   title: "Top K Elements",
-  description:
-    "Use heaps to efficiently find the top, bottom, or most frequent K elements in a dataset.",
+  description: "Use heaps to efficiently find the top, bottom, or most frequent K elements in a dataset.",
   lessons: [
     {
       id: "top-k-elements-intro",

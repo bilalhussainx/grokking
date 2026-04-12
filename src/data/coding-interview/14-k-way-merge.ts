@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const kWayMergeModule: Module = {
   id: "k-way-merge",
   title: "K-Way Merge",
-  description:
-    "Merge K sorted collections efficiently using a min-heap for O(N log K) performance.",
+  description: "Merge K sorted collections efficiently using a min-heap for O(N log K) performance.",
   lessons: [
     {
       id: "k-way-merge-intro",

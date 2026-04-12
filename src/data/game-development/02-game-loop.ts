@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const gameLoopModule: Module = {
   id: "game-loop",
   title: "The Game Loop",
-  description:
-    "Master the game loop pattern — manage game state, separate update from render, and handle frame-independent movement.",
+  description: "Master the game loop pattern — manage game state, separate update from render, and handle frame-independent movement.",
   lessons: [
     {
       id: "game-state",

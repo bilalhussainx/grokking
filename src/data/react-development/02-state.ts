@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const stateModule: Module = {
   id: "state",
   title: "State Management",
-  description:
-    "Understand state management concepts by implementing useState, useReducer, and state machines from scratch.",
+  description: "Understand state management concepts by implementing useState, useReducer, and state machines from scratch.",
   lessons: [
     {
       id: "state-intro",

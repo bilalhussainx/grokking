@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const modifiedBinarySearchModule: Module = {
   id: "modified-binary-search",
   title: "Modified Binary Search",
-  description:
-    "Adapt the classic binary search algorithm to handle rotated arrays, unknown bounds, and find boundary elements.",
+  description: "Adapt the classic binary search algorithm to handle rotated arrays, unknown bounds, and find boundary elements.",
   lessons: [
     {
       id: "modified-binary-search-intro",

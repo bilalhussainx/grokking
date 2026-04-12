@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const cppAdvancedModule: Module = {
   id: "cpp-advanced",
   title: "Advanced C++ Concepts",
-  description:
-    "Explore RAII, move semantics, and iterators — advanced C++ patterns implemented as Python equivalents.",
+  description: "Explore RAII, move semantics, and iterators — advanced C++ patterns implemented as Python equivalents.",
   lessons: [
     {
       id: "cpp-advanced-intro",

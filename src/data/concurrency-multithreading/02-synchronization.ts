@@ -158,7 +158,7 @@ def factorial(n, depth=0):
 result = factorial(10)
 print(f"factorial(10) = \${result}")
 print(f"Max recursion depth tracked: \${max_depth['value']}")
-print("RLock allowed same-thread reentrant locking!")`
+print("RLock allowed same-thread reentrant locking!")`,
     },
     {
       id: "semaphores",
@@ -296,7 +296,7 @@ for t in threads:
 total = time.time() - start_time
 print(f"\\nAll workers done in {total:.1f}s")
 print(f"With \${MAX_CONNECTIONS} max connections, 10 workers each taking 1s:")
-print(f"Expected ~{10 / MAX_CONNECTIONS:.0f}s, actual {total:.1f}s")`
+print(f"Expected ~{10 / MAX_CONNECTIONS:.0f}s, actual {total:.1f}s")`,
     },
     {
       id: "monitors-condition-variables",
@@ -496,7 +496,7 @@ for t in producers + consumers:
     t.start()
 for t in producers + consumers:
     t.join()
-print("\\nAll done! Buffer should be empty:", buffer.buffer)`
+print("\\nAll done! Buffer should be empty:", buffer.buffer)`,
     },
     {
       id: "read-write-locks",
@@ -688,7 +688,7 @@ for t in readers + writers:
 
 print(f"\\nCompleted in {time.time() - start:.2f}s")
 print(f"Total reads: \${stats['reads']}, Total writes: \${stats['writes']}")
-print(f"Final config: \${config}")`
+print(f"Final config: \${config}")`,
     },
     {
       id: "atomic-operations-cas",
@@ -869,7 +869,7 @@ print(f"Actual:   \${counter.get()}")
 print(f"CAS attempts: \${counter.cas_attempts}")
 print(f"CAS failures: \${counter.cas_failures}")
 print(f"Retry rate: \${counter.cas_failures / counter.cas_attempts * 100:.1f}%")
-assert counter.get() == 100000, "Incorrect count!"`
-    }
-  ]
+assert counter.get() == 100000, "Incorrect count!"`,
+    },
+  ],
 };

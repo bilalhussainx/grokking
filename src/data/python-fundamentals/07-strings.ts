@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const stringsModule: Module = {
   id: "strings",
   title: "String Methods & Formatting",
-  description:
-    "Deep dive into string methods, f-string formatting, slicing techniques, and text processing.",
+  description: "Deep dive into string methods, f-string formatting, slicing techniques, and text processing.",
   lessons: [
     {
       id: "strings-intro",

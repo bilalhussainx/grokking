@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const keyValueStoreModule: Module = {
   id: "sd-10",
   title: "Design a Key-Value Store",
-  description:
-    "Design a distributed key-value store with high availability, scalability, and tunable consistency using techniques like consistent hashing and LSM trees.",
+  description: "Design a distributed key-value store with high availability, scalability, and tunable consistency using techniques like consistent hashing and LSM trees.",
   lessons: [
     {
       id: "sd-10-01",

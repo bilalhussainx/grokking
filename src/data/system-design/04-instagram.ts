@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const instagramModule: Module = {
   id: "sd-instagram",
   title: "Design Instagram",
-  description:
-    "Design a photo-sharing social network — upload, feed generation, stories, and media delivery at scale.",
+  description: "Design a photo-sharing social network — upload, feed generation, stories, and media delivery at scale.",
   lessons: [
     {
       id: "sd-ig-1",

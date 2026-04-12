@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const deploymentModule: Module = {
   id: "mern-deployment",
   title: "Deployment",
-  description:
-    "Prepare your MERN app for production with environment variables, optimized builds, and Docker containers.",
+  description: "Prepare your MERN app for production with environment variables, optimized builds, and Docker containers.",
   lessons: [
     {
       id: "env-vars-production-build",

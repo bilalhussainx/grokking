@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const httpModule: Module = {
   id: "http-fundamentals",
   title: "HTTP Fundamentals",
-  description:
-    "Understand HTTP by building a parser, router, and middleware chain from scratch.",
+  description: "Understand HTTP by building a parser, router, and middleware chain from scratch.",
   lessons: [
     {
       id: "http-intro",

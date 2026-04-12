@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const linkedListsModule: Module = {
   id: "linked-lists",
   title: "Linked Lists",
-  description:
-    "Master singly and doubly linked lists, core operations, and classic interview problems involving pointer manipulation.",
+  description: "Master singly and doubly linked lists, core operations, and classic interview problems involving pointer manipulation.",
   lessons: [
     {
       id: "linked-lists-singly",

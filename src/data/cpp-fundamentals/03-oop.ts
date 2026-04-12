@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const cppOopModule: Module = {
   id: "cpp-oop",
   title: "Object-Oriented Programming",
-  description:
-    "Master C++ OOP — classes, inheritance, polymorphism, operator overloading, and templates — using Python exercises.",
+  description: "Master C++ OOP — classes, inheritance, polymorphism, operator overloading, and templates — using Python exercises.",
   lessons: [
     {
       id: "cpp-oop-intro",

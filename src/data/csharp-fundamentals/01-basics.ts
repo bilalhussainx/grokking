@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const csharpBasicsModule: Module = {
   id: "csharp-basics",
   title: "C# Basics",
-  description:
-    "Get started with C# programming — write your first program, learn about variables, types, operators, and type conversions.",
+  description: "Get started with C# programming — write your first program, learn about variables, types, operators, and type conversions.",
   lessons: [
     {
       id: "csharp-hello-world",

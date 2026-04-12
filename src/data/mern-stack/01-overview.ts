@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const overviewModule: Module = {
   id: "mern-overview",
   title: "MERN Overview",
-  description:
-    "Understand what the MERN stack is and how to architect a full-stack JavaScript project.",
+  description: "Understand what the MERN stack is and how to architect a full-stack JavaScript project.",
   lessons: [
     {
       id: "what-is-mern",

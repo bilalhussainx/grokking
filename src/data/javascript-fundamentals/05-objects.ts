@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const objectsModule: Module = {
   id: "js-objects",
   title: "Objects & Prototypes",
-  description:
-    "Work with objects, understand 'this', prototypes, destructuring, and master deep manipulation patterns.",
+  description: "Work with objects, understand 'this', prototypes, destructuring, and master deep manipulation patterns.",
   lessons: [
     {
       id: "js-objects-intro",

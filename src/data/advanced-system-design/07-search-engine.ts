@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const searchEngineModule: Module = {
   id: "design-search",
   title: "Designing a Distributed Search Engine",
-  description:
-    "Design a distributed search engine: inverted indexes, TF-IDF and BM25 scoring, distributed indexing, real-time ingestion pipelines, and complete Elasticsearch-inspired architecture walkthrough.",
+  description: "Design a distributed search engine: inverted indexes, TF-IDF and BM25 scoring, distributed indexing, real-time ingestion pipelines, and complete Elasticsearch-inspired architecture walkthrough.",
   lessons: [
     {
       id: "search-requirements",
@@ -120,177 +119,81 @@ A search engine solves the problem of finding relevant documents in a massive co
       title: "Inverted Index Design",
       content: `# Inverted Index Design
 
+\`\`\`concept
+{"title": "The Inverted Index Mental Model", "variant": "mental-model", "content": "Think of a library catalog vs. a book index. A catalog (forward index) tells you what books the library has. A book index (inverted index) tells you every page where a specific word appears. Search engines flip the document→word relationship so they can answer \\"which documents contain X?\\" in milliseconds instead of scanning every file."}
+\`\`\`
+
 The **inverted index** is the core data structure of every search engine. Instead of mapping documents to their words (a forward index), it maps each word to the list of documents that contain it.
 
-## Forward Index vs. Inverted Index
+## Forward vs. Inverted: Direction Matters
 
-\`\`\`
-Forward Index (what a database stores):
-  doc_1: "the quick brown fox jumps over the lazy dog"
-  doc_2: "the fox is quick and brown"
-  doc_3: "a lazy dog sleeps"
-
-Inverted Index (what a search engine stores):
-  "brown"  --> [doc_1, doc_2]
-  "dog"    --> [doc_1, doc_3]
-  "fox"    --> [doc_1, doc_2]
-  "jumps"  --> [doc_1]
-  "lazy"   --> [doc_1, doc_3]
-  "quick"  --> [doc_1, doc_2]
-  "sleeps" --> [doc_3]
-  ...
-
-Query: "quick fox"
-  "quick" --> [doc_1, doc_2]
-  "fox"   --> [doc_1, doc_2]
-  Intersect: [doc_1, doc_2]  (both contain both terms)
+\`\`\`compare
+{"variant": "before-after", "before": {"label": "Forward Index (database style)", "code": "doc_1: \\"the quick brown fox jumps over the lazy dog\\"\\ndoc_2: \\"the fox is quick and brown\\"\\ndoc_3: \\"a lazy dog sleeps\\"\\n\\nTo find \\"fox\\": scan every doc → O(N·L)"}, "after": {"label": "Inverted Index (search style)", "code": "\\"brown\\"  → [doc_1, doc_2]\\n\\"dog\\"    → [doc_1, doc_3]\\n\\"fox\\"    → [doc_1, doc_2]\\n\\"jumps\\"  → [doc_1]\\n\\"lazy\\"   → [doc_1, doc_3]\\n\\"quick\\"  → [doc_1, doc_2]\\n\\"sleeps\\" → [doc_3]\\n\\nQuery \\"quick fox\\":\\n  intersect([doc_1,doc_2], [doc_1,doc_2]) → [doc_1,doc_2] in O(log P)"}}
 \`\`\`
 
-To search for a term, you look up its **posting list** -- the sorted list of document IDs containing that term. For multi-term queries, you intersect or union the posting lists.
+To search for a term, you look up its **posting list** — the sorted list of document IDs containing that term. For multi-term queries, you intersect or union the posting lists.
 
 ## Anatomy of a Posting List
 
 A basic posting list stores just document IDs. A richer posting list stores additional metadata for scoring and highlighting:
 
+\`\`\`algoviz
+{"title": "Posting List Enrichment", "type": "array", "data": ["[doc_1, doc_2]", "[(doc_1,1), (doc_2,1)]", "[(doc_1,1,[1]), (doc_2,1,[3])]", "[(doc_1,1,[1],\\"body\\"), (doc_2,1,[3],\\"title\\")]"], "frames": [{"highlight": [0], "label": "Basic: only doc IDs", "stats": {"bytes": 16}}, {"highlight": [1], "label": "+ term frequency (TF) for scoring", "stats": {"bytes": 32}}, {"highlight": [2], "label": "+ positions for phrase queries", "stats": {"bytes": 56}}, {"highlight": [3], "label": "+ field info for weighted scoring", "stats": {"bytes": 72}}], "speed": 1000}
 \`\`\`
-Posting List for "quick"
-=========================
-
-Basic:
-  [doc_1, doc_2]
-
-With term frequency (TF):
-  [(doc_1, tf=1), (doc_2, tf=1)]
-
-With positions (for phrase queries):
-  [(doc_1, tf=1, positions=[1]),
-   (doc_2, tf=1, positions=[3])]
-
-With field information:
-  [(doc_1, tf=1, positions=[1], field="body"),
-   (doc_2, tf=1, positions=[3], field="title")]
 
 Positions enable phrase queries:
-  Query: "quick brown"
-  "quick" in doc_1: position 1
-  "brown" in doc_1: position 2
-  Position difference = 1 --> adjacent --> phrase match!
-\`\`\`
+- Query: \`"quick brown"\`
+- \`doc_1\`: "quick" at position 1, "brown" at position 2 → adjacent → phrase match!
 
 ## Tokenization Pipeline
 
 Before building the index, documents pass through an **analyzer** that transforms raw text into index terms:
 
-\`\`\`
-Analyzer Pipeline
-==================
-
-Input: "The Quick Brown Fox's 2nd Jump!"
-
-Step 1: Character filters
-  Remove HTML, normalize unicode
-  --> "The Quick Brown Fox's 2nd Jump!"
-
-Step 2: Tokenizer (split into tokens)
-  --> ["The", "Quick", "Brown", "Fox's", "2nd", "Jump"]
-
-Step 3: Token filters (applied in order)
-  a. Lowercase:     ["the", "quick", "brown", "fox's", "2nd", "jump"]
-  b. Possessive:    ["the", "quick", "brown", "fox", "2nd", "jump"]
-  c. Stop words:    ["quick", "brown", "fox", "2nd", "jump"]
-  d. Stemming:      ["quick", "brown", "fox", "2nd", "jump"]
-     (Porter stemmer: "jumping" --> "jump", "ran" --> "run")
-
-Final tokens indexed: ["quick", "brown", "fox", "2nd", "jump"]
+\`\`\`steps
+{"title": "Analyzer Pipeline Walk-through", "steps": [{"title": "Raw input", "content": "\`\\"The Quick Brown Fox's 2nd Jump!\\"\`"}, {"title": "Character filters", "content": "Strip HTML, normalize Unicode\\n→ \`\\"The Quick Brown Fox's 2nd Jump!\\"\`"}, {"title": "Tokenizer", "content": "Split on whitespace & punctuation\\n→ \`[\\"The\\", \\"Quick\\", \\"Brown\\", \\"Fox's\\", \\"2nd\\", \\"Jump\\"]\`"}, {"title": "Token filters", "content": "1. Lowercase\\n→ \`[\\"the\\", \\"quick\\", \\"brown\\", \\"fox's\\", \\"2nd\\", \\"jump\\"]\`\\n\\n2. Remove possessives\\n→ \`[\\"the\\", \\"quick\\", \\"brown\\", \\"fox\\", \\"2nd\\", \\"jump\\"]\`\\n\\n3. Stop-word removal\\n→ \`[\\"quick\\", \\"brown\\", \\"fox\\", \\"2nd\\", \\"jump\\"]\`\\n\\n4. Porter stemming\\n→ \`[\\"quick\\", \\"brown\\", \\"fox\\", \\"2nd\\", \\"jump\\"]\`"}, {"title": "Final tokens indexed", "content": "Same form for \\"jumps\\", \\"jumping\\", \\"jumped\\"\\n→ consistent retrieval"}]}
 \`\`\`
 
-## Document Frequency and Collection Statistics
+## Collection Statistics for Relevance
 
-For relevance scoring, the index also stores global statistics:
+The index also keeps global numbers that power TF-IDF and BM25:
 
+\`\`\`calculator
+{"type": "compound-interest", "title": "IDF Impact Calculator", "inputs": [{"id": "N", "label": "Total documents (N)", "default": 1000000, "min": 1000, "max": 10000000}, {"id": "df", "label": "Document frequency (DF)", "default": 5200, "min": 1, "max": 1000000}], "formula": "Math.log(N / df)"}
 \`\`\`
-Collection Statistics
-======================
 
-Total documents (N):         1,000,000
-Total tokens:                500,000,000
+Example values (N = 1 000 000):
 
-Per-term statistics:
-  Term        | Doc Frequency (DF) | Collection Frequency
-  ------------|-------------------|---------------------
-  "the"       | 950,000           | 12,000,000
-  "quick"     | 5,200             | 8,100
-  "fox"       | 1,800             | 2,300
-  "quetzal"   | 12                | 15
-
-Inverse Document Frequency: IDF(term) = log(N / DF)
-  IDF("the")     = log(1M / 950K) = 0.02  (very common, low value)
-  IDF("quick")   = log(1M / 5200) = 5.26  (moderately rare)
-  IDF("quetzal") = log(1M / 12)   = 11.3  (very rare, high value)
-\`\`\`
+| Term      | DF    | IDF = log(N/DF) | Interpretation |
+|-----------|-------|-----------------|----------------|
+| "the"     | 950 k | 0.02            | near-zero value |
+| "quick"   | 5.2 k | 5.26            | moderate rarity |
+| "quetzal" | 12    | 11.3            | very rare, high value |
 
 ## Index Storage Format
 
-Modern search engines store the inverted index in **immutable segments** on disk:
+Modern engines store the inverted index in **immutable segments** on disk:
 
-\`\`\`
-Index Segment Layout
-=====================
-
-Segment file structure:
-+-------------------+
-| Term Dictionary   |  (sorted terms + offset to posting list)
-+-------------------+
-| Posting Lists     |  (compressed doc ID arrays + TF + positions)
-+-------------------+
-| Stored Fields     |  (original document fields for retrieval)
-+-------------------+
-| Doc Values        |  (columnar data for sorting/aggregations)
-+-------------------+
-| Norms             |  (field length norms for scoring)
-+-------------------+
-
-Term Dictionary (sorted, binary-searchable):
-  "brown"   -> offset 0x1A00
-  "fox"     -> offset 0x1B40
-  "quick"   -> offset 0x1C80
-  ...
-
-Posting list at offset 0x1C80 ("quick"):
-  [doc_1: tf=1, pos=[1]] [doc_2: tf=1, pos=[3]]
-  (delta-encoded and compressed)
+\`\`\`sysdiag
+{"title": "Segment File Layout", "width": 600, "height": 300, "nodes": [{"id": "dict", "label": "Term Dictionary\\n(sorted terms)", "x": 80, "y": 60, "kind": "storage"}, {"id": "post", "label": "Posting Lists\\n(compressed)", "x": 220, "y": 60, "kind": "storage"}, {"id": "fields", "label": "Stored Fields\\n(_source)", "x": 360, "y": 60, "kind": "storage"}, {"id": "dv", "label": "DocValues\\n(columnar)", "x": 80, "y": 180, "kind": "storage"}, {"id": "norms", "label": "Norms\\n(length, boost)", "x": 220, "y": 180, "kind": "storage"}], "edges": [{"from": "dict", "to": "post", "label": "offset ptr"}, {"from": "fields", "to": "dv", "label": "aggregations"}], "annotations": {"dict": "Binary-searchable list of unique terms with file offsets to posting lists", "post": "Delta-encoded & variable-byte compressed arrays of doc IDs, TF, positions", "fields": "Original JSON/doc fields returned in search results", "dv": "Row-oriented data for fast sorting, faceting, SQL GROUP BY", "norms": "Per-field length and index-time boost factors used in scoring"}}
 \`\`\`
 
-## Compression Techniques
+## Compression in Action
 
-Posting lists can be enormous. Delta encoding plus variable-byte encoding compress them dramatically:
+Posting lists can be enormous. Delta + variable-byte encoding shrinks them dramatically:
 
-\`\`\`
-Posting List Compression
-=========================
-
-Raw doc IDs:     [1, 5, 12, 100, 101, 500]
-Delta-encoded:   [1, 4, 7, 88, 1, 399]
-  (store differences instead of absolutes)
-
-Variable-byte encoding (VByte):
-  1   --> 1 byte
-  4   --> 1 byte
-  7   --> 1 byte
-  88  --> 1 byte
-  1   --> 1 byte
-  399 --> 2 bytes
-
-Raw: 6 x 4 bytes = 24 bytes
-Compressed: 7 bytes (71% reduction)
-
-For billion-document indexes, this compression
-saves terabytes of storage and I/O bandwidth.
+\`\`\`trace
+{"title": "Compression Trace", "language": "python", "code": "def compress(ids):\\n    \\"\\"\\"Delta + VByte encode a sorted list of doc IDs\\"\\"\\"\\n    deltas = [ids[0]]          # first ID is stored raw\\n    for i in range(1, len(ids)):\\n        deltas.append(ids[i] - ids[i-1])\\n    \\n    def vbyte(x):\\n        \\"\\"\\"Variable-byte encode one integer\\"\\"\\"\\n        bytes_ = []\\n        while x >= 128:\\n            bytes_.append((x & 0x7F) | 0x80)\\n            x >>= 7\\n        bytes_.append(x)\\n        return bytes_\\n    \\n    compressed = []\\n    for d in deltas:\\n        compressed.extend(vbyte(d))\\n    return compressed\\n\\nraw = [1, 5, 12, 100, 101, 500]\\nprint('raw:', raw)\\nprint('delta:', [raw[0]] + [raw[i]-raw[i-1] for i in range(1, len(raw))])\\nprint('compressed bytes:', compress(raw))\\nprint('ratio: 6*4 = 24 bytes →', len(compress(raw)), 'bytes')", "frames": [{"line": 1, "vars": {"ids": [1, 5, 12, 100, 101, 500]}, "note": "Start with sorted doc IDs"}, {"line": 3, "vars": {"deltas": [1, 4, 7, 88, 1, 399]}, "note": "Delta encoding: store gaps"}, {"line": 14, "vars": {"compressed": [1, 4, 7, 88, 1, 143, 3]}, "note": "VByte: 399 = 143 + 3·128 → 2 bytes"}, {"line": 19, "stdout": "ratio: 6*4 = 24 bytes → 7 bytes", "note": "71 % reduction on tiny list; terabytes saved at web scale"}], "speed": 900}
 \`\`\`
 
-## Key Takeaway
+## Quiz
 
-The inverted index maps every unique term to a sorted list of documents containing that term. Posting lists store term frequencies and positions for scoring and phrase queries. The analyzer pipeline normalizes text into consistent tokens. Collection-wide statistics like document frequency enable relevance scoring. Efficient compression (delta + VByte encoding) makes it feasible to store indexes for billions of documents.`,
+\`\`\`quiz
+{"title": "Check Your Understanding", "questions": [{"question": "Why is an inverted index termed \\"inverted\\"?", "options": ["It stores documents upside-down", "It reverses the document→word mapping", "It sorts terms in reverse alphabetical order", "It inverts bit patterns for compression"], "answer": 1, "explanation": "A forward index maps documents to their words; an inverted index maps words back to the documents that contain them."}, {"question": "Which posting-list enrichment is REQUIRED to support exact-phrase queries?", "options": ["Term frequency (TF)", "Position offsets", "Field name", "Payload boost"], "answer": 1, "explanation": "Positions let the engine verify that terms appear adjacently or within the specified slop window."}, {"question": "Delta encoding compresses posting lists by:", "options": ["Storing XOR differences between term hashes", "Storing numeric gaps between successive doc IDs", "Replacing integers with UTF-8 strings", "Using Huffman codes on term text"], "answer": 1, "explanation": "Because doc IDs are sorted, storing gaps (deltas) yields small numbers that variable-byte codes can compress tightly."}]}
+\`\`\`
+
+\`\`\`takeaways
+{"title": "Key Takeaways", "items": ["An inverted index maps each unique term to a sorted list of documents (posting list) enabling O(log P) lookup instead of O(N·L) scan", "Posting lists can be enriched with TF, positions, and field info to support scoring, phrase search, and weighted retrieval", "The analyzer pipeline (tokenizers + filters) normalizes text into consistent tokens, determining both recall and index size", "Global statistics (N, DF) stored in the index power relevance models like TF-IDF and BM25", "Delta + variable-byte compression on immutable segments gives both space savings and fast disk I/O at billion-document scale"]}
+\`\`\``,
     },
     {
       id: "search-sharding",
@@ -481,6 +384,14 @@ Document partitioning is the standard approach for distributed search. Each shar
 
 When a user types a query, the search engine must decide which documents match and how to rank them. Scoring algorithms like **TF-IDF** and **BM25** compute a relevance score for each document based on how well it matches the query.
 
+\`\`\`concept
+{
+  "title": "TF-IDF Intuition",
+  "variant": "mental-model",
+  "content": "Imagine a library with millions of books. A word like \\"the\\" appears everywhere, so finding it doesn't help you find relevant books. But a word like \\"photosynthesis\\" is rare — if it appears in a book, that book is probably very relevant to your biology query. TF-IDF captures this intuition: common words within a document (high TF) are good, but common words across all documents (low IDF) are weak signals."
+}
+\`\`\`
+
 ## Term Frequency - Inverse Document Frequency (TF-IDF)
 
 TF-IDF is the foundation of text relevance scoring. It combines two intuitions:
@@ -488,35 +399,13 @@ TF-IDF is the foundation of text relevance scoring. It combines two intuitions:
 1. **Term Frequency (TF):** A term that appears more often in a document is more relevant to that document
 2. **Inverse Document Frequency (IDF):** A term that appears in fewer documents is more discriminating
 
-\`\`\`
-TF-IDF Formula
-===============
-
-TF(t, d) = count of term t in document d
-            --------------------------------
-            total terms in document d
-
-IDF(t) = log( N / DF(t) )
-  where N = total documents, DF = documents containing term t
-
-TF-IDF(t, d) = TF(t, d) x IDF(t)
-
-
-Example: Query "quick fox" against doc_1
-
-doc_1: "the quick brown fox jumps over the quick lazy fox"
-  Total terms = 10
-  TF("quick", doc_1) = 2/10 = 0.20
-  TF("fox", doc_1)   = 2/10 = 0.20
-
-Collection: N = 1,000,000 documents
-  DF("quick") = 5,200    IDF = log(1M/5200)  = 5.26
-  DF("fox")   = 1,800    IDF = log(1M/1800)  = 6.32
-
-TF-IDF("quick", doc_1) = 0.20 x 5.26 = 1.05
-TF-IDF("fox", doc_1)   = 0.20 x 6.32 = 1.26
-
-Total score for doc_1 = 1.05 + 1.26 = 2.31
+\`\`\`playground
+{
+  "title": "TF-IDF Calculator",
+  "language": "python",
+  "code": "import math\\n\\ndef tf_idf(term, document, collection_size, doc_frequency):\\n    # Term Frequency (normalized)\\n    words = document.split()\\n    tf = words.count(term) / len(words)\\n    \\n    # Inverse Document Frequency\\n    idf = math.log(collection_size / doc_frequency)\\n    \\n    # TF-IDF Score\\n    return tf * idf\\n\\n# Example: Query \\"quick fox\\" against doc_1\\ndoc_1 = \\"the quick brown fox jumps over the quick lazy fox\\"\\ncollection_size = 1_000_000\\n\\nquick_score = tf_idf(\\"quick\\", doc_1, collection_size, 5200)\\nfox_score = tf_idf(\\"fox\\", doc_1, collection_size, 1800)\\n\\nprint(f\\"TF-IDF('quick', doc_1) = {quick_score:.2f}\\")\\nprint(f\\"TF-IDF('fox', doc_1) = {fox_score:.2f}\\")\\nprint(f\\"Total score = {quick_score + fox_score:.2f}\\")",
+  "runnable": true
+}
 \`\`\`
 
 ## BM25 (Best Matching 25)
@@ -526,162 +415,144 @@ BM25 is the **industry-standard** scoring algorithm. It improves on TF-IDF with 
 1. **Term frequency saturation:** Diminishing returns -- the 10th occurrence of a term matters less than the 2nd
 2. **Document length normalization:** Longer documents are penalized (they match more terms by chance)
 
+\`\`\`compare
+{
+  "variant": "before-after",
+  "before": {
+    "label": "TF-IDF: Linear Growth",
+    "code": "# TF-IDF: Score grows linearly with term frequency\\n# TF=1 → score=1.0\\n# TF=2 → score=2.0  \\n# TF=10 → score=10.0\\n# Problem: 100th occurrence shouldn't matter 100x more than 1st"
+  },
+  "after": {
+    "label": "BM25: Saturation Curve",
+    "code": "# BM25: Score saturates with term frequency\\n# TF=1 → score=1.0\\n# TF=2 → score=1.5\\n# TF=10 → score=2.1\\n# TF=100 → score=2.2\\n# Better: Later occurrences add minimal value"
+  }
+}
 \`\`\`
-BM25 Formula
-==============
 
-score(q, d) = SUM over each term t in query q:
-    IDF(t) x  (TF(t,d) x (k1 + 1))
-              ----------------------------------
-              TF(t,d) + k1 x (1 - b + b x |d|/avgdl)
-
-Parameters:
-  k1 = 1.2  (term frequency saturation; higher = TF matters more)
-  b  = 0.75 (length normalization; 0 = no normalization, 1 = full)
-  |d| = length of document d (in terms)
-  avgdl = average document length in the collection
-
-IDF(t) = log( (N - DF(t) + 0.5) / (DF(t) + 0.5) + 1 )
-
-
-TF Saturation Effect (k1=1.2):
-  TF=1:   score contribution = 1.0
-  TF=2:   score contribution = 1.5
-  TF=5:   score contribution = 1.9
-  TF=10:  score contribution = 2.1
-  TF=100: score contribution = 2.2  (barely more than TF=10)
+\`\`\`algoviz
+{
+  "title": "BM25 Saturation Effect",
+  "type": "array",
+  "data": [1.0, 1.5, 1.7, 1.8, 1.9, 2.0, 2.05, 2.08, 2.1, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16],
+  "frames": [
+    {"highlight": [0], "label": "TF=1: score=1.0", "stats": {"tf": 1, "score": 1.0}},
+    {"highlight": [1], "label": "TF=2: score=1.5 (50% increase)", "stats": {"tf": 2, "score": 1.5}},
+    {"highlight": [4], "label": "TF=5: score=1.9 (diminishing returns)", "stats": {"tf": 5, "score": 1.9}},
+    {"highlight": [9], "label": "TF=10: score=2.1 (minimal gain)", "stats": {"tf": 10, "score": 2.1}},
+    {"highlight": [14], "label": "TF=100: score≈2.2 (plateau)", "stats": {"tf": 100, "score": 2.16}}
+  ],
+  "speed": 1000
+}
 \`\`\`
 
 ## Boolean Queries
 
 Before scoring, the engine must determine which documents match the query:
 
-\`\`\`
-Boolean Query Types
-====================
-
-AND: "quick AND fox"
-  Intersect posting lists:
-  "quick" -> [1, 2, 5, 8, 12]
-  "fox"   -> [1, 3, 5, 9, 12]
-  Result:    [1, 5, 12]
-
-OR: "quick OR fox"
-  Union posting lists:
-  Result: [1, 2, 3, 5, 8, 9, 12]
-
-NOT: "quick NOT fox"
-  Difference:
-  Result: [2, 8]
-
-Efficient intersection (merge join on sorted lists):
-  i=0, j=0
-  Compare list_A[i] with list_B[j]:
-    If equal: add to result, advance both
-    If A[i] < B[j]: advance i
-    If A[i] > B[j]: advance j
-
-  Time: O(|A| + |B|) -- linear in posting list lengths
+\`\`\`trace
+{
+  "title": "Posting List Intersection",
+  "language": "python",
+  "code": "def intersect_lists(list_a, list_b):\\n    \\"\\"\\"Efficient merge join on sorted posting lists\\"\\"\\"\\n    result = []\\n    i = j = 0\\n    \\n    while i < len(list_a) and j < len(list_b):\\n        if list_a[i] == list_b[j]:\\n            result.append(list_a[i])\\n            i += 1\\n            j += 1\\n        elif list_a[i] < list_b[j]:\\n            i += 1\\n        else:\\n            j += 1\\n    \\n    return result\\n\\n# Example: \\"quick AND fox\\"\\nquick_posts = [1, 2, 5, 8, 12]\\nfox_posts = [1, 3, 5, 9, 12]\\n\\nmatches = intersect_lists(quick_posts, fox_posts)\\nprint(f\\"Documents matching 'quick AND fox': {matches}\\")\\nprint(f\\"Time complexity: O({len(quick_posts)} + {len(fox_posts)}) = O({len(quick_posts) + len(fox_posts)})\\")",
+  "frames": [
+    {"line": 1, "vars": {"list_a": "[1, 2, 5, 8, 12]", "list_b": "[1, 3, 5, 9, 12]", "i": 0, "j": 0}, "note": "Initialize pointers at start of both lists"},
+    {"line": 6, "vars": {"list_a[0]": 1, "list_b[0]": 1, "i": 0, "j": 0}, "note": "Both point to doc 1 - MATCH!"},
+    {"line": 7, "vars": {"result": "[1]", "i": 1, "j": 1}, "note": "Add doc 1 to results, advance both pointers"},
+    {"line": 14, "vars": {"list_a[1]": 2, "list_b[1]": 3, "i": 1, "j": 1}, "note": "2 < 3, advance pointer i"},
+    {"line": 14, "vars": {"list_a[2]": 5, "list_b[2]": 5, "i": 2, "j": 2}, "note": "Both point to doc 5 - MATCH!"},
+    {"line": 7, "vars": {"result": "[1, 5]", "i": 3, "j": 3}, "note": "Add doc 5, advance both"},
+    {"line": 14, "vars": {"list_a[3]": 8, "list_b[3]": 9, "i": 3, "j": 3}, "note": "8 < 9, advance pointer i"},
+    {"line": 14, "vars": {"list_a[4]": 12, "list_b[4]": 12, "i": 4, "j": 4}, "note": "Both point to doc 12 - MATCH!"},
+    {"line": 11, "vars": {"result": "[1, 5, 12]"}, "note": "Final result: documents 1, 5, and 12"}
+  ],
+  "speed": 1200
+}
 \`\`\`
 
 ## Phrase Queries
 
 Phrase queries like "quick brown fox" require terms to appear adjacently and in order:
 
-\`\`\`
-Phrase Query: "quick brown fox"
-================================
-
-Posting lists with positions:
-  "quick": [(doc_1, pos=[1, 7]), (doc_2, pos=[3])]
-  "brown": [(doc_1, pos=[2]),    (doc_2, pos=[4])]
-  "fox":   [(doc_1, pos=[3]),    (doc_2, pos=[5])]
-
-For doc_1:
-  "quick" at position 1, "brown" at position 2, "fox" at position 3
-  Positions are consecutive (1, 2, 3) --> PHRASE MATCH!
-
-  "quick" at position 7 -- no "brown" at position 8
-  --> No phrase match for this occurrence
-
-For doc_2:
-  "quick" at 3, "brown" at 4, "fox" at 5
-  Consecutive --> PHRASE MATCH!
-
-Without stored positions, phrase queries are impossible.
+\`\`\`callout
+{
+  "type": "warning",
+  "title": "Positional Data Required",
+  "content": "Without storing term positions in the index, phrase queries are impossible. The inverted index must include positional information: \\"fox\\" appears at positions [3, 9] in document 1, not just that it appears in document 1."
+}
 \`\`\`
 
 ## Multi-Field Scoring
 
 Documents have multiple fields (title, body, tags) with different importance:
 
-\`\`\`
-Field Boosting
-===============
-
-Query: "distributed systems"
-
-doc_1:
-  title: "Distributed Systems Design"    (match in title)
-  body:  "This article covers networking..."  (no match)
-
-doc_2:
-  title: "Cloud Computing Overview"       (no match)
-  body:  "...discusses distributed systems..."  (match in body)
-
-Field boosts:
-  title:  boost = 3.0
-  body:   boost = 1.0
-  tags:   boost = 2.0
-
-doc_1 score = BM25("distributed systems", title) x 3.0 = 4.5
-doc_2 score = BM25("distributed systems", body)  x 1.0 = 1.8
-
-doc_1 ranks higher (title match is more important)
+\`\`\`quiz
+{
+  "title": "Multi-Field Scoring",
+  "questions": [
+    {
+      "question": "A query matches in the title field (boost=3.0) with BM25 score 2.0, and in the body field (boost=1.0) with BM25 score 3.0. Which document scores higher?",
+      "options": ["Title match document scores 6.0", "Body match document scores 3.0", "Both score equally", "Cannot determine"],
+      "answer": 0,
+      "explanation": "Title match: 2.0 × 3.0 = 6.0. Body match: 3.0 × 1.0 = 3.0. The title match wins despite lower raw BM25 score because title matches are more important."
+    },
+    {
+      "question": "Why does BM25 include document length normalization?",
+      "options": ["Longer documents have more unique words", "Longer documents match more terms by chance", "Shorter documents are always better", "To favor PDF documents"],
+      "answer": 1,
+      "explanation": "Longer documents naturally contain more terms, so they would score higher for most queries without normalization. BM25 penalizes longer documents to account for this statistical bias."
+    },
+    {
+      "question": "What happens to BM25 score as term frequency increases from 1 to 100?",
+      "options": ["Linear growth", "Exponential growth", "Rapid growth then saturation", "No change"],
+      "answer": 2,
+      "explanation": "BM25 shows diminishing returns - the score increases rapidly at first (TF=1→2: +50%) but plateaus (TF=10→100: +5%). This prevents 100 occurrences from being 100x more important than 1."
+    }
+  ]
+}
 \`\`\`
 
 ## Query Processing Pipeline
 
-\`\`\`
-Query Processing Flow
-======================
-
-User query: "Running quick foxes!"
-     |
-     v
-[Query Analyzer]
-  1. Tokenize:    ["Running", "quick", "foxes"]
-  2. Lowercase:   ["running", "quick", "foxes"]
-  3. Stem:        ["run", "quick", "fox"]
-     |
-     v
-[Query Planner]
-  1. Look up posting lists for each term
-  2. Estimate cost (posting list lengths)
-  3. Choose execution strategy:
-     - Short lists first (for AND queries)
-     - Skip lists for fast intersection
-     |
-     v
-[Posting List Intersection/Union]
-  Matching doc set: [1, 5, 12, ...]
-     |
-     v
-[BM25 Scorer]
-  Score each matching document
-     |
-     v
-[Top-K Selection]
-  Priority queue: keep only top 10 results
-     |
-     v
-[Return Results]
-  [(doc_5, 8.3), (doc_1, 7.1), (doc_12, 6.8), ...]
+\`\`\`steps
+{
+  "title": "Query Processing Flow",
+  "steps": [
+    {
+      "title": "Query Analysis",
+      "content": "Tokenize, lowercase, and stem the query. Apply the same pipeline as indexing to ensure \\"Running\\" matches \\"running\\" in the index."
+    },
+    {
+      "title": "Query Planning",
+      "content": "Look up posting lists for each term. Estimate costs based on list lengths. Choose execution strategy: process short lists first for AND queries."
+    },
+    {
+      "title": "Boolean Operations",
+      "content": "Intersect/union posting lists using merge join. For phrase queries, verify positional constraints on candidate documents."
+    },
+    {
+      "title": "Scoring",
+      "content": "Calculate BM25 scores for matching documents. Apply field boosts for multi-field queries."
+    },
+    {
+      "title": "Top-K Selection",
+      "content": "Use priority queue to keep only highest-scoring documents. Return results with scores and snippets."
+    }
+  ]
+}
 \`\`\`
 
-## Key Takeaway
-
-BM25 is the default scoring algorithm in Elasticsearch, Solr, and Lucene. It improves on raw TF-IDF by adding term frequency saturation and document length normalization. Boolean operations on posting lists determine which documents match, and positional data enables phrase queries. The query analyzer must apply the same tokenization pipeline as the indexer so that "Running" in the query matches "running" in the index.`,
+\`\`\`takeaways
+{
+  "title": "Key Takeaways",
+  "items": [
+    "BM25 is the industry standard (Elasticsearch, Solr, Lucene) because it improves TF-IDF with term frequency saturation and document length normalization",
+    "Boolean operations on posting lists use efficient O(n+m) merge joins on sorted lists",
+    "Phrase queries require positional data in the inverted index to verify adjacent term occurrences",
+    "Multi-field scoring applies field-specific boosts (title > tags > body) to reflect semantic importance",
+    "Query analyzer must apply identical tokenization pipeline as indexer for matching to work correctly"
+  ]
+}
+\`\`\``,
       starterCode: `# Inverted Index with TF-IDF Scoring
 # Build a simple search engine that indexes documents and
 # ranks search results by TF-IDF relevance score.
@@ -894,203 +765,135 @@ if __name__ == "__main__":
       title: "Real-time Indexing Pipeline",
       content: `# Real-time Indexing Pipeline
 
-Users expect new content to be searchable within seconds. A search engine must continuously ingest new documents, update the inverted index, and make changes visible to queries -- all without disrupting ongoing searches.
+Users expect new content to be searchable within seconds. A search engine must continuously ingest new documents, update the inverted index, and make changes visible to queries — all without disrupting ongoing searches.
+
+\`\`\`concept
+{"title": "The Real-time Trade-off", "variant": "insight", "content": "Real-time indexing prioritizes low latency (seconds or milliseconds) over resource efficiency. Achieving this immediacy demands high-performance compute and storage, increasing infrastructure costs compared to batch indexing. The design goal is \\"near-real-time\\" (NRT), not zero latency."}
+\`\`\`
 
 ## The Challenge
 
 Inverted indexes are optimized for reads, not writes. Updating a posting list for every new document would require rewriting large portions of the index on disk. The solution is to use **immutable segments** with periodic **merging**.
 
-\`\`\`
-The Write Problem
-==================
-
-Naive approach: update inverted index in place
-  1. New document contains term "fox"
-  2. Read posting list for "fox": [1, 5, 12, 88, 200, ...]
-  3. Append doc_201: [1, 5, 12, 88, 200, 201]
-  4. Write updated posting list back to disk
-
-Problem:
-  - Every new document modifies many posting lists
-  - Random I/O on disk is slow
-  - Concurrent reads see inconsistent state during updates
-  - Cannot do this at 10,000 docs/sec
-
-Solution: buffer writes in memory, flush as immutable segments
+\`\`\`compare
+{"variant": "before-after", "before": {"label": "Naïve In-Place Update", "code": "# Every new doc triggers random I/O\\nfor term in doc.terms:\\n    posting = disk.read(term)        # [1, 5, 12, 88, 200]\\n    posting.append(doc.id)           # [1, 5, 12, 88, 200, 201]\\n    disk.write(term, posting)        # rewrite entire list"}, "after": {"label": "Segment-Based Append", "code": "# Docs buffered in memory, flushed as new segment\\nbuffer = []                          # RAM, mutable\\nbuffer.append(doc)                   # O(1) append\\n# every N docs or M seconds:\\nsegment = flush(buffer)              # sequential write\\ndisk.append(segment)                 # immutable file"}}
 \`\`\`
 
 ## Segment-Based Architecture
 
 Inspired by Lucene (used by Elasticsearch and Solr), the index consists of multiple immutable segments:
 
+\`\`\`algoviz
+{"title": "Segment Layout Over Time", "type": "array", "data": ["buf", "S0", "S1", "S2"], "frames": [
+  {"highlight": [0], "label": "T=0: new docs land in mutable buffer", "stats": {"buf": 3}},
+  {"highlight": [0, 3], "label": "T=1: buffer flushed → new segment S3", "stats": {"buf": 0}},
+  {"highlight": [0], "label": "T=1.1: fresh buffer accepts more docs", "stats": {"buf": 2}}
+], "speed": 1200}
 \`\`\`
-Segment-Based Index
-=====================
 
-Memory:
-+---------------------+
-| In-Memory Buffer    |  <-- new documents go here
-| (RAM, mutable)      |
-| doc_201, doc_202... |
-+---------------------+
-        |
-        | flush (every N docs or M seconds)
-        v
-Disk:
-+----------+  +----------+  +----------+  +----------+
-| Segment 0|  | Segment 1|  | Segment 2|  | Segment 3|
-| (immutable)| (immutable)| (immutable)| (immutable)|
-| docs 1-50 | | docs 51- | | docs 101-| | docs 151-|
-|           | | 100      | | 150      | | 200      |
-+----------+  +----------+  +----------+  +----------+
-
-Search = query ALL segments + merge results
-\`\`\`
+Search = query **all** segments + merge results.
 
 ## The Refresh Cycle
 
-The **refresh interval** controls how quickly new documents become searchable:
+The **refresh interval** controls how quickly new documents become searchable (Elasticsearch default: 1 second):
 
+\`\`\`steps
+{"title": "1-Second Refresh Cycle", "steps": [
+  {"title": "0.0 s", "content": "doc_201 arrives → appended to in-memory buffer"},
+  {"title": "0.3 s", "content": "doc_202 arrives → appended to same buffer"},
+  {"title": "0.7 s", "content": "doc_203 arrives → buffer now holds 3 docs"},
+  {"title": "1.0 s", "content": "REFRESH: buffer converted to **new segment S_new**, buffer cleared, docs 201-203 become searchable"},
+  {"title": "1.1 s", "content": "Query executes across [S0, S1, S2, S_new] and finds the three new docs"}
+]}
 \`\`\`
-Refresh Cycle (Elasticsearch default: 1 second)
-================================================
 
-T=0.0s: doc_201 arrives --> written to in-memory buffer
-T=0.3s: doc_202 arrives --> written to in-memory buffer
-T=0.7s: doc_203 arrives --> written to in-memory buffer
-
-T=1.0s: REFRESH
-  1. In-memory buffer is converted to a new segment
-  2. New segment is opened for searching
-  3. A new empty buffer is created for incoming docs
-  4. docs 201-203 are now searchable!
-
-T=1.1s: Query arrives
-  Search segments: [S0, S1, S2, S3, S_new]
-  docs 201-203 are found in S_new
-
-This is "near-real-time" (NRT) search:
-  Documents are searchable within 1 second of ingestion.
-  NOT truly real-time, but close enough for most use cases.
-\`\`\`
+This is **near-real-time** (NRT) search — not truly instantaneous, but acceptable for most products.
 
 ## Segment Merging
 
 Over time, many small segments accumulate. Searching across hundreds of segments is slow. Background **merge** operations combine small segments into larger ones:
 
+\`\`\`algoviz
+{"title": "Tiered Merge Policy", "type": "array", "data": [50, 50, 50, 50, 12, 8, 15], "frames": [
+  {"highlight": [4, 5, 6], "label": "Pick smallest segments (≤ 20 docs each)", "stats": {"merge": "S4+S5+S6"}},
+  {"highlight": [4], "label": "Write merged 35-doc segment S7", "stats": {"new": "S7"}},
+  {"highlight": [0, 1, 2, 3], "label": "Eventually merge big tiers into 200-doc S8", "stats": {"new": "S8"}}
+], "speed": 1000}
 \`\`\`
-Segment Merge Process
-======================
-
-Before merge:
-  [S0: 50 docs] [S1: 50 docs] [S2: 50 docs] [S3: 50 docs]
-  [S4: 12 docs] [S5: 8 docs]  [S6: 15 docs]
-
-Merge policy (tiered):
-  Combine segments of similar size
-
-After merge:
-  [S0: 50 docs] [S1: 50 docs] [S2: 50 docs] [S3: 50 docs]
-  [S7: 35 docs]   <-- S4 + S5 + S6 merged
-
-Eventually:
-  [S8: 200 docs]  <-- S0 + S1 + S2 + S3 merged
-  [S7: 35 docs]
 
 Merge steps:
-  1. Read posting lists from all source segments
-  2. Merge-sort posting lists for each term
-  3. Write new combined segment
-  4. Swap new segment in, delete old segments
-  5. Old segments removed after all in-flight queries complete
-\`\`\`
+1. Read posting lists from all source segments  
+2. Merge-sort posting lists for each term  
+3. Write new combined segment  
+4. Swap new segment in, delete old segments  
+5. Old segments removed only after **all in-flight queries complete**
 
 ## Handling Deletes and Updates
 
 Since segments are immutable, deletes use a **tombstone** approach:
 
-\`\`\`
-Delete and Update Handling
-===========================
-
-Delete doc_42:
-  1. Mark doc_42 as deleted in a "live docs" bitset
-     Segment S1 live_docs: [1,1,1,0,1,1,...]
-                                   ^-- doc_42 is "dead"
-  2. Queries skip dead docs during scoring
-  3. Dead docs are physically removed during segment merge
-
-Update doc_42 (new content):
-  1. Mark old doc_42 as deleted (tombstone)
-  2. Index new doc_42 into the current buffer
-  3. Both versions exist temporarily
-  4. Queries see only the live version
-  5. Old version purged during merge
+\`\`\`callout
+{"type": "warning", "title": "Deletes Are Logical, Not Physical", "content": "A deleted document still occupies disk space until the next merge. Queries filter it out via a live-docs bitset, so results remain correct but slightly slower."}
 \`\`\`
 
 ## Write-Ahead Log (Translog)
 
-The in-memory buffer is volatile. A crash would lose unflshed documents. A **transaction log** (translog) provides durability:
+The in-memory buffer is volatile. A crash would lose unflushed documents. A **transaction log** (translog) provides durability:
 
+\`\`\`trace
+{"title": "Durability with Translog", "language": "python", "code": "def index_doc(doc):\\n    translog.append(doc)      # fsync’d before ACK\\n    buffer.add(doc)\\n    return 'ok'\\n\\ndef crash_recovery():\\n    segments = load_from_disk()\\n    replay(translog)          # rebuild buffer\\n    return segments + buffer", "frames": [
+  {"line": 1, "vars": {"doc": "doc_201"}, "note": "client sends doc_201"},
+  {"line": 2, "vars": {"translog": "[doc_201]"}, "stdout": "fsync\\n"},
+  {"line": 3, "vars": {"buffer": "[doc_201]"}, "note": "volatile memory"},
+  {"line": 4, "stdout": "ok\\n"},
+  {"line": 7, "vars": {"segments": "[S0,S1,S2]", "buffer": "[doc_201]"}, "note": "after crash, buffer rebuilt from translog"}
+], "speed": 800}
 \`\`\`
-Translog for Durability
-========================
-
-Write path:
-  1. Document arrives
-  2. Write to translog (append-only, fsync'd)  <-- durable
-  3. Add to in-memory buffer                    <-- volatile
-  4. Return success to client
-
-On crash recovery:
-  1. Load last flushed segments from disk
-  2. Replay translog entries since last flush
-  3. Rebuild in-memory buffer
-  4. No documents lost
-
-Translog is truncated after each flush (when buffer
-is written as a segment to disk).
 
 Flush vs. Refresh:
-  Refresh: buffer --> searchable segment (in memory/OS cache)
-           Translog NOT truncated (still needed for durability)
-  Flush:   segment --> fsync'd to disk
-           Translog truncated (no longer needed)
-\`\`\`
+- **Refresh**: buffer → searchable segment (in memory/OS cache); translog **not** truncated  
+- **Flush**: segment → fsync’d to disk; translog truncated (no longer needed)
 
 ## Indexing Pipeline Architecture
 
-\`\`\`
-Complete Ingestion Pipeline
-=============================
-
-[Data Sources]
-  |
-  v
-[Message Queue (Kafka)]  <-- buffer spikes, replay on failure
-  |
-  v
-[Indexing Workers]
-  1. Parse document (JSON, HTML, etc.)
-  2. Run analyzer pipeline (tokenize, stem, normalize)
-  3. Route to correct shard (hash(doc_id) % num_shards)
-  |
-  v
-[Shard Primary]
-  1. Write to translog
-  2. Add to in-memory buffer
-  3. Replicate to replica shards
-  4. On refresh: buffer --> new segment
-  5. On flush: segment --> disk, truncate translog
-  |
-  v
-[Background Merge]
-  Periodically merge small segments into larger ones
+\`\`\`sysdiag
+{"title": "End-to-End Ingestion Flow", "width": 720, "height": 400, "nodes": [
+  {"id": "src", "label": "Data Sources", "x": 60, "y": 60, "kind": "client"},
+  {"id": "mq", "label": "Kafka", "x": 180, "y": 60, "kind": "queue"},
+  {"id": "work", "label": "Indexing Workers", "x": 320, "y": 60, "kind": "service"},
+  {"id": "primary", "label": "Shard Primary", "x": 480, "y": 100, "kind": "db"},
+  {"id": "repl", "label": "Replica Shards", "x": 620, "y": 100, "kind": "db"},
+  {"id": "merge", "label": "Background Merge", "x": 550, "y": 280, "kind": "worker"}
+], "edges": [
+  {"from": "src", "to": "mq", "label": "events"},
+  {"from": "mq", "to": "work", "label": "stream"},
+  {"from": "work", "to": "primary", "label": "index"},
+  {"from": "primary", "to": "repl", "label": "replicate"},
+  {"from": "primary", "to": "merge", "label": "segments"}
+], "annotations": {
+  "mq": "buffers spikes & enables replay",
+  "work": "parse, analyze, route by hash(doc_id)",
+  "primary": "write translog + buffer, refresh every 1s",
+  "merge": "tiered policy keeps segment count low"
+}}
 \`\`\`
 
-## Key Takeaway
+\`\`\`quiz
+{"title": "Check Your Understanding", "questions": [
+  {"question": "Why are segments kept immutable?", "options": ["To speed up queries", "To avoid random I/O during writes", "To save disk space", "To simplify ranking"], "answer": 1, "explanation": "Immutable segments allow new data to be written with sequential I/O only; no in-place updates means no random disk seeks."},
+  {"question": "What happens during a 'refresh' in Elasticsearch?", "options": ["Buffer is fsync’d to disk", "Translog is truncated", "Buffer becomes a new searchable segment", "Old segments are deleted"], "answer": 2, "explanation": "Refresh converts the in-memory buffer into a new segment that is opened for searching; disk fsync happens later during flush."},
+  {"question": "How are deleted documents physically removed?", "options": ["Immediately on delete request", "During the next refresh", "During segment merge", "When translog is truncated"], "answer": 2, "explanation": "Deletes are logical (tombstone); the space is reclaimed only when segments are merged and a new segment without the dead docs is written."}
+]}
+\`\`\`
 
-Real-time search is achieved through a segment-based architecture. New documents are buffered in memory and periodically flushed as immutable segments. The refresh interval (typically 1 second) controls the delay between indexing and searchability. Background merging keeps the segment count manageable. The translog ensures durability across crashes. This design -- pioneered by Lucene -- enables search engines to ingest thousands of documents per second while maintaining sub-100ms query latency.`,
+\`\`\`takeaways
+{"title": "Key Takeaways", "items": [
+  "Real-time search uses immutable segments and periodic refresh (default 1s) to balance latency vs. resource cost.",
+  "New documents buffer in memory, flush as segments, and merge in the background to keep query performance high.",
+  "Deletes/updates are handled via tombstones and resolved during merges; translog guarantees durability across crashes.",
+  "The architecture—pioneered by Lucene—scales to thousands of docs/sec while maintaining sub-100ms queries."
+]}
+\`\`\``,
     },
     {
       id: "search-architecture",
@@ -1100,236 +903,120 @@ Real-time search is achieved through a segment-based architecture. New documents
 
 Let us bring together all the components into a complete distributed search engine, inspired by Elasticsearch's architecture.
 
+\`\`\`concept
+{"title": "The Four Pillars of Distributed Search", "variant": "mental-model", "content": "Every distributed search engine rests on four pillars:\\n\\n1. **Inverted Index** – O(log V) term lookup instead of O(N) full scans\\n2. **BM25 Scoring** – Relevance ranking that beats TF-IDF in practice\\n3. **Document Sharding** – Horizontal scale via partitioned Lucene indices\\n4. **Segment Architecture** – Near-real-time ingestion with 1-second refreshes\\n\\nThe coordinator pattern (scatter-gather) ties these together: fan out every query, merge globally, return top-K."}
+\`\`\`
+
 ## Complete Architecture
 
+\`\`\`sysdiag
+{"title": "Elasticsearch-Style Cluster Layout", "width": 720, "height": 420,
+ "nodes": [
+   {"id":"client","label":"Client","x":360,"y":30,"kind":"user"},
+   {"id":"coord","label":"Coordinator\\n(any node)","x":360,"y":100,"kind":"service"},
+   {"id":"n1","label":"Node 1\\nJVM + disks","x":120,"y":220,"kind":"storage"},
+   {"id":"n2","label":"Node 2\\nJVM + disks","x":360,"y":220,"kind":"storage"},
+   {"id":"n3","label":"Node 3\\nJVM + disks","x":600,"y":220,"kind":"storage"}
+ ],
+ "edges": [
+   {"from":"client","to":"coord","label":"query"},
+   {"from":"coord","to":"n1","label":"scatter"},
+   {"from":"coord","to":"n2","label":"scatter"},
+   {"from":"coord","to":"n3","label":"scatter"},
+   {"from":"n1","to":"coord","label":"gather"},
+   {"from":"n2","to":"coord","label":"gather"},
+   {"from":"n3","to":"coord","label":"gather"}
+ ],
+ "annotations": {
+   "coord": "Parses query, routes to shards, merges results",
+   "n1": "logs-P0 (primary), logs-R1, prods-R0",
+   "n2": "logs-P1 (primary), prods-P0 (primary)",
+   "n3": "logs-P2 (primary), prods-P1 (primary), prods-R1"
+ }}
 \`\`\`
-               Distributed Search Engine Architecture
-               ========================================
 
-[Clients / Applications]
-        |
-        v
-+--------------------------------------------------+
-|              Coordinator Layer                     |
-| (any node can be a coordinator)                    |
-|                                                   |
-| - Parse query                                     |
-| - Route to relevant shards                        |
-| - Scatter query to shards                         |
-| - Gather and merge results                        |
-| - Return top-K to client                          |
-+--------------------------------------------------+
-        |                              |
-        v                              v
-+-------------------+      +-------------------+
-|    Index: logs    |      |  Index: products  |
-|    (3 shards)     |      |    (2 shards)     |
-+-------------------+      +-------------------+
-
-Node 1            Node 2            Node 3
-+-----------+     +-----------+     +-----------+
-| logs-P0   |     | logs-P1   |     | logs-P2   |
-| logs-R1   |     | logs-R2   |     | logs-R0   |
-| prods-R0  |     | prods-P0  |     | prods-P1  |
-|           |     |           |     | prods-R1  |  (extra replica)
-+-----------+     +-----------+     +-----------+
-
-P = Primary shard    R = Replica shard
-Each node: JVM process with local segments, translog, caches
-\`\`\`
+Each node runs a single JVM process that hosts multiple shards (Lucene indices). A shard can be **primary** (accepts writes) or **replica** (read-only copy). The coordinator role rotates—any node can coordinate a query.
 
 ## Write Path End-to-End
 
-\`\`\`
-Index a Document
-==================
-
-Client: POST /products/_doc/42 {"name": "Widget", "price": 9.99}
-        |
-        v
-1. Coordinator receives request
-   Route: shard = hash("42") % 2 = 0
-   Primary for prods-P0 is on Node 2
-        |
-        v
-2. Node 2 (prods-P0 primary):
-   a. Write to translog (fsync)
-   b. Analyze fields:
-      "name": "Widget" --> ["widget"]
-      "price": 9.99 --> stored as doc value (not analyzed)
-   c. Add to in-memory buffer
-   d. Return ACK to coordinator
-        |
-        v
-3. Replicate to replica shards:
-   prods-R0 on Node 1: receive and apply same write
-   (configurable: wait_for_active_shards)
-        |
-        v
-4. Coordinator returns success to client
-   {"result": "created", "_id": "42", "_shard": 0}
-        |
-        v
-5. On next refresh (1s later):
-   Buffer flushed to new segment
-   Document 42 is now searchable
+\`\`\`steps
+{"title": "Indexing a Document", "steps": [
+  {"title": "1. Client POST", "content": "Client sends \`POST /products/_doc/42\` with body \`{\\"name\\":\\"Widget\\",\\"price\\":9.99}\`"},
+  {"title": "2. Coordinator Route", "content": "Coordinator hashes \`_id=42\` → \`shard = hash(42) % 2 = 0\`. Primary for \`prods-P0\` lives on Node 2."},
+  {"title": "3. Primary Write", "content": "Node 2:\\n- Appends to translog (fsync)\\n- Analyzes: \`\\"Widget\\" → [\\"widget\\"]\`\\n- Adds to in-memory buffer\\n- ACKs coordinator"},
+  {"title": "4. Replica Replication", "content": "Node 2 streams op to replica \`prods-R0\` on Node 1. Configurable \`wait_for_active_shards\` determines how many replicas must ACK before success."},
+  {"title": "5. Refresh & Searchable", "content": "After 1 s (default refresh interval) the in-memory buffer is flushed to a new segment. Document 42 is now searchable."}
+]}
 \`\`\`
 
 ## Read Path End-to-End
 
-\`\`\`
-Search Query
-=============
-
-Client: GET /products/_search?q=widget
-        |
-        v
-1. Coordinator parses query:
-   Query: {"match": {"name": "widget"}}
-   Analyze query: "widget" --> ["widget"]
-        |
-        v
-2. Scatter phase (query phase):
-   Send to one copy of each shard:
-   prods-shard-0: Node 2 (primary) or Node 1 (replica)
-   prods-shard-1: Node 3 (primary) or Node 3 (replica)
-        |
-        v
-3. Each shard executes locally:
-   a. Look up "widget" in term dictionary
-   b. Read posting list: [42, 87, 155]
-   c. Score each doc with BM25
-   d. Return top-K (doc_id, score) pairs
-        |
-        v
-4. Gather phase (fetch phase):
-   Coordinator merges results from all shards:
-   Shard 0: [(42, 8.3), (87, 5.1)]
-   Shard 1: [(155, 7.2), (301, 4.8)]
-   Global top-K: [(42, 8.3), (155, 7.2), (87, 5.1), (301, 4.8)]
-        |
-        v
-5. Fetch phase:
-   Coordinator asks shard 0 for doc 42 and 87 full source
-   Coordinator asks shard 1 for doc 155 and 301 full source
-        |
-        v
-6. Return to client:
-   {"hits": [
-     {"_id": "42", "score": 8.3, "name": "Widget", "price": 9.99},
-     {"_id": "155", "score": 7.2, ...},
-     ...
-   ]}
+\`\`\`trace
+{"title": "Search for \\"widget\\"", "language": "python", "code": "# Client query: GET /products/_search?q=widget\\n# Coordinator (Node 2) logic\\n\\nquery  = {\\"match\\": {\\"name\\": \\"widget\\"}}\\nshards = [\\"prods-P0@Node2\\", \\"prods-P1@Node3\\"]  # one copy each\\n\\ndef scatter():\\n    futures = []\\n    for shard in shards:\\n        futures.append(async_search(shard, query))\\n    return await gather(futures)\\n\\ndef gather(results):\\n    merged = heapq.merge(*results, key=lambda x: -x.score)\\n    top_k  = merged[:10]          # global top-10\\n    docs   = fetch_sources(top_k) # multi-get\\n    return docs\\n\\n# Shard-local scoring (BM25)\\n# prods-P0 returns [(42, 8.3), (87, 5.1)]\\n# prods-P1 returns [(155, 7.2), (301, 4.8)]", "frames": [
+  {"line": 1, "vars": {"query": {"match": {"name": "widget"}}}, "note": "Coordinator receives query", "stdout": ""},
+  {"line": 6, "vars": {"shards": ["prods-P0@Node2", "prods-P1@Node3"]}, "note": "Scatter to one copy of each shard", "stdout": ""},
+  {"line": 7, "vars": {"futures": ["async_obj_1", "async_obj_2"]}, "note": "Concurrent shard requests", "stdout": ""},
+  {"line": 12, "vars": {"results": [["(42, 8.3)", "(87, 5.1)"], ["(155, 7.2)", "(301, 4.8)"]]}, "note": "Shard results arrive", "stdout": ""},
+  {"line": 13, "vars": {"merged": ["(42, 8.3)", "(155, 7.2)", "(87, 5.1)", "(301, 4.8)"]}, "note": "Global merge by score", "stdout": ""},
+  {"line": 14, "vars": {"top_k": ["(42, 8.3)", "(155, 7.2)", "(87, 5.1)"]}, "note": "Keep top-3 for demo", "stdout": ""},
+  {"line": 15, "vars": {"docs": [{"_id": 42, "name": "Widget", "price": 9.99}, {"_id": 155, "name": "Widget Pro", "price": 19.99}, {"_id": 87, "name": "Blue Widget", "price": 7.5}]}, "note": "Fetch full source", "stdout": ""}
+], "speed": 900}
 \`\`\`
 
 ## Cluster Management
 
-\`\`\`
-Cluster State Management
-=========================
-
-Master Node (elected via Raft/Bully algorithm):
-  - Maintains cluster state:
-    - Which nodes are alive
-    - Which shards are on which nodes
-    - Index settings and mappings
-  - Publishes state changes to all nodes
-  - Does NOT handle data operations (lightweight)
-
-Node Discovery:
-  - Seed nodes list (static configuration)
-  - New node contacts seeds, receives cluster state
-  - Gossip protocol for failure detection
-
-Node Roles:
-  +-------------------+------------------------------------------+
-  | Role              | Responsibility                            |
-  +-------------------+------------------------------------------+
-  | Master-eligible   | Can be elected as master                  |
-  | Data              | Stores shards, handles CRUD               |
-  | Coordinator-only  | Routes requests, merges results           |
-  | Ingest            | Pre-processes docs before indexing         |
-  +-------------------+------------------------------------------+
+\`\`\`tabs
+{"tabs": [
+  {"label": "Master Election", "content": "Master-eligible nodes run Raft/Bully. A quorum (majority) is required to prevent split brain. The elected master publishes cluster state to all nodes via a diff protocol."},
+  {"label": "Node Roles", "content": "| Role | Duty |\\n|---|---|\\n| **Master-eligible** | Can become master; lightweight, no data traffic |\\n| **Data** | Stores shards, runs Lucene, heavy CPU/IO |\\n| **Coordinator-only** | Smart load-balancer, no local shards |\\n| **Ingest** | Runs pipelines (normalize, enrich) before indexing |"},
+  {"label": "Failure Detection", "content": "Gossip-style heartbeats. If a node misses 3 pings (≈ 3 × 500 ms) it is marked offline; master schedules re-allocation of its shards."}
+]}
 \`\`\`
 
 ## Fault Tolerance
 
-\`\`\`
-Failure Scenarios
-==================
-
-1. Data node crashes:
-   - Master detects failure (no heartbeat)
-   - Promotes replica shards on surviving nodes to primary
-   - Allocates new replicas on remaining nodes
-   - Cluster status: YELLOW (all primaries, missing replicas)
-
-2. Master node crashes:
-   - Master-eligible nodes run election
-   - New master elected within seconds
-   - New master publishes updated cluster state
-
-3. Network partition (split brain):
-   - Quorum requirement: majority of master-eligible nodes
-   - Minority side cannot elect a master
-   - Minority side rejects writes (read-only)
-   - Prevents two masters from accepting conflicting writes
-
-4. Slow shard (straggler):
-   - Coordinator has a timeout per shard
-   - If shard does not respond, return partial results
-   - Mark results as "timed_out": true
-   - Better to return partial results fast than wait forever
+\`\`\`compare
+{"variant": "before-after", "before": {"label": "Node 2 crashes — data loss?", "code": "Node 2 (prods-P0 primary) disappears.\\nWrites to /products return 503.\\nCluster state RED?"}, "after": {"label": "Automatic recovery within seconds", "code": "Master promotes prods-R0 on Node 1 → new primary.\\nCluster state YELLOW (all primaries OK, missing replicas).\\nNew replica allocated on Node 3 → GREEN.\\nZero data lost thanks to translog + replica."}}
 \`\`\`
 
 ## Performance Optimizations
 
+\`\`\`callout
+{"type": "tip", "title": "Shard Count Rule-of-Thumb", "content": "Start with **1–5 shards per node per index**. Over-sharding (>1000 shards per node) wastes heap; under-sharding leaves CPU idle. Resize with the split-shrine API before production."}
 \`\`\`
-Key Optimizations
-==================
 
-1. Query Cache:
-   Frequently executed filter queries are cached at the shard level.
-   Key = query hash, Value = bitset of matching doc IDs
-   Invalidated when new segments are created.
-
-2. Field Data Cache:
-   Columnar doc values loaded into memory for sorting/aggregations.
-   Avoids re-reading from disk on every query.
-
-3. OS Page Cache:
-   Segment files are memory-mapped.
-   Frequently accessed segments stay in OS page cache.
-   "Warm" shards serve queries from RAM, not disk.
-
-4. Adaptive Replica Selection:
-   Route queries to the replica with lowest recent latency.
-   Avoids sending queries to overloaded nodes.
-
-5. Index Sorting:
-   Pre-sort documents within segments by a field (e.g., timestamp).
-   Enables early termination: stop scoring after finding K matches.
-\`\`\`
+1. **Query Cache** – Filter bitsets cached per segment; invalidated only when new segments appear.
+2. **Field-data / Doc-values** – Columnar on-disk format loaded into OS page cache for aggregations.
+3. **Adaptive Replica Selection** – Route to the replica with the lowest 1-minute latency history; avoids hot-spots.
+4. **Index Sorting** – Pre-sort segments by \`timestamp\` to enable early-termination on \`TOP-K\` queries.
 
 ## Comparison with Other Search Systems
 
-\`\`\`
-+------------------+------------------+-----------------+-----------+
-| Feature          | Elasticsearch    | Apache Solr     | Meilisearch|
-+------------------+------------------+-----------------+-----------+
-| Storage engine   | Lucene           | Lucene          | Custom     |
-| Scoring          | BM25             | BM25            | Custom     |
-| Distribution     | Built-in cluster | ZooKeeper-based | Single node|
-| Real-time search | 1s refresh       | Soft/hard commit| Instant    |
-| Schema           | Dynamic mapping  | Schema required | Schemaless |
-| Primary use      | Logs, analytics  | Enterprise      | Typo-      |
-|                  |                  | search          | tolerant   |
-+------------------+------------------+-----------------+-----------+
+| Feature          | Elasticsearch | Apache Solr   | Meilisearch |
+|------------------|---------------|---------------|-------------|
+| Storage engine   | Lucene        | Lucene        | Custom      |
+| Scoring          | BM25          | BM25          | Custom typo-tolerant |
+| Distribution     | Built-in cluster | ZooKeeper | Single-node (v1) |
+| Real-time search | 1 s refresh   | Soft/hard commit | Millisecond |
+| Schema           | Dynamic mapping | Schema required | Schemaless |
+| Primary use-case | Logs, analytics | Enterprise search | End-user typo-tolerant search |
+
+\`\`\`quiz
+{"title": "Architecture Check", "questions": [
+  {"question": "Which node becomes the coordinator for a search request?", "options": ["The master node always", "A random data node", "Any node can volunteer", "The node that holds the most shards"], "answer": 2, "explanation": "Elasticsearch is peer-to-peer; any node can accept a client request and act as coordinator."},
+  {"question": "What happens first during document indexing?", "options": ["Buffer flushed to segment", "Document analyzed", "Translog fsync", "Replica replication"], "answer": 1, "explanation": "The primary shard analyzes fields before writing to the in-memory buffer and translog."},
+  {"question": "Why does the cluster enter YELLOW status after a node crash?", "options": ["Some primaries are missing", "Some replicas are missing", "Master is re-electing", "Translog is corrupted"], "answer": 1, "explanation": "YELLOW means all primary shards are assigned but one or more replicas are unassigned."}
+]}
 \`\`\`
 
-## Key Takeaway
-
-A distributed search engine is built on four pillars: (1) the inverted index for fast term lookups, (2) BM25 for relevance scoring, (3) document-partitioned sharding for horizontal scale, and (4) a segment-based architecture for near-real-time ingestion. The coordinator pattern (scatter-gather) ties it all together -- every query is fanned out to all shards, results are merged and ranked globally, and the top results are returned to the client. Elasticsearch has proven this architecture scales to petabytes of data and thousands of queries per second.`,
+\`\`\`takeaways
+{"title": "Key Takeaways", "items": [
+  "Inverted index + BM25 + sharding + segments = scalable relevance",
+  "Coordinator scatter-gather gives every node a chance to help",
+  "Translog + replicas guarantee durability even during crashes",
+  "1-second refresh balances near-real-time search vs. segment merge cost"
+]}
+\`\`\``,
     },
   ],
 };

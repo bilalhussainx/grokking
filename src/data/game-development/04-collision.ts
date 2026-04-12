@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const collisionModule: Module = {
   id: "collision-detection",
   title: "Collision Detection",
-  description:
-    "Detect when game objects overlap — rectangle vs rectangle, circle vs circle, and how to respond to collisions.",
+  description: "Detect when game objects overlap — rectangle vs rectangle, circle vs circle, and how to respond to collisions.",
   lessons: [
     {
       id: "aabb-collision",

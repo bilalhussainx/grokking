@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const scenariosModule: Module = {
   id: "fm-scenarios",
   title: "Scenario & Sensitivity Analysis",
-  description:
-    "Master advanced analytical techniques — sensitivity tables, scenario analysis, Monte Carlo simulation, and presenting results.",
+  description: "Master advanced analytical techniques — sensitivity tables, scenario analysis, Monte Carlo simulation, and presenting results.",
   lessons: [
     {
       id: "fm-scenarios-sensitivity",
@@ -22,11 +21,11 @@ A one-variable table varies a single input and shows the resulting impact on one
 
 | Revenue Growth | Enterprise Value | Implied Share Price |
 |---------------|-----------------|-------------------|
-| 3% | 4,200 | \$38.50 |
-| 5% | 4,800 | \$44.00 |
-| 7% | 5,500 | \$50.50 |
-| 9% | 6,300 | \$57.80 |
-| 11% | 7,200 | \$66.10 |
+| 3% | 4,200 | $38.50 |
+| 5% | 4,800 | $44.00 |
+| 7% | 5,500 | $50.50 |
+| 9% | 6,300 | $57.80 |
+| 11% | 7,200 | $66.10 |
 
 This tells you: for every 2% change in growth, enterprise value changes by approximately 600-900 million — a meaningful sensitivity.
 
@@ -139,7 +138,7 @@ Build three complete sets of projections side by side:
 | Year 5 Revenue | 1,159 | 1,403 | 1,762 |
 | Year 5 EBITDA | 255 | 365 | 511 |
 | Enterprise Value | 2,040 | 3,650 | 6,132 |
-| Share Price | \$28 | \$52 | \$88 |
+| Share Price | $28 | $52 | $88 |
 
 This approach makes comparison easy but takes more space.
 
@@ -173,7 +172,7 @@ For more granular analysis, use five scenarios:
 Different industries warrant different scenario dimensions:
 
 **Technology/SaaS:** Customer growth vs. churn, expansion revenue, competition from incumbents
-**Energy:** Oil price scenarios (\$50/\$70/\$90 per barrel), regulatory changes, energy transition
+**Energy:** Oil price scenarios ($50/$70/$90 per barrel), regulatory changes, energy transition
 **Retail:** Same-store sales growth, e-commerce penetration, consumer spending
 **Healthcare:** Drug approval probability, pricing pressure, patent cliffs
 **Real estate:** Occupancy rates, rent growth, interest rate environment
@@ -430,13 +429,13 @@ Present the results using a football field chart (range from each methodology) a
 
 | Method | Low | Mid | High |
 |--------|-----|-----|------|
-| DCF (Perpetuity Growth) | \$42 | \$52 | \$64 |
-| DCF (Exit Multiple) | \$44 | \$54 | \$66 |
-| Trading Comps | \$46 | \$50 | \$55 |
-| Precedent Transactions | \$50 | \$58 | \$66 |
-| **Reference Range** | **\$48** | **\$54** | **\$62** |
+| DCF (Perpetuity Growth) | $42 | $52 | $64 |
+| DCF (Exit Multiple) | $44 | $54 | $66 |
+| Trading Comps | $46 | $50 | $55 |
+| Precedent Transactions | $50 | $58 | $66 |
+| **Reference Range** | **$48** | **$54** | **$62** |
 
-Current price: \$45 (implied upside: 7-38%)
+Current price: $45 (implied upside: 7-38%)
 
 **4. Sensitivity Analysis (1-2 pages)**
 Show the tornado chart (what matters most) followed by 2-3 detailed sensitivity tables for the key variables.
@@ -446,10 +445,10 @@ Present bear/base/bull with probability weights:
 
 | Scenario | Probability | Value | Description |
 |----------|-----------|-------|-------------|
-| Bear | 25% | \$38 | Recession, margin compression |
-| Base | 50% | \$54 | Management plan execution |
-| Bull | 25% | \$72 | Market share gains, margin expansion |
-| **Expected** | | **\$55** | Probability-weighted |
+| Bear | 25% | $38 | Recession, margin compression |
+| Base | 50% | $54 | Management plan execution |
+| Bull | 25% | $72 | Market share gains, margin expansion |
+| **Expected** | | **$55** | Probability-weighted |
 
 **6. Appendix**
 Detailed model output, supporting data tables, comparable company detail, full financial statements. Available for reference but not presented unless asked.

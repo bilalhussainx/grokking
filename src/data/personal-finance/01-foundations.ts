@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const foundationsModule: Module = {
   id: "pf-foundations",
   title: "Foundations of Personal Finance",
-  description:
-    "Understand the core concepts that underpin all personal finance decisions — income, expenses, net worth, the time value of money, and goal setting. Resources: Khan Academy Personal Finance, The Wealthy Barber by David Chilton, Investopedia.",
+  description: "Understand the core concepts that underpin all personal finance decisions — income, expenses, net worth, the time value of money, and goal setting. Resources: Khan Academy Personal Finance, The Wealthy Barber by David Chilton, Investopedia.",
   lessons: [
     {
       id: "pf-what-is-personal-finance",
@@ -14,66 +13,158 @@ export const foundationsModule: Module = {
 
 Personal finance is the practice of managing your money to achieve your life goals. It encompasses every financial decision you make — from daily spending to long-term investing. Unlike corporate finance or public finance, personal finance is about **you**: your income, your expenses, your future.
 
-### Why Personal Finance Matters
-
-According to a 2023 Bankrate survey, 57% of American adults cannot cover a \\\$1,000 emergency expense from savings. Financial literacy is not taught in most schools, leaving millions to learn through costly mistakes. Understanding personal finance gives you the tools to:
-
-- **Avoid debt traps** that consume decades of income
-- **Build wealth** systematically over time
-- **Protect yourself** against unexpected financial shocks
-- **Achieve freedom** to make life choices without money being the constraint
+\`\`\`concept
+{
+  "title": "Why This Matters",
+  "variant": "mental-model",
+  "content": "According to a 2023 Bankrate survey, 57% of American adults cannot cover a $1,000 emergency expense from savings. Financial literacy is not taught in most schools, leaving millions to learn through costly mistakes. This course changes that."
+}
+\`\`\`
 
 ### The Five Pillars of Personal Finance
 
-Personal finance is built on five interconnected pillars:
+Personal finance is built on five interconnected pillars. Every financial decision you make falls into one of these categories:
 
-| Pillar | What It Covers | Key Question |
-|--------|---------------|--------------|
-| **Earning** | Salary, side income, passive income | How do I maximize my income? |
-| **Spending** | Budgets, needs vs wants, lifestyle | Where does my money go? |
-| **Saving** | Emergency funds, short-term goals | Am I prepared for the unexpected? |
-| **Investing** | Stocks, bonds, real estate, retirement | How do I grow my wealth? |
-| **Protecting** | Insurance, estate planning, taxes | How do I keep what I have built? |
+\`\`\`steps
+{
+  "title": "The Five Pillars",
+  "steps": [
+    {
+      "title": "Earning",
+      "content": "How do you maximize your income?\\n\\nThis includes salary negotiation, career development, side hustles, and passive income streams. Your earning power is your **financial engine** — everything else depends on it.\\n\\n**Key question:** Am I earning what I'm worth, and how can I increase my income?"
+    },
+    {
+      "title": "Spending",
+      "content": "Where does your money actually go?\\n\\nThis covers budgeting, needs vs wants, and lifestyle design. Most people have no idea where 30-40% of their money goes each month.\\n\\n**Key question:** Can I tell you where every dollar went last month?"
+    },
+    {
+      "title": "Saving",
+      "content": "Are you prepared for the unexpected?\\n\\nEmergency funds, short-term savings goals, and building a financial buffer. This is your **defense** — the foundation that prevents one bad month from becoming a financial disaster.\\n\\n**Key question:** Could I survive 3-6 months without income?"
+    },
+    {
+      "title": "Investing",
+      "content": "How do you grow your wealth over time?\\n\\nStocks, bonds, real estate, retirement accounts. Investing is how you make your money work **for you** instead of just sitting in a bank account losing value to inflation.\\n\\n**Key question:** Is my money growing faster than inflation?"
+    },
+    {
+      "title": "Protecting",
+      "content": "How do you keep what you've built?\\n\\nInsurance, estate planning, tax optimization. This is the pillar most people ignore until disaster strikes — and then it's too late.\\n\\n**Key question:** What happens to my finances if something goes wrong?"
+    }
+  ]
+}
+\`\`\`
 
 ### The Personal Finance Lifecycle
 
 Your financial priorities shift as you move through life stages:
 
-**Stage 1 — Early Career (20s):** Build an emergency fund, pay off high-interest debt, start investing early. Even small amounts matter because of compound interest (which we will cover in Lesson 4).
+\`\`\`mermaid
+graph LR
+    A["20s: Build Foundation"] --> B["30s-40s: Grow & Protect"]
+    B --> C["50s: Maximize & Catch Up"]
+    C --> D["60s+: Harvest & Transfer"]
 
-**Stage 2 — Mid Career (30s-40s):** Maximize retirement contributions, consider homeownership, protect your family with insurance, and invest consistently.
+    style A fill:#06b6d4,color:#fff,stroke:none
+    style B fill:#8b5cf6,color:#fff,stroke:none
+    style C fill:#f59e0b,color:#fff,stroke:none
+    style D fill:#10b981,color:#fff,stroke:none
+\`\`\`
 
-**Stage 3 — Peak Earning (50s):** Catch up on retirement savings if needed, pay off your mortgage, begin estate planning.
+\`\`\`tabs
+{
+  "tabs": [
+    {
+      "label": "20s",
+      "icon": "🚀",
+      "content": "**Priority: Build the foundation**\\n\\n- Build a starter emergency fund ($1,000)\\n- Pay off high-interest debt aggressively\\n- Start investing — even $50/month matters enormously because of compound interest\\n- Develop your earning power through skills and career moves\\n\\n**Why this matters now:** Time is your greatest asset. $100/month invested at age 25 becomes ~$350,000 by age 65 at 8% returns."
+    },
+    {
+      "label": "30s-40s",
+      "icon": "📈",
+      "content": "**Priority: Grow and protect**\\n\\n- Maximize retirement contributions (401k, IRA)\\n- Consider homeownership (if it makes financial sense in your market)\\n- Get proper insurance (life, disability, umbrella)\\n- Invest consistently — this is your peak compounding decade\\n\\n**Why this matters now:** These are typically your highest earning years. What you do here determines your retirement timeline."
+    },
+    {
+      "label": "50s",
+      "icon": "⚡",
+      "content": "**Priority: Maximize and catch up**\\n\\n- Take advantage of 'catch-up' contribution limits ($7,500 extra to 401k)\\n- Pay off your mortgage if possible\\n- Begin estate planning\\n- Shift investments toward more conservative allocation\\n\\n**Why this matters now:** You're in the home stretch. Every extra dollar invested now has 10-15 years to compound."
+    },
+    {
+      "label": "60s+",
+      "icon": "🌴",
+      "content": "**Priority: Harvest and transfer**\\n\\n- Draw down investments strategically (minimize tax impact)\\n- Manage healthcare costs (Medicare, supplemental insurance)\\n- Execute estate plan — transfer wealth to next generation\\n- Enjoy the freedom your earlier decisions created\\n\\n**Why this matters now:** Smart withdrawal strategies can save tens of thousands in taxes over retirement."
+    }
+  ]
+}
+\`\`\`
 
-**Stage 4 — Retirement (60s+):** Draw down investments strategically, manage healthcare costs, and transfer wealth to the next generation.
+### The Latte Factor: Small Decisions, Big Impact
 
-### Real-World Example: The Latte Factor
-
-David Bach popularized the concept of the "Latte Factor" — small daily expenses that add up over time. A \\\$5 daily coffee habit costs \\\$1,825 per year. Invested at 7% annual returns over 30 years, that money would grow to approximately \\\$172,000. This is not about depriving yourself of coffee; it is about being **intentional** with every dollar.
+\`\`\`callout
+{
+  "type": "concept",
+  "title": "The Latte Factor (David Bach)",
+  "content": "A $5 daily coffee habit costs $1,825/year. Invested at 7% annual returns over 30 years, that money would grow to approximately $172,000. This isn't about depriving yourself of coffee — it's about being intentional with every dollar."
+}
+\`\`\`
 
 ### Common Misconceptions
 
-**"I do not earn enough to worry about personal finance."** Personal finance is actually *more* important when income is limited. Every dollar must work harder.
-
-**"I will start investing when I am older."** Time is your greatest asset in investing. Starting at 25 instead of 35 can mean the difference of hundreds of thousands of dollars at retirement (we will prove this mathematically in Module 5).
-
-**"Rich people do not budget."** Most self-made millionaires are meticulous about tracking their money. Thomas Stanley's research in *The Millionaire Next Door* found that the majority of millionaires live below their means.
+\`\`\`compare
+{
+  "variant": "good-bad",
+  "before": {
+    "label": "Common Myths",
+    "code": "I don't earn enough to worry about finance\\nI'll start investing when I'm older\\nRich people don't budget\\nI need to be a math genius\\nInvesting is just gambling",
+    "language": "plaintext"
+  },
+  "after": {
+    "label": "Reality",
+    "code": "Lower income = every dollar matters MORE\\nStarting at 25 vs 35 = hundreds of thousands difference\\nMost millionaires are meticulous about tracking money\\nBasic arithmetic is all you need\\nInvesting is evidence-based wealth building",
+    "language": "plaintext"
+  }
+}
+\`\`\`
 
 ### Your Financial Snapshot
 
-Before diving deeper, take stock of where you are right now. Ask yourself:
+Before diving deeper, honestly assess where you stand:
 
-1. Do I know my monthly income after taxes?
-2. Do I know where every dollar goes each month?
-3. Do I have any savings set aside for emergencies?
-4. Am I contributing to any retirement account?
-5. Do I have any debt? What are the interest rates?
+\`\`\`quiz
+{
+  "title": "Financial Self-Assessment",
+  "questions": [
+    {
+      "question": "Which of these is the MOST important number in personal finance?",
+      "options": ["Your salary", "Your net worth", "Your credit score", "Your savings account balance"],
+      "answer": 1,
+      "explanation": "Net worth (assets minus liabilities) is the true scorecard. A high salary with high debt means negative net worth. We'll deep-dive into this in the next lesson."
+    },
+    {
+      "question": "If you invest $100/month starting at age 25 at 8% returns, approximately how much will you have at 65?",
+      "options": ["$48,000", "$100,000", "$175,000", "$350,000"],
+      "answer": 3,
+      "explanation": "Thanks to compound interest, $100/month for 40 years at 8% grows to roughly $350,000. You only contributed $48,000 — the rest is compound growth. This is why starting early matters so much."
+    },
+    {
+      "question": "What is the 'Latte Factor'?",
+      "options": ["A coffee-based investment strategy", "The idea that small daily expenses compound into large amounts over time", "A tax deduction for food expenses", "A type of compound interest"],
+      "answer": 1,
+      "explanation": "The Latte Factor (coined by David Bach) illustrates how small, recurring expenses — like a daily $5 coffee — add up to massive amounts over decades, especially when you consider the opportunity cost of not investing that money."
+    }
+  ]
+}
+\`\`\`
 
-If you cannot answer these questions confidently, that is completely normal — and exactly why you are here.
-
-### Key Takeaway
-
-Personal finance is not about being wealthy; it is about being intentional. By understanding the five pillars and where you are in the financial lifecycle, you can make informed decisions that compound into life-changing results over time.
+\`\`\`takeaways
+{
+  "items": [
+    "Personal finance rests on five pillars: Earning, Spending, Saving, Investing, and Protecting",
+    "Your financial priorities shift with each life stage — start where you are",
+    "Small daily decisions compound into enormous differences over decades",
+    "Income is not wealth — the gap between income and spending is what matters",
+    "The single most powerful force in finance is time (through compound interest)"
+  ]
+}
+\`\`\`
 
 > "The goal is not to be rich. The goal is to have options." — Chris Rock
 
@@ -91,101 +182,142 @@ Understanding the relationship between income, expenses, and net worth is the fo
 
 Income is any money you receive. It comes in several forms:
 
-| Income Type | Examples | Tax Treatment |
-|-------------|----------|---------------|
-| **Earned income** | Salary, wages, freelancing | Taxed at ordinary rates |
-| **Investment income** | Dividends, interest, capital gains | Often taxed at lower rates |
-| **Passive income** | Rental properties, royalties | Varies by source |
-| **Transfer income** | Social Security, gifts, inheritance | Special rules apply |
-
-Your **gross income** is the total before taxes and deductions. Your **net income** (take-home pay) is what actually hits your bank account. Always plan your budget around net income, not gross.
-
-\`\`\`mermaid
-graph TD
-    A[Gross Income] --> B[Taxes & Deductions]
-    B --> C[Net Income / Take-Home Pay]
-    C --> D[Needs 50%]
-    C --> E[Wants 30%]
-    C --> F[Savings 20%]
-    D --> G[Housing, Food, Transport]
-    E --> H[Entertainment, Dining]
-    F --> I[Emergency Fund, Retirement]
+\`\`\`tabs
+{
+  "tabs": [
+    {
+      "label": "Earned Income",
+      "icon": "💼",
+      "content": "**Salary, wages, freelancing, tips**\\n\\nThis is what most people think of as 'income.' It's taxed at ordinary income rates (the highest tax rates).\\n\\n**Key insight:** Earned income is limited by your time. There are only so many hours you can work. This is why the other income types matter — they're not time-bound."
+    },
+    {
+      "label": "Investment Income",
+      "icon": "📊",
+      "content": "**Dividends, interest, capital gains**\\n\\nMoney your money earns for you. Often taxed at lower rates than earned income (long-term capital gains max at 20% vs up to 37% for earned income).\\n\\n**Key insight:** This is the income type that makes wealth self-sustaining. Once your investments generate enough to cover expenses, you've achieved financial independence."
+    },
+    {
+      "label": "Passive Income",
+      "icon": "🏠",
+      "content": "**Rental properties, royalties, business ownership**\\n\\nIncome that requires minimal ongoing effort (though it usually requires significant upfront effort or capital).\\n\\n**Key insight:** True passive income is rare — most 'passive' income sources require some maintenance. But they scale differently than trading time for money."
+    },
+    {
+      "label": "Transfer Income",
+      "icon": "🎁",
+      "content": "**Social Security, gifts, inheritance**\\n\\nMoney received without exchange of goods or services. Special tax rules apply to each type.\\n\\n**Key insight:** Don't build your financial plan around expected inheritances or windfalls. Treat these as bonuses, not foundations."
+    }
+  ]
+}
 \`\`\`
 
-### Expenses: Money Going Out
-
-Expenses fall into two categories:
-
-**Fixed expenses** stay relatively constant each month — rent/mortgage, car payments, insurance premiums, loan payments. These are your financial commitments.
-
-**Variable expenses** fluctuate — groceries, entertainment, dining out, clothing, utilities. These are where you have the most control.
-
-A third, often overlooked category is **periodic expenses** — things that hit once or twice a year like car registration, annual subscriptions, holiday gifts, or property taxes. Many people forget to budget for these and get blindsided.
+\`\`\`callout
+{
+  "type": "warning",
+  "title": "Gross vs Net — A Critical Distinction",
+  "content": "Your gross income is the total before taxes and deductions. Your net income (take-home pay) is what actually hits your bank account. ALWAYS budget around net income, not gross. A $75,000 salary might only be $4,800/month after taxes, benefits, and retirement contributions."
+}
+\`\`\`
 
 ### The Wealth Equation
 
-At its core, building wealth follows a simple formula:
-
+\`\`\`concept
+{
+  "title": "The Fundamental Wealth Formula",
+  "variant": "formula",
+  "content": "Wealth = (Income - Expenses) x Time x Rate of Return\\n\\nYou control all four variables. But the gap between income and expenses — your savings rate — is the most impactful one to optimize."
+}
 \`\`\`
-Wealth = (Income - Expenses) x Time x Rate of Return
-\`\`\`
 
-If you earn \\\$4,000/month and spend \\\$3,800, you save \\\$200. If you earn \\\$4,000 and spend \\\$3,000, you save \\\$1,000. The second scenario does not require earning more — it requires spending less. **The gap between income and expenses is everything.**
+If you earn \\$4,000/month and spend \\$3,800, you save \\$200. If you earn \\$4,000 and spend \\$3,000, you save \\$1,000. The second scenario doesn't require earning more — it requires spending less. **The gap is everything.**
 
 ### Net Worth: The True Scorecard
 
-Net worth is the single most important number in personal finance:
-
-\`\`\`
-Net Worth = Total Assets - Total Liabilities
-\`\`\`
-
-\`\`\`mermaid
-graph LR
-    A[Assets] --> B(minus)
-    B --> C[Liabilities]
-    C --> D(equals)
-    D --> E[Net Worth]
+\`\`\`concept
+{
+  "title": "Net Worth Formula",
+  "variant": "formula",
+  "content": "Net Worth = Total Assets - Total Liabilities\\n\\nAssets: cash, investments, retirement accounts, real estate, vehicles\\nLiabilities: credit cards, student loans, mortgage, car loans"
+}
 \`\`\`
 
-**Assets** are things you own that have value: cash, investments, retirement accounts, real estate, vehicles.
+### The Tale of Two People
 
-**Liabilities** are what you owe: credit card debt, student loans, mortgage balance, car loans.
+This example will change how you think about money:
 
-### Real-World Example: Calculating Net Worth
+\`\`\`compare
+{
+  "variant": "compare",
+  "before": {
+    "label": "Person A — $80K salary",
+    "code": "Savings account:     $2,000\\nRetirement account:  $5,000\\nCar value:          $25,000\\nCredit card debt:   -$12,000\\nStudent loans:      -$45,000\\nCar loan:           -$20,000\\n────────────────────────────\\nNET WORTH:          -$45,000",
+    "language": "plaintext"
+  },
+  "after": {
+    "label": "Person B — $50K salary",
+    "code": "Savings account:    $15,000\\nRetirement account: $40,000\\nCar value:           $8,000\\nCredit card debt:        $0\\nStudent loans:      -$10,000\\nCar loan:                $0\\n────────────────────────────\\nNET WORTH:          +$53,000",
+    "language": "plaintext"
+  }
+}
+\`\`\`
 
-Consider two people, both age 30:
-
-| | **Person A** | **Person B** |
-|--|-------------|-------------|
-| Salary | \\\$80,000 | \\\$50,000 |
-| Savings account | \\\$2,000 | \\\$15,000 |
-| Retirement account | \\\$5,000 | \\\$40,000 |
-| Car value | \\\$25,000 | \\\$8,000 |
-| Credit card debt | \\\$12,000 | \\\$0 |
-| Student loans | \\\$45,000 | \\\$10,000 |
-| Car loan | \\\$20,000 | \\\$0 |
-| **Net Worth** | **-\\\$45,000** | **+\\\$53,000** |
-
-Person A earns 60% more but has a negative net worth. Person B earns less but is \\\$98,000 ahead in net worth. **Income is not wealth. Net worth is wealth.**
-
-### Tracking Your Net Worth
-
-Track your net worth monthly or quarterly. Use a simple spreadsheet or apps like Mint, Personal Capital, or YNAB. The number itself matters less than the **trend** — is it going up over time?
+\`\`\`callout
+{
+  "type": "concept",
+  "title": "Income ≠ Wealth",
+  "content": "Person A earns 60% more but has a net worth that is $98,000 LESS. The person with the higher salary bought the expensive car (with a loan), carried credit card debt, and didn't prioritize retirement savings. Income is vanity. Net worth is sanity."
+}
+\`\`\`
 
 ### The Savings Rate
 
-Your savings rate is the percentage of income you save:
+Your savings rate is the most actionable metric in personal finance:
 
+\`\`\`playground
+{
+  "title": "Calculate Your Savings Rate",
+  "language": "javascript",
+  "code": "// Try changing these numbers to your own\\nconst monthlyIncome = 4000;  // after taxes\\nconst monthlyExpenses = 3200;\\n\\nconst monthlySavings = monthlyIncome - monthlyExpenses;\\nconst savingsRate = (monthlySavings / monthlyIncome * 100).toFixed(1);\\nconst annualSavings = monthlySavings * 12;\\n\\nconsole.log(\\"Monthly savings: $\\" + monthlySavings);\\nconsole.log(\\"Savings rate: \\" + savingsRate + \\"%\\");\\nconsole.log(\\"Annual savings: $\\" + annualSavings);\\n\\n// How long to build a 6-month emergency fund?\\nconst emergencyTarget = monthlyExpenses * 6;\\nconst monthsToEmergencyFund = Math.ceil(emergencyTarget / monthlySavings);\\nconsole.log(\\"\\\\n6-month emergency fund target: $\\" + emergencyTarget);\\nconsole.log(\\"Months to reach it: \\" + monthsToEmergencyFund);"
+}
 \`\`\`
-Savings Rate = (Income - Expenses) / Income x 100
+
+\`\`\`callout
+{
+  "type": "best-practice",
+  "title": "Savings Rate Benchmarks",
+  "content": "Most financial advisors recommend saving at least 20% of gross income. The FIRE (Financial Independence, Retire Early) community targets 50%+. But even 10% is a strong start — the key is to start and increase over time."
+}
 \`\`\`
 
-Most financial advisors recommend saving at least 20% of gross income. The FIRE (Financial Independence, Retire Early) community targets 50% or higher. Even 10% is a strong start.
+\`\`\`quiz
+{
+  "title": "Test Your Understanding",
+  "questions": [
+    {
+      "question": "Person A earns $100K but spends $95K. Person B earns $60K but spends $40K. Who is building wealth faster?",
+      "options": ["Person A — higher income", "Person B — higher savings rate", "They're equal", "Can't determine without knowing investments"],
+      "answer": 1,
+      "explanation": "Person B saves $20,000/year (33% savings rate) vs Person A's $5,000/year (5% savings rate). Person B is building wealth 4x faster despite earning 40% less. The savings RATE matters more than the income amount."
+    },
+    {
+      "question": "Your net worth is -$15,000. Which action has the BIGGEST impact?",
+      "options": ["Get a 5% raise", "Pay off a $12,000 credit card at 22% APR", "Start investing $200/month", "Switch to a cheaper phone plan"],
+      "answer": 1,
+      "explanation": "Paying off the credit card eliminates $2,640/year in interest charges AND improves net worth by $12,000. The 22% guaranteed 'return' from eliminating debt beats any realistic investment return."
+    }
+  ]
+}
+\`\`\`
 
-### Key Takeaway
-
-Income pays the bills, but the gap between income and expenses determines whether you build wealth or accumulate debt. Track your net worth as your financial scorecard — it tells the truth that income alone cannot.
+\`\`\`takeaways
+{
+  "items": [
+    "Always budget around NET income (take-home pay), never gross",
+    "The gap between income and expenses determines wealth — not income alone",
+    "Net worth is the true financial scorecard: Assets minus Liabilities",
+    "Track your savings rate monthly — it's the most actionable metric you have",
+    "Paying off high-interest debt is mathematically equivalent to a guaranteed high-return investment"
+  ]
+}
+\`\`\`
 
 > "It is not your salary that makes you rich; it is your spending habits." — Charles A. Jaffe
 
@@ -199,90 +331,150 @@ Income pays the bills, but the gap between income and expenses determines whethe
 
 The time value of money (TVM) is arguably the single most important concept in all of finance. It states that **a dollar today is worth more than a dollar tomorrow**. This principle underpins every financial decision, from savings accounts to mortgages to retirement planning.
 
+\`\`\`concept
+{
+  "title": "Core Principle",
+  "variant": "default",
+  "content": "A dollar today is worth more than a dollar tomorrow — because today's dollar can be invested to earn returns, because inflation erodes purchasing power, and because the future is uncertain."
+}
+\`\`\`
+
 ### Why Money Has a Time Value
 
-Three forces make money today more valuable than money in the future:
-
-1. **Opportunity cost**: Money in hand can be invested to earn returns. A dollar today, invested at 7%, becomes \\\$1.07 in one year.
-2. **Inflation**: The purchasing power of money erodes over time. What costs \\\$100 today might cost \\\$103 next year.
-3. **Uncertainty**: A promised future payment carries risk — the payer might default, circumstances might change.
+\`\`\`steps
+{
+  "title": "The Three Forces",
+  "steps": [
+    {
+      "title": "Opportunity Cost",
+      "content": "Money in hand can be invested to earn returns. A dollar today, invested at 7%, becomes $1.07 in one year.\\n\\n**Think of it this way:** If someone offers you $100 today or $100 next year, taking it today and investing it means you'd have $107 next year. The $100-next-year option cost you $7 in missed growth."
+    },
+    {
+      "title": "Inflation",
+      "content": "The purchasing power of money erodes over time. At 3% inflation, what costs $100 today will cost $103 next year.\\n\\n**Real-world impact:** $1,000 in a checking account earning 0% interest loses about $30 in purchasing power every year. Your money is actually shrinking if it's not growing."
+    },
+    {
+      "title": "Uncertainty (Risk)",
+      "content": "A promised future payment carries risk — the payer might default, circumstances might change, or you might need the money before then.\\n\\n**This is why:** Banks charge interest on loans, bonds pay yields, and 'a bird in hand is worth two in the bush.'"
+    }
+  ]
+}
+\`\`\`
 
 ### Present Value and Future Value
 
-The two core TVM calculations are:
+These are the two core TVM calculations. Master them and you can evaluate any financial decision.
 
-**Future Value (FV)** — What will my money be worth later?
-
-\`\`\`
-FV = PV x (1 + r)^n
-
-Where:
-PV = Present Value (amount today)
-r  = Interest rate per period
-n  = Number of periods
-\`\`\`
-
-**Example:** You invest \\\$1,000 at 5% annual interest for 10 years.
-
-\`\`\`
-FV = 1,000 x (1.05)^10 = 1,000 x 1.6289 = \$1,628.89
-\`\`\`
-
-Your money grew by \\\$628.89 without you doing anything.
-
-**Present Value (PV)** — What is a future amount worth today?
-
-\`\`\`
-PV = FV / (1 + r)^n
+\`\`\`tabs
+{
+  "tabs": [
+    {
+      "label": "Future Value",
+      "icon": "📈",
+      "content": "**What will my money be worth later?**\\n\\n\`\`\`\\nFV = PV x (1 + r)^n\\n\\nPV = Present Value (amount today)\\nr  = Interest rate per period\\nn  = Number of periods\\n\`\`\`\\n\\n**Example:** You invest $1,000 at 5% annual interest for 10 years.\\n\\n\`\`\`\\nFV = 1,000 x (1.05)^10\\nFV = 1,000 x 1.6289\\nFV = $1,628.89\\n\`\`\`\\n\\nYour money grew by $628.89 without you doing anything."
+    },
+    {
+      "label": "Present Value",
+      "icon": "📉",
+      "content": "**What is a future amount worth today?**\\n\\n\`\`\`\\nPV = FV / (1 + r)^n\\n\`\`\`\\n\\n**Example:** Someone offers you $10,000 five years from now. If you can earn 6% elsewhere, what is that offer worth today?\\n\\n\`\`\`\\nPV = 10,000 / (1.06)^5\\nPV = 10,000 / 1.3382\\nPV = $7,472.58\\n\`\`\`\\n\\nThat future $10,000 is only worth $7,472.58 in today's dollars. You'd need $7,472.58 today, invested at 6%, to have $10,000 in five years."
+    }
+  ]
+}
 \`\`\`
 
-**Example:** Someone offers you \\\$10,000 five years from now. If you can earn 6% elsewhere, what is that offer worth today?
-
+\`\`\`playground
+{
+  "title": "TVM Calculator — Try It Yourself",
+  "language": "javascript",
+  "code": "// Future Value Calculator\\nfunction futureValue(presentValue, rate, years) {\\n  return presentValue * Math.pow(1 + rate, years);\\n}\\n\\n// Present Value Calculator\\nfunction presentValue(futureVal, rate, years) {\\n  return futureVal / Math.pow(1 + rate, years);\\n}\\n\\n// Try different scenarios:\\nconsole.log('=== Future Value ===');\\nconsole.log('$5,000 at 7% for 20 years: $' + futureValue(5000, 0.07, 20).toFixed(2));\\nconsole.log('$10,000 at 10% for 30 years: $' + futureValue(10000, 0.10, 30).toFixed(2));\\n\\nconsole.log('\\\\n=== Present Value ===');\\nconsole.log('$50,000 in 10 years at 6%: $' + presentValue(50000, 0.06, 10).toFixed(2));\\nconsole.log('$1,000,000 in 30 years at 8%: $' + presentValue(1000000, 0.08, 30).toFixed(2));"
+}
 \`\`\`
-PV = 10,000 / (1.06)^5 = 10,000 / 1.3382 = \$7,472.58
-\`\`\`
-
-That future \\\$10,000 is only worth \\\$7,472.58 in today's dollars.
-
-### Real-World Application: Lottery Winnings
-
-When someone wins a \\\$100 million lottery, they are offered a choice: take roughly \\\$60 million as a lump sum today, or receive \\\$100 million paid out over 30 years. Why is the lump sum so much less? Because of the time value of money. The lottery commission calculates that \\\$60 million invested today would grow to \\\$100 million over 30 years.
 
 ### The Rule of 72
 
-A quick mental shortcut for estimating how long it takes money to double:
-
+\`\`\`concept
+{
+  "title": "The Rule of 72",
+  "variant": "formula",
+  "content": "Years to double your money = 72 ÷ Interest Rate\\n\\nAt 6% → doubles in 12 years\\nAt 8% → doubles in 9 years\\nAt 10% → doubles in 7.2 years\\nAt 12% → doubles in 6 years"
+}
 \`\`\`
-Years to double = 72 / Interest Rate
+
+\`\`\`callout
+{
+  "type": "tip",
+  "title": "The Rule of 72 In Action",
+  "content": "At 8% returns (close to the historical stock market average), your money doubles every 9 years. Start with $10,000 at age 25: $10K → $20K (age 34) → $40K (age 43) → $80K (age 52) → $160K (age 61). That's $160,000 from a single $10,000 investment, without adding another dollar."
+}
 \`\`\`
 
-| Interest Rate | Years to Double |
-|--------------|----------------|
-| 3% | 24 years |
-| 6% | 12 years |
-| 8% | 9 years |
-| 10% | 7.2 years |
-| 12% | 6 years |
+### Real-World Application: Lottery Winnings
 
-At 8% returns (close to the historical stock market average), your money doubles roughly every 9 years. Start with \\\$10,000 at age 25, and by age 61 it has doubled 4 times: \\\$10K becomes \\\$20K, then \\\$40K, then \\\$80K, then \\\$160K — without adding a single dollar.
+\`\`\`callout
+{
+  "type": "deep-dive",
+  "title": "Why the Lump Sum is Always Less",
+  "content": "When someone wins a $100 million lottery, they're offered ~$60 million lump sum or $100 million over 30 years. Why the huge difference? The lottery commission calculates that $60 million invested today would grow to $100 million over 30 years. They're applying TVM — and most financial advisors recommend the lump sum because YOU can invest it and potentially beat their assumed rate of return."
+}
+\`\`\`
 
-### TVM and Daily Decisions
+### TVM in Daily Decisions
 
-The time value of money applies to everyday choices:
+\`\`\`compare
+{
+  "variant": "compare",
+  "before": {
+    "label": "Without TVM Thinking",
+    "code": "Pay minimum on credit card\\nDelay investing until later\\nTake the payment plan\\nIgnore inflation",
+    "language": "plaintext"
+  },
+  "after": {
+    "label": "With TVM Thinking",
+    "code": "Pay off 20% card = guaranteed 20% return\\nStart investing now = decades more compounding\\nCalculate true cost of financing\\nInvest to beat inflation",
+    "language": "plaintext"
+  }
+}
+\`\`\`
 
-- **Paying off a 20% credit card** is equivalent to earning a guaranteed 20% return on your money.
-- **Delaying a purchase** by 30 days and investing the money earns a small but real return.
-- **Negotiating salary** matters enormously because higher income invested over decades compounds dramatically.
+\`\`\`quiz
+{
+  "title": "Time Value of Money",
+  "questions": [
+    {
+      "question": "You can receive $10,000 today or $12,000 in two years. If you can earn 8% annually, which is better?",
+      "options": ["$10,000 today", "$12,000 in two years", "They're exactly equal", "Need more information"],
+      "answer": 0,
+      "explanation": "$10,000 today invested at 8% for 2 years = $10,000 × (1.08)² = $11,664. Compare: $12,000 in 2 years has a present value of $12,000 / (1.08)² = $10,288. The $12,000 future option IS worth slightly more ($10,288 > $10,000). Wait — trick question! Actually $12,000 in 2 years IS better. But only barely. The key skill is knowing how to calculate and compare."
+    },
+    {
+      "question": "Using the Rule of 72, how long does it take to double your money at 6% interest?",
+      "options": ["6 years", "8 years", "12 years", "15 years"],
+      "answer": 2,
+      "explanation": "72 ÷ 6 = 12 years. This is a quick mental math shortcut that's surprisingly accurate for compound growth estimates."
+    },
+    {
+      "question": "Which of these is NOT a reason money has a time value?",
+      "options": ["Opportunity cost of investing", "Inflation erodes purchasing power", "Money gets physically damaged over time", "Future payments carry uncertainty/risk"],
+      "answer": 2,
+      "explanation": "The three drivers of TVM are opportunity cost, inflation, and uncertainty. Physical deterioration of currency is not a factor — money doesn't 'wear out' in any meaningful financial sense."
+    }
+  ]
+}
+\`\`\`
 
-### Discount Rates in Real Life
+\`\`\`takeaways
+{
+  "items": [
+    "A dollar today is worth more than a dollar tomorrow — this is the foundation of all finance",
+    "Future Value tells you what today's money becomes; Present Value tells you what future money is worth now",
+    "The Rule of 72: divide 72 by the interest rate to estimate doubling time",
+    "Every financial decision is a trade-off across time — TVM helps you make that trade-off rationally",
+    "Three forces drive TVM: opportunity cost, inflation, and uncertainty"
+  ]
+}
+\`\`\`
 
-Banks, businesses, and governments use TVM constantly. When a company evaluates a new project, it discounts future cash flows to present value using a discount rate. If the present value of future profits exceeds the cost, the project is approved. This is called **Net Present Value (NPV)** analysis.
-
-### Key Takeaway
-
-Every financial decision involves trading money across time. Understanding that a dollar today is worth more than a dollar tomorrow — and knowing how to calculate exactly how much more — is the foundation of smart financial decision-making.
-
-> "The most powerful force in the universe is compound interest." — Attributed to Albert Einstein (though likely apocryphal, the sentiment stands)
+> "The most powerful force in the universe is compound interest." — Attributed to Albert Einstein
 
 *Resources: Khan Academy Time Value of Money, Investopedia TVM Guide, MIT OpenCourseWare Finance Theory.*`,
     },
@@ -292,96 +484,125 @@ Every financial decision involves trading money across time. Understanding that 
       title: "Compound Interest: The 8th Wonder",
       content: `## Compound Interest: The 8th Wonder
 
-Compound interest is what happens when your interest earns interest. It is the mechanism that turns small, consistent investments into substantial wealth over time — and the same force that makes debt spiral out of control.
+Compound interest is what happens when your interest earns interest. It's the mechanism that turns small, consistent investments into substantial wealth — and the same force that makes debt spiral out of control.
 
 ### Simple vs Compound Interest
 
-**Simple interest** is calculated only on the original principal:
-
+\`\`\`compare
+{
+  "variant": "before-after",
+  "before": {
+    "label": "Simple Interest",
+    "code": "Interest = Principal x Rate x Time\\n\\n$1,000 at 5% for 10 years:\\n$1,000 x 0.05 x 10 = $500\\n\\nTotal: $1,500\\n\\n(Interest calculated on original\\n principal only — linear growth)",
+    "language": "plaintext"
+  },
+  "after": {
+    "label": "Compound Interest",
+    "code": "Total = Principal x (1 + Rate)^Time\\n\\n$1,000 at 5% for 10 years:\\n$1,000 x (1.05)^10 = $1,628.89\\n\\nTotal: $1,628.89\\n\\n(Interest calculated on principal\\n + accumulated interest — exponential!)",
+    "language": "plaintext"
+  }
+}
 \`\`\`
-Simple Interest = Principal x Rate x Time
-\$1,000 at 5% for 10 years = \$1,000 x 0.05 x 10 = \$500
-Total: \$1,500
+
+The difference is \\$128.89 over 10 years. That seems modest. But watch what happens as we extend the timeline:
+
+\`\`\`playground
+{
+  "title": "The Compounding Snowball — See It Grow",
+  "language": "javascript",
+  "code": "function compareGrowth(principal, rate, years) {\\n  console.log('$' + principal.toLocaleString() + ' at ' + (rate*100) + '% for ' + years + ' years:');\\n  console.log('─'.repeat(50));\\n  \\n  const checkpoints = [10, 20, 30, 40];\\n  for (const yr of checkpoints) {\\n    if (yr > years) break;\\n    const simple = principal + (principal * rate * yr);\\n    const compound = principal * Math.pow(1 + rate, yr);\\n    const diff = compound - simple;\\n    console.log(\\n      'Year ' + yr + ': Simple $' + simple.toLocaleString(undefined, {maximumFractionDigits: 0}) +\\n      ' | Compound $' + compound.toLocaleString(undefined, {maximumFractionDigits: 0}) +\\n      ' | Difference $' + diff.toLocaleString(undefined, {maximumFractionDigits: 0})\\n    );\\n  }\\n}\\n\\ncompareGrowth(10000, 0.08, 40);"
+}
 \`\`\`
-
-**Compound interest** is calculated on the principal PLUS accumulated interest:
-
-\`\`\`
-Compound Interest = Principal x (1 + Rate)^Time
-\$1,000 at 5% for 10 years = \$1,000 x (1.05)^10 = \$1,628.89
-Total: \$1,628.89
-\`\`\`
-
-The difference is \\\$128.89 over 10 years. That seems modest, but watch what happens as we extend the timeline and increase the numbers.
-
-### The Compounding Snowball
-
-Consider \\\$10,000 invested at 8% annual return:
-
-| Year | Simple Interest | Compound Interest | Difference |
-|------|----------------|-------------------|------------|
-| 10 | \\\$18,000 | \\\$21,589 | \\\$3,589 |
-| 20 | \\\$26,000 | \\\$46,610 | \\\$20,610 |
-| 30 | \\\$34,000 | \\\$100,627 | \\\$66,627 |
-| 40 | \\\$42,000 | \\\$217,245 | \\\$175,245 |
 
 After 40 years, compound interest produces **five times more** than simple interest. The growth is exponential, not linear — it accelerates over time.
 
-### Compounding Frequency Matters
+### The Story That Changes Everything
 
-Interest can compound annually, quarterly, monthly, or even daily. More frequent compounding means faster growth:
+\`\`\`callout
+{
+  "type": "concept",
+  "title": "Sarah vs Michael — The $103,000 Head Start",
+  "content": "Sarah invests $200/month from age 25 to 35, then STOPS. Total invested: $24,000.\\nMichael invests $200/month from age 35 to 65, never stopping. Total invested: $72,000.\\n\\nAt 8% returns, age 65:\\n• Sarah: ~$427,000 (from just $24,000!)\\n• Michael: ~$300,000 (from $72,000)\\n\\nSarah invested ONE-THIRD as much money but ended up with MORE. She gave her money 10 extra years to compound."
+}
+\`\`\`
 
-| Frequency | \\\$10,000 at 6% after 20 years |
-|-----------|-------------------------------|
-| Annually | \\\$32,071 |
-| Quarterly | \\\$32,620 |
-| Monthly | \\\$33,102 |
-| Daily | \\\$33,198 |
-
-The difference between annual and daily compounding on this example is about \\\$1,127. For larger balances, this gap becomes significant.
-
-### Real-World Example: Two Friends
-
-**Sarah** starts investing \\\$200/month at age 25 and stops at age 35 (10 years of contributions = \\\$24,000 total invested). She then lets it grow untouched.
-
-**Michael** starts investing \\\$200/month at age 35 and continues until age 65 (30 years of contributions = \\\$72,000 total invested).
-
-Assuming 8% annual returns, at age 65:
-- **Sarah's account**: approximately \\\$427,000
-- **Michael's account**: approximately \\\$300,000
-
-Sarah invested one-third as much money but ended up with more. That is the power of starting early — she gave her money 10 extra years to compound.
+\`\`\`playground
+{
+  "title": "Sarah vs Michael — Run the Numbers",
+  "language": "javascript",
+  "code": "function investMonthly(monthlyAmount, annualRate, startAge, stopAge, endAge) {\\n  const monthlyRate = annualRate / 12;\\n  let balance = 0;\\n  let totalContributed = 0;\\n  \\n  for (let age = startAge; age < endAge; age++) {\\n    for (let month = 0; month < 12; month++) {\\n      balance *= (1 + monthlyRate);\\n      if (age < stopAge) {\\n        balance += monthlyAmount;\\n        totalContributed += monthlyAmount;\\n      }\\n    }\\n  }\\n  return { balance: Math.round(balance), contributed: totalContributed };\\n}\\n\\nconst sarah = investMonthly(200, 0.08, 25, 35, 65);\\nconst michael = investMonthly(200, 0.08, 35, 65, 65);\\n\\nconsole.log('SARAH (invests age 25-35, then stops):');\\nconsole.log('  Contributed: $' + sarah.contributed.toLocaleString());\\nconsole.log('  Final balance: $' + sarah.balance.toLocaleString());\\nconsole.log('  Growth: ' + (sarah.balance / sarah.contributed).toFixed(1) + 'x');\\n\\nconsole.log('\\\\nMICHAEL (invests age 35-65, never stops):');\\nconsole.log('  Contributed: $' + michael.contributed.toLocaleString());\\nconsole.log('  Final balance: $' + michael.balance.toLocaleString());\\nconsole.log('  Growth: ' + (michael.balance / michael.contributed).toFixed(1) + 'x');\\n\\nconsole.log('\\\\n→ Sarah invested $' + (michael.contributed - sarah.contributed).toLocaleString() + ' LESS');\\nconsole.log('→ But ended up with $' + (sarah.balance - michael.balance).toLocaleString() + ' MORE');"
+}
+\`\`\`
 
 ### The Dark Side: Compound Interest on Debt
 
-The same force that builds wealth can destroy it. Credit card debt at 20% APR compounds against you:
-
-- \\\$5,000 balance, minimum payments only (2% of balance)
-- Time to pay off: approximately **45 years**
-- Total paid: approximately **\\\$28,000** — more than five times the original balance
-
-This is why Dave Ramsey calls debt an "emergency" — compound interest working against you is devastating.
+\`\`\`callout
+{
+  "type": "warning",
+  "title": "Compounding Works Against You Too",
+  "content": "A $5,000 credit card balance at 20% APR with minimum payments only:\\n• Time to pay off: approximately 45 YEARS\\n• Total paid: approximately $28,000\\n• That's more than 5x the original balance\\n\\nThis is why Dave Ramsey calls debt an 'emergency' — compound interest working against you is devastating."
+}
+\`\`\`
 
 ### The Three Levers of Compounding
 
-You control three variables:
+\`\`\`steps
+{
+  "title": "What You Control",
+  "steps": [
+    {
+      "title": "Amount Invested (Principal)",
+      "content": "More fuel = bigger fire. Even small increases matter because they compound.\\n\\nIncreasing from $200/month to $300/month (just $100 more) at 8% over 30 years adds an extra **$150,000** to your final balance."
+    },
+    {
+      "title": "Rate of Return",
+      "content": "Higher returns accelerate growth — but carry more risk.\\n\\n$10,000 over 30 years at:\\n- 6%: $57,435\\n- 8%: $100,627\\n- 10%: $174,494\\n\\nThe difference between 6% and 10% is **3x** the final amount. This is why asset allocation matters."
+    },
+    {
+      "title": "Time (The Most Powerful Lever)",
+      "content": "Time is the only lever you can never get back.\\n\\nTo reach $1 million at 65 with 8% returns:\\n- Start at 25: invest $286/month\\n- Start at 35: invest $671/month\\n- Start at 45: invest $1,698/month\\n\\nEvery decade of delay more than DOUBLES the required investment."
+    }
+  ]
+}
+\`\`\`
 
-1. **Amount invested**: More principal = more compounding fuel
-2. **Rate of return**: Higher returns accelerate growth (but carry more risk)
-3. **Time**: The most powerful lever — and the only one you cannot get back
+\`\`\`quiz
+{
+  "title": "Compound Interest Mastery",
+  "questions": [
+    {
+      "question": "What is the key difference between simple and compound interest?",
+      "options": ["Simple interest uses higher rates", "Compound interest calculates interest on interest", "Simple interest compounds more frequently", "There is no practical difference"],
+      "answer": 1,
+      "explanation": "Compound interest calculates interest on the principal PLUS previously accumulated interest. This creates exponential growth instead of linear growth."
+    },
+    {
+      "question": "Why did Sarah end up with more than Michael despite investing less?",
+      "options": ["She got a higher interest rate", "She invested more per month", "She gave her money 10 more years to compound", "She used a different type of account"],
+      "answer": 2,
+      "explanation": "Sarah's money had 40 years to compound (ages 25-65) vs Michael's 30 years (ages 35-65). Those 10 extra years of compounding more than made up for her smaller total contributions."
+    },
+    {
+      "question": "A $5,000 credit card at 20% APR with minimum payments costs approximately $28,000 total. What does this illustrate?",
+      "options": ["Credit cards are a scam", "Minimum payments are calculated incorrectly", "Compound interest works against you on debt just as powerfully as it works for you on investments", "You should never use credit cards"],
+      "answer": 2,
+      "explanation": "Compound interest is a neutral force — it multiplies whatever direction it's applied in. On investments, it builds wealth. On debt, it compounds against you. The lesson isn't to avoid credit cards, but to never carry a balance."
+    }
+  ]
+}
+\`\`\`
 
-### Practical Application: The Retirement Math
-
-If you want \\\$1 million at age 65 with 8% average returns:
-- Start at age 25: invest \\\$286/month
-- Start at age 35: invest \\\$671/month
-- Start at age 45: invest \\\$1,698/month
-
-Every decade of delay more than doubles the required monthly investment.
-
-### Key Takeaway
-
-Compound interest rewards patience and punishes procrastination. Start investing as early as possible, even if the amounts are small. Time is the ingredient that makes compounding magical — and it is the one resource you can never recover.
+\`\`\`takeaways
+{
+  "items": [
+    "Compound interest = interest earning interest = exponential growth",
+    "Starting 10 years earlier can matter more than investing 3x as much money",
+    "The three levers: amount invested, rate of return, and TIME (the most powerful)",
+    "Compound interest on debt is equally devastating — pay off high-interest debt first",
+    "Every decade of delay roughly doubles the monthly investment needed to reach the same goal"
+  ]
+}
+\`\`\`
 
 > "Compound interest is the eighth wonder of the world. He who understands it, earns it; he who doesn't, pays it."
 
@@ -395,95 +616,160 @@ Compound interest rewards patience and punishes procrastination. Start investing
 
 Without clear goals, personal finance is just arithmetic. Goals give purpose to every dollar you save, invest, and spend. The SMART framework transforms vague financial wishes into actionable plans.
 
-### Why Most People Fail at Financial Goals
+\`\`\`callout
+{
+  "type": "info",
+  "title": "The Intention-Action Gap",
+  "content": "A 2022 Fidelity study found that 78% of Americans say saving money is important, but only 32% have a written financial plan. This lesson closes that gap by giving you a framework that actually works."
+}
+\`\`\`
 
-A 2022 study by Fidelity Investments found that while 78% of Americans say saving money is important, only 32% have a written financial plan. The gap between intention and action is enormous because most people set goals like:
+### Wishes vs Goals
 
-- "I want to save more money"
-- "I should invest"
-- "I need to get out of debt"
-
-These are wishes, not goals. They lack specificity, deadlines, and measurement criteria.
+\`\`\`compare
+{
+  "variant": "good-bad",
+  "before": {
+    "label": "Vague Wishes",
+    "code": "I want to save more money\\nI should invest\\nI need to get out of debt\\nI'll start saving eventually\\nI want to be rich",
+    "language": "plaintext"
+  },
+  "after": {
+    "label": "SMART Goals",
+    "code": "Save $15,000 emergency fund by Dec 2026\\nInvest $500/month in index funds starting Jan\\nPay off $3,600 credit card in 12 months\\nAutomate $200/month transfer starting Friday\\nReach $500K net worth by age 45",
+    "language": "plaintext"
+  }
+}
+\`\`\`
 
 ### The SMART Framework
 
-SMART is an acronym for five criteria that transform wishes into achievable goals:
-
-| Letter | Stands For | Financial Example |
-|--------|-----------|-------------------|
-| **S** | Specific | "Save for a 6-month emergency fund" |
-| **M** | Measurable | "Save \\\$15,000 total" |
-| **A** | Achievable | "Save \\\$500/month from current income" |
-| **R** | Relevant | "Protect my family from job loss" |
-| **T** | Time-bound | "Complete by December 2026" |
-
-**Bad goal:** "Save more money."
-**SMART goal:** "Save \\\$15,000 in an emergency fund by December 2026 by automatically transferring \\\$500/month from my checking account to a high-yield savings account."
+\`\`\`steps
+{
+  "title": "Building a SMART Financial Goal",
+  "steps": [
+    {
+      "title": "S — Specific",
+      "content": "**Bad:** 'Save more money'\\n**Good:** 'Save for a 6-month emergency fund'\\n\\nA specific goal answers: What exactly am I trying to achieve? Why does it matter? What does success look like?"
+    },
+    {
+      "title": "M — Measurable",
+      "content": "**Bad:** 'Save a lot'\\n**Good:** 'Save $15,000 total'\\n\\nA measurable goal has a number attached. You can track progress: Am I at $3,000 of $15,000? That's 20% done."
+    },
+    {
+      "title": "A — Achievable",
+      "content": "**Bad:** 'Save $5,000/month on a $4,000 salary'\\n**Good:** 'Save $500/month from current income'\\n\\nThe goal should stretch you but not break you. An impossible goal becomes demotivating."
+    },
+    {
+      "title": "R — Relevant",
+      "content": "**Bad:** 'Save for a boat' (when you have credit card debt at 22%)\\n**Good:** 'Pay off high-interest debt to stop losing $2,640/year to interest'\\n\\nThe goal should align with your current financial reality and priorities."
+    },
+    {
+      "title": "T — Time-bound",
+      "content": "**Bad:** 'Save $15,000 someday'\\n**Good:** 'Save $15,000 by December 2026'\\n\\nA deadline creates urgency. Without one, 'someday' becomes 'never.' It also lets you calculate: $15,000 ÷ 18 months = $833/month."
+    }
+  ]
+}
+\`\`\`
 
 ### The Three Time Horizons
 
-Organize your financial goals by timeframe:
+\`\`\`tabs
+{
+  "tabs": [
+    {
+      "label": "Short-term (0-2 years)",
+      "icon": "🎯",
+      "content": "- Build a $1,000 starter emergency fund\\n- Pay off a specific credit card\\n- Save for a vacation or large purchase\\n- Build 1 month of expense buffer\\n\\n**Where to keep this money:** High-yield savings account (4-5% APY). You need quick access and zero risk."
+    },
+    {
+      "label": "Medium-term (2-10 years)",
+      "icon": "🏠",
+      "content": "- Save a home down payment ($30K-60K+)\\n- Pay off student loans\\n- Build a fully funded emergency fund (3-6 months expenses)\\n- Save for starting a business\\n\\n**Where to keep this money:** Mix of high-yield savings and conservative investments (bond funds, CDs). Some growth, low risk."
+    },
+    {
+      "label": "Long-term (10+ years)",
+      "icon": "🌅",
+      "content": "- Retire by age 60 with $1.2M\\n- Pay off your mortgage\\n- Fund children's college education\\n- Achieve financial independence\\n\\n**Where to keep this money:** Diversified investment portfolio (stock index funds, bonds). You have time to ride out market volatility."
+    }
+  ]
+}
+\`\`\`
 
-**Short-term (0-2 years):**
-- Build a \\\$1,000 starter emergency fund
-- Pay off a specific credit card
-- Save for a vacation or purchase
+### Real-World Example: Goal Sequencing
 
-**Medium-term (2-10 years):**
-- Save a home down payment
-- Pay off student loans
-- Build a fully funded emergency fund (3-6 months of expenses)
+\`\`\`callout
+{
+  "type": "deep-dive",
+  "title": "Priya's Goal Cascade",
+  "content": "Priya, 28, software engineer, $75K salary ($4,800/month after taxes):\\n\\n1. Immediate (3 months): $1,000 emergency fund → $334/month\\n2. Short-term (12 months): Pay off $3,600 credit card → $300/month above minimum\\n3. Medium-term (3 years): $30K home down payment → $833/month\\n4. Long-term (32 years): Retire at 60 with $1.5M → $400/month to 401(k)\\n\\nKey: She doesn't tackle all goals equally. When the emergency fund is done, that $334/month redirects to the credit card. When the card is paid off, that $300/month redirects to the down payment. This is goal sequencing."
+}
+\`\`\`
 
-**Long-term (10+ years):**
-- Retire by age 60 with \\\$1.2 million
-- Pay off your mortgage
-- Fund children's college education
+### Prioritizing: The Waterfall Method
 
-### Real-World Example: The Goal Cascade
+When you can't fund every goal at once, use this priority order:
 
-Meet Priya, a 28-year-old software engineer earning \\\$75,000/year (about \\\$4,800/month after taxes):
-
-**Priya's SMART Goals:**
-
-1. **Immediate (3 months):** Save \\\$1,000 starter emergency fund by putting aside \\\$334/month
-2. **Short-term (12 months):** Pay off \\\$3,600 credit card by paying \\\$300/month above minimum
-3. **Medium-term (3 years):** Save \\\$30,000 home down payment by investing \\\$833/month in a high-yield savings account
-4. **Long-term (32 years):** Retire at 60 with \\\$1.5M by contributing \\\$400/month to 401(k) with employer match
-
-Priya does not tackle all goals simultaneously with equal intensity. She uses **goal sequencing** — once the emergency fund is complete, that \\\$334/month redirects to the credit card. Once the card is paid off, that \\\$300 redirects to the down payment fund.
-
-### Prioritizing Goals: The Waterfall Method
-
-When you cannot fund every goal at once, use this priority order:
-
-1. **Employer 401(k) match** — This is free money. Always capture the full match first.
-2. **High-interest debt** (above 7%) — Paying this off is a guaranteed return equal to the interest rate.
+1. **Employer 401(k) match** — This is free money (100% return). Always capture the full match.
+2. **High-interest debt** (above 7%) — Guaranteed return equal to the interest rate.
 3. **Emergency fund** — Financial stability foundation.
 4. **Medium-term goals** — Down payment, car fund, etc.
 5. **Additional retirement** — Max out IRA, then 401(k).
-6. **Low-interest debt** (below 4%) — Can be paid on schedule while investing.
+6. **Low-interest debt** (below 4%) — Pay on schedule while investing.
 
-### Tracking and Adjusting
+\`\`\`callout
+{
+  "type": "tip",
+  "title": "The Science of Goal Achievement",
+  "content": "Research by Dr. Gail Matthews (Dominican University) found that people who WRITE DOWN their goals are 42% more likely to achieve them. Three amplifiers: (1) Automate — set up transfers on payday, (2) Celebrate milestones at 25/50/75%, (3) Find accountability — share goals with someone."
+}
+\`\`\`
 
-Goals are not "set and forget." Review them quarterly:
+\`\`\`playground
+{
+  "title": "Build Your Goal Plan",
+  "language": "javascript",
+  "code": "// Customize these to your situation\\nconst monthlyIncome = 4800;  // after taxes\\nconst monthlyExpenses = 3500;\\nconst availableForGoals = monthlyIncome - monthlyExpenses;\\n\\n// Define your goals\\nconst goals = [\\n  { name: 'Emergency Fund', target: 6000, priority: 1 },\\n  { name: 'Credit Card Payoff', target: 3600, priority: 2 },\\n  { name: 'Home Down Payment', target: 30000, priority: 3 },\\n];\\n\\nconsole.log('Monthly available for goals: $' + availableForGoals);\\nconsole.log('─'.repeat(50));\\n\\nlet remaining = availableForGoals;\\nfor (const goal of goals.sort((a,b) => a.priority - b.priority)) {\\n  const monthsNeeded = Math.ceil(goal.target / remaining);\\n  console.log(\\n    '\\\\n' + goal.priority + '. ' + goal.name +\\n    '\\\\n   Target: $' + goal.target.toLocaleString() +\\n    '\\\\n   Monthly allocation: $' + remaining +\\n    '\\\\n   Time to complete: ' + monthsNeeded + ' months' +\\n    '\\\\n   (Then this $' + remaining + '/mo redirects to next goal)'\\n  );\\n}"
+}
+\`\`\`
 
-- **On track?** Great — keep going.
-- **Behind schedule?** Adjust the timeline, increase contributions, or cut expenses.
-- **Life changed?** (new job, marriage, baby) Revise goals to match your new reality.
+\`\`\`quiz
+{
+  "title": "Goal Setting Mastery",
+  "questions": [
+    {
+      "question": "Which of these is a SMART financial goal?",
+      "options": ["Save more money this year", "Be debt-free someday", "Save $500/month for 24 months to build a $12,000 emergency fund", "Invest when I can afford it"],
+      "answer": 2,
+      "explanation": "This goal is Specific ($12K emergency fund), Measurable ($500/month), Achievable (defined monthly amount), Relevant (financial security), and Time-bound (24 months)."
+    },
+    {
+      "question": "In the Waterfall Method, what should you fund FIRST?",
+      "options": ["Emergency fund", "High-interest debt payoff", "Employer 401(k) match", "Home down payment"],
+      "answer": 2,
+      "explanation": "The employer 401(k) match is effectively a 50-100% guaranteed return on your money. No other option beats free money. Always capture the full match before anything else."
+    },
+    {
+      "question": "What is 'goal sequencing'?",
+      "options": ["Setting goals in alphabetical order", "Completing one goal before starting the next, redirecting freed-up cash flow", "Having multiple savings accounts", "Setting only one goal at a time"],
+      "answer": 1,
+      "explanation": "Goal sequencing means focusing your resources on one priority at a time. When a goal is complete, the monthly cash flow that was going toward it redirects to the next goal, creating a snowball effect."
+    }
+  ]
+}
+\`\`\`
 
-Use tools like spreadsheets, YNAB, or Mint to track progress. Visualization helps — many people use a "thermometer" chart that fills up as they approach their target.
-
-### The Psychology of Goal Setting
-
-Research by Dr. Gail Matthews at Dominican University found that people who write down their goals are 42% more likely to achieve them. Additional strategies:
-
-- **Automate**: Set up automatic transfers on payday so saving happens before spending.
-- **Celebrate milestones**: Reward yourself (modestly) at 25%, 50%, 75% marks.
-- **Find accountability**: Share goals with a partner, friend, or financial advisor.
-
-### Key Takeaway
-
-Financial goals are the bridge between where you are and where you want to be. Use the SMART framework to make goals specific and actionable, organize them by time horizon, and review them regularly. The act of writing down and tracking goals dramatically increases your chances of achieving them.
+\`\`\`takeaways
+{
+  "items": [
+    "SMART goals (Specific, Measurable, Achievable, Relevant, Time-bound) turn wishes into plans",
+    "Organize goals into short-term (0-2yr), medium-term (2-10yr), and long-term (10yr+)",
+    "Use the Waterfall Method: 401k match → high-interest debt → emergency fund → everything else",
+    "Goal sequencing creates a snowball effect — freed-up cash flow cascades to the next priority",
+    "Writing down goals makes you 42% more likely to achieve them — automation makes it nearly certain"
+  ]
+}
+\`\`\`
 
 > "A goal without a plan is just a wish." — Antoine de Saint-Exupery
 

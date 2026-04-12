@@ -3,10 +3,8 @@ import { Module } from "../types";
 export const capstoneModule: Module = {
   id: "capstone",
   title: "Capstone: Putting It Together",
-  description:
-    "Combine everything you've learned across arrays, hash maps, linked lists, stacks, queues, trees, and graphs. Solve multi-pattern problems and build a mini-project that ties it all together.",
+  description: "Combine everything you've learned across arrays, hash maps, linked lists, stacks, queues, trees, and graphs. Solve multi-pattern problems and build a mini-project that ties it all together.",
   lessons: [
-    // ─── Lesson 1: Pattern Recognition ───
     {
       id: "pattern-recognition",
       slug: "pattern-recognition",
@@ -255,8 +253,6 @@ print(subarray_sum_equals_k([1, -1, 0], 0))
 # Expected: 3
 `,
     },
-
-    // ─── Lesson 2: Multi-Pattern Problem Solving ───
     {
       id: "multi-pattern-problems",
       slug: "multi-pattern-problems",
@@ -465,8 +461,6 @@ print(sorted(k_closest_points([[3,3],[5,-1],[-2,4]], 2)))
 # Expected: [[-2, 4], [3, 3]]
 `,
     },
-
-    // ─── Lesson 3: Mini-Project: Social Network ───
     {
       id: "mini-project-social-network",
       slug: "mini-project-social-network",
@@ -773,8 +767,6 @@ print(sorted_groups)
 # Expected: [[1, 2, 3, 4], [5, 6], [7]]
 `,
     },
-
-    // ─── Lesson 4: Module Checkpoint ───
     {
       id: "capstone-checkpoint",
       slug: "capstone-checkpoint",

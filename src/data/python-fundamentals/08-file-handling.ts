@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const fileHandlingModule: Module = {
   id: "file-handling",
   title: "File Handling",
-  description:
-    "Learn to read and write files in Python. Since we are in a browser, we simulate file I/O with string processing.",
+  description: "Learn to read and write files in Python. Since we are in a browser, we simulate file I/O with string processing.",
   lessons: [
     {
       id: "file-intro",

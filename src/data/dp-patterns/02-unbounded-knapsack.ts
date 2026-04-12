@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const unboundedKnapsackModule: Module = {
   id: "unbounded-knapsack-pattern",
   title: "Unbounded Knapsack Pattern",
-  description:
-    "Learn the Unbounded Knapsack pattern where each item can be selected an unlimited number of times.",
+  description: "Learn the Unbounded Knapsack pattern where each item can be selected an unlimited number of times.",
   lessons: [
     {
       id: "unbounded-knapsack-intro",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const gitModule: Module = {
   id: "git-github",
   title: "Git & GitHub",
-  description:
-    "Learn version control with Git: basic commands, branching workflows, and collaboration through GitHub.",
+  description: "Learn version control with Git: basic commands, branching workflows, and collaboration through GitHub.",
   lessons: [
     {
       id: "git-basics",

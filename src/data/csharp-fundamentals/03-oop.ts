@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const oopModule: Module = {
   id: "csharp-oop",
   title: "OOP in C#",
-  description:
-    "Learn object-oriented programming in C# — classes, objects, inheritance, interfaces, and polymorphism.",
+  description: "Learn object-oriented programming in C# — classes, objects, inheritance, interfaces, and polymorphism.",
   lessons: [
     {
       id: "csharp-classes-objects",

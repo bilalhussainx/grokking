@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const fibonacciModule: Module = {
   id: "fibonacci-pattern",
   title: "Fibonacci Numbers Pattern",
-  description:
-    "Recognize and solve problems where each state depends on the previous one or two states — the Fibonacci pattern family.",
+  description: "Recognize and solve problems where each state depends on the previous one or two states — the Fibonacci pattern family.",
   lessons: [
     {
       id: "fibonacci-intro",

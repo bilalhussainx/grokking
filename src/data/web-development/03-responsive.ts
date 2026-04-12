@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const responsiveModule: Module = {
   id: "responsive-design",
   title: "Responsive Design",
-  description:
-    "Learn to build websites that work on all screen sizes using media queries, mobile-first design, and CSS frameworks.",
+  description: "Learn to build websites that work on all screen sizes using media queries, mobile-first design, and CSS frameworks.",
   lessons: [
     {
       id: "responsive-media-queries",

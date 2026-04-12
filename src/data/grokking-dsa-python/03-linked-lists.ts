@@ -3,10 +3,8 @@ import { Module } from "../types";
 export const linkedListsModule: Module = {
   id: "linked-lists",
   title: "Linked Lists",
-  description:
-    "Understand how linked lists work, why they exist alongside arrays, and master the fast/slow pointer technique that solves cycle detection, middle-finding, and more.",
+  description: "Understand how linked lists work, why they exist alongside arrays, and master the fast/slow pointer technique that solves cycle detection, middle-finding, and more.",
   lessons: [
-    // ─── Lesson 1: Singly Linked Lists ───
     {
       id: "singly-linked-lists",
       slug: "singly-linked-lists",
@@ -323,8 +321,6 @@ print(linked_to_list(head))
 # Expected: [1, 2, 3]
 `,
     },
-
-    // ─── Lesson 2: Reversing a Linked List ───
     {
       id: "reversing-linked-list",
       slug: "reversing-linked-list",
@@ -601,8 +597,6 @@ print(is_palindrome(list_to_linked([1])))
 # Expected: True
 `,
     },
-
-    // ─── Lesson 3: Fast & Slow Pointers ───
     {
       id: "fast-slow-pointers",
       slug: "fast-slow-pointers",
@@ -892,8 +886,6 @@ print(has_cycle(None))
 # Expected: False
 `,
     },
-
-    // ─── Lesson 4: Module Checkpoint ───
     {
       id: "linked-lists-checkpoint",
       slug: "linked-lists-checkpoint",

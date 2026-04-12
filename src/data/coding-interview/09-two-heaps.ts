@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const twoHeapsModule: Module = {
   id: "two-heaps",
   title: "Two Heaps",
-  description:
-    "Learn to use a max-heap and min-heap in tandem to efficiently track medians and optimize selection problems.",
+  description: "Learn to use a max-heap and min-heap in tandem to efficiently track medians and optimize selection problems.",
   lessons: [
     {
       id: "two-heaps-intro",

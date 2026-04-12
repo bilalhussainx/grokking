@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const cppPointersMemoryModule: Module = {
   id: "cpp-pointers-memory",
   title: "Pointers & Memory Management",
-  description:
-    "Understand pointers, references, and memory management — the heart of C++ — through Python simulations.",
+  description: "Understand pointers, references, and memory management — the heart of C++ — through Python simulations.",
   lessons: [
     {
       id: "cpp-pointers-intro",

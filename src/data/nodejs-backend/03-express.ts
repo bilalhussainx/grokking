@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const expressModule: Module = {
   id: "express-js",
   title: "Express.js",
-  description:
-    "Learn Express.js from the ground up: setting up a server, defining routes, using middleware, and handling errors.",
+  description: "Learn Express.js from the ground up: setting up a server, defining routes, using middleware, and handling errors.",
   lessons: [
     {
       id: "express-setup",

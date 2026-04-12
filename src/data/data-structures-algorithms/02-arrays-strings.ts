@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const arraysStringsModule: Module = {
   id: "arrays-strings",
   title: "Arrays & Strings",
-  description:
-    "Master array and string manipulation techniques including prefix sums, Kadane's algorithm, and the KMP string matching algorithm.",
+  description: "Master array and string manipulation techniques including prefix sums, Kadane's algorithm, and the KMP string matching algorithm.",
   lessons: [
     {
       id: "arrays-strings-intro",

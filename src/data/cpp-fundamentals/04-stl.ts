@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const cppStlModule: Module = {
   id: "cpp-stl",
   title: "STL Containers & Algorithms",
-  description:
-    "Implement the core STL data structures and algorithms — vector, hash map, sort, find, and transform — in Python.",
+  description: "Implement the core STL data structures and algorithms — vector, hash map, sort, find, and transform — in Python.",
   lessons: [
     {
       id: "cpp-stl-intro",

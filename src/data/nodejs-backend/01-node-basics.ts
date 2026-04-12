@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const nodeBasicsModule: Module = {
   id: "node-basics",
   title: "Node.js Fundamentals",
-  description:
-    "Learn Node.js core concepts including the module system, event loop, and binary data handling with Buffers.",
+  description: "Learn Node.js core concepts including the module system, event loop, and binary data handling with Buffers.",
   lessons: [
     {
       id: "node-basics-intro",

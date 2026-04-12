@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const controlFlowModule: Module = {
   id: "csharp-control-flow",
   title: "Control Flow",
-  description:
-    "Master decision-making and repetition in C# — if/else, switch, and all types of loops.",
+  description: "Master decision-making and repetition in C# — if/else, switch, and all types of loops.",
   lessons: [
     {
       id: "csharp-if-else",

@@ -3,10 +3,8 @@ import { Module } from "../types";
 export const arraysStringsModule: Module = {
   id: "arrays-strings",
   title: "Arrays & Strings",
-  description:
-    "Learn the fundamentals of sequential data storage, master Python lists and strings, and discover the sliding window and two-pointer patterns that appear in dozens of interview problems.",
+  description: "Learn the fundamentals of sequential data storage, master Python lists and strings, and discover the sliding window and two-pointer patterns that appear in dozens of interview problems.",
   lessons: [
-    // ─── Lesson 1: Arrays & Lists Fundamentals ───
     {
       id: "arrays-lists-fundamentals",
       slug: "arrays-lists-fundamentals",
@@ -218,8 +216,6 @@ print(find_max([-5, -1, -10]))
 # Expected: -1
 `,
     },
-
-    // ─── Lesson 2: Strings as Arrays ───
     {
       id: "strings-as-arrays",
       slug: "strings-as-arrays",
@@ -470,8 +466,6 @@ print(is_anagram("", ""))
 # Expected: True
 `,
     },
-
-    // ─── Lesson 3: Two Pointers & Sliding Window ───
     {
       id: "two-pointers-sliding-window",
       slug: "two-pointers-sliding-window",
@@ -694,8 +688,6 @@ print(remove_duplicates(nums2), nums2[:1])
 # Expected: 1 [1]
 `,
     },
-
-    // ─── Lesson 4: Module Checkpoint ───
     {
       id: "arrays-strings-checkpoint",
       slug: "arrays-strings-checkpoint",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const restApiModule: Module = {
   id: "rest-api-design",
   title: "RESTful API Design",
-  description:
-    "Design and implement RESTful APIs: resource naming, HTTP methods, status codes, and API versioning.",
+  description: "Design and implement RESTful APIs: resource naming, HTTP methods, status codes, and API versioning.",
   lessons: [
     {
       id: "rest-resource-design",
@@ -694,14 +693,14 @@ function createVersionedAPI() {
     let routePath = path;
 
     // Try to extract version from URL path: /api/v1/...
-    const pathMatch = path.match(/^\/api\/v(\d+)(\/.*)?$/);
+    const pathMatch = path.match(/^/api/v(d+)(/.*)?$/);
     if (pathMatch) {
       versionNum = parseInt(pathMatch[1]);
       routePath = pathMatch[2] || '/';
     } else if (headers['API-Version']) {
       versionNum = parseInt(headers['API-Version']);
       // Remove /api prefix for matching
-      routePath = path.replace(/^\/api/, '') || '/';
+      routePath = path.replace(/^/api/, '') || '/';
     }
 
     if (!versionNum) {

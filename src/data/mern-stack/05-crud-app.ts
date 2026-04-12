@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const crudAppModule: Module = {
   id: "mern-crud-app",
   title: "CRUD Application",
-  description:
-    "Build a complete CRUD application -- Mongoose models, API endpoints, React forms, and a polished UI.",
+  description: "Build a complete CRUD application -- Mongoose models, API endpoints, React forms, and a polished UI.",
   lessons: [
     {
       id: "mongoose-models",

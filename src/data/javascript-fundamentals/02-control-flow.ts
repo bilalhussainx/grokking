@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const controlFlowModule: Module = {
   id: "js-control-flow",
   title: "Control Flow",
-  description:
-    "Master if/else, switch statements, the ternary operator, and understand truthy/falsy values in JavaScript.",
+  description: "Master if/else, switch statements, the ternary operator, and understand truthy/falsy values in JavaScript.",
   lessons: [
     {
       id: "js-control-flow-intro",

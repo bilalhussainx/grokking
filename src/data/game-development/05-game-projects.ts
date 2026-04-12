@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const gameProjectsModule: Module = {
   id: "game-projects",
   title: "Build Games",
-  description:
-    "Put it all together by building four classic games — Pong, Snake, Breakout, and a Space Shooter.",
+  description: "Put it all together by building four classic games — Pong, Snake, Breakout, and a Space Shooter.",
   lessons: [
     {
       id: "pong-game",

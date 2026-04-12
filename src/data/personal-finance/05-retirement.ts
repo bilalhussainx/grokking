@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const retirementModule: Module = {
   id: "pf-retirement",
   title: "Retirement Planning",
-  description:
-    "Plan for retirement using tax-advantaged accounts, employer matching, and the power of early investing. Resources: IRS.gov, Investopedia, Fidelity Retirement Planning, Khan Academy.",
+  description: "Plan for retirement using tax-advantaged accounts, employer matching, and the power of early investing. Resources: IRS.gov, Investopedia, Fidelity Retirement Planning, Khan Academy.",
   lessons: [
     {
       id: "pf-401k-employer-matching",
@@ -19,9 +18,9 @@ A 401(k) is an employer-sponsored retirement savings plan that offers tax advant
 Your employer sets up the plan with a financial institution. You elect to contribute a percentage of each paycheck, and the money is invested in a menu of funds (typically mutual funds and target-date funds).
 
 **Key features for 2024:**
-- **Contribution limit:** \\\$23,000/year (under age 50)
-- **Catch-up contribution:** Additional \\\$7,500/year (age 50+)
-- **Total limit (employee + employer):** \\\$69,000/year
+- **Contribution limit:** \\$23,000/year (under age 50)
+- **Catch-up contribution:** Additional \\$7,500/year (age 50+)
+- **Total limit (employee + employer):** \\$69,000/year
 - **Vesting:** Employer contributions may vest over 1-6 years
 
 ### Traditional 401(k) vs Roth 401(k)
@@ -44,11 +43,11 @@ Many employers match your contributions up to a certain percentage. Common struc
 - **50 cents per dollar up to 6%**: Contribute 6%, employer adds 3%
 - **Dollar-for-dollar up to 6%**: Contribute 6%, employer adds 6% (generous)
 
-**Example:** You earn \\\$70,000 and your employer matches dollar-for-dollar up to 4%.
+**Example:** You earn \\$70,000 and your employer matches dollar-for-dollar up to 4%.
 
-- You contribute 4%: \\\$2,800/year
-- Employer matches: \\\$2,800/year
-- **Total annual contribution: \\\$5,600**
+- You contribute 4%: \\$2,800/year
+- Employer matches: \\$2,800/year
+- **Total annual contribution: \\$5,600**
 - The match is an **instant 100% return** on your contribution
 
 **Not capturing the full match is literally leaving free money on the table.** This should be your first investment priority, even before paying off moderate-interest debt.
@@ -67,18 +66,18 @@ If you leave the company before fully vesting, you forfeit the unvested employer
 
 ### Real-World Example: The Match Makes Millionaires
 
-Consider Emma, age 25, earning \\\$60,000 with a 4% match:
+Consider Emma, age 25, earning \\$60,000 with a 4% match:
 
-- Emma contributes 4% (\\\$2,400/year)
-- Employer matches 4% (\\\$2,400/year)
-- Total: \\\$4,800/year at 8% average return
-- **At age 65: approximately \\\$1,295,000**
+- Emma contributes 4% (\\$2,400/year)
+- Employer matches 4% (\\$2,400/year)
+- Total: \\$4,800/year at 8% average return
+- **At age 65: approximately \\$1,295,000**
 
-Without the match (just her \\\$2,400/year): approximately \\\$647,000. The employer match doubled her retirement wealth.
+Without the match (just her \\$2,400/year): approximately \\$647,000. The employer match doubled her retirement wealth.
 
-Now consider if Emma increases her contribution to the maximum (\\\$23,000/year):
-- Total with match: \\\$25,400/year at 8%
-- **At age 65: approximately \\\$6,852,000**
+Now consider if Emma increases her contribution to the maximum (\\$23,000/year):
+- Total with match: \\$25,400/year at 8%
+- **At age 65: approximately \\$6,852,000**
 
 ### Investment Choices Within a 401(k)
 
@@ -116,7 +115,7 @@ An Individual Retirement Account (IRA) is a tax-advantaged account you open on y
 
 | Feature | Traditional IRA | Roth IRA |
 |---------|----------------|----------|
-| Contribution limit (2024) | \\\$7,000 (\\\$8,000 if 50+) | \\\$7,000 (\\\$8,000 if 50+) |
+| Contribution limit (2024) | \\$7,000 (\\$8,000 if 50+) | \\$7,000 (\\$8,000 if 50+) |
 | Tax deduction now? | Yes (if eligible) | No |
 | Tax on withdrawals | Taxed as income | Tax-free |
 | Tax on growth | Tax-deferred | Tax-free |
@@ -133,7 +132,7 @@ With a Traditional IRA, you may deduct your contributions from your taxable inco
 - Those who need a tax deduction this year
 - People without access to a Roth 401(k)
 
-**Deduction phase-outs (2024):** If you or your spouse has an employer retirement plan, the deduction phases out at higher incomes (\\\$77,000-\\\$87,000 for single filers, \\\$123,000-\\\$143,000 for married filing jointly).
+**Deduction phase-outs (2024):** If you or your spouse has an employer retirement plan, the deduction phases out at higher incomes (\\$77,000-\\$87,000 for single filers, \\$123,000-\\$143,000 for married filing jointly).
 
 ### Roth IRA: Tax Break Later
 
@@ -145,22 +144,22 @@ With a Roth IRA, you contribute after-tax money — no deduction today. But the 
 - Those who want flexibility (contributions can be withdrawn anytime without penalty)
 - Estate planning (no RMDs means the account can grow untouched and pass to heirs)
 
-**Income limits (2024):** Roth IRA contributions phase out at MAGI of \\\$146,000-\\\$161,000 (single) or \\\$230,000-\\\$240,000 (married filing jointly).
+**Income limits (2024):** Roth IRA contributions phase out at MAGI of \\$146,000-\\$161,000 (single) or \\$230,000-\\$240,000 (married filing jointly).
 
 ### Real-World Example: The Power of Tax-Free Growth
 
-Miguel, age 25, contributes \\\$7,000/year to a Roth IRA for 40 years at 8% average return.
+Miguel, age 25, contributes \\$7,000/year to a Roth IRA for 40 years at 8% average return.
 
-- Total contributions: \\\$280,000
-- Account value at 65: approximately **\\\$1,958,000**
-- Tax on withdrawal: **\\\$0**
+- Total contributions: \\$280,000
+- Account value at 65: approximately **\\$1,958,000**
+- Tax on withdrawal: **\\$0**
 
 If Miguel had used a Traditional IRA with identical contributions and returns:
-- Account value at 65: approximately \\\$1,958,000 (same)
-- Tax on withdrawal (assuming 22% bracket): approximately **\\\$430,760**
-- After-tax value: approximately **\\\$1,527,240**
+- Account value at 65: approximately \\$1,958,000 (same)
+- Tax on withdrawal (assuming 22% bracket): approximately **\\$430,760**
+- After-tax value: approximately **\\$1,527,240**
 
-The Roth advantage: approximately **\\\$430,000** more in after-tax retirement income.
+The Roth advantage: approximately **\\$430,000** more in after-tax retirement income.
 
 ### The Backdoor Roth IRA
 
@@ -188,17 +187,17 @@ The best IRA providers offer no-fee accounts, low-cost index funds, and excellen
 
 | Provider | Minimum | Index Fund Expenses | Notable Feature |
 |----------|---------|--------------------|----|
-| Fidelity | \\\$0 | 0.015% (FZROX) | Zero-fee index funds |
-| Vanguard | \\\$0 | 0.03% (VTI/VTSAX) | Pioneer of index investing |
-| Schwab | \\\$0 | 0.03% (SWTSX) | Excellent customer service |
+| Fidelity | \\$0 | 0.015% (FZROX) | Zero-fee index funds |
+| Vanguard | \\$0 | 0.03% (VTI/VTSAX) | Pioneer of index investing |
+| Schwab | \\$0 | 0.03% (SWTSX) | Excellent customer service |
 
 ### IRA vs 401(k): Use Both
 
 The optimal strategy for most workers:
 
 1. **Contribute to 401(k) up to employer match** (free money)
-2. **Max out Roth IRA** (\\\$7,000/year)
-3. **Go back and max out 401(k)** (\\\$23,000/year)
+2. **Max out Roth IRA** (\\$7,000/year)
+3. **Go back and max out 401(k)** (\\$23,000/year)
 4. **If capacity remains**, consider taxable brokerage account
 
 ### Key Takeaway
@@ -219,8 +218,8 @@ The single most important factor in investment success is not what you invest in
 
 This example has been used by financial educators for decades because it is so powerful:
 
-**Early Emily** starts investing \\\$5,000/year at age 25 and stops at age 35 (10 years of contributions).
-**Late Larry** starts investing \\\$5,000/year at age 35 and continues until age 65 (30 years of contributions).
+**Early Emily** starts investing \\$5,000/year at age 25 and stops at age 35 (10 years of contributions).
+**Late Larry** starts investing \\$5,000/year at age 35 and continues until age 65 (30 years of contributions).
 
 Both earn 8% average annual return.
 
@@ -229,47 +228,47 @@ Both earn 8% average annual return.
 | Starts investing | Age 25 | Age 35 |
 | Stops contributing | Age 35 | Age 65 |
 | Years of contributions | 10 | 30 |
-| Total invested | \\\$50,000 | \\\$150,000 |
-| Value at age 65 | **\\\$787,176** | **\\\$611,729** |
+| Total invested | \\$50,000 | \\$150,000 |
+| Value at age 65 | **\\$787,176** | **\\$611,729** |
 
-Emily invested **one-third as much money** but ended up with **\\\$175,000 more**. Those first 10 years of compounding are extraordinarily valuable because they have the longest time to grow.
+Emily invested **one-third as much money** but ended up with **\\$175,000 more**. Those first 10 years of compounding are extraordinarily valuable because they have the longest time to grow.
 
 ### Why the Math Works
 
-Emily's \\\$50,000 had 40 years to compound (from age 25 to 65). Larry's \\\$150,000 had less time — his earliest dollars had 30 years, his latest had just 1 year.
+Emily's \\$50,000 had 40 years to compound (from age 25 to 65). Larry's \\$150,000 had less time — his earliest dollars had 30 years, his latest had just 1 year.
 
 Year-by-year, Emily's portfolio:
-- Age 35 (stops contributing): \\\$78,227
-- Age 45 (10 years of growth, no new money): \\\$168,907
-- Age 55 (20 years of growth): \\\$364,722
-- Age 65 (30 years of growth): **\\\$787,176**
+- Age 35 (stops contributing): \\$78,227
+- Age 45 (10 years of growth, no new money): \\$168,907
+- Age 55 (20 years of growth): \\$364,722
+- Age 65 (30 years of growth): **\\$787,176**
 
-The last 10 years alone added \\\$422,454 — more than the prior 30 years combined. This is exponential growth in action.
+The last 10 years alone added \\$422,454 — more than the prior 30 years combined. This is exponential growth in action.
 
 ### Real-World Data: S&P 500 Historical Returns
 
 Using actual historical returns (1984-2024) rather than assumed 8%:
 
-\\\$10,000 invested in the S&P 500 (with dividends reinvested):
-- In 1984 (40 years): approximately **\\\$1,180,000**
-- In 1994 (30 years): approximately **\\\$267,000**
-- In 2004 (20 years): approximately **\\\$67,000**
-- In 2014 (10 years): approximately **\\\$33,000**
+\\$10,000 invested in the S&P 500 (with dividends reinvested):
+- In 1984 (40 years): approximately **\\$1,180,000**
+- In 1994 (30 years): approximately **\\$267,000**
+- In 2004 (20 years): approximately **\\$67,000**
+- In 2014 (10 years): approximately **\\$33,000**
 
 Each decade of delay cost a staggering amount of growth.
 
 ### The Cost of Waiting: A Different Perspective
 
-Another way to see the penalty for delay — how much extra you must invest monthly to reach \\\$1,000,000 by age 65 at 8% returns:
+Another way to see the penalty for delay — how much extra you must invest monthly to reach \\$1,000,000 by age 65 at 8% returns:
 
 | Starting Age | Monthly Investment | Total Invested | Cost of Delay |
 |-------------|-------------------|----------------|--------------|
-| 25 | \\\$286 | \\\$137,280 | — |
-| 30 | \\\$436 | \\\$182,280 | +\\\$45,000 |
-| 35 | \\\$671 | \\\$241,560 | +\\\$104,280 |
-| 40 | \\\$1,052 | \\\$315,600 | +\\\$178,320 |
-| 45 | \\\$1,698 | \\\$407,520 | +\\\$270,240 |
-| 50 | \\\$2,890 | \\\$520,200 | +\\\$382,920 |
+| 25 | \\$286 | \\$137,280 | — |
+| 30 | \\$436 | \\$182,280 | +\\$45,000 |
+| 35 | \\$671 | \\$241,560 | +\\$104,280 |
+| 40 | \\$1,052 | \\$315,600 | +\\$178,320 |
+| 45 | \\$1,698 | \\$407,520 | +\\$270,240 |
+| 50 | \\$2,890 | \\$520,200 | +\\$382,920 |
 
 Waiting from 25 to 45 means investing nearly **6 times more per month** and **3 times more total money** to reach the same goal.
 
@@ -277,8 +276,8 @@ Waiting from 25 to 45 means investing nearly **6 times more per month** and **3 
 
 The most common objection from young people is that they do not have enough money. But starting small is far better than not starting:
 
-- \\\$50/month starting at age 22 at 8% = **\\\$227,000** at age 65
-- \\\$200/month starting at age 35 at 8% = **\\\$226,000** at age 65
+- \\$50/month starting at age 22 at 8% = **\\$227,000** at age 65
+- \\$200/month starting at age 35 at 8% = **\\$226,000** at age 65
 
 Fifty dollars a month started 13 years earlier matches four times the contribution started later.
 
@@ -286,7 +285,7 @@ Fifty dollars a month started 13 years earlier matches four times the contributi
 
 If you are reading this at 40 or 50, do not despair. You cannot change the past, but you can:
 
-1. **Maximize contributions now** — Take full advantage of catch-up contributions (\\\$7,500 extra in 401(k) after age 50)
+1. **Maximize contributions now** — Take full advantage of catch-up contributions (\\$7,500 extra in 401(k) after age 50)
 2. **Reduce expenses aggressively** — Free up more capital to invest
 3. **Consider working a few extra years** — Each additional year adds contributions and growth while shortening retirement
 4. **Avoid panic** — Do not take excessive risk trying to "catch up." A disciplined approach still works.
@@ -317,7 +316,7 @@ Social Security is a federal program that provides retirement income, disability
 
 Social Security is funded through payroll taxes — FICA (Federal Insurance Contributions Act):
 
-- **Employee contribution:** 6.2% of wages (up to \\\$168,600 in 2024)
+- **Employee contribution:** 6.2% of wages (up to \\$168,600 in 2024)
 - **Employer contribution:** 6.2% (matching)
 - **Self-employed:** 12.4% (both halves)
 - **Medicare addition:** 1.45% each (employee and employer) — no income cap
@@ -326,7 +325,7 @@ These taxes fund current retirees' benefits. It is a pay-as-you-go system, not a
 
 ### Eligibility: Earning Your Credits
 
-You need **40 credits** (roughly 10 years of work) to qualify for retirement benefits. In 2024, you earn one credit for each \\\$1,730 in wages, up to 4 credits per year.
+You need **40 credits** (roughly 10 years of work) to qualify for retirement benefits. In 2024, you earn one credit for each \\$1,730 in wages, up to 4 credits per year.
 
 ### How Your Benefit Is Calculated
 
@@ -336,9 +335,9 @@ Social Security calculates your benefit based on your **highest 35 years of earn
 2. **Primary Insurance Amount (PIA):** A formula applied to AIME that determines your benefit
 
 The formula is progressive — it replaces a higher percentage of income for lower earners:
-- 90% of the first \\\$1,174 of AIME
-- 32% of AIME between \\\$1,174 and \\\$7,078
-- 15% of AIME above \\\$7,078
+- 90% of the first \\$1,174 of AIME
+- 32% of AIME between \\$1,174 and \\$7,078
+- 15% of AIME above \\$7,078
 
 **Implication:** If you worked fewer than 35 years, zeros are averaged in, reducing your benefit. Working a few extra years to replace those zeros can significantly boost your payment.
 
@@ -346,9 +345,9 @@ The formula is progressive — it replaces a higher percentage of income for low
 
 | Claiming Age | Benefit Level | Monthly Example |
 |-------------|--------------|----------------|
-| 62 (earliest) | 70% of full benefit | \\\$1,400 |
-| 67 (full retirement age for those born 1960+) | 100% of full benefit | \\\$2,000 |
-| 70 (maximum) | 124% of full benefit | \\\$2,480 |
+| 62 (earliest) | 70% of full benefit | \\$1,400 |
+| 67 (full retirement age for those born 1960+) | 100% of full benefit | \\$2,000 |
+| 70 (maximum) | 124% of full benefit | \\$2,480 |
 
 **Each year you delay** past full retirement age (up to 70) increases your benefit by approximately 8% — one of the best guaranteed returns available.
 
@@ -356,11 +355,11 @@ The formula is progressive — it replaces a higher percentage of income for low
 
 Should you claim at 62 or wait until 67?
 
-**Claim at 62 (\\\$1,400/month):** By age 67, you have collected \\\$84,000 in benefits. But your benefit stays at \\\$1,400/month forever.
+**Claim at 62 (\\$1,400/month):** By age 67, you have collected \\$84,000 in benefits. But your benefit stays at \\$1,400/month forever.
 
-**Claim at 67 (\\\$2,000/month):** You received nothing from 62-67, so you start \\\$84,000 "behind." But at \\\$600/month more, you recoup the difference in about 12 years (by age 79). After that, every month is \\\$600 more than you would have received.
+**Claim at 67 (\\$2,000/month):** You received nothing from 62-67, so you start \\$84,000 "behind." But at \\$600/month more, you recoup the difference in about 12 years (by age 79). After that, every month is \\$600 more than you would have received.
 
-If you live past 79 (the average American lives to about 78-80), waiting pays off. If you live to 85, waiting generates approximately \\\$43,000 more total. If you live to 90, it is \\\$79,000 more.
+If you live past 79 (the average American lives to about 78-80), waiting pays off. If you live to 85, waiting generates approximately \\$43,000 more total. If you live to 90, it is \\$79,000 more.
 
 ### Spousal and Survivor Benefits
 
@@ -376,7 +375,7 @@ This does not mean Social Security disappears. It means benefits may be reduced,
 
 ### Social Security Is Not Enough
 
-The average Social Security retirement benefit in 2024 is approximately **\\\$1,907/month** (\\\$22,884/year). For most people, this replaces only 30-40% of pre-retirement income. The standard recommendation is to replace 70-80% of pre-retirement income in retirement.
+The average Social Security retirement benefit in 2024 is approximately **\\$1,907/month** (\\$22,884/year). For most people, this replaces only 30-40% of pre-retirement income. The standard recommendation is to replace 70-80% of pre-retirement income in retirement.
 
 \`\`\`
 Social Security: 30-40%
@@ -421,14 +420,14 @@ All the concepts from this module — 401(k)s, IRAs, compound interest, Social S
 
 Most financial planners use the **80% rule** — you will need about 80% of your pre-retirement income in retirement. Some expenses decrease (commuting, work clothes, payroll taxes) while others increase (healthcare, travel, hobbies).
 
-**Example: Nadia, age 30, earns \\\$75,000/year**
+**Example: Nadia, age 30, earns \\$75,000/year**
 
-- Current income: \\\$75,000
-- 80% replacement: \\\$60,000/year in today's dollars
-- Monthly need: \\\$5,000
+- Current income: \\$75,000
+- 80% replacement: \\$60,000/year in today's dollars
+- Monthly need: \\$5,000
 
 But we need to adjust for inflation. At 3% inflation over 35 years:
-- \\\$60,000 in today's dollars = approximately \\\$169,000 in future dollars at age 65
+- \\$60,000 in today's dollars = approximately \\$169,000 in future dollars at age 65
 
 ### Step 2: Calculate Your Retirement Number
 
@@ -438,18 +437,18 @@ How much savings do you need to generate your target income? The **4% rule** (fr
 Retirement Number = Annual Need / 0.04
 \`\`\`
 
-Using Nadia's \\\$60,000/year (in today's dollars):
+Using Nadia's \\$60,000/year (in today's dollars):
 \`\`\`
-Retirement Number = \$60,000 / 0.04 = \$1,500,000
-\`\`\`
-
-But wait — Social Security will cover some of this. If Nadia expects \\\$24,000/year from Social Security (in today's dollars):
-\`\`\`
-Amount needed from savings = \$60,000 - \$24,000 = \$36,000/year
-Adjusted Retirement Number = \$36,000 / 0.04 = \$900,000
+Retirement Number = $60,000 / 0.04 = $1,500,000
 \`\`\`
 
-Nadia needs approximately **\\\$900,000** in retirement savings (in today's dollars, assuming Social Security covers the rest).
+But wait — Social Security will cover some of this. If Nadia expects \\$24,000/year from Social Security (in today's dollars):
+\`\`\`
+Amount needed from savings = $60,000 - $24,000 = $36,000/year
+Adjusted Retirement Number = $36,000 / 0.04 = $900,000
+\`\`\`
+
+Nadia needs approximately **\\$900,000** in retirement savings (in today's dollars, assuming Social Security covers the rest).
 
 ### Step 3: Project Your Current Trajectory
 
@@ -457,34 +456,34 @@ Now calculate what Nadia is on track to accumulate:
 
 **Current situation:**
 - Age: 30
-- Current retirement savings: \\\$25,000
-- Monthly 401(k) contribution: \\\$300 (4% of salary)
-- Employer match: \\\$300 (4% match)
-- Monthly Roth IRA contribution: \\\$200
-- Total monthly investment: \\\$800
+- Current retirement savings: \\$25,000
+- Monthly 401(k) contribution: \\$300 (4% of salary)
+- Employer match: \\$300 (4% match)
+- Monthly Roth IRA contribution: \\$200
+- Total monthly investment: \\$800
 - Assumed return: 8%
 
 **Projection to age 65 (35 years):**
 
-Existing \\\$25,000 growing at 8% for 35 years:
+Existing \\$25,000 growing at 8% for 35 years:
 \`\`\`
-\$25,000 x (1.08)^35 = \$369,525
-\`\`\`
-
-New contributions of \\\$800/month at 8% for 35 years:
-\`\`\`
-\$800 x [((1.0067)^420 - 1) / 0.0067] = approximately \$1,756,000
+$25,000 x (1.08)^35 = $369,525
 \`\`\`
 
-**Total projected at 65: approximately \\\$2,125,000**
+New contributions of \\$800/month at 8% for 35 years:
+\`\`\`
+$800 x [((1.0067)^420 - 1) / 0.0067] = approximately $1,756,000
+\`\`\`
+
+**Total projected at 65: approximately \\$2,125,000**
 
 ### Step 4: Assess the Gap
 
 | | Amount |
 |--|--------|
-| Retirement number needed | \\\$900,000 |
-| Projected savings | \\\$2,125,000 |
-| **Surplus** | **\\\$1,225,000** |
+| Retirement number needed | \\$900,000 |
+| Projected savings | \\$2,125,000 |
+| **Surplus** | **\\$1,225,000** |
 
 Nadia is actually ahead of schedule. This means she could potentially retire earlier, increase her lifestyle in retirement, or reduce contributions if needed for other goals.
 
@@ -494,10 +493,10 @@ What if assumptions change?
 
 | Scenario | Impact |
 |----------|--------|
-| Returns are 6% instead of 8% | Projected savings drop to ~\\\$1,200,000 (still sufficient) |
-| Nadia stops contributing for 5 years | Projected drops by ~\\\$350,000 |
-| Inflation averages 4% instead of 3% | Retirement number increases to ~\\\$1,050,000 |
-| Social Security is cut by 25% | Need increases to ~\\\$1,050,000 |
+| Returns are 6% instead of 8% | Projected savings drop to ~\\$1,200,000 (still sufficient) |
+| Nadia stops contributing for 5 years | Projected drops by ~\\$350,000 |
+| Inflation averages 4% instead of 3% | Retirement number increases to ~\\$1,050,000 |
+| Social Security is cut by 25% | Need increases to ~\\$1,050,000 |
 
 Even in a pessimistic scenario (lower returns + Social Security cuts), Nadia is still on track because she started at 30.
 
@@ -517,7 +516,7 @@ Even in a pessimistic scenario (lower returns + Social Security cuts), Nadia is 
 
 **Use conservative assumptions.** Better to plan for 6-7% returns and be pleasantly surprised than to assume 10% and fall short.
 
-**Do not forget healthcare.** Before Medicare kicks in at 65, healthcare costs can be \\\$1,000-2,000/month. If you retire early, budget for this.
+**Do not forget healthcare.** Before Medicare kicks in at 65, healthcare costs can be \\$1,000-2,000/month. If you retire early, budget for this.
 
 **Plan for longevity.** Plan to age 90-95, not 80. Running out of money at 85 is a disaster with no fix.
 

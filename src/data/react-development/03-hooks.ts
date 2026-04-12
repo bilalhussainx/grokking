@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const hooksModule: Module = {
   id: "hooks",
   title: "Custom Hooks",
-  description:
-    "Master the custom hooks pattern by building reusable logic extractors: useLocalStorage, usePrevious, and useDebounce.",
+  description: "Master the custom hooks pattern by building reusable logic extractors: useLocalStorage, usePrevious, and useDebounce.",
   lessons: [
     {
       id: "hooks-intro",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const cssModule: Module = {
   id: "css-fundamentals",
   title: "CSS Fundamentals",
-  description:
-    "Master CSS selectors, the box model, Flexbox layout, and CSS Grid to style and layout web pages.",
+  description: "Master CSS selectors, the box model, Flexbox layout, and CSS Grid to style and layout web pages.",
   lessons: [
     {
       id: "css-selectors",

@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const asyncModule: Module = {
   id: "csharp-async",
   title: "Async Programming",
-  description:
-    "Master asynchronous programming in C# — async/await, Task, and robust error handling.",
+  description: "Master asynchronous programming in C# — async/await, Task, and robust error handling.",
   lessons: [
     {
       id: "csharp-async-await",

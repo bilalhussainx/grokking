@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const notificationSystemModule: Module = {
   id: "sd-08",
   title: "Design a Notification System",
-  description:
-    "Design a scalable notification system supporting push notifications, SMS, and email with user preferences and rate limiting.",
+  description: "Design a scalable notification system supporting push notifications, SMS, and email with user preferences and rate limiting.",
   lessons: [
     {
       id: "sd-08-01",
