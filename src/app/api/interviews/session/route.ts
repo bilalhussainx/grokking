@@ -61,8 +61,9 @@ export async function POST(req: NextRequest) {
 
     const persona = getCompanyPersona(companyPersonaId);
 
-    // Build adaptive context (weakness-aware question selection)
+    // Build adaptive context (weakness-aware question selection + problem selection)
     let adaptiveExtension = "";
+    let selectedProblems: unknown[] = [];
     try {
       const adaptiveCtx = await buildAdaptiveContext({
         userId: user.id,
@@ -71,6 +72,7 @@ export async function POST(req: NextRequest) {
         language,
       });
       adaptiveExtension = buildAdaptivePromptExtension(adaptiveCtx);
+      selectedProblems = adaptiveCtx.selectedProblems || [];
     } catch (err) {
       console.warn("[Session] Adaptive context failed (non-fatal):", err);
     }
@@ -111,6 +113,7 @@ export async function POST(req: NextRequest) {
       sessionStructure: persona.sessionStructure,
       adaptiveContext: adaptiveExtension,
       agentContext: agentContextStr,
+      problems: selectedProblems,
     });
   } catch (error) {
     console.error("[Session] POST error:", error);

@@ -267,6 +267,16 @@ You are NOT a passive assistant waiting for questions. You are an ACTIVE tutor. 
 5. Keep responses to 1-2 sentences for voice. Short and punchy.
 Never say "How can I help?" — instead say "So in this lesson we're looking at [topic]. What's your take on [concept]?"`;
 
+  // CRITICAL: No markdown in voice output — TTS reads asterisks/hashes literally
+  contextPrompt += `\n\n## OUTPUT FORMAT (CRITICAL — VOICE MODE)
+Your responses will be spoken aloud by a text-to-speech engine. You MUST:
+- NEVER use markdown formatting: no **bold**, no *italic*, no # headings, no - bullet lists, no \`code backticks\`, no numbered lists with "1."
+- Write in plain, natural spoken English (or the target language). Just sentences and paragraphs.
+- For emphasis, use word choice and phrasing — not formatting symbols.
+- For code references, say them naturally: "the two sum function" not "\`twoSum\`".
+- For lists, use natural speech: "First... Second... Third..." not "1. ... 2. ... 3. ..."
+- This is a real-time voice conversation. Sound human, not like a document.`;
+
   if (lessonContext?.content) {
     const content = lessonContext.content.slice(0, 4000);
     contextPrompt += `\n\n## LESSON MATERIAL (USE THIS — the student is reading this right now)\n${content}`;

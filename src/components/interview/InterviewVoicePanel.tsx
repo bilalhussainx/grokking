@@ -54,6 +54,12 @@ SILENCE HANDLING (CRITICAL):
 - Keep the interview moving naturally — long silences kill the learning experience.
 - NEVER repeat the exact same question verbatim. Always rephrase, simplify, or offer a different angle.`;
 
+      const noMarkdown = `
+VOICE OUTPUT FORMAT (CRITICAL):
+- NEVER use markdown: no **bold**, no *italic*, no # headings, no bullet lists, no \`backticks\`.
+- Your output is spoken aloud by TTS. Asterisks and symbols are read literally and sound terrible.
+- Use plain spoken sentences only. For emphasis, use word choice and phrasing.`;
+
       const prompt = isFallback
         ? `You are conducting a ${interviewType || "technical"} interview as a ${persona}.
 
@@ -66,8 +72,9 @@ RULES:
 - At 5 minutes remaining, wrap up with "Any questions for me?"
 - Start by briefly introducing yourself and the interview format, then ask the first question.
 - Keep a natural, conversational tone — this should feel like a real interview, not a quiz.
-${silenceRules}`
-        : `You are conducting a ${interviewType || "technical"} interview. Here is your question plan:\n${JSON.stringify(questionPlan, null, 2)}\n\nRULES:\n- Ask questions one at a time. Wait for the candidate to respond.\n- Adapt follow-up questions based on their answers — don't rigidly follow the plan.\n- When the candidate is coding, observe their approach and give guidance if stuck.\n- IMPORTANT: When the candidate struggles, TEACH THEM. Explain the correct answer clearly.\n- At 5 minutes remaining, wrap up with "Any questions for me?"\n- Start by briefly introducing yourself and the format, then ask the first question.\n${silenceRules}`;
+${silenceRules}
+${noMarkdown}`
+        : `You are conducting a ${interviewType || "technical"} interview. Here is your question plan:\n${JSON.stringify(questionPlan, null, 2)}\n\nRULES:\n- Ask questions one at a time. Wait for the candidate to respond.\n- Adapt follow-up questions based on their answers — don't rigidly follow the plan.\n- When the candidate is coding, observe their approach and give guidance if stuck.\n- IMPORTANT: When the candidate struggles, TEACH THEM. Explain the correct answer clearly.\n- At 5 minutes remaining, wrap up with "Any questions for me?"\n- Start by briefly introducing yourself and the format, then ask the first question.\n${silenceRules}\n${noMarkdown}`;
 
       voiceAgentRef.current?.sendPromptUpdate(prompt);
 

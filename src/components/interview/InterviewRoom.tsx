@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import { Code2, Mic, ArrowLeft } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
 import InterviewEditor from "./InterviewEditor";
+import LiveCodingPanel from "./LiveCodingPanel";
 import InterviewVoicePanel from "./InterviewVoicePanel";
 import InterviewTextPanel from "./InterviewTextPanel";
 import Link from "next/link";
 
 export default function InterviewRoom() {
   const router = useRouter();
-  const { sessionId, interviewType, preset, questionPlan, inputMode } = useInterview();
+  const { sessionId, interviewType, preset, questionPlan, inputMode, currentProblem, dbSessionId } = useInterview();
   const codeRef = useRef("");
   const outputRef = useRef("");
   const [mobileTab, setMobileTab] = useState<"voice" | "code">("voice");
@@ -99,20 +100,36 @@ export default function InterviewRoom() {
       <div className="flex-1 flex min-h-0">
         {showEditor && (
           <div className="hidden md:block w-[55%] border-r border-white/[0.06] p-2">
-            <InterviewEditor
-              onCodeChange={handleCodeChange}
-              onOutputChange={handleOutputChange}
-            />
+            {currentProblem ? (
+              <LiveCodingPanel
+                problem={currentProblem}
+                sessionId={dbSessionId || undefined}
+                onCodeChange={handleCodeChange}
+              />
+            ) : (
+              <InterviewEditor
+                onCodeChange={handleCodeChange}
+                onOutputChange={handleOutputChange}
+              />
+            )}
           </div>
         )}
 
         {/* Mobile: show editor when tab is "code" */}
         {showEditor && mobileTab === "code" && (
           <div className="md:hidden w-full h-full p-2">
-            <InterviewEditor
-              onCodeChange={handleCodeChange}
-              onOutputChange={handleOutputChange}
-            />
+            {currentProblem ? (
+              <LiveCodingPanel
+                problem={currentProblem}
+                sessionId={dbSessionId || undefined}
+                onCodeChange={handleCodeChange}
+              />
+            ) : (
+              <InterviewEditor
+                onCodeChange={handleCodeChange}
+                onOutputChange={handleOutputChange}
+              />
+            )}
           </div>
         )}
 

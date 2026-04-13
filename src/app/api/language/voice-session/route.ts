@@ -240,7 +240,8 @@ APPROACH:
       + languageProfileBlock
       + `\n\nIMPORTANT: Start the conversation with this greeting: "${greeting}". Say it naturally as your first response when the user connects.`
       + `\n\nSPEECH RECOGNITION NOTE: The student is a language learner. Their speech may be transcribed imperfectly — accented ${languageName} words may appear as English phonetic approximations. Be generous in interpreting what they say. Never say "I didn't understand" — always try to work with what they said.`
-      + `\n\nCRITICAL LATENCY RULE: Keep ALL responses to 1-2 sentences MAX. This is voice — short is better. Never give a paragraph. One thought per response, then wait for the student.`;
+      + `\n\nCRITICAL LATENCY RULE: Keep ALL responses to 1-2 sentences MAX. This is voice — short is better. Never give a paragraph. One thought per response, then wait for the student.`
+      + `\n\nOUTPUT FORMAT (CRITICAL — VOICE MODE): Your responses are spoken aloud by TTS. NEVER use markdown: no **bold**, no *italic*, no # headings, no bullet lists, no \`backticks\`. Write plain spoken sentences only. For emphasis use word choice, not formatting symbols. For code references say them naturally like "the print function", not backtick-wrapped.`;
 
     // Build Deepgram Voice Agent settings (same format as Coach Alex)
     const settings = {

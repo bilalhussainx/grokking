@@ -123,6 +123,53 @@ export default function InterviewSetup() {
       }
 
       const jd = useCustom ? customJD.trim() : `Preset: ${preset}`;
+
+      // Create a persistent server-side session and fetch problems.
+      // For authenticated users: POST /api/interviews/session (creates DB row + selects adaptive problems).
+      // Fallback for guests / expired auth: GET /api/interviews/problems (random selection, no auth).
+      let dbSessionId: string | undefined;
+      let problems: import("@/types/interview").InterviewProblem[] = [];
+
+      // Only attempt the full session API if authenticated
+      if (user) {
+        try {
+          const sessionRes = await fetch("/api/interviews/session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              companyPersonaId,
+              category: "tech",
+              interviewType,
+              preset: preset || "fullstack",
+              language,
+              questionPlan: plan,
+            }),
+          });
+          if (sessionRes.ok) {
+            const sessionData = await sessionRes.json();
+            dbSessionId = sessionData.sessionId;
+            problems = sessionData.problems || [];
+          }
+        } catch {
+          // Non-fatal — fall through to fallback below
+        }
+      }
+
+      // Fallback: if we still have no problems (guest, expired token, session API error),
+      // fetch from the lightweight problems endpoint that doesn't require auth.
+      const needsCoding = interviewType !== "behavioral" && interviewType !== "recruiter";
+      if (problems.length === 0 && needsCoding) {
+        try {
+          const fallbackRes = await fetch(`/api/interviews/problems?count=3`);
+          if (fallbackRes.ok) {
+            const fallbackData = await fallbackRes.json();
+            problems = fallbackData.problems || [];
+          }
+        } catch {
+          // Non-fatal — interview will still work, just without LiveCodingPanel
+        }
+      }
+
       const sessionId = startInterview({
         interviewType,
         preset: preset || "fullstack",
@@ -131,6 +178,8 @@ export default function InterviewSetup() {
         language,
         companyPersonaId,
         inputMode,
+        problems,
+        dbSessionId,
       });
       router.push(`/interviews/${sessionId}`);
     } catch (err) {

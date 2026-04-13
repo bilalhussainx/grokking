@@ -12,6 +12,7 @@ import {
   InterviewType,
   InterviewPreset,
   InterviewPlan,
+  InterviewProblem,
   TranscriptEntry,
   InterviewScorecard,
 } from "@/types/interview";
@@ -43,9 +44,16 @@ interface InterviewState {
   feedbackLanguage?: string;        // for college: scorecard translation target
   // Text-only mode for users without microphone (audit 2026-04-07)
   inputMode: 'voice' | 'text';
+  // Live coding problems from the problem bank (Sub-Project 2: Interview Intelligence)
+  problems: InterviewProblem[];
+  currentProblemIndex: number;
+  // Server-side session ID (persisted in interview_sessions table)
+  dbSessionId: string | null;
 }
 
 interface InterviewContextValue extends InterviewState {
+  currentProblem: InterviewProblem | null;
+  advanceProblem: () => void;
   startInterview: (params: {
     interviewType: InterviewType;
     preset: InterviewPreset;
@@ -58,6 +66,8 @@ interface InterviewContextValue extends InterviewState {
     applicantProfile?: InterviewState['applicantProfile'];
     feedbackLanguage?: string;
     inputMode?: 'voice' | 'text';
+    problems?: InterviewProblem[];
+    dbSessionId?: string;
   }) => string;
   addTranscriptEntry: (entry: TranscriptEntry) => void;
   setFinalCode: (code: string) => void;
@@ -81,6 +91,9 @@ const defaultState: InterviewState = {
   applicantProfile: undefined,
   feedbackLanguage: "en",
   inputMode: "voice",
+  problems: [],
+  currentProblemIndex: 0,
+  dbSessionId: null,
 };
 
 const InterviewCtx = createContext<InterviewContextValue | null>(null);
@@ -125,6 +138,8 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
       applicantProfile?: InterviewState['applicantProfile'];
       feedbackLanguage?: string;
       inputMode?: 'voice' | 'text';
+      problems?: InterviewProblem[];
+      dbSessionId?: string;
     }) => {
       const sessionId = `interview-${Date.now()}-${Math.random()
         .toString(36)
@@ -145,6 +160,9 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         applicantProfile: params.applicantProfile,
         feedbackLanguage: params.feedbackLanguage || "en",
         inputMode: params.inputMode || "voice",
+        problems: params.problems || [],
+        currentProblemIndex: 0,
+        dbSessionId: params.dbSessionId || null,
       };
       setState(newState);
       // Write synchronously so the next page can rehydrate immediately
@@ -171,6 +189,15 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, scorecard }));
   }, []);
 
+  const advanceProblem = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      currentProblemIndex: Math.min(prev.currentProblemIndex + 1, prev.problems.length - 1),
+    }));
+  }, []);
+
+  const currentProblem = state.problems[state.currentProblemIndex] ?? null;
+
   const resetInterview = useCallback(() => {
     try {
       sessionStorage.removeItem(SESSION_STORAGE_KEY);
@@ -184,6 +211,8 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
     <InterviewCtx.Provider
       value={{
         ...state,
+        currentProblem,
+        advanceProblem,
         startInterview,
         addTranscriptEntry,
         setFinalCode,
