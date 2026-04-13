@@ -73,15 +73,27 @@ export default function InterviewScorecard() {
     }
   };
 
+  // Wait briefly for InterviewContext to rehydrate from sessionStorage before
+  // deciding the transcript is missing. Prevents a false "No transcript found"
+  // error on the very first render after navigation from the interview room.
   useEffect(() => {
-    if (!scorecard && transcript.length > 0) {
-      fetchScore();
-    } else if (transcript.length === 0) {
+    if (scorecard) {
       setLoading(false);
-      setError("No interview transcript found.");
+      return;
     }
+    if (transcript.length > 0) {
+      fetchScore();
+      return;
+    }
+    const t = setTimeout(() => {
+      if (transcript.length === 0) {
+        setLoading(false);
+        setError("No interview transcript found.");
+      }
+    }, 800);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [transcript.length, scorecard]);
 
   if (loading) {
     return (

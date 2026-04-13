@@ -55,6 +55,7 @@ export default function CollegeInterviewSetup() {
   const [topProjectTitle, setTopProjectTitle] = useState("");
   const [topProjectDescription, setTopProjectDescription] = useState("");
   const [recentInfluence, setRecentInfluence] = useState("");
+  const [collegeEssay, setCollegeEssay] = useState("");
   const [whyThisSchool, setWhyThisSchool] = useState("");
   const [feedbackLanguage, setFeedbackLanguage] = useState<string>("en");
   const [inputMode, setInputMode] = useState<'voice' | 'text'>("voice");
@@ -73,7 +74,7 @@ export default function CollegeInterviewSetup() {
         const supabase = createBrowserSupabase();
         const { data } = await supabase
           .from("college_applicant_profile")
-          .select("intended_major, top_project_title, top_project_description, recent_influence")
+          .select("intended_major, top_project_title, top_project_description, recent_influence, college_essay")
           .eq("user_id", user.id)
           .maybeSingle();
         if (data) {
@@ -81,6 +82,7 @@ export default function CollegeInterviewSetup() {
           setTopProjectTitle(data.top_project_title || "");
           setTopProjectDescription(data.top_project_description || "");
           setRecentInfluence(data.recent_influence || "");
+          setCollegeEssay(data.college_essay || "");
         }
       } catch {
         // ignore — fields stay empty
@@ -102,6 +104,7 @@ export default function CollegeInterviewSetup() {
         top_project_title: topProjectTitle.trim() || null,
         top_project_description: topProjectDescription.trim() || null,
         recent_influence: recentInfluence.trim() || null,
+        college_essay: collegeEssay.trim() || null,
         updated_at: new Date().toISOString(),
       });
     } catch (e) {
@@ -120,6 +123,7 @@ export default function CollegeInterviewSetup() {
       topProjectDescription: topProjectDescription.trim() || undefined,
       recentInfluence: recentInfluence.trim() || undefined,
       whyThisSchool: whyThisSchool.trim() || undefined,
+      collegeEssay: collegeEssay.trim() || undefined,
     };
 
     try {
@@ -302,6 +306,21 @@ export default function CollegeInterviewSetup() {
                   rows={4}
                   className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white/90 placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 focus:bg-white/[0.05] transition-colors resize-none"
                 />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-[11px] text-white/40 mb-1">
+                  Your college application essay <span className="text-white/25">— optional, but makes the interviewer MUCH sharper</span>
+                </label>
+                <textarea
+                  value={collegeEssay}
+                  onChange={(e) => setCollegeEssay(e.target.value)}
+                  placeholder="Paste your Common App / personal statement here. The alum will read it before the interview and ask specific follow-ups about the moments, people, and ideas you wrote about."
+                  rows={8}
+                  className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white/90 placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 focus:bg-white/[0.05] transition-colors resize-y"
+                />
+                <p className="text-[10px] text-white/30 mt-1.5">
+                  Stored privately on your profile. Used only to personalize your practice interview. {collegeEssay.length > 0 && <span className="text-white/50">{collegeEssay.length.toLocaleString()} chars</span>}
+                </p>
               </div>
             </div>
           )}

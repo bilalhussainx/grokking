@@ -1545,6 +1545,17 @@ export interface VoiceAgentConfig {
   companyPersonaId?: string;
   questionPlan?: unknown;
   interviewType?: string;
+  // College admissions vertical (spec: 2026-04-07-college-admissions-interviews-design.md)
+  category?: 'tech' | 'college';
+  collegePersonaId?: string;
+  applicantProfile?: {
+    intendedMajor?: string;
+    topProjectTitle?: string;
+    topProjectDescription?: string;
+    recentInfluence?: string;
+    whyThisSchool?: string;
+    collegeEssay?: string;
+  };
 }
 
 // Adapter: normalize both persona types into a common voice config

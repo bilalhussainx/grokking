@@ -131,6 +131,10 @@ export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
         companyPersonaId: config.companyPersonaId,
         questionPlan: config.questionPlan,
         interviewType: config.interviewType,
+        // College admissions vertical
+        category: config.category,
+        collegePersonaId: config.collegePersonaId,
+        applicantProfile: config.applicantProfile,
       });
     }
   }, [deepgramAgent, orchestratedAgent]);

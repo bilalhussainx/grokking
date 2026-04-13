@@ -40,6 +40,7 @@ interface InterviewState {
     topProjectDescription?: string;
     recentInfluence?: string;
     whyThisSchool?: string;
+    collegeEssay?: string;
   };
   feedbackLanguage?: string;        // for college: scorecard translation target
   // Text-only mode for users without microphone (audit 2026-04-07)
