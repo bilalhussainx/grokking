@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const fundamentalsModule: Module = {
   id: "ml-fundamentals",
   title: "ML Fundamentals",
-  description:
-    "Core machine learning concepts every interview candidate must know — learning paradigms, bias-variance tradeoff, evaluation metrics, and model selection.",
+  description: "Core machine learning concepts every interview candidate must know — learning paradigms, bias-variance tradeoff, evaluation metrics, and model selection.",
   lessons: [
     {
       id: "ml-fund-1",

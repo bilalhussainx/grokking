@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const recommendationsModule: Module = {
   id: "ml-recommendations",
   title: "ML System Design: Recommendations",
-  description:
-    "Design a recommendation system end-to-end — problem formulation, collaborative and content-based filtering, feature engineering, model architecture, and evaluation.",
+  description: "Design a recommendation system end-to-end — problem formulation, collaborative and content-based filtering, feature engineering, model architecture, and evaluation.",
   lessons: [
     {
       id: "rec-formulation",

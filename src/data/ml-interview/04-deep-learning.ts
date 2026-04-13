@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const deepLearningModule: Module = {
   id: "ml-deep-learning",
   title: "Deep Learning",
-  description:
-    "Neural network fundamentals through transformers — activation functions, backpropagation, CNNs, RNNs, and the attention mechanism.",
+  description: "Neural network fundamentals through transformers — activation functions, backpropagation, CNNs, RNNs, and the attention mechanism.",
   lessons: [
     {
       id: "ml-dl-1",

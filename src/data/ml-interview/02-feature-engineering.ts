@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const featureEngineeringModule: Module = {
   id: "ml-feature-engineering",
   title: "Feature Engineering",
-  description:
-    "Master the art of feature engineering — handling missing data, scaling, encoding, feature selection, and dimensionality reduction with PCA.",
+  description: "Master the art of feature engineering — handling missing data, scaling, encoding, feature selection, and dimensionality reduction with PCA.",
   lessons: [
     {
       id: "ml-fe-1",

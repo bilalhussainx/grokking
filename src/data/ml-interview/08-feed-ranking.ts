@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const feedRankingModule: Module = {
   id: "ml-feed-ranking",
   title: "ML System Design: Feed Ranking",
-  description:
-    "Design a social media feed ranking system — multi-objective optimization, feature engineering, multi-task learning, and evaluation of engagement, quality, and diversity.",
+  description: "Design a social media feed ranking system — multi-objective optimization, feature engineering, multi-task learning, and evaluation of engagement, quality, and diversity.",
   lessons: [
     {
       id: "feed-formulation",

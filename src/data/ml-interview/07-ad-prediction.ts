@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const adPredictionModule: Module = {
   id: "ml-ad-prediction",
   title: "ML System Design: Ad Prediction",
-  description:
-    "Design an ad prediction system — CTR prediction, feature engineering, model evolution from logistic regression to deep models, training pipelines, and online serving.",
+  description: "Design an ad prediction system — CTR prediction, feature engineering, model evolution from logistic regression to deep models, training pipelines, and online serving.",
   lessons: [
     {
       id: "ad-formulation",

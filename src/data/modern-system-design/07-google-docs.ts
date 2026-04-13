@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const googleDocsModule: Module = {
   id: "design-google-docs",
   title: "Design Google Docs",
-  description:
-    "Design a real-time collaborative editor: operational transformation, CRDTs, presence tracking, and conflict resolution at scale.",
+  description: "Design a real-time collaborative editor: operational transformation, CRDTs, presence tracking, and conflict resolution at scale.",
   lessons: [
     {
       id: "docs-requirements",
@@ -12,128 +11,90 @@ export const googleDocsModule: Module = {
       title: "Requirements & Consistency Challenges",
       content: `# Design Google Docs: Requirements & Consistency Challenges
 
-## Functional Requirements
+Real-time collaborative editing is one of the hardest distributed systems problems disguised as a simple product feature. When two people type in the same document simultaneously, the system must resolve conflicts, maintain consistency, and feel instant — all at once. This lesson establishes the requirements, quantifies the scale, and exposes *why* the core problem is fundamentally hard.
 
-Design a real-time collaborative document editor like Google Docs. Core features:
+## Functional Requirements
 
 1. **Real-time co-editing** — Multiple users edit the same document simultaneously
 2. **Rich text editing** — Bold, italic, headings, lists, tables, images
 3. **Conflict resolution** — Concurrent edits never corrupt the document
-4. **Offline support** — Users can edit offline and sync when reconnected
-5. **Version history** — View and restore any previous version of the document
+4. **Offline support** — Users can edit offline and sync on reconnect
+5. **Version history** — View and restore any previous document version
 6. **Comments and suggestions** — Inline comments, suggested edits with accept/reject
 7. **Permissions** — Owner, editor, commenter, viewer roles
 8. **Real-time presence** — See who else is in the document and where their cursor is
 
 ## Non-Functional Requirements
 
-- **Availability**: 99.99% — documents must always be accessible
-- **Latency**: Local edits appear instantly (<50ms); remote edits appear within 200ms
-- **Consistency**: All users converge to the same document state (eventual consistency)
-- **Scalability**: 100+ concurrent editors per document; billions of documents total
-- **Durability**: Zero data loss — every keystroke must be persisted
+| Property | Target | Why It Matters |
+|----------|--------|----------------|
+| **Availability** | 99.99% | Documents must always be accessible |
+| **Local edit latency** | <50ms | Edits must feel instantaneous to the author |
+| **Remote edit latency** | <200ms | Collaborators see changes near-instantly |
+| **Consistency** | Eventual (CCI model) | All users converge to the same document state |
+| **Scalability** | 100+ concurrent editors/doc | Large-team editing is a core use case |
+| **Durability** | Zero data loss | Every keystroke must be persisted |
 
 ## Scale Estimation
 
-### Users and Documents
-
-\`\`\`
-Monthly active users:       ~1.5 billion (Google Workspace)
-Documents:                  ~15 billion total
-Active documents (daily):   ~300 million
-Concurrent editors (peak):  ~50 million users editing simultaneously
-Average editors per doc:    2-5 (some docs have 100+)
-\`\`\`
-
-### Operations
-
-\`\`\`
-Keystrokes per active user:    ~2,000/hour (average typist)
-Operations per second (total): 50M users × 2000/3600 ≈ 28 million ops/s
-Operations per document:       Varies wildly — 1/min to 100/s
-Operation payload:             ~100-500 bytes per operation
-Bandwidth:                     28M × 200 bytes = 5.6 GB/s ingest
-\`\`\`
-
-### Storage
-
-\`\`\`
-New documents/day:          ~50 million
-Average document size:      ~50 KB (text + formatting)
-Daily new storage:          50M × 50 KB = 2.5 TB/day
-Operation log per doc:      ~500 KB/day for active docs
-Version snapshots:          Every 100 operations or 5 minutes
+\`\`\`tabs
+{ "tabs": [ { "label": "Users & Documents", "icon": "👥", "content": "| Metric | Estimate |\\n|--------|----------|\\n| Monthly active users | ~1.5 billion |\\n| Total documents | ~15 billion |\\n| Active documents (daily) | ~300 million |\\n| Peak concurrent editors | ~50 million |\\n| Avg editors per document | 2–5 (some docs: 100+) |" }, { "label": "Operations", "icon": "⚡", "content": "| Metric | Estimate |\\n|--------|----------|\\n| Keystrokes per active user | ~2,000 / hour |\\n| **Total ops/sec** | 50M × 2,000 ÷ 3,600 ≈ **28M ops/s** |\\n| Operation payload size | ~100–500 bytes |\\n| Network ingest bandwidth | ~5.6 GB/s |\\n\\n28 million operations per second is not a typo. Every keystroke by every active user flows through the system in real time. This is why documents must be partitioned across many collab servers." }, { "label": "Storage", "icon": "💾", "content": "| Metric | Estimate |\\n|--------|----------|\\n| New documents per day | ~50 million |\\n| Average document size | ~50 KB |\\n| Daily new storage | ~2.5 TB/day |\\n| Operation log per active doc | ~500 KB/day |\\n| Snapshot frequency | Every 100 ops or 5 min |\\n\\nOperation logs are append-only and grow indefinitely — compaction and snapshotting are critical to bound storage costs." } ] }
 \`\`\`
 
 ## The Core Challenge: Concurrent Edits
 
-The fundamental problem in collaborative editing is: what happens when two users edit the same spot in a document at the same time?
-
-\`\`\`
-Document: "Hello World"
-
-User A (position 5): Insert "," → "Hello, World"
-User B (position 6): Delete "W" → "Hello orld"
-
-Both edits happen simultaneously. What should the result be?
-
-Naive merge (apply both as-is):
-  Start:  "Hello World"
-  Apply A: "Hello, World"   (insert "," at position 5)
-  Apply B: delete at position 6 → "Hello,World"  ← WRONG!
-    (B's position 6 was "W" in the original, but after A's insert,
-     position 6 is now " ", not "W")
-
-Correct merge (transform operations):
-  Start:  "Hello World"
-  Apply A: "Hello, World"
-  Transform B: A inserted before B's position, so B's position shifts +1
-  Apply B': delete at position 7 → "Hello, orld"  ✓
+\`\`\`concept
+{ "title": "Why Concurrent Edits Break Everything", "variant": "mental-model", "content": "Single-user editing is trivial: one writer, one document, no conflicts. Add a second user and everything changes. Two users typing at the same position at the same millisecond will produce divergent documents unless a conflict resolution algorithm transforms one operation against the other before applying it. The entire architecture of Google Docs is organized around making that transformation correct, fast, and durable." }
 \`\`\`
 
-This is the essence of the problem. There are two major solutions: **Operational Transformation (OT)** and **CRDTs**. We will explore both.
+The fundamental question: what happens when two users edit the same position simultaneously? Here is a concrete trace showing why naive merging fails — and what Operational Transformation (OT) does to fix it.
 
-## Consistency Model
-
-Collaborative editing uses **eventual consistency** with a critical guarantee:
-
+\`\`\`steps
+{ "title": "Naive Merge vs. Operational Transformation", "steps": [ { "title": "Starting State", "content": "Both Alice and Bob open the same document. Current content: \`\\"BC\\"\`" }, { "title": "Concurrent Edits (before sync)", "content": "**Alice** inserts \`\\"A\\"\` at position 0 → her local view: \`\\"ABC\\"\`\\n\\n**Bob** inserts \`\\"D\\"\` at position 2 → his local view: \`\\"BCD\\"\`\\n\\nNeither user has received the other's operation yet. Both are working against the same original state." }, { "title": "Naive Merge — Broken ✗", "content": "Server applies Alice's op first: \`\\"BC\\"\` → \`\\"ABC\\"\`\\n\\nServer applies Bob's op literally — \`insert(\\"D\\", pos=2)\` on \`\\"ABC\\"\` → \`\\"ABDC\\"\`\\n\\nBob applies Alice's op to his \`\\"BCD\\"\` state → Bob sees \`\\"ABCD\\"\`\\n\\n**Alice sees \`\\"ABDC\\"\`, Bob sees \`\\"ABCD\\"\` — the documents have diverged.** The insert landed in the wrong position." }, { "title": "With Operational Transformation — Correct ✓", "content": "Bob's op \`insert(\\"D\\", pos=2)\` is **transformed** against Alice's concurrent op \`insert(\\"A\\", pos=0)\`.\\n\\nAlice inserted *before* Bob's target position, shifting all subsequent characters right by 1:\\n\\n\`insert(\\"D\\", pos=2)\` → \`insert(\\"D\\", pos=3)\`\\n\\nApply transformed op to \`\\"ABC\\"\` → **\`\\"ABCD\\"\`**\\n\\nBoth users now see the same document. OT preserved the *intention* of both edits." } ] }
 \`\`\`
-CCI Model:
-  Causality:    If operation A happened before B, all users see A before B
-  Convergence:  All users eventually see the same document state
-  Intention:    Each user's edit achieves what they intended
 
-Traditional databases optimize for C (strong consistency) or A (availability).
-Collaborative editing must optimize for all three CCI properties simultaneously.
+This is the essence of the problem. There are two major algorithm families that solve it: **Operational Transformation (OT)**, historically used by Google Docs, and **CRDTs** (Conflict-free Replicated Data Types), used by VS Code Live Share (Yjs) and Figma. We explore both in depth in the following lessons.
+
+## The CCI Consistency Model
+
+Traditional databases optimize for strong consistency (ACID) or availability (BASE). Collaborative editing needs a third model: **CCI**.
+
+\`\`\`concept
+{ "title": "CCI: Causality, Convergence, Intention", "variant": "rule", "content": "**Causality** — If operation A happened before B in the causal sense, every user sees A applied before B.\\n\\n**Convergence** — After all operations propagate, every user's document reaches exactly the same final state, regardless of the order in which operations were received.\\n\\n**Intention** — Each operation achieves what the user intended. An insert between two words stays between those words even after concurrent nearby operations transform it.\\n\\nPlain eventual consistency only guarantees convergence. CCI additionally requires causal ordering and intention preservation — which is why OT and CRDTs are necessary rather than simple last-write-wins." }
 \`\`\`
 
 ## High-Level Architecture
 
+\`\`\`sysdiag
+{ "title": "Google Docs — High-Level Architecture", "width": 760, "height": 380, "nodes": [ { "id": "ua", "label": "User A (Browser)", "x": 90, "y": 70, "kind": "client" }, { "id": "ub", "label": "User B (Browser)", "x": 90, "y": 190, "kind": "client" }, { "id": "uc", "label": "User C (Browser)", "x": 90, "y": 310, "kind": "client" }, { "id": "collab", "label": "Collab Server", "x": 390, "y": 190, "kind": "service" }, { "id": "storage", "label": "Document Storage", "x": 640, "y": 90, "kind": "database" }, { "id": "oplog", "label": "Operation Log (Kafka)", "x": 640, "y": 310, "kind": "queue" } ], "edges": [ { "from": "ua", "to": "collab", "label": "WebSocket" }, { "from": "ub", "to": "collab", "label": "WebSocket" }, { "from": "uc", "to": "collab", "label": "WebSocket" }, { "from": "collab", "to": "storage", "label": "snapshots" }, { "from": "collab", "to": "oplog", "label": "operations" } ], "annotations": { "collab": "Central ordering point: receives all operations, applies OT/CRDT transformation, and broadcasts transformed ops to every connected client.", "oplog": "Append-only operation log — source of truth for replaying document history and rebuilding state after failure.", "storage": "Periodic snapshots prevent unbounded log growth. Recovery = last snapshot + replay tail of operation log." } }
 \`\`\`
-┌──────────┐     ┌──────────────┐     ┌──────────────┐
-│ User A   │◀───▶│  Collab      │◀───▶│ Document     │
-│ (browser)│     │  Server      │     │ Storage      │
-├──────────┤     │              │     │ (snapshots)  │
-│ User B   │◀───▶│  - OT/CRDT  │     └──────────────┘
-│ (browser)│     │  - ordering  │
-├──────────┤     │  - broadcast │     ┌──────────────┐
-│ User C   │◀───▶│              │◀───▶│ Operation    │
-│ (browser)│     └──────────────┘     │ Log (Kafka)  │
-└──────────┘                          └──────────────┘
-\`\`\`
+
+The collaboration server is the **central ordering point** — the single place that decides the authoritative sequence of all operations. Centralizing ordering makes OT tractable (no N-way concurrent transformation required), at the cost of requiring a highly available server. This is a deliberate architectural trade-off, not an oversight.
 
 ## Key Challenges
 
 | Challenge | Why It's Hard |
 |-----------|--------------|
-| **Concurrent edit resolution** | Multiple users typing in the same paragraph |
-| **28M ops/s throughput** | Every keystroke must be processed and broadcast |
-| **<200ms propagation** | Remote edits must appear almost instantly |
-| **Offline + reconnect** | Merge hours of offline edits without corruption |
-| **100+ simultaneous editors** | Transform operations scale quadratically with users |
-| **Undo/redo in collaboration** | Undoing YOUR edit when others edited around it |
+| **Concurrent edit resolution** | Multiple users typing in the same paragraph simultaneously |
+| **28M ops/s throughput** | Every keystroke must be processed and broadcast in real time |
+| **<200ms propagation** | Remote edits must appear near-instantly to all collaborators |
+| **Offline + reconnect** | Merge potentially hours of offline edits without corruption |
+| **100+ simultaneous editors** | Transform complexity scales with the number of concurrent users |
+| **Collaborative undo/redo** | Undoing *your* edit when others have since edited around it |
 
-We will address each of these in the following lessons.`,
+\`\`\`callout
+{ "type": "info", "title": "What's Coming Next", "content": "The next lessons cover the two algorithms that solve concurrent edit resolution in depth:\\n\\n- **Operational Transformation (OT)** — the centralized algorithm Google Docs uses, where a server provides global operation ordering\\n- **CRDTs** — the decentralized alternative used by VS Code Live Share (Yjs) and Figma, which assigns each character a unique ordered ID so operations commute naturally\\n\\nUnderstanding when to choose OT vs CRDTs is the central architectural decision of this case study." }
+\`\`\`
+
+## Knowledge Check
+
+\`\`\`quiz
+{ "title": "Requirements & Consistency Challenges", "questions": [ { "question": "In the Alice/Bob example (initial state \\"BC\\"), Alice inserts \\"A\\" at position 0 and Bob inserts \\"D\\" at position 2, both against the same original state. After OT transforms Bob's operation, what position should Bob's insert use?", "options": ["Position 0 — same as Alice's insert", "Position 1 — halfway between the two inserts", "Position 2 — unchanged, since the operations are independent", "Position 3 — shifted +1 because Alice inserted before Bob's target"], "answer": 3, "explanation": "Alice inserted at position 0, which is *before* Bob's target position 2. This shifts all subsequent characters right by 1, so Bob's insert(pos=2) must be transformed to insert(pos=3). Applied to \\"ABC\\" → \\"ABCD\\". OT's transform function adjusts positions to preserve the intention of both edits." }, { "question": "Which additional guarantee does the CCI consistency model provide that plain eventual consistency does NOT?", "options": ["Linearizability — every read reflects the latest write globally", "Causality ordering and intention preservation, not just convergence", "ACID transactions across all distributed replicas", "Conflict-free merging without any transformation logic"], "answer": 1, "explanation": "Plain eventual consistency only guarantees that all replicas eventually reach the same state (convergence). CCI additionally requires Causality (operations are seen in causal order) and Intention (each edit achieves what the user meant, even after being transformed against concurrent ops). Without intention preservation, an insert could end up in the wrong position after OT." }, { "question": "Why is a 'last-write-wins' conflict strategy insufficient for real-time collaborative editing?", "options": ["It requires synchronous consensus, which introduces too much latency", "It silently discards one user's changes, violating the Intention property of CCI", "It only works for plain-text documents, not rich text with formatting", "It requires vector clocks, which are too expensive to maintain at scale"], "answer": 1, "explanation": "Last-write-wins would silently drop edits: if Alice and Bob type simultaneously, one user's work disappears with no indication. This violates the Intention property — the system must preserve all concurrent edits by transforming their positions, not choosing a winner and discarding the other." }, { "question": "Based on the scale estimation, approximately how many operations per second must Google Docs handle at peak across all active users?", "options": ["~1 million ops/s", "~5 million ops/s", "~28 million ops/s", "~500 million ops/s"], "answer": 2, "explanation": "~50M concurrent users × 2,000 keystrokes/hour ÷ 3,600 seconds/hour ≈ 28 million ops/s. This is why documents must be partitioned across many collab servers and why the operation pipeline must be highly optimized — no single machine can handle the full load." } ] }
+\`\`\`
+
+\`\`\`takeaways
+{ "title": "Key Takeaways", "items": [ "The core problem: two users editing the same position simultaneously produce divergent documents without a conflict resolution algorithm (OT or CRDT) to transform operations before applying them.", "Naive delta merge fails because operations reference positions in the original document state — after concurrent ops apply, those positions shift and the intent is lost.", "The CCI model (Causality, Convergence, Intention) is the correctness target. Convergence alone is not enough — edits must also preserve the user's intent after transformation.", "At Google Docs scale: ~28 million ops/second, <200ms propagation latency, and zero data loss are the non-negotiable requirements that shape every architectural decision.", "The centralized collab server is a deliberate trade-off: it makes OT tractable by providing a single ordering point, at the cost of requiring high availability.", "OT (Google Docs, centralized) and CRDTs (VS Code Live Share/Yjs, decentralized) are the two algorithm families that solve concurrent edit resolution — each with distinct trade-offs explored in upcoming lessons." ] }
+\`\`\``,
     },
     {
       id: "docs-ot",
@@ -141,406 +102,517 @@ We will address each of these in the following lessons.`,
       title: "Operational Transformation",
       content: `# Google Docs: Operational Transformation
 
-## What Is Operational Transformation?
-
-Operational Transformation (OT) is the algorithm Google Docs uses to handle concurrent edits. The core idea: when two operations conflict, **transform** one operation against the other so both can be applied in any order and produce the same result.
-
-## Operations
-
-Every edit is represented as an operation on the document:
-
-\`\`\`
-Operation types:
-  INSERT(position, character)   — Insert text at a position
-  DELETE(position, count)       — Delete characters starting at position
-  RETAIN(count)                 — Skip forward (no change)
-
-Example: "Hello World" → "Hello, World"
-  Operation: RETAIN(5), INSERT(","), RETAIN(6)
-
-Example: "Hello World" → "Hell World"
-  Operation: RETAIN(4), DELETE(1), RETAIN(6)
+\`\`\`concept
+{ "title": "The Core Idea", "variant": "mental-model", "content": "When two users edit the same document simultaneously, OT transforms each operation to account for the other's changes — so both edits land in the right place, every time. The server acts as a traffic controller: it orders operations, transforms late arrivals, and broadcasts corrected versions to all clients." }
 \`\`\`
 
-## The Transform Function
+## What Are Operations?
 
-The transform function takes two concurrent operations and produces transformed versions that can be applied in either order:
+Every keystroke or deletion is encoded as a structured operation. Google Docs uses three operation types:
 
+| Type | Syntax | Effect |
+|------|--------|--------|
+| \`INSERT\` | \`INSERT(pos, text)\` | Insert text at a position |
+| \`DELETE\` | \`DELETE(pos, count)\` | Remove characters starting at a position |
+| \`RETAIN\` | \`RETAIN(count)\` | Skip forward — no change |
+
+**Example:** \`"Hello World"\` → \`"Hello, World"\`
 \`\`\`
-transform(opA, opB) → (opA', opB')
-
-Such that:
-  apply(apply(document, opA), opB') = apply(apply(document, opB), opA')
-
-This is the "diamond property":
-
-         doc
-        /   \\
-      opA   opB
-      /       \\
-   docA      docB
-      \\       /
-      opB'  opA'
-        \\   /
-        docAB = docBA  ← MUST be identical
+RETAIN(5)    skip "Hello"
+INSERT(",")  add the comma
+RETAIN(6)    skip " World"
 \`\`\`
 
-### Transform Rules
-
+**Example:** \`"Hello World"\` → \`"Hell World"\`
 \`\`\`
-Case 1: Two inserts
-  opA = INSERT(pos=3, "X")
-  opB = INSERT(pos=5, "Y")
-
-  If posA <= posB:
-    opA' = INSERT(pos=3, "X")     — unchanged
-    opB' = INSERT(pos=6, "Y")     — shift right by 1 (A inserted before B)
-
-Case 2: Insert vs Delete
-  opA = INSERT(pos=3, "X")
-  opB = DELETE(pos=5, count=1)
-
-  posA < posB:
-    opA' = INSERT(pos=3, "X")     — unchanged
-    opB' = DELETE(pos=6, count=1) — shift right by 1
-
-Case 3: Two deletes
-  opA = DELETE(pos=3, count=1)
-  opB = DELETE(pos=3, count=1)    — same position!
-
-  Both delete the same character:
-    opA' = NOOP                    — already deleted by B
-    opB' = NOOP                    — already deleted by A
-
-Case 4: Delete vs Insert at same position
-  opA = DELETE(pos=3, count=1)
-  opB = INSERT(pos=3, "X")
-
-  opA' = DELETE(pos=4, count=1)   — shift right (B inserted before)
-  opB' = INSERT(pos=3, "X")       — unchanged
+RETAIN(4)    skip "Hell"
+DELETE(1)    remove "o"
+RETAIN(6)    skip " World"
 \`\`\`
 
-## Server as Single Source of Truth
+## The Diamond Property
 
-Google Docs uses a **centralized OT** model. The server maintains the authoritative operation order:
+The golden rule of OT: applying transformed operations in **either order** must produce the **same document**.
 
-\`\`\`
-┌──────────┐                    ┌──────────────┐
-│ Client A │─── op(rev=5) ────▶│   Server     │
-│          │                    │              │
-│          │                    │ Document at  │
-│          │                    │ revision 7   │
-│          │                    │              │
-│          │                    │ op was based │
-│          │                    │ on rev 5, but│
-│          │                    │ server is at │
-│          │                    │ rev 7        │
-│          │                    │              │
-│          │                    │ Transform op │
-│          │                    │ against revs │
-│          │                    │ 6 and 7      │
-│          │                    │              │
-│          │◀── ack(rev=8) ────│ Apply → rev 8│
-│          │                    │              │
-│ Client B │◀── broadcast ─────│ Broadcast to │
-│          │    op'(rev=8)      │ all others   │
-└──────────┘                    └──────────────┘
+\`\`\`mermaid
+graph TD
+    doc["doc (base)"]
+    docA["doc + opA"]
+    docB["doc + opB"]
+    docAB["docAB = docBA ✓"]
+
+    doc -->|opA| docA
+    doc -->|opB| docB
+    docA -->|"opB' (transformed)"| docAB
+    docB -->|"opA' (transformed)"| docAB
 \`\`\`
 
-### Client-Side OT Pipeline
+The \`transform(opA, opB)\` function produces \`(opA', opB')\` such that:
 
 \`\`\`
-Client maintains three states:
-
-1. Synchronized: client doc matches server's last ack'd revision
-2. Awaiting ACK: client sent an op, waiting for server confirmation
-3. Awaiting ACK + Buffer: client has new local ops while waiting
-
-State transitions:
-┌──────────────┐  send op   ┌──────────────┐  local edit  ┌─────────────┐
-│ Synchronized │──────────▶│ Awaiting ACK │────────────▶│ Awaiting    │
-│              │           │              │             │ ACK+Buffer  │
-│              │◀──────────│              │             │             │
-│              │  recv ack │              │◀────────────│             │
-└──────────────┘           └──────────────┘  recv ack   └─────────────┘
-                                              (send buffer)
-
-When receiving a remote op while in "Awaiting ACK":
-  - Transform remote op against pending local op
-  - Apply transformed remote op to local document
-  - Transform pending local op against remote op
-  - Keep transformed pending op for when ACK arrives
+apply(apply(doc, opA), opB') = apply(apply(doc, opB), opA')
 \`\`\`
 
-## Handling Complex Scenarios
+## The Four Transform Cases
 
-### Concurrent Typing in the Same Word
+\`\`\`tabs
+{
+  "tabs": [
+    {
+      "label": "Insert + Insert",
+      "icon": "✏️",
+      "content": "**Two concurrent inserts**\\n\\n\`\`\`\\nopA = INSERT(pos=3, \\"X\\")\\nopB = INSERT(pos=5, \\"Y\\")\\n\`\`\`\\n\\nIf \`posA ≤ posB\`, opA inserted before opB's target:\\n\\n\`\`\`\\nopA' = INSERT(pos=3, \\"X\\")    unchanged\\nopB' = INSERT(pos=6, \\"Y\\")    shift right by 1\\n\`\`\`\\n\\nIf \`posA > posB\`, the reverse applies — opA shifts right, opB stays put."
+    },
+    {
+      "label": "Insert + Delete",
+      "icon": "✂️",
+      "content": "**Insert before a delete target**\\n\\n\`\`\`\\nopA = INSERT(pos=3, \\"X\\")\\nopB = DELETE(pos=5, count=1)\\n\`\`\`\\n\\n\`posA(3) < posB(5)\` — A inserts before B's deletion point:\\n\\n\`\`\`\\nopA' = INSERT(pos=3, \\"X\\")      unchanged\\nopB' = DELETE(pos=6, count=1)  shift right by 1\\n\`\`\`\\n\\nA's insertion shifted the character B wanted to delete one position to the right."
+    },
+    {
+      "label": "Delete + Delete",
+      "icon": "🗑️",
+      "content": "**Both delete the same character**\\n\\n\`\`\`\\nopA = DELETE(pos=3, count=1)\\nopB = DELETE(pos=3, count=1)   same position!\\n\`\`\`\\n\\nBoth users deleted the same character. The second delete must become a no-op:\\n\\n\`\`\`\\nopA' = NOOP    B already deleted it\\nopB' = NOOP    A already deleted it\\n\`\`\`\\n\\nThis is the trickiest case — OT must detect the overlap and avoid trying to delete a character that no longer exists."
+    },
+    {
+      "label": "Delete + Insert",
+      "icon": "🔄",
+      "content": "**Delete meets an insert at the same position**\\n\\n\`\`\`\\nopA = DELETE(pos=3, count=1)\\nopB = INSERT(pos=3, \\"X\\")\\n\`\`\`\\n\\nB inserted at the exact position A is deleting. B's insert takes priority at that spot:\\n\\n\`\`\`\\nopA' = DELETE(pos=4, count=1)   shift right (B inserted first)\\nopB' = INSERT(pos=3, \\"X\\")      unchanged\\n\`\`\`\\n\\nThe character to be deleted is now at position 4 after B's insertion."
+    }
+  ]
+}
+\`\`\`
+
+## Transform in Action: Step-by-Step
+
+\`\`\`trace
+{
+  "title": "Resolving Two Concurrent Inserts",
+  "language": "python",
+  "code": "doc = list('abc')  # ['a', 'b', 'c']\\n\\n# Both ops created against the same revision\\nopA = ('insert', 1, 'X')  # Insert 'X' at pos 1\\nopB = ('insert', 2, 'Y')  # Insert 'Y' at pos 2\\n\\n# Server receives opA first — apply directly\\ndoc.insert(opA[1], opA[2])\\n# doc = ['a', 'X', 'b', 'c']\\n\\n# opB arrived based on old revision — must transform\\n# Rule: posA(1) <= posB(2), so shift opB right by 1\\nopB_prime = ('insert', opB[1] + 1, opB[2])  # pos: 2 -> 3\\n\\n# Apply transformed opB\\ndoc.insert(opB_prime[1], opB_prime[2])\\n# doc = ['a', 'X', 'b', 'Y', 'c']",
+  "frames": [
+    { "line": 1, "vars": { "doc": "['a', 'b', 'c']" }, "note": "Initial document — revision 0", "stdout": "" },
+    { "line": 4, "vars": { "opA": "('insert', 1, 'X')" }, "note": "opA: insert 'X' at position 1", "stdout": "" },
+    { "line": 5, "vars": { "opB": "('insert', 2, 'Y')" }, "note": "opB: insert 'Y' at position 2 — concurrent with opA", "stdout": "" },
+    { "line": 8, "vars": { "doc": "['a', 'X', 'b', 'c']" }, "note": "Server applies opA first. Revision bumps to 1.", "stdout": "" },
+    { "line": 13, "vars": { "check": "posA(1) ≤ posB(2) → shift right" }, "note": "Transform rule: opA inserted before opB's target position — opB must shift", "stdout": "" },
+    { "line": 14, "vars": { "opB_prime": "('insert', 3, 'Y')" }, "note": "opB′: position shifted 2 → 3 to account for opA's insertion", "stdout": "" },
+    { "line": 17, "vars": { "doc": "['a', 'X', 'b', 'Y', 'c']" }, "note": "Final document — both edits preserved in correct positions ✓", "stdout": "" }
+  ],
+  "speed": 900
+}
+\`\`\`
+
+## The Server Pipeline
+
+Every operation the server receives is tagged with the **revision it was based on**. If the server has moved ahead since then, it transforms the incoming operation against every intervening operation before applying it.
+
+\`\`\`sysdiag
+{
+  "title": "Centralized OT: Server as Order Authority",
+  "width": 700,
+  "height": 280,
+  "nodes": [
+    { "id": "clientA", "label": "Client A", "x": 80, "y": 140, "kind": "client" },
+    { "id": "server", "label": "OT Server", "x": 350, "y": 140, "kind": "service" },
+    { "id": "clientB", "label": "Client B", "x": 620, "y": 140, "kind": "client" }
+  ],
+  "edges": [
+    { "from": "clientA", "to": "server", "label": "op (based on rev 5)" },
+    { "from": "server", "to": "clientA", "label": "ack (rev 8)" },
+    { "from": "server", "to": "clientB", "label": "broadcast op' (rev 8)" }
+  ],
+  "annotations": {
+    "server": "Maintains total operation order. Op arrives based on rev 5 but server is at rev 7 — transforms incoming op against revs 6 and 7, applies it to reach rev 8, then broadcasts the result to all other clients.",
+    "clientA": "Optimistically applies own op locally. Awaits server ack before sending next op. Any incoming remote ops are transformed against the pending local op.",
+    "clientB": "Receives already-transformed operations from the server. Never directly coordinates with other clients — all conflict resolution happens server-side."
+  }
+}
+\`\`\`
+
+### Client State Machine
+
+The client tracks three states to manage the gap between local edits and server acknowledgement.
+
+\`\`\`steps
+{
+  "title": "Client-Side OT States",
+  "steps": [
+    {
+      "title": "Synchronized",
+      "content": "The client document matches the server's last acknowledged revision. Any new local edit immediately moves to **Awaiting ACK** and is sent to the server."
+    },
+    {
+      "title": "Awaiting ACK",
+      "content": "An operation was sent; the client is waiting for server confirmation. If a remote op arrives, the client transforms it against the pending local op, applies it locally, and updates the pending op (transformed against the remote op in turn)."
+    },
+    {
+      "title": "Awaiting ACK + Buffer",
+      "content": "A new local edit arrived while the previous ACK is still outstanding. The new edit is buffered. When the first ACK arrives, the buffer is sent as the next operation. Only one unacknowledged op is ever in-flight at a time — this preserves strict ordering."
+    }
+  ]
+}
+\`\`\`
+
+## Full Scenario: Concurrent Typing in the Same Sentence
 
 \`\`\`
-Document: "Hello World" (revision 10)
+Document: "Hello World"  (revision 10)
 
 User A types "!" after "World":
-  opA = RETAIN(11), INSERT("!")      based on rev 10
+  opA = RETAIN(11), INSERT("!")
+  based on rev 10
 
 User B types "Beautiful " before "World":
-  opB = RETAIN(6), INSERT("Beautiful "), RETAIN(5)    based on rev 10
+  opB = RETAIN(6), INSERT("Beautiful "), RETAIN(5)
+  based on rev 10
 
-Server receives opA first (wins the race):
-  Apply opA → "Hello World!" (rev 11)
+Server receives opA first:
+  Apply opA → "Hello World!"  (rev 11)
 
-Server receives opB (based on rev 10, but server is at rev 11):
-  Transform opB against opA:
-    opA inserted at pos 11, opB inserts at pos 6
-    posB < posA, so opB unchanged
-  Apply opB → "Hello Beautiful World!" (rev 12) ✓
+Server receives opB (based on rev 10, server is at rev 11):
+  opA inserted at position 11
+  opB inserts at position 6 → posB (6) < posA (11), so opB unchanged
+  Apply opB → "Hello Beautiful World!"  (rev 12) ✓
 
 Broadcast:
   User A receives transformed opB → "Hello Beautiful World!"
-  User B receives opA (transformed against opB) → "Hello Beautiful World!"
+  User B receives opA (position adjusted past opB) → "Hello Beautiful World!"
   Both converge ✓
 \`\`\`
 
-## OT Limitations
+## OT vs CRDT: Choosing the Right Tool
 
+\`\`\`compare
+{
+  "variant": "good-bad",
+  "before": {
+    "label": "OT — Google Docs' approach",
+    "code": "Strengths:\\n+ Battle-tested (Google Docs, Etherpad)\\n+ Small operation payloads\\n+ Central server simplifies conflict resolution\\n+ Easy garbage collection\\n\\nWeaknesses:\\n- Central server is mandatory for total ordering\\n- Transform functions grow O(N²) with op types\\n- Notoriously hard to prove correct at scale\\n- Offline editing is fragile (long divergence = many transforms)"
+  },
+  "after": {
+    "label": "CRDT — Figma, Notion, Automerge",
+    "code": "Strengths:\\n+ No central server required (peer-to-peer capable)\\n+ Offline editing is native and safe\\n+ Operations commute automatically\\n+ Horizontal scaling to the edge\\n\\nWeaknesses:\\n- High memory usage (IDs, tombstones, metadata)\\n- Larger network payloads\\n- Garbage collection is extremely hard\\n- More complex data structures to design initially"
+  }
+}
 \`\`\`
-Challenges with OT:
-  1. Transform functions are complex — N operation types need N² transform pairs
-  2. Server is a bottleneck — all operations serialized through one server
-  3. Hard to prove correctness — subtle bugs in transform logic
-  4. Offline support is difficult — long divergence = many transforms
 
-Google's solution to the server bottleneck:
-  - One OT server per document (not per-user)
-  - Documents sharded across servers by document ID
-  - Each server handles ~1000 active documents
-  - Horizontal scaling by adding more servers
+\`\`\`callout
+{ "type": "info", "title": "OT at Google Scale", "content": "Google shards documents across OT server instances — each server handles roughly 1,000 active documents. When a document has more than ~100 concurrent editors, the server switches from per-operation broadcasting to batched updates every 500ms. Transform latency stays under 1ms per operation pair; server-to-client broadcast stays under 100ms over WebSocket." }
 \`\`\`
 
-## Scale Numbers
-
+\`\`\`collapse
+{
+  "title": "Deep Dive: Why Multi-User OT Is So Hard to Get Right",
+  "content": "With two users, OT is manageable: transform opA against opB and you're done.\\n\\nWith three or more concurrent users, every operation must be transformed against every other concurrent operation — and the *order* of those transforms matters. This leads to the **TP2 (transformation property 2)** requirement:\\n\\n\`\`\`\\ntransform(transform(opA, opB), transform(opC, opB))\\n  = transform(transform(opA, opC), transform(opB, opC))\\n\`\`\`\\n\\nMost OT implementations (including early Google Wave) failed to satisfy TP2 correctly.\\n\\nGoogle Docs sidesteps this by enforcing **strict server-side total ordering** — the server serializes all operations so there is never true three-way concurrency at the transform level. Every operation is transformed against a linear history, not a concurrent graph. This is what makes Google Docs' OT correct in practice — but it locks in the centralized architecture permanently."
+}
 \`\`\`
-OT server instances:         ~50,000 (globally)
-Documents per server:        ~1,000 active
-Transforms per second:       ~28M globally
-Transform latency:           < 1ms per operation pair
-Server-to-client broadcast:  < 100ms (WebSocket)
-Maximum concurrent editors:  ~100 per document (practical limit)
-Beyond 100: switch to batched updates every 500ms
+
+\`\`\`quiz
+{
+  "title": "Check Your Understanding",
+  "questions": [
+    {
+      "question": "What does the 'diamond property' of OT guarantee?",
+      "options": [
+        "Operations are always applied in the order they were typed",
+        "Applying transformed operations in either order produces the same final document",
+        "The server transforms operations before any client sees them",
+        "Each operation is idempotent and can be applied multiple times safely"
+      ],
+      "answer": 1,
+      "explanation": "The diamond property (convergence) states that apply(apply(doc, opA), opB') must equal apply(apply(doc, opB), opA'). This is what allows two clients to apply operations in different orders and still arrive at the same document state."
+    },
+    {
+      "question": "User A inserts 'X' at position 3. User B concurrently inserts 'Y' at position 5. The server applies opA first. How should opB be transformed?",
+      "options": [
+        "opB stays at position 5 — it's after opA's position so nothing changes",
+        "opB shifts left to position 4 — opA freed up a slot before it",
+        "opB shifts right to position 6 — opA's insertion moved everything at pos 3+ right by 1",
+        "opB becomes a NOOP — conflicting inserts cancel each other out"
+      ],
+      "answer": 2,
+      "explanation": "opA inserted at position 3, which is before opB's target position 5. That insertion shifted every character at position 3 and beyond one slot to the right. So opB must move from position 5 to position 6 to hit the same logical location in the document."
+    },
+    {
+      "question": "What does the 'Awaiting ACK + Buffer' state protect against on the client?",
+      "options": [
+        "Applying the same remote operation twice",
+        "Sending multiple unacknowledged operations to the server simultaneously",
+        "Losing edits when the WebSocket connection drops",
+        "Transforming incoming ops in the wrong order"
+      ],
+      "answer": 1,
+      "explanation": "Only one unacknowledged op should be in-flight at a time. If the user keeps typing while waiting for the previous ACK, those edits are buffered. Once the server acknowledges the first op, the buffer is sent as the next operation. This preserves strict ordering and keeps server-side transforms tractable."
+    },
+    {
+      "question": "What is the primary reason OT requires a central server while CRDTs do not?",
+      "options": [
+        "OT operations are too large to send directly between browsers",
+        "OT needs a central clock to timestamp every operation",
+        "OT requires total ordering of all operations across replicas to guarantee convergence",
+        "CRDTs are inherently faster and eliminate the need for any coordination"
+      ],
+      "answer": 2,
+      "explanation": "OT's transform functions only produce correct results when all replicas apply operations in the same order. A central server enforces that total order. CRDTs assign each element a globally unique immutable ID, making operations commute regardless of application order — no total ordering (and therefore no central server) is required."
+    }
+  ]
+}
+\`\`\`
+
+\`\`\`takeaways
+{
+  "title": "Key Takeaways",
+  "items": [
+    "OT represents every edit as an INSERT, DELETE, or RETAIN operation tagged with the document revision it was based on.",
+    "The transform function adjusts concurrent operations so they can be applied in either order and produce the same result — the diamond (convergence) property.",
+    "Google Docs uses centralized OT: the server is the single authority that orders operations, transforms late arrivals against intervening revisions, and broadcasts corrected ops to all clients.",
+    "Clients maintain a three-state machine (Synchronized → Awaiting ACK → Awaiting ACK + Buffer) to handle the lag between local edits and server confirmation, keeping exactly one op in-flight at a time.",
+    "OT's tradeoff: small payloads and battle-tested correctness in exchange for a mandatory central server and transform functions that grow in complexity with rich-text formatting.",
+    "CRDTs (Figma, Notion, Automerge) are the modern alternative — offline-native and decentralizable, but at the cost of higher memory usage and significantly harder garbage collection."
+  ]
+}
 \`\`\``,
     },
     {
       id: "docs-crdts",
       slug: "docs-crdts",
       title: "CRDTs",
-      content: `# Google Docs: CRDTs
+      content: `# CRDTs
 
 ## What Are CRDTs?
 
-Conflict-free Replicated Data Types (CRDTs) are data structures that can be replicated across multiple nodes, modified independently and concurrently, and always merged into a consistent state — **without any coordination**.
+Conflict-free Replicated Data Types (CRDTs) were formally introduced in 2011. They are data structures that can be replicated across multiple nodes, modified independently and concurrently, and always merged into a consistent state — **without any coordination**.
 
 Unlike OT, which transforms operations through a central server, CRDTs guarantee convergence by mathematical properties of the data structure itself.
 
-\`\`\`
-OT approach:
-  Operations + Central Server + Transform Functions → Convergence
-
-CRDT approach:
-  Data Structure Properties → Convergence (no central server needed)
+\`\`\`concept
+{ "title": "The CRDT Core Guarantee", "variant": "mental-model", "content": "Any two peers that have seen the same set of operations will converge to the same document state — regardless of the order those operations arrived. No central server is required to enforce this. The data structure itself makes convergence guaranteed." }
 \`\`\`
 
-## Types of CRDTs
-
-### State-based (CvRDT) vs Operation-based (CmRDT)
-
+\`\`\`concept
+{ "title": "Logical Positions, Not Indexes", "variant": "insight", "content": "CRDTs do not track 'insert at index 5.' They track 'insert between these two existing characters' using unique element IDs. Indexes require global agreement — and global agreement is impossible in an offline-capable distributed system. Logical positions make convergence possible without coordination." }
 \`\`\`
-State-based (CvRDT):
-  - Replicas send their full state to each other
-  - States merged using a join/merge function
-  - Requires: merge is commutative, associative, idempotent
-  - Higher bandwidth (sends full state)
 
-Operation-based (CmRDT):
-  - Replicas send operations to each other
-  - Operations applied directly
-  - Requires: operations are commutative
-  - Lower bandwidth (sends only ops)
-  - Requires reliable broadcast (all ops delivered)
+---
+
+## State-Based vs Operation-Based CRDTs
+
+\`\`\`tabs
+{
+  "tabs": [
+    {
+      "label": "State-Based (CvRDT)",
+      "icon": "📦",
+      "content": "**How it works:** Replicas periodically send their full state to peers. States are merged using a join/merge function.\\n\\n**Mathematical requirements:** The merge function must be:\\n- **Commutative** — merge(A, B) = merge(B, A)\\n- **Associative** — merge(merge(A, B), C) = merge(A, merge(B, C))\\n- **Idempotent** — merge(A, A) = A\\n\\n**Trade-offs:**\\n- ✅ Tolerates message loss (state carries full history)\\n- ❌ Higher bandwidth — sends entire state on each sync\\n\\n**Example:** G-Counter, LWW-Register"
+    },
+    {
+      "label": "Operation-Based (CmRDT)",
+      "icon": "⚡",
+      "content": "**How it works:** Replicas broadcast individual operations. Each replica applies operations directly.\\n\\n**Mathematical requirements:** Operations must be **commutative** — applying op A then op B gives the same result as applying op B then op A.\\n\\n**Trade-offs:**\\n- ✅ Lower bandwidth — sends only the delta operation\\n- ❌ Requires reliable broadcast — all operations must be delivered to all nodes\\n\\n**Example:** PN-Counter, RGA (Replicated Growable Array)"
+    }
+  ]
+}
 \`\`\`
+
+---
 
 ## Common CRDT Types
 
 ### G-Counter (Grow-only Counter)
 
+Each node maintains its own slot in a vector. The global count is the sum of all slots. On merge, take the maximum of each node's value.
+
+\`\`\`algoviz
+{
+  "title": "G-Counter: Merge Across 3 Nodes",
+  "type": "array",
+  "data": [5, 3, 7],
+  "frames": [
+    { "highlight": [], "label": "Each node owns one slot. Node A=5, Node B=3, Node C=7. Total = 15.", "stats": { "total": 15 } },
+    { "highlight": [0], "label": "Node A increments — its slot goes from 5 → 6.", "stats": { "A": 6, "B": 3, "C": 7 } },
+    { "highlight": [0, 1, 2], "label": "Merge: take max of each slot. Result = [6, 3, 7]. Total = 16 ✓", "stats": { "total": 16 } }
+  ],
+  "speed": 900
+}
 \`\`\`
-Each node maintains its own counter. Global count = sum of all nodes.
 
-Node A: {A: 5, B: 0, C: 0}    → total = 5
-Node B: {A: 0, B: 3, C: 0}    → total = 3
-Node C: {A: 0, B: 0, C: 7}    → total = 7
-
-Merge: take max of each node's count
-  {A: 5, B: 3, C: 7} → total = 15
-
-Increment on Node A:
-  {A: 6, B: 0, C: 0}
-
-After merge: {A: 6, B: 3, C: 7} → total = 16 ✓
-
-Use case: page view counters, like counts
-\`\`\`
+**Use cases:** page view counters, like counts.
 
 ### PN-Counter (Positive-Negative Counter)
 
-\`\`\`
-Two G-Counters: one for increments (P), one for decrements (N).
-Value = sum(P) - sum(N)
+Two G-Counters: one for increments (P), one for decrements (N). Value = sum(P) − sum(N). Enables a counter that can go both up and down while remaining conflict-free.
 
-Node A increments 5 times, decrements 2 times:
-  P: {A: 5}    N: {A: 2}    → value = 3
-
-Node B increments 3 times, decrements 1 time:
-  P: {B: 3}    N: {B: 1}    → value = 2
-
-Merged: P: {A:5, B:3} = 8    N: {A:2, B:1} = 3    → value = 5 ✓
-
-Use case: inventory counts, upvote/downvote
-\`\`\`
+**Use cases:** inventory counts, upvote/downvote totals.
 
 ### LWW-Register (Last-Writer-Wins Register)
 
-\`\`\`
-Each write carries a timestamp. On merge, highest timestamp wins.
+Each write carries a timestamp. On merge, the highest timestamp wins. The problem is clock synchronization — physical clocks can skew across nodes. The solution is **Hybrid Logical Clocks (HLC)**, which combine a physical clock with a logical counter to provide causality without tight clock synchronization.
 
-Node A: value = "red",   timestamp = 1000
-Node B: value = "blue",  timestamp = 1002
+**Use cases:** user profile fields, settings, metadata.
 
-Merge: timestamp 1002 > 1000 → value = "blue" ✓
+---
 
-Problem: requires synchronized clocks.
-Solution: use Hybrid Logical Clocks (HLC) — combines physical
-          clock with logical counter.
+## RGA: The CRDT for Text Editing
 
-Use case: user profile fields, settings, metadata
-\`\`\`
+The Replicated Growable Array (RGA) is the CRDT type most relevant to collaborative text editing. It represents a document as an ordered sequence of elements, each with a globally unique ID and a pointer to its predecessor.
 
-### RGA (Replicated Growable Array) — For Text
-
-RGA is the CRDT type most relevant to collaborative text editing. It represents a document as an ordered sequence with unique element IDs.
-
-\`\`\`
-Document: "CAT"
-
-Internal representation:
-  ┌──────────┬──────────┬──────────┐
-  │ ID: A@1  │ ID: A@2  │ ID: A@3  │
-  │ char: C  │ char: A  │ char: T  │
-  │ after: ⊥ │ after:A@1│ after:A@2│
-  └──────────┴──────────┴──────────┘
-
-User A inserts "R" between "C" and "A":
-  New element: {ID: A@4, char: R, after: A@1}
-  → "CRAT"
-
-User B (concurrently) inserts "H" between "C" and "A":
-  New element: {ID: B@1, char: H, after: A@1}
-  → "CHAT"
-
-Merge conflict: both A@4 and B@1 claim to be after A@1
-Resolution: order by ID (A@4 > B@1) → "CHART" or "CHRAT"
-  (deterministic ordering, same result on all nodes)
+\`\`\`algoviz
+{
+  "title": "RGA Concurrent Insert: 'CAT' → 'CHART'",
+  "type": "array",
+  "data": ["C", "A", "T"],
+  "frames": [
+    { "highlight": [0, 1, 2], "label": "Initial document: 'CAT'. Each character has a unique ID (A@1, A@2, A@3) and a 'parent' pointer.", "stats": { "doc": "CAT" } },
+    { "highlight": [0], "label": "User A inserts 'R' after C (ID A@1). New element: {ID: A@4, char: R, after: A@1} → User A sees 'CRAT'.", "stats": { "userA": "CRAT" } },
+    { "highlight": [0], "label": "Concurrently, User B inserts 'H' after C (ID A@1). New element: {ID: B@1, char: H, after: A@1} → User B sees 'CHAT'.", "stats": { "userB": "CHAT" } },
+    { "highlight": [0, 1, 2], "label": "Merge conflict: both A@4 and B@1 claim position after A@1. Tie-break by ID: A@4 > B@1 (or vice versa — pick a rule, apply it everywhere).", "stats": { "conflict": "both after A@1" } },
+    { "highlight": [0, 1, 2], "label": "Resolved: deterministic ordering produces 'CHART'. Same result on every node — convergence guaranteed.", "stats": { "doc": "CHART" } }
+  ],
+  "speed": 1000
+}
 \`\`\`
 
-## CRDTs vs OT: Trade-offs
-
-\`\`\`
-┌─────────────────┬──────────────────┬──────────────────┐
-│ Property        │ OT               │ CRDTs            │
-├─────────────────┼──────────────────┼──────────────────┤
-│ Central server  │ Required         │ Not required     │
-│ Offline support │ Difficult        │ Natural          │
-│ Correctness     │ Hard to prove    │ Mathematically   │
-│                 │                  │ provable         │
-│ Memory overhead │ Low              │ High (tombstones,│
-│                 │                  │ unique IDs)      │
-│ Latency         │ Server round-trip│ Peer-to-peer OK  │
-│ Complexity      │ Transform funcs  │ Data structure   │
-│                 │ (N² pairs)       │ design           │
-│ Undo/redo       │ Well-understood  │ Research topic   │
-│ Production use  │ Google Docs      │ Figma, Apple     │
-│                 │                  │ Notes, Yjs       │
-└─────────────────┴──────────────────┴──────────────────┘
+\`\`\`callout
+{ "type": "info", "title": "Why Deterministic Tie-Breaking Works", "content": "The specific ordering rule (e.g., sort by replica ID) doesn't need to be 'correct' in any semantic sense — it just needs to be **identical on all replicas**. Mathematical convergence only requires a total order, not a meaningful one." }
 \`\`\`
 
-## CRDT Memory Overhead
+---
 
-The biggest practical challenge with CRDTs for text editing:
+## CRDTs vs OT: Side-by-Side
 
-\`\`\`
-Problem: tombstones
-
-When a character is deleted in a CRDT, it cannot be removed
-from the data structure — it must be kept as a "tombstone"
-so that concurrent inserts can still reference it.
-
-Document with 1000 characters visible:
-  OT storage: ~1 KB (just the text)
-  CRDT storage: ~50 KB (1000 live + thousands of tombstones,
-                 each with unique ID, parent pointer, timestamps)
-
-Over months of editing:
-  A document with 10K current characters might have 500K tombstones
-  → 50x memory overhead
-
-Solutions:
-  1. Garbage collection: periodically compact tombstones
-     (requires consensus that all nodes have seen the delete)
-  2. Snapshots: periodically create a clean snapshot
-     and discard old operations
-  3. Block-level CRDTs: operate on paragraphs, not characters
-     (reduces granularity of conflicts)
+\`\`\`tabs
+{
+  "tabs": [
+    {
+      "label": "Architecture",
+      "icon": "🏗️",
+      "content": "| Property | OT | CRDT |\\n|---|---|---|\\n| Central server | Required for ordering | Not required |\\n| Offline support | Difficult | Natural |\\n| Correctness | Hard to formally prove | Mathematically provable |\\n| Latency | Server round-trip required | Peer-to-peer OK |"
+    },
+    {
+      "label": "Complexity",
+      "icon": "🧩",
+      "content": "| Property | OT | CRDT |\\n|---|---|---|\\n| Core complexity | Transform functions (N² op pairs) | Data structure design |\\n| Memory overhead | Low — just the text | High — tombstones + unique IDs |\\n| Undo/Redo | Well-understood | Active research area |\\n| Concurrent users | Complexity grows with N² | Scales independently |"
+    },
+    {
+      "label": "Production Use",
+      "icon": "🚀",
+      "content": "| System | Approach | Notes |\\n|---|---|---|\\n| Google Docs | OT | Proven at billions of users |\\n| Figma | CRDT | Peer-to-peer sync for design objects |\\n| Apple Notes | CRDT | Offline-first, multi-device |\\n| Yjs ecosystem | CRDT | Notion (partial), JupyterLab, BlockSuite |\\n| Many modern systems | **Hybrid** | CRDT merge semantics + central server for ordering/persistence |"
+    }
+  ]
+}
 \`\`\`
 
-## Modern CRDT Libraries
+---
 
+## The Tombstone Problem
+
+\`\`\`callout
+{ "type": "warning", "title": "Tombstoning is Not a Bug — It's the Price of CRDTs", "content": "When a character is deleted in a CRDT, it **cannot be removed** from the data structure. It becomes a 'tombstone' — a hidden marker that stays in memory so concurrent inserts can still reference it.\\n\\nOT has no tombstoning because the server is always the ordering authority — deletion is final immediately. With CRDTs, you cannot fully delete a character until every peer has acknowledged the deletion." }
 \`\`\`
-Yjs:
-  - Most popular CRDT library for web apps
-  - Supports text, arrays, maps, XML
-  - Used by: Notion (partial), JupyterLab, BlockSuite
-  - Binary encoding: very compact wire format
-  - Performance: handles 100K+ operations efficiently
 
-Automerge:
-  - Rust-based CRDT library with JS bindings
-  - JSON-like document model
-  - Built-in version history
-  - Good for offline-first apps
+**The scale of the problem:**
 
-Diamond Types:
-  - Experimental, extremely fast
-  - Focuses on text CRDTs specifically
-  - Benchmarks: 100x faster than Yjs for large documents
+- A document with 10,000 visible characters might accumulate 50,000 tombstones over months of editing — roughly a **5x memory overhead** at minimum, often worse.
+- A heavily edited 10K-word document could hold 500K tombstones — **50x overhead**.
+
+**Mitigation strategies:**
+
+1. **Garbage collection** — compact tombstones once all nodes confirm they've seen the delete (hard to coordinate across offline clients)
+2. **Snapshots** — periodically create a clean checkpoint and discard old operations
+3. **Block-level CRDTs** — operate on paragraphs rather than individual characters, reducing conflict granularity
+
+\`\`\`collapse
+{ "title": "Deep Dive: Modern CRDT Libraries", "content": "**Yjs** — the most widely adopted CRDT library for web apps. Supports text, arrays, maps, and XML. Uses binary encoding for a very compact wire format. Handles 100K+ operations efficiently. Used by Notion (partially), JupyterLab, and BlockSuite.\\n\\n**Automerge** — a Rust-based CRDT library with JavaScript bindings. Models documents as JSON-like structures with built-in version history. Best for offline-first apps where full history replay matters.\\n\\n**Diamond Types** — experimental and extremely fast, focused specifically on text CRDTs. Benchmarks suggest 100x faster throughput than Yjs for large documents, though it is not yet production-hardened.\\n\\nAll three expose different trade-offs: Yjs prioritizes ecosystem breadth, Automerge prioritizes auditability, Diamond Types prioritizes raw performance." }
 \`\`\`
+
+---
 
 ## When to Choose What
 
+\`\`\`steps
+{
+  "title": "Picking Your Concurrency Strategy",
+  "steps": [
+    {
+      "title": "Choose OT when you have a reliable central server",
+      "content": "OT is battle-tested at Google Docs scale (billions of users). If your architecture already includes a central collaboration server that can order operations, OT gives you memory efficiency and a well-understood undo/redo model. The complexity cost is manageable with good engineering."
+    },
+    {
+      "title": "Choose CRDTs when offline-first or P2P is a requirement",
+      "content": "If users must edit while offline and sync later — or if you're building peer-to-peer collaboration without a persistent server — CRDTs are the natural fit. Mathematical convergence is guaranteed by the data structure itself, not by server coordination. Use Yjs or Automerge rather than implementing from scratch."
+    },
+    {
+      "title": "Consider a hybrid for production systems",
+      "content": "Many modern systems use CRDT data structures for their merge guarantees while still routing through a central server for ordering and persistence. This gives the best of both worlds: mathematical correctness from CRDTs, memory efficiency from server-assisted compaction, and reliable undo/redo from the ordered log."
+    }
+  ]
+}
 \`\`\`
-Choose OT when:
-  ├── You have a reliable central server
-  ├── Memory efficiency matters (large documents)
-  ├── You need well-understood undo/redo
-  └── Google Docs-scale: proven at billions of users
 
-Choose CRDTs when:
-  ├── Offline-first is a requirement
-  ├── Peer-to-peer collaboration (no server)
-  ├── You want mathematical correctness guarantees
-  └── Building on modern libraries (Yjs, Automerge)
+---
 
-Many modern systems use a hybrid:
-  - CRDT data structures for merge guarantees
-  - Central server for ordering and persistence
-  - This gives the best of both worlds
+## Knowledge Check
+
+\`\`\`quiz
+{
+  "title": "CRDTs in Depth",
+  "questions": [
+    {
+      "question": "A G-Counter on Node A holds the vector {A:5, B:3, C:7}. Node A increments once. After merging with Node B's state {A:4, B:6, C:7}, what is the resulting vector?",
+      "options": ["{A:6, B:6, C:7}", "{A:10, B:9, C:14}", "{A:6, B:3, C:7}", "{A:5, B:6, C:7}"],
+      "answer": 0,
+      "explanation": "G-Counter merge takes the max of each slot. A: max(6,4)=6, B: max(3,6)=6, C: max(7,7)=7 → {A:6, B:6, C:7}. Total = 19."
+    },
+    {
+      "question": "Why can't a deleted character be immediately removed from a CRDT document?",
+      "options": [
+        "Performance reasons — deletion is expensive",
+        "Concurrent operations from other peers may still reference the deleted element's ID as a position anchor",
+        "CRDTs only support insert operations",
+        "The central server hasn't confirmed the deletion yet"
+      ],
+      "answer": 1,
+      "explanation": "Tombstones exist because concurrent inserts reference existing character IDs as logical positions. If a character is truly removed, another peer's pending 'insert after character X' has nowhere to anchor — producing inconsistent state. The tombstone must persist until all peers have acknowledged seeing the delete."
+    },
+    {
+      "question": "What is the key mathematical requirement that makes operation-based CRDTs (CmRDTs) work correctly?",
+      "options": [
+        "Operations must be idempotent",
+        "Operations must be commutative — apply in any order and get the same result",
+        "The server must impose a total order before operations are applied",
+        "Each operation must carry a full document snapshot"
+      ],
+      "answer": 1,
+      "explanation": "CmRDTs require commutativity: op(A) then op(B) must equal op(B) then op(A). This is what allows peers to apply operations in different orders and still converge. State-based CRDTs instead require the merge function itself to be commutative, associative, and idempotent."
+    },
+    {
+      "question": "In an RGA concurrent insert scenario, two users both insert a character at the same logical position. How does RGA guarantee convergence?",
+      "options": [
+        "It rejects the second insert and asks the second user to retry",
+        "It sends both inserts to a central server which picks one",
+        "It applies a deterministic tie-breaking rule (e.g., sort by replica ID) that all nodes execute identically",
+        "It uses timestamps — the earlier insert wins"
+      ],
+      "answer": 2,
+      "explanation": "RGA uses deterministic tie-breaking: when two elements share the same parent, they are ordered by a consistent rule (e.g., lexicographic replica ID comparison). The specific rule doesn't need semantic meaning — it just needs to be identical on every replica. This guarantees all nodes produce the same ordering after merge."
+    }
+  ]
+}
+\`\`\`
+
+---
+
+\`\`\`takeaways
+{
+  "title": "Key Takeaways",
+  "items": [
+    "CRDTs guarantee convergence through mathematical properties of the data structure itself — no central server required to enforce ordering.",
+    "State-based CRDTs (CvRDT) send full state and use a merge function; operation-based CRDTs (CmRDT) send only operations but require reliable broadcast.",
+    "RGA represents text as a linked sequence of uniquely-identified elements, enabling concurrent inserts to be resolved deterministically without coordination.",
+    "Tombstoning is the fundamental cost of CRDTs: deleted characters must persist as invisible markers until all peers confirm the deletion, creating significant memory overhead at scale.",
+    "Most production systems use a hybrid: CRDT merge semantics for mathematical correctness + a central server for ordering, compaction, and reliable undo/redo."
+  ]
+}
 \`\`\``,
     },
     {

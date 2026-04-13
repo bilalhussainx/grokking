@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const socialNetworkModule: Module = {
   id: "design-social-network",
   title: "Design Social Network",
-  description:
-    "Design a social network platform: news feed generation, social graph, content moderation, and multi-region architecture at billion-user scale.",
+  description: "Design a social network platform: news feed generation, social graph, content moderation, and multi-region architecture at billion-user scale.",
   lessons: [
     {
       id: "social-requirements",

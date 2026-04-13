@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const searchRankingModule: Module = {
   id: "ml-search-ranking",
   title: "ML System Design: Search Ranking",
-  description:
-    "Design a search ranking system from scratch — problem formulation, features, training data, model architecture, and evaluation.",
+  description: "Design a search ranking system from scratch — problem formulation, features, training data, model architecture, and evaluation.",
   lessons: [
     {
       id: "ml-search-1",

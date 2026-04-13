@@ -3,8 +3,7 @@ import { Module } from "../types";
 export const classicMlModule: Module = {
   id: "ml-classic-algorithms",
   title: "Classic ML Algorithms",
-  description:
-    "Deep dive into the classic ML algorithms — linear models, trees, SVMs, KNN, Naive Bayes, and ensemble methods with sklearn implementations.",
+  description: "Deep dive into the classic ML algorithms — linear models, trees, SVMs, KNN, Naive Bayes, and ensemble methods with sklearn implementations.",
   lessons: [
     {
       id: "ml-classic-1",
