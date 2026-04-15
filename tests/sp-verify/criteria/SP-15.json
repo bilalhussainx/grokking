@@ -1,0 +1,20 @@
+{
+  "sp": "SP-15",
+  "name": "Multi-country school picker",
+  "specRef": "docs/TESTING-USER-FLOWS.md § SP-15",
+  "acceptanceCriteria": [
+    "The /college-interviews setup page shows 3 country tabs: United States, United Kingdom, Canada, each with a flag emoji",
+    "United States is selected by default",
+    "Clicking 'United Kingdom' filters the school grid to UK schools (Oxford, Cambridge, LSE)",
+    "Clicking 'Canada' filters the school grid to Canadian schools (Toronto, McGill, UBC)"
+  ],
+  "antiPatterns": [
+    "All 25 schools shown regardless of country tab",
+    "Tab row missing or appears below the grid instead of above"
+  ],
+  "screenshots": [
+    { "file": "01-setup-us.png", "step": "01-setup-us", "expect": "default US country view of school grid" },
+    { "file": "02-setup-uk.png", "step": "02-setup-uk", "expect": "UK tab clicked — Oxford/Cambridge/LSE visible" },
+    { "file": "03-setup-ca.png", "step": "03-setup-ca", "expect": "Canada tab clicked — Toronto/McGill/UBC visible" }
+  ]
+}

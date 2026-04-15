@@ -1,0 +1,17 @@
+{
+  "sp": "SP-1",
+  "name": "Interview scorecard block on home",
+  "specRef": "docs/TESTING-USER-FLOWS.md § SP-1",
+  "acceptanceCriteria": [
+    "A 'Recent interviews' card renders on the homepage after login, adjacent to readiness",
+    "If no sessions exist, the empty state shows a 'Start one' CTA pointing to /college-interviews",
+    "If sessions exist, at most 3 rows render, each with persona id, date, and overall /10 score"
+  ],
+  "antiPatterns": [
+    "Card shows raw NaN scores or '—/10' for all rows when data exists",
+    "Empty state missing — shows blank rectangle instead"
+  ],
+  "screenshots": [
+    { "file": "01-homepage-scorecard.png", "step": "01-homepage-scorecard", "expect": "home page with InterviewScorecardBlock visible" }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "sp": "SP-14",
+  "name": "Blog surface with college + career posts",
+  "specRef": "docs/TESTING-USER-FLOWS.md § SP-14",
+  "acceptanceCriteria": [
+    "The /blog index renders a grid with at least 5 post cards",
+    "At least one card is categorised as 'College Admissions'",
+    "At least one card is categorised as 'Careers'",
+    "Each card shows a title, excerpt, category pill, date and read-time"
+  ],
+  "antiPatterns": [
+    "Only the two legacy posts visible (college/careers additions missing)",
+    "Raw HTML entities in titles (&apos; / &quot;)"
+  ],
+  "screenshots": [
+    { "file": "01-blog-index.png", "step": "01-blog-index", "expect": "blog index with 5+ posts" },
+    { "file": "02-blog-post.png", "step": "02-blog-post", "expect": "a college admissions post opened" }
+  ]
+}

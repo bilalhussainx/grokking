@@ -24,6 +24,8 @@ import WelcomeModal from "@/components/onboarding/WelcomeModal";
 import { getDailyLoginReward } from "@/lib/rewards";
 import KairosLogo from "@/components/ui/SamsaraLogo";
 import JourneyBanner from "@/components/journey/JourneyBanner";
+import ReadinessCard from "@/components/journey/ReadinessCard";
+import InterviewScorecardBlock from "@/components/journey/InterviewScorecardBlock";
 
 
 const container = {
@@ -811,6 +813,14 @@ export default function HomePage() {
         {user && (
           <motion.div variants={item} className="mb-6">
             <JourneyBanner />
+          </motion.div>
+        )}
+
+        {/* SP-9 readiness + SP-1 scorecard — dashboard pair */}
+        {user && (
+          <motion.div variants={item} className="mb-6 grid md:grid-cols-2 gap-4">
+            <ReadinessCard />
+            <InterviewScorecardBlock category="college" />
           </motion.div>
         )}
 

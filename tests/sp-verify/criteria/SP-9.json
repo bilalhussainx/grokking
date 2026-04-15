@@ -1,0 +1,20 @@
+{
+  "sp": "SP-9",
+  "name": "Holistic readiness score card",
+  "specRef": "docs/TESTING-USER-FLOWS.md § SP-9",
+  "acceptanceCriteria": [
+    "An 'Application readiness' card renders on the homepage after login",
+    "The card shows a composite 0-100 score with a color-coded large numeral",
+    "Exactly 5 pillars are listed: Applicant profile, Activities list, Essays, Interview reps, Resume",
+    "Each pillar shows a progress bar with a score 0-100 and a short message",
+    "Each pillar row is clickable (cursor:pointer / link styling visible)"
+  ],
+  "antiPatterns": [
+    "Component is blank or stuck on 'Loading…' indefinitely",
+    "Any pillar score exceeds 100 or is negative",
+    "Composite renders NaN / undefined / empty"
+  ],
+  "screenshots": [
+    { "file": "01-homepage-readiness.png", "step": "01-homepage-readiness", "expect": "home page with ReadinessCard visible" }
+  ]
+}
