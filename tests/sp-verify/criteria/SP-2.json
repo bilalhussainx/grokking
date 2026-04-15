@@ -1,0 +1,33 @@
+{
+  "sp": "SP-2",
+  "name": "Essay-to-interview bridge (activities + multi-essay + probe hints)",
+  "specRef": "CollegeVCareers.md §SP-2",
+  "acceptanceCriteria": [
+    "/activities page renders a heading 'Activities' with a helper subtitle",
+    "'Add an activity' dashed-border button is visible at the bottom when list is empty",
+    "Adding an activity produces an editable row with fields: title, role, category select, hours/week, weeks/year, and description",
+    "Description textarea shows a character counter like '0/600'",
+    "Category select includes at least: academic, athletic, service, work, arts, leadership, research, other",
+    "Edits save on blur — a 'saving' indicator appears momentarily",
+    "Delete (trash) icon is present on each row",
+    "TopNav has an 'Activities' link visible on large viewports",
+    "College interview setup page's applicant-profile block now references that activities and supplementals will personalize the interview"
+  ],
+  "antiPatterns": [
+    "Activity row without a title field",
+    "Save icon spinning forever after blur",
+    "Delete button deletes without confirmation"
+  ],
+  "screenshots": [
+    {
+      "file": "01-activities-empty.png",
+      "step": "activities-empty",
+      "expect": "/activities page with empty-state message and add button"
+    },
+    {
+      "file": "02-activities-after-add.png",
+      "step": "activities-after-add",
+      "expect": "/activities page after clicking Add — one editable activity row visible with all inputs"
+    }
+  ]
+}
