@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 import { GraduationCap, Loader2, ArrowRight, Globe2, Sparkles, Mic, MessageSquare, Headphones } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { getAllCollegePersonas } from "@/data/college-interviewer-personas";
+import { getAllCollegePersonas, COUNTRIES, type Country } from "@/data/college-interviewer-personas";
 import { createBrowserSupabase } from "@/lib/supabase-browser";
 
 const SCHOOLS = getAllCollegePersonas();
@@ -60,6 +60,7 @@ export default function CollegeInterviewSetup() {
   const { user } = useAuth();
 
   const [collegePersonaId, setCollegePersonaId] = useState<string>("");
+  const [country, setCountry] = useState<Country>("US");
   // SP-11 — dynamic persona for schools outside the hard-coded list.
   const [dynamicSchoolName, setDynamicSchoolName] = useState<string>("");
   const [dynamicLoading, setDynamicLoading] = useState<boolean>(false);
@@ -242,8 +243,26 @@ export default function CollegeInterviewSetup() {
             <div className="w-6 h-6 rounded-full bg-white/[0.06] border border-white/[0.1] text-white/50 flex items-center justify-center text-xs font-bold">1</div>
             <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Pick a school</h2>
           </div>
+
+          <div className="flex gap-2 mb-3">
+            {COUNTRIES.map((c) => (
+              <button
+                key={c.code}
+                onClick={() => setCountry(c.code)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  country === c.code
+                    ? "bg-violet-500/20 border border-violet-500/40 text-white"
+                    : "bg-white/[0.03] border border-white/[0.08] text-white/60 hover:bg-white/[0.06]"
+                }`}
+              >
+                <span className="mr-1">{c.flag}</span>
+                {c.label}
+              </button>
+            ))}
+          </div>
+
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
-            {SCHOOLS.map((s) => {
+            {SCHOOLS.filter((s) => (s.country || "US") === country).map((s) => {
               const isSelected = collegePersonaId === s.id;
               return (
                 <motion.button

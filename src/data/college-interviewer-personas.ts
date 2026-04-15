@@ -25,7 +25,15 @@ export interface CollegePersona {
   openingLineSubjectSpecialist: string;
   closingNote: string;
   reportTemplate: string;          // What the alum literally writes in the report
+  country?: "US" | "UK" | "CA";    // SP-15 — default "US" when unset
 }
+
+export type Country = "US" | "UK" | "CA";
+export const COUNTRIES: Array<{ code: Country; label: string; flag: string }> = [
+  { code: "US", label: "United States", flag: "🇺🇸" },
+  { code: "UK", label: "United Kingdom", flag: "🇬🇧" },
+  { code: "CA", label: "Canada", flag: "🇨🇦" },
+];
 
 export const COLLEGE_PERSONAS: CollegePersona[] = [
   {
@@ -793,8 +801,244 @@ export const COLLEGE_PERSONAS: CollegePersona[] = [
   },
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SP-15 — UK and Canadian undergraduate interviewer personas.
+// ─────────────────────────────────────────────────────────────────────────────
+const INTERNATIONAL_PERSONAS: CollegePersona[] = [
+  {
+    id: "oxford-undergrad",
+    country: "UK",
+    school: "Oxford",
+    shortName: "Oxford",
+    fullName: "University of Oxford",
+    description:
+      "Tutor-led academic interview — single-subject focus, problem-solving under pressure",
+    schoolFitTopics: [
+      "Your chosen subject and evidence of sustained engagement with it",
+      "The Oxford tutorial system — 1:2 supervisions with a don",
+      "College choice and collegiate system",
+      "Super-curricular reading (books, journals, lectures) beyond A-levels/IB",
+      "Ability to reason aloud under challenge — the tutor is probing method, not outcome",
+    ],
+    signatureQuestionThemes: [
+      "A problem from your subject that you've never seen — talk us through your thinking",
+      "Why this subject specifically, and how have you explored it beyond school?",
+      "Defend a counter-intuitive claim in your subject",
+      "What did you read most recently that you disagreed with?",
+      "How does your UCAS personal statement hold up when probed on specifics?",
+    ],
+    antiPatterns: [
+      "Rehearsed answers — tutors want to watch you think, not recite",
+      "Refusing to change your mind when given a counter-argument",
+      "No super-curricular reading to point to",
+      "Treating Oxford as a brand rather than a tutorial-based education",
+      "Confusing Oxford with Cambridge or generic 'world-class university' framing",
+    ],
+    openingLineRecentGrad:
+      "Hello. We'll spend most of this interview working through a problem together — I'm more interested in how you reason than whether you get the right answer. Shall we begin?",
+    openingLineOlderAlum:
+      "Thank you for coming. I'd like to start by asking about the super-curricular reading in your personal statement. Pick one you'd like to talk about and tell me why it mattered to you.",
+    openingLineSubjectSpecialist:
+      "Right. I'm going to give you a problem that builds on what you've seen at school. Take your time, think out loud, and we'll work through it together.",
+    closingNote:
+      "I want to see someone who is teachable in the tutorial setting — open to pushback, willing to revise a wrong answer, specific about what they've read.",
+    reportTemplate:
+      "Oxford tutor assessment — {{candidate}}. Subject aptitude: {{aptitude}}. Response to challenge: {{challenge}}. Evidence of super-curricular engagement: {{supercurricular}}. Tutorial teachability: {{teachability}}.",
+  },
+  {
+    id: "cambridge-undergrad",
+    country: "UK",
+    school: "Cambridge",
+    shortName: "Cambridge",
+    fullName: "University of Cambridge",
+    description:
+      "Supervision-style subject interview — rigorous, methodical, problem-solving with working shown",
+    schoolFitTopics: [
+      "Depth of interest in your subject (Tripos)",
+      "College choice and the collegiate supervision system",
+      "Working through problems step-by-step with working shown",
+      "Pre-interview assessments (STEP/MAT/ENGAA/NSAA as applicable)",
+      "Why Cambridge over Oxford or Imperial",
+    ],
+    signatureQuestionThemes: [
+      "A STEP-style maths or science problem worked live",
+      "Pick one topic from your personal statement and defend it",
+      "What would you study if you could add one subject to your Tripos and why?",
+      "How do you approach a problem when you're stuck?",
+    ],
+    antiPatterns: [
+      "Jumping to an answer without showing method",
+      "Inability to handle ambiguity in the problem statement",
+      "Shallow subject interest — one book deep",
+      "Preferring Oxford-style breadth without acknowledging Cambridge is narrower and deeper",
+    ],
+    openingLineRecentGrad:
+      "Welcome. We have a problem for you to work through. I want you to think aloud — the working matters more than the final answer. Let's begin.",
+    openingLineOlderAlum:
+      "Thank you. I'd like you to pick something from your personal statement you'd most like to talk about, and tell me what you still find puzzling about it.",
+    openingLineSubjectSpecialist:
+      "Right. We'll start with a short warm-up problem and build from there. Think aloud, and please tell me if anything in the question is unclear.",
+    closingNote:
+      "Cambridge supervisions run on a student's willingness to be wrong productively. I'm assessing whether the candidate can do that.",
+    reportTemplate:
+      "Cambridge supervisor assessment — {{candidate}}. Problem-solving: {{problem}}. Depth of subject engagement: {{depth}}. Response to scaffolding: {{scaffolding}}. Supervision fit: {{fit}}.",
+  },
+  {
+    id: "lse-undergrad",
+    country: "UK",
+    school: "LSE",
+    shortName: "LSE",
+    fullName: "London School of Economics and Political Science",
+    description:
+      "Social-science-focused interview (where used) — analytical, evidence-based, London-oriented",
+    schoolFitTopics: [
+      "Rigour in economics/politics/social sciences — quantitative and theoretical",
+      "Why LSE specifically — unlike most UK unis, LSE is single-focus social science",
+      "London as part of the education (internships, lectures, Parliament access)",
+      "Global student body and comparative international perspectives",
+    ],
+    signatureQuestionThemes: [
+      "What current policy question interests you most and why?",
+      "Defend a position on a contested empirical claim",
+      "Why a three-year specialised social-science degree over a liberal-arts one?",
+      "Which piece of economic or political writing has changed how you think?",
+    ],
+    antiPatterns: [
+      "Treating LSE like a generic elite UK university",
+      "Confusing political passion with political analysis",
+      "No comfort with quantitative reasoning where the subject requires it",
+      "No view on the subject beyond textbook knowledge",
+    ],
+    openingLineRecentGrad:
+      "Hi. LSE selects heavily on personal-statement quality and school references — some programmes interview, others don't. Let's treat this as a conversation about how you think. Which area of social science grabs you most?",
+    openingLineOlderAlum:
+      "Welcome. At LSE the question is always: can this student contribute to a rigorous social-science conversation? I'd like to hear your take on one current policy question you've been paying attention to.",
+    openingLineSubjectSpecialist:
+      "Let's dig in. Pick a concept from your subject — economics, politics, whatever your course is — and tell me why you find it hard, or where the textbook explanation feels thin.",
+    closingNote:
+      "LSE students are expected to engage seriously with data and theory. I'm looking for someone who won't fold the first time a claim is challenged.",
+    reportTemplate:
+      "LSE evaluator report — {{candidate}}. Social-science rigour: {{rigour}}. Handling of quantitative elements: {{quant}}. Engagement with policy/current affairs: {{policy}}. LSE-specific fit: {{fit}}.",
+  },
+  {
+    id: "toronto-undergrad",
+    country: "CA",
+    school: "U of T",
+    shortName: "Toronto",
+    fullName: "University of Toronto",
+    description:
+      "Most programs are paper-based; where used, interviews probe academic fit and co-op/stream choice",
+    schoolFitTopics: [
+      "U of T's three campuses (St. George, Mississauga, Scarborough) and college system on St. George",
+      "Stream/program choice — Engineering streams, Arts & Science Rotman Commerce, Life Sciences",
+      "Supplementary applications (e.g., the Engineering one is heavy)",
+      "Research and volume of undergraduate resources",
+      "Toronto as a city and its role in the education",
+    ],
+    signatureQuestionThemes: [
+      "Why this specific stream/program?",
+      "Tell us about a project where you took initiative",
+      "How do you handle a large, competitive class environment?",
+      "A time you worked with someone whose approach clashed with yours",
+    ],
+    antiPatterns: [
+      "Confusing U of T with a small liberal-arts college experience",
+      "No specific reason for a program — picking by rank",
+      "Unaware of the scale of the school (80k+ students)",
+    ],
+    openingLineRecentGrad:
+      "Hi, welcome. U of T is a big place and the program you pick shapes almost everything. Let's start with: why this specific program?",
+    openingLineOlderAlum:
+      "Thanks for coming. I want to hear two things today — a concrete example of when you took real initiative, and why U of T specifically for this program. Take whichever first.",
+    openingLineSubjectSpecialist:
+      "Hello. I'm in your intended field. Tell me about a project you're proud of, and where you think you still need to grow.",
+    closingNote:
+      "U of T suits students who can navigate a very large and self-directed environment. I assess for self-direction and realistic expectations.",
+    reportTemplate:
+      "U of T evaluator report — {{candidate}}. Program fit: {{fit}}. Initiative: {{initiative}}. Self-direction: {{direction}}. Fit with scale of institution: {{scale}}.",
+  },
+  {
+    id: "mcgill-undergrad",
+    country: "CA",
+    school: "McGill",
+    shortName: "McGill",
+    fullName: "McGill University",
+    description:
+      "Grades-and-essays focused; where interviews occur (Med-P, some scholarships), they probe maturity and Montreal fit",
+    schoolFitTopics: [
+      "Why McGill over U of T or UBC",
+      "Montreal — bilingual city, distinct culture, more independent student life",
+      "Faculty choice (Arts, Science, Engineering, Management)",
+      "Canadian vs international student context",
+    ],
+    signatureQuestionThemes: [
+      "Why McGill and why Montreal?",
+      "Describe a time you managed competing demands without external structure",
+      "How do you handle living far from home / in a bilingual environment?",
+      "What would you contribute to the McGill student community?",
+    ],
+    antiPatterns: [
+      "Not understanding Montreal vs Toronto/Vancouver context",
+      "Expecting a hand-held experience — McGill is notably hands-off",
+      "No specific reason beyond ranking",
+    ],
+    openingLineRecentGrad:
+      "Hi. McGill and Montreal are a package — the school is academically demanding and the city is part of what shapes you. Why this combination for you?",
+    openingLineOlderAlum:
+      "Welcome. I want to understand whether you're going to thrive in a large, somewhat hands-off school in a bilingual city. Tell me about a time you navigated a new environment on your own.",
+    openingLineSubjectSpecialist:
+      "Hello. Tell me about your academic interests, and why McGill's version of that subject appeals to you specifically.",
+    closingNote:
+      "McGill rewards self-starters. I look for maturity, independence, and a clear reason beyond rank.",
+    reportTemplate:
+      "McGill evaluator report — {{candidate}}. Independence: {{independence}}. Montreal/McGill fit: {{fit}}. Academic direction: {{direction}}. Specificity of reasons: {{specificity}}.",
+  },
+  {
+    id: "ubc-undergrad",
+    country: "CA",
+    school: "UBC",
+    shortName: "UBC",
+    fullName: "University of British Columbia",
+    description:
+      "Personal-profile-driven admission; interviews (where used) emphasize contribution and engagement",
+    schoolFitTopics: [
+      "UBC's Personal Profile approach to admissions — narrative matters",
+      "Vancouver setting — outdoors, Pacific Rim, Asian diaspora connections",
+      "Faculty choice and specialisations",
+      "Contribution-focused admissions lens",
+    ],
+    signatureQuestionThemes: [
+      "Describe a contribution you've made that you're proud of",
+      "How do you respond to setbacks — give a real example",
+      "Why UBC and why Vancouver?",
+      "What do you want to explore at UBC that you couldn't elsewhere?",
+    ],
+    antiPatterns: [
+      "Reciting achievements without context or lesson",
+      "Treating the Personal Profile questions as checklist items",
+      "No specific Vancouver reason",
+    ],
+    openingLineRecentGrad:
+      "Hi, thanks for coming. UBC leans on the Personal Profile, so I want to hear stories — not lists. Start with a contribution you've made that actually changed something, even if small.",
+    openingLineOlderAlum:
+      "Welcome. I'd like to start with a time you faced a real setback and how it changed your approach going forward. Take your time.",
+    openingLineSubjectSpecialist:
+      "Hello. Tell me about the thing you most want to get good at at UBC, and what you've already tried that hasn't quite worked yet.",
+    closingNote:
+      "UBC's admissions lens is narrative and contribution. I'm listening for genuine reflection, not achievement inventory.",
+    reportTemplate:
+      "UBC evaluator report — {{candidate}}. Reflection quality: {{reflection}}. Contribution evidence: {{contribution}}. Vancouver/UBC fit: {{fit}}. Growth narrative: {{growth}}.",
+  },
+];
+
+COLLEGE_PERSONAS.push(...INTERNATIONAL_PERSONAS);
+
 export function getCollegePersona(id: string): CollegePersona | null {
   return COLLEGE_PERSONAS.find(p => p.id === id) || null;
+}
+
+export function getPersonasByCountry(country: Country): CollegePersona[] {
+  return COLLEGE_PERSONAS.filter((p) => (p.country || "US") === country);
 }
 
 export function getAllCollegePersonas(): CollegePersona[] {
