@@ -20,6 +20,27 @@ export interface ApplicantProfile {
   whyThisSchool?: string;
   /** Optional full college application essay — used for deeper personalized follow-ups */
   collegeEssay?: string;
+  /** SP-2 — Common-App-style extracurriculars for interviewer follow-ups */
+  activities?: Array<{
+    title: string;
+    role?: string | null;
+    category?: string | null;
+    description?: string | null;
+    hours_per_week?: number | null;
+    weeks_per_year?: number | null;
+  }>;
+  /** SP-2 — school-specific supplemental essays (filtered to the interview's school) */
+  supplementals?: Array<{
+    prompt: string;
+    body: string;
+    word_target?: number | null;
+  }>;
+  /** SP-2 — pre-flight LLM-extracted moments the interviewer should probe */
+  probeHints?: Array<{
+    moment: string;
+    question: string;
+    rationale: string;
+  }>;
 }
 
 export interface CollegeSessionContext {
@@ -266,6 +287,43 @@ function buildApplicantProfileBlock(profile: ApplicantProfile): string {
     lines.push(essay);
     lines.push('');
     lines.push('Use the essay to ask SPECIFIC follow-up questions — reference moments, people, or ideas they wrote about. Do NOT just summarize the essay back at them; probe deeper into the experiences and claims within it.');
+  }
+
+  if (profile.probeHints && profile.probeHints.length > 0) {
+    lines.push('');
+    lines.push('## PRE-FLIGHT PROBE HINTS (an earlier critic pass flagged these moments as interview gold)');
+    profile.probeHints.slice(0, 5).forEach((h, i) => {
+      lines.push(`${i + 1}. Moment: "${h.moment}"`);
+      lines.push(`   Suggested question: ${h.question}`);
+      lines.push(`   Why it matters: ${h.rationale}`);
+    });
+    lines.push('');
+    lines.push('Weave at least TWO of these probe questions naturally into the conversation. They are the highest-value places to surface authenticity.');
+  }
+
+  if (profile.activities && profile.activities.length > 0) {
+    lines.push('');
+    lines.push('## CANDIDATE ACTIVITIES LIST (from their Common App-style profile)');
+    profile.activities.slice(0, 10).forEach((a) => {
+      const role = a.role ? ` — ${a.role}` : '';
+      const hrs = a.hours_per_week ? ` (${a.hours_per_week}h/wk)` : '';
+      lines.push(`- ${a.title}${role}${hrs}`);
+      if (a.description) lines.push(`    ${a.description}`);
+    });
+    lines.push('');
+    lines.push('Cross-reference these activities when asking follow-ups. Example: "You listed debate — tell me about a round that didn\'t go your way." Don\'t let the candidate stay surface-level.');
+  }
+
+  if (profile.supplementals && profile.supplementals.length > 0) {
+    lines.push('');
+    lines.push('## CANDIDATE\'S SUPPLEMENTAL ESSAY(S) FOR THIS SCHOOL');
+    profile.supplementals.slice(0, 3).forEach((s, i) => {
+      lines.push(`### Supplemental ${i + 1}`);
+      lines.push(`Prompt: ${s.prompt}`);
+      lines.push(`Response:\n${s.body.slice(0, 2500)}`);
+    });
+    lines.push('');
+    lines.push('This supplemental is school-specific — use it to go deeper on the "why this school" and "why this program" probes.');
   }
 
   lines.push('');

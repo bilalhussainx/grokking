@@ -60,6 +60,10 @@ export default function CollegeInterviewSetup() {
   const { user } = useAuth();
 
   const [collegePersonaId, setCollegePersonaId] = useState<string>("");
+  // SP-11 — dynamic persona for schools outside the hard-coded list.
+  const [dynamicSchoolName, setDynamicSchoolName] = useState<string>("");
+  const [dynamicLoading, setDynamicLoading] = useState<boolean>(false);
+  const [dynamicLabel, setDynamicLabel] = useState<string>(""); // display name once loaded
   const [intendedMajor, setIntendedMajor] = useState("");
   const [topProjectTitle, setTopProjectTitle] = useState("");
   const [topProjectDescription, setTopProjectDescription] = useState("");
@@ -261,7 +265,7 @@ export default function CollegeInterviewSetup() {
               );
             })}
           </div>
-          {collegePersonaId && (
+          {collegePersonaId && SCHOOLS.find((s) => s.id === collegePersonaId) && (
             <div className="mt-3 text-xs text-white/50">
               Want to prep first?{" "}
               <a
@@ -274,6 +278,57 @@ export default function CollegeInterviewSetup() {
               </a>
             </div>
           )}
+
+          {/* SP-11 — generate persona for any school not in the list */}
+          <div className="mt-5 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+            <p className="text-xs text-white/50 mb-2">
+              Don&apos;t see your school? Generate a custom interviewer — works for any US/Canadian/UK university.
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={dynamicSchoolName}
+                onChange={(e) => setDynamicSchoolName(e.target.value)}
+                placeholder="e.g., University of Toronto, Oxford, UBC"
+                className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-violet-500/50"
+                disabled={dynamicLoading}
+              />
+              <button
+                type="button"
+                onClick={async () => {
+                  const name = dynamicSchoolName.trim();
+                  if (!name) return;
+                  setDynamicLoading(true);
+                  setError("");
+                  try {
+                    const res = await fetch("/api/college-interviews/dynamic-persona", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ schoolName: name }),
+                    });
+                    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Failed to generate persona");
+                    const j = await res.json();
+                    const p = j.persona;
+                    setCollegePersonaId(p.id);
+                    setDynamicLabel(p.shortName || p.school || name);
+                  } catch (e) {
+                    setError(e instanceof Error ? e.message : "Failed to generate");
+                  } finally {
+                    setDynamicLoading(false);
+                  }
+                }}
+                disabled={dynamicLoading || !dynamicSchoolName.trim()}
+                className="px-3 py-2 rounded-lg bg-violet-500 text-white text-xs font-semibold hover:bg-violet-400 disabled:bg-white/10 disabled:text-white/40 transition"
+              >
+                {dynamicLoading ? "Generating…" : "Generate"}
+              </button>
+            </div>
+            {dynamicLabel && collegePersonaId && !SCHOOLS.find((s) => s.id === collegePersonaId) && (
+              <p className="mt-2 text-xs text-violet-300">
+                ✓ Using generated interviewer for <strong>{dynamicLabel}</strong>. Quality is good but not as sharp as our hand-authored top-20 schools.
+              </p>
+            )}
+          </div>
         </motion.div>
 
         {/* Applicant profile */}

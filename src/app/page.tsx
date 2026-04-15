@@ -23,6 +23,7 @@ import VariableReward from "@/components/gamification/VariableReward";
 import WelcomeModal from "@/components/onboarding/WelcomeModal";
 import { getDailyLoginReward } from "@/lib/rewards";
 import KairosLogo from "@/components/ui/SamsaraLogo";
+import JourneyBanner from "@/components/journey/JourneyBanner";
 
 
 const container = {
@@ -803,6 +804,13 @@ export default function HomePage() {
                 </button>
               </motion.div>
             </motion.div>
+          </motion.div>
+        )}
+
+        {/* SP-13 journey banner — stage-aware next-best-action */}
+        {user && (
+          <motion.div variants={item} className="mb-6">
+            <JourneyBanner />
           </motion.div>
         )}
 

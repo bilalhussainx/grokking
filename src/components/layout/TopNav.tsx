@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search, MessageSquare, Star, Gem, GraduationCap, Target, PenSquare, FileText } from "lucide-react";
+import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search, MessageSquare, Star, Gem, GraduationCap, Target, PenSquare, FileText, ListChecks } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTopNav } from "@/contexts/TopNavContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -158,6 +158,15 @@ export default function TopNav({
         >
           <PenSquare className="w-3.5 h-3.5" />
           <span>Essays</span>
+        </Link>
+
+        <Link
+          href="/activities"
+          className="hidden lg:flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-white/[0.04] border border-white/10 text-white/80 text-xs font-medium hover:bg-white/[0.08] transition-all"
+          title="Manage your Common-App-style activities list"
+        >
+          <ListChecks className="w-3.5 h-3.5" />
+          <span>Activities</span>
         </Link>
 
         <Link
