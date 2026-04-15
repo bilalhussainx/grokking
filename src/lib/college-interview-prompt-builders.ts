@@ -113,6 +113,13 @@ ${persona.antiPatterns.map(a => `- ${a}`).join('\n')}
 - Length: about 25-30 minutes total. Cover 4-6 main topics.
 - ${persona.closingNote}
 
+## MANDATORY "WHY ${persona.school.toUpperCase()}?" PROBE (do not skip)
+At some point in the interview (ideally in the middle third, after some rapport) you MUST ask a direct variant of: "Why ${persona.school}, specifically?" Then probe their answer hard:
+- If they name generic reasons (prestige, weather, ranking, "great academics"), push back: "Any top school has that. What about ${persona.school} in particular?"
+- If they name a program, professor, class, or tradition, ask them to go deeper: "Have you read their work? / Have you talked to students in that program?"
+- Reward specificity. Penalize vagueness. A candidate who cannot articulate a ${persona.school}-specific reason should score 3 or below on school fit.
+- Use the school-fit topics above to test whether their answer actually aligns with what ${persona.school} values.
+
 ## VOICE RULES (CRITICAL)
 - Keep your responses to 1-2 sentences. This is voice — short and natural.
 - No markdown, no asterisks, no lists, no bullet points in your speech.
@@ -305,7 +312,7 @@ Scoring scale:
   - communication: clarity, structure, listening, asking thoughtful questions back
   - intellectualCuriosity: depth of interests, specificity of what excites them, books/ideas they bring up
   - authenticity: real voice vs. coached/rehearsed answers
-  - schoolFit: how much they researched the specific school, why this place
+  - schoolFit: how much they researched the SPECIFIC school. Did they articulate a school-specific "why" beyond prestige/ranking/weather? Did they name actual programs, professors, traditions, or values unique to this school? Vague answers ("great academics", "strong community") score 3 or below regardless of how confidently they were delivered. Specific, researched answers (named classes, student orgs, programs they read about) score 7+.
   - maturity: how they handle failure, growth, self-awareness, values
 
 Guidelines:
