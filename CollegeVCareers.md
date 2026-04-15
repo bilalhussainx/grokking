@@ -163,11 +163,28 @@ This is the "Sindh student with a phone and a transcript" user story.
 
 ### SP-10 — Essay ideation + review workbench — MEDIUM
 
-- `/college-prep/essays` — new page.
-- Two modes: **ideation** (student picks a prompt, AI asks probing questions, outputs 3 angles to try) and **review** (student pastes a draft, AI returns line-by-line suggestions + overall verdict).
+- `/essays` — new page (at root of track, not under `/college-prep`).
+- **Three modes, not two:**
+  1. **Ideation** — student picks a prompt, AI asks probing questions, outputs 3 angles to try.
+  2. **Drafting** — student writes in-page with a streaming critic sidebar (like Coach Alex, but essay-scoped).
+  3. **Review** — student pastes a finished draft, AI returns line-by-line suggestions + overall verdict.
+- **Inspiration sources (user-provided 2026-04-14):**
+  - https://github.com/bilalhussainx/essaymentor-ai.git — good for final-essay generation shape; **missing ideation + editing loop** which is what we must add.
+  - `C:\Users\bilal\projects\educator-app\educator-app\educators-edge-frontend\src\pages\ModernResumeOptimizationPage_clean.tsx` — handheld multi-step UI pattern to borrow.
+  - `C:\Users\bilal\projects\educator-app\educator-app\educators-edge-frontend\src\pages\EssayCollabPage.tsx`, `EssayEditorPage.tsx`, `EssaySessionPage.tsx`, `EssayGenerator/` — reference UX for draft/edit/collab flow.
 - Uses the same user profile + activity list so feedback is personalized (not generic).
-- Per-prompt history: drafts v1..vN saved.
-- Uses Sonnet for quality.
+- Per-prompt history: drafts v1..vN saved in `essay_versions`.
+- Uses Sonnet for quality (critique + rewrite). Moonshot for cheaper brainstorm steps.
+- **DB:** `essay_drafts(id, user_id, title, prompt, current_version)`, `essay_versions(id, draft_id, version_num, body_md, critique_json, created_at)`.
+
+### SP-16 — Resume optimizer — MEDIUM (added 2026-04-14 per user request)
+
+- `/resumes` — upload existing resume (PDF/DOCX) → parse → LLM-suggested rewrites → downloadable result.
+- Borrow UI shape from `ModernResumeOptimizationPage_clean.tsx` but radically simplify the service layer — educator-app has ~12 services (Azure Vision DOM, semantic preservation, revolutionary optimizer, etc.). We replace that with **two streamed API routes**:
+  - `POST /api/resumes/parse` — accepts file, uses `pdf-parse` or `mammoth` to extract text, returns structured sections.
+  - `POST /api/resumes/rewrite` — streams LLM-rewritten bullets keyed to a target role the student pastes in.
+- **DB:** `resume_docs(id, user_id, original_filename, parsed_sections jsonb, current_rewrite_id)`, `resume_rewrites(id, doc_id, target_role, body_md, created_at)`.
+- Ties into SP-12 careers track — same tables reused there.
 
 ### SP-11 — 50-college coverage via the research agent — LARGE
 
@@ -214,6 +231,22 @@ This is the "Sindh student with a phone and a transcript" user story.
 - **Parent-auth isolation**: Supabase RLS policies ensuring `parent_student_links` only exposes what the student chose to share.
 - **Rate limiting**: cache everything Tavily returns — one view of a school by 50 users should result in 1 Tavily call, not 50.
 
+### 4a. Architecture decision — stay on Vercel + Supabase (2026-04-14)
+
+User asked: "do we need a backend like educator-app or can we carry on with Vercel + Supabase?"
+
+**Decision: stay on Vercel + Supabase for essay + resume modules.** educator-app has a heavy Node backend because it does Docker code-sandboxing, Chroma vector DB, Azure Vision OCR pipelines, BullMQ queues, and real-time collab editing. Essay ideation/critique and resume optimization don't need any of that.
+
+**Split rule:**
+- **Next.js API routes on Vercel** handle: streamed LLM calls (Moonshot/Gemini/Sonnet), inline PDF/DOCX parsing via `pdf-parse` + `mammoth`, draft storage to Supabase, Supabase Realtime for light collab.
+- **Python research service (SP-8)** handles: Tavily-heavy research loops, LangGraph state machines, long-running persona generation, dynamic 50-school persona fetches. This is the only genuinely-needs-a-backend piece.
+- **External APIs called from Next.js** handle: heavy OCR (Azure Vision / Google Document AI) for scanned Pakistani marksheets — never self-host.
+
+**Vercel constraints to respect:**
+- 60s (Hobby) / 300s (Pro) serverless timeout → **always stream LLM output**, never wait for full completion on long essays.
+- No background jobs → use Supabase Edge Functions or Vercel Cron for async (e.g., "overnight essay rewrite" is the only thing we'd defer).
+- 4.5MB request/response limits → stream file uploads directly to Supabase Storage from the client; don't proxy through API routes.
+
 ---
 
 ## 5. Execution phases (sequence)
@@ -238,6 +271,7 @@ This is the "Sindh student with a phone and a transcript" user story.
 
 **Phase 4 — Holistic student experience (2-3 sessions)**
 - SP-10: essay workbench.
+- SP-16: resume optimizer.
 - SP-9: readiness readout.
 - SP-13: activity state machine.
 - SP-14: blog system.
