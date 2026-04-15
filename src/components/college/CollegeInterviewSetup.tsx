@@ -219,6 +219,12 @@ export default function CollegeInterviewSetup() {
           <p className="text-sm text-white/50 max-w-xl mx-auto">
             Pick a school. Get an AI alumni interviewer that knows what {"that"} school cares about. Interview is in English (matches the real thing). Feedback comes in your language.
           </p>
+          <p className="text-xs text-white/40 mt-3">
+            Also:{" "}
+            <a href="/essays" className="text-violet-300 hover:text-violet-200 underline underline-offset-2">
+              ideate & critique your essays →
+            </a>
+          </p>
         </motion.div>
 
         {/* School picker */}

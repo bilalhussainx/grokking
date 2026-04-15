@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search, MessageSquare, Star, Gem, GraduationCap, Target } from "lucide-react";
+import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search, MessageSquare, Star, Gem, GraduationCap, Target, PenSquare, FileText } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTopNav } from "@/contexts/TopNavContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -149,6 +149,24 @@ export default function TopNav({
         >
           <Target className="w-3.5 h-3.5" />
           <span>Tech</span>
+        </Link>
+
+        <Link
+          href="/essays"
+          className="hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-violet-500/10 border border-violet-500/25 text-violet-200 text-xs font-medium hover:bg-violet-500/20 transition-all"
+          title="Ideate, draft, and critique your college essays"
+        >
+          <PenSquare className="w-3.5 h-3.5" />
+          <span>Essays</span>
+        </Link>
+
+        <Link
+          href="/resumes"
+          className="hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-violet-500/10 border border-violet-500/25 text-violet-200 text-xs font-medium hover:bg-violet-500/20 transition-all"
+          title="Upload your resume and rewrite it for a target role"
+        >
+          <FileText className="w-3.5 h-3.5" />
+          <span>Resume</span>
         </Link>
 
         <Link
