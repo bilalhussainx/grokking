@@ -50,6 +50,15 @@ const DOMAIN_ORDER = [
   'interview-prep',
 ] as const;
 
+// Featured & fully-built courses — surfaced at the top so learners aren't overwhelmed
+// by the 60+ catalog. Order matters: this is the display order on the catalog page.
+const RECOMMENDED_SLUGS = [
+  'coding-interview',
+  'python-fundamentals',
+  'system-design',
+  'ai-ml-fundamentals',
+] as const;
+
 const DOMAIN_LABELS: Record<string, string> = {
   'computer-science': 'Computer Science & Engineering',
   'religious-studies': 'Religious Studies',
@@ -80,8 +89,14 @@ function courseListSchema() {
 }
 
 export default function CoursesPage() {
+  const recommendedSet = new Set<string>(RECOMMENDED_SLUGS);
+  const recommendedCourses = RECOMMENDED_SLUGS
+    .map((slug) => courses.find((c) => c.slug === slug))
+    .filter((c): c is NonNullable<typeof c> => Boolean(c));
+
   const domainGroups: Record<string, typeof courses> = {};
   for (const c of courses) {
+    if (recommendedSet.has(c.slug)) continue; // shown in the Recommended section instead
     const domain = c.domain || 'general';
     if (!domainGroups[domain]) domainGroups[domain] = [];
     domainGroups[domain].push(c);
@@ -128,6 +143,72 @@ export default function CoursesPage() {
             Kairos.ai offers {courses.length}+ interactive online courses spanning Computer Science, Language Learning, Religious Studies, Philosophy, Finance & Business, Health & Wellness, and Political Strategy. With {totalLessons}+ lessons, learners can study everything from Python and system design to Islamic studies, Stoic philosophy, meditation, and investing. {freeCourses} courses are completely free with AI voice coaching.
           </p>
         </header>
+
+        {/* Recommended — surfaces the flagship courses so learners aren't overwhelmed */}
+        {recommendedCourses.length > 0 && (
+          <section className="mb-14">
+            <div className="flex items-center gap-3 mb-5">
+              <h2 className="text-xl font-bold text-white">Recommended for You</h2>
+              <span className="text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full font-medium">
+                Start here
+              </span>
+            </div>
+            <p className="text-white/50 text-sm mb-5 max-w-2xl">
+              Four flagship courses with full interactive lessons, AI voice coaching, and hands-on exercises. New to the platform? Pick one and dive in.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+              {recommendedCourses.map((course) => {
+                const lessonCount = getAllLessons(course).length;
+                return (
+                  <Link
+                    key={course.id}
+                    href={`/course/${course.slug}`}
+                    className="group block"
+                  >
+                    <article className="rounded-xl border border-amber-500/25 bg-gradient-to-br from-amber-500/[0.04] to-violet-500/[0.04] p-5 hover:border-amber-500/40 hover:from-amber-500/[0.08] hover:to-violet-500/[0.08] transition-all duration-200 h-full hover:-translate-y-0.5">
+                      <div className="flex items-start justify-between mb-3">
+                        <span className="text-3xl" role="img" aria-label={course.title}>
+                          {course.icon}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25">
+                            ★ Recommended
+                          </span>
+                          <span
+                            className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                              course.tier === 'pro'
+                                ? 'bg-violet-500/10 text-violet-400 border border-violet-500/20'
+                                : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            }`}
+                          >
+                            {course.tier === 'pro' ? 'Pro' : 'Free'}
+                          </span>
+                        </div>
+                      </div>
+                      <h3 className="text-white font-semibold text-base mb-1.5 group-hover:text-amber-300 transition-colors">
+                        {course.title}
+                      </h3>
+                      <p className="text-white/50 text-sm leading-relaxed mb-3 line-clamp-2">
+                        {course.description}
+                      </p>
+                      <div className="flex items-center gap-2 text-[11px] text-white/35 font-medium">
+                        <span>{course.modules.length} modules</span>
+                        <span className="text-white/10">&middot;</span>
+                        <span>{lessonCount} lessons</span>
+                        {course.level && (
+                          <>
+                            <span className="text-white/10">&middot;</span>
+                            <span className="capitalize">{course.level}</span>
+                          </>
+                        )}
+                      </div>
+                    </article>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Course sections grouped by domain */}
         {DOMAIN_ORDER.map((domain) => {

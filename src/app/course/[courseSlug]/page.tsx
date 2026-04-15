@@ -170,16 +170,28 @@ export default function CourseOverviewPage() {
                   )}
                   {/* Show lesson titles */}
                   <div className="mt-3 ml-9 space-y-1">
-                    {module.lessons.map((lesson, li) => (
-                      <div key={lesson.id} className="flex items-center gap-2 text-[12px]">
-                        {isFree ? (
-                          <CheckCircle className="w-3 h-3 text-emerald-500/40 flex-shrink-0" />
-                        ) : (
-                          <Lock className="w-3 h-3 text-white/15 flex-shrink-0" />
-                        )}
-                        <span className="text-white/25 truncate">{lesson.title}</span>
-                      </div>
-                    ))}
+                    {module.lessons.map((lesson, li) => {
+                      const isComingSoon = /"title"\s*:\s*"Coming Soon"/.test(lesson.content);
+                      return (
+                        <div key={lesson.id} className="flex items-center gap-2 text-[12px]">
+                          {isComingSoon ? (
+                            <span className="w-3 h-3 rounded-full bg-amber-500/30 flex-shrink-0" aria-label="Coming soon" />
+                          ) : isFree ? (
+                            <CheckCircle className="w-3 h-3 text-emerald-500/40 flex-shrink-0" />
+                          ) : (
+                            <Lock className="w-3 h-3 text-white/15 flex-shrink-0" />
+                          )}
+                          <span className={`truncate ${isComingSoon ? 'text-white/25 italic' : 'text-white/25'}`}>
+                            {lesson.title}
+                          </span>
+                          {isComingSoon && (
+                            <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300/80 border border-amber-500/20 flex-shrink-0">
+                              Coming Soon
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </motion.div>
