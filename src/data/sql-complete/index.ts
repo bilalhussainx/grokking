@@ -14,7 +14,7 @@ export const sqlCompleteCourse: Course = {
   icon: "🗄️",
   tier: "pro",
   featured: true,
-  domain: "backend",
+  domain: "computer-science",
   level: "beginner",
   modules: [module1, module2, module3, module4, module5],
 };

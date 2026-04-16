@@ -15,7 +15,7 @@ export const javascriptCompleteCourse: Course = {
   icon: "⚡",
   tier: "pro",
   featured: true,
-  domain: "frontend",
+  domain: "computer-science",
   level: "intermediate",
   prerequisiteIds: ["javascript-fundamentals"],
   modules: [module1, module2, module3, module4, module5, module6],

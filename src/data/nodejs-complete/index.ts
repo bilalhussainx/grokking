@@ -13,7 +13,7 @@ export const nodejsCompleteCourse: Course = {
   icon: "🟢",
   tier: "pro",
   featured: true,
-  domain: "backend",
+  domain: "computer-science",
   level: "intermediate",
   prerequisiteIds: ["javascript-fundamentals"],
   modules: [module1, module2, module3, module4],

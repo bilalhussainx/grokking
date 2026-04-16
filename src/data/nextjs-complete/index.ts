@@ -14,7 +14,7 @@ export const nextjsCompleteCourse: Course = {
   icon: "▲",
   tier: "pro",
   featured: true,
-  domain: "frontend",
+  domain: "computer-science",
   level: "intermediate",
   prerequisiteIds: ["react-complete"],
   modules: [module1, module2, module3, module4, module5],
