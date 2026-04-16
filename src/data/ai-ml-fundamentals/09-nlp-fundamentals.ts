@@ -33,10 +33,10 @@ Every modern NLP model uses special tokens with reserved IDs:
 
 | Token | Purpose |
 |-------|---------|
-| `[PAD]` | Fill shorter sequences to match batch length |
-| `[UNK]` | Replace out-of-vocabulary words |
-| `[BOS]`/`[CLS]` | Beginning of sequence (generation start or classification token) |
-| `[EOS]`/`[SEP]` | End of sequence or separator between segments |
+| \`[PAD]\` | Fill shorter sequences to match batch length |
+| \`[UNK]\` | Replace out-of-vocabulary words |
+| \`[BOS]\`/\`[CLS]\` | Beginning of sequence (generation start or classification token) |
+| \`[EOS]\`/\`[SEP]\` | End of sequence or separator between segments |
 
 \`\`\`quiz
 { "question": "A tokenizer encounters the word 'cryptocurrency' at inference time, but it was not in the training vocabulary. Subword tokenization (BPE) handles this differently than word tokenization. How?", "options": ["BPE maps 'cryptocurrency' to a random known token", "BPE decomposes it into known subword pieces like 'crypto' + 'currency' — no OOV; word tokenization maps it to <UNK>", "BPE skips unknown words entirely, word tokenization replaces with the nearest neighbor", "Both methods handle OOV identically"], "answer": 1, "explanation": "BPE builds a vocabulary of subword pieces by merging frequent character pairs. 'cryptocurrency' can be split into 'crypto' + 'currency' or even smaller pieces — all of which may have been seen during training. Word-level tokenization has no mechanism to handle unseen words and must use a generic <UNK> token, losing all semantic information." }
