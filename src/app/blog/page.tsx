@@ -1,14 +1,35 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
-import { BLOG_POSTS } from '@/data/blog-posts';
 
 export const metadata: Metadata = {
   title: 'KairosLearn Blog - AI Education, Coding, Languages & Learning Tips',
   description: 'Learn about AI-powered education, coding best practices, language learning strategies, and more from the KairosLearn team.',
 };
 
-const blogPosts = [...BLOG_POSTS].sort((a, b) => (a.date < b.date ? 1 : -1));
+// Sample blog posts (in production, this would come from a CMS or database)
+const blogPosts = [
+  {
+    slug: 'why-voice-based-ai-tutoring-works',
+    title: 'Why Voice-Based AI Tutoring Works Better Than Text',
+    excerpt: 'Research shows that voice conversations improve retention by 40%. Here\'s why KairosLearn uses voice-first AI tutoring for coding, languages, and more.',
+    author: 'Bilal Hussain',
+    date: '2026-03-26',
+    readTime: '5 min read',
+    category: 'AI Education',
+    image: '/images/blog/voice-tutoring.jpg',
+  },
+  {
+    slug: 'learning-algorithms-in-your-native-language',
+    title: 'Why You Should Learn Algorithms in Your Native Language',
+    excerpt: 'Most coding resources are English-only. But research suggests you learn more effectively in your native language. Here\'s why KairosLearn supports 17 languages.',
+    author: 'Bilal Hussain',
+    date: '2026-03-25',
+    readTime: '6 min read',
+    category: 'Language Learning',
+    image: '/images/blog/multilingual-coding.jpg',
+  },
+];
 
 export default function BlogPage() {
   return (
