@@ -69,6 +69,7 @@ import { introPsychologyCourse } from "./intro-psychology";
 import { worldHistoryCourse } from "./world-history";
 import { ahmadiyyaFoundationsCourse } from "./ahmadiyya-foundations";
 import { reactCompleteCourse } from "./react-complete";
+import { javaCompleteCourse } from "./java-complete";
 
 export const courses: Course[] = [
   webDevelopmentCourse,
@@ -77,6 +78,7 @@ export const courses: Course[] = [
   gameDevelopmentCourse,
   reactDevelopmentCourse,
   reactCompleteCourse,
+  javaCompleteCourse,
   nodejsBackendCourse,
   mernStackCourse,
   dataStructuresAlgorithmsCourse,
