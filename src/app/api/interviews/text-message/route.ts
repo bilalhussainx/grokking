@@ -87,12 +87,7 @@ export async function POST(req: NextRequest) {
       const { buildCollegePersonaPrompt, loadCollegeSessionContext } = await import(
         "@/lib/college-interview-prompt-builders"
       );
-      let persona: CollegePersona | null = getCollegePersona(collegePersonaId);
-      if (!persona) {
-        // SP-11 — fall through to dynamic persona cache.
-        const { getCachedDynamicPersona } = await import("@/lib/dynamic-college-persona");
-        persona = await getCachedDynamicPersona(collegePersonaId);
-      }
+      const persona: CollegePersona | null = getCollegePersona(collegePersonaId);
       if (persona) {
         const sessionCtx = user
           ? await loadCollegeSessionContext(user.id, persona.id, persona.school)

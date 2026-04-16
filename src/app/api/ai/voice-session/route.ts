@@ -203,66 +203,12 @@ export async function POST(req: NextRequest) {
       const { buildCollegePersonaPrompt, loadCollegeSessionContext } = await import(
         "@/lib/college-interview-prompt-builders"
       );
-      let collegePersona = getCollegePersona(collegePersonaId);
-      if (!collegePersona) {
-        // SP-11 — fall through to dynamic persona cache.
-        const { getCachedDynamicPersona } = await import("@/lib/dynamic-college-persona");
-        collegePersona = await getCachedDynamicPersona(collegePersonaId);
-      }
+      const collegePersona = getCollegePersona(collegePersonaId);
       if (collegePersona) {
         const sessionCtx = user
           ? await loadCollegeSessionContext(user.id, collegePersona.id, collegePersona.school)
           : undefined;
-
-        // SP-2 — hydrate applicant profile with activities, school supplementals, and probe hints.
-        let enriched = applicantProfile;
-        if (user) {
-          try {
-            const { createServerSupabase } = await import("@/lib/supabase-auth");
-            const { createClient } = await import("@supabase/supabase-js");
-            const supabase = await createServerSupabase();
-
-            const [actRes, supRes] = await Promise.all([
-              supabase
-                .from("college_activities")
-                .select("title, role, category, description, hours_per_week, weeks_per_year")
-                .eq("user_id", user.id)
-                .order("position", { ascending: true }),
-              supabase
-                .from("college_essays")
-                .select("prompt, body, word_target")
-                .eq("user_id", user.id)
-                .eq("school_id", collegePersona.id)
-                .order("updated_at", { ascending: false })
-                .limit(3),
-            ]);
-
-            let probeHints: Array<{ moment: string; question: string; rationale: string }> = [];
-            const essayText = applicantProfile?.collegeEssay;
-            if (essayText && typeof essayText === "string" && essayText.trim()) {
-              const { getOrComputeProbeHints } = await import("@/lib/essay-probe-hints");
-              const admin = process.env.SUPABASE_SERVICE_ROLE_KEY
-                ? createClient(
-                    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                    process.env.SUPABASE_SERVICE_ROLE_KEY,
-                    { auth: { persistSession: false } }
-                  )
-                : undefined;
-              probeHints = await getOrComputeProbeHints(supabase, user.id, essayText, admin);
-            }
-
-            enriched = {
-              ...(applicantProfile || {}),
-              activities: actRes.data || [],
-              supplementals: supRes.data || [],
-              probeHints,
-            };
-          } catch (hydrateErr) {
-            console.warn("[voice-session] SP-2 enrichment failed, continuing with base profile:", hydrateErr);
-          }
-        }
-
-        const collegeBlock = buildCollegePersonaPrompt(collegePersona, enriched, sessionCtx);
+        const collegeBlock = buildCollegePersonaPrompt(collegePersona, applicantProfile, sessionCtx);
         contextPrompt = collegeBlock + "\n\n" + userProfileContext;
       }
     } catch (e) {
