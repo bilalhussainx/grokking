@@ -43,15 +43,6 @@ const SCHOOL_EMOJIS: Record<string, string> = {
   "cornell-undergrad": "⬜",
   "stanford-undergrad": "🟥",
   "mit-undergrad": "⬛",
-  "northwestern-undergrad": "🟪",
-  "uchicago-undergrad": "🟥",
-  "duke-undergrad": "🔵",
-  "georgetown-undergrad": "⬜",
-  "nyu-undergrad": "🟣",
-  "vanderbilt-undergrad": "🟨",
-  "emory-undergrad": "🟦",
-  "usc-undergrad": "🟥",
-  "notre-dame-undergrad": "🟩",
 };
 
 export default function CollegeInterviewSetup() {
@@ -251,19 +242,6 @@ export default function CollegeInterviewSetup() {
               );
             })}
           </div>
-          {collegePersonaId && (
-            <div className="mt-3 text-xs text-white/50">
-              Want to prep first?{" "}
-              <a
-                href={`/college-interviews/questions/${collegePersonaId}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-violet-300 hover:text-violet-200 underline underline-offset-2"
-              >
-                Real-style {SCHOOLS.find((s) => s.id === collegePersonaId)?.shortName} alumni questions →
-              </a>
-            </div>
-          )}
         </motion.div>
 
         {/* Applicant profile */}
