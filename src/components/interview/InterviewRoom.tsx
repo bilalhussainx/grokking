@@ -12,7 +12,7 @@ import Link from "next/link";
 
 export default function InterviewRoom() {
   const router = useRouter();
-  const { sessionId, interviewType, preset, questionPlan, inputMode, currentProblem, dbSessionId, category } = useInterview();
+  const { sessionId, interviewType, preset, questionPlan, inputMode, currentProblem, dbSessionId } = useInterview();
   const codeRef = useRef("");
   const outputRef = useRef("");
   const [mobileTab, setMobileTab] = useState<"voice" | "code">("voice");
@@ -26,9 +26,8 @@ export default function InterviewRoom() {
   }, []);
 
   const handleInterviewEnd = useCallback(() => {
-    const base = category === "college" ? "/college-interviews" : "/interviews";
-    router.push(`${base}/${sessionId}/results`);
-  }, [router, sessionId, category]);
+    router.push(`/interviews/${sessionId}/results`);
+  }, [router, sessionId]);
 
   if (!questionPlan || !sessionId) {
     return (

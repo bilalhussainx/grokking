@@ -18,8 +18,6 @@ export interface ApplicantProfile {
   topProjectDescription?: string;
   recentInfluence?: string;
   whyThisSchool?: string;
-  /** Optional full college application essay — used for deeper personalized follow-ups */
-  collegeEssay?: string;
 }
 
 export interface CollegeSessionContext {
@@ -257,15 +255,6 @@ function buildApplicantProfileBlock(profile: ApplicantProfile): string {
   }
   if (profile.whyThisSchool) {
     lines.push(`- What they said about why they want this school: ${profile.whyThisSchool}`);
-  }
-  if (profile.collegeEssay) {
-    // Cap essay length to keep the prompt manageable
-    const essay = profile.collegeEssay.slice(0, 4000);
-    lines.push('');
-    lines.push('## CANDIDATE\'S COLLEGE APPLICATION ESSAY (read before the interview)');
-    lines.push(essay);
-    lines.push('');
-    lines.push('Use the essay to ask SPECIFIC follow-up questions — reference moments, people, or ideas they wrote about. Do NOT just summarize the essay back at them; probe deeper into the experiences and claims within it.');
   }
 
   lines.push('');

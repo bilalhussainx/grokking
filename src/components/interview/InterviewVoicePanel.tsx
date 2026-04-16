@@ -19,7 +19,7 @@ export default function InterviewVoicePanel({
   outputRef,
   onInterviewEnd,
 }: InterviewVoicePanelProps) {
-  const { questionPlan, addTranscriptEntry, transcript, setFinalCode, interviewType, language, companyPersonaId, category, collegePersonaId, applicantProfile } = useInterview();
+  const { questionPlan, addTranscriptEntry, transcript, setFinalCode, interviewType, language, companyPersonaId } = useInterview();
   const [timeLeft, setTimeLeft] = useState(30 * 60);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -122,9 +122,6 @@ ${noMarkdown}`
         companyPersonaId: companyPersonaId || "generic",
         questionPlan: questionPlan || undefined,
         interviewType: interviewType || "technical",
-        category: category || "tech",
-        collegePersonaId,
-        applicantProfile,
       });
     }, 500);
     return () => clearTimeout(timer);
@@ -305,9 +302,6 @@ ${noMarkdown}`
                 companyPersonaId: companyPersonaId || "generic",
                 questionPlan: questionPlan || undefined,
                 interviewType: interviewType || "technical",
-                category: category || "tech",
-                collegePersonaId,
-                applicantProfile,
               })}
               className="text-xs bg-white/10 hover:bg-white/15 text-white/80 px-3 py-1 rounded transition-colors"
             >

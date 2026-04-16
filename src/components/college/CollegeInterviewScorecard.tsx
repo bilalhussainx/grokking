@@ -117,27 +117,15 @@ export default function CollegeInterviewScorecard() {
     }
   };
 
-  // Wait a moment after mount for InterviewContext to rehydrate from sessionStorage
-  // before deciding the transcript is missing. Without this, the scorecard reads
-  // the default empty transcript on first render and errors out prematurely.
   useEffect(() => {
-    if (scorecard) {
-      setLoading(false);
-      return;
-    }
-    if (transcript.length > 0) {
+    if (!scorecard && transcript.length > 0) {
       fetchScore();
-      return;
+    } else if (transcript.length === 0) {
+      setLoading(false);
+      setError("No interview transcript found.");
     }
-    const t = setTimeout(() => {
-      if (transcript.length === 0) {
-        setLoading(false);
-        setError("No interview transcript found.");
-      }
-    }, 800);
-    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transcript.length, scorecard]);
+  }, []);
 
   if (loading) {
     return (

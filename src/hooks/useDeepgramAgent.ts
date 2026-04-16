@@ -28,17 +28,6 @@ interface DeepgramAgentConfig {
   companyPersonaId?: string;
   questionPlan?: unknown;
   interviewType?: string;
-  // College admissions vertical
-  category?: 'tech' | 'college';
-  collegePersonaId?: string;
-  applicantProfile?: {
-    intendedMajor?: string;
-    topProjectTitle?: string;
-    topProjectDescription?: string;
-    recentInfluence?: string;
-    whyThisSchool?: string;
-    collegeEssay?: string;
-  };
 }
 
 interface DeepgramAgentCallbacks {
@@ -234,10 +223,6 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
             companyPersonaId: config?.companyPersonaId,
             questionPlan: config?.questionPlan,
             interviewType: config?.interviewType,
-            // College admissions vertical
-            category: config?.category,
-            collegePersonaId: config?.collegePersonaId,
-            applicantProfile: config?.applicantProfile,
           }),
         });
 
