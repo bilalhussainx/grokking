@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAI } from "@/contexts/AIContext";
 import { useXP } from "@/contexts/XPContext";
 import { courses } from "@/data";
+import { getAllLanguageCourses } from "@/data/languages";
 import { pathways } from "@/data/pathways";
 import type { Course } from "@/data/types";
 import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
@@ -1106,6 +1107,63 @@ export default function HomePage() {
               </div>
             </motion.div>
           ) : null;
+        })()}
+
+        {/* ── LOGGED-IN SECTION 7: Languages ── */}
+        {user && (() => {
+          const langCourses = getAllLanguageCourses().filter(
+            (c) => (c.language === "es" || c.language === "fr") && c.proficiencyLevel === "A1"
+          );
+          if (langCourses.length === 0) return null;
+          const FLAGS: Record<string, string> = {
+            es: "\u{1F1EA}\u{1F1F8}", fr: "\u{1F1EB}\u{1F1F7}", hi: "\u{1F1EE}\u{1F1F3}",
+            en: "\u{1F1EC}\u{1F1E7}",
+          };
+          return (
+            <motion.div variants={item} className="mb-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                  <Globe className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  Languages
+                </h3>
+                <Link href="/courses" className="text-xs text-[#D4AF37] hover:text-[#C4A030] transition-colors flex items-center gap-1">
+                  All courses <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {langCourses.map((course) => {
+                  const lessonCount = course.modules.reduce((sum, m) => sum + m.lessons.length, 0);
+                  return (
+                    <Link key={course.id} href={`/course/${course.slug}`}>
+                      <motion.div
+                        className="group rounded-xl bg-[#141414] border border-emerald-500/20 hover:border-emerald-500/40 p-4 cursor-pointer h-full transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <span className="text-2xl">{FLAGS[course.language] || course.icon}</span>
+                          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            {course.proficiencyLevel}
+                          </span>
+                        </div>
+                        <h4 className="text-white text-sm font-semibold mb-1 group-hover:text-emerald-400 transition-colors">
+                          {course.title}
+                        </h4>
+                        <p className="text-slate-400 text-xs line-clamp-2 mb-2">{course.description}</p>
+                        <div className="flex items-center gap-2 text-[11px] text-slate-600">
+                          <span>{course.modules.length} modules</span>
+                          <span>&middot;</span>
+                          <span>{lessonCount} lessons</span>
+                          <span>&middot;</span>
+                          <span>{course.estimatedHours}h</span>
+                        </div>
+                      </motion.div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+          );
         })()}
 
         {/* Testimonials removed — will add real user feedback when available */}
