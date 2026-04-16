@@ -13,9 +13,7 @@
     "test:desktop": "playwright test --project='Desktop Chrome'",
     "test:ui": "playwright test --ui",
     "test:unit": "vitest run",
-    "test:unit:watch": "vitest",
-    "test:sp": "playwright test --config=playwright.sp-verify.config.ts",
-    "verify:sp": "node scripts/verify-sp-screenshots.mjs"
+    "test:unit:watch": "vitest"
   },
   "dependencies": {
     "@11labs/react": "^0.2.0",
