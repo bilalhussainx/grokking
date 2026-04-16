@@ -72,6 +72,10 @@ import { reactCompleteCourse } from "./react-complete";
 import { javaCompleteCourse } from "./java-complete";
 import { fastapiCompleteCourse } from "./fastapi-complete";
 import { djangoCompleteCourse } from "./django-complete";
+import { javascriptCompleteCourse } from "./javascript-complete";
+import { nextjsCompleteCourse } from "./nextjs-complete";
+import { nodejsCompleteCourse } from "./nodejs-complete";
+import { sqlCompleteCourse } from "./sql-complete";
 
 export const courses: Course[] = [
   webDevelopmentCourse,
@@ -83,6 +87,10 @@ export const courses: Course[] = [
   javaCompleteCourse,
   fastapiCompleteCourse,
   djangoCompleteCourse,
+  javascriptCompleteCourse,
+  nextjsCompleteCourse,
+  nodejsCompleteCourse,
+  sqlCompleteCourse,
   nodejsBackendCourse,
   mernStackCourse,
   dataStructuresAlgorithmsCourse,
