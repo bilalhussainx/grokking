@@ -8,7 +8,7 @@ import { spanishIntermediateCourse } from "./spanish-intermediate";
 import { spanishAdvancedCourse } from "./spanish-advanced";
 
 // ── French ──
-import { frenchBeginnerCourse } from "./french-beginner";
+import { frenchBeginnerCourse } from "./french-beginner-v2";
 import { frenchIntermediateCourse } from "./french-intermediate";
 import { frenchAdvancedCourse } from "./french-advanced";
 
@@ -38,7 +38,7 @@ export { spanishIntermediateCourse } from "./spanish-intermediate";
 export { spanishAdvancedCourse } from "./spanish-advanced";
 
 // French
-export { frenchBeginnerCourse, getFrenchBeginnerLessons, findFrenchBeginnerLesson } from "./french-beginner";
+export { frenchBeginnerCourse, getFrenchBeginnerLessons, findFrenchBeginnerLesson } from "./french-beginner-v2";
 export { frenchIntermediateCourse } from "./french-intermediate";
 export { frenchAdvancedCourse } from "./french-advanced";
 
