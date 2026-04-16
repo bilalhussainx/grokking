@@ -70,6 +70,8 @@ import { worldHistoryCourse } from "./world-history";
 import { ahmadiyyaFoundationsCourse } from "./ahmadiyya-foundations";
 import { reactCompleteCourse } from "./react-complete";
 import { javaCompleteCourse } from "./java-complete";
+import { fastapiCompleteCourse } from "./fastapi-complete";
+import { djangoCompleteCourse } from "./django-complete";
 
 export const courses: Course[] = [
   webDevelopmentCourse,
@@ -79,6 +81,8 @@ export const courses: Course[] = [
   reactDevelopmentCourse,
   reactCompleteCourse,
   javaCompleteCourse,
+  fastapiCompleteCourse,
+  djangoCompleteCourse,
   nodejsBackendCourse,
   mernStackCourse,
   dataStructuresAlgorithmsCourse,
