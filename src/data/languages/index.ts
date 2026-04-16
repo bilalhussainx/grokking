@@ -27,6 +27,9 @@ import { englishBeginnerCourse } from "./english-beginner";
 import { englishIntermediateCourse } from "./english-intermediate";
 import { englishAdvancedCourse } from "./english-advanced";
 
+// ── English for Spanish Speakers ──
+import { englishForSpanishSpeakersCourse } from "./english-for-spanish-speakers";
+
 // ── Urdu — Not supported, excluded from build ──
 // import { urduA1Course } from "./urdu-a1";
 
@@ -54,6 +57,9 @@ export { englishBeginnerCourse, getEnglishBeginnerLessons, findEnglishBeginnerLe
 export { englishIntermediateCourse } from "./english-intermediate";
 export { englishAdvancedCourse } from "./english-advanced";
 
+// English for Spanish Speakers
+export { englishForSpanishSpeakersCourse, getEnglishForSpanishSpeakersLessons, findEnglishForSpanishSpeakersLesson } from "./english-for-spanish-speakers";
+
 // Urdu — not supported
 
 // ── Course Registry ──
@@ -75,6 +81,8 @@ export const languageCourses: LanguageCourse[] = [
   englishBeginnerCourse,
   englishIntermediateCourse,
   englishAdvancedCourse,
+  // English for Spanish Speakers
+  englishForSpanishSpeakersCourse,
 ];
 
 // ── Lookup Functions ──

@@ -17,7 +17,7 @@ export const systemDesignCourse: Course = {
   slug: "system-design",
   title: "Grokking System Design & Architecture",
   description: "Learn how to design large-scale distributed systems. Covers fundamentals, key concepts, and 10 real-world system design case studies with detailed architecture diagrams and trade-off analysis.",
-  icon: "\\\\u{1F3D7}\\\\u{FE0F}",
+  icon: "🏗️",
   tier: "pro",
   domain: "computer-science",
   variation: "interview-prep",
