@@ -1,7 +1,0 @@
-{
-  "sp": "SP-3",
-  "step": "01-parent-invalid",
-  "url": "http://localhost:3000/parent/INVALIDCODE999",
-  "annotation": "Invalid share code — gate page, no dashboard content leaked",
-  "captured_at": "2026-04-15T21:36:43.385Z"
-}
