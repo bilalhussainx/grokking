@@ -3,7 +3,7 @@
 import type { LanguageCourse } from "@/data/language-types";
 
 // ── Spanish ──
-import { spanishBeginnerCourse } from "./spanish-beginner";
+import { spanishBeginnerCourse } from "./spanish-beginner-v2";
 import { spanishIntermediateCourse } from "./spanish-intermediate";
 import { spanishAdvancedCourse } from "./spanish-advanced";
 
@@ -33,7 +33,7 @@ import { englishAdvancedCourse } from "./english-advanced";
 // ── Re-exports ──
 
 // Spanish
-export { spanishBeginnerCourse, getSpanishBeginnerLessons, findSpanishBeginnerLesson } from "./spanish-beginner";
+export { spanishBeginnerCourse, getSpanishBeginnerLessons, findSpanishBeginnerLesson } from "./spanish-beginner-v2";
 export { spanishIntermediateCourse } from "./spanish-intermediate";
 export { spanishAdvancedCourse } from "./spanish-advanced";
 
