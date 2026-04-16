@@ -76,6 +76,18 @@ import { javascriptCompleteCourse } from "./javascript-complete";
 import { nextjsCompleteCourse } from "./nextjs-complete";
 import { nodejsCompleteCourse } from "./nodejs-complete";
 import { sqlCompleteCourse } from "./sql-complete";
+import { typescriptCompleteCourse } from "./typescript-complete";
+import { dockerKubernetesCourse } from "./docker-kubernetes";
+import { dataSciencePythonCourse } from "./data-science-python";
+import { machinelearningCompleteCourse } from "./machine-learning-complete";
+import { awsFundamentalsCourse } from "./aws-fundamentals";
+import { golangCompleteCourse } from "./golang-complete";
+import { excelDataAnalysisCourse } from "./excel-data-analysis";
+import { digitalMarketingSEOCourse } from "./digital-marketing-seo";
+import { publicSpeakingCourse } from "./public-speaking";
+import { reactNativeMobileCourse } from "./react-native-mobile";
+import { llmEngineeringCourse } from "./llm-engineering";
+import { statisticsDataScienceCourse } from "./statistics-for-data-science";
 
 export const courses: Course[] = [
   webDevelopmentCourse,
@@ -91,6 +103,18 @@ export const courses: Course[] = [
   nextjsCompleteCourse,
   nodejsCompleteCourse,
   sqlCompleteCourse,
+  typescriptCompleteCourse,
+  dockerKubernetesCourse,
+  dataSciencePythonCourse,
+  machinelearningCompleteCourse,
+  awsFundamentalsCourse,
+  golangCompleteCourse,
+  excelDataAnalysisCourse,
+  digitalMarketingSEOCourse,
+  publicSpeakingCourse,
+  reactNativeMobileCourse,
+  llmEngineeringCourse,
+  statisticsDataScienceCourse,
   nodejsBackendCourse,
   mernStackCourse,
   dataStructuresAlgorithmsCourse,
