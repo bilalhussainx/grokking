@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search, MessageSquare, Star, Gem, GraduationCap, Target, Library } from "lucide-react";
+import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search, MessageSquare, Star, Gem, GraduationCap, Target, Library, Building2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTopNav } from "@/contexts/TopNavContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -176,6 +176,15 @@ export default function TopNav({
           title="Glossary"
         >
           <Library className="w-[18px] h-[18px]" />
+        </Link>
+
+        <Link
+          href="/my-schools"
+          className="hidden sm:flex p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-[#D4AF37] transition-colors"
+          aria-label="My Schools"
+          title="My School List"
+        >
+          <Building2 className="w-[18px] h-[18px]" />
         </Link>
 
         <button
