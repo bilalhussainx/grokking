@@ -32,7 +32,7 @@ export default function Footer() {
               <li><Link href="/courses" className="hover:text-white transition">Courses</Link></li>
               <li><Link href="/talk" className="hover:text-white transition">Voice Tutoring</Link></li>
               <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
-              <li><Link href="/interviews" className="hover:text-white transition">Mock Interviews</Link></li>
+              <li><Link href="/career/interviews" className="hover:text-white transition">Mock Interviews</Link></li>
               <li><Link href="/pathways" className="hover:text-white transition">Career Pathways</Link></li>
             </ul>
           </div>

@@ -610,7 +610,7 @@ export default function HomePage() {
             >
               {[
                 { href: "/college-interviews", icon: GraduationCap, label: "College Interview", style: "bg-[#D4AF37] text-black font-semibold" },
-                { href: "/interviews", icon: Target, label: "Tech Interview", style: "border border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10" },
+                { href: "/career/interviews", icon: Target, label: "Tech Interview", style: "border border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10" },
                 { href: "/talk", icon: Mic, label: "Voice Tutoring", style: "border border-white/20 text-white hover:border-[#D4AF37]/50 hover:bg-white/5" },
                 { href: "/history", icon: Clock, label: "Your Sessions", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
                 { href: "/leaderboard", icon: Trophy, label: "Leaderboard", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },

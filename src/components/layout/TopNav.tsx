@@ -143,12 +143,12 @@ export default function TopNav({
         </Link>
 
         <Link
-          href="/interviews"
+          href="/career/interviews"
           className="hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-white/[0.04] border border-white/10 text-white/80 text-xs font-medium hover:bg-white/[0.08] transition-all"
           title="Practice your tech interview"
         >
           <Target className="w-3.5 h-3.5" />
-          <span>Tech</span>
+          <span>Career</span>
         </Link>
 
         <Link

@@ -1,5 +1,5 @@
-import InterviewSetup from "@/components/interview/InterviewSetup";
+import { redirect } from "next/navigation";
 
-export default function InterviewsPage() {
-  return <InterviewSetup />;
+export default function InterviewsRedirect() {
+  redirect("/career/interviews");
 }
