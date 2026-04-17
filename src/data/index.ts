@@ -88,8 +88,10 @@ import { publicSpeakingCourse } from "./public-speaking";
 import { reactNativeMobileCourse } from "./react-native-mobile";
 import { llmEngineeringCourse } from "./llm-engineering";
 import { statisticsDataScienceCourse } from "./statistics-for-data-science";
+import { consultingCaseInterviewCourse } from "./consulting-case-interview";
 
 export const courses: Course[] = [
+  consultingCaseInterviewCourse,
   webDevelopmentCourse,
   pythonFundamentalsCourse,
   javascriptFundamentalsCourse,
