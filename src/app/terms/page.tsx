@@ -74,7 +74,7 @@ export default function TermsOfServicePage() {
 
           <h2>8. AI Tutoring Disclaimer</h2>
           <p>
-            Our AI tutor (Coach Alex) provides educational assistance based on AI models. While we strive for accuracy:
+            Our AI tutor (Coach Kairos) provides educational assistance based on AI models. While we strive for accuracy:
           </p>
           <ul>
             <li>AI responses may occasionally contain errors</li>

@@ -19,6 +19,18 @@ interface Diploma {
 }
 
 export default function CredentialsPage() {
+  if (process.env.NEXT_PUBLIC_CREDENTIALS_ENABLED !== "true") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-white/50">This feature is not currently available.</p>
+      </div>
+    );
+  }
+
+  return <CredentialsPageInner />;
+}
+
+function CredentialsPageInner() {
   const wallet = useCredentialWallet();
   const [diplomas, setDiplomas] = useState<Diploma[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -200,14 +212,36 @@ export default function CredentialsPage() {
                   </p>
                   <div className="mt-auto">
                     {d.alreadyMinted && d.txHash ? (
-                      <a
-                        href={`https://sepolia.basescan.org/tx/${d.txHash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block rounded-lg bg-emerald-600/20 px-4 py-2 text-center text-sm font-medium text-emerald-300 transition hover:bg-emerald-600/30"
-                      >
-                        View on BaseScan →
-                      </a>
+                      <div className="space-y-2">
+                        <a
+                          href={`https://sepolia.basescan.org/tx/${d.txHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block rounded-lg bg-emerald-600/20 px-4 py-2 text-center text-sm font-medium text-emerald-300 transition hover:bg-emerald-600/30"
+                        >
+                          View on BaseScan &rarr;
+                        </a>
+                        {d.tokenId && (
+                          <>
+                            <a
+                              href={`/verify/${d.tokenId}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block rounded-lg bg-purple-600/20 px-4 py-2 text-center text-sm font-medium text-purple-300 transition hover:bg-purple-600/30"
+                            >
+                              View credential page &rarr;
+                            </a>
+                            <a
+                              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://kairoslearn.com/verify/${d.tokenId}`)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block rounded-lg bg-[#0077B5]/20 px-4 py-2 text-center text-sm font-medium text-[#0077B5] transition hover:bg-[#0077B5]/30"
+                            >
+                              Share on LinkedIn
+                            </a>
+                          </>
+                        )}
+                      </div>
                     ) : (
                       <button
                         type="button"

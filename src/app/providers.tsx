@@ -57,14 +57,14 @@ function CoachSidebar() {
     if (isPanelOpen) setHasBeenOpened(true);
   }, [isPanelOpen]);
 
-  // Auto-close Coach Alex on pages where it shouldn't appear
+  // Auto-close Coach Kairos on pages where it shouldn't appear
   useEffect(() => {
     if (shouldHide && isPanelOpen) {
       closePanel();
     }
   }, [shouldHide, isPanelOpen, closePanel]);
 
-  // Hide Coach Alex on language courses, /talk, login, signup, onboarding
+  // Hide Coach Kairos on language courses, /talk, login, signup, onboarding
   if (shouldHide) return null;
 
   // Don't mount coach until it's been opened at least once or there's a lesson
@@ -145,7 +145,7 @@ function CoachSidebar() {
           <button
             onClick={closePanel}
             className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-white/50 hover:text-white transition-colors"
-            title="Close Coach Alex"
+            title="Close Coach Kairos"
           >
             <X className="w-4 h-4" />
           </button>
@@ -186,7 +186,7 @@ function CoachFAB() {
       className="fixed bottom-20 right-3 md:bottom-6 md:right-6 z-30 flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:gap-2 md:px-4 md:py-3 rounded-full bg-gradient-to-r from-blue-500 to-violet-600 text-white text-sm font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all hover:scale-105"
     >
       <GraduationCap className="w-4 h-4 md:w-5 md:h-5" />
-      <span className="hidden md:inline">Coach Alex</span>
+      <span className="hidden md:inline">Coach Kairos</span>
     </button>
   );
 }

@@ -122,7 +122,7 @@ export default function BlogPostPage() {
           <ul>
             <li><strong>Real-time voice conversations</strong> — not just text-to-speech reading a script</li>
             <li><strong>17 languages</strong> — learn in the language you think in</li>
-            <li><strong>Adaptive explanations</strong> — Coach Alex adjusts based on your level</li>
+            <li><strong>Adaptive explanations</strong> — Coach Kairos adjusts based on your level</li>
             <li><strong>Interactive practice</strong> — code while talking through problems</li>
           </ul>
 
@@ -191,7 +191,7 @@ export default function BlogPostPage() {
             Experience Voice-First Learning
           </h2>
           <p className="text-xl mb-8 text-black/80">
-            Try KairosLearn free. Talk to Coach Alex in 17 languages.
+            Try KairosLearn free. Talk to Coach Kairos in 17 languages.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

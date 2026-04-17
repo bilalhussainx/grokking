@@ -87,7 +87,7 @@ export default function CourseLayout({
 
         {/* TranslationBar rendered globally via providers.tsx */}
 
-        {/* Coach Alex is rendered globally via providers.tsx */}
+        {/* Coach Kairos is rendered globally via providers.tsx */}
       </div>
     </ProtectedRoute>
   );

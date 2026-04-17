@@ -48,7 +48,7 @@ export function rollVariableReward(userId: string, actionCount: number): RewardE
   } else if (roll < 0.98) {
     const messages = [
       "You're on fire today!",
-      "Coach Alex is impressed!",
+      "Coach Kairos is impressed!",
       "Learning streak activated!",
       "Brain power unlocked!",
       "Knowledge level: Expert mode!",

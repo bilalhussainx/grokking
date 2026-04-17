@@ -49,7 +49,7 @@ const AI_FEATURES = [
   },
   {
     icon: GraduationCap,
-    title: "Coach Alex",
+    title: "Coach Kairos",
     desc: "Click the Coach button on any lesson for AI hints, explanations, and code help",
     color: "text-violet-400",
   },

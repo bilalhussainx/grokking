@@ -142,12 +142,12 @@ export default function BlogPostPage() {
           </ul>
 
           <p>
-            Our AI tutor, Coach Alex, doesn't just <strong>translate</strong> the course — it <strong>explains concepts
+            Our AI tutor, Coach Kairos, doesn't just <strong>translate</strong> the course — it <strong>explains concepts
             natively</strong> in your language. It uses idioms, examples, and cultural references that make sense to you.
           </p>
 
           <p>
-            When a Spanish speaker asks about recursion, Coach Alex might reference "muñecas rusas" (Russian dolls).
+            When a Spanish speaker asks about recursion, Coach Kairos might reference "muñecas rusas" (Russian dolls).
             When a French speaker asks about binary trees, it uses "arbre binaire" naturally, not awkwardly translated English.
           </p>
 
@@ -246,7 +246,7 @@ export default function BlogPostPage() {
             Learn in Your Language
           </h2>
           <p className="text-xl mb-8 text-black/80">
-            Try KairosLearn free. Talk to Coach Alex in 17 languages.
+            Try KairosLearn free. Talk to Coach Kairos in 17 languages.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

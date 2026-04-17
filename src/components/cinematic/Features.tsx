@@ -21,7 +21,7 @@ const FEATURES = [
   {
     icon: '\u25D0',
     title: 'Real-time Coaching',
-    desc:  'Coach Alex adapts explanations to your level. Get progressive hints, detailed breakdowns, and encouragement — all through voice or text.',
+    desc:  'Coach Kairos adapts explanations to your level. Get progressive hints, detailed breakdowns, and encouragement — all through voice or text.',
   },
   {
     icon: '\u2B21',

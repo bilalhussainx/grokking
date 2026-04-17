@@ -166,7 +166,7 @@ function OnboardingInner() {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold text-white mb-1">What language do you speak?</h2>
-        <p className="text-sm text-white/50">Coach Alex can explain lessons in your language</p>
+        <p className="text-sm text-white/50">Coach Kairos can explain lessons in your language</p>
       </div>
 
       <div className="space-y-3">
@@ -220,9 +220,9 @@ function OnboardingInner() {
       {nativeLanguage !== "en" && (
         <div className="space-y-3 pt-2">
           <label className="text-sm text-white/70">
-            Would you like Coach Alex to explain lessons in {ALL_SUPPORTED_LANGUAGES.find(l => l.code === nativeLanguage)?.name || "your language"}?
+            Would you like Coach Kairos to explain lessons in {ALL_SUPPORTED_LANGUAGES.find(l => l.code === nativeLanguage)?.name || "your language"}?
           </label>
-          <p className="text-xs text-white/30">Course text stays in English, but the voice coach explains concepts in your chosen language. You can switch back to English anytime by telling Coach Alex.</p>
+          <p className="text-xs text-white/30">Course text stays in English, but the voice coach explains concepts in your chosen language. You can switch back to English anytime by telling Coach Kairos.</p>
           <div className="flex gap-2">
             <button
               onClick={() => { setWantInstruction(true); setInstructionLanguage(nativeLanguage); }}
@@ -281,7 +281,7 @@ function OnboardingInner() {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold text-white mb-1">How do you like to learn?</h2>
-        <p className="text-sm text-white/50">Coach Alex adapts to your preferred style</p>
+        <p className="text-sm text-white/50">Coach Kairos adapts to your preferred style</p>
       </div>
 
       <div className="space-y-3">
@@ -341,7 +341,7 @@ function OnboardingInner() {
 
       <div className="p-4 rounded-lg bg-white/[0.03] border border-white/[0.08] space-y-4">
         <p className="text-sm text-white/70 leading-relaxed">
-          We can use your language, location, and learning preferences to personalize your experience — recommending relevant courses, adapting Coach Alex's teaching style, and matching you with the right voice and accent.
+          We can use your language, location, and learning preferences to personalize your experience — recommending relevant courses, adapting Coach Kairos's teaching style, and matching you with the right voice and accent.
         </p>
 
         <div className="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
@@ -408,7 +408,7 @@ function OnboardingInner() {
         </div>
 
         <p className="text-xs text-white/30">
-          You can change any of these in Settings. Tell Coach Alex &quot;switch to English&quot; at any time during a lesson.
+          You can change any of these in Settings. Tell Coach Kairos &quot;switch to English&quot; at any time during a lesson.
         </p>
 
         <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 mt-4">

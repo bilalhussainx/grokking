@@ -17,7 +17,7 @@ interface ShortcutOptions {
  * Shortcuts:
  * - N: Next lesson
  * - P: Previous lesson
- * - H: Toggle hint panel (Coach Alex)
+ * - H: Toggle hint panel (Coach Kairos)
  * - ?: Show shortcuts help (dispatches event)
  */
 export function useKeyboardShortcuts({

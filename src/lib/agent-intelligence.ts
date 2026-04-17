@@ -2,7 +2,7 @@
  * Agent Intelligence Layer
  *
  * Fetches rich context from Supabase for every AI interaction.
- * Every agent (Coach Alex, Language Tutor, Talk) calls this before responding.
+ * Every agent (Coach Kairos, Language Tutor, Talk) calls this before responding.
  * This is the RAG brain — the more data it has, the smarter the agent gets.
  */
 

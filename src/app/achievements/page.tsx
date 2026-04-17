@@ -33,7 +33,7 @@ export default function AchievementsPage() {
   const ALL_ACHIEVEMENTS: Achievement[] = [
     { id: "first-steps", name: "First Steps", description: "Complete your first lesson", rarity: "common", icon: "👣", gemReward: 5 },
     { id: "voice-activated", name: "Voice Activated", description: "Start your first voice session", rarity: "common", icon: "🎤", gemReward: 5 },
-    { id: "curious-mind", name: "Curious Mind", description: "Ask Coach Alex a question", rarity: "common", icon: "🤔", gemReward: 5 },
+    { id: "curious-mind", name: "Curious Mind", description: "Ask Coach Kairos a question", rarity: "common", icon: "🤔", gemReward: 5 },
     { id: "consistent", name: "Consistent", description: "Maintain a 3-day streak", rarity: "uncommon", icon: "📅", gemReward: 10 },
     { id: "module-master", name: "Module Master", description: "Complete an entire module", rarity: "rare", icon: "📚", gemReward: 25 },
     { id: "polyglot", name: "Polyglot", description: "Start courses in 2+ languages", rarity: "rare", icon: "🌍", gemReward: 25 },

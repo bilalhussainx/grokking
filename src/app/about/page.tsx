@@ -57,7 +57,7 @@ export default function AboutPage() {
               <li><strong>Voice tutoring in 17 languages</strong> — not just English</li>
               <li><strong>69+ interactive courses</strong> — coding, languages, finance, philosophy, religion</li>
               <li><strong>2,284+ structured lessons</strong> — from beginner to professional</li>
-              <li><strong>Real-time AI coaching</strong> — Coach Alex adapts to your level and explains in your language</li>
+              <li><strong>Real-time AI coaching</strong> — Coach Kairos adapts to your level and explains in your language</li>
             </ul>
 
             <p className="text-gray-300 leading-relaxed mb-4">

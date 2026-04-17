@@ -291,20 +291,18 @@ export default function HomePage() {
         animate="visible"
       >
         {/* ====================================================================
-            NON-LOGGED-IN EXPERIENCE
+            NON-LOGGED-IN EXPERIENCE — COLLEGE COUNSELOR FIRST
             ==================================================================== */}
         {!user && !loading && (
           <>
-            {/* ── SECTION 1: HERO ── */}
+            {/* ── SECTION 1: HERO — College Counselor ── */}
             <motion.div variants={item} className="relative text-center mb-20 pt-8">
-              {/* Cinematic grid background */}
               <div
                 className="absolute -z-20 inset-0 h-[600px] w-full opacity-30
                 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)]
                 bg-[size:4rem_4rem]
                 [mask-image:radial-gradient(ellipse_80%_60%_at_50%_20%,#000_40%,transparent_100%)]"
               />
-              {/* Cinematic animated gradient orbs */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
                 <motion.div
                   className="absolute top-0 left-1/4 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-[120px]"
@@ -316,14 +314,8 @@ export default function HomePage() {
                   animate={{ x: [0, -35, 15, 0], y: [0, 30, -15, 0], scale: [1, 1.15, 1.05, 1] }}
                   transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
                 />
-                <motion.div
-                  className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-96 h-60 bg-white/5 rounded-full blur-[100px]"
-                  animate={{ scale: [1, 1.08, 0.98, 1], opacity: [0.8, 1, 0.7, 0.8] }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                />
               </div>
 
-              {/* Logo with cinematic scale-up */}
               <motion.div
                 className="flex justify-center mb-8"
                 initial={{ scale: 0.3, opacity: 0, filter: "blur(20px)" }}
@@ -333,7 +325,6 @@ export default function HomePage() {
                 <KairosLogo size="xl" showText={false} />
               </motion.div>
 
-              {/* Badge slides in */}
               <motion.div
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 text-[#D4AF37] text-xs font-medium mb-6"
                 initial={{ opacity: 0, y: 10, scale: 0.9 }}
@@ -341,43 +332,34 @@ export default function HomePage() {
                 transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.4, 0.25, 1] }}
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                FAANG mock interviews &middot; College alumni interviews &middot; 9 voice languages
+                Free for every student &middot; No credit card &middot; Speaks your language
               </motion.div>
 
-              {/* Hero text with word-by-word blur reveal */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1]">
                 <BlurReveal
-                  text="From Harvard to Google."
+                  text="Your free AI"
                   className="text-white"
                   delay={0.3}
                 />
                 <br />
                 <span className="inline-block">
                   <BlurReveal
-                    text="One AI"
-                    className="text-white"
-                    delay={0.6}
-                  />
-                  {" "}
-                  <BlurReveal
-                    text="interview coach."
+                    text="college counselor."
                     className="italic text-[#D4AF37]"
-                    delay={0.7}
+                    delay={0.6}
                   />
                 </span>
               </h1>
 
-              {/* Subtitle fades in */}
               <motion.p
                 className="mt-6 text-lg sm:text-xl text-white/55 max-w-2xl mx-auto leading-relaxed"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
               >
-                Practice your <strong className="text-white/80">Harvard alumni interview</strong> in the morning, your <strong className="text-white/80">Google L4 system design</strong> in the afternoon. AI personas trained on real reports — in your native language.
+                For <strong className="text-white/80">first-gen students</strong>. Build your school list, write winning essays, navigate financial aid, and practice interviews — all with an AI that speaks <strong className="text-white/80">your language</strong>.
               </motion.p>
 
-              {/* CTAs slide up with spring */}
               <motion.div
                 className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10"
                 initial={{ opacity: 0, y: 30 }}
@@ -385,295 +367,112 @@ export default function HomePage() {
                 transition={{ duration: 0.7, delay: 0.65, ease: [0.25, 0.4, 0.25, 1] }}
               >
                 <Link
-                  href="/college-interviews"
+                  href="/signup"
                   className="group w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-base hover:bg-[#C4A030] transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  Practice College Interview
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                </Link>
-                <Link
-                  href="/interviews"
-                  className="group w-full sm:w-auto px-8 py-3.5 rounded-xl border border-white/20 text-white font-medium text-base hover:border-[#D4AF37]/50 hover:bg-white/5 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
-                >
-                  <Target className="w-4 h-4" />
-                  Practice Tech Interview
+                  Start your free plan
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </motion.div>
             </motion.div>
 
-            {/* ── SECTION 2: THREE FEATURE PILLARS ── */}
+            {/* ── SECTION 2: THREE PERSONA TESTIMONIALS ── */}
             <StaggerReveal className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-20" delay={0.1}>
-              {/* College Interview Coaching Pillar — NEW, FEATURED FIRST */}
-              <motion.div
-                variants={staggerChild}
-                className="group relative overflow-hidden rounded-2xl border-2 border-[#D4AF37]/30 bg-gradient-to-br from-[#1a1610] to-[#141414] p-7 md:p-8"
-                whileHover={{ scale: 1.02, borderColor: "rgba(212, 175, 55, 0.6)", y: -4 }}
-                transition={springSnappy}
-              >
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#D4AF37]/10 rounded-full blur-3xl group-hover:bg-[#D4AF37]/20 transition-colors" />
-                <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-[10px] font-bold uppercase tracking-wider">New</div>
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center mb-5">
-                    <GraduationCap className="w-7 h-7 text-[#D4AF37]" />
+              {[
+                {
+                  name: "Maria",
+                  emoji: "🇲🇽",
+                  label: "First-gen, Spanish-speaking family",
+                  quote: "My parents don't speak English, so nobody at home could explain what FAFSA even means. Coach Kairos walked me through everything — in Spanish for my mom, in English for me. I applied to 12 schools and got into 4.",
+                  stat: "12 schools applied",
+                },
+                {
+                  name: "Jamal",
+                  emoji: "🎓",
+                  label: "Low-income, no college-educated relatives",
+                  quote: "I didn't even know you could negotiate financial aid. Kairos helped me compare award letters, draft an appeal, and save $8,000/year. None of my family had been through this before.",
+                  stat: "$8K saved in aid",
+                },
+                {
+                  name: "Priya",
+                  emoji: "🇮🇳",
+                  label: "International student from India",
+                  quote: "The US application process is totally different from India. Kairos explained Common App, helped me find need-blind schools for internationals, and prepped me for my MIT interview.",
+                  stat: "Need-blind schools found",
+                },
+              ].map((persona) => (
+                <motion.div
+                  key={persona.name}
+                  variants={staggerChild}
+                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#141414] p-7"
+                  whileHover={{ scale: 1.02, borderColor: "rgba(212, 175, 55, 0.4)", y: -4 }}
+                  transition={springSnappy}
+                >
+                  <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#D4AF37]/5 rounded-full blur-3xl group-hover:bg-[#D4AF37]/10 transition-colors" />
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-2xl">{persona.emoji}</span>
+                      <div>
+                        <p className="text-white font-semibold">{persona.name}</p>
+                        <p className="text-white/40 text-xs">{persona.label}</p>
+                      </div>
+                    </div>
+                    <p className="text-white/60 text-sm leading-relaxed mb-4">&ldquo;{persona.quote}&rdquo;</p>
+                    <span className="inline-block px-2.5 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium">
+                      {persona.stat}
+                    </span>
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-3">College Admissions</h2>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Building2 className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
-                      <span>Practice the real Harvard, Yale, Stanford, MIT alumni interview</span>
-                    </li>
-                    <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Brain className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
-                      <span>AI personalizes questions to your project, major, and essays</span>
-                    </li>
-                    <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Globe className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
-                      <span>Interview in English, get feedback in your native language (9 langs)</span>
-                    </li>
-                  </ul>
-                  <Link
-                    href="/college-interviews"
-                    className="inline-flex items-center gap-2 text-[#D4AF37] text-sm font-bold hover:text-[#C4A030] transition-colors"
-                  >
-                    Practice College Interview <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </motion.div>
-
-              {/* Tech Interview Coaching Pillar */}
-              <motion.div
-                variants={staggerChild}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#141414] p-7 md:p-8"
-                whileHover={{ scale: 1.02, borderColor: "rgba(212, 175, 55, 0.4)", y: -4 }}
-                transition={springSnappy}
-              >
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#D4AF37]/5 rounded-full blur-3xl group-hover:bg-[#D4AF37]/10 transition-colors" />
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center mb-5">
-                    <Target className="w-7 h-7 text-[#D4AF37]" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-white mb-3">Tech Interviews</h2>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Users className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
-                      <span>14 FAANG personas: Google L4, Meta E4, Amazon SDE II, Stripe, Anthropic</span>
-                    </li>
-                    <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Brain className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
-                      <span>AI adapts to your level and teaches when you get stuck</span>
-                    </li>
-                    <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Shield className="w-4 h-4 text-[#D4AF37] mt-0.5 shrink-0" />
-                      <span>Frontend, Backend, System Design, Behavioral, ML/AI, PM, Finance</span>
-                    </li>
-                  </ul>
-                  <Link
-                    href="/interviews"
-                    className="inline-flex items-center gap-2 text-[#D4AF37] text-sm font-medium hover:text-[#C4A030] transition-colors"
-                  >
-                    Practice Tech Interview <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </motion.div>
-
-              {/* Voice Tutoring Pillar */}
-              <motion.div
-                variants={staggerChild}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#141414] p-7 md:p-8"
-                whileHover={{ scale: 1.02, borderColor: "rgba(212, 175, 55, 0.4)", y: -4 }}
-                transition={springSnappy}
-              >
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors" />
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center mb-5">
-                    <Mic className="w-7 h-7 text-[#D4AF37]" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-white mb-3">Voice Tutoring</h2>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Globe className="w-4 h-4 text-white/70 mt-0.5 shrink-0" />
-                      <span>Learn coding, finance, philosophy in 9 native voice languages</span>
-                    </li>
-                    <li className="flex items-start gap-3 text-sm text-white/60">
-                      <MessageSquare className="w-4 h-4 text-white/70 mt-0.5 shrink-0" />
-                      <span>Real-time voice conversation with AI tutors</span>
-                    </li>
-                    <li className="flex items-start gap-3 text-sm text-white/60">
-                      <Zap className="w-4 h-4 text-white/70 mt-0.5 shrink-0" />
-                      <span>Sub-second response, powered by Claude Sonnet 4.5</span>
-                    </li>
-                  </ul>
-                  <Link
-                    href="/talk"
-                    className="inline-flex items-center gap-2 text-[#D4AF37] text-sm font-medium hover:text-[#C4A030] transition-colors"
-                  >
-                    Try Voice Chat <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </motion.div>
+                </motion.div>
+              ))}
             </StaggerReveal>
 
-            {/* ── SECTION 3: INTERVIEW TYPES GRID ── */}
+            {/* ── SECTION 3: WHAT COACH KAIROS DOES ── */}
             <ScrollReveal className="mb-20" delay={0.1} direction="up">
               <div className="text-center mb-8">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white">
-                  Practice Every Interview Type
+                  Everything a $10,000 counselor does. Free.
                 </h2>
                 <p className="mt-2 text-sm sm:text-base text-white/50 max-w-xl mx-auto">
-                  AI interviewers that adapt to your level, give real-time feedback, and teach you when you are stuck.
+                  Coach Kairos guides you from &ldquo;I have no idea where to start&rdquo; through &ldquo;I got in.&rdquo;
                 </p>
               </div>
-              <StaggerReveal className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4" delay={0.15}>
+              <StaggerReveal className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" delay={0.15}>
                 {[
-                  { icon: Users, label: "Recruiter Screen", desc: "15-minute phone screen simulation with follow-up questions", href: "/signup", color: "emerald" },
-                  { icon: Code2, label: "Technical Interview", desc: "Live coding problems with AI that evaluates your approach", href: "/signup", color: "blue" },
-                  { icon: Building2, label: "System Design", desc: "Whiteboard-style architecture discussions at any seniority", href: "/signup", color: "violet" },
-                  { icon: MessageSquare, label: "Behavioral", desc: "STAR method practice with real-time coaching on delivery", href: "/signup", color: "amber" },
-                  { icon: Map, label: "Career Pathways", desc: "Role-based learning paths that combine courses + interviews", href: "/pathways", color: "cyan" },
-                ].map((card) => {
-                  const Icon = card.icon;
+                  { icon: MessageSquare, label: "Voice Intake", desc: "Tell Kairos about yourself in a 5-minute conversation — type or speak" },
+                  { icon: Building2, label: "School List Builder", desc: "AI-generated reach/match/safety list based on your profile and goals" },
+                  { icon: BookOpen, label: "Essay Studio", desc: "Brainstorm, outline, and polish your essays — Kairos coaches, never writes for you" },
+                  { icon: Shield, label: "Financial Aid Navigator", desc: "FAFSA walkthrough, CSS Profile help, and scholarship matching" },
+                  { icon: Users, label: "Interview Prep", desc: "Practice with AI personas trained on real Harvard, Yale, and Stanford interviews" },
+                  { icon: Globe, label: "In Your Language", desc: "Speaks Spanish, Hindi, Mandarin, and more — for you and your parents" },
+                ].map((feature) => {
+                  const Icon = feature.icon;
                   return (
-                    <Link key={card.label} href={card.href}>
-                      <motion.div
-                        variants={staggerChild}
-                        className="bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 rounded-2xl p-5 cursor-pointer h-full transition-all"
-                        whileHover={{ scale: 1.04, y: -6 }}
-                        transition={springSnappy}
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center mb-3">
-                          <Icon className="w-5 h-5 text-[#D4AF37]" />
-                        </div>
-                        <h4 className="text-white font-semibold mb-1">{card.label}</h4>
-                        <p className="text-slate-400 text-xs leading-relaxed">{card.desc}</p>
-                      </motion.div>
-                    </Link>
+                    <motion.div
+                      key={feature.label}
+                      variants={staggerChild}
+                      className="bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 rounded-2xl p-5 transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center mb-3">
+                        <Icon className="w-5 h-5 text-[#D4AF37]" />
+                      </div>
+                      <h4 className="text-white font-semibold mb-1">{feature.label}</h4>
+                      <p className="text-slate-400 text-xs leading-relaxed">{feature.desc}</p>
+                    </motion.div>
                   );
                 })}
               </StaggerReveal>
             </ScrollReveal>
 
-            {/* ── SECTION 4: CAREER PATHWAYS PREVIEW ── */}
-            <ScrollReveal className="mb-20" direction="left">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-white">Career Pathways</h2>
-                  <p className="mt-1 text-sm text-white/50">Structured learning paths for specific roles</p>
-                </div>
-                <Link
-                  href="/pathways"
-                  className="text-sm text-[#D4AF37] hover:text-[#C4A030] font-medium flex items-center gap-1 transition-colors"
-                >
-                  All pathways <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {pathways.slice(0, 4).map((pw) => (
-                  <Link key={pw.slug} href={`/pathways/${pw.slug}`}>
-                    <motion.div
-                      className="group rounded-2xl border border-white/10 bg-[#141414] p-5 h-full cursor-pointer hover:border-[#D4AF37]/40 transition-all"
-                      whileHover={{ scale: 1.02 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <div className="text-3xl mb-3">{pw.icon}</div>
-                      <h4 className="text-white font-semibold mb-1">{pw.title}</h4>
-                      <p className="text-xs text-white/40 mb-3">{pw.courses.length} courses &middot; {pw.estimatedWeeks} weeks</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {pw.roles.slice(0, 2).map((role) => (
-                          <span key={role} className="px-2 py-0.5 rounded-full bg-white/5 text-white/40 text-[10px] border border-white/5">
-                            {role}
-                          </span>
-                        ))}
-                      </div>
-                    </motion.div>
-                  </Link>
-                ))}
-              </div>
-            </ScrollReveal>
-
-            {/* ── SECTION 5: TOP COURSES (curated, not all 69) ── */}
-            <ScrollReveal className="mb-20" delay={0.1}>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl sm:text-3xl font-bold text-white">Top Courses</h2>
-                <Link
-                  href="/courses"
-                  className="text-sm text-[#D4AF37] hover:text-[#C4A030] font-medium flex items-center gap-1 transition-colors"
-                >
-                  See all courses <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-
-              {/* Interview Prep row */}
-              <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Target className="w-3.5 h-3.5 text-[#D4AF37]" />
-                Interview Prep
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                {["coding-interview", "system-design", "behavioral-interview"].map((slug) => {
-                  const course = courses.find(c => c.slug === slug);
-                  if (!course) return null;
-                  return (
-                    <Link key={course.slug} href={`/course/${course.slug}`}>
-                      <motion.div
-                        className="group rounded-xl bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 p-5 h-full cursor-pointer transition-all"
-                        whileHover={{ scale: 1.02 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <span className="text-3xl">{course.icon}</span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'border-white/20 text-white/70'}`}>
-                            {course.tier === 'pro' ? 'PRO' : 'FREE'}
-                          </span>
-                        </div>
-                        <h4 className="text-white font-semibold">{course.title}</h4>
-                        <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
-                      </motion.div>
-                    </Link>
-                  );
-                })}
-              </div>
-
-              {/* Most Popular row */}
-              <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Star className="w-3.5 h-3.5 text-[#D4AF37]" />
-                Most Popular
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {["python-fundamentals", "react-development", "data-structures-algorithms"].map((slug) => {
-                  const course = courses.find(c => c.slug === slug);
-                  if (!course) return null;
-                  return (
-                    <Link key={course.slug} href={`/course/${course.slug}`}>
-                      <motion.div
-                        className="group rounded-xl bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 p-5 h-full cursor-pointer transition-all"
-                        whileHover={{ scale: 1.02 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <span className="text-3xl">{course.icon}</span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'border-white/20 text-white/70'}`}>
-                            {course.tier === 'pro' ? 'PRO' : 'FREE'}
-                          </span>
-                        </div>
-                        <h4 className="text-white font-semibold">{course.title}</h4>
-                        <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
-                      </motion.div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </ScrollReveal>
-
-            {/* ── SECTION 6: SOCIAL PROOF NUMBERS ── */}
+            {/* ── SECTION 4: SOCIAL PROOF NUMBERS ── */}
             <ScrollReveal className="mb-20" direction="scale">
               <div className="rounded-2xl border border-white/10 bg-[#141414] p-8">
                 <StaggerReveal className="grid grid-cols-2 md:grid-cols-4 gap-8" delay={0.1}>
                   {[
-                    { value: "69+", label: "Courses", icon: BookOpen },
-                    { value: "17", label: "Languages", icon: Globe },
-                    { value: "10", label: "Career Pathways", icon: Map },
-                    { value: "AI", label: "Voice Coaching", icon: Mic },
+                    { value: "550+", label: "Schools in Database", icon: Building2 },
+                    { value: "17", label: "Languages Supported", icon: Globe },
+                    { value: "200+", label: "Terms Explained", icon: BookOpen },
+                    { value: "$0", label: "Cost to Students", icon: GraduationCap },
                   ].map((stat) => {
                     const StatIcon = stat.icon;
                     return (
@@ -688,7 +487,47 @@ export default function HomePage() {
               </div>
             </ScrollReveal>
 
-            {/* ── SECTION 7: FINAL CTA ── */}
+            {/* ── SECTION 5: SUPPLEMENTAL LEARNING (de-emphasized) ── */}
+            <ScrollReveal className="mb-20" delay={0.1}>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-white/70">Supplemental Learning</h2>
+                  <p className="mt-1 text-xs text-white/40">AP courses, coding, and more to strengthen your application</p>
+                </div>
+                <Link
+                  href="/courses"
+                  className="text-sm text-[#D4AF37] hover:text-[#C4A030] font-medium flex items-center gap-1 transition-colors"
+                >
+                  All courses <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {["coding-interview", "python-fundamentals", "react-development"].map((slug) => {
+                  const course = courses.find(c => c.slug === slug);
+                  if (!course) return null;
+                  return (
+                    <Link key={course.slug} href={`/course/${course.slug}`}>
+                      <motion.div
+                        className="group rounded-xl bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 p-5 h-full cursor-pointer transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <span className="text-3xl">{course.icon}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'border-white/20 text-white/70'}`}>
+                            {course.tier === 'pro' ? 'PRO' : 'FREE'}
+                          </span>
+                        </div>
+                        <h4 className="text-white font-semibold">{course.title}</h4>
+                        <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
+                      </motion.div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </ScrollReveal>
+
+            {/* ── SECTION 6: FINAL CTA ── */}
             <ScrollReveal className="mb-16" direction="scale">
               <div className="relative rounded-2xl border border-white/10 bg-[#141414] p-10 text-center overflow-hidden">
                 <div className="absolute inset-0 pointer-events-none">
@@ -705,17 +544,17 @@ export default function HomePage() {
                 </div>
                 <div className="relative z-10">
                   <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                    Ready to ace your next interview?
+                    You deserve the same guidance as a prep-school kid.
                   </h2>
                   <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto mb-8">
-                    Get 300 free AI credits, access to all interview types, and voice coaching in 17 languages.
+                    Start free. No credit card. Coach Kairos is here whenever you need help — in your language.
                   </p>
                   <Link
                     href="/signup"
                     className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-base hover:bg-[#C4A030] transition-all hover:-translate-y-0.5 active:translate-y-0"
                   >
                     <GraduationCap className="w-5 h-5" />
-                    Create Free Account
+                    Start your free plan
                   </Link>
                 </div>
               </div>
@@ -800,7 +639,7 @@ export default function HomePage() {
                   className="group px-5 py-2.5 rounded-xl border border-[#D4AF37]/30 text-[#D4AF37] text-sm font-semibold hover:bg-[#D4AF37]/10 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  Chat with Coach Alex
+                  Chat with Coach Kairos
                 </button>
               </motion.div>
             </motion.div>

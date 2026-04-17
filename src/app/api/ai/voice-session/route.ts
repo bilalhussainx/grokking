@@ -313,7 +313,7 @@ Your responses will be spoken aloud by a text-to-speech engine. You MUST:
       },
       // OpenRouter primary (Claude Sonnet 4.5 — natural conversation),
       // Kimi/Moonshot fallback if OPENROUTER_API_KEY is missing.
-      // Spec: 2026-04-07-llm-router-design (Coach Alex parity)
+      // Spec: 2026-04-07-llm-router-design (Coach Kairos parity)
       think: OPENROUTER_API_KEY
         ? {
             provider: {

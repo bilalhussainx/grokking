@@ -7,7 +7,7 @@ const SHORTCUTS = [
   { keys: ["Ctrl", "K"], desc: "Search courses & lessons" },
   { keys: ["N"], desc: "Next lesson" },
   { keys: ["P"], desc: "Previous lesson" },
-  { keys: ["H"], desc: "Toggle Coach Alex hints" },
+  { keys: ["H"], desc: "Toggle Coach Kairos hints" },
   { keys: ["?"], desc: "Show this help" },
   { keys: ["Esc"], desc: "Close dialogs" },
 ];

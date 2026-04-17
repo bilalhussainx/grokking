@@ -243,7 +243,7 @@ APPROACH:
       + `\n\nCRITICAL LATENCY RULE: Keep ALL responses to 1-2 sentences MAX. This is voice — short is better. Never give a paragraph. One thought per response, then wait for the student.`
       + `\n\nOUTPUT FORMAT (CRITICAL — VOICE MODE): Your responses are spoken aloud by TTS. NEVER use markdown: no **bold**, no *italic*, no # headings, no bullet lists, no \`backticks\`. Write plain spoken sentences only. For emphasis use word choice, not formatting symbols. For code references say them naturally like "the print function", not backtick-wrapped.`;
 
-    // Build Deepgram Voice Agent settings (same format as Coach Alex)
+    // Build Deepgram Voice Agent settings (same format as Coach Kairos)
     const settings = {
       type: "Settings",
       audio: {

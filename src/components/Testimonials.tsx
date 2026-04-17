@@ -41,7 +41,7 @@ const testimonials = [
     name: 'David L.',
     role: 'Junior Developer',
     rating: 4,
-    text: 'I can ask follow-up questions and Coach Alex explains things in different ways until I understand. Way better than reading textbooks alone.',
+    text: 'I can ask follow-up questions and Coach Kairos explains things in different ways until I understand. Way better than reading textbooks alone.',
     course: 'Python Fundamentals',
   },
 ];

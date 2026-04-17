@@ -36,7 +36,7 @@ function categoryLabel(note: SessionNote): string {
   if (note.courseSlug === "mock-interview") return "Tech interview";
   if (note.courseSlug === "college-interview") return "College interview";
   if (note.courseSlug === "talk-session" || note.courseSlug === "voice-tutor") return "Voice tutor";
-  if (note.courseSlug === "coach-chat") return "Coach Alex";
+  if (note.courseSlug === "coach-chat") return "Coach Kairos";
   return note.courseTitle || "Lesson";
 }
 

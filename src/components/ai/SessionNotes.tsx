@@ -88,7 +88,7 @@ export default function SessionNotes() {
             <BookOpen className="w-8 h-8 mb-2" />
             <p className="text-xs">No notes yet</p>
             <p className="text-[10px] mt-1">
-              Chat with Coach Alex to generate session notes
+              Chat with Coach Kairos to generate session notes
             </p>
           </div>
         )}

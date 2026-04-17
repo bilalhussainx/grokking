@@ -310,7 +310,7 @@ export default function AICoach() {
       .slice(0, 6);
 
     const userQuestions = msgs.filter(m => m.role === 'user').length;
-    const summary = `Discussed "${ctx.lessonTitle}" with Coach Alex. ${userQuestions} question${userQuestions !== 1 ? 's' : ''} asked, ${coachMessages.length} response${coachMessages.length !== 1 ? 's' : ''} received. Topics covered: ${keyPoints.slice(0, 3).join('; ')}.`;
+    const summary = `Discussed "${ctx.lessonTitle}" with Coach Kairos. ${userQuestions} question${userQuestions !== 1 ? 's' : ''} asked, ${coachMessages.length} response${coachMessages.length !== 1 ? 's' : ''} received. Topics covered: ${keyPoints.slice(0, 3).join('; ')}.`;
 
     saveSessionNote({
       id: `note-${Date.now()}`,
@@ -984,7 +984,7 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
         {messages.length === 0 && !isStreaming && !isVoiceActive && coachMode === 'text-monitoring' && (
           <div className="flex flex-col items-center justify-center h-full text-center opacity-40">
             <GraduationCap className="w-8 h-8 mb-2" />
-            <p className="text-xs">{lessonContext ? 'Coach Alex is reading along with you' : 'Ask me anything — coding, interview prep, or any topic'}</p>
+            <p className="text-xs">{lessonContext ? 'Coach Kairos is reading along with you' : 'Ask me anything — coding, interview prep, or any topic'}</p>
             <p className="text-[10px] mt-1">Tap the mic or type below to chat</p>
           </div>
         )}
@@ -1042,7 +1042,7 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
           <input
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
-            placeholder={isVoiceActive ? "Type to Coach Alex (or just speak)..." : "Ask Coach Alex anything..."}
+            placeholder={isVoiceActive ? "Type to Coach Kairos (or just speak)..." : "Ask Coach Kairos anything..."}
             disabled={isStreaming}
             className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/40 disabled:opacity-50"
           />

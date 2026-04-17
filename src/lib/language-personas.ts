@@ -1,5 +1,5 @@
 // Language Persona Definitions for Language Learning Voice Agent
-// Separate from existing voice-personas.ts (Coach Alex, Interviewer, etc.)
+// Separate from existing voice-personas.ts (Coach Kairos, Interviewer, etc.)
 
 import type { ConversationCheckpoint } from '@/data/language-types';
 
@@ -1574,7 +1574,7 @@ export function toVoiceAgentConfig(
     };
   }
   
-  // It's an existing Persona (Coach Alex, Interviewer, etc.)
+  // It's an existing Persona (Coach Kairos, Interviewer, etc.)
   return {
     personaId: persona.id,
     systemPrompt: persona.systemPrompt,

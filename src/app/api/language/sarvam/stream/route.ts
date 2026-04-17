@@ -8,7 +8,7 @@ const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 
 // LLM brain — OpenRouter primary (Claude Sonnet 4.5), Kimi fallback.
-// Spec: 2026-04-07 OpenRouter parity with Coach Alex
+// Spec: 2026-04-07 OpenRouter parity with Coach Kairos
 const VOICE_LLM_MODEL = process.env.OPENROUTER_VOICE_MODEL || "anthropic/claude-sonnet-4.5";
 
 const SARVAM_LANGUAGES = ['hi', 'pa'];
