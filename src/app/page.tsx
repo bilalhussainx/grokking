@@ -367,7 +367,7 @@ export default function HomePage() {
                 transition={{ duration: 0.7, delay: 0.65, ease: [0.25, 0.4, 0.25, 1] }}
               >
                 <Link
-                  href="/signup"
+                  href="/intake"
                   className="group w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-base hover:bg-[#C4A030] transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
                 >
                   <GraduationCap className="w-4 h-4" />
@@ -550,7 +550,7 @@ export default function HomePage() {
                     Start free. No credit card. Coach Kairos is here whenever you need help — in your language.
                   </p>
                   <Link
-                    href="/signup"
+                    href="/intake"
                     className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-base hover:bg-[#C4A030] transition-all hover:-translate-y-0.5 active:translate-y-0"
                   >
                     <GraduationCap className="w-5 h-5" />

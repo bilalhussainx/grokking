@@ -49,7 +49,8 @@ function CoachSidebar() {
   const isTalkPage = pathname?.startsWith("/talk");
   const isInterviewPage = (pathname?.startsWith("/interviews/") && pathname !== "/interviews") || (pathname?.startsWith("/career/interviews/") && pathname !== "/career/interviews");
   const isAuthPage = pathname === "/login" || pathname === "/signup" || pathname === "/onboarding";
-  const shouldHide = isLanguageCourse || isTalkPage || isInterviewPage || isAuthPage;
+  const isIntakePage = pathname?.startsWith("/intake");
+  const shouldHide = isLanguageCourse || isTalkPage || isInterviewPage || isAuthPage || isIntakePage;
   const [activeTab, setActiveTab] = useState<"coach" | "notes">("coach");
   const [hasBeenOpened, setHasBeenOpened] = useState(false);
 
@@ -176,9 +177,9 @@ function CoachFAB() {
   const pathname = usePathname();
   const isTalkPage = pathname?.startsWith("/talk");
   const isAuthPage = pathname === "/login" || pathname === "/signup" || pathname === "/onboarding";
+  const isIntakePage = pathname?.startsWith("/intake");
 
-  // Hide on language courses, /talk, login, signup, onboarding
-  if (isPanelOpen || !lessonContext || isLanguageCourse || isTalkPage || isAuthPage) return null;
+  if (isPanelOpen || !lessonContext || isLanguageCourse || isTalkPage || isAuthPage || isIntakePage) return null;
 
   return (
     <button
