@@ -18,6 +18,10 @@ export interface ApplicantProfile {
   topProjectDescription?: string;
   recentInfluence?: string;
   whyThisSchool?: string;
+  essayContext?: {
+    prompt: string;
+    excerpt: string;
+  };
 }
 
 export interface CollegeSessionContext {
@@ -248,6 +252,14 @@ function buildApplicantProfileBlock(profile: ApplicantProfile): string {
   }
   if (profile.whyThisSchool) {
     lines.push(`- What they said about why they want this school: ${profile.whyThisSchool}`);
+  }
+
+  if (profile.essayContext) {
+    lines.push('');
+    lines.push('## CANDIDATE\'S ESSAY (use to ask specific, probing follow-up questions)');
+    lines.push(`Prompt: "${profile.essayContext.prompt}"`);
+    lines.push(`Opening excerpt: "${profile.essayContext.excerpt}"`);
+    lines.push('Ask 1-2 questions about this essay during the interview — probe for authenticity and depth behind the story.');
   }
 
   lines.push('');
