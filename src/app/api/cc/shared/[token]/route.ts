@@ -91,7 +91,7 @@ export async function GET(
       .select("application_status, cc_schools(name, city, state)")
       .eq("student_id", studentId);
     result.schoolList = (schools || []).map((s) => {
-      const school = s.cc_schools as { name: string; city: string; state: string } | null;
+      const school = s.cc_schools as unknown as { name: string; city: string; state: string } | null;
       return {
         schoolName: school?.name || "Unknown",
         city: school?.city || "",
