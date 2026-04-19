@@ -10,7 +10,7 @@
 //   - Feedback language picker (interview is always English)
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { GraduationCap, Loader2, ArrowRight, Globe2, Sparkles, Mic, MessageSquare, Headphones } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
@@ -62,6 +62,14 @@ export default function CollegeInterviewSetup() {
   const [profileLoading, setProfileLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const searchParams = useSearchParams();
+  const presetPersona = searchParams.get("persona");
+  const presetFeedbackLang = searchParams.get("feedbackLang");
+  const returnTo = searchParams.get("returnTo");
+  const shouldIncludeEssays = searchParams.get("includeEssays") === "true";
+
+  const [essayContext, setEssayContext] = useState<{ prompt: string; excerpt: string } | undefined>(undefined);
+
   // Load profile from Supabase if signed in
   useEffect(() => {
     if (!user) {
@@ -89,6 +97,37 @@ export default function CollegeInterviewSetup() {
       }
     })();
   }, [user]);
+
+  useEffect(() => {
+    if (presetPersona && !collegePersonaId) {
+      setCollegePersonaId(presetPersona);
+    }
+    if (presetFeedbackLang && feedbackLanguage === "en") {
+      setFeedbackLanguage(presetFeedbackLang);
+    }
+  }, [presetPersona, presetFeedbackLang]);
+
+  useEffect(() => {
+    if (!shouldIncludeEssays) return;
+    (async () => {
+      try {
+        const res = await fetch("/api/cc/essays");
+        const data = await res.json();
+        const essays = data.essays || [];
+        const draft = essays.find(
+          (e: { phase: string }) => e.phase === "draft" || e.phase === "revise"
+        );
+        if (draft) {
+          setEssayContext({
+            prompt: draft.prompt_text || "",
+            excerpt: (draft.content || "").slice(0, 500),
+          });
+        }
+      } catch {
+        // non-fatal
+      }
+    })();
+  }, [shouldIncludeEssays]);
 
   const canStart = !!collegePersonaId && !loading;
 
@@ -120,6 +159,7 @@ export default function CollegeInterviewSetup() {
       topProjectDescription: topProjectDescription.trim() || undefined,
       recentInfluence: recentInfluence.trim() || undefined,
       whyThisSchool: whyThisSchool.trim() || undefined,
+      essayContext,
     };
 
     try {
@@ -180,6 +220,9 @@ export default function CollegeInterviewSetup() {
         feedbackLanguage,
         inputMode,
       });
+      if (returnTo) {
+        sessionStorage.setItem("cc_interview_returnTo", returnTo);
+      }
       router.push(`/college-interviews/${sessionId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
