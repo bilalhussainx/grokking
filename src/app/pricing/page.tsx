@@ -37,6 +37,19 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Subsidized access banner */}
+      <section className="max-w-2xl mx-auto px-4 pb-8">
+        <a
+          href="/pricing/subsidized"
+          className="block p-4 rounded-2xl border border-[#D4AF37]/20 bg-[#D4AF37]/5 hover:bg-[#D4AF37]/10 transition-all text-center"
+        >
+          <p className="text-sm text-[#D4AF37] font-medium">
+            First-generation or low-income student? You may qualify for{" "}
+            <span className="font-bold underline underline-offset-2">free Pro access</span>.
+          </p>
+        </a>
+      </section>
+
       {/* Pricing Cards */}
       <section className="px-4 pb-20">
         <PricingCards />
