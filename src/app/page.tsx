@@ -560,7 +560,7 @@ export default function HomePage() {
 
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => openPanel()}
+                onClick={() => coachKairos.open()}
                 data-tour="coach"
                 className="px-3 py-1.5 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#F4D03F] transition-colors flex items-center gap-1.5"
               >
