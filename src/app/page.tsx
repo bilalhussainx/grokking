@@ -3,27 +3,22 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
-import { Mic, BookOpen, ArrowRight, Sparkles, Star, Target, Users, Building2, MessageSquare, Map, Code2, Globe, GraduationCap, Zap, Shield, Brain, Server, Clock, Trophy } from "lucide-react";
+import { BookOpen, ArrowRight, Sparkles, Star, Target, Users, Building2, MessageSquare, Code2, Globe, GraduationCap, Zap, Shield, Brain, Server, Clock, Trophy, ClipboardList, Share2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAI } from "@/contexts/AIContext";
+import { useCoachKairos } from "@/contexts/CoachKairosContext";
 import { useXP } from "@/contexts/XPContext";
 import { courses } from "@/data";
 import { getAllLanguageCourses } from "@/data/languages";
-import { pathways } from "@/data/pathways";
 import type { Course } from "@/data/types";
-import { ALL_SUPPORTED_LANGUAGES } from "@/lib/voice-provider-router";
 import { useRouter } from "next/navigation";
-import LearningStats from "@/components/gamification/LearningStats";
-import DailyMissions from "@/components/gamification/DailyMissions";
-import StreakCalendar from "@/components/gamification/StreakCalendar";
-import AchievementsShowcase from "@/components/gamification/AchievementsShowcase";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
 import ProgressRing from "@/components/ui/ProgressRing";
-import ForgettingAlert from "@/components/gamification/ForgettingAlert";
-import VariableReward from "@/components/gamification/VariableReward";
 import WelcomeModal from "@/components/onboarding/WelcomeModal";
-import { getDailyLoginReward } from "@/lib/rewards";
+import DashboardWalkthrough from "@/components/onboarding/DashboardWalkthrough";
 import KairosLogo from "@/components/ui/SamsaraLogo";
+import OnboardingChecklist from "@/components/cc/dashboard/OnboardingChecklist";
+import CounselorDashboard from "@/components/cc/dashboard/CounselorDashboard";
 
 
 const container = {
@@ -162,14 +157,33 @@ function scoreCourse(course: { title: string; slug: string; domain?: string; des
   return Math.min(score, 10);
 }
 
+interface DashboardSummary {
+  setup: {
+    hasIntakeCompleted: boolean;
+    hasSchools: boolean;
+    hasPersonalStatement: boolean;
+    hasActivities: boolean;
+    hasSupplementsStarted: boolean;
+    profileCompletion: number;
+    firstName: string | null;
+    hasGPA: boolean;
+  };
+  schools: Parameters<typeof CounselorDashboard>[0]["schools"];
+  personalStatement: Parameters<typeof CounselorDashboard>[0]["personalStatement"];
+  activities: { logged: number; optimized: number; topThree: { id: string; label: string; impactScore: number | null }[] };
+  brief: string | null;
+  hasMetCoach: boolean;
+}
+
 export default function HomePage() {
   const { user, profile, credits, loading } = useAuth();
-  const { earnXP, showXPFlyUp, lastXPAmount, pendingReward, dismissReward } = useXP();
+  const { earnXP } = useXP();
   const { openPanel } = useAI();
+  const coachKairos = useCoachKairos();
   const router = useRouter();
   const [userInterests, setUserInterests] = useState<string[]>([]);
-  const [dailyXPAwarded, setDailyXPAwarded] = useState(false);
-  const [dailyLoginReward, setDailyLoginReward] = useState<{ gems: number; xp: number; message: string; isJackpot: boolean } | null>(null);
+  const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
   const courseProgress = useCourseProgress();
 
   // Get ALL courses user has started (progress > 0, not 100%), sorted by progress desc
@@ -220,70 +234,37 @@ export default function HomePage() {
       .catch(() => {});
   }, [user]);
 
-  // Award escalating daily login rewards once per day
+  // Quietly award daily-login XP once per day (no UI — gamification moved off dashboard)
   useEffect(() => {
     if (!user) return;
     const today = new Date().toISOString().slice(0, 10);
     const lastDate = localStorage.getItem("last-login-xp-date");
     if (lastDate === today) return;
-
-    // Track consecutive login days
-    const lastLoginDate = localStorage.getItem("last-login-date");
-    let consecutiveDay = parseInt(localStorage.getItem("login-consecutive-day") || "0", 10);
-
-    if (lastLoginDate) {
-      const lastD = new Date(lastLoginDate);
-      const todayD = new Date(today);
-      const diffMs = todayD.getTime() - lastD.getTime();
-      const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-      if (diffDays === 1) {
-        consecutiveDay += 1;
-      } else if (diffDays > 1) {
-        consecutiveDay = 1; // streak broken, restart
-      }
-    } else {
-      consecutiveDay = 1; // first login
-    }
-
-    localStorage.setItem("last-login-date", today);
     localStorage.setItem("last-login-xp-date", today);
-    localStorage.setItem("login-consecutive-day", String(consecutiveDay));
-
-    const reward = getDailyLoginReward(consecutiveDay);
-    setDailyLoginReward(reward);
-
-    earnXP("daily_login").then(() => setDailyXPAwarded(true));
+    earnXP("daily_login");
   }, [user, earnXP]);
+
+  // Fetch counselor dashboard summary
+  useEffect(() => {
+    if (!user) {
+      setDashboardLoading(false);
+      return;
+    }
+    setDashboardLoading(true);
+    fetch("/api/cc/dashboard/summary")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) setDashboard(data);
+      })
+      .catch(() => {})
+      .finally(() => setDashboardLoading(false));
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      {/* Variable reward popup */}
-      <VariableReward reward={pendingReward} onDismiss={dismissReward} />
-
       {/* First-time welcome modal */}
       {user && <WelcomeModal userName={profile?.full_name} />}
 
-      {/* XP fly-up on daily login */}
-      {showXPFlyUp > 0 && dailyXPAwarded && (
-        <motion.div
-          key={showXPFlyUp}
-          className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] pointer-events-none"
-          initial={{ opacity: 1, y: 0, scale: 1 }}
-          animate={{ opacity: 0, y: -60, scale: 1.3 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          onAnimationComplete={() => setDailyXPAwarded(false)}
-        >
-          <div className={`px-4 py-2 rounded-xl border font-bold text-lg shadow-lg ${
-            dailyLoginReward?.isJackpot
-              ? "bg-yellow-500/20 border-yellow-500/30 text-yellow-300 shadow-yellow-500/10"
-              : "bg-white/10 border-white/20 text-[#D4AF37]"
-          }`}>
-            {dailyLoginReward
-              ? dailyLoginReward.message
-              : `+${lastXPAmount} XP`}
-          </div>
-        </motion.div>
-      )}
       <motion.div
         className="max-w-5xl mx-auto px-4 pt-16 pb-20"
         variants={container}
@@ -566,85 +547,52 @@ export default function HomePage() {
             LOGGED-IN EXPERIENCE
             ==================================================================== */}
 
-        {/* Hero for logged-in users */}
+        {/* Compact header for logged-in users — tiny eyebrow + icon rail.
+            Hero space is ceded to the counselor brief in CounselorDashboard. */}
         {user && (
-          <motion.div variants={item} className="relative text-center mb-12 pt-4">
-            {/* Subtle grid bg for logged-in too */}
-            <div
-              className="absolute -z-10 inset-0 h-[400px] w-full opacity-15
-              bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)]
-              bg-[size:4rem_4rem]
-              [mask-image:radial-gradient(ellipse_70%_50%_at_50%_20%,#000_30%,transparent_100%)]"
-            />
-            <motion.div
-              className="flex justify-center mb-6"
-              initial={{ scale: 0.5, opacity: 0, filter: "blur(12px)" }}
-              animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <KairosLogo size="xl" showText={false} />
-            </motion.div>
-            <motion.h1
-              className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-[1.2] mb-4"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-            >
-              Welcome back{profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}
-            </motion.h1>
-            <motion.p
-              className="text-base text-white/50 max-w-xl mx-auto mb-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-            >
-              Practice interviews, talk with AI tutors, or continue your learning path.
-            </motion.p>
+          <motion.div variants={item} className="mb-6 pt-2">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <span className="text-[11px] text-white/40 tracking-wide">
+                {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                {profile?.full_name ? ` · Hi, ${profile.full_name.split(" ")[0]}` : ""}
+              </span>
+            </div>
 
-            {/* Quick action row — staggered entrance */}
-            <motion.div
-              className="flex flex-wrap items-center justify-center gap-3"
-              initial="hidden"
-              animate="visible"
-              variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06, delayChildren: 0.4 } } }}
-            >
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => openPanel()}
+                data-tour="coach"
+                className="px-3 py-1.5 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#F4D03F] transition-colors flex items-center gap-1.5"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                Coach
+              </button>
               {[
-                { href: "/college-interviews", icon: GraduationCap, label: "College Interview", style: "bg-[#D4AF37] text-black font-semibold" },
-                { href: "/career/interviews", icon: Target, label: "Tech Interview", style: "border border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/10" },
-                { href: "/talk", icon: Mic, label: "Voice Tutoring", style: "border border-white/20 text-white hover:border-[#D4AF37]/50 hover:bg-white/5" },
-                { href: "/history", icon: Clock, label: "Your Sessions", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
-                { href: "/leaderboard", icon: Trophy, label: "Leaderboard", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
-                { href: "/courses", icon: BookOpen, label: "All Courses", style: "border border-white/20 text-white/60 hover:border-[#D4AF37]/50 hover:bg-white/5" },
+                { href: "/schools", icon: Building2, label: "Schools", tour: "schools", style: "border border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10" },
+                { href: "/cc/activities-optimizer", icon: Target, label: "Activities", tour: "activities", style: "border border-white/15 text-white/80 hover:border-[#D4AF37]/40 hover:bg-white/5" },
+                { href: "/cc/essays", icon: BookOpen, label: "Essays", tour: "essays", style: "border border-white/15 text-white/80 hover:border-[#D4AF37]/40 hover:bg-white/5" },
+                { href: "/college-interviews", icon: GraduationCap, label: "Interview", tour: "interview", style: "border border-white/15 text-white/70 hover:border-[#D4AF37]/40 hover:bg-white/5" },
+                { href: "/cc/share-settings", icon: Globe, label: "Share", tour: "share", style: "border border-white/15 text-white/70 hover:border-[#D4AF37]/40 hover:bg-white/5" },
               ].map((action) => {
                 const ActionIcon = action.icon;
                 return (
-                  <motion.div
+                  <Link
                     key={action.label}
-                    variants={{ hidden: { opacity: 0, y: 12, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1 } }}
+                    href={action.href}
+                    data-tour={action.tour}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${action.style}`}
                   >
-                    <Link
-                      href={action.href}
-                      className={`group px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 ${action.style}`}
-                    >
-                      <ActionIcon className="w-4 h-4" />
-                      {action.label}
-                      <ArrowRight className="w-3.5 h-3.5 opacity-0 -ml-1 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                    </Link>
-                  </motion.div>
+                    <ActionIcon className="w-3.5 h-3.5" />
+                    {action.label}
+                  </Link>
                 );
               })}
-              <motion.div variants={{ hidden: { opacity: 0, y: 12, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1 } }}>
-                <button
-                  onClick={() => openPanel()}
-                  className="group px-5 py-2.5 rounded-xl border border-[#D4AF37]/30 text-[#D4AF37] text-sm font-semibold hover:bg-[#D4AF37]/10 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Chat with Coach Kairos
-                </button>
-              </motion.div>
-            </motion.div>
+            </div>
           </motion.div>
         )}
+
+        {user && <DashboardWalkthrough />}
+
 
         {/* Continue where you left off — shown above missions when relevant.
             Per audit 2026-04-07: "Continue where you left off section missing" */}
@@ -675,25 +623,51 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* Daily Missions + Streak Calendar + Achievements — retention hooks
-            (per audit 2026-04-07) */}
+        {/* Counselor-view dashboard — onboarding checklist for new users,
+            per-school progress for returning users. Replaces old gamification
+            stack (streak/missions/achievements) as of 2026-04-20. */}
         {user && (
-          <motion.div variants={item} className="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2">
-              <DailyMissions />
-            </div>
-            <div className="space-y-4">
-              <StreakCalendar />
-              <AchievementsShowcase />
-            </div>
-          </motion.div>
-        )}
-
-        {/* Learning Stats + Forgetting Alert (logged-in users) */}
-        {user && (
-          <motion.div variants={item} className="mb-10 space-y-4">
-            <LearningStats />
-            <ForgettingAlert />
+          <motion.div variants={item} className="mb-12">
+            {dashboardLoading && !dashboard ? (
+              <div className="space-y-4">
+                <div className="h-8 w-1/2 bg-white/5 rounded animate-pulse" />
+                <div className="h-32 bg-white/5 rounded-2xl animate-pulse" />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="h-48 bg-white/5 rounded-2xl animate-pulse" />
+                  <div className="h-48 bg-white/5 rounded-2xl animate-pulse" />
+                </div>
+              </div>
+            ) : dashboard ? (
+              (() => {
+                const { setup, schools, personalStatement, activities, brief, hasMetCoach } = dashboard;
+                const isReturning =
+                  setup.hasSchools && (setup.hasPersonalStatement || setup.hasSupplementsStarted || setup.hasActivities);
+                return isReturning ? (
+                  <CounselorDashboard
+                    firstName={setup.firstName}
+                    brief={brief}
+                    briefLoading={false}
+                    schools={schools}
+                    personalStatement={personalStatement}
+                    activities={{ logged: activities.logged, optimized: activities.optimized }}
+                    onOpenCoach={() => coachKairos.open()}
+                  />
+                ) : (
+                  <OnboardingChecklist
+                    firstName={setup.firstName}
+                    status={{
+                      hasMetCoach,
+                      hasIntakeCompleted: setup.hasIntakeCompleted,
+                      hasSchools: setup.hasSchools,
+                      hasPersonalStatement: setup.hasPersonalStatement,
+                      hasActivities: setup.hasActivities,
+                      hasSupplementsStarted: setup.hasSupplementsStarted,
+                    }}
+                    onOpenCoach={() => coachKairos.open()}
+                  />
+                );
+              })()
+            ) : null}
           </motion.div>
         )}
 
@@ -723,33 +697,33 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* ── LOGGED-IN SECTION 2: Interview Coaches (HERO) ── */}
+        {/* ── LOGGED-IN SECTION 2: Application Tools Grid ── */}
         {user && (
           <motion.div variants={item} className="mb-12">
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 text-[#D4AF37] text-xs font-medium mb-4">
-                <Target className="w-3.5 h-3.5" />
-                AI-Powered Practice
+                <GraduationCap className="w-3.5 h-3.5" />
+                Your Application Toolkit
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-                Your Interview Coaches
+                Everything You Need
               </h2>
               <p className="text-base text-white/50 max-w-xl mx-auto">
-                Pick a role and start practicing. The AI adapts to your level in real time.
+                AI-powered tools for every part of your college application.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
-                { icon: Globe, label: "Frontend Engineer", desc: "React, CSS, DOM, accessibility, and UI architecture questions." },
-                { icon: Server, label: "Backend Engineer", desc: "APIs, databases, auth, caching, and server-side architecture." },
-                { icon: Code2, label: "Full Stack Developer", desc: "End-to-end system questions spanning frontend and backend." },
-                { icon: Building2, label: "System Design", desc: "Whiteboard-style architecture rounds for senior roles." },
-                { icon: Users, label: "Recruiter Screen", desc: "15-minute phone screens: tell me about yourself, why this role, salary." },
-                { icon: MessageSquare, label: "Behavioral", desc: "STAR method practice: leadership, conflict, failure, teamwork." },
+                { icon: BookOpen, label: "Essay Studio", desc: "AI-guided brainstorming, outlining, and draft coaching for personal statements and supplementals.", href: "/cc/essays" },
+                { icon: Target, label: "Interview Prep", desc: "Practice with 10 Ivy+ alumni AI personas. Harvard, Yale, Stanford, MIT, and more.", href: "/college-interviews" },
+                { icon: Building2, label: "School List Builder", desc: "Get a reach/match/safety list with chancing estimates based on your profile.", href: "/schools" },
+                { icon: ClipboardList, label: "Activities Optimizer", desc: "AI rewrites, impact scoring, and optimal ordering for your Common App activities.", href: "/cc/activities-optimizer" },
+                { icon: Users, label: "Recommendations Coach", desc: "Build brag sheets, draft ask emails, and track each recommender's confirmation.", href: "/cc/recommenders" },
+                { icon: Share2, label: "Counselor Share Link", desc: "One link to share essays, activities, school list, and scores with counselors and parents.", href: "/cc/share-settings" },
               ].map((card) => {
                 const Icon = card.icon;
                 return (
-                  <Link key={card.label} href="/interviews">
+                  <Link key={card.label} href={card.href}>
                     <motion.div
                       className="group relative overflow-hidden rounded-2xl bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 p-6 cursor-pointer h-full min-h-[140px] transition-all"
                       whileHover={{ scale: 1.03, y: -4 }}
@@ -761,7 +735,7 @@ export default function HomePage() {
                       <h4 className="text-white font-semibold text-base mb-1.5">{card.label}</h4>
                       <p className="text-slate-400 text-sm leading-relaxed mb-4">{card.desc}</p>
                       <div className="flex items-center gap-1.5 text-sm font-medium text-[#D4AF37] group-hover:gap-2.5 transition-all">
-                        Start Interview <ArrowRight className="w-4 h-4" />
+                        Open <ArrowRight className="w-4 h-4" />
                       </div>
                     </motion.div>
                   </Link>
@@ -771,103 +745,7 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* ── LOGGED-IN SECTION 3: Quick Voice Practice (compact) ── */}
-        {user && (
-          <motion.div variants={item} className="mb-10">
-            <div className="space-y-3">
-              <Link href="/talk">
-                <motion.div
-                  className="inline-flex items-center gap-2.5 px-5 py-3 rounded-xl border border-white/20 text-white hover:border-[#D4AF37]/50 hover:bg-white/5 font-medium text-sm transition-all cursor-pointer"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <Mic className="w-4 h-4" />
-                  Voice Practice
-                </motion.div>
-              </Link>
-              <div className="flex flex-wrap gap-2">
-                {ALL_SUPPORTED_LANGUAGES
-                  .filter(l => l.code !== (typeof window !== 'undefined' ? localStorage.getItem('native-language') : 'en'))
-                  .filter(l => (l.code as string) !== 'en-IN')
-                  .slice(0, 8)
-                  .map((l) => (
-                  <Link key={l.code} href={`/talk?lang=${l.code}`}>
-                    <motion.button
-                      className="flex items-center gap-1.5 px-3 py-2.5 min-h-[44px] rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300 text-xs hover:bg-slate-800 hover:border-slate-600 hover:text-white transition-all"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.97 }}
-                    >
-                      <span className="text-sm">{l.flag}</span>
-                      {l.name}
-                    </motion.button>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── LOGGED-IN SECTION 4: Career Pathways ── */}
-        {user && (
-          <motion.div variants={item} className="mb-10">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                <Map className="w-3.5 h-3.5 text-[#D4AF37]" />
-                Career Pathways
-              </h3>
-              <Link href="/pathways" className="text-xs text-[#D4AF37] hover:text-[#C4A030] transition-colors flex items-center gap-1">
-                View all <ArrowRight className="w-3 h-3" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {pathways.slice(0, 6).map((pathway) => {
-                const pathwayCourseProgress = pathway.courses.reduce((acc, slug) => {
-                  const p = courseProgress[slug];
-                  return acc + (p && p > 0 ? p : 0);
-                }, 0);
-                const avgProgress = pathway.courses.length > 0
-                  ? Math.round(pathwayCourseProgress / pathway.courses.length)
-                  : 0;
-                const hasStarted = avgProgress > 0;
-                return (
-                  <Link key={pathway.slug} href={`/pathways/${pathway.slug}`}>
-                    <motion.div
-                      className="rounded-xl bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 p-4 cursor-pointer h-full transition-all"
-                      whileHover={{ scale: 1.02 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <span className="text-2xl">{pathway.icon}</span>
-                        {hasStarted && (
-                          <span className="text-xs font-medium text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-0.5 rounded-full">
-                            {avgProgress}%
-                          </span>
-                        )}
-                      </div>
-                      <h4 className="text-white text-sm font-semibold mb-1">{pathway.title}</h4>
-                      <p className="text-slate-500 text-xs line-clamp-2">{pathway.description}</p>
-                      <div className="flex items-center gap-2 mt-3">
-                        <span className="text-xs text-slate-600">{pathway.courses.length} courses</span>
-                        <span className="text-slate-700">-</span>
-                        <span className="text-xs text-slate-600">{pathway.estimatedWeeks} weeks</span>
-                      </div>
-                      {hasStarted && (
-                        <div className="w-full h-1 bg-slate-700/50 rounded-full overflow-hidden mt-2">
-                          <div
-                            className={`h-full rounded-full bg-gradient-to-r ${pathway.color}`}
-                            style={{ width: `${avgProgress}%` }}
-                          />
-                        </div>
-                      )}
-                    </motion.div>
-                  </Link>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── LOGGED-IN SECTION 5: Continue Learning ── */}
+        {/* ── LOGGED-IN SECTION 3: Continue Learning ── */}
         {user && inProgressCourses.length > 0 && (
           <motion.div variants={item} className="mb-10">
             <div className="flex items-center justify-between mb-4">
