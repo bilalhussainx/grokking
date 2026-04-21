@@ -1,5 +1,6 @@
 // College admissions interview vertical entry point
 // Spec: docs/superpowers/specs/2026-04-07-college-admissions-interviews-design.md
+import { Suspense } from "react";
 import CollegeInterviewSetup from "@/components/college/CollegeInterviewSetup";
 
 export const metadata = {
@@ -9,5 +10,9 @@ export const metadata = {
 };
 
 export default function CollegeInterviewsPage() {
-  return <CollegeInterviewSetup />;
+  return (
+    <Suspense fallback={null}>
+      <CollegeInterviewSetup />
+    </Suspense>
+  );
 }
