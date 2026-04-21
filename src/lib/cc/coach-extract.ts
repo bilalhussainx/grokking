@@ -290,12 +290,45 @@ If no schools were approved, return { "schools": [] }`,
 
   for (const school of schools) {
     const needle = lookupAlias(school.name);
+
+    // Matching strategy (prefer most-specific, fully deterministic):
+    //   1. exact case-insensitive name match
+    //   2. prefix match ordered by shortest name (shortest = canonical row)
+    //   3. substring match ordered by shortest name
+    //   4. fallback: strip filler words and retry substring match
+    // Without ORDER BY, Postgres returns rows in heap order — so the same search
+    // can return a different cc_schools row on each run, and the dedup check
+    // below (which keys on school_id) won't catch the duplicate. That was the
+    // "Carnegie Mellon added 6 times" bug.
     let { data: found } = await supabase
       .from("cc_schools")
       .select("id, name")
-      .ilike("name", `%${needle}%`)
+      .ilike("name", needle)
+      .order("name", { ascending: true })
       .limit(1)
       .maybeSingle();
+
+    if (!found) {
+      const res = await supabase
+        .from("cc_schools")
+        .select("id, name")
+        .ilike("name", `${needle}%`)
+        .order("name", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      found = res.data;
+    }
+
+    if (!found) {
+      const res = await supabase
+        .from("cc_schools")
+        .select("id, name")
+        .ilike("name", `%${needle}%`)
+        .order("name", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      found = res.data;
+    }
 
     if (!found) {
       const bare = school.name.replace(/\b(university|college|institute|of|the|at)\b/gi, "").replace(/\s+/g, " ").trim();
@@ -304,6 +337,7 @@ If no schools were approved, return { "schools": [] }`,
           .from("cc_schools")
           .select("id, name")
           .ilike("name", `%${bare}%`)
+          .order("name", { ascending: true })
           .limit(1)
           .maybeSingle();
         found = result.data;

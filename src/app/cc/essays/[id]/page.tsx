@@ -83,14 +83,14 @@ export default function EssayWorkspace({
             ? { ...prev, current_draft: draftText, revision_comments: data.review, phase: "revise" }
             : prev
         );
-        // Auto-nudge coach about next steps after first review lands
-        setTimeout(() => {
-          coach.open();
-          coach.sendMessage(
-            "My essay review just came back — give me your read: where it's landing, what's weak, and how it fits the rest of my application.",
-            { essayId: id, sourceEvent: "review-landed" }
-          );
-        }, 800);
+        // Do NOT auto-open Coach Kairos here. Two reasons:
+        //   1. The student needs uninterrupted time to read their own review.
+        //   2. An 800ms setTimeout raced the Supabase write of revision_comments,
+        //      so the coach often loaded with empty review context and
+        //      responded "I don't have the essay or the review findings".
+        // The manual "Review landed → open coach" CTA on the revise panel is
+        // still available; clicking it after the write settles gives the coach
+        // full context.
       }
     } finally {
       setReviewLoading(false);
@@ -209,15 +209,26 @@ export default function EssayWorkspace({
                       { essayId: id, sourceEvent: "review-landed" }
                     );
                   }}
-                  className="w-full mb-4 flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/15 transition-colors text-left group"
+                  // Disabled until the review has actually persisted. Otherwise
+                  // the coach opens, POSTs /api/cc/coach/message, re-reads the
+                  // essay before revision_comments is visible, and responds
+                  // "content didn't come through on my end". The button enables
+                  // once revision_comments is on the client (which means the
+                  // Supabase write returned).
+                  disabled={reviewLoading || !essay.revision_comments}
+                  className="w-full mb-4 flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/15 transition-colors text-left group disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#D4AF37]/10"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-[#D4AF37]">
-                      Review landed. Activity optimizer is up next — supplements come after.
+                      {reviewLoading || !essay.revision_comments
+                        ? "Review is still landing — one moment…"
+                        : "Review landed. Activity optimizer is up next — supplements come after."}
                     </p>
                     <p className="text-[11px] text-white/40 mt-0.5">
-                      Ask Coach Kairos to walk you through what to tackle.
+                      {reviewLoading || !essay.revision_comments
+                        ? "Coach Kairos will be ready as soon as the feedback is saved."
+                        : "Ask Coach Kairos to walk you through what to tackle."}
                     </p>
                   </div>
                   <span className="text-[11px] text-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity">
