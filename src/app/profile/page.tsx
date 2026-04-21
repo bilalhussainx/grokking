@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { GraduationCap } from "lucide-react";
 import CompletionRing from "@/components/cc/profile/CompletionRing";
@@ -14,6 +14,14 @@ import FinancialForm from "@/components/cc/profile/FinancialForm";
 const TABS = ["Identity", "Academic", "Activities", "Honors", "Financial"] as const;
 
 export default function ProfilePage() {
+  return (
+    <Suspense fallback={null}>
+      <ProfilePageInner />
+    </Suspense>
+  );
+}
+
+function ProfilePageInner() {
   const searchParams = useSearchParams();
   const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -133,7 +141,7 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <div className="flex items-center gap-4 mb-8">
+      <div className="flex items-center gap-4 mb-6">
         <CompletionRing percent={(profileData as { completion_pct: number }).completion_pct} />
         <div>
           <h1 className="text-xl font-bold text-white">Your Profile</h1>
@@ -141,6 +149,12 @@ export default function ProfilePage() {
             {(profileData as { completion_pct: number }).completion_pct}% complete
           </p>
         </div>
+      </div>
+
+      <div className="rounded-xl bg-white/[0.02] border border-white/5 px-4 py-3 mb-6">
+        <p className="text-xs text-white/30 leading-relaxed">
+          This is your full Common App profile. Fill it out at your own pace — Coach Kairos only needs your GPA and grade to start recommending schools. Everything else helps fine-tune your recommendations and essays.
+        </p>
       </div>
 
       <div className="flex gap-1 border-b border-white/10 mb-6 overflow-x-auto">
