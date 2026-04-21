@@ -40,14 +40,24 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
   const pathname = request.nextUrl.pathname;
 
+  // Quick cookie check — Supabase stores auth in sb-*-auth-token cookies.
+  // Same heuristic is used on both / and /landing so the two redirects never
+  // disagree (preventing an infinite ping-pong).
+  const hasAuthCookie = request.cookies.getAll().some(c => c.name.includes("auth-token"));
+
   // Redirect non-logged-in users from / to /landing (cinematic page)
   if (pathname === "/") {
-    // Quick cookie check — Supabase stores auth in sb-*-auth-token cookies
-    const hasAuthCookie = request.cookies.getAll().some(c => c.name.includes("auth-token"));
     if (!hasAuthCookie) {
       return NextResponse.redirect(new URL("/landing", request.url));
     }
     return response;
+  }
+
+  // Inverse: redirect logged-in users OFF /landing back to the dashboard.
+  // Without this, a flaky cookie detection on / bounces the user to /landing
+  // and every CTA there (which calls router.replace("/")) loops back.
+  if (pathname === "/landing" && hasAuthCookie) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   // Skip public routes

@@ -2,13 +2,20 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function IntakePage() {
   const router = useRouter();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    router.replace("/?coach=open");
-  }, [router]);
+    if (loading) return;
+    if (user) {
+      router.replace("/?coach=open");
+    } else {
+      router.replace("/signup?next=/");
+    }
+  }, [router, user, loading]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
