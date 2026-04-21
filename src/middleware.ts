@@ -18,6 +18,9 @@ const PUBLIC_ROUTES = [
   "/api/survey",
   "/survey.html",
   "/call",
+  // /cc is the public toolkit overview — linked from /landing as "Explore Coach Kairos".
+  // Individual tool pages under /cc/* still require auth (they're not matched by this exact-path rule).
+  "/cc",
 ];
 
 // Route prefixes that are always public

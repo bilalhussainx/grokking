@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
@@ -13,8 +12,7 @@ import { Label } from "@/components/ui/label";
 import KairosLogo from "@/components/ui/SamsaraLogo";
 
 export default function SignupPage() {
-  const { signInWithGoogle, signUpWithEmail, user } = useAuth();
-  const router = useRouter();
+  const { signInWithGoogle, signUpWithEmail, user, loading: authLoading } = useAuth();
   const nameRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -29,10 +27,14 @@ export default function SignupPage() {
     nameRef.current?.focus();
   }, []);
 
-  if (user) {
-    router.replace("/");
-    return null;
-  }
+  // Redirect already-logged-in users to the dashboard. Use hard navigation so
+  // cookies are guaranteed to be sent to middleware (avoids the blank-page trap
+  // when client/server auth state is out of sync).
+  useEffect(() => {
+    if (!authLoading && user) {
+      window.location.assign("/");
+    }
+  }, [user, authLoading]);
 
   const validateFields = (): boolean => {
     const errors: typeof fieldErrors = {};
@@ -75,12 +77,12 @@ export default function SignupPage() {
       setLoading(false);
     } else {
       if (result.confirmed) {
-        // Bug fix 2026-04-07: window.location.href was a full-page hard
-        // redirect that bypassed Next's client router and could leave the
-        // app in an inconsistent state if /onboarding threw on first
-        // mount. Use the router so we stay client-side and inherit the
-        // app's error boundary.
-        router.push("/onboarding?new=1");
+        // Use hard navigation so the freshly-set auth cookies are guaranteed
+        // to reach middleware on the /onboarding request. (Earlier revision
+        // preferred router.push to keep the client-side error boundary, but
+        // that caused /onboarding and downstream redirects to hit middleware
+        // without cookies, creating the /landing redirect loop.)
+        window.location.assign("/onboarding?new=1");
       } else {
         setSuccess(true);
       }

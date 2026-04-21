@@ -1,8 +1,8 @@
 // src/app/login/page.tsx
 "use client";
 
-import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
@@ -21,8 +21,7 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
-  const { signInWithGoogle, signInWithEmail, user } = useAuth();
-  const router = useRouter();
+  const { signInWithGoogle, signInWithEmail, user, loading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/";
   const authError = searchParams.get("error");
@@ -37,11 +36,14 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Redirect if already logged in
-  if (user) {
-    router.replace(next);
-    return null;
-  }
+  // Redirect if already logged in — use hard navigation so cookies are guaranteed
+  // to be sent to middleware on the next request (avoids client/server auth desync
+  // that strands users on a blank page).
+  useEffect(() => {
+    if (!authLoading && user) {
+      window.location.assign(next);
+    }
+  }, [user, authLoading, next]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +54,9 @@ function LoginForm() {
       setError(result.error);
       setLoading(false);
     } else {
-      router.replace(next);
+      // Hard navigation so the freshly-written auth cookie is included in the
+      // middleware request for `next`.
+      window.location.assign(next);
     }
   };
 
