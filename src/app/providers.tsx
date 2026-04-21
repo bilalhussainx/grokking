@@ -19,6 +19,8 @@ import GlobalSearch from "@/components/search/GlobalSearch";
 import ShortcutsHelp from "@/components/ui/ShortcutsHelp";
 import SurveyPrompt from "@/components/feedback/SurveyPrompt";
 import XPFlyUp from "@/components/gamification/XPFlyUp";
+import { CoachKairosProvider } from "@/contexts/CoachKairosContext";
+import CoachKairosShell from "@/components/cc/coach/CoachKairosShell";
 import AchievementToast from "@/components/gamification/AchievementToast";
 import VariableReward from "@/components/gamification/VariableReward";
 import { GraduationCap, X, FileText, ChevronLeft, Mic } from "lucide-react";
@@ -256,15 +258,18 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           <XPProvider>
           <AIStateProvider>
           <GlossaryProvider>
+          <CoachKairosProvider>
             <AppLayout>
               {children}
             </AppLayout>
+            <CoachKairosShell />
             <CoachFAB />
             <GamificationOverlays />
             <GlobalSearch />
             <ShortcutsHelp />
             <TranslationBarWrapper />
             <SurveyPrompt />
+          </CoachKairosProvider>
           </GlossaryProvider>
           </AIStateProvider>
           </XPProvider>
