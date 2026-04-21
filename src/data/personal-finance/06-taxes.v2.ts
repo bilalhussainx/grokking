@@ -13,80 +13,49 @@ export const taxesModule: Module = {
 
 Understanding how income tax actually works is one of the most important — and most misunderstood — concepts in personal finance. The #1 misconception is that moving into a higher tax bracket means all your income is taxed at the higher rate. It does not.
 
-\`\`\`concept
-{
-  "title": "The Big Misconception",
-  "variant": "mental-model",
-  "content": "Think of tax brackets like filling buckets of water. Each bucket (bracket) has a different tax rate painted on it. You pour your income into the first bucket until it's full, then move to the next bucket. Only the water in each individual bucket gets taxed at that bucket's rate — not all the water you've poured so far."
-}
-\`\`\`
-
-### The U.S. Federal Tax Brackets (2025, Single Filer)
+### The U.S. Federal Tax Brackets (2024, Single Filer)
 
 | Taxable Income | Tax Rate |
 |---------------|----------|
-| \\$0 - \\$11,925 | 10% |
-| \\$11,926 - \\$48,475 | 12% |
-| \\$48,476 - \\$103,350 | 22% |
-| \\$103,351 - \\$197,300 | 24% |
-| \\$197,301 - \\$250,525 | 32% |
-| \\$250,526 - \\$626,350 | 35% |
-| Over \\$626,350 | 37% |
+| \\$0 - \\$11,600 | 10% |
+| \\$11,601 - \\$47,150 | 12% |
+| \\$47,151 - \\$100,525 | 22% |
+| \\$100,526 - \\$191,950 | 24% |
+| \\$191,951 - \\$243,725 | 32% |
+| \\$243,726 - \\$609,350 | 35% |
+| Over \\$609,350 | 37% |
 
 ### Marginal vs Effective Tax Rate
 
 The tax system is **progressive** — each bracket applies only to the income within that range, not all your income.
 
-\`\`\`calculator
-{
-  "type": "compound-interest",
-  "title": "Federal Tax Calculator",
-  "inputs": [
-    { "id": "income", "label": "Taxable Income", "default": 85000, "min": 0, "max": 1000000, "prefix": "$" },
-    { "id": "filing", "label": "Filing Status", "default": "single", "type": "select", "options": ["single", "married"] }
-  ]
-}
-\`\`\`
-
 **Example: You earn \\$85,000 taxable income (single filer)**
 
 | Income Range | Rate | Tax |
 |-------------|------|-----|
-| First \\$11,925 | 10% | \\$1,193 |
-| \\$11,926 - \\$48,475 | 12% | \\$4,386 |
-| \\$48,476 - \\$85,000 | 22% | \\$8,035 |
-| **Total** | | **\\$13,614** |
+| First \\$11,600 | 10% | \\$1,160 |
+| \\$11,601 - \\$47,150 | 12% | \\$4,266 |
+| \\$47,151 - \\$85,000 | 22% | \\$8,327 |
+| **Total** | | **\\$13,753** |
 
 - **Marginal rate:** 22% (the rate on your last dollar)
-- **Effective rate:** 16.0% (\\$13,614 / \\$85,000)
+- **Effective rate:** 16.2% (\\$13,753 / \\$85,000)
 
-You are "in the 22% bracket" but you pay only 16.0% overall. The common fear — "If I earn more, I will lose money to taxes" — is a myth. Only the income above each threshold is taxed at the higher rate.
-
-\`\`\`quiz
-{
-  "title": "Test Your Understanding",
-  "questions": [
-    {
-      "question": "If you move from the 12% bracket to the 22% bracket, what happens?",
-      "options": ["All your income is now taxed at 22%", "Only the income above the bracket threshold is taxed at 22%", "You pay 22% on your first dollar of income", "Your effective rate becomes 22%"],
-      "answer": 1,
-      "explanation": "Only the income that falls within the 22% bracket is taxed at that rate. All income below that threshold is still taxed at the lower rates."
-    },
-    {
-      "question": "What is your marginal tax rate?",
-      "options": ["The average rate you pay on all your income", "The highest rate you pay on any portion of your income", "The lowest rate you pay on your first dollar", "Your effective rate plus 5%"],
-      "answer": 1,
-      "explanation": "Your marginal tax rate is the rate you pay on your last dollar of income — the highest bracket you reach."
-    },
-    {
-      "question": "Which is typically higher: marginal rate or effective rate?",
-      "options": ["Marginal rate", "Effective rate", "They're always equal", "It depends on your income level"],
-      "answer": 0,
-      "explanation": "Your marginal rate is always higher than or equal to your effective rate in a progressive tax system, because it's the highest rate you pay on any portion of income."
-    }
-  ]
-}
+\`\`\`mermaid
+graph LR
+    A[Gross Income] --> B[Standard Deduction]
+    B --> C[Taxable Income]
+    C --> D[10% Bracket]
+    D --> E[12% Bracket]
+    E --> F[22% Bracket]
+    F --> G[24% Bracket]
+    style D fill:#2d6a4f
+    style E fill:#40916c
+    style F fill:#52b788
+    style G fill:#74c69d
 \`\`\`
+
+You are "in the 22% bracket" but you pay only 16.2% overall. The common fear — "If I earn more, I will lose money to taxes" — is a myth. Only the income above each threshold is taxed at the higher rate.
 
 ### Taxable Income vs Gross Income
 
@@ -100,46 +69,31 @@ Gross Income
 = Taxable Income
 \`\`\`
 
-**Standard Deduction (2025):**
-- Single: \\$15,750
-- Married filing jointly: \\$31,500
-- Head of household: \\$23,500
+**Standard Deduction (2024):**
+- Single: \\$14,600
+- Married filing jointly: \\$29,200
+- Head of household: \\$21,900
 
 So if you earn \\$85,000 gross and contribute \\$5,000 to a 401(k):
 \`\`\`
 $85,000 - $5,000 (401k) = $80,000 AGI
-$80,000 - $15,750 (standard deduction) = $64,250 taxable income
+$80,000 - $14,600 (standard deduction) = $65,400 taxable income
 \`\`\`
 
-Your tax is calculated on \\$64,250, not \\$85,000. This is why pre-tax contributions (401(k), Traditional IRA, HSA) are so powerful — they reduce taxable income.
+Your tax is calculated on \\$65,400, not \\$85,000. This is why pre-tax contributions (401(k), Traditional IRA, HSA) are so powerful — they reduce taxable income.
 
 ### Real-World Example: The Raise Fear
 
 Raj earns \\$47,000 and is offered a raise to \\$52,000. He hesitates: "If I move into the 22% bracket, will I take home less?"
 
-\`\`\`trace
-{
-  "title": "Raj's Raise Analysis",
-  "language": "python",
-  "code": "# Raj's tax situation before and after raise\\n# Assuming single filer, standard deduction only\\n\\ndef calculate_tax(taxable_income):\\n    tax = 0\\n    brackets = [11925, 48475, 103350, 197300, 250525, 626350]\\n    rates = [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]\\n    \\n    remaining = taxable_income\\n    for i, (bracket, rate) in enumerate(zip(brackets + [float('inf')], rates)):\\n        if remaining <= 0:\\n            break\\n        taxable_at_this_rate = min(remaining, bracket if i == 0 else bracket - brackets[i-1])\\n        tax += taxable_at_this_rate * rate\\n        remaining -= taxable_at_this_rate\\n    \\n    return tax\\n\\n# Before raise\\nbefore_gross = 47000\\nbefore_taxable = before_gross - 15750  # standard deduction\\nbefore_tax = calculate_tax(before_taxable)\\n\\nprint(f\\"Before raise:\\")\\nprint(f\\"  Gross income: \\\\\${before_gross:,}\\")\\nprint(f\\"  Taxable income: \\\\\${before_taxable:,}\\")\\nprint(f\\"  Federal tax: \\\\\${before_tax:,.0f}\\")\\nprint(f\\"  After-tax income: \\\\\${before_gross - before_tax:,.0f}\\")\\n\\n# After raise\\nafter_gross = 52000\\nafter_taxable = after_gross - 15750\\nafter_tax = calculate_tax(after_taxable)\\n\\nprint(f\\"\\\\nAfter raise:\\")\\nprint(f\\"  Gross income: \\\\\${after_gross:,}\\")\\nprint(f\\"  Taxable income: \\\\\${after_taxable:,}\\")\\nprint(f\\"  Federal tax: \\\\\${after_tax:,.0f}\\")\\nprint(f\\"  After-tax income: \\\\\${after_gross - after_tax:,.0f}\\")\\n\\nprint(f\\"\\\\nNet gain from raise: \\\\\${(after_gross - after_tax) - (before_gross - before_tax):,.0f}\\")",
-  "frames": [
-    { "line": 3, "vars": {"before_gross": 47000, "before_taxable": 31250}, "note": "Starting scenario: $47k gross income" },
-    { "line": 4, "vars": {"before_tax": 3620}, "note": "Tax on $31,250 taxable income" },
-    { "line": 16, "vars": {"after_gross": 52000, "after_taxable": 36250}, "note": "After $5k raise: $52k gross income" },
-    { "line": 17, "vars": {"after_tax": 4220}, "note": "Tax on $36,250 taxable income" },
-    { "line": 25, "note": "Raj gains $4,400 after taxes - no bracket penalty!" }
-  ]
-}
-\`\`\`
-
-**Before raise (taxable income ~\\$31,250):**
+**Before raise (taxable income ~\\$32,400):**
 - All income taxed at 10% and 12%
 - Tax: approximately \\$3,620
 - After tax: approximately \\$43,380
 
-**After raise (taxable income ~\\$36,250):**
-- First \\$11,925 at 10%, next \\$24,325 at 12% — same as before
-- Additional \\$5,000 is entirely in the 12% bracket (below \\$48,475 threshold)
+**After raise (taxable income ~\\$37,400):**
+- First \\$11,600 at 10%, next \\$25,800 at 12% — same as before
+- Additional \\$5,000 is entirely in the 12% bracket (below \\$47,150 threshold)
 - Tax: approximately \\$4,220
 - After tax: approximately \\$47,780
 
@@ -160,23 +114,16 @@ A high earner in California might have a combined marginal rate of 50%+ (37% fed
 ### FICA Taxes (Payroll Taxes)
 
 In addition to income tax, you pay FICA:
-- Social Security: 6.2% on first \\$176,100 (2025)
+- Social Security: 6.2% on first \\$168,600
 - Medicare: 1.45% on all income (plus 0.9% surtax on income above \\$200,000)
 
 These are flat taxes — no brackets. They hit lower earners proportionally harder.
 
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Tax brackets work like buckets: only income within each bracket is taxed at that rate",
-    "Your marginal rate is what you pay on your last dollar; your effective rate is much lower",
-    "Earning more never reduces your take-home pay due to tax brackets",
-    "Pre-tax contributions (401k, HSA) reduce your taxable income, not just your tax bill",
-    "Focus on your effective tax rate when planning, not your marginal rate"
-  ]
-}
-\`\`\``,
+### Key Takeaway
+
+The U.S. income tax system is progressive and marginal. Higher brackets apply only to income above each threshold. Understanding this eliminates the fear of earning more and empowers you to use pre-tax deductions strategically. Always focus on your effective rate, not your marginal rate.
+
+*Resources: IRS.gov Tax Tables, Khan Academy Income Taxes, TurboTax Tax Bracket Calculator, Investopedia Marginal Tax Rate Guide.*`,
     },
     {
       id: "pf-deductions-vs-credits",
@@ -382,43 +329,25 @@ The holding period determines whether you pay ordinary rates or preferential cap
 
 Tax-advantaged accounts are special account types that offer tax benefits for specific purposes — retirement, healthcare, or education. Using them strategically can save you tens of thousands of dollars in taxes over your lifetime.
 
-\`\`\`concept
-{
-  "title": "The Triple Tax Advantage",
-  "variant": "mental-model",
-  "content": "Think of tax-advantaged accounts as having three possible tax benefits:\\n\\n1. **Tax-deductible contributions** (money goes in pre-tax)\\n2. **Tax-free growth** (investments compound without annual taxes)\\n3. **Tax-free withdrawals** (money comes out tax-free)\\n\\nMost accounts offer 1-2 of these. The HSA is unique — it offers all three when used for medical expenses, making it the most tax-advantaged account available."
-}
-\`\`\`
-
 ### The Account Landscape
 
-| Account | Tax Benefit | 2026 Limit | Purpose |
+| Account | Tax Benefit | 2024 Limit | Purpose |
 |---------|-----------|-----------|---------|
-| 401(k) / 403(b) | Pre-tax or Roth | $24,500 | Retirement |
-| Traditional IRA | Pre-tax (if eligible) | $7,500 | Retirement |
-| Roth IRA | After-tax in, tax-free out | $7,500 | Retirement |
-| HSA | Triple tax-free | $4,400 / $8,750 | Healthcare |
+| 401(k) / 403(b) | Pre-tax or Roth | \\$23,000 | Retirement |
+| Traditional IRA | Pre-tax (if eligible) | \\$7,000 | Retirement |
+| Roth IRA | After-tax in, tax-free out | \\$7,000 | Retirement |
+| HSA | Triple tax-free | \\$4,150 / \\$8,300 | Healthcare |
 | 529 Plan | Tax-free growth + withdrawals | Varies by state | Education |
-| FSA | Pre-tax | $3,200 | Healthcare (use it or lose it) |
-| Coverdell ESA | Tax-free growth | $2,000/year | Education |
+| FSA | Pre-tax | \\$3,200 | Healthcare (use it or lose it) |
+| Coverdell ESA | Tax-free growth | \\$2,000/year | Education |
 
-\`\`\`tabs
-{
-  "tabs": [
-    {
-      "label": "Tax-Deferred",
-      "content": "**Traditional 401(k) / IRA**\\n\\n- **Contributions:** Pre-tax (reduce current taxable income)\\n- **Growth:** Tax-deferred (no annual taxes)\\n- **Withdrawals:** Taxed as ordinary income\\n\\n**Best for:** High earners in peak earning years who expect lower tax rates in retirement"
-    },
-    {
-      "label": "Tax-Free",
-      "content": "**Roth 401(k) / IRA**\\n\\n- **Contributions:** After-tax (no current deduction)\\n- **Growth:** Tax-free\\n- **Withdrawals:** Tax-free (qualified distributions)\\n\\n**Best for:** Young professionals or those in lower tax brackets"
-    },
-    {
-      "label": "Triple Tax-Free",
-      "content": "**Health Savings Account (HSA)**\\n\\n- **Contributions:** Pre-tax (above the line deduction)\\n- **Growth:** Tax-free\\n- **Withdrawals:** Tax-free for medical expenses\\n\\n**Stealth retirement account:** After 65, non-medical withdrawals taxed like Traditional IRA"
-    }
-  ]
-}
+### The Tax Treatment Spectrum
+
+\`\`\`
+Traditional 401(k)/IRA          →  Tax-deferred (pay taxes later)
+Roth 401(k)/IRA                  →  Tax-free growth (pay taxes now)
+HSA                              →  Triple tax-free (never pay taxes if used for medical)
+Taxable brokerage account        →  Fully taxed (no special treatment)
 \`\`\`
 
 ### Priority Order for Tax-Advantaged Accounts
@@ -440,23 +369,11 @@ Financial planners generally recommend this order:
 - Contributions (not earnings) can be withdrawn anytime
 
 **Step 4: Max out 401(k) to the full limit**
-- Additional tax-deferred or Roth growth up to $24,500
+- Additional tax-deferred or Roth growth up to \\$23,000
 
 **Step 5: Taxable brokerage account**
 - No contribution limits
 - No special tax benefits (but long-term capital gains rates are preferential)
-
-\`\`\`calculator
-{
-  "type": "compound-interest",
-  "title": "HSA Retirement Growth Calculator",
-  "inputs": [
-    { "id": "p", "label": "Annual Contribution", "default": 4150, "min": 0, "max": 8300, "prefix": "$" },
-    { "id": "r", "label": "Annual Return", "default": 8, "min": 0, "max": 15, "suffix": "%" },
-    { "id": "t", "label": "Years Until Retirement", "default": 35, "min": 5, "max": 50, "suffix": " years" }
-  ]
-}
-\`\`\`
 
 ### The HSA as a Retirement Account
 
@@ -464,7 +381,7 @@ Many people overlook the HSA's retirement potential. After age 65, you can withd
 
 **Strategy:** Invest your HSA in index funds, pay current medical bills out of pocket, save receipts, and let the HSA grow for decades. By retirement, you may have a substantial tax-free pool for healthcare expenses.
 
-**Example:** $4,400/year invested in an HSA from age 30 to 65 at 8% return = approximately **$810,000** — all available tax-free for medical expenses in retirement.
+**Example:** \\$4,150/year invested in an HSA from age 30 to 65 at 8% return = approximately **\\$762,000** — all available tax-free for medical expenses in retirement.
 
 ### 529 Plans: Tax-Free Education Savings
 
@@ -473,49 +390,23 @@ A 529 plan lets you save for education expenses with tax-free growth and withdra
 - **Contributions:** Not federally deductible, but 30+ states offer state tax deductions
 - **Growth:** Tax-free
 - **Withdrawals:** Tax-free for qualified education expenses (tuition, room, board, books)
-- **Excess funds:** Can be transferred to another beneficiary or (as of 2024) rolled into a Roth IRA (up to $35,000 lifetime, subject to conditions)
-
-\`\`\`quiz
-{
-  "title": "Tax-Advantaged Account Strategy",
-  "questions": [
-    {
-      "question": "Which account offers a 'triple tax advantage' when used for medical expenses?",
-      "options": ["Traditional 401(k)", "Roth IRA", "HSA", "529 Plan"],
-      "answer": 2,
-      "explanation": "HSAs offer tax-deductible contributions, tax-free growth, and tax-free withdrawals for medical expenses — the only account with all three benefits."
-    },
-    {
-      "question": "What's the first priority when investing in tax-advantaged accounts?",
-      "options": ["Max out Roth IRA", "Contribute to 401(k) up to employer match", "Max out HSA", "Pay off high-interest debt"],
-      "answer": 1,
-      "explanation": "The employer match is free money with an instant 50-100% return, making it the highest priority before other tax-advantaged contributions."
-    },
-    {
-      "question": "After age 65, how are HSA withdrawals for non-medical expenses taxed?",
-      "options": ["Tax-free", "10% penalty plus income tax", "Income tax only (like Traditional IRA)", "20% capital gains rate"],
-      "answer": 2,
-      "explanation": "After 65, non-medical HSA withdrawals are taxed as ordinary income, similar to Traditional IRA withdrawals, with no penalty."
-    }
-  ]
-}
-\`\`\`
+- **Excess funds:** Can be transferred to another beneficiary or (as of 2024) rolled into a Roth IRA (up to \\$35,000 lifetime, subject to conditions)
 
 ### Real-World Example: The Tax Alpha
 
-Consider two investors, both earning $100,000 and investing $20,000/year for 30 years at 8%:
+Consider two investors, both earning \\$100,000 and investing \\$20,000/year for 30 years at 8%:
 
 **Investor A (taxable brokerage only):**
 - Annual capital gains taxes reduce effective return to ~6.5%
-- After 30 years: approximately $1,680,000
-- After selling (15% capital gains on profit): approximately $1,478,000
+- After 30 years: approximately \\$1,680,000
+- After selling (15% capital gains on profit): approximately \\$1,478,000
 
 **Investor B (tax-advantaged accounts):**
-- 401(k): $24,500/year (no annual taxes on growth)
-- After 30 years: approximately $2,450,000
-- Withdrawal over 30 years of retirement at ~20% effective rate: approximately $1,960,000 after tax
+- 401(k): \\$23,000/year (no annual taxes on growth)
+- After 30 years: approximately \\$2,448,000
+- Withdrawal over 30 years of retirement at ~20% effective rate: approximately \\$1,958,000 after tax
 
-The tax advantage generated approximately **$480,000** in additional wealth over the same period.
+The tax advantage generated approximately **\\$480,000** in additional wealth over the same period.
 
 ### Common Mistakes with Tax-Advantaged Accounts
 
@@ -525,18 +416,11 @@ The tax advantage generated approximately **$480,000** in additional wealth over
 4. **Cashing out 401(k) when changing jobs** — Triggers taxes plus 10% penalty before 59.5
 5. **Using 529 funds for non-qualified expenses** — Triggers taxes plus 10% penalty on earnings
 
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Tax-advantaged accounts can add hundreds of thousands to your lifetime wealth through tax savings and faster compounding",
-    "Follow the priority order: 401(k) match → HSA → Roth IRA → max 401(k) → taxable account",
-    "HSA is the most tax-advantaged account available and can double as a retirement account after age 65",
-    "529 plans offer tax-free education savings with new flexibility to roll excess funds into Roth IRAs",
-    "Avoid common mistakes like missing employer matches, leaving HSA funds uninvested, or cashing out retirement accounts early"
-  ]
-}
-\`\`\``,
+### Key Takeaway
+
+Tax-advantaged accounts are the most powerful legal tools for building wealth. The difference between using them and not using them can be hundreds of thousands of dollars over a career. Follow the priority order, maximize what you can, and let tax-free compounding work in your favor.
+
+*Resources: IRS Retirement Topics, Investopedia Tax-Advantaged Account Guide, HSA Bank, Savingforcollege.com (529 plans), Bogleheads Tax-Efficient Fund Placement.*`,
     },
     {
       id: "pf-filing-taxes",

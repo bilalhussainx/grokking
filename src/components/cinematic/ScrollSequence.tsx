@@ -6,31 +6,31 @@ import styles from './ScrollSequence.module.css'
 const PANELS = [
   {
     id:  'seq-p1',
-    num: '01 — Your Language',
-    heading: <>The interview, in <em>Hindi</em></>,
+    num: '01 — Essay Studio',
+    heading: <>From blank page to <em>personal statement</em></>,
     body:
-      'Pramp, Interviewing.io, LeetCode — all English-only. We are the only AI interview coach with native voices in 9 languages: English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, and Punjabi. Practice in the language you actually think in.',
+      'AI-guided brainstorming to find your story. Outline generation, draft coaching, and revision feedback. Every essay type — Common App personal statement, supplementals, Why Us — with real-time word count and phase tracking.',
     visual: 'langs',
   },
   {
     id:  'seq-p2',
-    num: '02 — The Coach',
-    heading: <>AI that teaches, not just <em>tests</em></>,
+    num: '02 — Interview Prep',
+    heading: <>Practice with <em>Ivy+ alumni</em></>,
     body:
-      'Stuck on a question? Our AI explains the answer, adapts difficulty in real-time, and gives feedback a human interviewer would. Frontend, backend, system design, behavioral — 10 role types. Voice-first.',
+      'Mock interviews with AI personas from Harvard, Yale, Princeton, Stanford, MIT, Columbia, Penn, Brown, Dartmouth, and Cornell. 4-session adaptive arc: narrative assessment, weak areas, full mock, and essay coaching. Voice or text.',
     visual: 'pulse',
   },
   {
     id:  'seq-p3',
-    num: '03 — The Path',
-    heading: <>From course to <em>offer</em></>,
+    num: '03 — The Full Picture',
+    heading: <>Every piece, <em>one platform</em></>,
     body:
-      '69 courses across 10 career pathways. Learn the fundamentals, practice with mock interviews, track your progress. Everything you need from day one to job offer.',
+      'School list builder with chancing data. Activities optimizer with Common App formatting. Recommendations coach with brag sheets and email drafts. Share everything with your counselor in one link.',
     visual: 'path',
   },
 ]
 
-const LANGS = ['English', 'Espa\u00f1ol', 'Fran\u00e7ais', 'Deutsch', 'Italiano', 'Nederlands', '\u65e5\u672c\u8a9e', '\u0939\u093f\u0928\u094d\u0926\u0940', '\u0a2a\u0a70\u0a1c\u0a3e\u0a2c\u0a40']
+const LANGS = ['Personal Statement', 'Supplementals', 'Why Us', 'Short Answers', 'Activities List', 'Brainstorm', 'Draft', 'Revise', 'Polish']
 
 function PulseVisual() {
   return (
@@ -49,7 +49,7 @@ function LangsVisual() {
       {LANGS.map((lang, i) => (
         <div
           key={lang}
-          className={`${styles.langPill} ${lang === 'Hindi' ? styles.langGold : ''}`}
+          className={`${styles.langPill} ${lang === 'Personal Statement' ? styles.langGold : ''}`}
           style={{ animationDelay: `${i * 0.18}s` }}
         >
           {lang}
@@ -75,9 +75,9 @@ function PathVisual() {
         <circle cx="150" cy="140" r="11" fill="rgba(212,168,75,0.12)"/>
         <circle cx="270" cy="35"  r="5"  fill="#d4a84b" opacity="0.35"/>
         <circle cx="270" cy="35"  r="9"  fill="rgba(212,168,75,0.08)"/>
-        <text x="50"  y="255" fill="rgba(212,168,75,0.6)" fontSize="10" fontWeight="300">Frontend</text>
-        <text x="162" y="145" fill="rgba(212,168,75,0.5)" fontSize="10" fontWeight="300">Full Stack</text>
-        <text x="238" y="32"  fill="rgba(212,168,75,0.4)" fontSize="10" fontWeight="300">ML/AI</text>
+        <text x="50"  y="255" fill="rgba(212,168,75,0.6)" fontSize="10" fontWeight="300">Profile</text>
+        <text x="152" y="145" fill="rgba(212,168,75,0.5)" fontSize="10" fontWeight="300">Application</text>
+        <text x="240" y="32"  fill="rgba(212,168,75,0.4)" fontSize="10" fontWeight="300">Admitted</text>
         <circle cx="90"  cy="198" r="3.5" fill="rgba(212,168,75,0.28)"/>
         <circle cx="113" cy="162" r="3"   fill="rgba(212,168,75,0.2)"/>
         <circle cx="195" cy="87"  r="3.5" fill="rgba(212,168,75,0.2)"/>

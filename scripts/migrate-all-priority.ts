@@ -15,33 +15,81 @@ import * as path from "node:path";
 import { execSync, spawn } from "node:child_process";
 
 const PRIORITY_COURSES = [
+  // Wave 1: CS/Tech — core interview + fundamentals (2026-04-13)
   "coding-interview",
   "system-design",
   "data-structures-algorithms",
-  "react-development",
-  "personal-finance",
-  // Wave 2 — remaining coding courses
   "python-fundamentals",
   "javascript-fundamentals",
+  "react-development",
+  "dp-patterns",
+  "ds-interview",
+  "ml-interview",
+  "ood-interview",
+  "concurrency-multithreading",
+  "grokking-dsa-python",
   "cpp-fundamentals",
   "csharp-fundamentals",
   "nodejs-backend",
   "mern-stack",
   "web-development",
   "game-development",
-  "dp-patterns",
-  "grokking-dsa-python",
-  "ood-interview",
-  "concurrency-multithreading",
+  "behavioral-interview",
   "api-design-interview",
-  "advanced-system-design",
   "modern-system-design",
-  "ml-interview",
-  "ds-interview",
-  "coding-interview-premium",
+  // Wave 2: CS/Tech — AI, security, advanced
+  "ai-ml-fundamentals",
+  "ai-agents",
+  "nn-zero-to-hero",
+  "prompt-engineering",
+  "rag-engineering",
+  "mcp-claude-code",
+  "claude-code-mastery",
+  "ethical-hacking",
+  "ap-cs-a",
+  "ap-cs-principles",
+  // Wave 3: Finance/Business
+  "personal-finance",
+  "financial-modeling",
+  "financial-ml",
+  "corporate-finance",
+  "investment-banking",
+  "quantitative-finance",
+  "stock-market-investing",
+  "investing-wealth",
+  "accounting-fundamentals",
+  "fintech-blockchain",
+  "behavioral-economics",
+  "macroeconomics",
+  "microeconomics",
+  "international-economics",
+  "entrepreneurship",
+  "business-analytics",
+  "business-strategy",
+  // Wave 4: Other — religion, philosophy, wellness, etc.
+  "islam-foundations",
+  "christian-theology",
+  "buddhism-foundations",
+  "hinduism-foundations",
+  "judaism-foundations",
+  "sikhism-foundations",
+  "sufism-foundations",
+  "confucianism-foundations",
+  "taoism-foundations",
+  "ahmadiyya-foundations",
+  "stoic-philosophy",
+  "meditation-mindfulness",
+  "mental-health-resilience",
+  "leadership-management",
+  "leadership-growth",
+  "negotiation-influence",
+  "political-strategy",
+  "intro-psychology",
+  "ap-biology",
+  "world-history",
 ];
 
-const PROGRESS_FILE = ".research/migration-progress.json";
+const DEFAULT_PROGRESS_FILE = ".research/migration-progress.json";
 
 interface Progress {
   completed: string[]; // module file paths that are done (have a .v2.ts)
@@ -50,19 +98,19 @@ interface Progress {
   lastUpdate: string;
 }
 
-async function loadProgress(): Promise<Progress> {
+async function loadProgress(progressFile: string): Promise<Progress> {
   try {
-    const raw = await fs.readFile(PROGRESS_FILE, "utf-8");
+    const raw = await fs.readFile(progressFile, "utf-8");
     return JSON.parse(raw);
   } catch {
     return { completed: [], failed: {}, startedAt: new Date().toISOString(), lastUpdate: "" };
   }
 }
 
-async function saveProgress(p: Progress) {
+async function saveProgress(p: Progress, progressFile: string) {
   p.lastUpdate = new Date().toISOString();
-  await fs.mkdir(path.dirname(PROGRESS_FILE), { recursive: true });
-  await fs.writeFile(PROGRESS_FILE, JSON.stringify(p, null, 2));
+  await fs.mkdir(path.dirname(progressFile), { recursive: true });
+  await fs.writeFile(progressFile, JSON.stringify(p, null, 2));
 }
 
 async function listModuleFiles(course: string): Promise<string[]> {
@@ -75,12 +123,16 @@ async function listModuleFiles(course: string): Promise<string[]> {
     .sort();
 }
 
-function runMigration(filePath: string): Promise<{ ok: boolean; log: string }> {
+function runMigration(filePath: string, engine: string): Promise<{ ok: boolean; log: string }> {
   return new Promise((resolve) => {
-    const child = spawn("npx", ["tsx", "scripts/migrate-lesson.ts", filePath], {
-      stdio: ["ignore", "pipe", "pipe"],
-      shell: true,
-    });
+    const child = spawn(
+      "npx",
+      ["tsx", "scripts/migrate-lesson.ts", filePath, "--engine", engine],
+      {
+        stdio: ["ignore", "pipe", "pipe"],
+        shell: true,
+      }
+    );
     let log = "";
     child.stdout.on("data", (d) => {
       const s = d.toString();
@@ -101,13 +153,27 @@ async function main() {
   const fresh = args.includes("--fresh");
   const onlyIdx = args.indexOf("--only");
   const onlyCourse = onlyIdx >= 0 ? args[onlyIdx + 1] : undefined;
+  const engineIdx = args.indexOf("--engine");
+  const engine = engineIdx >= 0 ? args[engineIdx + 1] : "moonshot";
+  if (engine !== "moonshot" && engine !== "claude") {
+    console.error(`--engine must be "moonshot" or "claude" (got "${engine}")`);
+    process.exit(1);
+  }
+
+  // Separate progress file per engine so switching engines doesn't skip files
+  const progressFile =
+    engine === "claude"
+      ? ".research/migration-progress-claude.json"
+      : DEFAULT_PROGRESS_FILE;
 
   const coursesToRun = onlyCourse ? [onlyCourse] : PRIORITY_COURSES;
   const progress = fresh
     ? { completed: [], failed: {}, startedAt: new Date().toISOString(), lastUpdate: "" }
-    : await loadProgress();
+    : await loadProgress(progressFile);
 
   console.log(`\n━━━ Priority migration driver ━━━`);
+  console.log(`Engine: ${engine}`);
+  console.log(`Progress file: ${progressFile}`);
   console.log(`Courses: ${coursesToRun.join(", ")}`);
   console.log(`Resuming: ${progress.completed.length} already complete, ${Object.keys(progress.failed).length} previously failed\n`);
 
@@ -131,7 +197,7 @@ async function main() {
     }
     console.log(`\n━━━ [${i + 1}/${allFiles.length}] ${f} ━━━`);
     const start = Date.now();
-    const { ok } = await runMigration(f);
+    const { ok } = await runMigration(f, engine);
     const elapsed = ((Date.now() - start) / 1000).toFixed(1);
     if (ok) {
       progress.completed.push(f);
@@ -141,7 +207,7 @@ async function main() {
       progress.failed[f] = `exit non-zero at ${new Date().toISOString()}`;
       console.log(`✗ ${f} failed after ${elapsed}s`);
     }
-    await saveProgress(progress);
+    await saveProgress(progress, progressFile);
   }
 
   console.log(`\n━━━ Done ━━━`);

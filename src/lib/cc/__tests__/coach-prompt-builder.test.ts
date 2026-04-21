@@ -20,7 +20,11 @@ describe("buildSystemPrompt", () => {
     hasGPA: true,
     hasSchools: true,
     hasEssays: false,
+    hasEssayReviewed: false,
+    hasActivitiesOptimized: false,
+    hasSupplementsStarted: false,
     hasInterviewSessions: false,
+    latestEssayReview: null,
     preferences: null,
   };
 

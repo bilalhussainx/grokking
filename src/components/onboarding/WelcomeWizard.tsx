@@ -10,20 +10,21 @@ import {
   ChevronRight, Check, ArrowRight,
 } from "lucide-react";
 import { courses } from "@/data";
+import { COACH_LANGUAGES } from "@/lib/cc/coach-languages";
 
 interface WelcomeWizardProps {
   userName?: string;
   onComplete: () => void;
 }
 
-type Interest = "cs" | "finance" | "languages" | "personal";
+type Interest = "essays" | "interviews" | "schools" | "activities";
 type Pace = "5min" | "30min" | "1hr";
 
 const INTERESTS = [
-  { id: "cs" as const, label: "Computer Science", desc: "Coding interviews, system design, algorithms", icon: Code2 },
-  { id: "finance" as const, label: "Finance & Business", desc: "Personal finance, investing, economics", icon: TrendingUp },
-  { id: "languages" as const, label: "Languages", desc: "Practice speaking with AI voice tutors", icon: Languages },
-  { id: "personal" as const, label: "Personal Growth", desc: "Philosophy, mental health, leadership", icon: Brain },
+  { id: "essays" as const, label: "Essay Writing", desc: "Personal statements, supplementals, Why Us essays", icon: Code2 },
+  { id: "interviews" as const, label: "Interview Prep", desc: "Mock interviews with Ivy+ alumni personas", icon: TrendingUp },
+  { id: "schools" as const, label: "School List", desc: "Build your reach, match, and safety list", icon: Languages },
+  { id: "activities" as const, label: "Activities & Recs", desc: "Optimize activities list, manage recommendations", icon: Brain },
 ];
 
 const PACES = [
@@ -34,35 +35,35 @@ const PACES = [
 
 // Map interests to actual course domains for smart matching
 const INTEREST_DOMAINS: Record<Interest, string[]> = {
-  cs: ["computer-science", "cs"],
-  finance: ["finance-business"],
-  languages: [], // handled separately via /talk
-  personal: ["philosophy", "health-wellness", "religious-studies"],
+  essays: ["college-prep"],
+  interviews: ["college-prep"],
+  schools: ["college-prep"],
+  activities: ["college-prep"],
 };
 
 const AI_FEATURES = [
   {
-    icon: Search,
-    title: "Search anything",
-    desc: "Press Ctrl+K to instantly find courses, lessons, or topics",
-    color: "text-blue-400",
-  },
-  {
     icon: GraduationCap,
-    title: "Coach Kairos",
-    desc: "Click the Coach button on any lesson for AI hints, explanations, and code help",
+    title: "Essay Studio",
+    desc: "AI-guided brainstorming, outline generation, and draft coaching for every essay type",
     color: "text-violet-400",
   },
   {
     icon: Mic,
-    title: "Voice practice",
-    desc: "Click \"Talk\" in the top nav to start a voice conversation in 7+ languages",
+    title: "Interview Prep",
+    desc: "Practice with 10 Ivy+ alumni AI personas — Harvard, Yale, Stanford, MIT, and more",
     color: "text-emerald-400",
   },
   {
+    icon: Search,
+    title: "School List Builder",
+    desc: "Search 1,500+ colleges with chancing estimates, net price data, and application tracking",
+    color: "text-blue-400",
+  },
+  {
     icon: Keyboard,
-    title: "Keyboard shortcuts",
-    desc: "N = next lesson, P = previous, H = hints, ? = all shortcuts",
+    title: "Counselor Share Link",
+    desc: "Share your essays, activities, and scores with counselors and parents — they don't need an account",
     color: "text-amber-400",
   },
 ];
@@ -70,44 +71,17 @@ const AI_FEATURES = [
 function getRecommendedCourses(selectedInterests: Set<Interest>) {
   const recommended: { slug: string; title: string; icon: string; reason: string }[] = [];
 
+  const CC_PAGES: Record<Interest, { slug: string; title: string; icon: string; reason: string }> = {
+    essays: { slug: "__cc_essays__", title: "Essay Studio", icon: "✍️", reason: "Start brainstorming your personal statement" },
+    interviews: { slug: "__cc_interviews__", title: "Interview Prep", icon: "🎯", reason: "Practice with Ivy+ alumni personas" },
+    schools: { slug: "__cc_schools__", title: "School List Builder", icon: "🏫", reason: "Build your reach, match, and safety list" },
+    activities: { slug: "__cc_activities__", title: "Activities Optimizer", icon: "📋", reason: "Optimize your Common App activities list" },
+  };
+
   for (const interest of selectedInterests) {
-    if (interest === "languages") {
-      // Language learners should go to the Talk page
-      recommended.push({
-        slug: "__talk__",
-        title: "Start a Voice Conversation",
-        icon: "\u{1F3A4}",
-        reason: "Practice speaking with AI tutors",
-      });
-      continue;
-    }
-
-    const domains = INTEREST_DOMAINS[interest];
-    const matching = courses.filter(
-      (c) => domains.some((d) => c.domain === d) || (!c.domain && interest === "cs")
-    );
-
-    // Pick beginner-level or free courses first
-    const sorted = matching.sort((a, b) => {
-      if (a.level === "beginner" && b.level !== "beginner") return -1;
-      if (a.tier === "free" && b.tier !== "free") return -1;
-      return 0;
-    });
-
-    const pick = sorted[0];
-    if (pick && !recommended.some((r) => r.slug === pick.slug)) {
-      const reasons: Record<Interest, string> = {
-        cs: "Great starting point for coding",
-        finance: "Build financial literacy",
-        personal: "Start your personal growth journey",
-        languages: "",
-      };
-      recommended.push({
-        slug: pick.slug,
-        title: pick.title,
-        icon: pick.icon,
-        reason: reasons[interest],
-      });
+    const page = CC_PAGES[interest];
+    if (page && !recommended.some((r) => r.slug === page.slug)) {
+      recommended.push(page);
     }
   }
 
@@ -120,6 +94,7 @@ export default function WelcomeWizard({ userName, onComplete }: WelcomeWizardPro
   const [pace, setPace] = useState<Pace | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [coachLang, setCoachLang] = useState<string>("en");
   const router = useRouter();
 
   const toggleInterest = (id: Interest) => {
@@ -137,6 +112,14 @@ export default function WelcomeWizard({ userName, onComplete }: WelcomeWizardPro
     localStorage.setItem("onboarding_complete", "true");
     localStorage.setItem("learning_interests", JSON.stringify([...interests]));
     localStorage.setItem("learning_pace", pace ?? "30min");
+    localStorage.setItem("coach_kairos_language", coachLang);
+    if (coachLang !== "en") {
+      fetch("/api/cc/profile/voice", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ language: coachLang }),
+      }).catch(() => {});
+    }
 
     // Trigger confetti celebration
     setShowConfetti(true);
@@ -144,13 +127,14 @@ export default function WelcomeWizard({ userName, onComplete }: WelcomeWizardPro
     // Navigate after a brief confetti moment
     setTimeout(() => {
       const target = selectedCourse || recommended[0]?.slug;
-      if (target === "__talk__") {
-        router.push("/talk");
-      } else if (target) {
-        router.push(`/course/${target}`);
-      } else {
-        router.push("/courses");
-      }
+      const ccRoutes: Record<string, string> = {
+        "__cc_essays__": "/cc/essays",
+        "__cc_interviews__": "/college-interviews",
+        "__cc_schools__": "/cc/schools",
+        "__cc_activities__": "/cc/activities",
+      };
+      const route = ccRoutes[target || ""] || "/cc";
+      router.push(route);
       setTimeout(() => onComplete(), 100);
     }, 600);
   };
@@ -190,8 +174,28 @@ export default function WelcomeWizard({ userName, onComplete }: WelcomeWizardPro
                   Welcome{userName ? `, ${userName}` : ""}!
                 </h2>
                 <p className="text-sm text-[var(--muted-foreground)] mt-2">
-                  What would you like to learn?
+                  What do you need help with?
                 </p>
+              </div>
+
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-2.5">
+                <label className="flex items-center justify-between gap-3 cursor-pointer">
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-[var(--foreground)]">Coach Kairos speaks</p>
+                    <p className="text-[10px] text-[var(--muted-foreground)]">Voice-reply language — change any time</p>
+                  </div>
+                  <select
+                    value={coachLang}
+                    onChange={(e) => setCoachLang(e.target.value)}
+                    className="shrink-0 px-2.5 py-1.5 rounded-lg bg-[var(--background)] border border-[var(--border)] text-xs text-[var(--foreground)] focus:outline-none focus:border-blue-500/50"
+                  >
+                    {COACH_LANGUAGES.map((l) => (
+                      <option key={l.code} value={l.code}>
+                        {l.flag} {l.nativeName}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -305,10 +309,10 @@ export default function WelcomeWizard({ userName, onComplete }: WelcomeWizardPro
             >
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-[var(--foreground)]">
-                  Your AI superpowers
+                  Your application toolkit
                 </h2>
                 <p className="text-sm text-[var(--muted-foreground)] mt-2">
-                  Here&apos;s what makes Samsara different.
+                  Everything you need to ace your college applications.
                 </p>
               </div>
 
@@ -361,10 +365,10 @@ export default function WelcomeWizard({ userName, onComplete }: WelcomeWizardPro
             >
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-[var(--foreground)]">
-                  Recommended for you
+                  Where to start
                 </h2>
                 <p className="text-sm text-[var(--muted-foreground)] mt-2">
-                  Pick a course to start with, or browse all courses.
+                  Pick a tool to begin with, or go straight to your dashboard.
                 </p>
               </div>
 
@@ -411,12 +415,12 @@ export default function WelcomeWizard({ userName, onComplete }: WelcomeWizardPro
               <button
                 onClick={() => {
                   localStorage.setItem("onboarding_complete", "true");
-                  router.push("/courses");
+                  router.push("/cc");
                   setTimeout(() => onComplete(), 100);
                 }}
                 className="w-full text-center text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
               >
-                Browse all courses instead
+                Go to my dashboard instead
               </button>
             </motion.div>
           )}

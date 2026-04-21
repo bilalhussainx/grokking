@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuth, unauthorized, createAdminSupabase } from "../../helpers";
 import { callLLMJSON, type ChatMessage } from "@/lib/cc/llm-stream";
 import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
+import { ACTIVITY_WRITING_RULES, ACTIVITY_EXEMPLARS, ACTIVITY_ACTION_VERBS } from "@/lib/cc/activity-exemplars";
 
 interface ActivityRow {
   position: number;
@@ -96,16 +97,24 @@ export async function POST() {
     `Position ${h.position}: "${h.title}" — Level: ${h.level}, Grade: ${h.grade}\n  Description (100 char max): "${h.description_100 || ""}"`
   ).join("\n\n");
 
-  const systemPrompt = `You are a college admissions activities optimizer for ${profile.preferred_name || profile.legal_first_name || "a student"}.
+  const systemPrompt = `You are a college admissions activities optimizer for ${profile.preferred_name || profile.legal_first_name || "a student"}. You write at the level of successful Ivy+ admits and coach the student to do the same.
 
-Rules:
+${ACTIVITY_WRITING_RULES}
+
+${ACTIVITY_ACTION_VERBS}
+
+${ACTIVITY_EXEMPLARS}
+
+Optimizer rules:
 1. Suggested descriptions MUST respect character limits: 150 chars for activities, 100 chars for honors. Count characters carefully.
-2. Use active verbs and quantifiable results in suggestions.
-3. Impact scores 1-5: 1=filler, 2=average, 3=solid, 4=strong, 5=exceptional.
-4. Recommended order: strongest/most unique first, declining impact.
-5. Be specific in gap analysis — name the missing category and suggest a concrete fix.
-6. Flag implausible time commitments (>25 hrs/week per activity, >80 total hrs/week across all).
-7. If STAR fields are provided, use them to craft better descriptions.
+2. Every suggested description must pass the rubric above — lead with a verb from the ACTION VERB BANK (pick the category that matches the activity: Achievement / Help-Teach / Administrative / Lead-Manage / Communication / Plan-Organize / Creative / Research-Analytical / Financial / Technical), pack 3-4 outcomes with semicolons, quantify, cite award levels, no filler openings.
+3. Each suggested description must match the STYLE of the exemplars. Soft self-descriptions get rewritten crisp. If current says "Plays the violin and has won a few competitions" → "Violinist; multiple inter-school wins; weekly rehearsals; selected for regional orchestra". If a passion activity has no awards (e.g., Indian Tabla), use the passion template: "Self-taught via YouTube videos; played drums at community meetings for worker rights awareness; helped my sister become proficient."
+4. Impact scores 1-5: 1=filler, 2=average, 3=solid, 4=strong, 5=exceptional. A solo-hobby with no output = 2; national award with leadership = 5.
+5. Recommended order: strongest/most unique first, declining impact. National/international awards and major-aligned activities go in slots 1-3.
+6. Gap analysis: name the missing Common App category by its exact name (Research, Internship, Work (Paid), Family Responsibilities, Social Justice, Community Service, etc.) and suggest a concrete fix.
+7. Flag implausible time commitments (>25 hrs/week per activity, >80 total hrs/week across all).
+8. If STAR fields are provided, mine them for the strongest outcome phrases. Do NOT invent awards or metrics the student didn't provide — when in doubt, flag "needs quantifying" in suggestions.
+9. If the student has fewer than 10 activities, do NOT fabricate or pad. Leave slots empty and surface that gap in gaps[].
 
 Return valid JSON only matching this schema:
 {

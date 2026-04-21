@@ -4,34 +4,34 @@ import styles from './Features.module.css'
 
 const FEATURES = [
   {
-    icon: '\u25CE',
-    title: 'AI Mock Interviews',
-    desc:  'Voice-first interview practice with 10 role presets. Recruiter screens, technical rounds, system design, and behavioral — all with real-time AI feedback.',
+    icon: '\u270D',
+    title: 'Essay Studio',
+    desc:  'AI-guided brainstorming, outline generation, and draft coaching. Personal statements, supplementals, and Why Us essays — each with phase tracking from brainstorm to polish.',
   },
   {
-    icon: '\u27E1',
-    title: '17 Voice Languages',
-    desc:  'Hindi, Spanish, French, Japanese, Bengali, Tamil, and 11 more. AI tutors trained on native speaker patterns with sub-second response time.',
+    icon: '\u25CE',
+    title: 'Interview Prep',
+    desc:  'Practice with 10 Ivy+ alumni AI personas. Harvard, Yale, Stanford, MIT, and more. 4-session adaptive arc with detailed scorecards and essay-aware questioning.',
   },
   {
     icon: '\u25C8',
-    title: 'Career Pathways',
-    desc:  '10 structured paths from Frontend to Finance. Each pathway groups courses, tracks your progress, and connects directly to mock interviews for that role.',
+    title: 'Activities Optimizer',
+    desc:  'AI reviews your Common App activities list. Get description rewrites, impact scoring, optimal ordering, and gap analysis — all in 150-character format.',
   },
   {
     icon: '\u25D0',
-    title: 'Real-time Coaching',
-    desc:  'Coach Kairos adapts explanations to your level. Get progressive hints, detailed breakdowns, and encouragement — all through voice or text.',
+    title: 'Recommendations Coach',
+    desc:  'Build brag sheets for each recommender. AI drafts ask emails, tracks confirmation status, and ensures your recommender list covers every angle.',
   },
   {
     icon: '\u2B21',
-    title: '69+ Courses',
-    desc:  'Coding interviews, system design, data structures, personal finance, philosophy, and more. Every course structured with checkpoints and exercises.',
+    title: 'School List Builder',
+    desc:  'Search 1,500+ colleges. Get chancing estimates, compare net prices, and track application status — reach, match, and safety all in one view.',
   },
   {
     icon: '\u25C6',
-    title: 'Interview Scorecard',
-    desc:  'Get detailed feedback after every practice session. Communication clarity, technical depth, problem-solving approach — all scored and tracked over time.',
+    title: 'Counselor Share Link',
+    desc:  'Generate one link to share your essays, activities, school list, recommendations, and interview scores with counselors and parents. They don\'t need an account.',
   },
 ]
 

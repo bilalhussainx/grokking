@@ -13,14 +13,6 @@ export const stateModule: Module = {
 
 **State** is data that changes over time and affects what a component renders. Unlike props (which flow down from a parent), state is **owned and managed by the component itself**.
 
-\`\`\`concept
-{
-  "title": "What is State?",
-  "variant": "mental-model",
-  "content": "Think of state as a component's short-term memory. Just like you remember if a light switch is on or off, a React component remembers its state values between renders. When state changes, React 'flips the switch' and updates what you see on screen."
-}
-\`\`\`
-
 ### Props vs State
 
 | Props | State |
@@ -29,32 +21,6 @@ export const stateModule: Module = {
 | Read-only for the component | Can be updated by the component |
 | Changes trigger re-render | Changes trigger re-render |
 | Flow downward | Owned locally |
-
-\`\`\`quiz
-{
-  "title": "Props vs State Check",
-  "questions": [
-    {
-      "question": "Which statement about props and state is TRUE?",
-      "options": ["Props can be modified by the child component", "State is passed down from parent components", "Both props and state changes trigger re-renders", "State is read-only for the component"],
-      "answer": 2,
-      "explanation": "Both props and state changes trigger re-renders. Props are read-only to the child component, state is owned locally (not passed from parent), and state can be updated by the component itself."
-    },
-    {
-      "question": "A form input's current value should typically be stored as:",
-      "options": ["Props", "State", "A regular JavaScript variable", "A CSS class"],
-      "answer": 1,
-      "explanation": "Form input values that change over time should be stored in state since the component needs to 'remember' and update this value as the user types."
-    },
-    {
-      "question": "When should you use props instead of state?",
-      "options": ["When data needs to change within the component", "When data is provided by a parent component", "When you need to remember user interactions", "When you want to trigger re-renders"],
-      "answer": 1,
-      "explanation": "Use props when a parent component needs to pass data to a child component. Props are the mechanism for parent-to-child communication in React."
-    }
-  ]
-}
-\`\`\`
 
 ### How React State Works
 
@@ -65,39 +31,16 @@ When you call \`useState\`, React:
 3. When the setter is called, React **schedules a re-render**
 4. On re-render, \`useState\` returns the **updated value**
 
-\`\`\`trace
-{
-  "title": "useState in Action",
-  "language": "javascript",
-  "code": "function Counter() {\\n  const [count, setCount] = useState(0);\\n  \\n  function handleClick() {\\n    setCount(count + 1);\\n  }\\n  \\n  return (\\n    <button onClick={handleClick}>\\n      Count: {count}\\n    </button>\\n  );\\n}",
-  "frames": [
-    {
-      "line": 1,
-      "vars": {"count": 0},
-      "note": "Initial render: useState(0) returns [0, setter]",
-      "stdout": ""
-    },
-    {
-      "line": 5,
-      "vars": {"count": 0},
-      "note": "User clicks button, handleClick called",
-      "stdout": ""
-    },
-    {
-      "line": 6,
-      "vars": {"count": 0},
-      "note": "setCount(1) scheduled - React will re-render",
-      "stdout": ""
-    },
-    {
-      "line": 1,
-      "vars": {"count": 1},
-      "note": "Re-render: useState now returns [1, setter]",
-      "stdout": ""
-    }
-  ],
-  "speed": 1000
-}
+\`\`\`
+// Conceptual model:
+const [count, setCount] = useState(0);
+// React stores: hooks[0] = 0
+// Returns: [0, setterForHook0]
+
+setCount(1);
+// React updates: hooks[0] = 1
+// React re-renders the component
+// useState now returns: [1, setterForHook0]
 \`\`\`
 
 ### The Rules of State
@@ -106,14 +49,6 @@ When you call \`useState\`, React:
 2. **State updates may be batched** — React can group multiple updates
 3. **State updates are asynchronous** — you cannot read the new value immediately after setting
 4. **Hooks must be called in the same order** — no conditionals around hooks
-
-\`\`\`callout
-{
-  "type": "warning",
-  "title": "Common Pitfall: Direct Mutation",
-  "content": "Never do this: \`count = 5\` or \`count++\`. Always use the setter: \`setCount(5)\` or \`setCount(prev => prev + 1)\`. Direct mutation bypasses React's re-render mechanism, leaving your UI stale."
-}
-\`\`\`
 
 ### Reducers: State Machines for Complex State
 
@@ -124,39 +59,6 @@ When state logic gets complex (multiple related values, complex transitions), \`
 \`\`\`
 
 Instead of scattering state updates everywhere, you define all transitions in one reducer function.
-
-\`\`\`steps
-{
-  "title": "When to Choose useReducer",
-  "steps": [
-    {
-      "title": "Multiple State Values",
-      "content": "When you have 3+ related state values that update together (like form fields, shopping cart items, or UI flags), useReducer keeps them synchronized in one place."
-    },
-    {
-      "title": "Complex State Logic",
-      "content": "If the next state depends on multiple conditions or previous values (like a game state machine or multi-step form), a reducer makes the logic explicit and testable."
-    },
-    {
-      "title": "Predictable Updates",
-      "content": "Reducers centralize all state transitions, making it easier to debug and reason about how state changes in response to different actions."
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "State is a component's local memory that triggers re-renders when updated",
-    "Props flow down from parents; state is owned and managed locally",
-    "Always use setter functions to update state—never mutate directly",
-    "State updates are asynchronous and may be batched by React",
-    "useReducer provides structured state management for complex scenarios"
-  ]
-}
-\`\`\`
 
 In these exercises, you will build these patterns from scratch to deeply understand how React manages state internally.`,
     },
@@ -342,145 +244,19 @@ Create \`createReducer(reducer, initialState)\` that returns an object with:
 
 This is the same pattern used by React's \`useReducer\` hook and Redux.
 
-\`\`\`concept
-{
-  "title": "The Reducer Pattern",
-  "variant": "mental-model",
-  "content": "Think of a reducer as a state machine: given the current state and an action describing what happened, it computes the next state. No side effects, no mutations — just pure computation."
-}
+### Examples
+
 \`\`\`
-
-### Why Reducers Matter
-
-Reducers shine when state logic grows complex. While \`useState\` works great for independent values, reducers excel at coordinating related state changes through a single, predictable flow.
-
-\`\`\`compare
-{
-  "variant": "before-after",
-  "before": {
-    "label": "useState — scattered logic",
-    "code": "const [count, setCount] = useState(0);\\nconst [history, setHistory] = useState([]);\\n\\nfunction increment() {\\n  setCount(c => c + 1);\\n  setHistory(h => [...h, 'inc']);\\n}"
-  },
-  "after": {
-    "label": "useReducer — centralized logic",
-    "code": "const [state, dispatch] = useReducer(counterReducer, {\\n  count: 0,\\n  history: []\\n});\\n\\ndispatch({ type: 'INCREMENT' }); // single call"
+const counter = createReducer((state, action) => {
+  switch (action.type) {
+    case "INCREMENT": return { count: state.count + 1 };
+    case "DECREMENT": return { count: state.count - 1 };
+    default: return state;
   }
-}
-\`\`\`
+}, { count: 0 });
 
-### Building Your Own createReducer
-
-Let’s implement the core mechanism step-by-step.
-
-\`\`\`steps
-{
-  "title": "Implementing createReducer",
-  "steps": [
-    {
-      "title": "1. Create closure around state",
-      "content": "We need a variable that lives outside the returned object so both \`getState\` and \`dispatch\` can access it."
-    },
-    {
-      "title": "2. Provide read access",
-      "content": "\`getState()\` simply returns the current value of that closed-over variable."
-    },
-    {
-      "title": "3. Provide write access",
-      "content": "\`dispatch(action)\` calls the reducer with the current state and the action, then replaces the closed-over variable with the returned next state."
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`playground
-{
-  "title": "Starter: createReducer",
-  "language": "javascript",
-  "code": "function createReducer(reducer, initialState) {\\n  // TODO: implement\\n  return {\\n    getState() {},\\n    dispatch(action) {}\\n  };\\n}\\n\\n// tests\\nconst counter = createReducer(\\n  (state, { type }) => {\\n    switch (type) {\\n      case 'INC': return { count: state.count + 1 };\\n      case 'DEC': return { count: state.count - 1 };\\n      default:   return state;\\n    }\\n  },\\n  { count: 0 }\\n);\\n\\nconsole.log(counter.getState()); // { count: 0 }\\ncounter.dispatch({ type: 'INC' });\\nconsole.log(counter.getState()); // { count: 1 }",
-  "runnable": true
-}
-\`\`\`
-
-### Watching It Work
-
-Here’s a visual trace of the reducer executing three actions.
-
-\`\`\`trace
-{
-  "title": "Reducer Execution Trace",
-  "language": "javascript",
-  "code": "function createReducer(reducer, initialState) {\\n  let state = initialState;\\n  return {\\n    getState() { return state; },\\n    dispatch(action) {\\n      state = reducer(state, action);\\n    }\\n  };\\n}\\n\\nconst r = createReducer((s, a) => {\\n  switch (a.type) {\\n    case 'ADD': return { total: s.total + a.payload };\\n    default:    return s;\\n  }\\n}, { total: 10 });\\n\\nr.dispatch({ type: 'ADD', payload: 5 });\\nr.dispatch({ type: 'ADD', payload: 2 });\\nr.dispatch({ type: 'ADD', payload: 3 });",
-  "frames": [
-    { "line": 11, "vars": { "state": "{ total: 10 }" }, "note": "initial state", "stdout": "" },
-    { "line": 12, "vars": { "state": "{ total: 15 }" }, "note": "after ADD 5", "stdout": "" },
-    { "line": 13, "vars": { "state": "{ total: 17 }" }, "note": "after ADD 2", "stdout": "" },
-    { "line": 14, "vars": { "state": "{ total: 20 }" }, "note": "after ADD 3", "stdout": "" }
-  ],
-  "speed": 600
-}
-\`\`\`
-
-### Common Pitfalls
-
-\`\`\`callout
-{
-  "type": "warning",
-  "title": "Don’t mutate state",
-  "content": "Always return a *new* object. Mutating the existing state breaks purity and can lead to subtle bugs when React double-invokes reducers in Strict Mode."
-}
-\`\`\`
-
-\`\`\`quiz
-{
-  "title": "Reducer Knowledge Check",
-  "questions": [
-    {
-      "question": "Which of the following is a valid reducer?",
-      "options": [
-        "(state, action) => { state.count++; return state; }",
-        "(state, action) => ({ ...state, count: state.count + 1 })",
-        "(state, action) => state.count = state.count + 1",
-        "(state, action) => { alert(action.type); return state; }"
-      ],
-      "answer": 1,
-      "explanation": "Reducers must be pure and return new objects. Option 2 spreads the old state and updates only the needed field."
-    },
-    {
-      "question": "When is useReducer preferred over useState?",
-      "options": [
-        "Always — it’s the modern way",
-        "When state has multiple sub-values that update together",
-        "When you need faster re-renders",
-        "When you want less boilerplate"
-      ],
-      "answer": 1,
-      "explanation": "useReducer centralizes complex, inter-dependent state updates, making them easier to follow and test."
-    },
-    {
-      "question": "What guarantees that dispatch identity is stable?",
-      "options": [
-        "React memoizes the dispatch function internally",
-        "The reducer is pure",
-      "initialState is immutable",
-        "We use closure in createReducer"
-      ],
-      "answer": 0,
-      "explanation": "React ensures dispatch never changes between renders, allowing child components to safely use it without extra memoization."
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Reducers are pure functions: (state, action) → nextState",
-    "Complex, intertwined state logic is easier to manage with reducers than scattered setState calls",
-    "Dispatch has stable identity, optimizing re-renders when passed to children",
-    "Always return new objects; never mutate the previous state"
-  ]
-}
+counter.dispatch({ type: "INCREMENT" });
+counter.getState(); // => { count: 1 }
 \`\`\``,
       starterCode: `function createReducer(reducer, initialState) {
   // TODO: implement the reducer pattern
@@ -633,14 +409,6 @@ console.log(todos.getState());
       title: "Counter State Machine",
       content: `## Counter State Machine
 
-\`\`\`concept
-{
-  "title": "State Machines vs. Reducers",
-  "variant": "mental-model",
-  "content": "A reducer answers \\"what happens when an action fires?\\" A state machine answers \\"what happens when an action fires **while I'm in this specific state**?\\" That extra guard makes impossible transitions literally unrepresentable."
-}
-\`\`\`
-
 ### Problem Statement
 
 Implement a \`createStateMachine\` function that enforces valid state transitions. Unlike a plain reducer, a state machine explicitly defines **which transitions are allowed** from each state.
@@ -658,125 +426,23 @@ Return an object with:
 - \`send(event)\` — transitions if the event is valid for the current state
 - \`canSend(event)\` — returns true if the event is valid for the current state
 
-\`\`\`playground
-{
-  "title": "Starter Code",
-  "language": "javascript",
-  "code": "function createStateMachine(config) {\\n  // TODO: implement\\n}\\n\\n// usage\\nconst light = createStateMachine({\\n  initial: \\"green\\",\\n  context: {},\\n  states: {\\n    green:  { TIMER: \\"yellow\\" },\\n    yellow: { TIMER: \\"red\\"    },\\n    red:    { TIMER: \\"green\\"  }\\n  }\\n});\\n\\nconsole.log(light.getState().value); // \\"green\\"\\nlight.send(\\"TIMER\\");\\nconsole.log(light.getState().value); // \\"yellow\\"\\nconsole.log(light.canSend(\\"INVALID\\")); // false",
-  "runnable": true
-}
+### Examples
+
 \`\`\`
-
-### Walk-through: Traffic-Light Example
-
-\`\`\`steps
-{
-  "title": "Building the Machine",
-  "steps": [
-    {
-      "title": "1. Parse the config",
-      "content": "Store \`initial\`, \`context\`, and the \`states\` map. Pre-compute a reverse lookup so \`canSend\` is O(1)."
-    },
-    {
-      "title": "2. Track current state",
-      "content": "Keep a private variable \`current\` that always holds the state name. Never expose it directly—only via \`getState()\`."
-    },
-    {
-      "title": "3. Validate transitions",
-      "content": "In \`send(event)\` check \`states[current].hasOwnProperty(event)\`. If missing, ignore the event (no-op)."
-    },
-    {
-      "title": "4. Execute side-effects",
-      "content": "If the transition config is an object \`{target, action}\`, call \`action(context)\` before switching to \`target\`."
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`trace
-{
-  "title": "Trace: three TIMER events",
-  "language": "javascript",
-  "code": "const light = createStateMachine({\\n  initial: \\"green\\",\\n  context: { ticks: 0 },\\n  states: {\\n    green:  { TIMER: { target: \\"yellow\\", action: c => c.ticks++ } },\\n    yellow: { TIMER: { target: \\"red\\",    action: c => c.ticks++ } },\\n    red:    { TIMER: { target: \\"green\\",  action: c => c.ticks++ } }\\n  }\\n});\\n\\nlight.send(\\"TIMER\\");\\nlight.send(\\"TIMER\\");\\nlight.send(\\"TIMER\\");\\nconsole.log(light.getState());",
-  "frames": [
-    { "line": 11, "vars": { "current": "green", "context": { "ticks": 0 } }, "note": "initial state", "stdout": "" },
-    { "line": 13, "vars": { "current": "yellow", "context": { "ticks": 1 } }, "note": "TIMER #1", "stdout": "" },
-    { "line": 14, "vars": { "current": "red", "context": { "ticks": 2 } }, "note": "TIMER #2", "stdout": "" },
-    { "line": 15, "vars": { "current": "green", "context": { "ticks": 3 } }, "note": "TIMER #3", "stdout": "{ value: 'green', context: { ticks: 3 } }" }
-  ],
-  "speed": 800
-}
-\`\`\`
-
-### Counter Machine
-
-A **Counter State Machine** is simply an FSM whose states are the integers you care about. Each \`INC\`/\`DEC\` event moves you to the adjacent number, but you can also guard the edges (e.g., never go below 0).
-
-\`\`\`compare
-{
-  "variant": "good-bad",
-  "before": {
-    "label": "Plain reducer — anything goes",
-    "code": "function counterReducer(state, action) {\\n  switch (action.type) {\\n    case 'INC': return state + 1;\\n    case 'DEC': return state - 1;\\n    case 'JUMP': return action.n; // who knows if this is legal?\\n    default: return state;\\n  }\\n}"
+const light = createStateMachine({
+  initial: "green",
+  context: {},
+  states: {
+    green:  { TIMER: "yellow" },
+    yellow: { TIMER: "red" },
+    red:    { TIMER: "green" },
   },
-  "after": {
-    "label": "State machine — only listed edges",
-    "code": "const counter = createStateMachine({\\n  initial: 0,\\n  context: {},\\n  states: {\\n    0: { INC: 1 },               // no DEC from 0\\n    1: { INC: 2, DEC: 0 },\\n    2: { INC: 3, DEC: 1 },\\n    3: { DEC: 2 }                // no INC from 3\\n  }\\n});"
-  }
-}
-\`\`\`
+});
 
-\`\`\`quiz
-{
-  "title": "Quick Check",
-  "questions": [
-    {
-      "question": "What happens when the current state has no handler for an event?",
-      "options": [
-        "The machine throws an error",
-        "The machine silently stays in the current state",
-        "The machine resets to initial state",
-        "The machine picks a random next state"
-      ],
-      "answer": 1,
-      "explanation": "By convention state machines ignore unknown events; they are no-ops so the current state is unchanged."
-    },
-    {
-      "question": "Which best describes the Big-O cost of a transition lookup?",
-      "options": [
-        "O(n) in the number of states",
-        "O(1) — a single object key check",
-        "O(log n) using binary search",
-        "O(n²) because all states must be scanned"
-      ],
-      "answer": 1,
-      "explanation": "Each state's allowed events are stored in a hash map, so checking \`states[current][event]\` is constant time."
-    },
-    {
-      "question": "Why prefer a state machine over a boolean flag like \`isLoading\`?",
-      "options": [
-        "State machines use less memory",
-        "State machines prevent impossible combos like loading + error simultaneously",
-        "State machines render faster in React",
-        "State machines eliminate the need for useEffect"
-      ],
-      "answer": 1,
-      "explanation": "Explicit transitions make invalid states unrepresentable, removing an entire class of bugs."
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "A state machine is a reducer with guards: only explicitly listed events can move you out of the current state.",
-    "Transition lookup is O(1); complexity grows with the number of states, not with data size.",
-    "By ignoring invalid events, machines stay in predictable states—no 'ghost' or impossible states.",
-    "Side-effects can be attached to transitions via \`{target, action}\` objects without breaking purity of the state map."
-  ]
-}
+light.getState().value; // "green"
+light.send("TIMER");
+light.getState().value; // "yellow"
+light.send("INVALID"); // no transition — stays "yellow"
 \`\`\``,
       starterCode: `function createStateMachine(config) {
   // TODO: implement a state machine with:

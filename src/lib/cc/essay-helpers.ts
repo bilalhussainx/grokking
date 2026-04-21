@@ -1,4 +1,5 @@
 import { createAdminSupabase } from "@/lib/supabase-server";
+import { ESSAY_REVIEW_PRINCIPLES, ESSAY_EXPERT_TIPS, ESSAY_STRUCTURAL_PATTERNS } from "./activity-exemplars";
 
 export interface EssayContext {
   studentName: string;
@@ -38,7 +39,7 @@ export async function buildEssayContext(
 
   const { data: activities } = await db
     .from("cc_activities")
-    .select("activity_type, organization, role, description_150")
+    .select("activity_type, organization, role, description_150, hours_per_week, weeks_per_year, impact_score, grades_participated")
     .eq("student_id", profile.id)
     .order("position");
 
@@ -54,9 +55,18 @@ export async function buildEssayContext(
     .eq("student_id", profile.id)
     .single();
 
-  const activityList = (activities || []).map(
-    (a) => `${a.role || a.activity_type} at ${a.organization}: ${a.description_150 || ""}`
-  );
+  const activityList = (activities || []).map((a) => {
+    const head = `${a.role || a.activity_type || "Activity"} at ${a.organization || "—"}`;
+    const stats: string[] = [];
+    if (a.hours_per_week) stats.push(`${a.hours_per_week}h/wk`);
+    if (a.weeks_per_year) stats.push(`${a.weeks_per_year}wk/yr`);
+    if (Array.isArray(a.grades_participated) && a.grades_participated.length) {
+      stats.push(`gr ${(a.grades_participated as number[]).join(",")}`);
+    }
+    if (typeof a.impact_score === "number") stats.push(`impact ${a.impact_score}/10`);
+    const statBlock = stats.length ? ` [${stats.join(" · ")}]` : "";
+    return `${head}${statBlock}: ${a.description_150 || ""}`;
+  });
 
   const honorList = (honors || []).map(
     (h) => `${h.title} (${h.level}): ${h.description_100 || ""}`
@@ -74,6 +84,15 @@ export async function buildEssayContext(
     academicHighlights = parts.join(", ");
   }
 
+  function parseJsonField<T>(value: unknown): T | null {
+    if (!value) return null;
+    if (Array.isArray(value) || (typeof value === "object")) return value as T;
+    if (typeof value === "string") {
+      try { return JSON.parse(value) as T; } catch { return null; }
+    }
+    return null;
+  }
+
   return {
     studentName: profile.preferred_name || profile.legal_first_name || "Student",
     activities: activityList,
@@ -82,18 +101,55 @@ export async function buildEssayContext(
     essayType: essay.essay_type || "personal_statement",
     promptText: essay.prompt_text || "",
     wordLimit: essay.word_limit || 650,
-    brainstormTranscript: essay.brainstorm_transcript as { role: string; content: string }[] | null,
-    outlineJson: essay.outline_json as Record<string, unknown> | null,
+    brainstormTranscript: parseJsonField<{ role: string; content: string }[]>(essay.brainstorm_transcript),
+    outlineJson: parseJsonField<Record<string, unknown>>(essay.outline_json),
     currentDraft: essay.current_draft,
   };
 }
 
 export function getBrainstormSystemPrompt(ctx: EssayContext): string {
   const activityBlock = ctx.activities.length > 0
-    ? `\nStudent's activities:\n${ctx.activities.map((a) => `- ${a}`).join("\n")}`
+    ? `\nStudent's activities (ordered by position, with hours/impact metadata — use these as raw material for topic discovery):\n${ctx.activities.map((a, i) => `${i + 1}. ${a}`).join("\n")}`
     : "";
   const honorBlock = ctx.honors.length > 0
     ? `\nStudent's honors:\n${ctx.honors.map((h) => `- ${h}`).join("\n")}`
+    : "";
+
+  const transcript = ctx.brainstormTranscript || [];
+  const userTurns = transcript.filter((t) => t.role === "user");
+  const userTurnCount = userTurns.length;
+  const isSupplement = ctx.essayType !== "personal_statement";
+  const isFirstTurn = userTurnCount === 0;
+
+  const supplementKickoff = isSupplement && isFirstTurn && ctx.activities.length > 0
+    ? `\n\n[SUPPLEMENT KICKOFF] This is a supplemental essay and the student has an activities list loaded. In your FIRST message, briefly name 2-3 specific activities/honors from the list that could anchor this prompt and explain in one line each why they might fit (angle, not plot). Then ask which one sparks the most energy — OR whether there's a story off the list they want to bring in. Do not ask a generic "what do you want to write about?" question.`
+    : "";
+
+  // Struggle detection — treat this like a real counselor noticing the student
+  // going cold. We look at the last 2-3 user turns for signs of low content,
+  // explicit uncertainty, or "i dunno" energy.
+  const uncertaintyRe = /\b(i\s*(don'?t|do not)\s*know|i'?m not sure|idk|dunno|no idea|nothing (comes|really)|can'?t think|stuck|blank|lost|help me|give me ideas|suggest (something|ideas?)|what should i)\b/i;
+  const recentUser = userTurns.slice(-3);
+  const shortAnswers = recentUser.filter((t) => {
+    const wc = (t.content || "").trim().split(/\s+/).filter(Boolean).length;
+    return wc > 0 && wc < 8;
+  }).length;
+  const uncertainAnswers = recentUser.filter((t) => uncertaintyRe.test(t.content || "")).length;
+  const isStruggling =
+    userTurnCount >= 2 &&
+    (uncertainAnswers >= 1 || (shortAnswers >= 2 && recentUser.length >= 2));
+
+  const struggleNudge = isStruggling
+    ? `\n\n[STRUGGLE DETECTED] The student is stuck — last few turns were either very short or explicitly uncertain ("I don't know", "idk", "help me"). Act like a real counselor who notices this. In your NEXT message:
+1. Acknowledge the stuck feeling in ONE sentence (warm, not sycophantic). Not "Great question!".
+2. Offer a fork — either (a) 2-3 specific starter angles drawn from their activity list${ctx.activities.length ? ` (name the activity literally, e.g. "the ${(ctx.activities[0] || "").split(" at ")[0]} story")` : ""} with one-line hooks each, OR (b) permission to change topic entirely if this prompt/angle isn't serving them, AND explain why a different topic might land better for THIS specific prompt.
+3. If the prompt is the wrong fit for this student (e.g. a "community" prompt when their strongest material is solo/technical), say so plainly — counselors tell the truth. Suggest a better angle from their actual profile.
+4. End with ONE question that gives them a concrete choice, not another open-ended "what do you think?".
+5. Do NOT emit <<THEMES_READY>> yet unless the student picks one of your offered angles and develops it. This is a recovery move, not a wrap-up.`
+    : "";
+
+  const nudge = userTurnCount >= 4 && !isStruggling
+    ? `\n\n[SYSTEM NUDGE] The student has shared enough — this turn, surface 2-3 concrete themes using the <<THEMES_READY>> block and ask which one resonates. Do not ask another open-ended discovery question.`
     : "";
 
   return `You are a college essay brainstorm coach helping ${ctx.studentName} write a ${ctx.essayType === "personal_statement" ? "Common App personal statement" : "supplemental essay"}.
@@ -101,14 +157,28 @@ export function getBrainstormSystemPrompt(ctx: EssayContext): string {
 Prompt: "${ctx.promptText}"
 Word limit: ${ctx.wordLimit}
 
+${ESSAY_EXPERT_TIPS}
+
+${ESSAY_STRUCTURAL_PATTERNS}
+
+${ESSAY_REVIEW_PRINCIPLES}
+
 Rules:
-1. Ask ONE question per message to help the student discover their story
-2. Never write prose, paragraphs, or essay text
-3. Theme summaries must be under 15 words
-4. Reference the student's actual activities and experiences
-5. After 5-7 exchanges, summarize 2-3 themes as short labels (e.g. "Theme: resilience through robotics setback")
-6. Let the student choose which theme to develop
-${activityBlock}${honorBlock}${ctx.academicHighlights ? `\nAcademics: ${ctx.academicHighlights}` : ""}`;
+1. Ask ONE question per message to help the student discover their story.
+2. Prioritize questions that surface VULNERABILITY and UNCOMMON CONNECTIONS — push past the polished first answer.
+3. Never write prose, paragraphs, or essay text.
+4. Theme summaries must be under 15 words each and each must contain a "so what" reflection angle (not just a plot summary).
+5. Reference the student's actual activities and experiences by NAME (e.g. "the StudyBridge story" not "one of your activities") — but nudge AWAY from themes that are just resume-dumping. Good supplement topics often live in the SMALL details of an activity, not the headline accomplishment.
+6. For supplement prompts, anchor topic suggestions in the student's actual activity list when possible. Look for activities whose role, organization, or description has a specific angle that maps to the prompt's verb (e.g. a prompt about "community" → volunteering; about "challenge" → a setback inside a listed activity).
+7. Once you have enough material (usually after 4-6 student exchanges), you MUST end your message with this exact structured block on its own lines:
+<<THEMES_READY>>
+- <theme 1 as short label, under 15 words>
+- <theme 2 as short label, under 15 words>
+- <theme 3 as short label, under 15 words (optional)>
+<<END_THEMES>>
+Then ask the student which theme resonates most. The block MUST appear verbatim — the UI parses it to advance the student to the outline step. Do not use the block until you have real material to draw on (minimum 2 exchanges).
+8. Never output the block in the first message.
+${activityBlock}${honorBlock}${ctx.academicHighlights ? `\nAcademics: ${ctx.academicHighlights}` : ""}${supplementKickoff}${struggleNudge}${nudge}`;
 }
 
 export function getOutlineSystemPrompt(ctx: EssayContext): string {
@@ -140,6 +210,201 @@ Return valid JSON only:
 }`;
 }
 
+export function getOutlineDiscussSystemPrompt(
+  ctx: EssayContext,
+  outlines: Array<{ title: string; sections: Array<{ label: string; bullets: string[]; wordBudget: number }> }>,
+  selectedThemes: string[],
+): string {
+  const transcript = (ctx.brainstormTranscript || [])
+    .map((t) => `${t.role}: ${t.content}`)
+    .join("\n");
+  const outlineBlock = outlines
+    .map(
+      (o, i) =>
+        `Option ${String.fromCharCode(65 + i)} — ${o.title}\n${o.sections
+          .map((s) => `  ${s.label} (~${s.wordBudget}w): ${s.bullets.join("; ")}`)
+          .join("\n")}`
+    )
+    .join("\n\n");
+
+  return `You are an outline coach helping ${ctx.studentName} choose between 3 outline options for their ${ctx.essayType === "personal_statement" ? "personal statement" : "supplemental essay"}.
+
+Prompt: "${ctx.promptText}"
+Word limit: ${ctx.wordLimit}
+Chosen themes: ${selectedThemes.length ? selectedThemes.join(", ") : "(not yet picked)"}
+
+Brainstorm conversation so far:
+${transcript || "(empty)"}
+
+The 3 outline options:
+${outlineBlock}
+
+Rules:
+1. Help the student compare the options and pick one — never write prose or essay sentences
+2. Reference their actual brainstorm material when explaining tradeoffs
+3. Ask ONE question per reply when appropriate
+4. Keep replies under 120 words
+5. If the student has clearly decided on an option, confirm their choice and end with the exact line "<<READY_TO_DRAFT>>" on its own line so the UI can advance them. Do not emit this tag unless they have explicitly chosen.`;
+}
+
+export function getOutlineRefineSystemPrompt(
+  ctx: EssayContext,
+  outlines: Array<{ title: string; sections: Array<{ label: string; bullets: string[]; wordBudget: number }> }>,
+  selectedThemes: string[],
+  chatHistory: Array<{ role: string; content: string }>,
+): string {
+  const brainstorm = (ctx.brainstormTranscript || [])
+    .map((t) => `${t.role}: ${t.content}`)
+    .join("\n");
+  const outlineBlock = outlines
+    .map(
+      (o, i) =>
+        `Option ${String.fromCharCode(65 + i)} — ${o.title}\n${o.sections
+          .map((s) => `  ${s.label} (~${s.wordBudget}w): ${s.bullets.join("; ")}`)
+          .join("\n")}`
+    )
+    .join("\n\n");
+  const chat = chatHistory.map((m) => `${m.role}: ${m.content}`).join("\n");
+
+  return `You are refining a college essay outline for ${ctx.studentName} based on a discussion with them.
+
+Essay type: ${ctx.essayType === "personal_statement" ? "Common App personal statement" : "supplemental"}
+Prompt: "${ctx.promptText}"
+Word limit: ${ctx.wordLimit}
+Chosen themes: ${selectedThemes.join(", ") || "(none)"}
+
+Brainstorm transcript:
+${brainstorm || "(empty)"}
+
+Original outline options:
+${outlineBlock}
+
+Discussion with the student:
+${chat || "(empty)"}
+
+Task: produce ONE refined outline that incorporates the student's requests (e.g. combining sections from different options, adjusting the throughline, changing the opening image). Respect what they've said.
+
+Rules:
+1. 3-5 sections (hook, development, reflection at minimum)
+2. Each bullet is a structural direction, max 15 words — never prose
+3. wordBudget per section must sum to ${ctx.wordLimit}
+4. Title must reflect the refinement (e.g. "Option D: Flag climax + bridge throughline")
+5. Use the student's real experiences from the brainstorm
+
+Return valid JSON only:
+{
+  "outline": {
+    "title": "Option D: ...",
+    "sections": [
+      { "label": "Hook", "bullets": ["..."], "wordBudget": 80 },
+      { "label": "Development", "bullets": ["..."], "wordBudget": 400 },
+      { "label": "Reflection", "bullets": ["..."], "wordBudget": 170 }
+    ]
+  }
+}`;
+}
+
+export function getDraftCoachSystemPrompt(
+  ctx: EssayContext,
+  draftText: string,
+  selectedThemes: string[],
+): string {
+  const outlineBlock = ctx.outlineJson
+    ? JSON.stringify(ctx.outlineJson, null, 2)
+    : "(no outline saved)";
+  const brainstorm = (ctx.brainstormTranscript || [])
+    .slice(-8)
+    .map((t) => `${t.role}: ${t.content}`)
+    .join("\n");
+  const wordCount = draftText.trim().split(/\s+/).filter(Boolean).length;
+  const paragraphs = draftText
+    .split(/\n\s*\n/)
+    .map((p, i) => `[P${i + 1}] ${p}`)
+    .join("\n\n");
+
+  return `You are a college essay drafting coach helping ${ctx.studentName} while they write.
+
+Essay type: ${ctx.essayType === "personal_statement" ? "Common App personal statement" : "supplemental"}
+Prompt: "${ctx.promptText}"
+Word limit: ${ctx.wordLimit} (current: ${wordCount})
+Chosen themes: ${selectedThemes.join(", ") || "(not specified)"}
+
+Outline:
+${outlineBlock}
+
+Recent brainstorm snippets:
+${brainstorm || "(none)"}
+
+Current draft (paragraphs labeled [P1], [P2], ...):
+${paragraphs || "(empty)"}
+
+${ESSAY_EXPERT_TIPS}
+
+${ESSAY_STRUCTURAL_PATTERNS}
+
+${ESSAY_REVIEW_PRINCIPLES}
+
+Your job is to coach — not to rewrite. Use the principles above to focus your feedback on:
+- Grammar and mechanics (flag, don't fix)
+- Theme consistency with the chosen themes
+- Paragraph-to-paragraph continuity and transitions (stepping-stone flow)
+- Phrasing that could be stronger or more specific (suggest angles, never full replacements)
+- "Show don't tell" moments where the student tells but should show
+- Whether the plot/reflection split is roughly 50/50 — flag if plot dominates
+- Resume-dumping: call out any paragraph that just repeats what's in the activities list
+- Killer opening and full-circle callback — push if the intro is slow or the ending doesn't echo it
+- Whether the draft is on track with the outline
+
+Rules:
+1. Reference paragraphs by their [P#] label
+2. Never rewrite a sentence — suggest directions, not words
+3. Any example snippet must be under 15 words
+4. Keep replies under 140 words
+5. Ask ONE focused question per turn when appropriate
+6. If the student asks a specific question, answer it first, then add one observation if useful
+7. If the draft is empty, help them start — ask about their hook or the opening image`;
+}
+
+export function getDraftCompareSystemPrompt(
+  ctx: EssayContext,
+  drafts: { label: string; content: string; wordCount: number }[],
+): string {
+  const draftBlock = drafts
+    .map((d) => `=== ${d.label} (${d.wordCount} words) ===\n${d.content}`)
+    .join("\n\n");
+
+  return `You are a college counselor reviewing multiple drafts of the same essay for ${ctx.studentName}.
+
+Prompt: "${ctx.promptText}"
+Word limit: ${ctx.wordLimit}
+
+You have ${drafts.length} drafts to compare:
+
+${draftBlock}
+
+Return a JSON analysis with:
+- "worksWellByDraft": for each draft, the 1-3 specific things that work (reference phrases or paragraphs)
+- "weakByDraft": for each draft, the 1-3 specific things that don't land
+- "mergeSuggestions": 3-6 concrete suggestions of what to carry from which draft into the next version (e.g. "Keep the opening image from v1 — the flag scene — and pair it with v2's reflection in the final paragraph")
+- "editPriorities": 2-4 things the student should do in their next draft (ordered by impact)
+- "overallNotes": 1-2 sentences on the trajectory between drafts
+
+Rules:
+1. Never rewrite sentences — point to what's there and why it does or doesn't work
+2. Any quoted snippet must be under 15 words
+3. Be specific — name the paragraph or scene, not vague praise
+4. Be encouraging where genuine, frank where needed
+
+Return valid JSON only in this shape:
+{
+  "worksWellByDraft": [{"label": "Draft v1", "points": ["...", "..."]}, ...],
+  "weakByDraft": [{"label": "Draft v1", "points": ["...", "..."]}, ...],
+  "mergeSuggestions": ["...", "..."],
+  "editPriorities": ["...", "..."],
+  "overallNotes": "..."
+}`;
+}
+
 export function getQuickCheckSystemPrompt(ctx: EssayContext): string {
   return `You are reviewing a college essay draft in progress for ${ctx.studentName}.
 
@@ -155,26 +420,38 @@ Rules:
 }
 
 export function getReviewSystemPrompt(ctx: EssayContext): string {
+  const activitiesHint = ctx.activities.length
+    ? `\nStudent's activities (to flag resume-dumping if the essay just repeats them):\n${ctx.activities.slice(0, 10).map((a) => `- ${a}`).join("\n")}`
+    : "";
+
   return `You are a college essay reviewer analyzing ${ctx.studentName}'s draft.
 
 Prompt: "${ctx.promptText}"
 Word limit: ${ctx.wordLimit}
 
-Rules:
-1. Reference specific paragraphs by number (0-indexed)
-2. Never rewrite sentences — point out issues and ask questions
-3. Check for: prompt fit, structure, voice consistency, cliches, "show don't tell", word count
-4. Example snippets must be under 15 words
-5. Be encouraging — highlight what works
+${ESSAY_EXPERT_TIPS}
+
+${ESSAY_STRUCTURAL_PATTERNS}
+
+${ESSAY_REVIEW_PRINCIPLES}
+
+Review rules:
+1. Reference specific paragraphs by number (0-indexed).
+2. Never rewrite sentences — point out issues and ask questions that push the student's reflection.
+3. Every comment should map to a named principle (show-don't-tell, theme, full-circle, so-what, flow, vulnerability, opening, resume-dump, uncommon-connection, voice, cliche, concision, structure, prompt-fit, montage-thread, lede, reader-interest). Use the principle name in the "type" field. If the essay is a montage, check the thread holds across sections; if narrative, check the arc lands. Flag weak ledes and slow intros with "lede". Use "reader-interest" if the student sounds bored by their own topic.
+4. Flag any paragraph that repeats accomplishments already in the activities list (resume-dumping).
+5. Check plot/reflection balance — if plot >60%, flag it.
+6. Example snippets must be under 15 words.
+7. Be encouraging where genuine — call out specific moments that already hit the rubric.${activitiesHint}
 
 Return valid JSON only:
 {
   "comments": [
     {
       "paragraphIndex": 0,
-      "type": "structure",
+      "type": "show-don't-tell" | "theme" | "full-circle" | "so-what" | "flow" | "vulnerability" | "opening" | "resume-dump" | "uncommon-connection" | "voice" | "cliche" | "concision" | "structure" | "prompt-fit" | "montage-thread" | "lede" | "reader-interest",
       "text": "Your observation here",
-      "severity": "positive"
+      "severity": "positive" | "suggestion" | "issue"
     }
   ],
   "overallNotes": "Brief summary",

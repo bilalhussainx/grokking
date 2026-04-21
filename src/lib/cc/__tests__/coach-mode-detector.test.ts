@@ -8,6 +8,9 @@ describe("detectMode", () => {
     hasGPA: false,
     hasSchools: false,
     hasEssays: false,
+    hasEssayReviewed: false,
+    hasActivitiesOptimized: false,
+    hasSupplementsStarted: false,
     hasInterviewSessions: false,
   };
 
@@ -16,6 +19,9 @@ describe("detectMode", () => {
     hasGPA: true,
     hasSchools: true,
     hasEssays: true,
+    hasEssayReviewed: true,
+    hasActivitiesOptimized: true,
+    hasSupplementsStarted: true,
     hasInterviewSessions: true,
   };
 

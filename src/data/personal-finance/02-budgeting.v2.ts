@@ -13,14 +13,6 @@ export const budgetingModule: Module = {
 
 A budget is a plan for your money. It tells every dollar where to go before the month begins, rather than wondering where it went after the month ends. Budgeting is not about restriction — it is about **intentionality**.
 
-\`\`\`concept
-{
-  "title": "Budgeting as Intentionality",
-  "variant": "mental-model",
-  "content": "Think of budgeting like GPS for your money. Without it, you're driving blind — you might reach your destination by luck, but you'll probably get lost, waste fuel, and arrive stressed. A budget gives you turn-by-turn directions to your financial goals."
-}
-\`\`\`
-
 ### The Case for Budgeting
 
 According to a 2023 survey by the National Foundation for Credit Counseling, only 40% of American adults follow a budget. Yet budgeting is consistently cited by financial planners as the single most impactful habit for building wealth.
@@ -28,35 +20,9 @@ According to a 2023 survey by the National Foundation for Credit Counseling, onl
 Consider what happens without a budget:
 
 - **Lifestyle creep**: As income rises, spending rises to match, leaving savings flat
-- **Invisible spending**: Small recurring charges ($10 streaming services, $15 subscriptions) accumulate silently
+- **Invisible spending**: Small recurring charges (\\$10 streaming services, \\$15 subscriptions) accumulate silently
 - **Emergency vulnerability**: Without planned savings, any unexpected expense becomes a crisis
 - **Debt accumulation**: Credit cards fill the gap between income and overspending
-
-\`\`\`quiz
-{
-  "title": "The Hidden Cost of Small Expenses",
-  "questions": [
-    {
-      "question": "If you have 5 subscription services costing $12.99 each, how much do you spend annually?",
-      "options": ["$519.60", "$649.50", "$779.40", "$909.30"],
-      "answer": 2,
-      "explanation": "5 × $12.99 × 12 months = $779.40. Small monthly charges compound into significant annual expenses."
-    },
-    {
-      "question": "Which of these is NOT a common consequence of budgeting?",
-      "options": ["Reduced financial stress", "Increased awareness of spending", "More lifestyle creep", "Better goal prioritization"],
-      "answer": 2,
-      "explanation": "Budgeting prevents lifestyle creep by making spending visible and intentional, not promoting it."
-    },
-    {
-      "question": "What percentage of American adults follow a budget according to 2023 data?",
-      "options": ["25%", "40%", "55%", "70%"],
-      "answer": 1,
-      "explanation": "Only 40% of American adults follow a budget, leaving 60% without this fundamental financial tool."
-    }
-  ]
-}
-\`\`\`
 
 ### What a Budget Actually Does
 
@@ -71,56 +37,24 @@ A budget serves four critical functions:
 
 ### Real-World Example: The Subscription Audit
 
-Jake, a 26-year-old marketing associate, assumed he spent about $50/month on subscriptions. When he actually listed them all:
+Jake, a 26-year-old marketing associate, assumed he spent about \\$50/month on subscriptions. When he actually listed them all:
 
-- Netflix: $15.49
-- Spotify: $10.99
-- YouTube Premium: $13.99
-- Adobe Creative Cloud: $54.99
-- Gym membership: $49.99
-- iCloud storage: $2.99
-- Amazon Prime: $14.99
-- Two forgotten apps: $9.98
+- Netflix: \\$15.49
+- Spotify: \\$10.99
+- YouTube Premium: \\$13.99
+- Adobe Creative Cloud: \\$54.99
+- Gym membership: \\$49.99
+- iCloud storage: \\$2.99
+- Amazon Prime: \\$14.99
+- Two forgotten apps: \\$9.98
 
-**Actual total: $173.42/month** — nearly $2,100/year. After his budget audit, Jake canceled three services he rarely used, saving $960 annually. That money now goes to his Roth IRA.
-
-\`\`\`steps
-{
-  "title": "Conduct Your Own Subscription Audit",
-  "steps": [
-    {
-      "title": "Step 1: List All Subscriptions",
-      "content": "Check your bank statements, credit cards, and PayPal for the last 3 months. Write down every recurring charge, even $0.99 ones."
-    },
-    {
-      "title": "Step 2: Calculate Annual Costs",
-      "content": "Multiply each monthly subscription by 12. For annual subscriptions, note the full amount. This reveals the true impact."
-    },
-    {
-      "title": "Step 3: Evaluate Usage vs. Cost",
-      "content": "For each service, ask: 'Did I use this last week? Does it provide $X worth of value monthly?' Be honest about actual usage."
-    },
-    {
-      "title": "Step 4: Cancel Ruthlessly",
-      "content": "Cancel anything you didn't use recently or doesn't justify its cost. You can always resubscribe later if you miss it."
-    }
-  ]
-}
-\`\`\`
+**Actual total: \\$173.42/month** — nearly \\$2,100/year. After his budget audit, Jake canceled three services he rarely used, saving \\$960 annually. That money now goes to his Roth IRA.
 
 ### The Budgeting Mindset Shift
 
 Many people resist budgeting because it feels restrictive. In reality, a budget is **liberating**. When you know your bills are paid, your savings goals are funded, and your retirement contributions are set, you can spend the remainder guilt-free.
 
 Think of it this way: without a budget, every purchase triggers a question — "Can I afford this?" With a budget, you already know the answer.
-
-\`\`\`concept
-{
-  "title": "The Liberation Framework",
-  "variant": "insight",
-  "content": "A budget transforms spending from anxiety ('Should I buy this?') to empowerment ('This money is specifically for enjoyment — spend it freely!'). When every dollar has a job, spending becomes intentional rather than stressful."
-}
-\`\`\`
 
 ### Cash Flow: Income Timing Matters
 
@@ -130,18 +64,6 @@ Budgeting is not just about amounts — it is about **timing**. If you are paid 
 2. When fixed expenses are due
 3. When variable spending occurs
 4. When savings transfers happen
-
-\`\`\`calculator
-{
-  "type": "compound-interest",
-  "title": "See How Small Savings Grow",
-  "inputs": [
-    { "id": "p", "label": "Monthly savings from budget cuts", "default": 100, "min": 10, "max": 500 },
-    { "id": "r", "label": "Annual return rate (%)", "default": 7, "min": 1, "max": 12 },
-    { "id": "t", "label": "Years invested", "default": 10, "min": 1, "max": 30 }
-  ]
-}
-\`\`\`
 
 ### Getting Started: Three Steps
 
@@ -157,20 +79,6 @@ Budgeting is not just about amounts — it is about **timing**. If you are paid 
 - **Forgetting irregular expenses**: Car maintenance, gifts, annual subscriptions — plan for these.
 - **Not adjusting**: A budget is a living document. Adjust monthly as needed.
 - **Giving up after one bad month**: Perfection is not the goal. Progress is.
-
-\`\`\`compare
-{
-  "variant": "good-bad",
-  "before": {
-    "label": "Restrictive Budget (Fails)",
-    "code": "Rent: $1200\\nGroceries: $200\\nUtilities: $150\\nGas: $100\\nSavings: $500\\nFun Money: $0\\nTotal: $2150\\n\\nProblem: No entertainment budget leads to burnout and abandonment"
-  },
-  "after": {
-    "label": "Balanced Budget (Succeeds)",
-    "code": "Rent: $1200\\nGroceries: $300\\nUtilities: $150\\nGas: $100\\nSavings: $400\\nFun Money: $100\\nTotal: $2250\\n\\nSolution: Includes realistic spending for enjoyment, making it sustainable"
-  }
-}
-\`\`\`
 
 ### Key Takeaway
 
@@ -404,14 +312,6 @@ Zero-based budgeting gives every dollar a job, eliminating the "where did my mon
 
 The best budget is one you actually use. Whether you prefer a simple spreadsheet or a full-featured app, the right tool makes budgeting sustainable. This lesson reviews the most popular options and helps you choose.
 
-\`\`\`concept
-{
-  "title": "The Tool Paradox",
-  "variant": "insight",
-  "content": "Research shows that users who stick with ANY budgeting tool for 3+ months see 23% reduction in unnecessary spending. The perfect tool you abandon is worse than the imperfect one you use daily."
-}
-\`\`\`
-
 ### Option 1: Spreadsheets (Google Sheets / Excel)
 
 **Best for:** People who want full control and customization.
@@ -429,14 +329,7 @@ A spreadsheet is the most flexible budgeting tool. You design the categories, fo
 **Pros:** Free, fully customizable, no data sharing with third parties, works offline.
 **Cons:** Manual data entry, no automatic transaction imports, requires spreadsheet skills.
 
-\`\`\`playground
-{
-  "title": "Build a Simple Budget Formula",
-  "language": "javascript",
-  "code": "// Simple budget tracker formula\\nfunction calculateDifference(budgeted, actual) {\\n  return actual - budgeted;\\n}\\n\\n// Example usage:\\nconst categories = [\\n  { name: \\"Rent\\", budgeted: 1200, actual: 1200 },\\n  { name: \\"Groceries\\", budgeted: 400, actual: 437 },\\n  { name: \\"Entertainment\\", budgeted: 150, actual: 112 }\\n];\\n\\ncategories.forEach(cat => {\\n  const diff = calculateDifference(cat.budgeted, cat.actual);\\n  console.log(\`\\\\\${cat.name}: \\\\$\\\\\${diff >= 0 ? '+' : ''}\\\\\${diff}\`);\\n});",
-  "runnable": true
-}
-\`\`\`
+**Recommended templates:** Google Sheets has free budget templates under File > New > From template gallery. Microsoft offers dozens of Excel budget templates.
 
 ### Option 2: YNAB (You Need a Budget)
 
@@ -484,45 +377,16 @@ Goodbudget is a digital envelope system designed for shared budgeting. Both part
 **Pros:** Envelope-based, shared access, available on web and mobile, free tier available.
 **Cons:** Free tier limited to 20 envelopes; no bank sync on free plan.
 
-\`\`\`compare
-{
-  "variant": "before-after",
-  "before": {
-    "label": "Manual Spreadsheet Budget",
-    "code": "January 2024\\nRent: $1200 (budget) vs $1200 (actual) ✓\\nGroceries: $400 vs $437 ✗ (-$37)\\nEntertainment: $150 vs $112 ✓ (+$38)\\n\\nFebruary tracking: Haven't updated yet..."
-  },
-  "after": {
-    "label": "YNAB Real-time Budget",
-    "code": "Available to Budget: $0 (every dollar has a job)\\nGroceries envelope: $23 remaining (alert at 90%)\\nDining out: Fully funded for month\\nEmergency fund: Aging money = 31 days\\n\\nAuto-import keeps everything current"
-  }
-}
-\`\`\`
+### Comparison Table
 
-\`\`\`quiz
-{
-  "title": "Choose Your Budgeting Tool",
-  "questions": [
-    {
-      "question": "You want zero-based budgeting with automatic bank sync and don't mind paying. Which tool fits best?",
-      "options": ["Spreadsheet", "YNAB", "Mint", "EveryDollar free"],
-      "answer": 1,
-      "explanation": "YNAB specializes in zero-based budgeting and includes automatic bank sync, though it requires a paid subscription."
-    },
-    {
-      "question": "You're budgeting with a partner and want shared access to digital envelopes. What's your best free option?",
-      "options": ["YNAB", "Mint", "Goodbudget", "EveryDollar premium"],
-      "answer": 2,
-      "explanation": "Goodbudget offers shared envelope budgeting with a free tier (limited to 20 envelopes)."
-    },
-    {
-      "question": "You prefer manual entry for increased awareness and want complete customization. Which should you choose?",
-      "options": ["Mint", "YNAB", "Spreadsheet", "EveryDollar premium"],
-      "answer": 2,
-      "explanation": "Spreadsheets offer complete customization and manual entry while being free to use."
-    }
-  ]
-}
-\`\`\`
+| Feature | Spreadsheet | YNAB | Mint | EveryDollar | Goodbudget |
+|---------|------------|------|------|-------------|------------|
+| Cost | Free | \\$99/yr | Free | Free/\\$18/mo | Free/\\$8/mo |
+| Auto-import | No | Yes | Yes | Premium only | Premium only |
+| Zero-based | Manual | Built-in | No | Built-in | Built-in |
+| Shared access | Via cloud | Yes | No | Premium | Yes |
+| Customization | Unlimited | Moderate | Low | Low | Low |
+| Learning curve | Medium | Medium | Low | Low | Low |
 
 ### How to Choose
 
@@ -536,42 +400,15 @@ Ask yourself these questions:
 
 4. **How much time will I spend?** Spreadsheets and YNAB require weekly attention. Mint works with monthly check-ins.
 
-\`\`\`steps
-{
-  "title": "Your 3-Month Tool Trial",
-  "steps": [
-    {
-      "title": "Month 1: Pick and Setup",
-      "content": "Choose the tool that feels most approachable. Set up your categories and enter one month of transactions. Don't worry about perfection."
-    },
-    {
-      "title": "Month 2: Build the Habit",
-      "content": "Check your budget weekly. Adjust categories as you learn your spending patterns. The goal is consistency, not accuracy."
-    },
-    {
-      "title": "Month 3: Evaluate and Adjust",
-      "content": "Review: Are you checking it regularly? Does it help you make spending decisions? If not, consider switching tools before giving up on budgeting entirely."
-    }
-  ]
-}
-\`\`\`
-
 ### The Best Tool Is the One You Use
 
 A perfectly designed spreadsheet that you abandon in February is worse than a simple app you check weekly all year. Start with whatever feels most approachable, and upgrade as your habits strengthen.
 
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "YNAB and EveryDollar excel at zero-based budgeting but require payment for full features",
-    "Mint offers free automatic tracking but transitioned to Credit Karma in 2024",
-    "Spreadsheets provide maximum control and privacy but demand more effort",
-    "Goodbudget specializes in shared envelope budgeting for couples",
-    "Consistency matters more than perfection—pick one tool and commit for 3 months"
-  ]
-}
-\`\`\``,
+### Key Takeaway
+
+Modern budgeting tools remove the friction that historically made budgeting tedious. Whether you choose a spreadsheet for full control or an app for convenience, the important thing is consistency. Pick one tool, commit to it for three months, and evaluate.
+
+*Resources: YNAB.com, Mint by Intuit, Dave Ramsey's EveryDollar, Goodbudget.com, Google Sheets Templates.*`,
     },
     {
       id: "pf-emergency-fund",
@@ -581,17 +418,9 @@ A perfectly designed spreadsheet that you abandon in February is worse than a si
 
 An emergency fund is a dedicated savings reserve for unexpected expenses — job loss, medical bills, car repairs, or home emergencies. It is the financial shock absorber that keeps you from falling into debt when life throws a curveball.
 
-\`\`\`concept
-{
-  "title": "Emergency Fund as Financial Shock Absorber",
-  "variant": "mental-model",
-  "content": "Think of your emergency fund as a financial airbag. Just as an airbag doesn't prevent accidents but prevents serious injury, an emergency fund doesn't prevent emergencies but prevents them from becoming financial disasters. It absorbs the impact so you can walk away intact."
-}
-\`\`\`
-
 ### Why You Need One
 
-According to the Federal Reserve's 2023 Survey of Household Economics, 37% of Americans would struggle to cover a $400 emergency expense. Without an emergency fund, unexpected costs force people into:
+According to the Federal Reserve's 2023 Survey of Household Economics, 37% of Americans would struggle to cover a \\$400 emergency expense. Without an emergency fund, unexpected costs force people into:
 
 - **Credit card debt** at 20%+ interest rates
 - **Payday loans** at 400%+ APR
@@ -612,36 +441,21 @@ The standard recommendation is **3 to 6 months of essential expenses** (not inco
 - Minimum debt payments
 - Medical costs
 
-\`\`\`calculator
-{
-  "type": "compound-interest",
-  "title": "Emergency Fund Calculator",
-  "inputs": [
-    { "id": "rent", "label": "Monthly Rent/Mortgage", "default": 1400, "min": 0, "max": 5000, "prefix": "$" },
-    { "id": "groceries", "label": "Monthly Groceries", "default": 400, "min": 0, "max": 1000, "prefix": "$" },
-    { "id": "utilities", "label": "Monthly Utilities", "default": 200, "min": 0, "max": 500, "prefix": "$" },
-    { "id": "transport", "label": "Transportation", "default": 450, "min": 0, "max": 1000, "prefix": "$" },
-    { "id": "insurance", "label": "Insurance", "default": 150, "min": 0, "max": 500, "prefix": "$" },
-    { "id": "debt", "label": "Minimum Debt Payments", "default": 250, "min": 0, "max": 1000, "prefix": "$" }
-  ]
-}
-\`\`\`
-
 **Example calculation:**
 
 | Essential Expense | Monthly Cost |
 |-------------------|-------------|
-| Rent | $1,400 |
-| Groceries | $400 |
-| Utilities | $200 |
-| Car payment + insurance | $450 |
-| Health insurance | $150 |
-| Phone | $60 |
-| Minimum debt payments | $250 |
-| **Total** | **$2,910** |
+| Rent | \\$1,400 |
+| Groceries | \\$400 |
+| Utilities | \\$200 |
+| Car payment + insurance | \\$450 |
+| Health insurance | \\$150 |
+| Phone | \\$60 |
+| Minimum debt payments | \\$250 |
+| **Total** | **\\$2,910** |
 
-- **3-month fund:** $8,730
-- **6-month fund:** $17,460
+- **3-month fund:** \\$8,730
+- **6-month fund:** \\$17,460
 
 ### 3 Months vs 6 Months: Which Is Right?
 
@@ -654,7 +468,7 @@ The standard recommendation is **3 to 6 months of essential expenses** (not inco
 | In a volatile industry | 6 months |
 | Health issues or aging parents | 6 months |
 
-Dave Ramsey recommends starting with a $1,000 "baby emergency fund" while paying off debt, then building to 3-6 months after debt is eliminated. This staged approach prevents emergency-fund building from competing with high-interest debt repayment.
+Dave Ramsey recommends starting with a \\$1,000 "baby emergency fund" while paying off debt, then building to 3-6 months after debt is eliminated. This staged approach prevents emergency-fund building from competing with high-interest debt repayment.
 
 ### Where to Keep Your Emergency Fund
 
@@ -668,17 +482,17 @@ Your emergency fund needs to be **liquid** (easily accessible) and **safe** (not
 
 ### Real-World Example: The Emergency Fund in Action
 
-Lisa, age 32, had a 4-month emergency fund of $12,000 in a high-yield savings account. In March, three emergencies hit within two weeks:
+Lisa, age 32, had a 4-month emergency fund of \\$12,000 in a high-yield savings account. In March, three emergencies hit within two weeks:
 
-1. Her car needed a $1,800 transmission repair
-2. Her dog required emergency surgery: $2,200
+1. Her car needed a \\$1,800 transmission repair
+2. Her dog required emergency surgery: \\$2,200
 3. She was laid off from her tech job
 
-Without her emergency fund, Lisa would have put $4,000 on credit cards at 22% APR and panicked about rent. Instead, she paid the bills from savings and had 2.5 months of runway to find a new job. She found one in 6 weeks and immediately began rebuilding her fund.
+Without her emergency fund, Lisa would have put \\$4,000 on credit cards at 22% APR and panicked about rent. Instead, she paid the bills from savings and had 2.5 months of runway to find a new job. She found one in 6 weeks and immediately began rebuilding her fund.
 
 ### Building Your Emergency Fund: A Step-by-Step Plan
 
-**Phase 1 — The Starter Fund ($1,000):**
+**Phase 1 — The Starter Fund (\\$1,000):**
 - Timeline: 1-3 months
 - Method: Cut one expense, sell unused items, redirect a small portion of each paycheck
 - Purpose: Cover minor emergencies while you tackle other priorities
@@ -693,32 +507,6 @@ Without her emergency fund, Lisa would have put $4,000 on credit cards at 22% AP
 - As your expenses change (new rent, new car payment), adjust the target
 - Once fully funded, redirect excess savings to investments
 
-\`\`\`quiz
-{
-  "title": "Emergency Fund Knowledge Check",
-  "questions": [
-    {
-      "question": "What percentage of Americans would struggle to cover a $400 emergency expense according to the Federal Reserve's 2023 survey?",
-      "options": ["25%", "37%", "45%", "52%"],
-      "answer": 1,
-      "explanation": "The Federal Reserve's 2023 Survey of Household Economics found that 37% of Americans would struggle to cover a $400 emergency expense."
-    },
-    {
-      "question": "When calculating your emergency fund target, you should base it on:",
-      "options": ["Your gross monthly income", "Your monthly take-home pay", "Your essential monthly expenses", "Your total monthly spending"],
-      "answer": 2,
-      "explanation": "Emergency funds should be based on essential monthly expenses (housing, food, utilities, insurance, minimum debt payments), not income or total spending."
-    },
-    {
-      "question": "Which of these is NOT a recommended place to keep your emergency fund?",
-      "options": ["High-yield savings account", "Money market account", "Certificate of deposit (CD)", "Online savings account"],
-      "answer": 2,
-      "explanation": "CDs are not recommended because they lock up your money for a specific term, making it inaccessible when you need it most."
-    }
-  ]
-}
-\`\`\`
-
 ### The #1 Rule: Do Not Touch It for Non-Emergencies
 
 An emergency fund is for true emergencies only. It is NOT for:
@@ -729,17 +517,9 @@ An emergency fund is for true emergencies only. It is NOT for:
 
 Define your emergencies in advance: job loss, medical emergency, essential home/car repair, unexpected tax bill.
 
-\`\`\`callout
-{
-  "type": "warning",
-  "title": "Common Emergency Fund Mistake",
-  "content": "The biggest mistake people make is rationalizing non-emergencies as emergencies. A sale on electronics, a wedding invitation, or 'I deserve a treat' are NOT emergencies. Write down what constitutes an emergency for YOU before you're tempted."
-}
-\`\`\`
-
 ### Key Takeaway
 
-An emergency fund is the single most important financial safety net you can build. Start with $1,000, then build to 3-6 months of expenses in a high-yield savings account. Automate the process and protect the fund from non-emergency spending. When the inevitable crisis comes, you will be glad you prepared.
+An emergency fund is the single most important financial safety net you can build. Start with \\$1,000, then build to 3-6 months of expenses in a high-yield savings account. Automate the process and protect the fund from non-emergency spending. When the inevitable crisis comes, you will be glad you prepared.
 
 > "An emergency fund turns a crisis into an inconvenience." — Dave Ramsey
 

@@ -26,13 +26,13 @@ export default function CTASection() {
         marginBottom: 48,
         color: '#f2ede3',
       }}>
-        Your next interview<br />
+        Your dream school<br />
         starts <em style={{ fontStyle: 'italic', color: '#d4a84b' }}>here.</em>
       </h2>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' as const }}>
         <Link
-          href="/interviews"
+          href="/signup"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -46,10 +46,10 @@ export default function CTASection() {
             borderRadius: 4,
           }}
         >
-          Try a Mock Interview — Free
+          Start Your Application — Free
         </Link>
         <Link
-          href="/college-interviews"
+          href="/cc"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -64,7 +64,7 @@ export default function CTASection() {
             borderRadius: 4,
           }}
         >
-          Or practice a college interview
+          Explore Coach Kairos
         </Link>
       </div>
       <p style={{
@@ -73,7 +73,7 @@ export default function CTASection() {
         color: 'rgba(242, 237, 227, 0.4)',
         letterSpacing: '0.04em',
       }}>
-        Tech interviews: 14 FAANG personas · College interviews: Harvard, Yale, Stanford, MIT, +6
+        Essays · Activities · School List · Interviews · Recommendations · Counselor Sharing
       </p>
     </section>
   )

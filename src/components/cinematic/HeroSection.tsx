@@ -64,26 +64,26 @@ export default function HeroSection() {
       <div className={styles.bottomFade} aria-hidden="true" />
 
       <div ref={contentRef} className={styles.content} id="hero-content">
-        <p className={styles.eyebrow} id="he">English · Español · Français · Deutsch · Italiano · Nederlands · 日本語 · हिन्दी · ਪੰਜਾਬੀ</p>
+        <p className={styles.eyebrow} id="he">Essays · Activities · School List · Interviews · Recommendations · Sharing</p>
 
         <h1 className={styles.headline}>
           <span className={styles.clipLine}>
-            <span className={styles.clipInner} id="hl1">Practice tech interviews</span>
+            <span className={styles.clipInner} id="hl1">Your college app,</span>
           </span>
           <span className={styles.clipLine}>
             <span className={styles.clipInner} id="hl2">
-              in <em>your language.</em>
+              powered by <em>AI.</em>
             </span>
           </span>
         </h1>
 
         <p className={styles.sub} id="hs">
-          The only AI interview coach that runs in 9 native voice languages. Practice the real Google L4, Meta E4, Stripe, Anthropic, and 10 other company loops — in English, Hindi, Spanish, Japanese, or whatever language you think in. $10/mo.
+          Essay brainstorming and drafting. Activities optimization. Mock interviews with Harvard, Yale, Stanford, and MIT alumni personas. School list building. Recommendation coaching. One platform, every piece of your application. $10/mo.
         </p>
 
         <div className={styles.ctas} id="hc">
-          <Link href="/interviews" className="cine-btn-primary">Try a Mock Interview — Free</Link>
-          <Link href="/courses" className="cine-btn-outline">Browse 69+ Courses</Link>
+          <Link href="/signup" className="cine-btn-primary">Start Your Application — Free</Link>
+          <Link href="/cc" className="cine-btn-outline">Explore Coach Kairos</Link>
         </div>
       </div>
 

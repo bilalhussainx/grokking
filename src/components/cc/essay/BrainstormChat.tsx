@@ -14,18 +14,79 @@ interface BrainstormChatProps {
   onAdvanceToOutline: (themes: string[]) => void;
 }
 
+// Parses "<<THEMES_READY>>\n- a\n- b\n<<END_THEMES>>" out of the AI reply.
+// Falls back to detecting a markdown-numbered/bulleted theme list when the model
+// skips the structured tags (it happens — "1. **Theme** — description").
+// Returns { displayText, themes } where displayText has the tag block stripped
+// (markdown fallback leaves displayText as-is so the chat still reads naturally).
+function parseThemesBlock(text: string): { displayText: string; themes: string[] } {
+  const tagged = text.match(/<<THEMES_READY>>([\s\S]*?)<<END_THEMES>>/);
+  if (tagged) {
+    const themes = tagged[1]
+      .split("\n")
+      .map((line) => line.replace(/^\s*[-*]\s*/, "").trim())
+      .filter((line) => line.length > 0);
+    const displayText = text
+      .replace(/<<THEMES_READY>>[\s\S]*?<<END_THEMES>>\s*/, "")
+      .trim();
+    return { displayText, themes };
+  }
+
+  // Markdown fallback: look for 2+ "1. **Label**" or "- **Label**" items AND a
+  // choice cue ("which feels most", "which resonates", "pick one", etc.).
+  const choiceCue =
+    /\b(which|pick|choose)\b[^\n?]*\b(feels|resonates|sounds|most|one)\b/i.test(text);
+  if (!choiceCue) return { displayText: text, themes: [] };
+
+  // Capture the full line after the list marker so themes include the descriptor
+  // (e.g. "Sandbox-to-deployment — the frustration with small models...").
+  const itemRe = /^\s*(?:\d+[.)]|[-*])\s+(.+?)\s*$/gm;
+  const matches = [...text.matchAll(itemRe)].filter((m) => /\*\*/.test(m[1]));
+  if (matches.length < 2) return { displayText: text, themes: [] };
+
+  const themes = matches
+    .map((m) => m[1].replace(/\*\*/g, "").trim())
+    .filter((t) => t.length > 0);
+  return { displayText: text, themes };
+}
+
+function normalizeTranscript(raw: unknown): Message[] {
+  if (Array.isArray(raw)) {
+    return raw.filter(
+      (m): m is Message =>
+        m != null &&
+        typeof m === "object" &&
+        "role" in m &&
+        "content" in m &&
+        typeof (m as { content: unknown }).content === "string",
+    );
+  }
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      return normalizeTranscript(parsed);
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 export default function BrainstormChat({
   essayId,
   initialTranscript,
   onAdvanceToOutline,
 }: BrainstormChatProps) {
-  const [messages, setMessages] = useState<Message[]>(initialTranscript);
+  const [messages, setMessages] = useState<Message[]>(() => normalizeTranscript(initialTranscript));
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
-  const [showThemePicker, setShowThemePicker] = useState(false);
+  const [themes, setThemes] = useState<string[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
+  const [errorBanner, setErrorBanner] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const startedRef = useRef(false);
+
+  const userTurnCount = messages.filter((m) => m.role === "user").length;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -39,8 +100,21 @@ export default function BrainstormChat({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Re-parse themes whenever the transcript changes (handles reload from DB too).
+  useEffect(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role !== "assistant") continue;
+      const parsed = parseThemesBlock(messages[i].content);
+      if (parsed.themes.length > 0) {
+        setThemes(parsed.themes);
+        return;
+      }
+    }
+  }, [messages]);
+
   const sendMessage = async (text: string) => {
     if (streaming) return;
+    setErrorBanner(null);
     const userMsg: Message = { role: "user", content: text };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
@@ -54,11 +128,9 @@ export default function BrainstormChat({
       });
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "Request failed" }));
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: err.error || "Something went wrong." },
-        ]);
+        const err = await res.json().catch(() => ({ error: `Request failed (${res.status})` }));
+        setErrorBanner(err.error || "Something went wrong.");
+        setMessages((prev) => prev.slice(0, -1)); // roll back optimistic user msg
         setStreaming(false);
         return;
       }
@@ -75,21 +147,15 @@ export default function BrainstormChat({
         const { done, value } = await reader.read();
         if (done) break;
         aiText += decoder.decode(value, { stream: true });
+        const parsed = parseThemesBlock(aiText);
         setMessages((prev) => {
           const updated = [...prev];
-          updated[updated.length - 1] = { role: "assistant", content: aiText };
+          updated[updated.length - 1] = { role: "assistant", content: parsed.displayText };
           return updated;
         });
       }
-
-      if (aiText.toLowerCase().includes("theme:") || aiText.toLowerCase().includes("theme 1")) {
-        setShowThemePicker(true);
-      }
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Connection error. Please try again." },
-      ]);
+      setErrorBanner("Connection error. Please try again.");
     } finally {
       setStreaming(false);
     }
@@ -101,18 +167,15 @@ export default function BrainstormChat({
     sendMessage(input.trim());
   };
 
-  const extractThemes = (): string[] => {
-    const lastAi = [...messages].reverse().find((m) => m.role === "assistant");
-    if (!lastAi) return [];
-    const themeMatches = lastAi.content.match(/Theme[:\s]*[^.\n]+/gi) || [];
-    return themeMatches.map((t) => t.replace(/^Theme[:\s]*/i, "").trim());
-  };
-
   const toggleTheme = (theme: string) => {
     setSelectedThemes((prev) =>
-      prev.includes(theme) ? prev.filter((t) => t !== theme) : [...prev, theme]
+      prev.includes(theme) ? prev.filter((t) => t !== theme) : [...prev, theme],
     );
   };
+
+  // UI-side fallback: after 4 user turns, let the student force a theme surface
+  // if the AI hasn't emitted the block yet.
+  const showForceThemesButton = userTurnCount >= 4 && themes.length === 0 && !streaming;
 
   return (
     <div className="flex flex-col h-full">
@@ -123,7 +186,7 @@ export default function BrainstormChat({
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+              className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
                 msg.role === "user"
                   ? "bg-[#D4AF37]/20 text-white"
                   : "bg-white/5 text-white/80 border border-white/10"
@@ -138,21 +201,27 @@ export default function BrainstormChat({
         <div ref={bottomRef} />
       </div>
 
-      {showThemePicker && (
+      {errorBanner && (
+        <div className="px-4 py-2 bg-red-500/10 border-t border-red-500/20 text-xs text-red-300">
+          {errorBanner}
+        </div>
+      )}
+
+      {themes.length > 0 && (
         <div className="px-4 py-3 border-t border-white/10 bg-white/5">
           <p className="text-xs text-white/50 mb-2 flex items-center gap-1">
             <Sparkles className="w-3 h-3 text-[#D4AF37]" />
             Select 1-2 themes to develop:
           </p>
-          <div className="flex flex-wrap gap-2 mb-3">
-            {extractThemes().map((theme) => (
+          <div className="flex flex-col gap-2 mb-3">
+            {themes.map((theme) => (
               <button
                 key={theme}
                 onClick={() => toggleTheme(theme)}
-                className={`px-3 py-1 rounded-full text-xs transition-colors ${
+                className={`text-left px-3 py-2 rounded-lg text-xs leading-relaxed transition-colors ${
                   selectedThemes.includes(theme)
                     ? "bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30"
-                    : "bg-white/5 text-white/60 border border-white/10 hover:text-white/80"
+                    : "bg-white/5 text-white/70 border border-white/10 hover:text-white/90 hover:bg-white/[0.07]"
                 }`}
               >
                 {theme}
@@ -167,6 +236,21 @@ export default function BrainstormChat({
               Continue to Outline
             </button>
           )}
+        </div>
+      )}
+
+      {showForceThemesButton && (
+        <div className="px-4 py-2 border-t border-white/10 bg-white/5 flex justify-end">
+          <button
+            onClick={() =>
+              sendMessage(
+                "I think I've shared enough — please surface 2-3 concrete themes I could develop.",
+              )
+            }
+            className="text-xs text-[#D4AF37] hover:text-[#C4A030] underline"
+          >
+            I&apos;ve said enough — show me themes
+          </button>
         </div>
       )}
 

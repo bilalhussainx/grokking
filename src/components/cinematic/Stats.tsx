@@ -1,10 +1,10 @@
 'use client'
 
 const STATS = [
-  { value: '69+', label: 'Courses' },
-  { value: '17', label: 'Languages' },
-  { value: '10', label: 'Career Pathways' },
-  { value: '2000+', label: 'Lessons' },
+  { value: '10', label: 'Ivy+ Alumni Personas' },
+  { value: '6', label: 'Application Tools' },
+  { value: '4', label: 'Interview Sessions per Arc' },
+  { value: '$10', label: 'Per Month' },
 ]
 
 export default function Stats() {

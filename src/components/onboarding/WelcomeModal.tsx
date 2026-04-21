@@ -13,10 +13,23 @@ const STORAGE_KEY = "kairos-welcome-seen";
 
 const actions = [
   {
-    title: "Practice Mock Interviews",
+    title: "Start Your Essays",
     description:
-      "AI interviewer adapts to your level. Choose a role and start practicing.",
-    href: "/interviews",
+      "AI-guided brainstorming, outline generation, and draft coaching for every essay type.",
+    href: "/cc/essays",
+    icon: BookOpen,
+    accent: "gold",
+    bg: "from-[#D4AF37]/10 to-[#D4AF37]/5",
+    border: "border-[#D4AF37]/20 hover:border-[#D4AF37]/40",
+    iconBg: "bg-[#D4AF37]/10",
+    iconColor: "text-[#D4AF37]",
+    arrowColor: "text-[#D4AF37]",
+  },
+  {
+    title: "Practice Interviews",
+    description:
+      "Mock interviews with AI personas from Harvard, Yale, Stanford, MIT, and more.",
+    href: "/college-interviews",
     icon: Target,
     accent: "gold",
     bg: "from-[#D4AF37]/10 to-[#D4AF37]/5",
@@ -26,24 +39,11 @@ const actions = [
     arrowColor: "text-[#D4AF37]",
   },
   {
-    title: "Talk to an AI Tutor",
+    title: "Build Your School List",
     description:
-      "Voice conversation in 17 languages. Pick a topic and start talking.",
-    href: "/talk",
+      "Search 1,500+ colleges with chancing estimates, net price, and application tracking.",
+    href: "/intake",
     icon: Mic,
-    accent: "gold",
-    bg: "from-[#D4AF37]/10 to-[#D4AF37]/5",
-    border: "border-[#D4AF37]/20 hover:border-[#D4AF37]/40",
-    iconBg: "bg-[#D4AF37]/10",
-    iconColor: "text-[#D4AF37]",
-    arrowColor: "text-[#D4AF37]",
-  },
-  {
-    title: "Take a Course",
-    description:
-      "69+ courses in coding, finance, philosophy, and more. Learn at your pace.",
-    href: "/courses",
-    icon: BookOpen,
     accent: "gold",
     bg: "from-[#D4AF37]/10 to-[#D4AF37]/5",
     border: "border-[#D4AF37]/20 hover:border-[#D4AF37]/40",

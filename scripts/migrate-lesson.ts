@@ -20,6 +20,7 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
+import { spawn } from "node:child_process";
 import { config as loadEnv } from "dotenv";
 
 loadEnv({ path: ".env.local" });
@@ -27,10 +28,12 @@ loadEnv({ path: ".env" });
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY;
+const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 const MOONSHOT_MODEL = "kimi-k2-turbo-preview";
 const MOONSHOT_ENDPOINT = "https://api.moonshot.ai/v1/chat/completions";
+const TAVILY_ENDPOINT = "https://api.tavily.com/search";
 
 // ---------- Types ----------
 
@@ -150,9 +153,42 @@ CRITICAL RULES:
   or \`\`\`trace block showing the algorithm execution on a concrete example.
 `;
 
-// ---------- Research phase (Gemini + google_search grounding) ----------
+// ---------- Research phase ----------
+// Primary: Tavily (purpose-built LLM grounding, real snippets)
+// Fallback: Gemini with google_search
 
-async function researchConcept(query: string): Promise<ResearchBrief> {
+async function researchViaTavily(query: string): Promise<ResearchBrief> {
+  if (!TAVILY_API_KEY) throw new Error("TAVILY_API_KEY missing");
+  const resp = await fetch(TAVILY_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      api_key: TAVILY_API_KEY,
+      query,
+      search_depth: "advanced",
+      include_answer: true,
+      max_results: 6,
+      include_raw_content: false,
+    }),
+  });
+  if (!resp.ok) {
+    throw new Error(`Tavily failed: ${resp.status} ${await resp.text()}`);
+  }
+  const data: any = await resp.json();
+  const answer: string = data.answer || "";
+  const results: any[] = data.results || [];
+  const snippets = results
+    .map((r, i) => `[${i + 1}] ${r.title}\n${r.content}`)
+    .join("\n\n");
+  const brief =
+    (answer ? `**Synthesized answer:**\n${answer}\n\n` : "") +
+    `**Source snippets:**\n${snippets}`;
+  const citations = results.map((r) => ({ url: r.url, title: r.title }));
+  if (citations.length === 0) throw new Error("Tavily returned no results");
+  return { brief, citations };
+}
+
+async function researchViaGemini(query: string): Promise<ResearchBrief> {
   if (!GEMINI_API_KEY) {
     throw new Error("GEMINI_API_KEY missing — can't run research phase");
   }
@@ -191,6 +227,16 @@ async function researchConcept(query: string): Promise<ResearchBrief> {
     }))
     .filter((c: any) => c.url);
   return { brief, citations };
+}
+
+async function researchConcept(query: string): Promise<ResearchBrief> {
+  // Try Tavily first; fall back to Gemini on failure
+  try {
+    return await researchViaTavily(query);
+  } catch (e: any) {
+    console.log(`    (tavily failed: ${e.message} — falling back to gemini)`);
+    return await researchViaGemini(query);
+  }
 }
 
 // ---------- Rewrite phase (Moonshot / Kimi K2) ----------
@@ -274,6 +320,107 @@ the existing lesson's level of depth or exceed it. Output ONLY the new markdown 
   const content = data.choices?.[0]?.message?.content;
   if (!content) throw new Error("Moonshot returned empty content");
   return content.trim();
+}
+
+// ---------- Rewrite phase (Claude Code CLI) ----------
+
+async function rewriteLessonViaClaude(
+  lesson: Lesson,
+  brief: ResearchBrief,
+  courseContext: string,
+  retryFeedback?: { previousOutput: string; errors: string[] }
+): Promise<string> {
+  const citationsBlock = brief.citations
+    .map((c, i) => `[${i + 1}] ${c.title || c.url} — ${c.url}`)
+    .join("\n");
+
+  const retryBlock = retryFeedback
+    ? `\n\n# RETRY — previous attempt failed validation
+
+Your previous output had these errors:
+${retryFeedback.errors.map((e) => `- ${e}`).join("\n")}
+
+Previous output (fix ONLY the specific problems above — keep everything else):
+\`\`\`
+${retryFeedback.previousOutput}
+\`\`\`
+
+Common JSON pitfalls to avoid:
+- Unescaped double quotes inside string values — escape them as \\"
+- Trailing commas before } or ]
+- Unescaped newlines in string values — use \\n
+- Using single quotes instead of double quotes
+`
+    : "";
+
+  const combinedPrompt = `${RICH_BLOCK_SCHEMA}
+
+COURSE CONTEXT: ${courseContext}
+
+# Lesson to rewrite
+
+**Title:** ${lesson.title}
+
+**Original content (markdown, may be plain text / mermaid only):**
+\`\`\`
+${lesson.content}
+\`\`\`
+
+**Research brief (ground all factual claims in this):**
+${brief.brief}
+
+**Citations:**
+${citationsBlock || "(none)"}
+${retryBlock}
+# Your task
+
+Rewrite the lesson content following the rich-block schema. Preserve the original
+pedagogical arc but introduce 3-5 interactive blocks appropriate to the topic. Match
+the existing lesson's level of depth or exceed it. Output ONLY the new markdown content —
+no preamble, no "here is the rewrite", no wrapping code fence around the whole thing.`;
+
+  return new Promise((resolve, reject) => {
+    // On Windows, npm/claude is a .cmd shim — must use shell:true to resolve it.
+    const isWin = process.platform === "win32";
+    const child = spawn(
+      "claude",
+      ["-p", "--output-format", "text", "--model", "sonnet"],
+      {
+        stdio: ["pipe", "pipe", "pipe"],
+        shell: isWin,
+      }
+    );
+
+    let stdout = "";
+    let stderr = "";
+    const timeout = setTimeout(() => {
+      child.kill();
+      reject(new Error("Claude CLI timed out after 5 minutes"));
+    }, 5 * 60 * 1000);
+
+    child.stdout.on("data", (chunk) => (stdout += chunk.toString()));
+    child.stderr.on("data", (chunk) => (stderr += chunk.toString()));
+    child.on("error", (err) => {
+      clearTimeout(timeout);
+      reject(new Error(`Claude CLI spawn failed: ${err.message}`));
+    });
+    child.on("close", (code) => {
+      clearTimeout(timeout);
+      if (code !== 0) {
+        reject(new Error(`Claude CLI exited ${code}: ${stderr.trim() || stdout.trim()}`));
+        return;
+      }
+      const trimmed = stdout.trim();
+      if (!trimmed) {
+        reject(new Error(`Claude CLI returned empty output. stderr: ${stderr.trim()}`));
+        return;
+      }
+      resolve(trimmed);
+    });
+
+    child.stdin.write(combinedPrompt);
+    child.stdin.end();
+  });
 }
 
 // ---------- Validation ----------
@@ -405,19 +552,27 @@ interface CLIArgs {
   dryRun: boolean;
   only?: number[];
   outPath?: string;
+  engine: "moonshot" | "claude";
 }
 
 function parseArgs(argv: string[]): CLIArgs {
-  const args: CLIArgs = { inputPath: "", dryRun: false };
+  const args: CLIArgs = { inputPath: "", dryRun: false, engine: "moonshot" };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--dry-run") args.dryRun = true;
     else if (a === "--only") args.only = argv[++i].split(",").map(Number);
     else if (a === "--out") args.outPath = argv[++i];
-    else if (!args.inputPath) args.inputPath = a;
+    else if (a === "--engine") {
+      const e = argv[++i];
+      if (e !== "moonshot" && e !== "claude") {
+        console.error(`--engine must be "moonshot" or "claude" (got "${e}")`);
+        process.exit(1);
+      }
+      args.engine = e;
+    } else if (!args.inputPath) args.inputPath = a;
   }
   if (!args.inputPath) {
-    console.error("Usage: tsx scripts/migrate-lesson.ts <path> [--dry-run] [--only 0,1] [--out path]");
+    console.error("Usage: tsx scripts/migrate-lesson.ts <path> [--dry-run] [--only 0,1] [--out path] [--engine claude|moonshot]");
     process.exit(1);
   }
   return args;
@@ -431,6 +586,7 @@ async function main() {
 
   console.log(`\n→ Loaded ${exportName} from ${args.inputPath}`);
   console.log(`  ${mod.lessons.length} lessons in module "${mod.title}"`);
+  console.log(`  engine: ${args.engine}`);
   if (args.dryRun) console.log("  [DRY RUN] — no API calls, will test serialization round-trip only");
 
   const targetIndices =
@@ -460,7 +616,9 @@ async function main() {
       for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         console.log(`  rewriting (attempt ${attempt}/${MAX_ATTEMPTS})...`);
         const retryFeedback = attempt > 1 ? { previousOutput: newContent, errors: report.errors } : undefined;
-        newContent = await rewriteLesson(lesson, brief, courseContext, retryFeedback);
+        newContent = args.engine === "claude"
+          ? await rewriteLessonViaClaude(lesson, brief, courseContext, retryFeedback)
+          : await rewriteLesson(lesson, brief, courseContext, retryFeedback);
         console.log(`  got rewrite (${newContent.length} chars)`);
         report = validateRewrite(newContent);
         if (report.ok) break;

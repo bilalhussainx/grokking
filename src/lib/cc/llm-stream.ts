@@ -67,7 +67,7 @@ export async function streamLLM(
           "X-Title": "Kairos.ai",
         },
         body: JSON.stringify({
-          model: opts?.model || "openai/gpt-4o-mini",
+          model: opts?.model || "anthropic/claude-sonnet-4-6",
           messages,
           stream: true,
           temperature: temp,
@@ -77,6 +77,7 @@ export async function streamLLM(
       if (resp.ok && resp.body) {
         return { stream: parseSSEStream(resp.body), provider: "openrouter" };
       }
+      console.error("[LLM] OpenRouter non-ok:", resp.status, await resp.text().catch(() => ""));
     } catch (err) {
       console.error("[LLM] OpenRouter failed:", err);
     }

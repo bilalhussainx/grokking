@@ -17,9 +17,16 @@ export async function POST(req: NextRequest) {
   }
 
   const admin = createAdminSupabase();
+
+  const { data: preferences } = await admin
+    .from("cc_school_preferences")
+    .select("*")
+    .eq("student_id", profile.id)
+    .maybeSingle();
+
   const { data: allSchools } = await admin
     .from("cc_schools")
-    .select("id, name, acceptance_rate, avg_net_price, test_policy, state, school_type")
+    .select("id, name, acceptance_rate, avg_net_price, test_policy, state, school_type, meets_full_need")
     .order("name");
 
   if (!allSchools || allSchools.length === 0) {
@@ -33,7 +40,7 @@ export async function POST(req: NextRequest) {
     ? profile.cc_financial_profiles[0]
     : profile.cc_financial_profiles;
 
-  const profileSummary = [
+  const profileParts = [
     profile.state_province ? `State: ${profile.state_province}` : null,
     academic?.gpa_unweighted ? `GPA (UW): ${academic.gpa_unweighted}` : null,
     academic?.gpa_weighted ? `GPA (W): ${academic.gpa_weighted}` : null,
@@ -43,9 +50,28 @@ export async function POST(req: NextRequest) {
     financial?.household_income_bracket ? `Income: ${financial.household_income_bracket}` : null,
     profile.is_first_gen ? "First-generation student" : null,
     profile.is_international ? "International student" : null,
-  ].filter(Boolean).join(", ");
+  ].filter(Boolean);
 
-  const schoolList = allSchools.map((s) =>
+  if (preferences?.financial_need) profileParts.push(`Financial aid need: ${preferences.financial_need}`);
+  if (preferences?.income_bracket) profileParts.push(`Family income: ${preferences.income_bracket}`);
+  if (preferences?.location_type) profileParts.push(`Preferred setting: ${preferences.location_type}`);
+  if (preferences?.preferred_regions?.length) profileParts.push(`Preferred regions: ${preferences.preferred_regions.join(", ")}`);
+  if (preferences?.intended_major) profileParts.push(`Intended major: ${preferences.intended_major}`);
+  if (preferences?.needs_international_full_need) profileParts.push(`Needs schools that meet full financial need for international students`);
+  if (preferences?.extracurriculars_summary) profileParts.push(`Activities: ${preferences.extracurriculars_summary}`);
+  if (preferences?.campus_size_preference && preferences.campus_size_preference !== "no-preference") {
+    profileParts.push(`Campus preference: ${preferences.campus_size_preference}`);
+  }
+
+  const profileSummary = profileParts.join(", ");
+
+  let filteredSchools = allSchools;
+  if (preferences?.needs_international_full_need) {
+    const fullNeed = allSchools.filter((s: { meets_full_need: boolean }) => s.meets_full_need);
+    if (fullNeed.length >= 30) filteredSchools = fullNeed;
+  }
+
+  const schoolList = filteredSchools.map((s: { name: string; state: string; school_type: string; acceptance_rate: number; avg_net_price: number; test_policy: string }) =>
     `${s.name} | ${s.state} | ${s.school_type} | accept: ${Math.round((s.acceptance_rate || 0) * 100)}% | net: $${s.avg_net_price || "?"} | test: ${s.test_policy}`
   ).join("\n");
 

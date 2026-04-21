@@ -334,106 +334,105 @@ Auto insurance is mandatory but should be optimized through higher deductibles, 
       id: "pf-estate-planning",
       slug: "estate-planning-basics",
       title: "Estate Planning Basics",
-      content: `\`\`\`concept
-{"title": "Estate Planning in One Sentence", "variant": "mental-model", "content": "Estate planning is the act of writing instructions today so a stranger in a black robe doesn’t make them for you tomorrow."}
-\`\`\`
+      content: `## Estate Planning Basics
 
-Estate planning is not a “rich-person” checkbox—it’s the process of arranging who manages your money, your kids, and your medical care if you’re alive-but-unable or no longer here. Skip it and state law writes the script: rigid formulas, public court fights, frozen accounts, and guardians you never chose.
+Estate planning is not just for the wealthy. It is the process of arranging for the management and distribution of your assets after death (or incapacity). Without a plan, the state decides who gets your property, who raises your children, and who makes medical decisions for you.
 
-\`\`\`callout
-{"type": "warning", "title": "The 46 % Problem", "content": "Gallup 2023: fewer than half of U.S. adults have a will. Everyone else is betting the state’s one-size-fits-all rules match their family, their values, and their timeline. Spoiler: they rarely do."}
-\`\`\`
+### Why Everyone Needs an Estate Plan
 
-## What Happens If You Do Nothing (a.k.a. Dying “Intestate”)
+According to a 2023 Gallup poll, only 46% of American adults have a will. The consequences of dying without one (called dying "intestate"):
 
-| Consequence | Real-world pain |
-|-------------|-----------------|
-| State decides heirs | Your favorite niece gets nothing; a distant cousin you’ve never met might |
-| No guardian named | Court hearing; grandparents on both sides lawyer-up |
-| Assets frozen | Mortgage, tuition, daycare bills keep arriving; cash is locked |
-| Public probate | Neighbors can read your inventory online |
-| Possible extra tax | No marital or charitable tricks = bigger tax bite |
+- **The state decides** who inherits your assets — following a rigid formula that may not match your wishes
+- **No guardian is named** for minor children — the court appoints one
+- **Family conflict** — disputes over inheritance are common and devastating
+- **Probate delays** — assets may be frozen for months or years
+- **Tax inefficiency** — without planning, your estate may pay more in taxes than necessary
 
-\`\`\`quiz
-{"title": "Quick Check: Intestacy", "questions": [
-  {"question": "If you die without a will, who chooses the guardian for your minor children?", "options": ["Your parents", "The family by mutual agreement", "A judge", "The state’s child-services agency"], "answer": 2, "explanation": "A judge holds a hearing and appoints a guardian; family members can petition, but the court decides."},
-  {"question": "Which assets bypass your will entirely?", "options": ["House in your name alone", "Car titled to you", "401(k) with a named beneficiary", "Checking account with no POD"], "answer": 2, "explanation": "Beneficiary-designation assets (retirement accounts, life insurance, POD/TOD accounts) go straight to the named person—will or no will."},
-  {"question": "Approximately what percentage of estates pay federal estate tax in 2024?", "options": ["10 %", "3 %", "0.1 %", "25 %"], "answer": 2, "explanation": "The exemption is $13.61 million per person; only about 1 in 1,000 estates owe federal tax."}
-]}
-\`\`\`
+### The Four Essential Estate Planning Documents
 
-## The Core Four Documents
+**1. Will (Last Will and Testament)**
 
-1. **Will** – who gets what, who raises the kids, who’s in charge.
-2. **Revocable Living Trust** – owns your stuff while you’re alive, transfers it instantly at death, skips probate.
-3. **Durable Power of Attorney** – someone you trust signs your checks if you can’t.
-4. **Healthcare Directive** – your medical wishes + who speaks for you when you can’t speak.
+A will specifies:
+- Who inherits your property (beneficiaries)
+- Who raises your minor children (guardian)
+- Who manages the process (executor)
 
-\`\`\`compare
-{"variant": "before-after", "before": {"label": "Only a Will", "code": "House → 9-month probate\\nKids → court picks guardian\\nFinances → frozen until probate ends\\nPublic record → anyone can read"}, "after": {"label": "Will + Trust + POA + Healthcare", "code": "House → transfers in weeks, no probate\\nKids → your chosen guardian sworn in immediately\\nFinances → agent pays bills day 1\\nPrivacy → no public inventory"}}
-\`\`\`
+A will must go through **probate** — a court process that validates the will and oversees distribution. Probate is public, can take 6-12 months, and costs 3-7% of the estate.
 
-### Wills vs. Living Trust—When Does Each Shine?
+**2. Revocable Living Trust**
 
-\`\`\`tabs
-{"tabs": [
-  {"label": "Simple & Cheap", "content": "**Will**\\n- Cost: $200–500 online or attorney\\n- Good if: no real estate, assets <$100k, okay with probate\\n- Downside: 6–12-month probate, public"},
-  {"label": "Privacy & Speed", "content": "**Revocable Living Trust**\\n- Cost: $1k–3k attorney, $400–700 online\\n- Good if: real estate, assets >$100k, hate probate, want incapacity plan\\n- Downside: must re-title assets into trust"},
-  {"label": "Hybrid Route", "content": "Pour-over will + small trust\\n- Will catches forgotten items and sends them into your trust\\n- Keeps guardianship provisions\\n- Still avoids probate on major assets"}
-]}
-\`\`\`
+A trust holds your assets during your lifetime and transfers them to beneficiaries at death — **bypassing probate entirely**.
 
-### Beneficiary Designations—The Invisible Will
+| Feature | Will | Living Trust |
+|---------|------|-------------|
+| Probate required | Yes | No |
+| Public record | Yes | No (private) |
+| Effective during incapacity | No | Yes |
+| Cost to create | \\$200-500 | \\$1,000-3,000 |
+| Complexity | Simple | Moderate |
 
-Retirement plans, life insurance, and most bank accounts pass **outside** your will. If the beneficiary form still names your ex from 2009, that ex wins—regardless of what your fancy new will says.
+**When a trust makes sense:** Owning real estate, having assets over \\$100,000, wanting privacy, or living in a state with expensive probate (California, Florida).
 
-\`\`\`steps
-{"title": "Annual 15-Minute Beneficiary Audit", "steps": [
-  {"title": "List", "content": "Write every account that asks for a beneficiary: 401(k), IRA, HSA, life insurance, brokerage, bank savings with POD."},
-  {"title": "Match", "content": "Read the name on each form. Does it match your current wish?"},
-  {"title": "Update", "content": "Log in or call; change forms in minutes; save PDF confirmations."},
-  {"title": "Backup", "content": "Email copies to your executor/trustee so they know these assets exist."}
-]}
-\`\`\`
+**3. Durable Power of Attorney (POA)**
 
-### Estate Taxes: The Line in the Sand
+Designates someone to make financial decisions if you become incapacitated (accident, illness, cognitive decline):
+- Pay your bills
+- Manage your investments
+- Handle your real estate
+- File your taxes
 
-- **Federal**: 2024 exemption $13.61 million per person (≈ $27 million for a couple). Rate on the excess: 18–40 %. Roughly 0.1 % of estates owe anything.
-- **State gotchas**: Oregon taxes estates >$1 million, Massachusetts >$2 million, New York >$6.94 million. Live there? Plan early—gifting, trusts, or life-insurance trusts can shrink the taxable pile.
+Without a POA, your family must petition the court for conservatorship — expensive, time-consuming, and public.
 
-\`\`\`calculator
-{"type": "compound-interest", "title": "Gifting to Shrink a Taxable Estate", "inputs": [
-  {"id": "p", "label": "Annual gifts per couple", "default": 34000, "min": 0, "max": 100000, "prefix": "$"},
-  {"id": "r", "label": "Growth rate", "default": 6, "min": 0, "max": 12, "suffix": "%"},
-  {"id": "t", "label": "Years of gifting", "default": 20, "min": 5, "max": 40, "suffix": " yrs"}
-]}
-\`\`\`
+**4. Healthcare Directive (Living Will + Healthcare POA)**
 
-## Real-World Walk-Through: David’s 8-Month Freeze
+Two components:
+- **Living will:** States your wishes for end-of-life medical care (life support, resuscitation, organ donation)
+- **Healthcare proxy (POA):** Designates someone to make medical decisions if you cannot
 
-David, 42, remarried but never updated his 401(k) beneficiary. After a car accident:
+### Beneficiary Designations: The Override
 
-\`\`\`trace
-{"title": "What Hit the Family’s Cash-Flow", "language": "python", "code": "# David's assets and flow\\nassets = {'home_joint': 400000, '401k': 200000, 'savings': 50000}\\nbeneficiaries = {'401k': 'ex-wife', 'home': 'wife', 'savings': 'estate'}\\n\\nprint('Day 1:')\\nprint('  Home → wife (joint) ✓')\\nprint('  401k → ex-wife 😟')\\nprint('  Savings → PROBATE (frozen)')\\n\\nprint('\\\\nMonth 8: probate closed')\\nprint('  Savings → wife (after $3k fees)')", "frames": [
-  {"line": 1, "vars": {"assets": {"home_joint": 400000, "401k": 200000, "savings": 50000}}, "note": "Total = $650k", "stdout": ""},
-  {"line": 5, "vars": {"beneficiaries": {"401k": "ex-wife", "home": "wife", "savings": "estate"}}, "note": "Ex-wife still on 401(k) form", "stdout": "Day 1:\\n  Home → wife (joint) ✓\\n  401k → ex-wife 😟\\n  Savings → PROBATE (frozen)"},
-  {"line": 10, "vars": {}, "note": "Wife finally accesses savings", "stdout": "Month 8: probate closed\\n  Savings → wife (after $3k fees)"}
-]}
-\`\`\`
+**Critical:** Beneficiary designations on accounts (401(k), IRA, life insurance, bank accounts) **override your will**. If your will says "leave everything to my spouse" but your 401(k) beneficiary is your ex-spouse from 10 years ago, the ex gets the 401(k).
 
-Guardianship hearings added legal bills and family tension—avoidable with a 2-hour update.
+**Action item:** Review beneficiary designations on all accounts at least annually and after any major life event (marriage, divorce, birth, death).
 
-## Your Minimum-Viable Plan
+### Real-World Example: The Cost of No Plan
 
-1. Draft a will (online $100–300) – name executor & guardian.
-2. Complete or update every beneficiary form.
-3. Sign state-specific healthcare directive + durable POA (free templates at most hospitals).
-4. Move big-ticket assets (house, large brokerage) into a revocable living trust if probate sounds awful.
-5. Store originals in a fire-safe; tell your key people where it lives; calendar an annual 15-minute review.
+David, 42, dies unexpectedly in a car accident. He has:
+- \\$400,000 home (owned jointly with wife)
+- \\$200,000 401(k) (ex-wife listed as beneficiary — never updated after remarriage)
+- \\$50,000 savings account (in his name only)
+- Two minor children
 
-\`\`\`takeaways
-{"title": "Key Takeaways", "items": ["Estate planning is for every adult, not just the wealthy; without it, state law writes your script.", "Four documents cover 90 % of needs: will, revocable living trust, durable power of attorney, healthcare directive.", "Beneficiary designations override your will—review them yearly and after every life change.", "Federal estate tax hits only the top 0.1 %, but a dozen states grab smaller estates; know your local threshold.", "A two-hour annual check (documents + beneficiaries) can save your family months of probate, thousands in fees, and endless stress."]}
-\`\`\``,
+**What happens:**
+- House: transfers to wife automatically (joint ownership)
+- 401(k): goes to **ex-wife** (beneficiary designation overrides everything)
+- Savings: frozen in probate for 8 months; wife cannot access it for bills
+- Children's guardianship: David's parents and wife's parents both petition the court, creating a legal battle
+
+If David had spent 2 hours updating his beneficiary designations and creating basic estate documents, all of this would have been avoided.
+
+### Estate Taxes: Who Pays?
+
+For 2024, the federal estate tax exemption is **\\$13.61 million per person** (\\$27.22 million for married couples). Estates below this threshold pay no federal estate tax. Only about 0.1% of estates are affected.
+
+However, some states have lower thresholds:
+- Oregon: \\$1 million
+- Massachusetts: \\$2 million
+- New York: \\$6.94 million
+
+### Getting Started: Minimum Viable Estate Plan
+
+1. **Create a will** — Online services (Trust & Will, LegalZoom, Nolo) cost \\$100-300
+2. **Designate beneficiaries** on all financial accounts
+3. **Set up healthcare directive** and durable POA
+4. **Organize documents** and tell your executor/trustee where to find them
+5. **Review annually** and after life events
+
+### Key Takeaway
+
+Estate planning ensures your wishes are followed, your family is protected, and your assets transfer efficiently. At minimum, every adult needs a will, updated beneficiary designations, a power of attorney, and a healthcare directive. The cost of not planning is far greater than the cost of planning.
+
+*Resources: Nolo Estate Planning Guide, AARP Estate Planning, Trust & Will (online estate planning), Investopedia Estate Planning Basics.*`,
     },
     {
       id: "pf-generational-wealth",
@@ -454,14 +453,6 @@ Research from the Brookings Institution shows that intergenerational wealth tran
 
 ### The Three Pillars of Generational Wealth
 
-\`\`\`concept
-{
-  "title": "The Three Pillars of Generational Wealth",
-  "variant": "mental-model",
-  "content": "Think of generational wealth as a three-legged stool. Remove any leg and the entire structure collapses:\\n\\n1. **Financial Assets** - The money and investments you can pass on\\n2. **Real Estate** - Property that appreciates and generates income\\n3. **Financial Literacy** - The knowledge that ensures the next generation can manage and grow what they receive\\n\\nMost families focus only on the first pillar, but without all three, wealth typically disappears within two generations."
-}
-\`\`\`
-
 **Pillar 1: Financial Assets**
 - Retirement accounts, investment portfolios, savings
 - These can be passed through beneficiary designations, trusts, and inheritance
@@ -480,14 +471,6 @@ Research from the Brookings Institution shows that intergenerational wealth tran
 ### The Shirtsleeves-to-Shirtsleeves Problem
 
 Research consistently shows that **70% of wealthy families lose their wealth by the second generation**, and **90% lose it by the third**. This phenomenon is known as "shirtsleeves to shirtsleeves in three generations."
-
-\`\`\`callout
-{
-  "type": "warning",
-  "title": "The 70/90 Rule Reality Check",
-  "content": "While these statistics are widely cited, they originate from a single 1987 study focused on business succession rather than overall family wealth preservation. However, the core insight remains valid: without proper planning and education, wealth tends to dissipate across generations. The real lesson is that building wealth is only half the battle — preserving it requires equal attention."
-}
-\`\`\`
 
 Common causes:
 - Heirs lack financial education
@@ -518,19 +501,21 @@ You cannot pour from an empty cup. Follow the principles from this course:
 
 ### Real-World Example: The Two Families
 
-\`\`\`compare
-{
-  "variant": "before-after",
-  "before": {
-    "label": "The Thompson Family: Starting Over Each Generation",
-    "code": "Generation 1: Earns $75,000/year, spends it all\\n- No savings or investments\\n- No financial education passed down\\n- House paid off by retirement\\n\\nGeneration 2: Starts from zero\\n- Takes on student loans and mortgage\\n- No inheritance received\\n- Repeats parents' spending patterns\\n\\nGeneration 3: The cycle continues\\n- No financial head start\\n- Accumulates debt early in adulthood\\n- Wealth gap grows exponentially"
-  },
-  "after": {
-    "label": "The Martinez Family: Compounding Across Generations",
-    "code": "Generation 1: Invests $500/month from age 30-65\\n- Portfolio grows to ~$1.13M at 8% return\\n- Teaches children budgeting and investing\\n- Creates estate plan with trusts\\n\\nGeneration 2: Receives $500,000 inheritance\\n- Already financially literate\\n- Continues investing strategy\\n- Adds $1,000/month to family portfolio\\n\\nGeneration 3: Starts with advantages\\n- College funded through 529 plans\\n- Receives down payment help for first home\\n- Inherits $2M+ and knows how to manage it"
-  }
-}
-\`\`\`
+**The Martinez Family:**
+- Parents invest \\$500/month in index funds starting at age 30
+- By 65: approximately \\$1,130,000
+- They teach their children about budgeting, investing, and compound interest
+- At death, children inherit remaining portfolio (tax-advantaged through stepped-up basis)
+- Children continue investing and add to the family's wealth
+- Grandchildren start life with both financial assets AND financial knowledge
+
+**The Thompson Family:**
+- Parents earn the same income but spend it all
+- No savings, no investments, no financial education for children
+- At death, nothing to pass on except possibly a paid-off house
+- Children start from zero, repeating the cycle
+
+Over three generations, the wealth gap between these families grows exponentially.
 
 ### Strategies for Transferring Wealth Tax-Efficiently
 
@@ -546,29 +531,15 @@ You cannot pour from an empty cup. Follow the principles from this course:
 
 ### Teaching Financial Literacy to Children
 
-\`\`\`steps
-{
-  "title": "Age-Appropriate Financial Education",
-  "steps": [
-    {
-      "title": "Ages 5-10: Foundation Building",
-      "content": "- **Allowance tied to chores** - Connect work with earning\\n- **Three-jar system** - Spend, Save, Give jars for money management\\n- **Basic concepts** - Understanding that money is earned and choices must be made\\n- **Games** - Monopoly Junior, The Game of Life for fun financial lessons"
-    },
-    {
-      "title": "Ages 11-14: Real-World Practice",
-      "content": "- **Bank account** - Open a savings account and explain interest\\n- **Budgeting basics** - Plan for desired purchases\\n- **Compound interest** - Show how money grows over time with the Rule of 72\\n- **Critical thinking** - Analyze advertising and understand marketing tactics"
-    },
-    {
-      "title": "Ages 15-18: Preparing for Independence",
-      "content": "- **Part-time job** - Earned income qualifies for Roth IRA contributions\\n- **Roth IRA** - Start investing early (even $500/year makes a difference)\\n- **Credit education** - How credit scores work and why they matter\\n- **College planning** - Understanding student loans, scholarships, and ROI"
-    },
-    {
-      "title": "Ages 18-25: Full Independence",
-      "content": "- **Complete financial toolkit** - Budgeting, taxes, investing, insurance\\n- **Investment strategy** - Asset allocation, index funds, tax-advantaged accounts\\n- **Debt management** - Student loans, credit cards, mortgage basics\\n- **Career planning** - Salary negotiation, benefits evaluation, entrepreneurship"
-    }
-  ]
-}
-\`\`\`
+Age-appropriate financial education is the highest-return investment you can make:
+
+**Ages 5-10:** Allowance tied to chores, saving jars (spend/save/give), basic concepts of earning and spending.
+
+**Ages 11-14:** Bank account, budgeting basics, the concept of compound interest, understanding advertising and marketing.
+
+**Ages 15-18:** Part-time job, Roth IRA (with earned income), investing basics, understanding credit, college financial planning.
+
+**Ages 18-25:** Full financial independence training — budgeting, taxes, investing, insurance, debt management.
 
 ### The Long View
 
@@ -582,18 +553,7 @@ Building generational wealth requires three things: accumulating financial asset
 
 > "Someone is sitting in the shade today because someone planted a tree a long time ago." — Warren Buffett
 
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Generational wealth includes both financial assets AND financial knowledge — without education, 70% of families lose wealth by the second generation",
-    "The three pillars are financial assets, real estate, and financial literacy — neglect any one and wealth typically disappears",
-    "Tax-efficient transfer strategies like annual gifting, 529 plans, and stepped-up basis can preserve more wealth for heirs",
-    "Start teaching financial literacy early and match lessons to your child's age and maturity level",
-    "Building generational wealth begins with securing your own financial foundation first — you can't transfer what you don't have"
-  ]
-}
-\`\`\``,
+*Resources: Brookings Institution Wealth Mobility Studies, The Millionaire Next Door by Thomas Stanley, Investopedia Generational Wealth Guide, Khan Academy Teaching Kids About Money.*`,
     },
   ],
 };

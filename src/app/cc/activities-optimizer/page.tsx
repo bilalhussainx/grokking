@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ArrowLeft, Loader2, Sparkles, ListOrdered, Search } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { ArrowLeft, Loader2, Sparkles, ListOrdered, Search, Pencil, Upload, GraduationCap, PenLine, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import SuggestionCard from "@/components/cc/activities/SuggestionCard";
 import ReorderPanel from "@/components/cc/activities/ReorderPanel";
 import GapAnalysis from "@/components/cc/activities/GapAnalysis";
+import ResumeUpload from "@/components/cc/activities/ResumeUpload";
+import BulletEditor from "@/components/cc/activities/BulletEditor";
 
-type Tab = "review" | "reorder" | "gaps";
+type Tab = "edit" | "review" | "reorder" | "gaps";
 
 interface ActivitySuggestion {
   position: number;
@@ -30,7 +32,15 @@ interface ActivityRow {
   organization: string | null;
   role: string | null;
   activity_type: string | null;
+  description_150: string | null;
   impact_score: number | null;
+}
+
+interface HonorRow {
+  position: number;
+  title: string | null;
+  level: string | null;
+  description_100: string | null;
 }
 
 interface OptimizeResult {
@@ -44,11 +54,22 @@ interface OptimizeResult {
 }
 
 export default function ActivitiesOptimizerPage() {
-  const [tab, setTab] = useState<Tab>("review");
+  const [tab, setTab] = useState<Tab>("edit");
   const [result, setResult] = useState<OptimizeResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [activities, setActivities] = useState<ActivityRow[]>([]);
+  const [honors, setHonors] = useState<HonorRow[]>([]);
   const [error, setError] = useState("");
+  const [showUpload, setShowUpload] = useState(false);
+
+  const loadProfile = useCallback(async () => {
+    try {
+      const res = await fetch("/api/cc/profile");
+      const d = await res.json();
+      if (d.activities) setActivities(d.activities);
+      if (d.honors) setHonors(d.honors);
+    } catch {}
+  }, []);
 
   const runOptimization = async () => {
     setLoading(true);
@@ -61,6 +82,7 @@ export default function ActivitiesOptimizerPage() {
         return;
       }
       setResult(data);
+      setTab("review");
     } catch {
       setError("Connection error — try again");
     } finally {
@@ -69,36 +91,25 @@ export default function ActivitiesOptimizerPage() {
   };
 
   useEffect(() => {
-    fetch("/api/cc/profile")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.activities) setActivities(d.activities);
-      })
-      .catch(() => {});
-  }, []);
+    loadProfile();
+  }, [loadProfile]);
 
-  const handleAcceptDescription = async (position: number, description: string) => {
-    await fetch("/api/cc/profile", {
+  const handleSaveActivity = async (position: number, description: string) => {
+    await fetch("/api/cc/profile/activities", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        section: "activity",
-        position,
-        data: { description_150: description },
-      }),
+      body: JSON.stringify({ position, description_150: description }),
     });
+    await loadProfile();
   };
 
-  const handleAcceptHonorDescription = async (position: number, description: string) => {
-    await fetch("/api/cc/profile", {
+  const handleSaveHonor = async (position: number, description: string) => {
+    await fetch("/api/cc/profile/honors", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        section: "honor",
-        position,
-        data: { description_100: description },
-      }),
+      body: JSON.stringify({ position, description_100: description }),
     });
+    await loadProfile();
   };
 
   const handleAcceptOrder = async (newOrder: number[]) => {
@@ -113,13 +124,17 @@ export default function ActivitiesOptimizerPage() {
         }),
       });
     }
+    await loadProfile();
   };
 
   const TABS = [
-    { key: "review" as Tab, label: "Review", icon: Sparkles },
-    { key: "reorder" as Tab, label: "Reorder", icon: ListOrdered },
-    { key: "gaps" as Tab, label: "Gaps", icon: Search },
+    { key: "edit" as Tab, label: "Edit", icon: Pencil },
+    { key: "review" as Tab, label: "Review", icon: Sparkles, requiresResult: true },
+    { key: "reorder" as Tab, label: "Reorder", icon: ListOrdered, requiresResult: true },
+    { key: "gaps" as Tab, label: "Gaps", icon: Search, requiresResult: true },
   ];
+
+  const hasContent = activities.length > 0 || honors.length > 0;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
@@ -127,131 +142,239 @@ export default function ActivitiesOptimizerPage() {
         <Link href="/profile" className="text-white/30 hover:text-white/50">
           <ArrowLeft className="w-4 h-4" />
         </Link>
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold text-white">Activities Optimizer</h1>
-          <p className="text-sm text-white/40 mt-0.5">AI analysis of your activities and honors</p>
+          <p className="text-sm text-white/40 mt-0.5">Edit bullets, get AI feedback, run full review</p>
+        </div>
+        <button
+          onClick={() => setShowUpload((v) => !v)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs hover:bg-white/10 transition-colors"
+        >
+          <Upload className="w-3.5 h-3.5" />
+          {showUpload ? "Hide" : "Import resume"}
+        </button>
+      </div>
+
+      {showUpload && <ResumeUpload onImported={() => { loadProfile(); setShowUpload(false); }} />}
+
+      {/* Tabs */}
+      <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 mb-6">
+        {TABS.map((t) => {
+          const disabled = t.requiresResult && !result;
+          return (
+            <button
+              key={t.key}
+              onClick={() => !disabled && setTab(t.key)}
+              disabled={disabled}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                tab === t.key
+                  ? "bg-[#D4AF37]/20 text-[#D4AF37]"
+                  : disabled
+                  ? "text-white/20 cursor-not-allowed"
+                  : "text-white/40 hover:text-white/60"
+              }`}
+            >
+              <t.icon className="w-3.5 h-3.5" />
+              {t.label}
+            </button>
+          );
+        })}
+
+        <div className="ml-auto">
+          <button
+            onClick={runOptimization}
+            disabled={loading || !hasContent}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#C4A030] disabled:opacity-40 transition-colors"
+          >
+            {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+            {loading ? "Analyzing..." : result ? "Re-analyze" : "Run full review"}
+          </button>
         </div>
       </div>
 
-      {!result && !loading && (
-        <div className="text-center py-16">
-          <Sparkles className="w-12 h-12 text-[#D4AF37]/40 mx-auto mb-4" />
-          <p className="text-sm text-white/50 mb-4">
-            Get AI-powered suggestions to strengthen your activities list
-          </p>
-          <button
-            onClick={runOptimization}
-            className="px-6 py-2.5 rounded-xl bg-[#D4AF37] text-black text-sm font-semibold hover:bg-[#C4A030] transition-colors"
-          >
-            Run Optimization
-          </button>
-          {error && <p className="text-xs text-red-400 mt-3">{error}</p>}
+      {error && <p className="text-xs text-red-400 mb-3">{error}</p>}
+
+      {tab === "edit" && (
+        <div className="space-y-4">
+          {!hasContent && (
+            <div className="text-center py-12 rounded-xl border border-white/10 bg-white/5">
+              <Sparkles className="w-8 h-8 text-[#D4AF37]/40 mx-auto mb-3" />
+              <p className="text-sm text-white/50 mb-2">No activities or honors yet</p>
+              <p className="text-xs text-white/30 mb-4">Import a resume or add entries from your profile</p>
+              <button
+                onClick={() => setShowUpload(true)}
+                className="px-4 py-2 rounded-lg bg-[#D4AF37]/10 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition-colors"
+              >
+                Import from resume
+              </button>
+            </div>
+          )}
+
+          {activities.length > 0 && (
+            <>
+              <h2 className="text-xs text-white/40 uppercase tracking-wide">Activities</h2>
+              {activities.map((a) => (
+                <BulletEditor
+                  key={`a-${a.position}`}
+                  position={a.position}
+                  kind="activity"
+                  label={a.organization || a.role || a.activity_type || `Activity ${a.position}`}
+                  initialText={a.description_150 || ""}
+                  charLimit={150}
+                  organization={a.organization}
+                  role={a.role}
+                  onSave={handleSaveActivity}
+                />
+              ))}
+            </>
+          )}
+
+          {honors.length > 0 && (
+            <>
+              <h2 className="text-xs text-white/40 uppercase tracking-wide mt-6">Honors</h2>
+              {honors.map((h) => (
+                <BulletEditor
+                  key={`h-${h.position}`}
+                  position={h.position}
+                  kind="honor"
+                  label={h.title || `Honor ${h.position}`}
+                  initialText={h.description_100 || ""}
+                  charLimit={100}
+                  organization={h.level}
+                  onSave={handleSaveHonor}
+                />
+              ))}
+            </>
+          )}
         </div>
       )}
 
-      {loading && (
+      {loading && tab !== "edit" && (
         <div className="text-center py-16">
           <Loader2 className="w-8 h-8 text-[#D4AF37] mx-auto mb-3 animate-spin" />
           <p className="text-sm text-white/40">Analyzing your activities and honors...</p>
         </div>
       )}
 
-      {result && (
-        <>
-          {/* Tabs */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 mb-6">
-            {TABS.map((t) => (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  tab === t.key
-                    ? "bg-[#D4AF37]/20 text-[#D4AF37]"
-                    : "text-white/40 hover:text-white/60"
-                }`}
-              >
-                <t.icon className="w-4 h-4" />
-                {t.label}
-              </button>
-            ))}
-
-            <div className="ml-auto">
-              <button
-                onClick={runOptimization}
-                disabled={loading}
-                className="px-3 py-1.5 rounded-lg text-xs text-white/30 hover:text-white/50 transition-colors"
-              >
-                Re-analyze
-              </button>
-            </div>
-          </div>
-
-          {/* Tab content */}
-          {tab === "review" && (
-            <div className="space-y-3">
-              {result.activities.length > 0 && (
-                <>
-                  <h2 className="text-xs text-white/40 uppercase tracking-wide">Activities</h2>
-                  {result.activities.map((a) => {
-                    const act = activities.find((x) => x.position === a.position);
-                    return (
-                      <SuggestionCard
-                        key={`act-${a.position}`}
-                        position={a.position}
-                        type="activity"
-                        label={act?.organization || act?.activity_type || `Activity ${a.position}`}
-                        currentDescription={a.currentDescription}
-                        suggestedDescription={a.suggestedDescription}
-                        impactScore={a.impactScore}
-                        impactReason={a.impactReason}
-                        suggestions={a.suggestions}
-                        charLimit={150}
-                        onAccept={handleAcceptDescription}
-                      />
-                    );
-                  })}
-                </>
-              )}
-
-              {result.honors.length > 0 && (
-                <>
-                  <h2 className="text-xs text-white/40 uppercase tracking-wide mt-6">Honors</h2>
-                  {result.honors.map((h) => (
-                    <SuggestionCard
-                      key={`hon-${h.position}`}
-                      position={h.position}
-                      type="honor"
-                      label={`Honor ${h.position}`}
-                      currentDescription={h.currentDescription}
-                      suggestedDescription={h.suggestedDescription}
-                      suggestions={h.suggestions}
-                      charLimit={100}
-                      onAccept={handleAcceptHonorDescription}
-                    />
-                  ))}
-                </>
-              )}
-            </div>
+      {result && tab === "review" && (
+        <div className="space-y-3">
+          {result.activities.length > 0 && (
+            <>
+              <h2 className="text-xs text-white/40 uppercase tracking-wide">Activities</h2>
+              {result.activities.map((a) => {
+                const act = activities.find((x) => x.position === a.position);
+                return (
+                  <SuggestionCard
+                    key={`act-${a.position}`}
+                    position={a.position}
+                    type="activity"
+                    label={act?.organization || act?.activity_type || `Activity ${a.position}`}
+                    currentDescription={a.currentDescription}
+                    suggestedDescription={a.suggestedDescription}
+                    impactScore={a.impactScore}
+                    impactReason={a.impactReason}
+                    suggestions={a.suggestions}
+                    charLimit={150}
+                    onAccept={handleSaveActivity}
+                  />
+                );
+              })}
+            </>
           )}
 
-          {tab === "reorder" && (
-            <ReorderPanel
-              activities={activities}
-              recommendedOrder={result.recommendedOrder}
-              rationale={result.orderingRationale}
-              onAcceptOrder={handleAcceptOrder}
-            />
+          {result.honors.length > 0 && (
+            <>
+              <h2 className="text-xs text-white/40 uppercase tracking-wide mt-6">Honors</h2>
+              {result.honors.map((h) => (
+                <SuggestionCard
+                  key={`hon-${h.position}`}
+                  position={h.position}
+                  type="honor"
+                  label={`Honor ${h.position}`}
+                  currentDescription={h.currentDescription}
+                  suggestedDescription={h.suggestedDescription}
+                  suggestions={h.suggestions}
+                  charLimit={100}
+                  onAccept={handleSaveHonor}
+                />
+              ))}
+            </>
           )}
-
-          {tab === "gaps" && (
-            <GapAnalysis
-              gaps={result.gaps}
-              flags={result.flags}
-              overallStrength={result.overallStrength}
-            />
-          )}
-        </>
+        </div>
       )}
+
+      {result && tab === "reorder" && (
+        <ReorderPanel
+          activities={activities}
+          recommendedOrder={result.recommendedOrder}
+          rationale={result.orderingRationale}
+          onAcceptOrder={handleAcceptOrder}
+        />
+      )}
+
+      {result && tab === "gaps" && (
+        <GapAnalysis
+          gaps={result.gaps}
+          flags={result.flags}
+          overallStrength={result.overallStrength}
+        />
+      )}
+
+      {result && (tab === "review" || tab === "gaps") && (
+        <SupplementHandoff strength={result.overallStrength} />
+      )}
+    </div>
+  );
+}
+
+function SupplementHandoff({ strength }: { strength: number }) {
+  const pct = Math.round(strength * 100);
+  const ready = pct >= 60;
+  const headline = ready
+    ? "Activities are in good shape — time to start supplements"
+    : "Polish the flagged bullets first, then jump into supplements";
+  const sub = ready
+    ? "Coach Kairos will pull these activities into every supplement brainstorm so you get topic ideas grounded in what you've actually done."
+    : "You can still start drafting — Coach uses your latest activities as brainstorm context, so updates flow through automatically.";
+
+  return (
+    <div className="mt-8 p-5 rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#D4AF37]/10 to-transparent">
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/20 flex items-center justify-center shrink-0">
+          <PenLine className="w-5 h-5 text-[#D4AF37]" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-white">{headline}</h3>
+          <p className="text-xs text-white/50 mt-1 leading-relaxed">{sub}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <Link
+          href="/my-schools"
+          className="flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#C4A030] transition-colors"
+        >
+          <span className="flex items-center gap-2">
+            <GraduationCap className="w-4 h-4" />
+            Pick a school &rarr; Supplements
+          </span>
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+        <Link
+          href="/cc/essays"
+          className="flex items-center justify-between gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white/70 text-xs font-semibold hover:bg-white/10 transition-colors"
+        >
+          <span className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            Open Coach Kairos (essays)
+          </span>
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
+      <p className="text-[11px] text-white/30 mt-3">
+        Tip: open a school from <span className="text-white/50">My Schools</span> &rarr; Supplements tab, then press
+        <span className="text-white/50"> Start</span> on any prompt. Coach opens in brainstorm mode with your activities already loaded.
+      </p>
     </div>
   );
 }

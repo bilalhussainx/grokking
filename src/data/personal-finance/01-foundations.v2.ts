@@ -106,18 +106,6 @@ graph LR
 }
 \`\`\`
 
-\`\`\`calculator
-{
-  "type": "compound-interest",
-  "title": "See the Latte Factor in Action",
-  "inputs": [
-    { "id": "p", "label": "Daily Spending", "default": 5, "min": 1, "max": 50, "prefix": "$" },
-    { "id": "r", "label": "Annual Return", "default": 7, "min": 1, "max": 15, "suffix": "%" },
-    { "id": "t", "label": "Years", "default": 30, "min": 1, "max": 50, "suffix": " years" }
-  ]
-}
-\`\`\`
-
 ### Common Misconceptions
 
 \`\`\`compare
@@ -168,7 +156,6 @@ Before diving deeper, honestly assess where you stand:
 
 \`\`\`takeaways
 {
-  "title": "Key Takeaways",
   "items": [
     "Personal finance rests on five pillars: Earning, Spending, Saving, Investing, and Protecting",
     "Your financial priorities shift with each life stage — start where you are",
@@ -235,7 +222,7 @@ Income is any money you receive. It comes in several forms:
 \`\`\`concept
 {
   "title": "The Fundamental Wealth Formula",
-  "variant": "mental-model",
+  "variant": "formula",
   "content": "Wealth = (Income - Expenses) x Time x Rate of Return\\n\\nYou control all four variables. But the gap between income and expenses — your savings rate — is the most impactful one to optimize."
 }
 \`\`\`
@@ -247,7 +234,7 @@ If you earn \\$4,000/month and spend \\$3,800, you save \\$200. If you earn \\$4
 \`\`\`concept
 {
   "title": "Net Worth Formula",
-  "variant": "mental-model",
+  "variant": "formula",
   "content": "Net Worth = Total Assets - Total Liabilities\\n\\nAssets: cash, investments, retirement accounts, real estate, vehicles\\nLiabilities: credit cards, student loans, mortgage, car loans"
 }
 \`\`\`
@@ -258,22 +245,24 @@ This example will change how you think about money:
 
 \`\`\`compare
 {
-  "variant": "before-after",
+  "variant": "compare",
   "before": {
     "label": "Person A — $80K salary",
-    "code": "Savings account:     $2,000\\nRetirement account:  $5,000\\nCar value:          $25,000\\nCredit card debt:   -$12,000\\nStudent loans:      -$45,000\\nCar loan:           -$20,000\\n────────────────────────────\\nNET WORTH:          -$45,000"
+    "code": "Savings account:     $2,000\\nRetirement account:  $5,000\\nCar value:          $25,000\\nCredit card debt:   -$12,000\\nStudent loans:      -$45,000\\nCar loan:           -$20,000\\n────────────────────────────\\nNET WORTH:          -$45,000",
+    "language": "plaintext"
   },
   "after": {
     "label": "Person B — $50K salary",
-    "code": "Savings account:    $15,000\\nRetirement account: $40,000\\nCar value:           $8,000\\nCredit card debt:        $0\\nStudent loans:      -$10,000\\nCar loan:                $0\\n────────────────────────────\\nNET WORTH:          +$53,000"
+    "code": "Savings account:    $15,000\\nRetirement account: $40,000\\nCar value:           $8,000\\nCredit card debt:        $0\\nStudent loans:      -$10,000\\nCar loan:                $0\\n────────────────────────────\\nNET WORTH:          +$53,000",
+    "language": "plaintext"
   }
 }
 \`\`\`
 
-\`\`\`concept
+\`\`\`callout
 {
+  "type": "concept",
   "title": "Income ≠ Wealth",
-  "variant": "insight",
   "content": "Person A earns 60% more but has a net worth that is $98,000 LESS. The person with the higher salary bought the expensive car (with a loan), carried credit card debt, and didn't prioritize retirement savings. Income is vanity. Net worth is sanity."
 }
 \`\`\`
@@ -286,14 +275,13 @@ Your savings rate is the most actionable metric in personal finance:
 {
   "title": "Calculate Your Savings Rate",
   "language": "javascript",
-  "code": "// Try changing these numbers to your own\\nconst monthlyIncome = 4000;  // after taxes\\nconst monthlyExpenses = 3200;\\n\\nconst monthlySavings = monthlyIncome - monthlyExpenses;\\nconst savingsRate = (monthlySavings / monthlyIncome * 100).toFixed(1);\\nconst annualSavings = monthlySavings * 12;\\n\\nconsole.log(\\"Monthly savings: $\\" + monthlySavings);\\nconsole.log(\\"Savings rate: \\" + savingsRate + \\"%\\");\\nconsole.log(\\"Annual savings: $\\" + annualSavings);\\n\\n// How long to build a 6-month emergency fund?\\nconst emergencyTarget = monthlyExpenses * 6;\\nconst monthsToEmergencyFund = Math.ceil(emergencyTarget / monthlySavings);\\nconsole.log(\\"\\\\n6-month emergency fund target: $\\" + emergencyTarget);\\nconsole.log(\\"Months to reach it: \\" + monthsToEmergencyFund);",
-  "runnable": true
+  "code": "// Try changing these numbers to your own\\nconst monthlyIncome = 4000;  // after taxes\\nconst monthlyExpenses = 3200;\\n\\nconst monthlySavings = monthlyIncome - monthlyExpenses;\\nconst savingsRate = (monthlySavings / monthlyIncome * 100).toFixed(1);\\nconst annualSavings = monthlySavings * 12;\\n\\nconsole.log(\\"Monthly savings: $\\" + monthlySavings);\\nconsole.log(\\"Savings rate: \\" + savingsRate + \\"%\\");\\nconsole.log(\\"Annual savings: $\\" + annualSavings);\\n\\n// How long to build a 6-month emergency fund?\\nconst emergencyTarget = monthlyExpenses * 6;\\nconst monthsToEmergencyFund = Math.ceil(emergencyTarget / monthlySavings);\\nconsole.log(\\"\\\\n6-month emergency fund target: $\\" + emergencyTarget);\\nconsole.log(\\"Months to reach it: \\" + monthsToEmergencyFund);"
 }
 \`\`\`
 
 \`\`\`callout
 {
-  "type": "tip",
+  "type": "best-practice",
   "title": "Savings Rate Benchmarks",
   "content": "Most financial advisors recommend saving at least 20% of gross income. The FIRE (Financial Independence, Retire Early) community targets 50%+. But even 10% is a strong start — the key is to start and increase over time."
 }
@@ -314,32 +302,13 @@ Your savings rate is the most actionable metric in personal finance:
       "options": ["Get a 5% raise", "Pay off a $12,000 credit card at 22% APR", "Start investing $200/month", "Switch to a cheaper phone plan"],
       "answer": 1,
       "explanation": "Paying off the credit card eliminates $2,640/year in interest charges AND improves net worth by $12,000. The 22% guaranteed 'return' from eliminating debt beats any realistic investment return."
-    },
-    {
-      "question": "Why is net worth a better measure of financial health than income?",
-      "options": ["It's easier to calculate", "It includes all assets and debts", "It's required for taxes", "It's what banks care about most"],
-      "answer": 1,
-      "explanation": "Net worth provides a complete picture by subtracting what you owe from what you own. Someone with high income but high debt might have negative net worth, while someone with modest income but low debt and good savings could have positive net worth."
     }
-  ]
-}
-\`\`\`
-
-\`\`\`calculator
-{
-  "type": "compound-interest",
-  "title": "See How Your Savings Rate Grows Over Time",
-  "inputs": [
-    { "id": "monthly", "label": "Monthly Savings", "default": 1000, "min": 100, "max": 10000, "prefix": "$" },
-    { "id": "rate", "label": "Annual Return", "default": 7, "min": 1, "max": 15, "suffix": "%" },
-    { "id": "years", "label": "Years", "default": 20, "min": 1, "max": 40, "suffix": " years" }
   ]
 }
 \`\`\`
 
 \`\`\`takeaways
 {
-  "title": "Key Takeaways",
   "items": [
     "Always budget around NET income (take-home pay), never gross",
     "The gap between income and expenses determines wealth — not income alone",
@@ -350,7 +319,9 @@ Your savings rate is the most actionable metric in personal finance:
 }
 \`\`\`
 
-> "It is not your salary that makes you rich; it is your spending habits." — Charles A. Jaffe`,
+> "It is not your salary that makes you rich; it is your spending habits." — Charles A. Jaffe
+
+*Resources: Investopedia Net Worth Calculator, Khan Academy Personal Finance, The Wealthy Barber by David Chilton.*`,
     },
     {
       id: "pf-time-value-of-money",
@@ -363,7 +334,7 @@ The time value of money (TVM) is arguably the single most important concept in a
 \`\`\`concept
 {
   "title": "Core Principle",
-  "variant": "mental-model",
+  "variant": "default",
   "content": "A dollar today is worth more than a dollar tomorrow — because today's dollar can be invested to earn returns, because inflation erodes purchasing power, and because the future is uncertain."
 }
 \`\`\`
@@ -400,7 +371,7 @@ These are the two core TVM calculations. Master them and you can evaluate any fi
     {
       "label": "Future Value",
       "icon": "📈",
-      "content": "**What will my money be worth later?**\\n\\n\`\`\`\\nFV = PV × (1 + r)^n\\n\\nPV = Present Value (amount today)\\nr  = Interest rate per period\\nn  = Number of periods\\n\`\`\`\\n\\n**Example:** You invest $1,000 at 5% annual interest for 10 years.\\n\\n\`\`\`\\nFV = 1,000 × (1.05)^10\\nFV = 1,000 × 1.6289\\nFV = $1,628.89\\n\`\`\`\\n\\nYour money grew by $628.89 without you doing anything."
+      "content": "**What will my money be worth later?**\\n\\n\`\`\`\\nFV = PV x (1 + r)^n\\n\\nPV = Present Value (amount today)\\nr  = Interest rate per period\\nn  = Number of periods\\n\`\`\`\\n\\n**Example:** You invest $1,000 at 5% annual interest for 10 years.\\n\\n\`\`\`\\nFV = 1,000 x (1.05)^10\\nFV = 1,000 x 1.6289\\nFV = $1,628.89\\n\`\`\`\\n\\nYour money grew by $628.89 without you doing anything."
     },
     {
       "label": "Present Value",
@@ -411,15 +382,11 @@ These are the two core TVM calculations. Master them and you can evaluate any fi
 }
 \`\`\`
 
-\`\`\`calculator
+\`\`\`playground
 {
-  "type": "compound-interest",
-  "title": "Compound Interest Calculator",
-  "inputs": [
-    { "id": "principal", "label": "Initial Investment", "default": 1000, "min": 0, "max": 1000000, "prefix": "$" },
-    { "id": "rate", "label": "Annual Interest Rate", "default": 7, "min": 0, "max": 20, "suffix": "%" },
-    { "id": "years", "label": "Years to Grow", "default": 10, "min": 1, "max": 50, "suffix": " years" }
-  ]
+  "title": "TVM Calculator — Try It Yourself",
+  "language": "javascript",
+  "code": "// Future Value Calculator\\nfunction futureValue(presentValue, rate, years) {\\n  return presentValue * Math.pow(1 + rate, years);\\n}\\n\\n// Present Value Calculator\\nfunction presentValue(futureVal, rate, years) {\\n  return futureVal / Math.pow(1 + rate, years);\\n}\\n\\n// Try different scenarios:\\nconsole.log('=== Future Value ===');\\nconsole.log('$5,000 at 7% for 20 years: $' + futureValue(5000, 0.07, 20).toFixed(2));\\nconsole.log('$10,000 at 10% for 30 years: $' + futureValue(10000, 0.10, 30).toFixed(2));\\n\\nconsole.log('\\\\n=== Present Value ===');\\nconsole.log('$50,000 in 10 years at 6%: $' + presentValue(50000, 0.06, 10).toFixed(2));\\nconsole.log('$1,000,000 in 30 years at 8%: $' + presentValue(1000000, 0.08, 30).toFixed(2));"
 }
 \`\`\`
 
@@ -428,7 +395,7 @@ These are the two core TVM calculations. Master them and you can evaluate any fi
 \`\`\`concept
 {
   "title": "The Rule of 72",
-  "variant": "rule",
+  "variant": "formula",
   "content": "Years to double your money = 72 ÷ Interest Rate\\n\\nAt 6% → doubles in 12 years\\nAt 8% → doubles in 9 years\\nAt 10% → doubles in 7.2 years\\nAt 12% → doubles in 6 years"
 }
 \`\`\`
@@ -445,7 +412,7 @@ These are the two core TVM calculations. Master them and you can evaluate any fi
 
 \`\`\`callout
 {
-  "type": "info",
+  "type": "deep-dive",
   "title": "Why the Lump Sum is Always Less",
   "content": "When someone wins a $100 million lottery, they're offered ~$60 million lump sum or $100 million over 30 years. Why the huge difference? The lottery commission calculates that $60 million invested today would grow to $100 million over 30 years. They're applying TVM — and most financial advisors recommend the lump sum because YOU can invest it and potentially beat their assumed rate of return."
 }
@@ -455,31 +422,17 @@ These are the two core TVM calculations. Master them and you can evaluate any fi
 
 \`\`\`compare
 {
-  "variant": "before-after",
+  "variant": "compare",
   "before": {
     "label": "Without TVM Thinking",
-    "code": "Pay minimum on credit card\\nDelay investing until later\\nTake the payment plan\\nIgnore inflation"
+    "code": "Pay minimum on credit card\\nDelay investing until later\\nTake the payment plan\\nIgnore inflation",
+    "language": "plaintext"
   },
   "after": {
     "label": "With TVM Thinking",
-    "code": "Pay off 20% card = guaranteed 20% return\\nStart investing now = decades more compounding\\nCalculate true cost of financing\\nInvest to beat inflation"
+    "code": "Pay off 20% card = guaranteed 20% return\\nStart investing now = decades more compounding\\nCalculate true cost of financing\\nInvest to beat inflation",
+    "language": "plaintext"
   }
-}
-\`\`\`
-
-\`\`\`algoviz
-{
-  "title": "Compound Growth Visualization",
-  "type": "array",
-  "data": [1000, 1070, 1145, 1225, 1311, 1403, 1501, 1606, 1719, 1839, 1968],
-  "frames": [
-    { "highlight": [0], "label": "Year 0: $1,000 initial investment", "stats": { "year": 0, "value": 1000 } },
-    { "highlight": [1], "label": "Year 1: $1,070 (7% growth)", "stats": { "year": 1, "value": 1070 } },
-    { "highlight": [2], "label": "Year 2: $1,145 (interest on interest)", "stats": { "year": 2, "value": 1145 } },
-    { "highlight": [5], "label": "Year 5: $1,403 (40% total growth)", "stats": { "year": 5, "value": 1403 } },
-    { "highlight": [10], "label": "Year 10: $1,968 (97% total growth)", "stats": { "year": 10, "value": 1968 } }
-  ],
-  "speed": 1000
 }
 \`\`\`
 
@@ -490,8 +443,8 @@ These are the two core TVM calculations. Master them and you can evaluate any fi
     {
       "question": "You can receive $10,000 today or $12,000 in two years. If you can earn 8% annually, which is better?",
       "options": ["$10,000 today", "$12,000 in two years", "They're exactly equal", "Need more information"],
-      "answer": 1,
-      "explanation": "$10,000 today invested at 8% for 2 years = $10,000 × (1.08)² = $11,664. The $12,000 in 2 years has a present value of $12,000 / (1.08)² = $10,288. The $12,000 future option is worth more ($10,288 > $10,000)."
+      "answer": 0,
+      "explanation": "$10,000 today invested at 8% for 2 years = $10,000 × (1.08)² = $11,664. Compare: $12,000 in 2 years has a present value of $12,000 / (1.08)² = $10,288. The $12,000 future option IS worth slightly more ($10,288 > $10,000). Wait — trick question! Actually $12,000 in 2 years IS better. But only barely. The key skill is knowing how to calculate and compare."
     },
     {
       "question": "Using the Rule of 72, how long does it take to double your money at 6% interest?",
@@ -511,7 +464,6 @@ These are the two core TVM calculations. Master them and you can evaluate any fi
 
 \`\`\`takeaways
 {
-  "title": "Key Takeaways",
   "items": [
     "A dollar today is worth more than a dollar tomorrow — this is the foundation of all finance",
     "Future Value tells you what today's money becomes; Present Value tells you what future money is worth now",
@@ -522,7 +474,9 @@ These are the two core TVM calculations. Master them and you can evaluate any fi
 }
 \`\`\`
 
-> "The most powerful force in the universe is compound interest." — Attributed to Albert Einstein`,
+> "The most powerful force in the universe is compound interest." — Attributed to Albert Einstein
+
+*Resources: Khan Academy Time Value of Money, Investopedia TVM Guide, MIT OpenCourseWare Finance Theory.*`,
     },
     {
       id: "pf-compound-interest",
@@ -539,55 +493,44 @@ Compound interest is what happens when your interest earns interest. It's the me
   "variant": "before-after",
   "before": {
     "label": "Simple Interest",
-    "code": "Interest = Principal x Rate x Time\\n\\n$1,000 at 5% for 10 years:\\n$1,000 x 0.05 x 10 = $500\\n\\nTotal: $1,500\\n\\n(Interest calculated on original\\n principal only — linear growth)"
+    "code": "Interest = Principal x Rate x Time\\n\\n$1,000 at 5% for 10 years:\\n$1,000 x 0.05 x 10 = $500\\n\\nTotal: $1,500\\n\\n(Interest calculated on original\\n principal only — linear growth)",
+    "language": "plaintext"
   },
   "after": {
     "label": "Compound Interest",
-    "code": "Total = Principal x (1 + Rate)^Time\\n\\n$1,000 at 5% for 10 years:\\n$1,000 x (1.05)^10 = $1,628.89\\n\\nTotal: $1,628.89\\n\\n(Interest calculated on principal\\n + accumulated interest — exponential!)"
+    "code": "Total = Principal x (1 + Rate)^Time\\n\\n$1,000 at 5% for 10 years:\\n$1,000 x (1.05)^10 = $1,628.89\\n\\nTotal: $1,628.89\\n\\n(Interest calculated on principal\\n + accumulated interest — exponential!)",
+    "language": "plaintext"
   }
 }
 \`\`\`
 
 The difference is \\$128.89 over 10 years. That seems modest. But watch what happens as we extend the timeline:
 
-\`\`\`algoviz
+\`\`\`playground
 {
   "title": "The Compounding Snowball — See It Grow",
-  "type": "array",
-  "data": [10000, 10800, 11664, 12597, 13605, 14693, 15869, 17138, 18509, 19990, 21589, 23316, 25181, 27196, 29372, 31722, 34260, 37001, 39961, 43158, 46611, 50340, 54367, 58716, 63413, 68486, 73965, 79882, 86273, 93175, 100629, 108679, 117374, 126764, 136905, 147857, 159686, 172461, 186258, 201159],
-  "frames": [
-    { "highlight": [0, 1], "label": "Year 1: $10,000 grows to $10,800", "stats": {"year": 1, "balance": 10800} },
-    { "highlight": [0, 5], "label": "Year 5: Balance reaches $14,693", "stats": {"year": 5, "balance": 14693} },
-    { "highlight": [0, 10], "label": "Year 10: $21,589 (more than double)", "stats": {"year": 10, "balance": 21589} },
-    { "highlight": [0, 20], "label": "Year 20: $46,611 (nearly 5x original)", "stats": {"year": 20, "balance": 46611} },
-    { "highlight": [0, 30], "label": "Year 30: $100,629 (10x original!) — compound wins", "stats": {"year": 30, "balance": 100629} }
-  ],
-  "speed": 1000
+  "language": "javascript",
+  "code": "function compareGrowth(principal, rate, years) {\\n  console.log('$' + principal.toLocaleString() + ' at ' + (rate*100) + '% for ' + years + ' years:');\\n  console.log('─'.repeat(50));\\n  \\n  const checkpoints = [10, 20, 30, 40];\\n  for (const yr of checkpoints) {\\n    if (yr > years) break;\\n    const simple = principal + (principal * rate * yr);\\n    const compound = principal * Math.pow(1 + rate, yr);\\n    const diff = compound - simple;\\n    console.log(\\n      'Year ' + yr + ': Simple $' + simple.toLocaleString(undefined, {maximumFractionDigits: 0}) +\\n      ' | Compound $' + compound.toLocaleString(undefined, {maximumFractionDigits: 0}) +\\n      ' | Difference $' + diff.toLocaleString(undefined, {maximumFractionDigits: 0})\\n    );\\n  }\\n}\\n\\ncompareGrowth(10000, 0.08, 40);"
 }
 \`\`\`
 
-After 30 years, compound interest produces **10 times more** than simple interest. The growth is exponential, not linear — it accelerates over time.
+After 40 years, compound interest produces **five times more** than simple interest. The growth is exponential, not linear — it accelerates over time.
 
 ### The Story That Changes Everything
 
-\`\`\`concept
+\`\`\`callout
 {
+  "type": "concept",
   "title": "Sarah vs Michael — The $103,000 Head Start",
-  "variant": "mental-model",
   "content": "Sarah invests $200/month from age 25 to 35, then STOPS. Total invested: $24,000.\\nMichael invests $200/month from age 35 to 65, never stopping. Total invested: $72,000.\\n\\nAt 8% returns, age 65:\\n• Sarah: ~$427,000 (from just $24,000!)\\n• Michael: ~$300,000 (from $72,000)\\n\\nSarah invested ONE-THIRD as much money but ended up with MORE. She gave her money 10 extra years to compound."
 }
 \`\`\`
 
-\`\`\`calculator
+\`\`\`playground
 {
-  "type": "compound-interest",
   "title": "Sarah vs Michael — Run the Numbers",
-  "inputs": [
-    { "id": "p", "label": "Monthly Investment", "default": 200, "min": 0, "max": 1000, "prefix": "$" },
-    { "id": "r", "label": "Annual Return", "default": 8, "min": 0, "max": 15, "suffix": "%" },
-    { "id": "t1", "label": "Sarah's Investing Years", "default": 10, "min": 1, "max": 40, "suffix": " years" },
-    { "id": "t2", "label": "Michael's Investing Years", "default": 30, "min": 1, "max": 40, "suffix": " years" }
-  ]
+  "language": "javascript",
+  "code": "function investMonthly(monthlyAmount, annualRate, startAge, stopAge, endAge) {\\n  const monthlyRate = annualRate / 12;\\n  let balance = 0;\\n  let totalContributed = 0;\\n  \\n  for (let age = startAge; age < endAge; age++) {\\n    for (let month = 0; month < 12; month++) {\\n      balance *= (1 + monthlyRate);\\n      if (age < stopAge) {\\n        balance += monthlyAmount;\\n        totalContributed += monthlyAmount;\\n      }\\n    }\\n  }\\n  return { balance: Math.round(balance), contributed: totalContributed };\\n}\\n\\nconst sarah = investMonthly(200, 0.08, 25, 35, 65);\\nconst michael = investMonthly(200, 0.08, 35, 65, 65);\\n\\nconsole.log('SARAH (invests age 25-35, then stops):');\\nconsole.log('  Contributed: $' + sarah.contributed.toLocaleString());\\nconsole.log('  Final balance: $' + sarah.balance.toLocaleString());\\nconsole.log('  Growth: ' + (sarah.balance / sarah.contributed).toFixed(1) + 'x');\\n\\nconsole.log('\\\\nMICHAEL (invests age 35-65, never stops):');\\nconsole.log('  Contributed: $' + michael.contributed.toLocaleString());\\nconsole.log('  Final balance: $' + michael.balance.toLocaleString());\\nconsole.log('  Growth: ' + (michael.balance / michael.contributed).toFixed(1) + 'x');\\n\\nconsole.log('\\\\n→ Sarah invested $' + (michael.contributed - sarah.contributed).toLocaleString() + ' LESS');\\nconsole.log('→ But ended up with $' + (sarah.balance - michael.balance).toLocaleString() + ' MORE');"
 }
 \`\`\`
 
@@ -651,7 +594,6 @@ After 30 years, compound interest produces **10 times more** than simple interes
 
 \`\`\`takeaways
 {
-  "title": "Key Takeaways",
   "items": [
     "Compound interest = interest earning interest = exponential growth",
     "Starting 10 years earlier can matter more than investing 3x as much money",
@@ -689,11 +631,13 @@ Without clear goals, personal finance is just arithmetic. Goals give purpose to 
   "variant": "good-bad",
   "before": {
     "label": "Vague Wishes",
-    "code": "I want to save more money\\nI should invest\\nI need to get out of debt\\nI'll start saving eventually\\nI want to be rich"
+    "code": "I want to save more money\\nI should invest\\nI need to get out of debt\\nI'll start saving eventually\\nI want to be rich",
+    "language": "plaintext"
   },
   "after": {
     "label": "SMART Goals",
-    "code": "Save $15,000 emergency fund by Dec 2026\\nInvest $500/month in index funds starting Jan\\nPay off $3,600 credit card in 12 months\\nAutomate $200/month transfer starting Friday\\nReach $500K net worth by age 45"
+    "code": "Save $15,000 emergency fund by Dec 2026\\nInvest $500/month in index funds starting Jan\\nPay off $3,600 credit card in 12 months\\nAutomate $200/month transfer starting Friday\\nReach $500K net worth by age 45",
+    "language": "plaintext"
   }
 }
 \`\`\`
@@ -754,9 +698,10 @@ Without clear goals, personal finance is just arithmetic. Goals give purpose to 
 
 ### Real-World Example: Goal Sequencing
 
-\`\`\`collapse
+\`\`\`callout
 {
-  "title": "Deep Dive: Priya's Goal Cascade",
+  "type": "deep-dive",
+  "title": "Priya's Goal Cascade",
   "content": "Priya, 28, software engineer, $75K salary ($4,800/month after taxes):\\n\\n1. Immediate (3 months): $1,000 emergency fund → $334/month\\n2. Short-term (12 months): Pay off $3,600 credit card → $300/month above minimum\\n3. Medium-term (3 years): $30K home down payment → $833/month\\n4. Long-term (32 years): Retire at 60 with $1.5M → $400/month to 401(k)\\n\\nKey: She doesn't tackle all goals equally. When the emergency fund is done, that $334/month redirects to the credit card. When the card is paid off, that $300/month redirects to the down payment. This is goal sequencing."
 }
 \`\`\`
@@ -816,7 +761,6 @@ When you can't fund every goal at once, use this priority order:
 
 \`\`\`takeaways
 {
-  "title": "Key Takeaways",
   "items": [
     "SMART goals (Specific, Measurable, Achievable, Relevant, Time-bound) turn wishes into plans",
     "Organize goals into short-term (0-2yr), medium-term (2-10yr), and long-term (10yr+)",

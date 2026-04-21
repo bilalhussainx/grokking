@@ -90,15 +90,9 @@ Debt is a tool — like fire, it can warm your house or burn it down. Good debt 
 
 Your credit score is a three-digit number that summarizes your creditworthiness. It affects your ability to borrow money, the interest rates you pay, and even your ability to rent an apartment or get certain jobs. Understanding how it works gives you the power to improve it.
 
-\`\`\`concept
-{
-  "title": "What Is a Credit Score?",
-  "variant": "mental-model",
-  "content": "Think of your credit score as a financial report card that lenders use to predict how likely you are to repay borrowed money. Just like a GPA summarizes your academic performance, your credit score summarizes your credit behavior in one number ranging from 300-850."
-}
-\`\`\`
+### What Is a Credit Score?
 
-### Credit Score Ranges & Impact
+Credit scores range from 300 to 850 (FICO model). Higher is better:
 
 | Range | Rating | Impact |
 |-------|--------|--------|
@@ -110,34 +104,17 @@ Your credit score is a three-digit number that summarizes your creditworthiness.
 
 The average FICO score in the US is approximately 715 (as of 2023, per Experian).
 
-### The Five Factors That Build Your Score
+### The Five Factors
 
-\`\`\`tabs
-{
-  "tabs": [
-    {
-      "label": "Payment History (35%)",
-      "content": "**The Most Important Factor**\\n\\n- Measures whether you pay bills on time\\n- Even one 30-day late payment can drop your score 50-100 points\\n- Stays on your report for 7 years from the first missed payment\\n\\n**Pro tip:** Set up autopay for at least the minimum payment to never miss a due date."
-    },
-    {
-      "label": "Credit Utilization (30%)",
-      "content": "**Your Debt-to-Credit Ratio**\\n\\n- Formula: Balance ÷ Credit Limit × 100\\n- Keep below 30%, ideally below 10%\\n- Measured on statement closing date, not due date\\n\\n**Example:** $2,500 balance on $10,000 limit = 25% utilization"
-    },
-    {
-      "label": "Length of History (15%)",
-      "content": "**Time Builds Trust**\\n\\n- Average age of all your credit accounts\\n- Older accounts help your score more\\n- Closing old accounts can hurt your score\\n\\n**Keep old cards open** even if you rarely use them."
-    },
-    {
-      "label": "Credit Mix (10%)",
-      "content": "**Diversity Matters**\\n\\n- Shows you can handle different types of credit\\n- Includes credit cards, auto loans, mortgages, student loans\\n- Don't open accounts just for mix - it's the least important factor"
-    },
-    {
-      "label": "New Credit (10%)",
-      "content": "**Recent Activity**\\n\\n- Too many applications signal financial stress\\n- Hard inquiries stay for 2 years but only affect score for 1 year\\n- Rate shopping for mortgages/auto loans counts as one inquiry if within 14-45 days"
-    }
-  ]
-}
-\`\`\`
+Your FICO score is calculated from five weighted factors:
+
+| Factor | Weight | What It Measures |
+|--------|--------|-----------------|
+| **Payment history** | 35% | Do you pay on time? Even one 30-day late payment can drop your score 50-100 points |
+| **Credit utilization** | 30% | How much of your available credit are you using? Keep below 30%, ideally below 10% |
+| **Length of credit history** | 15% | How long have your accounts been open? Older is better |
+| **Credit mix** | 10% | Do you have different types of credit? (cards, auto, mortgage, student loans) |
+| **New credit inquiries** | 10% | How many new accounts or applications recently? Too many signals risk |
 
 ### Credit Utilization Deep Dive
 
@@ -147,42 +124,14 @@ Credit utilization is the ratio of your balance to your credit limit:
 Utilization = Balance / Credit Limit x 100
 \`\`\`
 
-**Example:** You have a credit card with a $10,000 limit and a $2,500 balance. Your utilization is 25%.
+**Example:** You have a credit card with a \\$10,000 limit and a \\$2,500 balance. Your utilization is 25%.
 
-| Utilization Range | Impact on Score |
-|------------------|-----------------|
-| 0-9% | Excellent |
-| 10-29% | Good |
-| 30-49% | Fair — hurting your score |
-| 50%+ | Poor — significantly damaging |
+- **0-9%**: Excellent impact on score
+- **10-29%**: Good
+- **30-49%**: Fair — hurting your score
+- **50%+**: Poor — significantly damaging
 
 **Pro tip:** Utilization is typically measured on your statement closing date, not your due date. Paying your balance before the statement closes can show lower utilization to the bureaus.
-
-\`\`\`quiz
-{
-  "title": "Test Your Credit Knowledge",
-  "questions": [
-    {
-      "question": "Which factor has the biggest impact on your credit score?",
-      "options": ["Credit utilization", "Payment history", "Length of credit history", "Credit mix"],
-      "answer": 1,
-      "explanation": "Payment history accounts for 35% of your FICO score, making it the most important factor. Even one late payment can significantly damage your score."
-    },
-    {
-      "question": "What's the recommended maximum credit utilization ratio?",
-      "options": ["50%", "30%", "10%", "No limit"],
-      "answer": 1,
-      "explanation": "Experts recommend keeping your credit utilization below 30%, with under 10% being ideal for the highest scores."
-    },
-    {
-      "question": "How long does a late payment stay on your credit report?",
-      "options": ["1 year", "3 years", "7 years", "10 years"],
-      "answer": 2,
-      "explanation": "Late payments remain on your credit report for 7 years from the date of the first missed payment, though their impact lessens over time."
-    }
-  ]
-}
-\`\`\`
 
 ### Credit Reports: The Full Picture
 
@@ -203,36 +152,17 @@ You are entitled to **one free credit report per year** from each bureau at **An
 - Incorrect balances or late payments
 - Outdated negative information (most negatives fall off after 7 years)
 
-\`\`\`callout
-{
-  "type": "warning",
-  "title": "Beware of Imposter Sites",
-  "content": "Only use AnnualCreditReport.com for your free reports. Many sites with similar names try to sell you services or collect your personal information. The government-authorized site will never ask for payment information for your free annual reports."
-}
-\`\`\`
-
 ### Real-World Example: Score Impact
 
-Sarah has a 750 credit score. She is shopping for a $300,000 30-year fixed mortgage.
+Sarah has a 750 credit score. She is shopping for a \\$300,000 30-year fixed mortgage.
 
 | Credit Score | Estimated APR | Monthly Payment | Total Interest Paid |
 |-------------|--------------|----------------|-------------------|
-| 750+ | 6.5% | $1,896 | $382,560 |
-| 680 | 7.1% | $2,014 | $425,040 |
-| 620 | 7.8% | $2,155 | $475,800 |
+| 750+ | 6.5% | \\$1,896 | \\$382,560 |
+| 680 | 7.1% | \\$2,014 | \\$425,040 |
+| 620 | 7.8% | \\$2,155 | \\$475,800 |
 
-The difference between a 750 and 620 score costs **$93,240 over the life of the loan**. Your credit score is literally worth tens of thousands of dollars.
-
-\`\`\`calculator
-{
-  "type": "loan",
-  "title": "See How Your Score Affects Your Mortgage",
-  "inputs": [
-    { "id": "principal", "label": "Loan Amount", "default": 300000, "min": 50000, "max": 1000000, "prefix": "$" },
-    { "id": "score", "label": "Credit Score", "default": 750, "min": 300, "max": 850 }
-  ]
-}
-\`\`\`
+The difference between a 750 and 620 score costs **\\$93,240 over the life of the loan**. Your credit score is literally worth tens of thousands of dollars.
 
 ### How to Improve Your Credit Score
 
@@ -242,26 +172,11 @@ The difference between a 750 and 620 score costs **$93,240 over the life of the 
 4. **Limit hard inquiries** — Only apply for credit when you truly need it
 5. **Dispute errors** — File disputes online through each bureau's website
 
-\`\`\`callout
-{
-  "type": "tip",
-  "title": "Quick Wins for Your Score",
-  "content": "1. Pay down credit card balances before your statement closes to show lower utilization\\n2. Ask for credit limit increases (but don't use the extra credit)\\n3. Become an authorized user on a family member's old, well-managed account\\n4. Use a secured credit card if you need to build credit from scratch"
-}
-\`\`\`
+### Key Takeaway
 
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Your credit score is one of the most consequential numbers in your financial life, potentially worth six figures over a lifetime",
-    "Payment history (35%) and credit utilization (30%) make up nearly two-thirds of your FICO score",
-    "Check your credit reports annually at AnnualCreditReport.com for errors and fraud",
-    "Keep credit utilization below 30% and pay every bill on time for the biggest score improvements",
-    "The difference between good and poor credit can cost you $93,000+ on a typical mortgage"
-  ]
-}
-\`\`\``,
+Your credit score is one of the most consequential numbers in your financial life. It is built on five factors you can control, and the difference between a good and poor score can cost you six figures over a lifetime. Check your credit report annually, pay on time, and keep utilization low.
+
+*Resources: AnnualCreditReport.com, MyFICO.com, Experian Credit Education, Khan Academy Credit.*`,
     },
     {
       id: "pf-avalanche-vs-snowball",
@@ -368,114 +283,92 @@ Both the avalanche and snowball methods work. The avalanche saves money; the sno
       title: "Student Loans: Repayment Strategies",
       content: `## Student Loans: Repayment Strategies
 
-Student-loan debt in the United States totals **$1.77 trillion**, held by about **43.5 million borrowers**.  
-The average balance is **$37,000**—roughly the price of a new car, but with no trade-in option.
+Student loan debt in the United States totals over \\$1.77 trillion, held by approximately 43.5 million borrowers (Federal Reserve, 2023). The average borrower owes around \\$37,000. Understanding your repayment options is essential for managing this debt effectively.
 
-\`\`\`concept
-{"title": "Rule #1", "variant": "rule", "content": "Always know whether your loans are federal or private. This single fact determines every option you have."}
-\`\`\`
-
-### Federal vs. Private: Know the Line in the Sand
+### Federal vs Private Student Loans
 
 | Feature | Federal Loans | Private Loans |
 |---------|--------------|--------------|
-| Interest rates | Fixed by Congress (2024: 5.50 % undergrad) | 4–14 % (credit-based, can be variable) |
-| Income-driven plans | ✅ Yes | ❌ No |
-| Forgiveness programs | ✅ PSLF, IDR forgiveness | ❌ No |
-| Deferment / forbearance | Generous, built-in | Limited, lender decides |
-| Bankruptcy discharge | Practically impossible | Practically impossible |
+| Interest rates | Fixed, set by Congress | Fixed or variable, set by lender |
+| Income-driven plans | Yes | No |
+| Forgiveness programs | Yes (PSLF, IDR forgiveness) | No |
+| Deferment/forbearance | Generous options | Limited |
+| Bankruptcy discharge | Very difficult | Very difficult |
+| Current rates (2024) | 5.50% (undergrad) | 4-14% (varies by credit) |
 
-\`\`\`quiz
-{"title": "Quick Check: Federal vs. Private", "questions": [
-  {"question": "Which loans can be placed on an Income-Driven Repayment (IDR) plan?", "options": ["Only federal loans", "Only private loans", "Both", "Neither"], "answer": 0, "explanation": "IDR plans are a federal-only benefit; private lenders do not offer them."},
-  {"question": "What happens to federal protections if you refinance federal loans with a private lender?", "options": ["They transfer to the new lender", "They are permanently lost", "They pause for 12 months", "They become optional"], "answer": 1, "explanation": "Refinancing federal → private is a one-way door: once you leave the federal system, you cannot return."},
-  {"question": "Which balance is most likely to be eligible for Public Service Loan Forgiveness?", "options": ["$20 k private loan at 8 %", "$55 k federal Direct loan", "$30 k Parent PLUS loan in parent's name", "$15 k federal Perkins loan held by the school"], "answer": 1, "explanation": "Only Direct loans in the borrower's name qualify; private and most Perkins loans do not."}
-]}
-\`\`\`
+**Rule #1:** Always know whether your loans are federal or private. This determines your options.
 
-### Federal Repayment Plans in One Glance
+### Federal Repayment Plans
 
-\`\`\`tabs
-{"tabs": [
-  {"label": "Standard", "content": "**10-year fixed schedule.**\\n- Highest monthly payment\\n- Least total interest\\n- Automatically assigned if you do nothing"},
-  {"label": "Graduated", "content": "**10-year schedule, payments rise every 2 years.**\\n- Good when you expect promotions / raises\\n- More interest than Standard"},
-  {"label": "Extended", "content": "**25-year schedule.**\\n- Needs ≥ $30 k balance\\n- Payment can be fixed or graduated\\n- Much more interest overall"},
-  {"label": "IDR Family", "content": "**Payments = % of discretionary income.**\\n- SAVE, PAYE, IBR, ICR\\n- 20-25-year forgiveness (taxable)\\n- 10-year forgiveness if you add PSLF"}
-]}
-\`\`\`
+**Standard Repayment:** Fixed payments over 10 years. Highest monthly payment but lowest total interest.
 
-\`\`\`callout
-{"type": "warning", "title": "Interest Never Sleeps", "content": "On IDR plans, payments may be lower than monthly interest—your balance can grow even while you pay. Forgiveness can still make this worthwhile, but run the numbers first."}
-\`\`\`
+**Graduated Repayment:** Payments start low and increase every two years. Same 10-year term. Good for those expecting rising income.
 
-### Public Service Loan Forgiveness (PSLF): The 10-Year Shortcut
+**Extended Repayment:** Payments over 25 years. Lower monthly payment but significantly more interest.
 
-Work full-time for government or any 501(c)(3) nonprofit, make **120 qualifying payments** on an IDR plan, and the remaining balance is wiped out **tax-free**.
+**Income-Driven Repayment (IDR):** Monthly payments based on a percentage of discretionary income. Four types exist:
 
-\`\`\`steps
-{"title": "PSLF Checklist", "steps": [
-  {"title": "1. Confirm Loan Type", "content": "Only **Direct** loans qualify. Older FFEL or Perkins loans must be consolidated into a Direct Consolidation loan first."},
-  {"title": "2. Pick an IDR Plan", "content": "SAVE, PAYE, IBR, or ICR—whichever gives the lowest payment."},
-  {"title": "3. Certify Employment Yearly", "content": "Use the **PSLF Help Tool** on StudentAid.gov to generate a form for each employer, signed by HR."},
-  {"title": "4. Track Payments", "content": "FedLoan (now MOHELA) counts qualifying payments. Keep your own spreadsheet as backup."},
-  {"title": "5. Apply After 120", "content": "Submit the final PSLF form; forgiveness typically processes within 3–6 months."}
-]}
-\`\`\`
+| Plan | Payment | Forgiveness After |
+|------|---------|------------------|
+| SAVE (newest) | 5-10% of discretionary income | 20-25 years |
+| PAYE | 10% of discretionary income | 20 years |
+| IBR | 10-15% of discretionary income | 20-25 years |
+| ICR | 20% of discretionary income | 25 years |
 
-\`\`\`trace
-{"title": "Aisha’s PSLF Walk-Through", "language": "python", "code": "# Aisha: public-school teacher, $60 k federal Direct loans at 5.5 %\\n# SAVE plan: 10 % of discretionary income → $250 / mo\\nbalance = 60_000\\nrate = 0.055 / 12          # monthly rate\\npayment = 250\\nmonths = 0\\ntotal_paid = 0\\n\\nwhile months < 120:        # 10 years of PSLF\\n    interest = balance * rate\\n    balance += interest - payment\\n    total_paid += payment\\n    months += 1\\n\\nprint(f\\"Paid \\\\\${total_paid:,.0f}; ~\\\\\${balance:,.0f} forgiven\\")\\n# Output: Paid $30,000; ~$42,000 forgiven (tax-free)", "frames": [
-  {"line": 1, "vars": {"balance": 60000, "months": 0, "total_paid": 0}, "note": "Starting balance", "stdout": ""},
-  {"line": 9, "vars": {"months": 1, "balance": 60025, "total_paid": 250}, "note": "Interest accrues faster than payment", "stdout": ""},
-  {"line": 9, "vars": {"months": 120, "balance": 42038, "total_paid": 30000}, "note": "After 120 payments", "stdout": "Paid $30,000; ~$42,000 forgiven"}
-]}
-\`\`\`
+After the forgiveness period, remaining balance is forgiven (but may be taxed as income under current law).
 
-### Refinancing: The Double-Edged Sword
+### Public Service Loan Forgiveness (PSLF)
 
-Refinancing **replaces** your existing loan(s) with a new **private** loan. You keep the debt, but the terms change.
+If you work full-time for a qualifying employer (government, nonprofit), you can receive loan forgiveness after **120 qualifying payments** (10 years) on an IDR plan. The forgiven amount is **not taxed**.
 
-\`\`\`compare
-{"variant": "good-bad", "before": {"label": "Refinance WHEN", "code": "- High-interest PRIVATE loans\\n- Credit score ≥ 700\\n- Stable income\\n- Can drop rate by ≥ 1 %\\n- No need for IDR / PSLF"}, "after": {"label": "Do NOT refinance WHEN", "code": "- Loans are federal and you may need:\\n  – Income-driven payments\\n  – Deferment / forbearance\\n  – PSLF or IDR forgiveness\\n- Credit score < 650\\n- Income uncertain"}}
-\`\`\`
+Requirements:
+- Federal Direct Loans only
+- Full-time employment at a qualifying organization
+- 120 qualifying payments (do not need to be consecutive)
+- Must be on an IDR plan
 
-\`\`\`callout
-{"type": "danger", "title": "One-Way Door", "content": "Once federal loans become private, you cannot re-enter the federal system. There is no \\"undo\\" button."}
-\`\`\`
+**Real-World Example:** Aisha is a public school teacher with \\$60,000 in federal loans. On the SAVE plan, her payment is \\$250/month. After 10 years of payments totaling \\$30,000, her remaining balance of approximately \\$42,000 is forgiven tax-free through PSLF. Without PSLF, she would have paid over \\$72,000 total.
 
-### Aggressive Payoff Playbook
+### Refinancing: When It Makes Sense
 
-1. **Target the highest-rate loan first** (avalanche).  
-2. **Tell your servicer** extra money goes to **principal**, not “next month’s payment.”  
-3. **Refinance high-rate private loans** only if the above criteria are met.  
-4. **Tap employer assistance**—up to **$5,250/year** is tax-free through 2025.  
-5. **Funnel side-gig income** straight to loans.
+Refinancing replaces your existing loans with a new private loan at a (hopefully) lower interest rate.
 
-\`\`\`calculator
-{"type": "loan", "title": "Avalanche vs Minimum-Only", "inputs": [
-  {"id": "principal", "label": "Loan balance", "default": 35000, "min": 1000, "max": 200000, "prefix": "$"},
-  {"id": "rate", "label": "Interest rate", "default": 7, "min": 3, "max": 15, "suffix": "%"},
-  {"id": "extra", "label": "Extra payment/month", "default": 200, "min": 0, "max": 2000, "prefix": "$"}
-]}
-\`\`\`
+**Refinance when:**
+- You have high-interest private loans AND good credit (700+)
+- You have stable, high income and do not need federal protections
+- You can reduce your rate by 1%+ and maintain a reasonable term
 
-### Forgiveness vs. Aggressive Payoff: Decision Matrix
+**Do NOT refinance when:**
+- Your loans are federal and you may need IDR, deferment, or PSLF
+- Your credit score is low (you will not get a better rate)
+- You are uncertain about income stability
 
-| Factor | Consider Forgiveness | Pay Off Aggressively |
-|--------|----------------------|----------------------|
-| **Loan balance** | > 1.5× annual income | < 1× annual income |
-| **Career** | Government / nonprofit | Private sector |
-| **Income trend** | Flat or modest raises | Rapid raises / high ceiling |
-| **Risk tolerance** | Comfortable with 10-25 yr plan | Hates debt, wants certainty |
+**Warning:** Refinancing federal loans into private loans permanently eliminates all federal protections and forgiveness options.
 
-\`\`\`takeaways
-{"title": "Key Takeaways", "items": [
-  "Federal loans = options (IDR, PSLF); private loans = few safety nets.",
-  "PSLF can erase tens of thousands tax-free in 10 years—certify employment annually.",
-  "Refinancing federal loans is irreversible; only do it if you will never need IDR or forgiveness.",
-  "Paying extra is useless if you don’t specify “apply to principal.”",
-  "Use the Federal Loan Simulator (StudentAid.gov) every year—life changes, and so should your plan."
-]}
-\`\`\``,
+### Aggressive Payoff Strategies
+
+If you want to eliminate student loans fast:
+
+1. **Pay more than the minimum** — Specify that extra payments go to **principal**, not future payments
+2. **Use the avalanche method** — Target the highest-rate loan first
+3. **Refinance high-rate loans** — If it makes sense per the criteria above
+4. **Employer assistance** — Some employers offer student loan repayment benefits (up to \\$5,250/year tax-free through 2025)
+5. **Side income** — Dedicate freelance or gig income entirely to loans
+
+### The Forgiveness vs Payoff Decision
+
+| Factor | Pursue Forgiveness | Pay Off Aggressively |
+|--------|-------------------|---------------------|
+| Loan balance | Very high relative to income | Manageable relative to income |
+| Career path | Public service / nonprofit | Private sector |
+| Timeline | Can commit 10-25 years | Want debt-free ASAP |
+| Risk tolerance | Comfortable with program rules | Prefer certainty |
+
+### Key Takeaway
+
+Student loans are complex, but you have options. Federal borrowers should explore IDR plans and PSLF before aggressive payoff. Private loan holders should consider refinancing if rates can be lowered. The worst strategy is ignoring the debt and making only minimum payments for decades.
+
+*Resources: StudentAid.gov, Federal Student Aid Loan Simulator, NerdWallet Student Loan Refinancing, The PSLF Help Tool.*`,
     },
     {
       id: "pf-mortgages",
@@ -495,17 +388,14 @@ A mortgage is a loan used to purchase real estate, where the property itself ser
 - **Down payment:** The upfront cash you pay (typically 3-20% of the purchase price)
 - **Escrow:** Account that holds money for property taxes and insurance
 
-\`\`\`concept
-{
-  "title": "The Mortgage Time Machine",
-  "variant": "mental-model",
-  "content": "Think of a mortgage as renting money to buy a house, but with a twist: you're slowly buying the money itself through interest. The longer you 'rent' the money, the more expensive it becomes. A 30-year mortgage at 6% interest means you'll pay more in interest than the original house price!"
-}
-\`\`\`
-
 ### Fixed-Rate Mortgages
 
 A fixed-rate mortgage locks in your interest rate for the entire loan term. Your payment never changes.
+
+**Example:** \\$300,000 loan at 6.5% fixed for 30 years
+- Monthly payment: \\$1,896 (principal + interest)
+- Total paid over 30 years: \\$682,633
+- Total interest: \\$382,633
 
 **Pros:**
 - Predictable payments — easy to budget
@@ -526,6 +416,10 @@ An ARM starts with a lower fixed rate for an introductory period, then adjusts p
 - **7/1 ARM:** Fixed for 7 years, then adjusts annually
 - **10/1 ARM:** Fixed for 10 years, then adjusts annually
 
+**Example:** \\$300,000 loan, 5/1 ARM starting at 5.5%
+- Years 1-5: \\$1,703/month
+- Year 6+: Adjusts based on index (could go up to 7-8% or higher)
+
 **Pros:**
 - Lower initial payments
 - Good if you plan to sell or refinance before the adjustment period
@@ -536,20 +430,6 @@ An ARM starts with a lower fixed rate for an introductory period, then adjusts p
 - If rates rise significantly, payments can increase dramatically
 - Harder to budget long-term
 
-\`\`\`compare
-{
-  "variant": "before-after",
-  "before": {
-    "label": "5/1 ARM at 5.5%",
-    "code": "Years 1-5: $1,703/month\\nYear 6: Rate adjusts to 7.5%\\nNew payment: $2,098/month (+$395)\\nYear 7: Rate adjusts to 8.5%\\nNew payment: $2,307/month (+$604 total)"
-  },
-  "after": {
-    "label": "30-Year Fixed at 6.5%",
-    "code": "Years 1-30: $1,896/month\\nNo changes, ever\\nTotal predictability\\nSame payment in year 1 and year 30"
-  }
-}
-\`\`\`
-
 ### 15-Year vs 30-Year: The Trade-Off
 
 | Feature | 15-Year | 30-Year |
@@ -559,26 +439,30 @@ An ARM starts with a lower fixed rate for an introductory period, then adjusts p
 | Total interest paid | Much less | Much more |
 | Flexibility | Less (locked into higher payment) | More (can always pay extra) |
 
-The 15-year mortgage costs more per month but can save **hundreds of thousands** in interest.
+**Example on \\$300,000 loan:**
+- 30-year at 6.5%: \\$1,896/month, \\$382,633 total interest
+- 15-year at 5.8%: \\$2,511/month, \\$151,937 total interest
+
+The 15-year mortgage costs \\$615 more per month but saves **\\$230,696** in interest.
 
 ### Understanding Amortization
 
 Amortization is the process of paying off a loan through regular payments. Here is the critical insight: **in the early years, most of your payment goes to interest, not principal.**
 
-\`\`\`algoviz
-{
-  "title": "Amortization: Where Your Payment Goes",
-  "type": "array",
-  "data": [1625, 271, 1591, 305, 1091, 805, 288, 1608],
-  "frames": [
-    {"highlight": [0, 1], "label": "Month 1: $1,625 interest (85.7%), $271 principal (14.3%)", "stats": {"payment": 1896, "balance": 299729}},
-    {"highlight": [2, 3], "label": "Month 60: $1,591 interest (84%), $305 principal (16%)", "stats": {"payment": 1896, "balance": 280123}},
-    {"highlight": [4, 5], "label": "Month 180: $1,091 interest (57.5%), $805 principal (42.5%)", "stats": {"payment": 1896, "balance": 189234}},
-    {"highlight": [6, 7], "label": "Month 336: $288 interest (15.2%), $1,608 principal (84.8%)", "stats": {"payment": 1896, "balance": 37256}}
-  ],
-  "speed": 1200
-}
-\`\`\`
+**Year 1 of a \\$300,000, 30-year, 6.5% mortgage:**
+- Monthly payment: \\$1,896
+- Month 1 interest: \\$1,625 (85.7% of payment!)
+- Month 1 principal: \\$271 (14.3%)
+
+**Year 15 (halfway through):**
+- Monthly payment: \\$1,896 (same)
+- Month 180 interest: \\$1,091 (57.5%)
+- Month 180 principal: \\$805 (42.5%)
+
+**Year 28 (near the end):**
+- Monthly payment: \\$1,896 (same)
+- Month 336 interest: \\$288 (15.2%)
+- Month 336 principal: \\$1,608 (84.8%)
 
 This front-loading of interest is why extra principal payments in the early years are so powerful — they reduce the balance that future interest is calculated on.
 
@@ -592,61 +476,15 @@ This front-loading of interest is why extra principal payments in the early year
 
 **PMI (Private Mortgage Insurance)** is required when the down payment is less than 20%. It typically costs 0.5-1% of the loan amount annually and protects the *lender*, not you.
 
-\`\`\`calculator
-{
-  "type": "loan",
-  "title": "Mortgage Payment Calculator",
-  "inputs": [
-    {"id": "p", "label": "Home Price", "default": 400000, "min": 100000, "max": 2000000, "prefix": "$"},
-    {"id": "d", "label": "Down Payment %", "default": 20, "min": 3, "max": 50, "suffix": "%"},
-    {"id": "r", "label": "Interest Rate", "default": 6.5, "min": 2, "max": 10, "suffix": "%"},
-    {"id": "t", "label": "Loan Term", "default": 30, "min": 15, "max": 30, "suffix": " years"}
-  ]
-}
-\`\`\`
-
 ### Real-World Strategy: Extra Payments
 
 Making one extra mortgage payment per year on a 30-year loan typically reduces the term by 4-5 years and saves tens of thousands in interest. You can achieve this by paying biweekly instead of monthly (26 half-payments = 13 full payments per year).
 
-\`\`\`quiz
-{
-  "title": "Mortgage Mastery Quiz",
-  "questions": [
-    {
-      "question": "Which mortgage type protects you from rising interest rates?",
-      "options": ["5/1 ARM", "7/1 ARM", "Fixed-rate mortgage", "Interest-only loan"],
-      "answer": 2,
-      "explanation": "Fixed-rate mortgages lock in your interest rate for the entire loan term, protecting you from market fluctuations."
-    },
-    {
-      "question": "In year 1 of a 30-year mortgage, approximately what percentage of your payment goes toward principal?",
-      "options": ["50%", "25%", "10-15%", "75%"],
-      "answer": 2,
-      "explanation": "During the first year, roughly 85-90% of your payment goes toward interest, leaving only 10-15% for principal reduction."
-    },
-    {
-      "question": "What's the primary benefit of making extra principal payments in the early years?",
-      "options": ["Lower monthly payment", "Reduced interest over the life of the loan", "Elimination of PMI", "Tax benefits"],
-      "answer": 1,
-      "explanation": "Extra principal payments reduce your loan balance faster, which means less interest accrues over time, potentially saving tens of thousands."
-    }
-  ]
-}
-\`\`\`
+### Key Takeaway
 
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Fixed-rate mortgages provide payment stability but start with higher rates than ARMs",
-    "ARMs can save money short-term but carry the risk of significantly higher payments later",
-    "15-year mortgages build equity faster and save massive amounts in interest compared to 30-year loans",
-    "In early years, most of your payment goes to interest — extra principal payments are most powerful early in the loan",
-    "A 20% down payment eliminates PMI and can save hundreds per month"
-  ]
-}
-\`\`\``,
+A mortgage is a powerful tool for homeownership, but the details matter enormously. Understand the difference between fixed and adjustable rates, use amortization awareness to your advantage, and aim for 20% down to avoid PMI. The right mortgage structure can save you hundreds of thousands of dollars.
+
+*Resources: Investopedia Mortgage Guide, Bankrate Mortgage Calculator, Khan Academy Housing, Consumer Financial Protection Bureau (CFPB).*`,
     },
   ],
 };

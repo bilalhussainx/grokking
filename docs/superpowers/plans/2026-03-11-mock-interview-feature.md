@@ -1,5 +1,37 @@
 # Mock Interview Feature Implementation Plan
 
+Research Ideas:
+Come up with unique technological idea that is instantly monetizable and would attract a lot of users to pay for the service. Use tavily search to research what's out there, research products on Product Hunt
+
+
+
+* Indie Hackers
+
+* BetaList
+
+* Startup Stash
+
+* Side Project Ideas
+
+* Dev Hunt
+
+* SaaS Hub
+
+* PitchWall
+
+* MicroLaunch
+
+* Uneed
+
+* Launching Next
+
+* SaaSHub and ycombinators ideas for 2026, what's missing from the financial or technological or other industries that I can build. Do deep research and come up with a startup that would be profitable and require little to no investment. You are a top CEO and entrepreneur with an MBA from Harvard School of Buisness and a PHD in Computer Technology from Stanford graduating in 0.1% of the top batches. You will do deep research using tavily search on what's already implemented, what's being implemented but still can be reproduced with some missing use-cases that haven't been developed. It can be a web-app, an mobile app, can use any stack, Also research github repositories for the most stars like openclaw and think of something that is significant as building openclaw for the first time.
+
+
+
+
+
+
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a voice-based mock interview system with code editor, Kimi question planning, ElevenLabs voice agent, and post-interview scorecard.

@@ -31,12 +31,42 @@ Before component-based thinking, web apps were built as monolithic HTML pages wi
     {
       "label": "Without Components",
       "icon": "❌",
-      "content": "Imagine building a dashboard with a sidebar, header, data table, and charts. In vanilla JS, you'd write one massive file managing all the state, event handlers, and DOM updates for everything. Change the sidebar? You might break the table.\\n\\n\`\`\`html\\n<!-- Everything tangled together -->\\n<div id=\\"app\\">\\n  <div id=\\"sidebar\\">...</div>\\n  <div id=\\"header\\">...</div>\\n  <div id=\\"table\\">...</div>\\n</div>\\n<script>\\n  // 500+ lines managing everything\\n  let sidebarOpen = true;\\n  let tableData = [];\\n  let sortColumn = 'name';\\n  // ... nightmare to maintain\\n</script>\\n\`\`\`"
+      "content": "Imagine building a dashboard with a sidebar, header, data table, and charts. In vanilla JS, you'd write one massive file managing all the state, event handlers, and DOM updates for everything. Change the sidebar? You might break the table.
+
+\`\`\`html
+<!-- Everything tangled together -->
+<div id=\\"app\\">
+  <div id=\\"sidebar\\">...</div>
+  <div id=\\"header\\">...</div>
+  <div id=\\"table\\">...</div>
+</div>
+<script>
+  // 500+ lines managing everything
+  let sidebarOpen = true;
+  let tableData = [];
+  let sortColumn = 'name';
+  // ... nightmare to maintain
+</script>
+\`\`\`"
     },
     {
       "label": "With Components",
       "icon": "✅",
-      "content": "Each piece is isolated. The Sidebar doesn't know or care about the DataTable. They communicate through well-defined props.\\n\\n\`\`\`jsx\\nfunction App() {\\n  return (\\n    <div>\\n      <Sidebar items={menuItems} />\\n      <Header user={currentUser} />\\n      <DataTable data={rows} sortBy=\\"name\\" />\\n    </div>\\n  );\\n}\\n\`\`\`\\n\\nChange the Sidebar implementation? The rest of the app doesn't even notice."
+      "content": "Each piece is isolated. The Sidebar doesn't know or care about the DataTable. They communicate through well-defined props.
+
+\`\`\`jsx
+function App() {
+  return (
+    <div>
+      <Sidebar items={menuItems} />
+      <Header user={currentUser} />
+      <DataTable data={rows} sortBy=\\"name\\" />
+    </div>
+  );
+}
+\`\`\`
+
+Change the Sidebar implementation? The rest of the app doesn't even notice."
     }
   ]
 }
@@ -46,32 +76,30 @@ Before component-based thinking, web apps were built as monolithic HTML pages wi
 
 Components form a **tree structure**. The \`App\` component sits at the root, rendering child components, which render their own children:
 
-\`\`\`algoviz
-{
-  "title": "Component Tree Visualization",
-  "type": "tree",
-  "data": [
-    {"id": "app", "label": "App", "parent": null},
-    {"id": "header", "label": "Header", "parent": "app"},
-    {"id": "main", "label": "MainContent", "parent": "app"},
-    {"id": "footer", "label": "Footer", "parent": "app"},
-    {"id": "logo", "label": "Logo", "parent": "header"},
-    {"id": "nav", "label": "NavMenu", "parent": "header"},
-    {"id": "articles", "label": "ArticleList", "parent": "main"},
-    {"id": "sidebar", "label": "Sidebar", "parent": "main"},
-    {"id": "card1", "label": "ArticleCard", "parent": "articles"},
-    {"id": "card2", "label": "ArticleCard", "parent": "articles"},
-    {"id": "card3", "label": "ArticleCard", "parent": "articles"}
-  ],
-  "frames": [
-    {"highlight": ["app"], "label": "App is the root component"},
-    {"highlight": ["header", "main", "footer"], "label": "App renders three direct children"},
-    {"highlight": ["logo", "nav"], "label": "Header renders Logo and NavMenu"},
-    {"highlight": ["articles", "sidebar"], "label": "MainContent renders ArticleList and Sidebar"},
-    {"highlight": ["card1", "card2", "card3"], "label": "ArticleList renders multiple ArticleCard instances"}
-  ],
-  "speed": 1000
-}
+\`\`\`mermaid
+graph TD
+    App --> Header
+    App --> MainContent
+    App --> Footer
+    Header --> Logo
+    Header --> NavMenu
+    MainContent --> ArticleList
+    MainContent --> Sidebar
+    ArticleList --> ArticleCard1[ArticleCard]
+    ArticleList --> ArticleCard2[ArticleCard]
+    ArticleList --> ArticleCard3[ArticleCard]
+
+    style App fill:#4f46e5,color:#fff,stroke:none
+    style Header fill:#7c3aed,color:#fff,stroke:none
+    style MainContent fill:#7c3aed,color:#fff,stroke:none
+    style Footer fill:#7c3aed,color:#fff,stroke:none
+    style Logo fill:#a78bfa,color:#fff,stroke:none
+    style NavMenu fill:#a78bfa,color:#fff,stroke:none
+    style ArticleList fill:#a78bfa,color:#fff,stroke:none
+    style Sidebar fill:#a78bfa,color:#fff,stroke:none
+    style ArticleCard1 fill:#c4b5fd,color:#1e1b4b,stroke:none
+    style ArticleCard2 fill:#c4b5fd,color:#1e1b4b,stroke:none
+    style ArticleCard3 fill:#c4b5fd,color:#1e1b4b,stroke:none
 \`\`\`
 
 Data flows **downward** through this tree via props. The parent decides what to render and passes the data each child needs.
@@ -99,15 +127,6 @@ Data flows **downward** through this tree via props. The parent decides what to 
       "content": "React never uses class inheritance to extend components. Instead, you **compose** — nest components inside each other, pass components as props, and build complex UIs from simple pieces.\\n\\n\`\`\`jsx\\n// Composition: a Dialog wraps any content\\n<Dialog>\\n  <DialogHeader title=\\"Confirm\\" />\\n  <DialogBody>\\n    <p>Are you sure?</p>\\n  </DialogBody>\\n  <DialogFooter>\\n    <Button>Yes</Button>\\n    <Button>Cancel</Button>\\n  </DialogFooter>\\n</Dialog>\\n\`\`\`"
     }
   ]
-}
-\`\`\`
-
-\`\`\`playground
-{
-  "title": "Build Your First Component",
-  "language": "javascript",
-  "code": "function Greeting({ name, isLoggedIn }) {\\n  if (!isLoggedIn) {\\n    return <p>Please log in</p>;\\n  }\\n  return <h1>Welcome back, {name}!</h1>;\\n}\\n\\n// Try rendering with different props\\nfunction App() {\\n  return (\\n    <div>\\n      <Greeting name=\\"Alice\\" isLoggedIn={true} />\\n      <Greeting name=\\"Bob\\" isLoggedIn={false} />\\n    </div>\\n  );\\n}",
-  "runnable": true
 }
 \`\`\`
 
@@ -140,12 +159,6 @@ Data flows **downward** through this tree via props. The parent decides what to 
       "options": ["Class inheritance", "Component composition", "Template strings", "Direct DOM manipulation"],
       "answer": 1,
       "explanation": "React uses composition — nesting simple components inside each other — rather than inheritance. This is more flexible and easier to reason about."
-    },
-    {
-      "question": "Which type of component is recommended for new React code?",
-      "options": ["Class components", "Function components with Hooks", "jQuery plugins", "Web Components"],
-      "answer": 1,
-      "explanation": "Since React 16.8 introduced Hooks, function components are the recommended approach for new code due to their simplicity and reduced boilerplate."
     }
   ]
 }
@@ -153,13 +166,11 @@ Data flows **downward** through this tree via props. The parent decides what to 
 
 \`\`\`takeaways
 {
-  "title": "Key Takeaways",
   "items": [
     "Components are functions: props in, UI description out",
     "Component trees mirror your UI hierarchy — data flows downward through props",
     "Each component should have exactly one job (single responsibility)",
-    "Build complex UIs by composing simple components, never through inheritance",
-    "Function components with Hooks are the modern way to write React components"
+    "Build complex UIs by composing simple components, never through inheritance"
   ]
 }
 \`\`\``,
@@ -394,7 +405,7 @@ The \`validate\` function iterates over the schema, checks each prop against its
 
 \`\`\`callout
 {
-  "type": "tip",
+  "type": "best-practice",
   "title": "Collect All Errors, Don't Bail on First",
   "content": "A good validator reports ALL issues at once. If 'name' is missing AND 'age' is wrong type, report both errors — don't stop at the first one. Users hate fixing one error only to discover another."
 }
@@ -405,27 +416,19 @@ The \`validate\` function iterates over the schema, checks each prop against its
   "variant": "good-bad",
   "before": {
     "label": "Bail on First Error",
-    "code": "function validate(props) {\\n  for (const [key, checker] of entries) {\\n    if (hasError(props[key], checker)) {\\n      return { valid: false, error: '...' };\\n      // User only sees ONE error\\n    }\\n  }\\n}"
+    "code": "function validate(props) {\\n  for (const [key, checker] of entries) {\\n    if (hasError(props[key], checker)) {\\n      return { valid: false, error: '...' };\\n      // User only sees ONE error\\n    }\\n  }\\n}",
+    "language": "javascript"
   },
   "after": {
     "label": "Collect All Errors",
-    "code": "function validate(props) {\\n  const errors = [];\\n  for (const [key, checker] of entries) {\\n    if (hasError(props[key], checker)) {\\n      errors.push('...');\\n      // Keep going!\\n    }\\n  }\\n  return { valid: !errors.length, errors };\\n}"
+    "code": "function validate(props) {\\n  const errors = [];\\n  for (const [key, checker] of entries) {\\n    if (hasError(props[key], checker)) {\\n      errors.push('...');\\n      // Keep going!\\n    }\\n  }\\n  return { valid: !errors.length, errors };\\n}",
+    "language": "javascript"
   }
-}
-\`\`\`
-
-\`\`\`playground
-{
-  "title": "Build Your PropTypes Validator",
-  "language": "javascript",
-  "code": "const PropTypes = {\\n  string: { type: 'string' },\\n  number: { type: 'number' },\\n  bool: { type: 'boolean' },\\n  \\n  required(checker) {\\n    return { ...checker, isRequired: true };\\n  },\\n  \\n  oneOf(values) {\\n    return { type: 'oneOf', values };\\n  }\\n};\\n\\nfunction validate(props, schema) {\\n  const errors = [];\\n  \\n  for (const [key, checker] of Object.entries(schema)) {\\n    const value = props[key];\\n    \\n    // Check required\\n    if (checker.isRequired && value === undefined) {\\n      errors.push(\\\\\`\\\\\${key} is required\\\\\`);\\n      continue;\\n    }\\n    \\n    // Skip type checks if value is missing and not required\\n    if (value === undefined) continue;\\n    \\n    // Check type\\n    if (checker.type === 'string' && typeof value !== 'string') {\\n      errors.push(\\\\\`\\\\\${key} must be of type string\\\\\`);\\n    } else if (checker.type === 'number' && typeof value !== 'number') {\\n      errors.push(\\\\\`\\\\\${key} must be of type number\\\\\`);\\n    } else if (checker.type === 'boolean' && typeof value !== 'boolean') {\\n      errors.push(\\\\\`\\\\\${key} must be of type boolean\\\\\`);\\n    } else if (checker.type === 'oneOf' && !checker.values.includes(value)) {\\n      errors.push(\\\\\`\\\\\${key} must be one of: \\\\\${checker.values.join(', ')}\\\\\`);\\n    }\\n  }\\n  \\n  return { valid: errors.length === 0, errors };\\n}\\n\\n// Test cases\\nconsole.log('Test 1:', validate({}, { name: PropTypes.required(PropTypes.string) }));\\nconsole.log('Test 2:', validate({ name: 42 }, { name: PropTypes.required(PropTypes.string) }));\\nconsole.log('Test 3:', validate({ role: 'superadmin' }, { role: PropTypes.oneOf(['admin', 'user']) }));",
-  "runnable": true
 }
 \`\`\`
 
 \`\`\`quiz
 {
-  "title": "Props Validator Quiz",
   "questions": [
     {
       "question": "Given schema { name: PropTypes.required(PropTypes.string) }, what does validate({}) return?",
@@ -448,17 +451,6 @@ The \`validate\` function iterates over the schema, checks each prop against its
       ],
       "answer": 2,
       "explanation": "The value IS present (not undefined), so it passes the 'required' check. But 42 is a number, not a string, so it fails the type check."
-    },
-    {
-      "question": "Which checker would validate that a prop is either 'red', 'green', or 'blue'?",
-      "options": [
-        "PropTypes.string",
-        "PropTypes.oneOf(['red', 'green', 'blue'])",
-        "PropTypes.required(PropTypes.string)",
-        "PropTypes.oneOfType(['red', 'green', 'blue'])"
-      ],
-      "answer": 1,
-      "explanation": "PropTypes.oneOf restricts values to a specific set of allowed values, making it perfect for enum-like validation."
     }
   ]
 }
@@ -590,7 +582,7 @@ Now you'll build the core of how React actually works — the **virtual DOM**. E
 \`\`\`concept
 {
   "title": "JSX is Just Function Calls",
-  "variant": "insight",
+  "variant": "default",
   "content": "When you write <Button color=\\"blue\\">Click</Button>, the compiler turns it into:\\ncreateElement(Button, { color: 'blue' }, 'Click')\\n\\nThere's no magic — JSX is syntactic sugar for nested function calls."
 }
 \`\`\`
@@ -599,14 +591,16 @@ Now you'll build the core of how React actually works — the **virtual DOM**. E
 
 \`\`\`compare
 {
-  "variant": "before-after",
+  "variant": "compare",
   "before": {
     "label": "What You Write (JSX)",
-    "code": "<div id=\\"root\\">\\n  <h1 className=\\"title\\">Hello</h1>\\n  <p>World</p>\\n</div>"
+    "code": "<div id=\\"root\\">\\n  <h1 className=\\"title\\">Hello</h1>\\n  <p>World</p>\\n</div>",
+    "language": "jsx"
   },
   "after": {
     "label": "What React Sees",
-    "code": "createElement('div', { id: 'root' },\\n  createElement('h1',\\n    { className: 'title' },\\n    'Hello'\\n  ),\\n  createElement('p', null, 'World')\\n)"
+    "code": "createElement('div', { id: 'root' },\\n  createElement('h1',\\n    { className: 'title' },\\n    'Hello'\\n  ),\\n  createElement('p', null, 'World')\\n)",
+    "language": "javascript"
   }
 }
 \`\`\`
@@ -637,48 +631,16 @@ Now you'll build the core of how React actually works — the **virtual DOM**. E
 }
 \`\`\`
 
-\`\`\`playground
-{
-  "title": "Build Your Virtual DOM Engine",
-  "language": "javascript",
-  "code": "function createElement(type, props, ...children) {\\n  // TODO: Return virtual DOM node object\\n  return {\\n    type: type,\\n    props: props || {},\\n    children: children\\n  };\\n}\\n\\nfunction renderTree(element, depth = 0) {\\n  const indent = '  '.repeat(depth);\\n  \\n  if (typeof element === 'string') {\\n    // TODO: Return indented string\\n    return indent + element;\\n  }\\n  \\n  if (typeof element.type === 'function') {\\n    // TODO: Call function component and render result\\n    const result = element.type({\\n      ...element.props,\\n      children: element.children\\n    });\\n    return renderTree(result, depth);\\n  }\\n  \\n  if (typeof element.type === 'string') {\\n    // TODO: Render HTML tag with attributes and children\\n    const attrs = Object.entries(element.props)\\n      .map(([k, v]) => \\\\\`\\\\\${k}=\\"\\\\\${v}\\"\\\\\`)\\n      .join(' ');\\n    \\n    const tag = attrs ? \\\\\`<\\\\\${element.type} \\\\\${attrs}>\\\\\` : \\\\\`<\\\\\${element.type}>\\\\\`;\\n    const children = element.children\\n      .map(child => renderTree(child, depth + 1))\\n      .join('\\\\n');\\n    const closing = \\\\\`</\\\\\${element.type}>\\\\\`;\\n    \\n    return indent + tag + '\\\\n' + children + '\\\\n' + indent + closing;\\n  }\\n}\\n\\n// Test your implementation\\nfunction Button(props) {\\n  return createElement('button', { className: 'btn' }, props.label);\\n}\\n\\nconst tree = createElement('div', { id: 'app' },\\n  createElement('h1', null, 'Welcome'),\\n  createElement(Button, { label: 'Click me' })\\n);\\n\\nconsole.log(renderTree(tree));",
-  "runnable": true
-}
-\`\`\`
-
-\`\`\`algoviz
-{
-  "title": "Virtual DOM Tree Construction",
-  "type": "tree",
-  "data": [
-    { "id": "root", "label": "div#app", "parent": null },
-    { "id": "h1", "label": "h1", "parent": "root" },
-    { "id": "button", "label": "button.btn", "parent": "root" },
-    { "id": "welcome", "label": "\\"Welcome\\"", "parent": "h1" },
-    { "id": "click", "label": "\\"Click me\\"", "parent": "button" }
-  ],
-  "frames": [
-    { "highlight": ["root"], "label": "Create root div#app node", "stats": {"depth": 0} },
-    { "highlight": ["h1"], "label": "Add h1 child", "stats": {"depth": 1} },
-    { "highlight": ["button"], "label": "Add button child", "stats": {"depth": 1} },
-    { "highlight": ["welcome"], "label": "Add text node to h1", "stats": {"depth": 2} },
-    { "highlight": ["click"], "label": "Add text node to button", "stats": {"depth": 2} }
-  ],
-  "speed": 1000
-}
-\`\`\`
-
 \`\`\`callout
 {
-  "type": "info",
+  "type": "deep-dive",
   "title": "Why Virtual DOM?",
-  "content": "Real DOM operations are slow. Creating a virtual DOM node (a plain JS object) is near-instant. React builds the entire virtual tree, diffs it against the previous one using an O(n) algorithm, and only touches the real DOM where things actually changed. This is React's core performance insight."
+  "content": "Real DOM operations are slow. Creating a virtual DOM node (a plain JS object) is near-instant. React builds the entire virtual tree, diffs it against the previous one, and only touches the real DOM where things actually changed. This is React's core performance insight."
 }
 \`\`\`
 
 \`\`\`quiz
 {
-  "title": "Virtual DOM Fundamentals",
   "questions": [
     {
       "question": "What does createElement return?",
@@ -701,17 +663,6 @@ Now you'll build the core of how React actually works — the **virtual DOM**. E
       ],
       "answer": 2,
       "explanation": "Function components are resolved by calling them with their props (including children). The return value is then rendered recursively — this is component resolution."
-    },
-    {
-      "question": "What's the time complexity of React's reconciliation algorithm?",
-      "options": [
-        "O(n³)",
-        "O(n log n)",
-        "O(n)",
-        "O(n²)"
-      ],
-      "answer": 2,
-      "explanation": "While theoretical tree diffing could be O(n³), React uses heuristics to achieve O(n) linear time complexity for reconciliation."
     }
   ]
 }

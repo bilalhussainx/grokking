@@ -11,93 +11,48 @@ export const dynamicProgrammingModule: Module = {
       title: "Memoization (Top-Down)",
       content: `## Memoization — Top-Down Dynamic Programming
 
-Memoization is an optimization technique within dynamic programming that caches the results of expensive function calls and returns the cached result when the same inputs occur again. It transforms exponential-time recursive solutions into polynomial-time ones by ensuring each subproblem is solved only once.
-
-\`\`\`concept
-{
-  "title": "Memoization as a Mental Model",
-  "variant": "mental-model",
-  "content": "Think of memoization like a chef keeping a chalkboard of dishes already prepared. When an order comes in, the chef first checks the board: if the dish is already cooked, it's served immediately. Only if it's not on the board does the chef cook it—and then writes the result so future identical orders are instant. This 'check board → cook → write result' loop is exactly what your recursive function does with its cache."
-}
-\`\`\`
+**Memoization** is a technique where you cache the results of expensive function calls and return the cached result when the same inputs occur again.
 
 ### When to Use DP
 
-A problem is ripe for memoization when it exhibits:
-
-1. **Optimal substructure** – the optimal solution can be constructed from optimal solutions to subproblems.
-2. **Overlapping subproblems** – the same subproblems are solved multiple times in a naïve recursion.
-
-\`\`\`quiz
-{
-  "title": "Spot the Overlapping Subproblems",
-  "questions": [
-    {
-      "question": "Which problem does NOT have overlapping subproblems?",
-      "options": ["Fibonacci numbers", "Binary search on a sorted array", "Climbing stairs (1 or 2 steps)", "Coin change"],
-      "answer": 1,
-      "explanation": "Binary search splits the search space in half each time and never revisits the same index, so no overlap occurs."
-    },
-    {
-      "question": "In the Fibonacci recursion tree for fib(5), how many distinct subproblems exist?",
-      "options": ["5", "6", "7", "8"],
-      "answer": 1,
-      "explanation": "The distinct subproblems are fib(0)…fib(5), i.e. 6 unique values, even though the naïve tree recomputes some of them multiple times."
-    },
-    {
-      "question": "Memoization reduces time complexity by trading what for speed?",
-      "options": ["CPU cores", "Memory space", "Code clarity", "Language features"],
-      "answer": 1,
-      "explanation": "We store previously computed results in a cache, so we pay extra space to save time."
-    }
-  ]
-}
-\`\`\`
+A problem has **optimal substructure** and **overlapping subproblems** when:
+1. The optimal solution can be constructed from optimal solutions to subproblems
+2. The same subproblems are solved multiple times
 
 ### Memoization Pattern
 
-The top-down template is a three-line addition to any naïve recursion:
-
 \`\`\`python
-def solve(args, memo={}):
-    if args in memo:               # 1. check cache
-        return memo[args]
-    # base case handling
-    result = ...                   # 2. recursive computation
-    memo[args] = result            # 3. store before return
+def solve(n, memo={}):
+    if n in memo:
+        return memo[n]
+    # base cases
+    # recursive computation
+    memo[n] = result
     return result
 \`\`\`
 
-\`\`\`playground
-{
-  "title": "Memoized Fibonacci",
-  "language": "python",
-  "code": "def fib(n, memo={}):\\n    if n in memo:\\n        return memo[n]\\n    if n <= 1:\\n        return n\\n    memo[n] = fib(n-1, memo) + fib(n-2, memo)\\n    return memo[n]\\n\\nprint(fib(10))  # 55\\nprint(fib(50))  # 12586269025 (instant)",
-  "runnable": true
-}
+### Overlapping Subproblems: Fibonacci
+
+\`\`\`mermaid
+graph TD
+    F5["fib(5)"] --> F4["fib(4)"]
+    F5 --> F3a["fib(3)"]
+    F4 --> F3b["fib(3)"]
+    F4 --> F2a["fib(2)"]
+    F3a --> F2b["fib(2)"]
+    F3a --> F1a["fib(1)"]
+    F3b --> F2c["fib(2)"]
+    F3b --> F1b["fib(1)"]
+    style F3a fill:#f59e0b,color:#000
+    style F3b fill:#f59e0b,color:#000
+    style F2a fill:#ef4444,color:#fff
+    style F2b fill:#ef4444,color:#fff
+    style F2c fill:#ef4444,color:#fff
 \`\`\`
 
-### Overlapping Subproblems in Action
+*Yellow/red nodes are computed multiple times without memoization. DP caches them so each is computed only once.*
 
-\`\`\`algoviz
-{
-  "title": "Naïve vs Memoized Fibonacci",
-  "type": "tree",
-  "data": ["fib(5)", "fib(4)", "fib(3)", "fib(3)", "fib(2)", "fib(2)", "fib(1)", "fib(2)", "fib(1)", "fib(1)", "fib(0)"],
-  "frames": [
-    { "highlight": [0], "label": "call fib(5)", "stats": {"cache hits":0} },
-    { "highlight": [1,2], "label": "spawn fib(4) & fib(3)", "stats": {"cache hits":0} },
-    { "highlight": [3,4], "label": "fib(4) spawns fib(3) & fib(2) — fib(3) already seen!", "stats": {"cache hits":1} },
-    { "highlight": [5,6], "label": "fib(3) (second) spawns fib(2) & fib(1)", "stats": {"cache hits":1} },
-    { "highlight": [7], "label": "fib(2) (third) — now cached, skipped recomputation", "stats": {"cache hits":2} }
-  ],
-  "speed": 1000
-}
-\`\`\`
-
-Yellow nodes are recomputed multiple times without memoization; with memoization each distinct subproblem is evaluated once.
-
-### Classic Problem: Climbing Stairs
+### Problem: Climbing Stairs
 
 You are climbing a staircase with \`n\` steps. Each time you can climb 1 or 2 steps. How many distinct ways can you reach the top?
 
@@ -108,56 +63,10 @@ climb(3) -> 3  (1+1+1, 1+2, 2+1)
 climb(4) -> 5  (1+1+1+1, 1+1+2, 1+2+1, 2+1+1, 2+2)
 \`\`\`
 
-\`\`\`trace
-{
-  "title": "climb(4) with memoization",
-  "language": "python",
-  "code": "def climb(n, memo={}):\\n    if n in memo:\\n        return memo[n]\\n    if n == 0: return 1\\n    if n == 1: return 1\\n    memo[n] = climb(n-1, memo) + climb(n-2, memo)\\n    return memo[n]\\n\\nprint(climb(4))",
-  "frames": [
-    { "line": 2, "vars": {"n":4,"memo":{}}, "note": "miss", "stdout": "" },
-    { "line": 7, "vars": {"n":4,"memo":{}}, "note": "recurse to climb(3)", "stdout": "" },
-    { "line": 7, "vars": {"n":3,"memo":{}}, "note": "recurse to climb(2)", "stdout": "" },
-    { "line": 7, "vars": {"n":2,"memo":{"1":1,"0":1}}, "note": "base case hit", "stdout": "" },
-    { "line": 8, "vars": {"n":3,"memo":{"1":1,"0":1,"2":2}}, "note": "store climb(2)", "stdout": "" },
-    { "line": 8, "vars": {"n":4,"memo":{"1":1,"0":1,"2":2,"3":3}}, "note": "store climb(3)", "stdout": "" },
-    { "line": 8, "vars": {"n":4,"memo":{"1":1,"0":1,"2":2,"3":3,"4":5}}, "note": "store climb(4)", "stdout": "5" }
-  ],
-  "speed": 800
-}
-\`\`\`
-
 ### Complexity
 
-| Approach | Time | Space (extra) |
-|----------|------|---------------|
-| Naïve recursion | O(2^n) | O(n) call stack |
-| Memoized (top-down) | O(n) | O(n) cache + O(n) call stack |
-
-\`\`\`compare
-{
-  "variant": "before-after",
-  "before": {
-    "label": "Naïve (exponential)",
-    "code": "def fib(n):\\n    if n <= 1:\\n        return n\\n    return fib(n-1) + fib(n-2)\\n\\n# fib(50) → minutes"
-  },
-  "after": {
-    "label": "Memoized (linear)",
-    "code": "def fib(n, memo={}):\\n    if n in memo:\\n        return memo[n]\\n    if n <= 1:\\n        return n\\n    memo[n] = fib(n-1, memo) + fib(n-2, memo)\\n    return memo[n]\\n\\n# fib(50) → instant"
-  }
-}
-\`\`\`
-
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Memoization turns exponential-time recursive algorithms into linear-time ones by caching subproblem results.",
-    "It is a top-down approach: start with the original problem and recurse down, storing answers as you return.",
-    "Space overhead is O(subproblem count) for the cache plus the recursion stack; always weigh this against the speed gain.",
-    "Implementation is usually a three-line addition: check cache → recurse → store result."
-  ]
-}
-\`\`\``,
+- **Without memo:** O(2^n) — exponential
+- **With memo:** O(n) — each subproblem solved once`,
       starterCode: `def climb_stairs_naive(n):
     # TODO: Naive recursive solution (exponential)
     pass
@@ -228,18 +137,14 @@ print(grid_paths(1, 1))   # Expected: 1
 
 **Tabulation** builds a table from the smallest subproblems up to the desired answer. Unlike memoization (top-down), tabulation (bottom-up) avoids recursion and its stack overhead.
 
-\`\`\`concept
-{"title": "Tabulation as Iterative Table-Building", "variant": "mental-model", "content": "Think of tabulation like building a brick wall: you lay the first row (base cases), then each new row depends only on the bricks already placed below it. No scaffolding (recursion) needed — just steady, upward progress."}
-\`\`\`
-
 ### Pattern
 
-\`\`\`playground
-{"title": "Fibonacci Tabulation Template", "language": "python", "code": "def fib_tab(n: int) -> int:\\n    if n < 2:\\n        return n\\n    dp = [0] * (n + 1)      # 1. table\\n    dp[0], dp[1] = 0, 1     # 2. base cases\\n    for i in range(2, n + 1):\\n        dp[i] = dp[i-1] + dp[i-2]  # 3. recurrence\\n    return dp[n]\\n\\nprint(f\\"fib(8) = {fib_tab(8)}\\")", "runnable": true}
-\`\`\`
-
-\`\`\`steps
-{"title": "How Tabulation Works", "steps": [{"title": "1. Allocate a table", "content": "Create an array (or matrix) large enough to hold every subproblem answer, indexed by the problem size."}, {"title": "2. Seed base cases", "content": "Fill the smallest subproblems directly — the iterative equivalent of recursion base cases."}, {"title": "3. Iterate upward", "content": "Use a loop to fill entries in a predictable order, ensuring every dependency is already computed."}, {"title": "4. Return final cell", "content": "The last entry written is the answer to the original problem."}]}
+\`\`\`python
+def solve(n):
+    dp = [base_values]
+    for i in range(start, n+1):
+        dp[i] = combine(dp[smaller_subproblems])
+    return dp[n]
 \`\`\`
 
 ### Memoization vs Tabulation
@@ -252,8 +157,24 @@ print(grid_paths(1, 1))   # Expected: 1
 | Computes | Only needed subproblems | All subproblems |
 | Space optimization | Harder | Easier |
 
-\`\`\`compare
-{"variant": "before-after", "before": {"label": "Memoization (Top-Down)", "code": "def fib(n, memo={}):\\n    if n in memo:\\n        return memo[n]\\n    if n < 2:\\n        return n\\n    memo[n] = fib(n-1, memo) + fib(n-2, memo)\\n    return memo[n]"}, "after": {"label": "Tabulation (Bottom-Up)", "code": "def fib(n):\\n    if n < 2:\\n        return n\\n    dp = [0]*(n+1)\\n    dp[0], dp[1] = 0, 1\\n    for i in range(2, n+1):\\n        dp[i] = dp[i-1] + dp[i-2]\\n    return dp[n]"}}
+### Top-Down vs Bottom-Up
+
+\`\`\`mermaid
+flowchart LR
+    subgraph "Top-Down (Memoization)"
+    TD1["Start: fib(5)"] --> TD2["Recurse down"]
+    TD2 --> TD3["Hit base case"]
+    TD3 --> TD4["Cache & return up"]
+    end
+    subgraph "Bottom-Up (Tabulation)"
+    BU1["Start: dp[0]=0, dp[1]=1"] --> BU2["Build dp[2]"]
+    BU2 --> BU3["Build dp[3]"]
+    BU3 --> BU4["... dp[n] = answer"]
+    end
+    style TD1 fill:#6366f1,color:#fff
+    style BU1 fill:#4ade80,color:#000
+    style TD4 fill:#6366f1,color:#fff
+    style BU4 fill:#4ade80,color:#000
 \`\`\`
 
 ### Problem: Fibonacci & Coin Change
@@ -264,22 +185,6 @@ Implement Fibonacci using tabulation, then solve the coin change problem: given 
 coin_change([1, 5, 10, 25], 30) -> 2 (25 + 5)
 coin_change([1, 3, 4], 6) -> 2 (3 + 3)
 coin_change([2], 3) -> -1 (impossible)
-\`\`\`
-
-\`\`\`algoviz
-{"title": "Coin-Change Table Walk-Through (amount=6, coins=[1,3,4])", "type": "array", "data": [0, 1, 2, 1, 1, 2, 2], "frames": [{"highlight": [0], "label": "dp[0]=0 (base case: 0 coins needed for 0¢)", "stats": {"amount": 0}}, {"highlight": [1], "label": "dp[1]=1 (use one 1¢ coin)", "stats": {"amount": 1}}, {"highlight": [2], "label": "dp[2]=2 (two 1¢ coins)", "stats": {"amount": 2}}, {"highlight": [3], "label": "dp[3]=1 (one 3¢ coin beats three 1¢)", "stats": {"amount": 3}}, {"highlight": [4], "label": "dp[4]=1 (one 4¢ coin)", "stats": {"amount": 4}}, {"highlight": [5], "label": "dp[5]=2 (4¢+1¢)", "stats": {"amount": 5}}, {"highlight": [6], "label": "dp[6]=2 (3¢+3¢)", "stats": {"amount": 6}}], "speed": 1000}
-\`\`\`
-
-\`\`\`playground
-{"title": "Coin-Change Bottom-Up", "language": "python", "code": "def coin_change(coins, amount):\\n    dp = [float('inf')] * (amount + 1)\\n    dp[0] = 0                       # base case\\n    for a in range(1, amount + 1):  # build up\\n        for c in coins:\\n            if a - c >= 0:\\n                dp[a] = min(dp[a], dp[a - c] + 1)\\n    return dp[amount] if dp[amount] != float('inf') else -1\\n\\nprint(coin_change([1, 3, 4], 6))  # -> 2\\nprint(coin_change([2], 3))        # -> -1", "runnable": true}
-\`\`\`
-
-\`\`\`quiz
-{"title": "Check Your Tabulation Intuition", "questions": [{"question": "Which statement is TRUE about tabulation?", "options": ["It uses recursion to fill the table", "It computes subproblems on demand", "It fills the table iteratively from smallest to largest", "It cannot be space-optimized"], "answer": 2, "explanation": "Tabulation iterates from the base cases upward, guaranteeing every dependency is already solved."}, {"question": "For coin-change, what does dp[a] represent?", "options": ["The largest coin used so far", "The minimum coins needed to make amount a", "The number of ways to make amount a", "The total value of coins used"], "answer": 1, "explanation": "dp[a] stores the minimum coin count for amount a, built from smaller sub-amounts."}, {"question": "Why might tabulation outperform memoization for large inputs?", "options": ["It skips unnecessary subproblems", "It avoids recursion overhead and stack-overflow risk", "It uses hash maps instead of arrays", "It requires less memory"], "answer": 1, "explanation": "Iterative table-filling removes function-call overhead and deep-recursion danger."}]}
-\`\`\`
-
-\`\`\`takeaways
-{"title": "Key Takeaways", "items": ["Tabulation fills a table iteratively from base cases upward, avoiding recursion.", "It systematically computes all subproblems, giving predictable O(n) time and often better constant factors.", "Space optimization is easier: sometimes only the last row or two needs to be kept.", "Choose tabulation when the input size is large or recursion depth is a concern."]}
 \`\`\``,
       starterCode: `def fib_tabulation(n):
     # TODO: Compute n-th Fibonacci using tabulation
@@ -340,103 +245,31 @@ print(coin_change([1, 2, 5], 11))        # Expected: 3
       title: "Knapsack & LCS",
       content: `## Classic DP: 0/1 Knapsack & Longest Common Subsequence
 
-\`\`\`concept
-{"title": "Two Classic DP Patterns", "variant": "mental-model", "content": "Both 0/1 Knapsack and LCS share the same blueprint:\\n1. Define a 2-D table whose indices represent sub-problem choices\\n2. Express the global optimum as a recurrence over smaller sub-problems\\n3. Fill the table bottom-up, re-using already computed results\\nMaster these two and you can recognize dozens of interview problems built on the same skeleton."}
-\`\`\`
-
----
-
 ### Problem 1: 0/1 Knapsack
 
-You have \`n\` items, each with a weight and a value, and a single knapsack that can carry at most capacity \`W\`.  
-Goal: pick a subset of items whose total weight ≤ \`W\` and total value is maximized.  
-Each item may be taken **at most once** (0/1 choice).
+Given items with weights and values, and a knapsack capacity, find the maximum value you can carry. Each item can be used at most once.
 
-\`\`\`algoviz
-{"title": "Filling the DP table for weights=[1,3,4,5], values=[1,4,5,7], W=7", "type": "array", "data": [[0,0,0,0,0,0,0,0],[0,1,1,1,1,1,1,1],[0,1,1,4,5,5,5,5],[0,1,1,4,5,6,6,9],[0,1,1,4,5,7,8,9]], "frames": [{"highlight":[0],"label":"Row 0: no items → value 0","stats":{"i":0,"w":7}},{"highlight":[1],"label":"Row 1: item 0 (w=1,v=1) can fit everywhere","stats":{"i":1,"w":7}},{"highlight":[2],"label":"Row 2: item 1 (w=3,v=4). Best at w=3..6 is 4","stats":{"i":2,"w":6}},{"highlight":[3],"label":"Row 3: item 2 (w=4,v=5). Best at w=4 is 5, w=7 is 9","stats":{"i":3,"w":7}},{"highlight":[4],"label":"Row 4: item 3 (w=5,v=7). Final max value = 9","stats":{"i":4,"w":7}}], "speed": 900}
+\`\`\`
+weights = [1, 3, 4, 5]
+values  = [1, 4, 5, 7]
+capacity = 7
+Answer: 9 (items with weight 3 and 4, values 4 + 5)
 \`\`\`
 
-#### Recurrence
-
-Let \`dp[i][w]\` be the best value achievable with the first \`i\` items and capacity \`w\`.
-
-- If we **skip** item \`i-1\`: \`dp[i-1][w]\`  
-- If we **take** item \`i-1\` (and \`w ≥ weight[i-1]\`): \`dp[i-1][w-weight[i-1]] + value[i-1]\`
-
-Therefore  
-\`dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight[i-1]] + value[i-1])\`
-
-\`\`\`playground
-{"title": "0/1 Knapsack bottom-up", "language": "python", "code": "def knapsack(weights, values, W):\\n    n = len(weights)\\n    dp = [[0]*(W+1) for _ in range(n+1)]\\n    for i in range(1, n+1):\\n        wt, val = weights[i-1], values[i-1]\\n        for w in range(W+1):\\n            if wt <= w:\\n                dp[i][w] = max(dp[i-1][w], dp[i-1][w-wt] + val)\\n            else:\\n                dp[i][w] = dp[i-1][w]\\n    return dp[n][W]\\n\\nprint(knapsack([1,3,4,5], [1,4,5,7], 7))  # → 9", "runnable": true}
-\`\`\`
-
-#### Complexity
-
-- Time: \`O(n·W)\` — pseudo-polynomial (depends on numeric value of capacity)  
-- Space: \`O(n·W)\` table; reducible to \`O(W)\` with rolling rows
-
-\`\`\`callout
-{"type": "warning", "title": "NP-hard does not mean \\"skip DP\\"", "content": "Knapsack is NP-hard, yet the DP above easily handles n≈10³ and W≈10⁵ in under a second. \\"Hardness\\" matters when W is huge or you need the exact optimum for millions of items — not for typical interview sizes."}
-\`\`\`
-
----
+**Recurrence:** \`dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight[i]] + value[i])\`
 
 ### Problem 2: Longest Common Subsequence (LCS)
 
-Given two strings \`A\` (length \`n\`) and \`B\` (length \`m\`), find the length of their longest **subsequence** present in both (order preserved, not necessarily contiguous).
+Find the length of the longest subsequence common to two strings.
 
-\`\`\`compare
-{"variant": "good-bad", "before": {"label": "Brute idea", "code": "Generate every subsequence of A (2ⁿ) and check membership in B\\n→ O(2ⁿ · m) — hopeless for n>20"}, "after": {"label": "DP idea", "code": "Build table dp[i][j] = LCS of A[:i] and B[:j]\\n→ O(n·m) time, O(n·m) space (can drop to O(min(n,m)))"}}
+\`\`\`
+LCS("ABCBDAB", "BDCAB") -> 4 ("BCAB")
+LCS("ABC", "DEF") -> 0
 \`\`\`
 
-#### Recurrence
-
-\`dp[i][j]\` = LCS length of prefixes \`A[0..i-1]\` and \`B[0..j-1]\`
-
-- If \`A[i-1] == B[j-1]\`: the chars match → extend previous best by 1  
-  \`dp[i][j] = dp[i-1][j-1] + 1\`  
-- Else: skip one char from either string  
-  \`dp[i][j] = max(dp[i-1][j], dp[i][j-1])\`
-
-\`\`\`trace
-{"title": "LCS of \\"ABCBDAB\\" and \\"BDCAB\\"", "language": "python", "code": "A, B = \\"ABCBDAB\\", \\"BDCAB\\"\\nn, m = len(A), len(B)\\ndp = [[0]*(m+1) for _ in range(n+1)]\\nfor i in range(1, n+1):\\n    for j in range(1, m+1):\\n        if A[i-1] == B[j-1]:\\n            dp[i][j] = dp[i-1][j-1] + 1\\n        else:\\n            dp[i][j] = max(dp[i-1][j], dp[i][j-1])\\nprint(dp[n][m])  # 4", "frames": [{"line":5,"vars":{"i":1,"j":1,"A":"ABCBDAB","B":"BDCAB"},"note":"A[0]='A' != B[0]='B' → max(0,0)=0","stdout":""},{"line":5,"vars":{"i":2,"j":1,"j_curr":1},"note":"A[1]='B' == B[0]='B' → 1","stdout":""},{"line":5,"vars":{"i":4,"j":3},"note":"A[3]='B' == B[2]='C'? No → max(2,2)=2","stdout":""},{"line":5,"vars":{"i":7,"j":5},"note":"Final cell dp[7][5]=4","stdout":"4\\n"}], "speed": 700}
-\`\`\`
-
-#### Reconstructing the actual subsequence
-
-Walk backwards from \`dp[n][m]\`:
-
-1. If \`A[i-1] == B[j-1]\`: this char is part of LCS — record it, move ↖  
-2. Else move to the larger of ↑ or ←
-
-\`\`\`playground
-{"title": "LCS length + reconstruction", "language": "python", "code": "def lcs_with_string(A, B):\\n    n, m = len(A), len(B)\\n    dp = [[0]*(m+1) for _ in range(n+1)]\\n    # fill length table\\n    for i in range(1, n+1):\\n        for j in range(1, m+1):\\n            dp[i][j] = dp[i-1][j-1]+1 if A[i-1]==B[j-1] else max(dp[i-1][j], dp[i][j-1])\\n    # reconstruct\\n    i, j = n, m\\n    sub = []\\n    while i>0 and j>0:\\n        if A[i-1]==B[j-1]:\\n            sub.append(A[i-1]); i-=1; j-=1\\n        elif dp[i-1][j] >= dp[i][j-1]: i-=1\\n        else: j-=1\\n    return ''.join(reversed(sub))\\n\\nprint(lcs_with_string(\\"ABCBDAB\\", \\"BDCAB\\"))  # → BCAB", "runnable": true}
-\`\`\`
-
-#### Complexity
-
-- Time: \`O(n·m)\`  
-- Space: \`O(n·m)\` full table; \`O(min(n,m))\` with rolling array if you only need the length
-
----
-
-### Quick comparison
-
-| Dimension        | 0/1 Knapsack                     | LCS                              |
-|------------------|----------------------------------|----------------------------------|
-| State            | \`dp[i][w]\`                       | \`dp[i][j]\`                       |
-| State meaning    | best value, first i items, cap w | LCS length of prefixes i,j       |
-| Recurrence       | max(skip, take)                  | if match: diag+1; else max(up,left) |
-| Time complexity  | \`O(n·W)\`                         | \`O(n·m)\`                         |
-| Space (opt)      | \`O(W)\`                           | \`O(min(n,m))\`                    |
-
-\`\`\`quiz
-{"title": "Check your understanding", "questions": [{"question":"In 0/1 Knapsack the entry dp[i][w] can be smaller than dp[i-1][w].","options":["True — skipping an item may lower the value","False — values only stay equal or increase"],"answer":1,"explanation":"Skipping never hurts; dp[i][w] is at least dp[i-1][w]."},{"question":"Which statement about LCS is correct?","options":["A contiguous substring is always a subsequence","A subsequence is always a contiguous substring","They are identical concepts"],"answer":0,"explanation":"Contiguous is a special case of subsequence; LCS allows gaps."},{"question":"The DP for 0/1 Knapsack is called ‘pseudo-polynomial’ because","options":["It is exponential in the number of items","Its runtime depends on the numeric value of W","It uses polynomial extra space"],"answer":1,"explanation":"Runtime is polynomial in the value of W, not its input bit length."}]}
-\`\`\`
-
-\`\`\`takeaways
-{"title": "Key Takeaways", "items": ["Both problems use a 2-D table where indices represent choices (items & capacity vs. string prefixes)", "Recurrences decide between ‘include current element’ or ‘skip it’, exploiting optimal substructure", "Table filling is O(n·W) for Knapsack and O(n·m) for LCS; space can be compressed with rolling arrays", "Recognizing these patterns lets you solve dozens of interview variants (target sum, edit distance, etc.)"]}
-\`\`\``,
+**Recurrence:**
+- If chars match: \`dp[i][j] = dp[i-1][j-1] + 1\`
+- If not: \`dp[i][j] = max(dp[i-1][j], dp[i][j-1])\``,
       starterCode: `def knapsack(weights, values, capacity):
     # TODO: Return maximum value achievable
     pass
@@ -528,99 +361,31 @@ print(lcs_string("AGGTAB", "GXTXAYB"))  # Expected: "GTAB" or similar
       title: "LIS & Edit Distance",
       content: `## Classic DP: Longest Increasing Subsequence & Edit Distance
 
-\`\`\`concept
-{"title": "Two Classic DP Patterns", "variant": "mental-model", "content": "Both LIS and Edit Distance follow the same DP blueprint: build a table where each cell answers a smaller version of the original question. The art is choosing the right sub-problem definition—ending index for LIS, prefix lengths for Edit Distance—and writing the recurrence that bridges neighboring cells."}
-\`\`\`
-
----
-
 ### Problem 1: Longest Increasing Subsequence (LIS)
 
-Find the length of the longest strictly increasing subsequence (elements keep original order but need not be contiguous).
+Find the length of the longest strictly increasing subsequence.
 
 \`\`\`
-LIS([10, 9, 2, 5, 3, 7, 101, 18]) → 4  # [2, 3, 7, 18] or [2, 5, 7, 101]
-LIS([0, 1, 0, 3, 2, 3]) → 4            # [0, 1, 2, 3]
+LIS([10, 9, 2, 5, 3, 7, 101, 18]) -> 4  ([2, 3, 7, 18] or [2, 5, 7, 101])
+LIS([0, 1, 0, 3, 2, 3]) -> 4  ([0, 1, 2, 3])
 \`\`\`
 
-#### O(n²) DP Idea
-
-Let \`dp[i]\` = length of the LIS that **must end at index i**.
-
-For every earlier index \`j < i\`:
-- If \`arr[j] < arr[i]\` we can extend that subsequence:  
-  \`dp[i] = max(dp[i], dp[j] + 1)\`
-
-\`\`\`algoviz
-{"title": "LIS DP on [10, 9, 2, 5]", "type": "array", "data": [10, 9, 2, 5],
- "frames": [
-  {"highlight": [0], "label": "i=0: dp[0]=1 (base)", "stats": {"i": 0, "dp[0]": 1}},
-  {"highlight": [1], "label": "i=1: 9<10 → dp[1]=dp[0]+1=2", "stats": {"i": 1, "dp[1]": 2}},
-  {"highlight": [2], "label": "i=2: 2 smaller than all → dp[2]=1", "stats": {"i": 2, "dp[2]": 1}},
-  {"highlight": [3], "label": "i=3: 5 can extend dp[2] → dp[3]=2", "stats": {"i": 3, "dp[3]": 2}}
- ], "speed": 700}
-\`\`\`
-
-The answer is \`max(dp)\` because the best subsequence may end anywhere.
-
-\`\`\`playground
-{"title": "O(n²) LIS Template", "language": "python", "code": "def lis(nums):\\n    n = len(nums)\\n    dp = [1] * n\\n    for i in range(n):\\n        for j in range(i):\\n            if nums[j] < nums[i]:\\n                dp[i] = max(dp[i], dp[j] + 1)\\n    return max(dp)\\n\\nprint(lis([10, 9, 2, 5, 3, 7, 101, 18]))  # 4", "runnable": true}
-\`\`\`
-
-\`\`\`callout
-{"type": "tip", "title": "Can we do better?", "content": "Yes! A patience-sorting style algorithm with binary search drops the time to O(n log n) and space to O(n). For interviews, mention the n² version first—it's clearer—then wow them with the upgrade."}
-\`\`\`
-
----
+**O(n^2) approach:** \`dp[i]\` = length of LIS ending at index i.
+For each j < i: if \`arr[j] < arr[i]\`, then \`dp[i] = max(dp[i], dp[j] + 1)\`
 
 ### Problem 2: Edit Distance (Levenshtein Distance)
 
-Minimum single-character edits (insert, delete, replace) to turn string \`s\` into string \`t\`.
+Find the minimum number of operations (insert, delete, replace) to transform one string into another.
 
 \`\`\`
-edit_distance("kitten", "sitting") → 3
-edit_distance("", "abc") → 3
+edit_distance("kitten", "sitting") -> 3
+edit_distance("", "abc") -> 3
 \`\`\`
 
-#### 2-D DP Definition
-
-Let \`dp[i][j]\` = min edits to transform \`s[0..i-1]\` into \`t[0..j-1]\`.
-
-Recurrence:
-- If \`s[i-1] == t[j-1]\`:  
-  \`dp[i][j] = dp[i-1][j-1]\`  (no new cost)
-- Else:  
-  \`dp[i][j] = 1 + min(\`  
-  &nbsp;&nbsp;\`dp[i-1][j],   # delete from s\`  
-  &nbsp;&nbsp;\`dp[i][j-1],   # insert into s\`  
-  &nbsp;&nbsp;\`dp[i-1][j-1]  # replace\`  
-  \`)\`
-
-\`\`\`trace
-{"title": "Editing \\"kitten\\" → \\"sitting\\"", "language": "python", "code": "def edit_distance(s, t):\\n    m, n = len(s), len(t)\\n    dp = [[0]*(n+1) for _ in range(m+1)]\\n    # base: empty strings\\n    for i in range(m+1): dp[i][0] = i\\n    for j in range(n+1): dp[0][j] = j\\n    # fill table\\n    for i in range(1, m+1):\\n        for j in range(1, n+1):\\n            if s[i-1] == t[j-1]:\\n                dp[i][j] = dp[i-1][j-1]\\n            else:\\n                dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])\\n    return dp[m][n]\\n\\nprint(edit_distance(\\"kitten\\", \\"sitting\\"))  # 3", "frames": [
-  {"line": 4, "vars": {"s": "kitten", "t": "sitting", "m": 6, "n": 7}, "note": "initialize first row/col"},
-  {"line": 10, "vars": {"i": 1, "j": 1, "s[i-1]": "k", "t[j-1]": "s"}, "note": "replace k→s, cost 1"},
-  {"line": 10, "vars": {"i": 6, "j": 7, "dp[5][6]": 2, "dp[6][6]": 3}, "note": "final cell dp[6][7]=3"}
-], "speed": 800}
-\`\`\`
-
-Complexities: O(m·n) time, O(m·n) space (can be trimmed to O(min(m, n)) if you only need the number, not the path).
-
-\`\`\`quiz
-{"title": "Quick Check", "questions": [
-  {"question": "In the LIS recurrence, what does dp[i] represent?", "options": ["Length of any increasing subsequence inside i", "Length of the LIS that ends exactly at index i", "Length of the LIS starting from index i", "Total number of increasing subsequences"], "answer": 1, "explanation": "We pin the subsequence to end at i so earlier indices can extend it."},
-  {"question": "Which edit-operation set is NOT part of the standard Levenshtein distance?", "options": ["Insert", "Delete", "Replace", "Transpose"], "answer": 3, "explanation": "Transpose (swap adjacent chars) is a different variant, not in vanilla Levenshtein."},
-  {"question": "For Edit Distance, why do we initialize dp[i][0] = i?", "options": ["i characters need to be inserted", "i characters need to be deleted to match empty t", "Base case for recursion depth", "Avoid index errors"], "answer": 1, "explanation": "Turning a prefix of length i into an empty string requires i deletions."}
-]}
-\`\`\`
-
-\`\`\`takeaways
-{"title": "Key Takeaways", "items": [
-  "Define dp[i] as the best value *ending at* i for sequence problems like LIS; take max (or min) across all endings for the final answer.",
-  "Define dp[i][j] on *prefix lengths* for string-to-string problems; build a 2-D table and fill with a nested loop.",
-  "Both classics showcase the same DP recipe: characterize sub-problems, write a recurrence, implement with loops or memoization, then optimize if needed."
-]}
-\`\`\``,
+**Recurrence:**
+- If chars match: \`dp[i][j] = dp[i-1][j-1]\`
+- If not: \`dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])\`
+  - (delete, insert, replace)`,
       starterCode: `def longest_increasing_subsequence(arr):
     # TODO: Return length of LIS
     pass

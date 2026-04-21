@@ -13,41 +13,32 @@ export const contextModule: Module = {
 
 **Prop drilling** is when you pass data through many layers of components that do not need it, just so a deeply nested component can access it:
 
-\`\`\`mermaid
-graph TD
-    A[App has user data] -->|passes user| B[Layout]
-    B -->|passes user| C[Sidebar]
-    C -->|passes user| D[UserMenu needs user]
-    
-    style B fill:#f9f9f9
-    style C fill:#f9f9f9
+\`\`\`
+App (has user data)
+  └─> Layout (passes user down)
+       └─> Sidebar (passes user down)
+            └─> UserMenu (actually needs user)
 \`\`\`
 
 Layout and Sidebar do not use \`user\` — they just relay it. This makes code hard to maintain and refactor.
-
-\`\`\`concept
-{
-  "title": "The Prop Drilling Problem",
-  "variant": "insight",
-  "content": "Every intermediate component becomes coupled to data it doesn't use. Change the shape of \`user\`? Update 3+ components. Remove a layer? Break the chain. Context breaks this coupling by creating a direct pipeline from provider to consumer."
-}
-\`\`\`
 
 ### React Context solves this
 
 Context provides a way to share values between components without explicitly passing props through every level:
 
-\`\`\`compare
-{
-  "variant": "before-after",
-  "before": {
-    "label": "Prop Drilling",
-    "code": "function App() {\\n  const user = useUser();\\n  return <Layout user={user} />;\\n}\\n\\nfunction Layout({ user }) {\\n  return <Sidebar user={user} />;\\n}\\n\\nfunction Sidebar({ user }) {\\n  return <UserMenu user={user} />;\\n}"
-  },
-  "after": {
-    "label": "With Context",
-    "code": "const UserContext = createContext(null);\\n\\nfunction App() {\\n  const user = useUser();\\n  return (\\n    <UserContext.Provider value={user}>\\n      <Layout />\\n    </UserContext.Provider>\\n  );\\n}\\n\\nfunction UserMenu() {\\n  const user = useContext(UserContext);\\n  return <span>{user.name}</span>;\\n}"
-  }
+\`\`\`
+// Create context with a default value
+const UserContext = createContext(null);
+
+// Provide the value at any level
+<UserContext.Provider value={currentUser}>
+  <Layout />     {/* no user prop needed */}
+</UserContext.Provider>
+
+// Consume it anywhere below — no matter how deep
+function UserMenu() {
+  const user = useContext(UserContext);
+  return <span>{user.name}</span>;
 }
 \`\`\`
 
@@ -58,19 +49,6 @@ Context provides a way to share values between components without explicitly pas
 3. \`useContext(Context)\` walks up the component tree to find the nearest Provider
 4. If no Provider is found, the default value is used
 
-\`\`\`trace
-{
-  "title": "Context Lookup in Action",
-  "language": "javascript",
-  "code": "const ThemeContext = createContext('light');\\n\\nfunction App() {\\n  return (\\n    <ThemeContext.Provider value=\\"dark\\">\\n      <Header />\\n    </ThemeContext.Provider>\\n  );\\n}\\n\\nfunction Header() {\\n  return <Button />;\\n}\\n\\nfunction Button() {\\n  const theme = useContext(ThemeContext);\\n  return <button className={theme}>Click</button>;\\n}",
-  "frames": [
-    { "line": 1, "vars": {}, "note": "Context created with default 'light'" },
-    { "line": 4, "vars": { "ThemeContext": {} }, "note": "Provider sets value to 'dark'" },
-    { "line": 13, "vars": { "theme": "dark" }, "note": "useContext finds nearest Provider" }
-  ]
-}
-\`\`\`
-
 ### Context Concepts
 
 | Concept | Description |
@@ -80,57 +58,14 @@ Context provides a way to share values between components without explicitly pas
 | **Consumer / useContext** | Reads the nearest provider's value |
 | **Nesting** | Inner providers override outer ones |
 
-\`\`\`quiz
-{
-  "title": "Context Fundamentals",
-  "questions": [
-    {
-      "question": "What happens when useContext finds no Provider above it?",
-      "options": ["Throws an error", "Returns undefined", "Returns the default value", "Returns null"],
-      "answer": 2,
-      "explanation": "useContext returns the default value passed to createContext when no Provider is found in the component tree."
-    },
-    {
-      "question": "Which components need to be aware of Context when using it?",
-      "options": ["All components in the tree", "Only the Provider and Consumer", "Every parent up to the Provider", "Only leaf components"],
-      "answer": 1,
-      "explanation": "Only the component providing the value and the component consuming it need to know about the Context. Intermediate components remain unaware."
-    },
-    {
-      "question": "Can you have multiple Providers for the same Context?",
-      "options": ["No, only one Provider allowed", "Yes, but they must have the same value", "Yes, inner Providers override outer ones", "Only if they're in different React trees"],
-      "answer": 2,
-      "explanation": "You can nest Providers for the same Context. The innermost Provider's value is what consumers below it will receive."
-    }
-  ]
-}
-\`\`\`
-
 ### When to Use Context
 
-\`\`\`tabs
-{
-  "tabs": [
-    {
-      "label": "✅ Good Use Cases",
-      "content": "**Theme System**: Dark/light mode that many components need\\n\\n**Authentication**: Current user info accessible throughout app\\n\\n**Localization**: Language/locale settings for translations\\n\\n**Router State**: Current route info for navigation components"
-    },
-    {
-      "label": "❌ Avoid For",
-      "content": "**Frequently changing data**: Causes excessive re-renders (use state management instead)\\n\\n**Single component needs**: Just pass props if only 1-2 components need it\\n\\n**Derived state**: Computed values that can be calculated from existing props\\n\\n**Everything**: Overuse leads to performance issues and tangled dependencies"
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`callout
-{
-  "type": "warning",
-  "title": "Performance Consideration",
-  "content": "Context triggers re-renders of all consumers when its value changes. For high-frequency updates (like form inputs), consider splitting contexts or using specialized state management solutions."
-}
-
-\`\`\`
+| Use Context For | Do NOT Use Context For |
+|----------------|----------------------|
+| Theme (dark/light mode) | Frequently changing data (use state management) |
+| Current user / auth state | Data that only 1-2 components need (just pass props) |
+| Locale / language | Everything — overuse causes re-render problems |
+| Router information | |
 
 In these exercises, you will implement the Context pattern from scratch.`,
     },
@@ -153,122 +88,29 @@ Create:
 
 Providers can be nested. The innermost Provider's value wins. When a Provider's callback finishes, the previous value is restored (simulating component tree scope).
 
-\`\`\`concept
-{
-  "title": "Context Provider Stack",
-  "variant": "mental-model",
-  "content": "Think of Context Providers like a stack of transparent overlays. Each Provider adds a new overlay with its value. When you call useContext, you always see the top overlay. When a Provider's callback ends, its overlay is removed, revealing the previous value underneath."
-}
+### Examples
+
 \`\`\`
+const ThemeContext = createContext("light");
 
-\`\`\`trace
-{
-  "title": "Provider Nesting in Action",
-  "language": "javascript",
-  "code": "const ThemeContext = createContext(\\"light\\");\\n\\nconsole.log(useContext(ThemeContext)); // \\"light\\" (default)\\n\\nThemeContext.Provider(\\"dark\\", () => {\\n  console.log(useContext(ThemeContext)); // \\"dark\\"\\n  \\n  ThemeContext.Provider(\\"blue\\", () => {\\n    console.log(useContext(ThemeContext)); // \\"blue\\" (innermost)\\n  });\\n  \\n  console.log(useContext(ThemeContext)); // \\"dark\\" (restored)\\n});",
-  "frames": [
-    { "line": 1, "vars": { "ThemeContext": "context object" }, "note": "Context created with default value 'light'" },
-    { "line": 3, "vars": { "stack": [] }, "stdout": "light\\n", "note": "No providers active, using default value" },
-    { "line": 5, "vars": { "stack": ["dark"] }, "note": "Provider pushes 'dark' onto stack" },
-    { "line": 6, "vars": { "stack": ["dark"] }, "stdout": "dark\\n", "note": "Top of stack is 'dark'" },
-    { "line": 8, "vars": { "stack": ["dark", "blue"] }, "note": "Nested provider pushes 'blue'" },
-    { "line": 9, "vars": { "stack": ["dark", "blue"] }, "stdout": "blue\\n", "note": "Innermost provider wins" },
-    { "line": 8, "vars": { "stack": ["dark"] }, "note": "Inner provider exits, pops 'blue'" },
-    { "line": 11, "vars": { "stack": ["dark"] }, "stdout": "dark\\n", "note": "Previous value restored" }
-  ],
-  "speed": 1000
-}
-\`\`\`
+console.log(useContext(ThemeContext)); // "light" (default)
 
-### Implementation Strategy
+ThemeContext.Provider("dark", () => {
+  console.log(useContext(ThemeContext)); // "dark"
 
-\`\`\`steps
-{
-  "title": "Building the Context System",
-  "steps": [
-    {
-      "title": "Step 1: Create the Context Object",
-      "content": "Your \`createContext\` function should return an object with:\\n- A \`Provider\` method that takes (value, callback)\\n- An internal stack to track nested values\\n- A default value property"
-    },
-    {
-      "title": "Step 2: Implement the Provider Method",
-      "content": "The Provider method should:\\n1. Push the new value onto the internal stack\\n2. Execute the callback function\\n3. Pop the value from the stack when callback completes\\n4. Handle errors to ensure stack cleanup"
-    },
-    {
-      "title": "Step 3: Create useContext Function",
-      "content": "\`useContext\` should:\\n1. Check if the context has any active providers (stack not empty)\\n2. Return the top value from the stack if providers exist\\n3. Return the default value if no providers are active"
-    }
-  ]
-}
+  ThemeContext.Provider("blue", () => {
+    console.log(useContext(ThemeContext)); // "blue" (innermost)
+  });
+
+  console.log(useContext(ThemeContext)); // "dark" (restored)
+});
 \`\`\`
 
 ### Hints
 
 - Use a stack to track nested provider values
 - Push on Provider entry, pop on Provider exit
-- useContext reads the top of the stack, or default if empty
-
-\`\`\`quiz
-{
-  "title": "Context Provider Behavior",
-  "questions": [
-    {
-      "question": "What happens when multiple Providers are nested?",
-      "options": [
-        "All values are merged together",
-        "The outermost Provider's value is used",
-        "The innermost Provider's value is used",
-        "An error is thrown"
-      ],
-      "answer": 2,
-      "explanation": "The innermost Provider's value always takes precedence, similar to how local variables shadow outer variables in scope."
-    },
-    {
-      "question": "When should you pop a value from the Provider stack?",
-      "options": [
-        "Immediately after pushing it",
-        "When the Provider component unmounts",
-        "When the callback function completes",
-        "Never, values accumulate"
-      ],
-      "answer": 2,
-      "explanation": "Values should be popped when the Provider's callback completes, ensuring proper cleanup and restoration of previous values."
-    },
-    {
-      "question": "What does useContext return when no Provider is active?",
-      "options": [
-        "undefined",
-        "null",
-        "The default value from createContext",
-        "An error"
-      ],
-      "answer": 2,
-      "explanation": "When no Provider is active in the component tree, useContext returns the default value that was passed to createContext."
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`playground
-{
-  "title": "Implement Your Context System",
-  "language": "javascript",
-  "code": "function createContext(defaultValue) {\\n  // TODO: Implement createContext\\n  // Should return an object with Provider method\\n  // and handle the internal stack\\n}\\n\\nfunction useContext(context) {\\n  // TODO: Implement useContext\\n  // Should return current context value\\n}\\n\\n// Test your implementation\\nconst ThemeContext = createContext(\\"light\\");\\nconsole.log(\\"Default:\\", useContext(ThemeContext));\\n\\nThemeContext.Provider(\\"dark\\", () => {\\n  console.log(\\"Inside provider:\\", useContext(ThemeContext));\\n});\\n\\nconsole.log(\\"After provider:\\", useContext(ThemeContext));",
-  "runnable": true
-}
-\`\`\`
-
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Context Providers use a stack-based approach to handle nested contexts",
-    "The innermost Provider's value always takes precedence over outer Providers",
-    "Values are automatically restored when Providers exit, maintaining proper scope",
-    "This pattern mirrors React's actual Context API behavior for prop drilling solutions"
-  ]
-}
-\`\`\``,
+- useContext reads the top of the stack, or default if empty`,
       starterCode: `function createContext(defaultValue) {
   // TODO: implement context with:
   // - A stack of values (to support nested Providers)

@@ -9,6 +9,18 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  try {
+  return await handleBrainstorm(req, params);
+  } catch (err) {
+    console.error("[Brainstorm] Unhandled error:", err);
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
+}
+
+async function handleBrainstorm(
+  req: NextRequest,
+  params: Promise<{ id: string }>
+) {
   const auth = await requireAuth();
   if (!auth) return unauthorized();
   const { id } = await params;
@@ -50,12 +62,24 @@ export async function POST(
     })),
   ];
 
-  const result = await streamLLM(messages, { maxTokens: 300, temperature: 0.7 });
+  let result;
+  try {
+    result = await streamLLM(messages, { maxTokens: 300, temperature: 0.7 });
+  } catch (err) {
+    console.error("[Brainstorm] streamLLM error:", err);
+    return NextResponse.json({ error: "LLM unavailable" }, { status: 503 });
+  }
   if (!result) {
     return NextResponse.json({ error: "LLM unavailable" }, { status: 503 });
   }
 
-  const fullText = await collectStream(result.stream);
+  let fullText: string;
+  try {
+    fullText = await collectStream(result.stream);
+  } catch (err) {
+    console.error("[Brainstorm] collectStream error:", err);
+    return NextResponse.json({ error: "LLM stream failed" }, { status: 503 });
+  }
   const guardrail = validateGuardrail(fullText);
 
   await db.from("cc_essay_interactions").insert({

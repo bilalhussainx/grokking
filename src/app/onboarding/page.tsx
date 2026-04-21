@@ -10,14 +10,14 @@ const STEPS = ["language", "interests", "style", "privacy", "summary"] as const;
 type Step = typeof STEPS[number];
 
 const INTEREST_CATEGORIES = [
-  { id: "coding", name: "Programming & CS", icon: "💻", examples: "Python, JavaScript, Data Structures" },
-  { id: "ai-ml", name: "AI & Machine Learning", icon: "🤖", examples: "Prompt Engineering, RAG, Neural Networks" },
-  { id: "system-design", name: "System Design", icon: "🏗️", examples: "Architecture, Scalability, Microservices" },
-  { id: "interview-prep", name: "Interview Prep", icon: "🎯", examples: "Coding Interviews, Behavioral, Mock Interviews" },
-  { id: "finance", name: "Finance & Business", icon: "📈", examples: "Investing, Accounting, Economics" },
-  { id: "languages", name: "Language Learning", icon: "🌍", examples: "Spanish, French, Hindi, Chinese" },
-  { id: "religion", name: "Religion & Philosophy", icon: "📖", examples: "Islam, Christianity, Buddhism, Stoicism" },
-  { id: "personal-growth", name: "Personal Growth", icon: "🌱", examples: "Leadership, Mindfulness, Negotiation" },
+  { id: "essays", name: "Essay Writing", icon: "✍️", examples: "Personal Statement, Supplementals, Why Us" },
+  { id: "interviews", name: "Interview Prep", icon: "🎯", examples: "Mock Interviews with Ivy+ Alumni Personas" },
+  { id: "school-list", name: "School List Building", icon: "🏫", examples: "Reach, Match, Safety, Chancing Estimates" },
+  { id: "activities", name: "Activities Optimization", icon: "📋", examples: "Common App Activities List, Impact Scoring" },
+  { id: "recommendations", name: "Recommendation Strategy", icon: "📝", examples: "Brag Sheets, Ask Emails, Recommender Tracking" },
+  { id: "financial-aid", name: "Financial Aid & Scholarships", icon: "💰", examples: "FAFSA, CSS Profile, Award Letter Appeals" },
+  { id: "test-prep", name: "Test Prep & Academics", icon: "📚", examples: "SAT, ACT, AP Courses, GPA Strategy" },
+  { id: "personal-growth", name: "Personal Growth", icon: "🌱", examples: "Leadership, Mindfulness, Time Management" },
 ];
 
 const FLUENCY_LEVELS = [
@@ -153,7 +153,7 @@ function OnboardingInner() {
         localStorage.removeItem("pending-invite-code");
       }
 
-      router.push("/");
+      router.push("/intake");
     } catch (err) {
       console.error("Failed to save preferences:", err);
     } finally {
@@ -250,8 +250,8 @@ function OnboardingInner() {
   const interestsStep = (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-white mb-1">What interests you?</h2>
-        <p className="text-sm text-white/50">Pick as many as you like — we'll recommend courses</p>
+        <h2 className="text-xl font-bold text-white mb-1">What do you need help with?</h2>
+        <p className="text-sm text-white/50">Pick as many as you like — we'll personalize your experience</p>
       </div>
 
       <div className="grid grid-cols-1 gap-2">
@@ -411,10 +411,17 @@ function OnboardingInner() {
           You can change any of these in Settings. Tell Coach Kairos &quot;switch to English&quot; at any time during a lesson.
         </p>
 
-        <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 mt-4">
+        <div className="p-3 rounded-lg bg-[#D4AF37]/5 border border-[#D4AF37]/20 mt-4">
+          <p className="text-xs text-[#D4AF37] font-medium mb-1">Next: Meet Coach Kairos</p>
+          <p className="text-xs text-white/50">
+            Coach Kairos will ask a few quick questions about you — your name, grade, and what schools interest you. This helps personalize your essays, interviews, and school recommendations.
+          </p>
+        </div>
+
+        <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 mt-3">
           <p className="text-xs text-amber-400 font-medium mb-1">Your Free Pro Trial</p>
           <p className="text-xs text-white/50">
-            You have 1 month of full Pro access and 300 AI credits. After your trial, you can subscribe for $15/mo or continue with free-tier access (first 3 lessons of each premium course).
+            You have 1 month of full Pro access including Essay Studio, Interview Prep with 10 Ivy+ alumni personas, Activities Optimizer, and all application tools. After your trial, subscribe for $10/mo or continue with free-tier access.
           </p>
         </div>
       </div>
@@ -460,7 +467,7 @@ function OnboardingInner() {
               disabled={saving}
               className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 text-white text-sm font-semibold hover:from-violet-400 hover:to-cyan-400 transition-all disabled:opacity-50 flex items-center gap-2"
             >
-              {saving ? "Saving..." : "Start Learning"}
+              {saving ? "Saving..." : "Meet Coach Kairos"}
               <ChevronRight className="w-4 h-4" />
             </button>
           ) : (

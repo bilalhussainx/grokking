@@ -62,125 +62,27 @@ These projects are designed to run in a plain JavaScript environment. They test 
       title: "Virtual DOM Implementation",
       content: `## Virtual DOM Implementation
 
-\`\`\`concept
-{
-  "title": "What is a Virtual DOM?",
-  "variant": "mental-model",
-  "content": "Think of the Virtual DOM as a blueprint of your UI. Instead of rebuilding the house every time you change a door, you first update the blueprint, compare it to the old one, and then only touch the parts of the house that actually changed."
-}
-\`\`\`
-
 ### Problem Statement
 
-Build a tiny Virtual DOM engine that can:
+Implement a simplified Virtual DOM system with three core functions:
 
-1. **Create** lightweight JavaScript objects that describe real DOM nodes
-2. **Compare** two descriptions and figure out the smallest set of changes
-3. **Apply** those changes to the real DOM (we'll log them instead of touching the browser)
+1. \`h(tag, props, ...children)\` — creates a virtual node (vnode)
+2. \`diff(oldTree, newTree)\` — compares two virtual trees and returns a list of patches
+3. \`applyPatches(patches)\` — applies patches and returns a log of operations
 
-\`\`\`steps
-{
-  "title": "Patch Types You'll Implement",
-  "steps": [
-    {
-      "title": "CREATE",
-      "content": "Add a brand-new node somewhere in the tree"
-    },
-    {
-      "title": "REMOVE",
-      "content": "Delete a node and its entire subtree"
-    },
-    {
-      "title": "REPLACE",
-      "content": "Swap one node for a completely different one"
-    },
-    {
-      "title": "UPDATE_PROPS",
-      "content": "Change, add, or remove attributes/properties"
-    },
-    {
-      "title": "UPDATE_TEXT",
-      "content": "Replace text content inside a node"
-    }
-  ]
-}
-\`\`\`
+Patch types:
+- \`CREATE\` — add a new node
+- \`REMOVE\` — remove a node
+- \`REPLACE\` — replace a node with a different one
+- \`UPDATE_PROPS\` — change props on an existing node
+- \`UPDATE_TEXT\` — change text content
 
 ### Key Behaviors
 
-- **Tag mismatch?** Entire subtree is blown away and replaced (React's reconciliation shortcut)
-- **Props diffed** key-by-key: additions, removals, and value changes tracked separately
-- **Children diffed** by index: position 0 vs 0, 1 vs 1, etc. (no fancy key-based matching)
-- **Text nodes** compared as plain strings
-
-\`\`\`algoviz
-{
-  "title": "Diffing Two Tiny Trees",
-  "type": "tree",
-  "data": [
-    {"id": "A", "label": "div", "children": ["B", "C"]},
-    {"id": "B", "label": "h1", "children": ["D"]},
-    {"id": "C", "label": "p", "children": ["E"]},
-    {"id": "D", "label": "text: Hello"},
-    {"id": "E", "label": "text: world"}
-  ],
-  "frames": [
-    {"highlight": ["A"], "label": "Compare root tags (both div)"},
-    {"highlight": ["B"], "label": "Compare h1 → h1 (same, recurse)"},
-    {"highlight": ["D"], "label": "Text changed: Hello → Hi"},
-    {"highlight": ["C"], "label": "p tag unchanged, but child will be checked"},
-    {"highlight": ["E"], "label": "Text unchanged: world"}
-  ],
-  "speed": 1000
-}
-\`\`\`
-
-\`\`\`quiz
-{
-  "title": "Quick Check: Diff Logic",
-  "questions": [
-    {
-      "question": "If old node is <span> and new node is <p>, what patch is generated?",
-      "options": ["UPDATE_PROPS", "REPLACE", "REMOVE + CREATE", "Nothing"],
-      "answer": 1,
-      "explanation": "Different tags trigger a full REPLACE of the subtree."
-    },
-    {
-      "question": "Which patch type is used when a node's className changes?",
-      "options": ["CREATE", "UPDATE_PROPS", "REPLACE", "UPDATE_TEXT"],
-      "answer": 1,
-      "explanation": "Props (including className) are handled by UPDATE_PROPS."
-    },
-    {
-      "question": "In our simplified diff, how are children matched?",
-      "options": ["By unique key", "By index position", "By tag name", "By content hash"],
-      "answer": 1,
-      "explanation": "We use index-based matching: first child vs first child, etc."
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`playground
-{
-  "title": "Starter Skeleton",
-  "language": "javascript",
-  "code": "// 1. Create a vnode\\nfunction h(tag, props, ...children) {\\n  return { tag, props, children };\\n}\\n\\n// 2. Diff two vnodes\\nfunction diff(oldTree, newTree) {\\n  const patches = [];\\n  // your logic here\\n  return patches;\\n}\\n\\n// 3. Apply patches (just log for now)\\nfunction applyPatches(patches) {\\n  patches.forEach(p => console.log(p));\\n}\\n\\n// Example usage:\\nconst oldTree = h('div', {}, h('h1', {}, 'Hello'));\\nconst newTree = h('div', {}, h('h1', {}, 'Hi'));\\nconst patches = diff(oldTree, newTree);\\napplyPatches(patches);",
-  "runnable": true
-}
-\`\`\`
-
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Virtual DOM = plain JS objects that describe real DOM nodes",
-    "Diffing finds the minimal set of changes between two descriptions",
-    "Tag mismatches short-circuit into full subtree replacements",
-    "Props and children are diffed separately for finer-grained patches"
-  ]
-}
-\`\`\``,
+- If tags differ, the entire subtree is replaced (like React)
+- Props are diffed individually (added, removed, changed)
+- Children are diffed by index (simplified — no key-based reconciliation)
+- Text nodes (strings) are compared directly`,
       starterCode: `function h(tag, props, ...children) {
   // TODO: return a virtual node { tag, props, children }
   // Flatten nested children arrays
@@ -811,138 +713,13 @@ Pattern matching rules:
 - \`*\` — wildcard, matches anything remaining
 - Exact segments must match exactly
 
-\`\`\`concept
-{
-  "title": "History API: The Backbone of Client-Side Routing",
-  "variant": "mental-model",
-  "content": "Think of the History API as a backstage pass to the browser's URL bar. pushState() lets you silently change the URL without reloading the page, while popstate events notify you when the user hits Back/Forward. Your router listens to these events and decides which view to render."
-}
-\`\`\`
-
-\`\`\`steps
-{
-  "title": "Route Resolution Pipeline",
-  "steps": [
-    {
-      "title": "1. Normalize the path",
-      "content": "Strip leading/trailing slashes and split into segments: \`/users/42\` → [\\"users\\", \\"42\\"]"
-    },
-    {
-      "title": "2. Attempt pattern match",
-      "content": "For each registered route, compare its pattern segments against the path segments. A \`:param\` segment matches any value and stores it under that key."
-    },
-    {
-      "title": "3. Extract parameters",
-      "content": "Build a params object: pattern \`/users/:id\` matched against \`[\\"users\\", \\"42\\"]\` yields \`{ id: \\"42\\" }\`"
-    },
-    {
-      "title": "4. Invoke handler & update history",
-      "content": "Call the matched handler with params, push the new path onto the history stack, and update current-route metadata."
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`playground
-{
-  "title": "Starter: createRouter skeleton",
-  "language": "javascript",
-  "code": "function createRouter() {\\n  const routes = [];\\n  let history = [];\\n  let currentIndex = -1;\\n\\n  function addRoute(pattern, handler) {\\n    // TODO: store pattern and handler\\n  }\\n\\n  function navigate(path) {\\n    // TODO: match path, call handler, update history\\n  }\\n\\n  function back() {\\n    // TODO: pop history and navigate backwards\\n  }\\n\\n  function getCurrentRoute() {\\n    // TODO: return current route info\\n  }\\n\\n  function getHistory() {\\n    // TODO: return history array\\n  }\\n\\n  return { addRoute, navigate, back, getCurrentRoute, getHistory };\\n}",
-  "runnable": false
-}
-\`\`\`
-
-\`\`\`algoviz
-{
-  "title": "Matching /users/42 against two routes",
-  "type": "array",
-  "data": ["/users/:id", "/posts/*", "/users/42"],
-  "frames": [
-    { "highlight": [0], "label": "Try /users/:id pattern", "stats": { "segment": 0 } },
-    { "highlight": [0, 2], "label": "Segment 'users' matches exactly", "stats": { "segment": 1 } },
-    { "highlight": [0, 2], "label": "Segment ':id' matches '42' → param id=42", "stats": { "segment": 2 } },
-    { "highlight": [0], "label": "Full match found; stop searching", "stats": { "match": true } }
-  ],
-  "speed": 1000
-}
-\`\`\`
-
-\`\`\`compare
-{
-  "variant": "good-bad",
-  "before": {
-    "label": "Naïve string split on '/'",
-    "code": "const parts = path.split('/');\\n// [\\"\\", \\"users\\", \\"42\\"]\\n// Oops—empty string at index 0"
-  },
-  "after": {
-    "label": "Robust segment extraction",
-    "code": "const parts = path\\n  .replace(/^\\\\/+|\\\\/+$/g, '')\\n  .split('/')\\n  .filter(Boolean);\\n// [\\"users\\", \\"42\\"]"
-  }
-}
-\`\`\`
-
-\`\`\`quiz
-{
-  "title": "Check your understanding",
-  "questions": [
-    {
-      "question": "Which History API method updates the URL without reloading the page?",
-      "options": ["history.assign()", "history.pushState()", "history.replace()", "location.href="],
-      "answer": 1,
-      "explanation": "pushState() adds a new entry to the session history stack and changes the URL without a page refresh."
-    },
-    {
-      "question": "What does the pattern \`/blog/:slug/comments/*\` match?",
-      "options": ["/blog/123", "/blog/hello/comments", "/blog/hello/comments/1/2", "/blog/comments/*"],
-      "answer": 2,
-      "explanation": "The wildcard * consumes everything after /comments/, so any depth of trailing segments is accepted."
-    },
-    {
-      "question": "Why keep a history array inside the router instead of relying only on browser history?",
-      "options": ["To support IE11", "To enable programmatic back()", "To avoid popstate events", "To compress URLs"],
-      "answer": 1,
-      "explanation": "Maintaining your own stack lets you implement custom navigation logic (e.g., confirmation modals) and inspect previous routes via getHistory()."
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`callout
-{
-  "type": "tip",
-  "title": "RegExp vs. Segment Loop",
-  "content": "Converting each pattern to a giant RegExp works, but looping over segments is easier to read, debug, and extend with custom modifiers (e.g., optional groups or regex constraints like \`:id(\\\\\\\\d+)\`)."
-}
-\`\`\`
-
-\`\`\`collapse
-{
-  "title": "Deep Dive: Nested Routes",
-  "content": "Nested routes mean patterns like \`/dashboard/users/:id\`. Resolve these by recursively slicing the remaining pathname after each match and delegating to sub-routers, or by flattening the pattern into a single regex with capture groups. Keep a parent pointer so each level can bubble up parameter objects."
-}
-\`\`\`
-
 ### Examples
 
-\`\`\`playground
-{
-  "title": "Demo: router in action",
-  "language": "javascript",
-  "code": "const router = createRouter();\\n\\nrouter.addRoute(\\"/users/:id\\", (params) => {\\n  console.log(\`User profile for \\\\\${params.id}\`);\\n});\\n\\nrouter.addRoute(\\"/posts/*\\", (params, wildcard) => {\\n  console.log(\`Blog section: \\\\\${wildcard}\`);\\n});\\n\\nrouter.navigate(\\"/users/42\\");\\nrouter.navigate(\\"/posts/2024/roadmap\\");\\nrouter.back();\\nconsole.log(router.getHistory());",
-  "runnable": true
-}
 \`\`\`
-
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Client-side routing swaps views without page reloads by intercepting URL changes via the History API.",
-    "Segment-based pattern matching with :params and * wildcards gives you express-style flexibility.",
-    "Maintain an internal history array so you can implement .back() and inspect past routes.",
-    "A mini router is great for learning, but production apps often graduate to React Router for features like code-splitting, lazy loading, and accessibility."
-  ]
-}
+const router = createRouter();
+router.addRoute("/users/:id", (params) => \`User \${params.id}\`);
+router.navigate("/users/42");
+// handler called with { id: "42" }
 \`\`\``,
       starterCode: `function createRouter() {
   // TODO: implement router with:

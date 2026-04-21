@@ -30,7 +30,6 @@ export function PrivyProvider({ children }: { children: ReactNode }) {
         appearance: {
           theme: "dark",
           accentColor: "#8b5cf6",
-          logo: "/logo.svg",
         },
         embeddedWallets: {
           ethereum: {

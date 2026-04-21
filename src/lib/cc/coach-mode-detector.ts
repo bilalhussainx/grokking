@@ -4,6 +4,7 @@ export type CoachMode =
   | "school-builder"
   | "school-browse"
   | "essay"
+  | "essay-post-review"
   | "interview"
   | "general";
 
@@ -12,6 +13,9 @@ export interface ProfileProgress {
   hasGPA: boolean;
   hasSchools: boolean;
   hasEssays: boolean;
+  hasEssayReviewed: boolean;
+  hasActivitiesOptimized: boolean;
+  hasSupplementsStarted: boolean;
   hasInterviewSessions: boolean;
 }
 
@@ -32,9 +36,17 @@ const PAGE_MODES: Array<{ pattern: RegExp; mode: CoachMode }> = [
 export function detectMode(
   progress: ProfileProgress,
   currentPage: string,
-  userMessage: string
+  userMessage: string,
+  signals?: { focusEssayHasReview?: boolean }
 ): CoachMode {
   if (!progress.hasIntakeCompleted) return "intake";
+
+  // Post-review context takes precedence: if the student is on a specific essay
+  // page AND that essay has a review attached, route them to the counselor
+  // debrief mode regardless of what they typed.
+  if (/^\/cc\/essays\/[^/]+/.test(currentPage) && signals?.focusEssayHasReview) {
+    return "essay-post-review";
+  }
 
   if (userMessage) {
     for (const { pattern, mode } of INTENT_PATTERNS) {

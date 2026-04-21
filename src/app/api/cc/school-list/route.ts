@@ -18,11 +18,12 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("cc_student_schools")
-    .select("id, school_id, chancing_band, application_status, net_price_estimate, created_at, cc_schools(id, name, city, state, school_type, acceptance_rate, avg_net_price, test_policy, regular_deadline, early_deadline, website)")
+    .select("id, school_id, chancing_band, application_status, application_plan, estimated_net_price_low, estimated_net_price_high, added_at, cc_schools(id, name, city, state, school_type, acceptance_rate, avg_net_price, test_policy, regular_deadline, early_deadline, website)")
     .eq("student_id", profile.id)
-    .order("created_at", { ascending: false });
+    .order("added_at", { ascending: false });
 
   if (error) {
+    console.error("[school-list GET]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

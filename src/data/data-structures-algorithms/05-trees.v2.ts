@@ -11,92 +11,40 @@ export const treesModule: Module = {
       title: "Binary Search Tree",
       content: `## Binary Search Tree (BST)
 
-A **Binary Search Tree** is a binary tree where every node obeys a strict ordering rule:
+A **Binary Search Tree** is a binary tree where for every node:
+- All values in the **left subtree** are less than the node's value
+- All values in the **right subtree** are greater than the node's value
 
-- All keys in the **left subtree** are **less** than the node's key  
-- All keys in the **right subtree** are **greater** than the node's key  
-- Both subtrees are themselves BSTs
-
-\`\`\`concept
-{"title": "BST Ordering Rule", "variant": "mental-model", "content": "Think of each node as a pivot: everything to its left is smaller, everything to its right is larger. This single rule makes the entire tree a sorted index—no duplicates, no ambiguity."}
+\`\`\`mermaid
+graph TD
+    A[8] --> B[3]
+    A --> C[10]
+    B --> D[1]
+    B --> E[6]
+    E --> F[4]
+    E --> G[7]
+    C --> H[14]
+    H --> I[13]
 \`\`\`
 
-\`\`\`algoviz
-{"title": "Visual BST Example", "type": "tree", "data": [8,3,10,1,6,14,4,7,13], "frames": [
-  {"highlight": [0], "label": "Root 8: left < 8 < right", "stats": {"depth": 0}},
-  {"highlight": [1,2], "label": "3 < 8 and 10 > 8", "stats": {"depth": 1}},
-  {"highlight": [3,4,7], "label": "1 < 3, 6 > 3, 14 > 10", "stats": {"depth": 2}},
-  {"highlight": [6,8], "label": "4 < 6, 7 > 6, 13 < 14", "stats": {"depth": 3}}
-], "speed": 1000}
-\`\`\`
+### Operations (Balanced)
 
-### Complexity Snapshot (Balanced vs. Worst-Case)
+| Operation | Time |
+|-----------|------|
+| Search | O(log n) |
+| Insert | O(log n) |
+| Delete | O(log n) |
+| Min/Max | O(log n) |
 
-| Operation | Balanced | Degenerate (Linked-List) |
-|-----------|----------|--------------------------|
-| Search    | O(log n) | O(n) |
-| Insert    | O(log n) | O(n) |
-| Delete    | O(log n) | O(n) |
-| Min/Max   | O(log n) | O(n) |
+### Problem
 
-\`\`\`callout
-{"type": "warning", "title": "Unbalanced = Performance Trap", "content": "Inserting sorted data [1,2,3,4,5] produces a right-skewed chain. The tree still satisfies BST rules, but search degrades to linear scan. Self-balancing variants (AVL, Red-Black) prevent this."}
-\`\`\`
+Implement a BST with insert, search, delete, find_min, find_max, and inorder traversal.
 
-### Core Operations Walk-Through
+### Deletion Cases
 
-\`\`\`steps
-{"title": "Building a BST from Scratch", "steps": [
-  {"title": "1. Insert", "content": "Start at root. If new key < current, go left; else go right. Repeat until you hit null—attach new node there."},
-  {"title": "2. Search", "content": "Same path logic as insert. If you reach null, key absent; if you match, return node."},
-  {"title": "3. Find Min/Max", "content": "Min: follow left children until null. Max: follow right children until null."},
-  {"title": "4. In-Order Traversal", "content": "Left → Root → Right. Because of BST ordering, this yields keys in ascending sorted order in O(n) time."}
-]}
-\`\`\`
-
-\`\`\`playground
-{"title": "BST Insert & Search", "language": "python", "code": "class Node:\\n    def __init__(self, key):\\n        self.key = key\\n        self.left = None\\n        self.right = None\\n\\nclass BST:\\n    def __init__(self):\\n        self.root = None\\n\\n    def insert(self, key):\\n        self.root = self._insert(self.root, key)\\n\\n    def _insert(self, node, key):\\n        if node is None:\\n            return Node(key)\\n        if key < node.key:\\n            node.left = self._insert(node.left, key)\\n        elif key > node.key:\\n            node.right = self._insert(node.right, key)\\n        return node\\n\\n    def search(self, key):\\n        return self._search(self.root, key)\\n\\n    def _search(self, node, key):\\n        if node is None or node.key == key:\\n            return node\\n        if key < node.key:\\n            return self._search(node.left, key)\\n        return self._search(node.right, key)\\n\\n# Quick demo\\nbst = BST()\\nfor val in [8,3,10,1,6,14,4,7,13]:\\n    bst.insert(val)\\nprint(\\"Search 6:\\", bst.search(6) is not None)\\nprint(\\"Search 99:\\", bst.search(99) is not None)", "runnable": true}
-\`\`\`
-
-### Deletion: The Tricky Part
-
-Deleting a node has **three distinct cases**:
-
-1. **Leaf** — snip it off (set parent pointer to null)  
-2. **One child** — splice it out (parent points to grandchild)  
-3. **Two children** — find **in-order successor** (smallest in right subtree), copy its key into the node to delete, then recursively delete the successor (which now falls into case 1 or 2)
-
-\`\`\`trace
-{"title": "Deleting Node with Two Children", "language": "python", "code": "def delete(root, key):\\n    if not root:\\n        return None\\n    if key < root.key:\\n        root.left = delete(root.left, key)\\n    elif key > root.key:\\n        root.right = delete(root.right, key)\\n    else:  # found\\n        if not root.left:          # case 0/1\\n            return root.right\\n        if not root.right:         # case 1\\n            return root.left\\n        # case 2: two children\\n        succ = min_node(root.right)\\n        root.key = succ.key\\n        root.right = delete(root.right, succ.key)\\n    return root\\n\\ndef min_node(node):\\n    while node.left:\\n        node = node.left\\n    return node", "frames": [
-  {"line": 1, "vars": {"root": "8", "key": "6"}, "note": "Start delete(6)", "stdout": ""},
-  {"line": 3, "vars": {"root": "8"}, "note": "6 < 8 → go left", "stdout": ""},
-  {"line": 4, "vars": {"root": "3"}, "note": "Now at node 3", "stdout": ""},
-  {"line": 5, "vars": {"root": "3"}, "note": "6 > 3 → go right", "stdout": ""},
-  {"line": 7, "vars": {"root": "6"}, "note": "Found node 6", "stdout": ""},
-  {"line": 11, "vars": {"root": "6"}, "note": "Has both children", "stdout": ""},
-  {"line": 15, "vars": {"succ": "7"}, "note": "Successor is 7", "stdout": ""},
-  {"line": 16, "vars": {"root.key": "7"}, "note": "Copy 7 into node", "stdout": ""},
-  {"line": 17, "vars": {}, "note": "Delete original 7", "stdout": ""}
-], "speed": 900}
-\`\`\`
-
-\`\`\`quiz
-{"title": "BST Quick Check", "questions": [
-  {"question": "In-order traversal of any BST produces:", "options": ["random order", "descending order", "ascending order", "level order"], "answer": 2, "explanation": "Left < Root < Right guarantees ascending sequence."},
-  {"question": "Worst-case height of a basic BST with n nodes is:", "options": ["O(log n)", "O(n)", "O(n log n)", "O(1)"], "answer": 1, "explanation": "Inserting sorted data creates a linked-list-like chain of height n."},
-  {"question": "When deleting a node with two children, we replace its key with the:", "options": ["predecessor (max of left)", "successor (min of right)", "parent", "root"], "answer": 1, "explanation": "The in-order successor is the smallest node larger than the one being deleted, preserving BST order."}
-]}
-\`\`\`
-
-\`\`\`takeaways
-{"title": "Key Takeaways", "items": [
-  "BSTs embed a sorted order: left < root < right.",
-  "Balanced BSTs give O(log n) search/insert/delete; unbalanced ones degrade to O(n).",
-  "In-order traversal outputs keys in ascending order in O(n) time.",
-  "Deletion requires handling three cases—leaf, one child, or two children (use successor).",
-  "Real-world systems use self-balancing variants (AVL, Red-Black, B-trees) to guarantee logarithmic performance."
-]}
-\`\`\``,
+1. **Leaf node** — Simply remove
+2. **One child** — Replace with child
+3. **Two children** — Replace with in-order successor (smallest in right subtree)`,
       starterCode: `class TreeNode:
     def __init__(self, val):
         self.val = val
@@ -236,9 +184,7 @@ print(bst.inorder())    # Expected: [1, 4, 6, 7, 8]
       title: "Tree Traversals",
       content: `## Tree Traversals
 
-\`\`\`concept
-{"title": "What is a Tree Traversal?", "variant": "mental-model", "content": "Tree traversal is the systematic process of visiting each node in a tree exactly once. Think of it as choosing a route through a maze: different paths (algorithms) will reveal the 'treasures' (node values) in different orders. The path you pick depends on what you want to do with the data."}
-\`\`\`
+### The Four Traversals
 
 | Traversal | Order | Use Case |
 |-----------|-------|----------|
@@ -247,28 +193,29 @@ print(bst.inorder())    # Expected: [1, 4, 6, 7, 8]
 | **Post-order** | Left, Right, Root | Deleting a tree, expression eval |
 | **Level-order** | Level by level (BFS) | Level-based processing |
 
-\`\`\`algoviz
-{"title": "Traversal Orders on a Sample Tree", "type": "tree", "data": [1,2,3,4,5,null,6], "frames": [
-  {"highlight": [1], "label": "Pre-order: visit root first", "stats": {"step": 1}},
-  {"highlight": [2], "label": "Pre-order: then left subtree", "stats": {"step": 2}},
-  {"highlight": [4], "label": "Pre-order: continue left", "stats": {"step": 3}},
-  {"highlight": [5], "label": "Pre-order: right child of 2", "stats": {"step": 4}},
-  {"highlight": [3], "label": "Pre-order: right subtree", "stats": {"step": 5}},
-  {"highlight": [6], "label": "Pre-order: final node", "stats": {"step": 6}}
-], "speed": 1000}
-\`\`\`
+### Traversal Orders Visualized
 
-\`\`\`tabs
-{"tabs": [
-  {"label": "In-order", "content": "\`\`\`python\\ndef in_order(node):\\n    if not node: return\\n    in_order(node.left)   # 1. Left\\n    visit(node)           # 2. Root\\n    in_order(node.right)  # 3. Right\\n\`\`\`\\nProduces sorted sequence for BSTs."},
-  {"label": "Pre-order", "content": "\`\`\`python\\ndef pre_order(node):\\n    if not node: return\\n    visit(node)           # 1. Root\\n    pre_order(node.left)  # 2. Left\\n    pre_order(node.right) # 3. Right\\n\`\`\`\\nUseful for creating a deep copy of the tree."},
-  {"label": "Post-order", "content": "\`\`\`python\\ndef post_order(node):\\n    if not node: return\\n    post_order(node.left)  # 1. Left\\n    post_order(node.right) # 2. Right\\n    visit(node)            # 3. Root\\n\`\`\`\\nRequired when freeing nodes (children before parent)."},
-  {"label": "Level-order", "content": "\`\`\`python\\nfrom collections import deque\\n\\ndef level_order(root):\\n    if not root: return\\n    q = deque([root])\\n    while q:\\n        node = q.popleft()\\n        visit(node)\\n        if node.left:  q.append(node.left)\\n        if node.right: q.append(node.right)\\n\`\`\`\\nVisits nodes top-to-bottom, left-to-right."}
-]}
-\`\`\`
-
-\`\`\`callout
-{"type": "info", "title": "Complexity Cheat-Sheet", "content": "All four traversals visit each node exactly once:\\n- **Time**: O(N)\\n- **DFS space** (in/pre/post): O(H) recursion stack, where H = tree height\\n- **BFS space** (level-order): O(W) queue width, where W = max nodes on any level"}
+\`\`\`mermaid
+graph TD
+    subgraph "Pre: Root,L,R | In: L,Root,R | Post: L,R,Root"
+    R["1 (pre:1st, in:4th, post:6th)"]
+    L["2 (pre:2nd, in:2nd, post:3rd)"]
+    RI["3 (pre:5th, in:5th, post:5th)"]
+    LL["4 (pre:3rd, in:1st, post:1st)"]
+    LR["5 (pre:4th, in:3rd, post:2nd)"]
+    RR["6 (pre:6th, in:6th, post:4th)"]
+    R --> L
+    R --> RI
+    L --> LL
+    L --> LR
+    RI --> RR
+    end
+    style R fill:#f59e0b,color:#000
+    style L fill:#60a5fa,color:#000
+    style RI fill:#60a5fa,color:#000
+    style LL fill:#4ade80,color:#000
+    style LR fill:#4ade80,color:#000
+    style RR fill:#4ade80,color:#000
 \`\`\`
 
 ### Problem
@@ -286,22 +233,6 @@ In-order:    [4, 2, 5, 1, 3, 6]
 Pre-order:   [1, 2, 4, 5, 3, 6]
 Post-order:  [4, 5, 2, 6, 3, 1]
 Level-order: [1, 2, 3, 4, 5, 6]
-\`\`\`
-
-\`\`\`playground
-{"title": "Implement All Traversals", "language": "python", "code": "from collections import deque\\n\\nclass Node:\\n    def __init__(self, val, left=None, right=None):\\n        self.val = val\\n        self.left = left\\n        self.right = right\\n\\ndef in_order(root):\\n    # TODO: Left -> Root -> Right\\n    pass\\n\\ndef pre_order(root):\\n    # TODO: Root -> Left -> Right\\n    pass\\n\\ndef post_order(root):\\n    # TODO: Left -> Right -> Root\\n    pass\\n\\ndef level_order(root):\\n    # TODO: use a queue\\n    pass\\n\\n# ---- test on sample tree ----\\nroot = Node(1,\\n            Node(2, Node(4), Node(5)),\\n            Node(3, None, Node(6)))\\n\\nprint('In:', in_order(root))\\nprint('Pre:', pre_order(root))\\nprint('Post:', post_order(root))\\nprint('Level:', level_order(root))", "runnable": true}
-\`\`\`
-
-\`\`\`quiz
-{"title": "Quick Check", "questions": [
-  {"question": "Which traversal gives sorted output for a BST?", "options": ["Pre-order", "In-order", "Post-order", "Level-order"], "answer": 1, "explanation": "In-order visits Left, Root, Right, which for a BST yields ascending order."},
-  {"question": "What is the space complexity of recursive DFS traversals?", "options": ["O(N)", "O(log N)", "O(H)", "O(1)"], "answer": 2, "explanation": "The recursion stack holds at most H frames, where H is the tree height."},
-  {"question": "Which traversal is best suited to delete a tree?", "options": ["Pre-order", "In-order", "Post-order", "Level-order"], "answer": 2, "explanation": "Post-order deletes children before their parent, avoiding dangling pointers."}
-]}
-\`\`\`
-
-\`\`\`takeaways
-{"title": "Key Takeaways", "items": ["In-order produces sorted order for BSTs", "Pre-order is ideal for copying/serializing trees", "Post-order ensures children are processed before parents", "Level-order uses a queue and consumes O(W) memory", "All traversals run in O(N) time because every node is visited once"]}
 \`\`\``,
       starterCode: `from collections import deque
 
@@ -399,35 +330,6 @@ print(level_order(root))  # Expected: [1, 2, 3, 4, 5, 6]
 
 An **AVL tree** is a self-balancing BST where the height difference between left and right subtrees of any node is at most 1. When an insertion or deletion violates this property, **rotations** restore balance.
 
-\`\`\`concept
-{
-  "title": "AVL Invariant",
-  "variant": "rule",
-  "content": "For every node, |height(left) - height(right)| ≤ 1. This balance factor (-1, 0, or 1) guarantees O(log n) height and operation cost."
-}
-\`\`\`
-
-### Balance Factor
-
-\`balance(node) = height(left) - height(right)\`
-
-- If balance > 1: left-heavy, needs right rotation(s)
-- If balance < -1: right-heavy, needs left rotation(s)
-
-\`\`\`trace
-{
-  "title": "Insert 1 → 2 → 3 and watch imbalance grow",
-  "language": "python",
-  "code": "class Node:\\n    def __init__(self, key):\\n        self.key, self.left, self.right, self.h = key, None, None, 1\\n\\ndef height(n): return n.h if n else 0\\n\\ndef update(n):\\n    n.h = 1 + max(height(n.left), height(n.right))\\n\\ndef insert(root, key):\\n    if not root: return Node(key)\\n    if key < root.key: root.left = insert(root.left, key)\\n    else: root.right = insert(root.right, key)\\n    update(root)\\n    return root\\n\\nroot = None\\nfor v in [1,2,3]:\\n    root = insert(root, v)\\n    print(f'after {v}: height={root.h}, balance={height(root.left)-height(root.right)}')",
-  "frames": [
-    {"line": 10, "vars": {"root": "None", "v": 1}, "stdout": "after 1: height=1, balance=0\\n"},
-    {"line": 10, "vars": {"root": "Node(1)", "v": 2}, "stdout": "after 2: height=2, balance=-1\\n"},
-    {"line": 10, "vars": {"root": "Node(1)", "v": 3}, "stdout": "after 3: height=3, balance=-2 ← violates AVL!\\n"}
-  ],
-  "speed": 1000
-}
-\`\`\`
-
 ### Rotations
 
 | Case | Rotation |
@@ -437,76 +339,20 @@ An **AVL tree** is a self-balancing BST where the height difference between left
 | Left-heavy, left child right-heavy | Left-Right rotation |
 | Right-heavy, right child left-heavy | Right-Left rotation |
 
-\`\`\`algoviz
-{
-  "title": "Single Right Rotation (LL Case)",
-  "type": "tree",
-  "data": [3, 2, 1, null, null, null, null],
-  "frames": [
-    {"highlight": [1], "label": "Node 3 is left-heavy (balance=2)", "stats": {"bal": 2}},
-    {"highlight": [2], "label": "Left child 2 is also left-heavy → LL case", "stats": {"bal": 1}},
-    {"highlight": [1, 2], "label": "Right-rotate around 3", "stats": {"action": "rotateRight(3)"}},
-    {"highlight": [2], "label": "New root 2; heights restored", "stats": {"bal": 0}}
-  ],
-  "speed": 800
-}
-\`\`\`
+### Balance Factor
+
+\`balance(node) = height(left) - height(right)\`
+
+- If balance > 1: left-heavy, needs right rotation(s)
+- If balance < -1: right-heavy, needs left rotation(s)
+
+### Problem
+
+Implement an AVL tree with self-balancing insert. After each insertion, the tree should remain balanced.
 
 ### Complexity
 
-All operations remain **O(log n)** guaranteed, unlike a plain BST which can degrade to **O(n)**.
-
-\`\`\`compare
-{
-  "variant": "before-after",
-  "before": {
-    "label": "Plain BST after sorted insert 1-2-3-4-5",
-    "code": "    1\\n     \\\\\\n      2\\n       \\\\\\n        3\\n         \\\\\\n          4\\n           \\\\\\n            5\\nheight = 5, search = O(n)"
-  },
-  "after": {
-    "label": "AVL after same inserts (rotations applied)",
-    "code": "      2\\n    /   \\\\\\n   1     4\\n        / \\\\\\n       3   5\\nheight = 3, search = O(log n)"
-  }
-}
-\`\`\`
-
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Balance factor ∈ {-1,0,1} keeps height ≤ 1.44 log n",
-    "Rotations are local; only the deepest unbalanced ancestor is fixed",
-    "AVL gives faster lookups than Red-Black but may rotate more on updates",
-    "Used in database indexes where reads dominate writes"
-  ]
-}
-\`\`\`
-
-\`\`\`quiz
-{
-  "title": "Check Your AVL Intuition",
-  "questions": [
-    {
-      "question": "After inserting 7 into the AVL tree with root 5 (left child 3, right child 8), which node is the deepest unbalanced ancestor?",
-      "options": ["3", "5", "8", "7"],
-      "answer": 1,
-      "explanation": "Insertion happens at 8’s right; 8’s balance becomes -1 and 5’s balance becomes -2, so 5 is the deepest unbalanced node."
-    },
-    {
-      "question": "Which rotation fixes the RR case?",
-      "options": ["Right rotation", "Left rotation", "Left-Right rotation", "Right-Left rotation"],
-      "answer": 1,
-      "explanation": "RR means right-heavy with right child also right-heavy → single left rotation on the root."
-    },
-    {
-      "question": "What is the worst-case height of an AVL tree with n nodes?",
-      "options": ["log₂ n", "1.44 log₂ n", "2 log₂ n", "n"],
-      "answer": 1,
-      "explanation": "Tight analysis shows height ≤ 1.44 log₂(n+2), tighter than Red-Black’s 2 log₂ n."
-    }
-  ]
-}
-\`\`\``,
+All operations remain O(log n) guaranteed, unlike a plain BST which can degrade to O(n).`,
       starterCode: `class AVLNode:
     def __init__(self, val):
         self.val = val
@@ -655,90 +501,44 @@ print(f"Root height: {avl.root.height}")  # Expected: 3
       title: "Tree Problems",
       content: `## Tree Problems
 
-Binary trees appear in nearly every technical interview. These three classic problems—maximum depth, lowest common ancestor, and BST validation—cover the essential patterns you'll reuse again and again.
-
-\`\`\`concept
-{"title": "Tree Thinking Checklist", "variant": "mental-model", "content": "Before you code:\\n1. Identify the traversal order (pre/in/post or level?)\\n2. Decide what information each subtree must return\\n3. Check if the problem needs parent pointers or can be solved top-down\\n4. For BSTs, remember the invariant: left < root ≤ right"}
-\`\`\`
-
 ### Problem 1: Maximum Depth
 
-Find the height of a binary tree—the number of nodes along the longest root-to-leaf path.
+Find the maximum depth (height) of a binary tree.
 
-\`\`\`algoviz
-{"title": "Max Depth on Sample Tree", "type": "tree", "data": [3,9,20,null,null,15,7], "frames": [
-  {"highlight": [0], "label": "Start at root (depth 1)", "stats": {"depth": 1}},
-  {"highlight": [1], "label": "Left subtree: depth(9) = 1", "stats": {"depth": 1}},
-  {"highlight": [2], "label": "Right subtree: explore 20", "stats": {"depth": 1}},
-  {"highlight": [5], "label": "Left of 20: depth(15) = 1", "stats": {"depth": 1}},
-  {"highlight": [6], "label": "Right of 20: depth(7) = 1", "stats": {"depth": 1}},
-  {"highlight": [2], "label": "depth(20) = max(1,1)+1 = 2", "stats": {"depth": 2}},
-  {"highlight": [0], "label": "depth(3) = max(1,2)+1 = 3", "stats": {"depth": 3}}
-], "speed": 1000}
+\`\`\`
+    3
+   / \\
+  9  20
+    /  \\
+   15   7
+
+max_depth -> 3
 \`\`\`
 
-The recursive rule is trivial but powerful:  
-\`depth(node) = max(depth(left), depth(right)) + 1\`
+### Problem 2: Lowest Common Ancestor (BST)
 
-\`\`\`playground
-{"title": "Max Depth—Try It", "language": "python", "code": "class Node:\\n    def __init__(self, val, left=None, right=None):\\n        self.val, self.left, self.right = val, left, right\\n\\ndef max_depth(root):\\n    # base case\\n    if not root:\\n        return 0\\n    # recursive case\\n    return max(max_depth(root.left), max_depth(root.right)) + 1\\n\\n# ---- test ----\\ntree = Node(3,\\n            Node(9),\\n            Node(20, Node(15), Node(7)))\\nprint(max_depth(tree))  # expected 3", "runnable": true}
+Given a BST and two node values, find their lowest common ancestor.
+
 \`\`\`
+        6
+       / \\
+      2   8
+     / \\ / \\
+    0  4 7  9
 
-Time complexity: **O(n)**—every node is visited once.  
-Space complexity: **O(h)** where *h* is tree height (call-stack).
-
-### Problem 2: Lowest Common Ancestor in a BST
-
-Given two node values, find the deepest node that is an ancestor of both.
-
-\`\`\`steps
-{"title": "LCA Decision Rules", "steps": [
-  {"title": "Both targets < current", "content": "LCA must be in the **left** subtree—recurse left."},
-  {"title": "Both targets > current", "content": "LCA must be in the **right** subtree—recurse right."},
-  {"title": "Values split current node", "content": "Current node is the **split point**—return it immediately."}
-]}
-\`\`\`
-
-\`\`\`trace
-{"title": "Finding LCA(2,8) in a BST", "language": "python", "code": "def lca_bst(root, p, q):\\n    while root:\\n        if p < root.val and q < root.val:\\n            root = root.left\\n        elif p > root.val and q > root.val:\\n            root = root.right\\n        else:\\n            return root.val\\n    return None", "frames": [
-  {"line": 2, "vars": {"root.val": 6, "p": 2, "q": 8}, "note": "2<6 and 8>6 → split → return 6"},
-  {"line": 8, "stdout": "6\\n"}
-], "speed": 800}
-\`\`\`
-
-The algorithm runs in **O(log n)** average time for balanced BSTs and **O(n)** worst-case if the tree is skewed.
-
-\`\`\`quiz
-{"title": "LCA Quick Check", "questions": [
-  {"question": "In a BST with root 10, where would you search for LCA(3, 14)?", "options": ["Left subtree only", "Right subtree only", "Stay at 10—it's the split node", "Need more info"], "answer": 2, "explanation": "3 < 10 and 14 > 10, so 10 is the split point and thus the LCA."},
-  {"question": "What’s the worst-case time to find LCA in a BST?", "options": ["O(log n)", "O(n)", "O(h²)", "O(1)"], "answer": 1, "explanation": "If the tree degenerates into a linked list, you may traverse every node."},
-  {"question": "Why can’t we use the BST rule in a plain binary tree?", "options": ["No ordering property", "Too many nulls", "Needs parent pointers", "Stack overflow"], "answer": 0, "explanation": "Without the ordering guarantee, we can’t decide left vs right based on values alone."}
-]}
+LCA(2, 8) -> 6
+LCA(2, 4) -> 2
 \`\`\`
 
 ### Problem 3: Validate BST
 
-Is the given binary tree a legal BST? The trick is to carry a **valid range** (min, max) as you recurse.
+Determine if a binary tree is a valid BST.
 
-\`\`\`compare
-{"variant": "good-bad", "before": {"label": "Wrong—only check immediate children", "code": "def is_bst(root):\\n    if not root:\\n        return True\\n    left_ok = not root.left or root.left.val < root.val\\n    right_ok = not root.right or root.right.val >= root.val\\n    return left_ok and right_ok and is_bst(root.left) and is_bst(root.right)"}, "after": {"label": "Correct—track global range", "code": "def is_bst(root, lo=float('-inf'), hi=float('inf')):\\n    if not root:\\n        return True\\n    if not (lo < root.val < hi):\\n        return False\\n    return (is_bst(root.left, lo, root.val) and\\n            is_bst(root.right, root.val, hi))"}}
-\`\`\`
+### Key Insights
 
-\`\`\`playground
-{"title": "Validate This Tree", "language": "python", "code": "class Node:\\n    def __init__(self, val, left=None, right=None):\\n        self.val, self.left, self.right = val, left, right\\n\\ndef is_bst(root, lo=float('-inf'), hi=float('inf')):\\n    if not root:\\n        return True\\n    if not (lo < root.val < hi):\\n        return False\\n    return is_bst(root.left, lo, root.val) and is_bst(root.right, root.val, hi)\\n\\n# ---- test ----\\ngood = Node(5, Node(3, Node(1), Node(4)), Node(7, Node(6), Node(8)))\\nbad  = Node(5, Node(3, Node(4), Node(1)), Node(7))  # 4 is in wrong place\\nprint(is_bst(good))  # True\\nprint(is_bst(bad))   # False", "runnable": true}
-\`\`\`
-
-Time complexity: **O(n)**—each node is checked once.  
-Space complexity: **O(h)** for the recursion stack.
-
-\`\`\`takeaways
-{"title": "Key Takeaways", "items": [
-  "Max depth = 1 + max(left depth, right depth)—simple post-order pattern.",
-  "LCA in BST exploits ordering: go left/right until values split.",
-  "Validate BST with range tracking—never trust only local parent-child checks.",
-  "All three problems run in O(n) time and O(h) space—memorize these bounds for interviews."
-]}
-\`\`\``,
+- **Max depth**: Recursively compute max(left_depth, right_depth) + 1
+- **LCA in BST**: If both values < node, go left. If both > node, go right. Otherwise, current node is LCA.
+- **Validate BST**: Track valid range (min, max) at each node`,
       starterCode: `class TreeNode:
     def __init__(self, val):
         self.val = val

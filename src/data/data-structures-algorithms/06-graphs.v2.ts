@@ -13,19 +13,11 @@ export const graphsModule: Module = {
 
 A **graph** consists of **vertices** (nodes) and **edges** (connections). Graphs model networks, maps, social connections, dependencies, and more.
 
-\`\`\`concept
-{
-  "title": "Graphs Everywhere",
-  "variant": "analogy",
-  "content": "Think of a city metro map: each station is a vertex and each direct track between two stations is an edge. The entire map is a graph that tells you how to travel. Social networks, the internet, and even your file system are all graphs hiding in plain sight."
-}
-\`\`\`
-
 ### Types of Graphs
 
 | Type | Description |
 |------|-------------|
-| **Directed** | Edges have direction (A → B) |
+| **Directed** | Edges have direction (A -> B) |
 | **Undirected** | Edges are bidirectional |
 | **Weighted** | Edges have associated costs |
 | **Unweighted** | All edges have equal cost |
@@ -34,108 +26,49 @@ A **graph** consists of **vertices** (nodes) and **edges** (connections). Graphs
 
 **Adjacency List** — For each vertex, store a list of neighbors. Best for sparse graphs.
 
-\`\`\`playground
-{
-  "title": "Adjacency List in Python",
-  "language": "python",
-  "code": "graph = {\\n    'A': ['B', 'C'],\\n    'B': ['A', 'D'],\\n    'C': ['A', 'D'],\\n    'D': ['B', 'C']\\n}\\n\\n# Quick check: neighbors of A\\nprint('Neighbors of A:', graph['A'])\\n\\n# Add a new edge A-D in O(1)\\ngraph['A'].append('D')\\ngraph['D'].append('A')\\nprint('After adding A-D:', graph)",
-  "runnable": true
+\`\`\`
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D'],
+    'C': ['A', 'D'],
+    'D': ['B', 'C']
 }
 \`\`\`
 
 **Adjacency Matrix** — A 2D matrix where \`matrix[i][j] = 1\` if there is an edge from i to j. Best for dense graphs.
 
-\`\`\`algoviz
-{
-  "title": "Same Graph: List vs Matrix",
-  "type": "array",
-  "data": [
-    ["A", "B", "C", "D"],
-    [0, 1, 1, 0],
-    [1, 0, 0, 1],
-    [1, 0, 0, 1],
-    [0, 1, 1, 0]
-  ],
-  "frames": [
-    { "highlight": [1], "label": "Row A: edges to B and C", "stats": {"row": "A", "edges": 2} },
-    { "highlight": [2], "label": "Row B: edges to A and D", "stats": {"row": "B", "edges": 2} },
-    { "highlight": [3], "label": "Row C: edges to A and D", "stats": {"row": "C", "edges": 2} },
-    { "highlight": [4], "label": "Row D: edges to B and C", "stats": {"row": "D", "edges": 2} }
-  ],
-  "speed": 1000
-}
+\`\`\`mermaid
+graph TD
+    subgraph "Adjacency List"
+    AL_A["A -> [B, C]"]
+    AL_B["B -> [A, D]"]
+    AL_C["C -> [A, D]"]
+    AL_D["D -> [B, C]"]
+    end
+    subgraph "Same Graph"
+    A --- B
+    A --- C
+    B --- D
+    C --- D
+    end
+    style A fill:#6366f1,color:#fff
+    style B fill:#6366f1,color:#fff
+    style C fill:#6366f1,color:#fff
+    style D fill:#6366f1,color:#fff
 \`\`\`
 
 ### Comparison
 
-| Operation | Adjacency List | Adjacency Matrix |
-|-----------|----------------|------------------|
-| **Space** | O(V + E) | O(V²) |
-| **Check edge** | O(degree) | O(1) |
-| **Find neighbors** | O(1) | O(V) |
-| **Add edge** | O(1) | O(1) |
-
-\`\`\`callout
-{
-  "type": "tip",
-  "title": "Rule of Thumb",
-  "content": "Use an adjacency list when E ≪ V² (sparse graphs) and an adjacency matrix when E ≈ V² (dense graphs). For social networks (sparse) pick the list; for a chessboard (dense) pick the matrix."
-}
-\`\`\`
-
-\`\`\`quiz
-{
-  "title": "Pick the Right Representation",
-  "questions": [
-    {
-      "question": "You have 10 000 users and each follows ~50 others. Best representation?",
-      "options": ["Adjacency list", "Adjacency matrix", "Edge list", "Incidence matrix"],
-      "answer": 0,
-      "explanation": "Sparse graph: 10 000 × 50 edges ≪ 10 000². List saves memory and gives fast neighbor iteration."
-    },
-    {
-      "question": "You need to check if an edge exists billions of times per second. Best choice?",
-      "options": ["Adjacency list", "Adjacency matrix", "Hash-map of edges", "Both are equal"],
-      "answer": 1,
-      "explanation": "Matrix lookup is O(1) regardless of degree; list lookup is O(degree) and becomes a bottleneck."
-    },
-    {
-      "question": "Adding a new vertex is asymptotically cheaper in which structure?",
-      "options": ["Adjacency list", "Adjacency matrix", "Same cost", "Impossible in both"],
-      "answer": 0,
-      "explanation": "List appends an empty array in O(1); matrix must resize a V×V grid, costing O(V²)."
-    }
-  ]
-}
-\`\`\`
+| | Adjacency List | Adjacency Matrix |
+|-|----------------|-----------------|
+| Space | O(V + E) | O(V^2) |
+| Check edge | O(degree) | O(1) |
+| Find neighbors | O(1) | O(V) |
+| Add edge | O(1) | O(1) |
 
 ### Problem
 
-Build a Graph class that supports both representations and can convert between them.
-
-\`\`\`fillblank
-{
-  "title": "Starter: List → Matrix",
-  "prompt": "Complete the method that returns an adjacency matrix for the stored list.",
-  "language": "python",
-  "template": "class Graph:\\n    def __init__(self, vertices):\\n        self.vertices = vertices\\n        self.adj_list = {v: [] for v in vertices}\\n\\n    def add_edge(self, u, v):\\n        self.adj_list[u].append(v)\\n        self.adj_list[v].append(u)  # undirected\\n\\n    def to_matrix(self):\\n        n = len(self.vertices)\\n        matrix = [[0]*n for _ in range(n)]\\n        idx = {v: i for i, v in enumerate(self.vertices)}\\n        for v in self.vertices:\\n            for neighbor in self.adj_list[v]:\\n                matrix[___][___] = 1  # fill blanks\\n        return matrix",
-  "blanks": [
-    { "answer": "idx[v]", "hint": "row index for vertex v" },
-    { "answer": "idx[neighbor]", "hint": "column index for neighbor" }
-  ]
-}
-\`\`\`
-
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Adjacency lists shine for sparse graphs and neighbor iteration; matrices excel at fast edge existence checks.",
-    "Space cost: list O(V+E) vs matrix O(V²); time cost: neighbor lookup O(1) vs O(V), edge check O(degree) vs O(1).",
-    "Choose the representation that matches your algorithm’s hot path: traversal → list, heavy edge queries → matrix."
-  ]
-}
-\`\`\``,
+Build a Graph class that supports both representations and can convert between them.`,
       starterCode: `class Graph:
     def __init__(self):
         self.adj_list = {}
@@ -367,162 +300,48 @@ print(bfs_shortest_path(graph, 'A', 'Z'))
       title: "Depth-First Search",
       content: `## Depth-First Search (DFS)
 
-Depth-First Search explores a graph by going **as deep as possible** along each branch before backtracking. It uses a **stack** (or recursion) to remember where to return when it hits a dead end.
+DFS explores a graph by going **as deep as possible** along each branch before backtracking. It uses a **stack** (or recursion).
 
-\`\`\`algoviz
-{
-  "title": "DFS Traversal Order",
-  "type": "tree",
-  "data": [
-    {"id": "A", "label": "A", "children": ["B", "C"]},
-    {"id": "B", "label": "B", "children": ["D", "E"]},
-    {"id": "C", "label": "C", "children": ["F"]},
-    {"id": "D", "label": "D", "children": []},
-    {"id": "E", "label": "E", "children": []},
-    {"id": "F", "label": "F", "children": []}
-  ],
-  "frames": [
-    {"highlight": ["A"], "label": "Start at A", "stats": {"stack": ["A"], "visited": ["A"]}},
-    {"highlight": ["B"], "label": "Go deep to B", "stats": {"stack": ["A", "B"], "visited": ["A", "B"]}},
-    {"highlight": ["D"], "label": "Go deeper to D", "stats": {"stack": ["A", "B", "D"], "visited": ["A", "B", "D"]}},
-    {"highlight": ["B"], "label": "Backtrack from D", "stats": {"stack": ["A", "B"], "visited": ["A", "B", "D"]}},
-    {"highlight": ["E"], "label": "Explore E", "stats": {"stack": ["A", "B", "E"], "visited": ["A", "B", "D", "E"]}},
-    {"highlight": ["A"], "label": "Backtrack to A", "stats": {"stack": ["A"], "visited": ["A", "B", "D", "E"]}},
-    {"highlight": ["C"], "label": "Explore C", "stats": {"stack": ["A", "C"], "visited": ["A", "B", "C", "D", "E"]}},
-    {"highlight": ["F"], "label": "Go deep to F", "stats": {"stack": ["A", "C", "F"], "visited": ["A", "B", "C", "D", "E", "F"]}}
-  ],
-  "speed": 1000
-}
+\`\`\`mermaid
+graph TD
+    A["A (1)"] --> B["B (2)"]
+    A --> C["C (5)"]
+    B --> D["D (3)"]
+    B --> E["E (4)"]
+    C --> F["F (6)"]
+    style A fill:#4ade80,color:#000
+    style B fill:#60a5fa,color:#000
+    style D fill:#f59e0b,color:#000
+    style E fill:#f59e0b,color:#000
+    style C fill:#60a5fa,color:#000
+    style F fill:#f59e0b,color:#000
 \`\`\`
 
-\`\`\`concept
-{
-  "title": "DFS Mental Model",
-  "variant": "mental-model",
-  "content": "Imagine DFS as a brave explorer with a ball of string. The explorer walks down paths as far as possible, unwinding the string. When they hit a dead end, they follow the string back to the last intersection and try a different path. The string is the stack — it remembers the path back."
-}
-\`\`\`
+*Numbers show DFS visit order -- goes deep (A->B->D) before backtracking to E, then C->F.*
 
 ### Properties
 
-- **Time:** O(V + E) — visits every vertex and edge once
-- **Space:** O(V) — stack can hold all vertices in worst case
-- **Does NOT guarantee shortest path** — finds *a* path, not necessarily the shortest
+- Time: O(V + E)
+- Space: O(V) for the stack and visited set
+- Does NOT guarantee shortest path
 
-\`\`\`compare
-{
-  "variant": "good-bad",
-  "before": {
-    "label": "BFS for Shortest Path",
-    "code": "BFS finds shortest path in unweighted graphs\\nbecause it explores level by level"
-  },
-  "after": {
-    "label": "DFS for Path Finding",
-    "code": "DFS finds *some* path quickly\\nbut it might be longer than necessary"
-  }
-}
-\`\`\`
+### Algorithm
 
-### Two Ways to Implement DFS
+1. Start from source, mark visited
+2. For each unvisited neighbor, recursively visit it
+3. Backtrack when no unvisited neighbors remain
 
-\`\`\`tabs
-{
-  "tabs": [
-    {
-      "label": "Recursive DFS",
-      "icon": "🔄",
-      "content": "\`\`\`python\\ndef dfs_recursive(graph, vertex, visited=None):\\n    if visited is None:\\n        visited = set()\\n    \\n    visited.add(vertex)\\n    print(vertex)  # Process vertex\\n    \\n    for neighbor in graph[vertex]:\\n        if neighbor not in visited:\\n            dfs_recursive(graph, neighbor, visited)\\n    \\n    return visited\\n\\n# Usage\\ngraph = {'A': ['B', 'C'], 'B': ['D', 'E'], 'C': ['F']}\\ndfs_recursive(graph, 'A')\\n\`\`\`"
-    },
-    {
-      "label": "Iterative DFS",
-      "icon": "🥞",
-      "content": "\`\`\`python\\ndef dfs_iterative(graph, start):\\n    visited = set()\\n    stack = [start]\\n    \\n    while stack:\\n        vertex = stack.pop()\\n        \\n        if vertex not in visited:\\n            visited.add(vertex)\\n            print(vertex)  # Process vertex\\n            \\n            # Add neighbors to stack (reverse order for same order as recursive)\\n            for neighbor in reversed(graph[vertex]):\\n                if neighbor not in visited:\\n                    stack.append(neighbor)\\n    \\n    return visited\\n\\n# Usage\\ngraph = {'A': ['B', 'C'], 'B': ['D', 'E'], 'C': ['F']}\\ndfs_iterative(graph, 'A')\\n\`\`\`"
-    }
-  ]
-}
-\`\`\`
+### Applications
 
-### Real-World Applications
+- Topological sorting
+- Cycle detection
+- Connected components
+- Path finding (all paths, not necessarily shortest)
+- Maze solving
 
-DFS powers many everyday algorithms:
+### Problem
 
-\`\`\`steps
-{
-  "title": "DFS in Action",
-  "steps": [
-    {
-      "title": "🔍 Maze Solving",
-      "content": "DFS explores each corridor until it hits a wall, then backtracks to the last intersection — perfect for finding *any* exit from a maze."
-    },
-    {
-      "title": "📊 Topological Sorting",
-      "content": "Used in build systems and course prerequisites to determine the order of tasks when some depend on others."
-    },
-    {
-      "title": "🔄 Cycle Detection",
-      "content": "In dependency graphs, DFS can detect circular dependencies that would cause infinite loops or deadlocks."
-    },
-    {
-      "title": "🏝️ Connected Components",
-      "content": "Social networks use DFS to find groups of friends — all people reachable from one person form a connected component."
-    }
-  ]
-}
-\`\`\`
-
-### Practice: Cycle Detection
-
-Let's use DFS to detect cycles in a directed graph. A cycle exists if we visit a node that's already in our current recursion stack.
-
-\`\`\`playground
-{
-  "title": "Detect Cycles with DFS",
-  "language": "python",
-  "code": "def has_cycle(graph):\\n    visited = set()\\n    rec_stack = set()  # Current recursion path\\n    \\n    def dfs(vertex):\\n        if vertex in rec_stack:  # Found a cycle!\\n            return True\\n        if vertex in visited:    # Already processed this branch\\n            return False\\n        \\n        visited.add(vertex)\\n        rec_stack.add(vertex)\\n        \\n        for neighbor in graph.get(vertex, []):\\n            if dfs(neighbor):\\n                return True\\n        \\n        rec_stack.remove(vertex)\\n        return False\\n    \\n    # Check all vertices (graph might be disconnected)\\n    for vertex in graph:\\n        if dfs(vertex):\\n            return True\\n    return False\\n\\n# Test cases\\ntest_graphs = [\\n    {'A': ['B'], 'B': ['C'], 'C': ['A']},  # Cycle A->B->C->A\\n    {'A': ['B'], 'B': ['C'], 'C': []},     # No cycle\\n    {'A': ['B', 'C'], 'B': ['D'], 'C': ['B'], 'D': ['A']}  # Cycle\\n]\\n\\nfor i, g in enumerate(test_graphs, 1):\\n    print(f\\"Graph {i}: {has_cycle(g)}\\")",
-  "runnable": true
-}
-\`\`\`
-
-### Quick Check
-
-\`\`\`quiz
-{
-  "title": "DFS Understanding Check",
-  "questions": [
-    {
-      "question": "What's the primary data structure DFS uses?",
-      "options": ["Queue", "Stack", "Priority Queue", "Hash Table"],
-      "answer": 1,
-      "explanation": "DFS uses a stack (either explicitly or via recursion) to remember the path and backtrack when needed."
-    },
-    {
-      "question": "In a complete binary tree with 7 nodes, what's the maximum depth of the DFS recursion stack?",
-      "options": ["3", "4", "7", "1"],
-      "answer": 0,
-      "explanation": "A complete binary tree with 7 nodes has 3 levels (root at level 1, leaves at level 3), so the maximum recursion depth is 3."
-    },
-    {
-      "question": "Why doesn't DFS guarantee the shortest path in unweighted graphs?",
-      "options": ["It's too slow", "It explores depth-first, not level-by-level", "It uses too much memory", "It skips nodes"],
-      "answer": 1,
-      "explanation": "DFS goes deep first and might find a longer path to the target before discovering a shorter one that exists at a shallower level."
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "DFS explores as deep as possible before backtracking, using a stack for memory",
-    "Time complexity is O(V + E), space is O(V) in worst case",
-    "Choose DFS when you need any path quickly, topological order, or cycle detection",
-    "Recursive implementation is elegant but can hit recursion limits on deep graphs",
-    "DFS does NOT find shortest paths — use BFS for that in unweighted graphs"
-  ]
-}
-\`\`\``,
+Implement DFS traversal (both recursive and iterative) and use DFS to detect cycles in a directed graph.`,
       starterCode: `def dfs_recursive(graph, start, visited=None):
     # TODO: Return list of vertices in DFS order (recursive)
     pass
@@ -633,142 +452,28 @@ print(has_cycle(cyclic))  # Expected: True
       title: "Shortest Path (Dijkstra)",
       content: `## Shortest Path — Dijkstra's Algorithm
 
-\`\`\`concept
-{
-  "title": "Dijkstra's Algorithm",
-  "variant": "mental-model",
-  "content": "Think of Dijkstra's algorithm as a cautious explorer with a map. It always moves to the nearest unvisited city first, records the shortest known distance to every neighbor, and never revisits a city once its optimal distance is locked in. This greedy strategy guarantees the shortest paths—provided no road has a negative length."
-}
-\`\`\`
+**Dijkstra's algorithm** finds the shortest path from a source to all other vertices in a **weighted graph with non-negative edge weights**.
 
-Dijkstra's algorithm finds the shortest path from a source to **all other vertices** in a **weighted graph with non-negative edge weights**. It is the foundation of modern GPS routing, network packet forwarding, and flight-schedule search.
+### Algorithm
 
-### How the Algorithm Works
+1. Initialize distances: source = 0, all others = infinity
+2. Use a min-heap (priority queue) to always process the closest unvisited vertex
+3. For each neighbor, if going through the current vertex gives a shorter path, update the distance
+4. Continue until all vertices are processed
 
-\`\`\`steps
-{
-  "title": "Dijkstra Step-by-Step",
-  "steps": [
-    {
-      "title": "1. Initialize",
-      "content": "Set \`dist[src] = 0\` and every other distance to ∞. Push \`(0, src)\` into a min-heap."
-    },
-    {
-      "title": "2. Extract-Min",
-      "content": "Pop the vertex \`u\` with the smallest tentative distance from the heap."
-    },
-    {
-      "title": "3. Relax Neighbors",
-      "content": "For every edge \`(u, v, w)\`, if \`dist[u] + w < dist[v]\`, update \`dist[v]\` and push \`(dist[v], v)\` into the heap."
-    },
-    {
-      "title": "4. Repeat",
-      "content": "Continue until the heap is empty. Each extraction finalizes one vertex’s shortest distance."
-    }
-  ]
-}
-\`\`\`
+### Complexity
 
-### Live Execution on a Tiny Graph
+- **Time:** O((V + E) log V) with a binary heap
+- **Space:** O(V)
 
-\`\`\`algoviz
-{
-  "title": "Dijkstra on a 5-Node Graph",
-  "type": "array",
-  "data": ["A:0", "B:∞", "C:∞", "D:∞", "E:∞"],
-  "frames": [
-    { "highlight": [0], "label": "Start at A with distance 0", "stats": { "curr": "A", "done": 0 } },
-    { "highlight": [1, 2], "label": "Relax B(4) and C(2)", "stats": { "curr": "A", "done": 1 } },
-    { "highlight": [2], "label": "Pick C(2), relax D(5)", "stats": { "curr": "C", "done": 2 } },
-    { "highlight": [1], "label": "Pick B(4), relax E(7)", "stats": { "curr": "B", "done": 3 } },
-    { "highlight": [3], "label": "Pick D(5), no updates", "stats": { "curr": "D", "done": 4 } },
-    { "highlight": [4], "label": "Pick E(7), all done", "stats": { "curr": "E", "done": 5 } }
-  ],
-  "speed": 1000
-}
-\`\`\`
+### Limitations
 
-### Implementation (Binary-Heap Version)
+- Does NOT work with negative edge weights (use Bellman-Ford instead)
+- Greedy approach: once a vertex is finalized, its distance is optimal
 
-\`\`\`playground
-{
-  "title": "Dijkstra in Python",
-  "language": "python",
-  "runnable": true,
-  "code": "import heapq\\n\\ndef dijkstra(graph, src):\\n    \\"\\"\\"\\n    graph: dict {u: [(v, w), ...]}\\n    returns: dict of shortest distances from src\\n    \\"\\"\\"\\n    dist = {v: float('inf') for v in graph}\\n    dist[src] = 0\\n    heap = [(0, src)]\\n    \\n    while heap:\\n        d, u = heapq.heappop(heap)\\n        if d > dist[u]:          # stale entry\\n            continue\\n        for v, w in graph[u]:\\n            nd = d + w\\n            if nd < dist[v]:\\n                dist[v] = nd\\n                heapq.heappush(heap, (nd, v))\\n    return dist\\n\\n# ---- demo ----\\ngraph = {\\n    'A': [('B', 4), ('C', 2)],\\n    'B': [('E', 3)],\\n    'C': [('D', 3), ('E', 5)],\\n    'D': [],\\n    'E': []\\n}\\nprint(dijkstra(graph, 'A'))"
-}
-\`\`\`
+### Problem
 
-### Complexity & Data-Structure Trade-Offs
-
-\`\`\`tabs
-{
-  "tabs": [
-    {
-      "label": "Binary Heap",
-      "content": "**Time:** O((V + E) log V)  \\n**Space:** O(V)  \\nBest general-purpose choice for sparse graphs."
-    },
-    {
-      "label": "Fibonacci Heap",
-      "content": "**Time:** O(E + V log V)  \\n**Space:** O(V)  \\nTheoretically faster decrease-key, but larger constant factors."
-    },
-    {
-      "label": "Array Scan",
-      "content": "**Time:** O(V²)  \\n**Space:** O(V)  \\nSimpler code, competitive for **dense** graphs (E ≈ V²)."
-    }
-  ]
-}
-\`\`\`
-
-### Limitations You Must Remember
-
-\`\`\`callout
-{
-  "type": "warning",
-  "title": "Negative Weights Break Dijkstra",
-  "content": "The algorithm assumes every edge weight is non-negative. A single negative edge can invalidate the greedy choice and produce wrong answers. For graphs with negative weights, use Bellman-Ford instead."
-}
-\`\`\`
-
-### Quick Knowledge Check
-
-\`\`\`quiz
-{
-  "title": "Dijkstra Checkpoint",
-  "questions": [
-    {
-      "question": "Which data structure is most commonly used to achieve O((V + E) log V) time?",
-      "options": ["Stack", "Binary heap", "Hash table", "Disjoint-set"],
-      "answer": 1,
-      "explanation": "A binary min-heap lets us extract the closest unvisited vertex in logarithmic time."
-    },
-    {
-      "question": "What happens if the graph contains a negative edge?",
-      "options": ["The algorithm runs slower", "The algorithm may give incorrect distances", "The algorithm still works but needs two passes", "Nothing—performance improves"],
-      "answer": 1,
-      "explanation": "Dijkstra locks in a vertex once it is finalized; a later negative edge could offer a shorter path that is never considered."
-    },
-    {
-      "question": "After Dijkstra finishes, how many times has each vertex been finalized?",
-      "options": ["0", "1", "Up to V", "Up to E"],
-      "answer": 1,
-      "explanation": "Each vertex is extracted from the priority queue exactly once, marking its shortest distance as final."
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`takeaways
-{
-  "title": "Key Takeaways",
-  "items": [
-    "Dijkstra greedily processes the closest unvisited vertex, guaranteeing optimal distances when all weights are non-negative.",
-    "With a binary heap the runtime is O((V + E) log V) and memory overhead is O(V).",
-    "Negative edges invalidate the greedy choice; use Bellman-Ford for those graphs.",
-    "The same framework (distance array + priority queue) underlies modern shortest-path engines in maps, networks, and games."
-  ]
-}
-\`\`\``,
+Implement Dijkstra's algorithm to find shortest distances and paths from a source vertex.`,
       starterCode: `import heapq
 
 def dijkstra(graph, start):

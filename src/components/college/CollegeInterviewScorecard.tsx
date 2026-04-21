@@ -129,9 +129,9 @@ export default function CollegeInterviewScorecard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-violet-400 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 text-[#D4AF37] animate-spin mx-auto mb-4" />
           <p className="text-white/50 text-sm">Writing your alumni report...</p>
           <p className="text-white/20 text-xs mt-1">This may take a moment</p>
         </div>
@@ -141,13 +141,13 @@ export default function CollegeInterviewScorecard() {
 
   if (error || !sc) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-4" />
           <p className="text-white/70 text-sm mb-4">{error || "No scorecard available"}</p>
           <button
             onClick={() => router.push("/college-interviews")}
-            className="text-violet-400 hover:text-violet-300 text-sm underline"
+            className="text-[#D4AF37] hover:text-[#E4BF47] text-sm underline"
           >
             Start a new interview
           </button>
@@ -162,7 +162,7 @@ export default function CollegeInterviewScorecard() {
     sc.overallRecommendation >= 3 ? "text-amber-400" : "text-red-400";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-12">
+    <div className="min-h-screen bg-[var(--background)] px-4 py-12">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
@@ -237,10 +237,10 @@ export default function CollegeInterviewScorecard() {
         </div>
 
         {/* The killer feature: what they would write */}
-        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-violet-500/[0.06] to-cyan-500/[0.06] border border-violet-500/[0.15]">
+        <div className="mb-8 p-6 rounded-2xl bg-[#D4AF37]/[0.06] border border-[#D4AF37]/[0.18]">
           <div className="flex items-center gap-2 mb-3">
-            <FileText className="w-4 h-4 text-violet-400" />
-            <h3 className="text-xs uppercase tracking-wider text-violet-300">What they would write in the report</h3>
+            <FileText className="w-4 h-4 text-[#D4AF37]" />
+            <h3 className="text-xs uppercase tracking-wider text-[#D4AF37]">What they would write in the report</h3>
           </div>
           <p className="text-sm text-white/85 leading-relaxed italic">
             {sc.whatTheyWouldWriteInTheReport}
@@ -254,7 +254,7 @@ export default function CollegeInterviewScorecard() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/college-interviews")}
-            className="flex-1 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all"
+            className="flex-1 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#C4A030] text-black text-sm font-semibold flex items-center justify-center gap-2 transition-all"
           >
             <RotateCcw className="w-4 h-4" />
             Practice another interview
