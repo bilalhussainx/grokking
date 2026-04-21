@@ -176,7 +176,6 @@ export async function POST(req: NextRequest) {
       category = "tech",
       collegePersonaId,
       applicantProfile,
-      whyThisSchool,
     }: {
       jobDescription: string;
       preset: InterviewPreset;
@@ -187,11 +186,9 @@ export async function POST(req: NextRequest) {
       collegePersonaId?: string;
       applicantProfile?: {
         intendedMajor?: string;
-        topProjectTitle?: string;
-        topProjectDescription?: string;
-        recentInfluence?: string;
+        essayContext?: { prompt: string; excerpt: string };
+        activitiesSummary?: string[];
       };
-      whyThisSchool?: string;
     } = body;
 
     // Validation differs by category
@@ -254,19 +251,51 @@ export async function POST(req: NextRequest) {
         }
       } catch {}
 
-      const profileBlock = applicantProfile
-        ? `\n\nThe candidate has shared this about themselves (use it to PERSONALIZE questions):
-- Intended major: ${applicantProfile.intendedMajor || 'not specified'}
-- Top project / extracurricular: ${applicantProfile.topProjectTitle || 'not specified'}
-- Project description: ${applicantProfile.topProjectDescription || 'not specified'}
-- Recent influence: ${applicantProfile.recentInfluence || 'not specified'}
-- Why this school: ${whyThisSchool || 'not specified'}`
+      // Read the persona's fullName so the "Why [SchoolName]?" question uses
+      // the real school name the candidate selected, not a placeholder.
+      let schoolFullName = "this school";
+      let schoolShortName = "this school";
+      try {
+        const { getCollegePersona } = await import("@/data/college-interviewer-personas");
+        const persona = getCollegePersona(collegePersonaId!);
+        if (persona) {
+          schoolFullName = persona.fullName;
+          schoolShortName = persona.shortName;
+        }
+      } catch {}
+
+      const profileLines: string[] = [];
+      if (applicantProfile?.intendedMajor) {
+        profileLines.push(`- Intended major: ${applicantProfile.intendedMajor}`);
+      }
+      if (applicantProfile?.essayContext?.excerpt) {
+        profileLines.push(`- Common App personal statement prompt: "${applicantProfile.essayContext.prompt || 'not specified'}"`);
+        profileLines.push(`- Common App essay excerpt: "${applicantProfile.essayContext.excerpt}"`);
+      }
+      if (applicantProfile?.activitiesSummary?.length) {
+        profileLines.push(`- Activities list (Common App format):`);
+        for (const a of applicantProfile.activitiesSummary.slice(0, 10)) {
+          profileLines.push(`    • ${a}`);
+        }
+      }
+      const profileBlock = profileLines.length > 0
+        ? `\n\nThe candidate has shared this about themselves (use it to PERSONALIZE questions):\n${profileLines.join('\n')}`
         : '';
 
       userPrompt = `Generate an alumni interview question plan for a high school applicant.
 ${collegeContext}${profileBlock}${exclusionBlock}
 
-Generate 5-7 questions in the alumni interview format. All questions should be type "behavioral" (college alumni interviews are not technical). The questions must be SPECIFIC to the candidate's profile when possible — reference their intended major, top project, and recent influence directly. Question text in the plan must be in English.
+Generate 5-7 questions in the alumni interview format. All questions should be type "behavioral" (college alumni interviews are not technical). Question text must be in English.
+
+MANDATORY QUESTIONS — include these (phrase them as you would naturally):
+1. One question that explicitly asks "Why ${schoolFullName}?" — refer to the school BY ITS NAME (${schoolShortName}). This is non-negotiable; do not substitute "why this school" or a generic variant.
+2. If a Common App essay excerpt is provided, include ONE probing follow-up that references a specific moment from the essay (not a rehash of the whole essay — just the most interesting thread).
+3. If activities are provided, include ONE deep-dive question about the activity with the highest commitment (most hours/week or most senior role).
+
+NON-REPETITION RULES:
+- Each question must cover a DIFFERENT topic. Do not ask the same thing phrased two ways.
+- Do NOT ask the candidate to summarize their essay or their full activities list — the interviewer already read them. Ask for depth, not recap.
+- Avoid the generic trio "tell me about yourself / why this school / biggest challenge" unless you can make each specific.
 
 Return the JSON question plan now.`;
     } else {

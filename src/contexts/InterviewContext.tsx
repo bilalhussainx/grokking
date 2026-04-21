@@ -36,6 +36,9 @@ interface InterviewState {
   collegePersonaId?: string;        // e.g. "harvard-undergrad"
   applicantProfile?: {
     intendedMajor?: string;
+    essayContext?: { prompt: string; excerpt: string };
+    activitiesSummary?: string[];
+    // Legacy — kept optional for back-compat with pre-existing sessionStorage.
     topProjectTitle?: string;
     topProjectDescription?: string;
     recentInfluence?: string;

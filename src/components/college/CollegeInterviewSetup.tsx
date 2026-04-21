@@ -2,17 +2,17 @@
 
 // College admissions interview setup page.
 // Spec: docs/superpowers/specs/2026-04-07-college-admissions-interviews-design.md
-//
-// Mirrors InterviewSetup.tsx structure but for college applicants:
-//   - 10 school cards (Ivies + Stanford + MIT)
-//   - 4-field applicant profile (persisted to user)
-//   - Per-session "why this school"
-//   - Feedback language picker (interview is always English)
+// Design refresh 2026-04-20: aligned with site dark+gold palette, mobile-first layout,
+// persona preview card after selection.
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { GraduationCap, Loader2, ArrowRight, Globe2, Sparkles, Mic, MessageSquare, Headphones } from "lucide-react";
+import {
+  GraduationCap, Loader2, ArrowRight, ArrowLeft, Globe2, Sparkles,
+  Mic, MessageSquare, Headphones, ChevronRight, CheckCircle2, BookOpen,
+} from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAllCollegePersonas } from "@/data/college-interviewer-personas";
@@ -21,28 +21,28 @@ import { createBrowserSupabase } from "@/lib/supabase-browser";
 const SCHOOLS = getAllCollegePersonas();
 
 const FEEDBACK_LANGUAGES = [
-  { code: "en", label: "English",   nativeLabel: "English" },
-  { code: "es", label: "Spanish",   nativeLabel: "Español" },
-  { code: "fr", label: "French",    nativeLabel: "Français" },
-  { code: "de", label: "German",    nativeLabel: "Deutsch" },
-  { code: "it", label: "Italian",   nativeLabel: "Italiano" },
-  { code: "nl", label: "Dutch",     nativeLabel: "Nederlands" },
-  { code: "ja", label: "Japanese",  nativeLabel: "日本語" },
-  { code: "hi", label: "Hindi",     nativeLabel: "हिन्दी" },
-  { code: "pa", label: "Punjabi",   nativeLabel: "ਪੰਜਾਬੀ" },
+  { code: "en", label: "English",   nativeLabel: "English",   flag: "🇺🇸" },
+  { code: "es", label: "Spanish",   nativeLabel: "Español",   flag: "🇪🇸" },
+  { code: "fr", label: "French",    nativeLabel: "Français",  flag: "🇫🇷" },
+  { code: "de", label: "German",    nativeLabel: "Deutsch",   flag: "🇩🇪" },
+  { code: "it", label: "Italian",   nativeLabel: "Italiano",  flag: "🇮🇹" },
+  { code: "nl", label: "Dutch",     nativeLabel: "Nederlands",flag: "🇳🇱" },
+  { code: "ja", label: "Japanese",  nativeLabel: "日本語",     flag: "🇯🇵" },
+  { code: "hi", label: "Hindi",     nativeLabel: "हिन्दी",     flag: "🇮🇳" },
+  { code: "pa", label: "Punjabi",   nativeLabel: "ਪੰਜਾਬੀ",      flag: "🇮🇳" },
 ];
 
-const SCHOOL_EMOJIS: Record<string, string> = {
-  "harvard-undergrad": "🟥",
-  "yale-undergrad": "🟦",
-  "princeton-undergrad": "🟧",
-  "columbia-undergrad": "🟦",
-  "penn-undergrad": "🟦",
-  "brown-undergrad": "🟫",
-  "dartmouth-undergrad": "🟩",
-  "cornell-undergrad": "⬜",
-  "stanford-undergrad": "🟥",
-  "mit-undergrad": "⬛",
+const SCHOOL_BADGES: Record<string, { color: string; accent: string }> = {
+  "harvard-undergrad":   { color: "from-rose-500/20 to-rose-900/10",    accent: "bg-rose-500"    },
+  "yale-undergrad":      { color: "from-blue-500/20 to-blue-900/10",    accent: "bg-blue-500"    },
+  "princeton-undergrad": { color: "from-orange-500/20 to-orange-900/10",accent: "bg-orange-500"  },
+  "columbia-undergrad":  { color: "from-sky-500/20 to-sky-900/10",      accent: "bg-sky-500"     },
+  "penn-undergrad":      { color: "from-indigo-500/20 to-indigo-900/10",accent: "bg-indigo-500"  },
+  "brown-undergrad":     { color: "from-amber-700/20 to-amber-900/10",  accent: "bg-amber-700"   },
+  "dartmouth-undergrad": { color: "from-emerald-500/20 to-emerald-900/10",accent: "bg-emerald-500"},
+  "cornell-undergrad":   { color: "from-red-500/20 to-red-900/10",      accent: "bg-red-500"     },
+  "stanford-undergrad":  { color: "from-rose-600/20 to-rose-900/10",    accent: "bg-rose-600"    },
+  "mit-undergrad":       { color: "from-slate-400/20 to-slate-900/10",  accent: "bg-slate-400"   },
 };
 
 export default function CollegeInterviewSetup() {
@@ -52,10 +52,6 @@ export default function CollegeInterviewSetup() {
 
   const [collegePersonaId, setCollegePersonaId] = useState<string>("");
   const [intendedMajor, setIntendedMajor] = useState("");
-  const [topProjectTitle, setTopProjectTitle] = useState("");
-  const [topProjectDescription, setTopProjectDescription] = useState("");
-  const [recentInfluence, setRecentInfluence] = useState("");
-  const [whyThisSchool, setWhyThisSchool] = useState("");
   const [feedbackLanguage, setFeedbackLanguage] = useState<string>("en");
   const [inputMode, setInputMode] = useState<'voice' | 'text'>("voice");
   const [loading, setLoading] = useState(false);
@@ -66,11 +62,17 @@ export default function CollegeInterviewSetup() {
   const presetPersona = searchParams.get("persona");
   const presetFeedbackLang = searchParams.get("feedbackLang");
   const returnTo = searchParams.get("returnTo");
-  const shouldIncludeEssays = searchParams.get("includeEssays") === "true";
 
+  // Auto-pulled from the student's /cc workspace — used to personalize the
+  // interview without making them retype what they've already written.
   const [essayContext, setEssayContext] = useState<{ prompt: string; excerpt: string } | undefined>(undefined);
+  const [activitiesSummary, setActivitiesSummary] = useState<string[]>([]);
 
-  // Load profile from Supabase if signed in
+  const selectedPersona = useMemo(
+    () => SCHOOLS.find((s) => s.id === collegePersonaId),
+    [collegePersonaId]
+  );
+
   useEffect(() => {
     if (!user) {
       setProfileLoading(false);
@@ -81,17 +83,14 @@ export default function CollegeInterviewSetup() {
         const supabase = createBrowserSupabase();
         const { data } = await supabase
           .from("college_applicant_profile")
-          .select("intended_major, top_project_title, top_project_description, recent_influence")
+          .select("intended_major")
           .eq("user_id", user.id)
           .maybeSingle();
         if (data) {
           setIntendedMajor(data.intended_major || "");
-          setTopProjectTitle(data.top_project_title || "");
-          setTopProjectDescription(data.top_project_description || "");
-          setRecentInfluence(data.recent_influence || "");
         }
       } catch {
-        // ignore — fields stay empty
+        // ignore
       } finally {
         setProfileLoading(false);
       }
@@ -99,35 +98,83 @@ export default function CollegeInterviewSetup() {
   }, [user]);
 
   useEffect(() => {
-    if (presetPersona && !collegePersonaId) {
-      setCollegePersonaId(presetPersona);
-    }
-    if (presetFeedbackLang && feedbackLanguage === "en") {
-      setFeedbackLanguage(presetFeedbackLang);
-    }
+    if (presetPersona && !collegePersonaId) setCollegePersonaId(presetPersona);
+    if (presetFeedbackLang && feedbackLanguage === "en") setFeedbackLanguage(presetFeedbackLang);
   }, [presetPersona, presetFeedbackLang]);
 
+  // Auto-pull the reviewed Common App personal statement + activities list.
+  // The interview coach uses these to ask deeper, non-repetitive questions
+  // instead of making the student retype a project + "book that inspired you".
   useEffect(() => {
-    if (!shouldIncludeEssays) return;
+    if (!user) return;
     (async () => {
       try {
         const res = await fetch("/api/cc/essays");
         const data = await res.json();
-        const essays = data.essays || [];
-        const draft = essays.find(
-          (e: { phase: string }) => e.phase === "draft" || e.phase === "revise"
-        );
-        if (draft) {
-          setEssayContext({
-            prompt: draft.prompt_text || "",
-            excerpt: (draft.content || "").slice(0, 500),
-          });
+        const essays: Array<{ id: string; essay_type?: string; phase?: string; prompt_text?: string }> = data.essays || [];
+        // Prefer the Common App personal statement that has been reviewed.
+        const reviewed = essays.find((e) => e.essay_type === "personal_statement" && e.phase === "review");
+        const target = reviewed
+          || essays.find((e) => e.essay_type === "personal_statement" && (e.phase === "revise" || e.phase === "draft"))
+          || essays.find((e) => e.phase === "review" || e.phase === "revise" || e.phase === "draft");
+        if (target) {
+          try {
+            const detail = await fetch(`/api/cc/essays/${target.id}`).then((r) => (r.ok ? r.json() : null));
+            const essay = detail?.essay;
+            if (essay?.content) {
+              setEssayContext({
+                prompt: essay.prompt_text || target.prompt_text || "",
+                excerpt: (essay.content || "").slice(0, 1200),
+              });
+            }
+          } catch {
+            // non-fatal
+          }
         }
       } catch {
         // non-fatal
       }
     })();
-  }, [shouldIncludeEssays]);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const supabase = createBrowserSupabase();
+        const { data: profile } = await supabase
+          .from("cc_student_profiles")
+          .select("id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (!profile) return;
+        const { data: acts } = await supabase
+          .from("cc_activities")
+          .select("position, activity_type, organization, role, description_150, hours_per_week, weeks_per_year")
+          .eq("student_id", profile.id)
+          .order("position", { ascending: true });
+        if (acts && acts.length > 0) {
+          const summary = acts
+            .filter((a: { role?: string; organization?: string; description_150?: string }) =>
+              (a.role || a.organization || a.description_150)
+            )
+            .slice(0, 10)
+            .map((a: { position?: number; activity_type?: string; organization?: string; role?: string; description_150?: string; hours_per_week?: number; weeks_per_year?: number }) => {
+              const parts: string[] = [];
+              const label = [a.role, a.organization].filter(Boolean).join(" · ");
+              if (label) parts.push(label);
+              if (a.activity_type) parts.push(`(${a.activity_type})`);
+              if (a.description_150) parts.push(`— ${a.description_150}`);
+              if (a.hours_per_week) parts.push(`[${a.hours_per_week}h/wk × ${a.weeks_per_year || '?'}wk]`);
+              return parts.join(" ");
+            });
+          setActivitiesSummary(summary);
+        }
+      } catch {
+        // non-fatal
+      }
+    })();
+  }, [user]);
 
   const canStart = !!collegePersonaId && !loading;
 
@@ -138,9 +185,6 @@ export default function CollegeInterviewSetup() {
       await supabase.from("college_applicant_profile").upsert({
         user_id: user.id,
         intended_major: intendedMajor.trim() || null,
-        top_project_title: topProjectTitle.trim() || null,
-        top_project_description: topProjectDescription.trim() || null,
-        recent_influence: recentInfluence.trim() || null,
         updated_at: new Date().toISOString(),
       });
     } catch (e) {
@@ -155,20 +199,15 @@ export default function CollegeInterviewSetup() {
 
     const applicantProfile = {
       intendedMajor: intendedMajor.trim() || undefined,
-      topProjectTitle: topProjectTitle.trim() || undefined,
-      topProjectDescription: topProjectDescription.trim() || undefined,
-      recentInfluence: recentInfluence.trim() || undefined,
-      whyThisSchool: whyThisSchool.trim() || undefined,
       essayContext,
+      activitiesSummary: activitiesSummary.length > 0 ? activitiesSummary : undefined,
     };
 
     try {
-      // Persist profile in background
       persistProfile();
 
       let plan;
       if (!user) {
-        // Guest mode — fallback plan, no API call
         plan = {
           questions: [],
           interviewerPersona: "Adaptive college admissions interviewer",
@@ -186,9 +225,8 @@ export default function CollegeInterviewSetup() {
               category: "college",
               collegePersonaId,
               interviewType: "behavioral",
-              language: "en",                  // interview is always English
+              language: "en",
               applicantProfile,
-              whyThisSchool: whyThisSchool.trim() || undefined,
             }),
             signal: controller.signal,
           });
@@ -209,10 +247,10 @@ export default function CollegeInterviewSetup() {
 
       const sessionId = startInterview({
         interviewType: "behavioral",
-        preset: "fullstack",                  // unused in college mode but required by type
+        preset: "fullstack",
         jobDescription: `College: ${collegePersonaId}`,
         questionPlan: plan,
-        language: "en",                       // interview voice is English
+        language: "en",
         companyPersonaId: "generic",
         category: "college",
         collegePersonaId,
@@ -231,226 +269,210 @@ export default function CollegeInterviewSetup() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        <motion.div
-          className="text-center mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+    <div className="min-h-screen bg-[var(--background)] text-white relative overflow-hidden">
+      {/* Ambient gold glow — signals "college application premium feel" */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-[#D4AF37]/[0.04] blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-blue-500/[0.03] blur-3xl" />
+      </div>
+
+      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        {/* Back link */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors mb-6"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-semibold mb-4">
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back to dashboard
+        </Link>
+
+        {/* Hero */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-10 sm:mb-12"
+        >
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-[11px] font-semibold mb-5">
             <Sparkles className="w-3 h-3" />
-            College Admissions Interview Practice
+            Alumni Interview Practice
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-            Practice your alumni interview
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-white mb-3 leading-[1.05]">
+            Practice with an <span className="text-[#D4AF37]">Ivy+ alumni</span> interviewer
           </h1>
-          <p className="text-sm text-white/50 max-w-xl mx-auto">
-            Pick a school. Get an AI alumni interviewer that knows what {"that"} school cares about. Interview is in English (matches the real thing). Feedback comes in your language.
+          <p className="text-sm sm:text-base text-white/55 max-w-2xl leading-relaxed">
+            Pick a school. Get an AI trained on how <em>that</em> school&apos;s alumni actually interview. Interview stays in English to mirror the real thing — your feedback comes back in any of 9 languages.
           </p>
         </motion.div>
 
-        {/* School picker */}
-        <motion.div
-          className="mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-6 h-6 rounded-full bg-white/[0.06] border border-white/[0.1] text-white/50 flex items-center justify-center text-xs font-bold">1</div>
-            <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Pick a school</h2>
-          </div>
+        {/* Step 1: School picker */}
+        <Section number={1} title="Pick a school">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
             {SCHOOLS.map((s) => {
               const isSelected = collegePersonaId === s.id;
+              const badge = SCHOOL_BADGES[s.id] || { color: "from-[#D4AF37]/20 to-[#D4AF37]/5", accent: "bg-[#D4AF37]" };
               return (
                 <motion.button
                   key={s.id}
                   onClick={() => setCollegePersonaId(s.id)}
-                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  className={`p-3.5 rounded-xl border text-left transition-colors ${
+                  className={`group relative overflow-hidden p-3.5 rounded-2xl border text-left transition-all ${
                     isSelected
-                      ? "bg-violet-500/10 border-violet-500/30 ring-1 ring-violet-500/20"
+                      ? "bg-[#D4AF37]/[0.06] border-[#D4AF37]/40 ring-1 ring-[#D4AF37]/20 shadow-lg shadow-[#D4AF37]/10"
                       : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]"
                   }`}
                 >
-                  <div className={`text-2xl mb-2`}>{SCHOOL_EMOJIS[s.id] || "🎓"}</div>
-                  <div className={`text-[13px] font-semibold mb-0.5 ${isSelected ? "text-white" : "text-white/70"}`}>{s.shortName}</div>
-                  <div className="text-[10px] text-white/30 leading-tight">{s.fullName}</div>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${badge.color} opacity-40 pointer-events-none`} />
+                  <div className="relative">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className={`w-2 h-2 rounded-full ${badge.accent} ${isSelected ? "" : "opacity-60"}`} />
+                      <div className={`text-[10px] uppercase tracking-wide ${isSelected ? "text-[#D4AF37]" : "text-white/30"}`}>
+                        {isSelected ? "Selected" : "Ivy+"}
+                      </div>
+                    </div>
+                    <div className={`text-[15px] font-semibold mb-0.5 ${isSelected ? "text-white" : "text-white/85"}`}>
+                      {s.shortName}
+                    </div>
+                    <div className="text-[10px] text-white/35 leading-tight">{s.fullName}</div>
+                    {isSelected && (
+                      <CheckCircle2 className="w-4 h-4 text-[#D4AF37] absolute top-0 right-0" />
+                    )}
+                  </div>
                 </motion.button>
               );
             })}
           </div>
-        </motion.div>
 
-        {/* Applicant profile */}
-        <motion.div
-          className="mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-6 h-6 rounded-full bg-white/[0.06] border border-white/[0.1] text-white/50 flex items-center justify-center text-xs font-bold">2</div>
-            <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Tell us about you</h2>
-            {user && (
-              <span className="text-[10px] text-white/30">saved to your profile</span>
-            )}
-          </div>
+          {/* Persona preview */}
+          {selectedPersona && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 p-4 rounded-2xl bg-gradient-to-br from-[#D4AF37]/[0.06] to-transparent border border-[#D4AF37]/15"
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center shrink-0">
+                  <GraduationCap className="w-4 h-4 text-[#D4AF37]" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <p className="text-sm font-semibold text-white">{selectedPersona.shortName} alum</p>
+                    <p className="text-[10px] text-white/40">{selectedPersona.fullName}</p>
+                  </div>
+                  <p className="text-xs text-white/60 leading-relaxed mb-3">{selectedPersona.description}</p>
+                  <div className="flex items-center gap-1.5 text-[10px] text-white/40 mb-1.5">
+                    <BookOpen className="w-3 h-3" />
+                    <span className="uppercase tracking-wide">What this alum cares about</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedPersona.schoolFitTopics.slice(0, 4).map((topic, i) => (
+                      <span
+                        key={i}
+                        className="px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/10 text-[10px] text-white/60"
+                      >
+                        {topic}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </Section>
 
+        {/* Step 2: Applicant profile */}
+        <Section number={2} title="Tell us about you" hint={user ? "saved to your profile" : undefined}>
           {profileLoading ? (
             <div className="text-xs text-white/40">Loading your profile…</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] text-white/40 mb-1">Intended major</label>
-                <input
-                  type="text"
-                  value={intendedMajor}
-                  onChange={(e) => setIntendedMajor(e.target.value)}
-                  placeholder="e.g. Computer Science"
-                  className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white/90 placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 focus:bg-white/[0.05] transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] text-white/40 mb-1">A book/article that influenced you</label>
-                <input
-                  type="text"
-                  value={recentInfluence}
-                  onChange={(e) => setRecentInfluence(e.target.value)}
-                  placeholder="e.g. Sapiens by Yuval Harari"
-                  className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white/90 placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 focus:bg-white/[0.05] transition-colors"
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block text-[11px] text-white/40 mb-1">Top project / extracurricular — title</label>
-                <input
-                  type="text"
-                  value={topProjectTitle}
-                  onChange={(e) => setTopProjectTitle(e.target.value)}
-                  placeholder="e.g. Built a machine learning model to detect pneumonia from X-rays"
-                  className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white/90 placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 focus:bg-white/[0.05] transition-colors"
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block text-[11px] text-white/40 mb-1">Tell the alum about it (100-200 words)</label>
-                <textarea
-                  value={topProjectDescription}
-                  onChange={(e) => setTopProjectDescription(e.target.value)}
-                  placeholder="What did you build? Why did you start it? What was the hardest part? What did you learn?"
-                  rows={4}
-                  className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white/90 placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 focus:bg-white/[0.05] transition-colors resize-none"
-                />
-              </div>
+            <div className="space-y-3">
+              <Field label="Intended major" value={intendedMajor} onChange={setIntendedMajor} placeholder="e.g. Computer Science" />
+
+              {(essayContext || activitiesSummary.length > 0) && (
+                <div className="rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.04] px-4 py-3">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    <span className="text-[11px] font-semibold text-[#D4AF37] uppercase tracking-wide">
+                      Using your application
+                    </span>
+                  </div>
+                  <ul className="text-[12px] text-white/70 space-y-0.5 leading-relaxed">
+                    {essayContext && (
+                      <li>• Common App personal statement ({Math.round(essayContext.excerpt.length / 5)} words excerpt)</li>
+                    )}
+                    {activitiesSummary.length > 0 && (
+                      <li>• {activitiesSummary.length} {activitiesSummary.length === 1 ? "activity" : "activities"} from your list</li>
+                    )}
+                  </ul>
+                  <p className="text-[10px] text-white/40 mt-1.5">
+                    The alum will go deeper on these instead of generic questions. &quot;Why {selectedPersona?.shortName || "this school"}?&quot; is asked live during the interview.
+                  </p>
+                </div>
+              )}
             </div>
           )}
-        </motion.div>
+        </Section>
 
-        {/* Why this school */}
-        <motion.div
-          className="mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.25 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-6 h-6 rounded-full bg-white/[0.06] border border-white/[0.1] text-white/50 flex items-center justify-center text-xs font-bold">3</div>
-            <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Why this school?</h2>
-            <span className="text-[10px] text-white/30">just for this session</span>
+        {/* Step 3: Feedback language */}
+        <Section number={3} title="Feedback language" icon={<Globe2 className="w-3.5 h-3.5" />}>
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+            {FEEDBACK_LANGUAGES.map((l) => {
+              const isSelected = feedbackLanguage === l.code;
+              return (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => setFeedbackLanguage(l.code)}
+                  className={`px-2.5 py-2.5 rounded-xl border text-left transition-colors ${
+                    isSelected
+                      ? "bg-[#D4AF37]/[0.08] border-[#D4AF37]/40 ring-1 ring-[#D4AF37]/20"
+                      : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm">{l.flag}</span>
+                    <span className={`text-[11px] font-semibold ${isSelected ? "text-white" : "text-white/70"}`}>
+                      {l.nativeLabel}
+                    </span>
+                  </div>
+                  {l.code !== "en" && (
+                    <span className="text-[9px] text-white/35 mt-0.5 block">{l.label}</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
-          <input
-            type="text"
-            value={whyThisSchool}
-            onChange={(e) => setWhyThisSchool(e.target.value)}
-            placeholder={
-              collegePersonaId
-                ? `e.g. why ${SCHOOLS.find((s) => s.id === collegePersonaId)?.shortName} specifically — what does this school offer that no other does?`
-                : "Pick a school first to see suggestions"
-            }
-            className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white/90 placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 focus:bg-white/[0.05] transition-colors"
-          />
-        </motion.div>
-
-        {/* Feedback language */}
-        <motion.div
-          className="mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-6 h-6 rounded-full bg-white/[0.06] border border-white/[0.1] text-white/50 flex items-center justify-center text-xs font-bold">
-              <Globe2 className="w-3 h-3" />
-            </div>
-            <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Feedback language</h2>
-          </div>
-          <select
-            value={feedbackLanguage}
-            onChange={(e) => setFeedbackLanguage(e.target.value)}
-            className="w-full sm:w-80 bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/90 focus:outline-none focus:border-violet-500/40 focus:bg-white/[0.05] transition-colors appearance-none cursor-pointer"
-          >
-            {FEEDBACK_LANGUAGES.map((l) => (
-              <option key={l.code} value={l.code} className="bg-slate-900 text-white">
-                {l.nativeLabel} {l.code !== "en" ? `(${l.label})` : ""}
-              </option>
-            ))}
-          </select>
-          <p className="text-[10px] text-white/30 mt-2 leading-relaxed">
-            Interview is always in English (matches the real thing). Your scorecard and feedback will be in this language.
+          <p className="text-[11px] text-white/35 mt-3 leading-relaxed">
+            Interview is always in English (matches the real thing). Your scorecard and feedback come in this language.
           </p>
-        </motion.div>
+        </Section>
 
-        {/* Voice / Text mode (audit 2026-04-07: text fallback for users without mic) */}
-        <motion.div
-          className="mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.32 }}
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-6 h-6 rounded-full bg-white/[0.06] border border-white/[0.1] text-white/50 flex items-center justify-center text-xs font-bold">
-              <Headphones className="w-3 h-3" />
-            </div>
-            <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Interview mode</h2>
-          </div>
+        {/* Step 4: Voice / Text mode */}
+        <Section number={4} title="Interview mode" icon={<Headphones className="w-3.5 h-3.5" />}>
           <div className="grid grid-cols-2 gap-2.5">
-            <button
-              type="button"
+            <ModeCard
+              active={inputMode === "voice"}
+              icon={<Mic className="w-4 h-4" />}
+              label="Voice"
+              desc="Speak your answers — most realistic"
               onClick={() => setInputMode("voice")}
-              className={`p-3.5 rounded-xl border text-left transition-colors ${
-                inputMode === "voice"
-                  ? "bg-violet-500/10 border-violet-500/30 ring-1 ring-violet-500/20"
-                  : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]"
-              }`}
-            >
-              <Mic className={`w-4 h-4 mb-2 ${inputMode === "voice" ? "text-violet-400" : "text-white/30"}`} />
-              <div className={`text-[13px] font-semibold mb-0.5 ${inputMode === "voice" ? "text-white" : "text-white/70"}`}>Voice</div>
-              <div className="text-[10px] text-white/30 leading-tight">Speak your answers — most realistic</div>
-            </button>
-            <button
-              type="button"
+            />
+            <ModeCard
+              active={inputMode === "text"}
+              icon={<MessageSquare className="w-4 h-4" />}
+              label="Text"
+              desc="No mic needed — type your answers"
               onClick={() => setInputMode("text")}
-              className={`p-3.5 rounded-xl border text-left transition-colors ${
-                inputMode === "text"
-                  ? "bg-violet-500/10 border-violet-500/30 ring-1 ring-violet-500/20"
-                  : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]"
-              }`}
-            >
-              <MessageSquare className={`w-4 h-4 mb-2 ${inputMode === "text" ? "text-violet-400" : "text-white/30"}`} />
-              <div className={`text-[13px] font-semibold mb-0.5 ${inputMode === "text" ? "text-white" : "text-white/70"}`}>Text</div>
-              <div className="text-[10px] text-white/30 leading-tight">No mic needed — type your answers</div>
-            </button>
+            />
           </div>
-        </motion.div>
+        </Section>
 
         {/* Error */}
         {error && (
           <motion.div
-            className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm"
+            className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm"
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
           >
@@ -458,29 +480,117 @@ export default function CollegeInterviewSetup() {
           </motion.div>
         )}
 
-        {/* Start button */}
-        <motion.button
-          onClick={handleStart}
-          disabled={!canStart}
-          className="group w-full py-3.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-20 disabled:cursor-not-allowed bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white shadow-lg shadow-violet-500/15 hover:shadow-violet-500/30 hover:-translate-y-0.5 active:translate-y-0"
-          initial={{ opacity: 0, y: 10 }}
+        {/* Sticky mobile CTA bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.35 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
+          className="sticky bottom-4 z-20 sm:static mt-8"
         >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Preparing interview...
-            </>
-          ) : (
-            <>
-              <GraduationCap className="w-4 h-4" />
-              Start Practice Interview
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </>
+          <button
+            onClick={handleStart}
+            disabled={!canStart}
+            className={`group w-full py-4 rounded-2xl text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-xl ${
+              canStart
+                ? "bg-[#D4AF37] hover:bg-[#C4A030] text-black shadow-[#D4AF37]/20 hover:shadow-[#D4AF37]/40 hover:-translate-y-0.5 active:translate-y-0"
+                : "bg-white/5 text-white/30 cursor-not-allowed shadow-none"
+            }`}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Preparing your interview…
+              </>
+            ) : (
+              <>
+                <GraduationCap className="w-4 h-4" />
+                {selectedPersona ? `Start ${selectedPersona.shortName} interview` : "Start Practice Interview"}
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </>
+            )}
+          </button>
+          {!selectedPersona && !loading && (
+            <p className="text-center text-[11px] text-white/30 mt-2">Pick a school to unlock</p>
           )}
-        </motion.button>
+        </motion.div>
       </div>
     </div>
+  );
+}
+
+function Section({
+  number, title, hint, icon, children,
+}: {
+  number: number;
+  title: string;
+  hint?: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, delay: number * 0.05 }}
+      className="mb-8 sm:mb-10"
+    >
+      <div className="flex items-center gap-2.5 mb-4">
+        <div className="w-6 h-6 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center text-[11px] font-bold">
+          {icon || number}
+        </div>
+        <h2 className="text-[11px] font-semibold text-white/70 uppercase tracking-[0.14em]">{title}</h2>
+        {hint && <span className="text-[10px] text-white/30 ml-1">· {hint}</span>}
+        <ChevronRight className="w-3 h-3 text-white/10 ml-auto hidden sm:block" />
+      </div>
+      {children}
+    </motion.section>
+  );
+}
+
+function Field({
+  label, value, onChange, placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <div>
+      <label className="block text-[11px] text-white/40 mb-1.5 font-medium">{label}</label>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/90 placeholder:text-white/25 focus:outline-none focus:border-[#D4AF37]/40 focus:bg-white/[0.05] transition-colors"
+      />
+    </div>
+  );
+}
+
+function ModeCard({
+  active, icon, label, desc, onClick,
+}: {
+  active: boolean;
+  icon: React.ReactNode;
+  label: string;
+  desc: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`p-4 rounded-xl border text-left transition-colors ${
+        active
+          ? "bg-[#D4AF37]/[0.08] border-[#D4AF37]/40 ring-1 ring-[#D4AF37]/20"
+          : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]"
+      }`}
+    >
+      <div className={`mb-2 ${active ? "text-[#D4AF37]" : "text-white/40"}`}>{icon}</div>
+      <div className={`text-sm font-semibold mb-0.5 ${active ? "text-white" : "text-white/75"}`}>{label}</div>
+      <div className="text-[10px] text-white/35 leading-tight">{desc}</div>
+    </button>
   );
 }

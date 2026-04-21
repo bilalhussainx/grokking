@@ -14,14 +14,16 @@ import { getSessionStructure } from '@/data/college-interviewer-personas';
 
 export interface ApplicantProfile {
   intendedMajor?: string;
-  topProjectTitle?: string;
-  topProjectDescription?: string;
-  recentInfluence?: string;
-  whyThisSchool?: string;
   essayContext?: {
     prompt: string;
     excerpt: string;
   };
+  activitiesSummary?: string[];
+  // Legacy fields — preserved for back-compat with older sessionStorage payloads.
+  topProjectTitle?: string;
+  topProjectDescription?: string;
+  recentInfluence?: string;
+  whyThisSchool?: string;
 }
 
 export interface CollegeSessionContext {
@@ -114,6 +116,17 @@ ${persona.antiPatterns.map(a => `- ${a}`).join('\n')}
 - If they ask you a question about ${persona.school}, answer it briefly and authentically — alumni interviews are two-way.
 - Length: about 25-30 minutes total. Cover 4-6 main topics.
 - ${persona.closingNote}
+
+## MANDATORY QUESTION — "Why ${persona.fullName}?"
+At some point during the interview (not the very first question, not the very last), you MUST ask the candidate why they want to attend ${persona.fullName} specifically. Use the school's name — "${persona.shortName}" or "${persona.fullName}" — explicitly in the question. Examples:
+- "So — why ${persona.shortName}? What is it about ${persona.fullName} in particular that pulled you?"
+- "There are a lot of great schools. Help me understand what made you pick ${persona.shortName}."
+Do NOT skip this. Do NOT substitute a generic "why college?" — the answer has to be about ${persona.shortName}.
+
+## NON-REPETITION RULES (critical)
+- You have ALREADY READ the candidate's essay and activities list before the interview. Do NOT ask them to summarize either. Ask for depth — specific moments, decisions, what changed in them.
+- Track every question you have already asked in this session. NEVER ask the same question twice, even phrased differently. If you realize you are repeating yourself, pivot: "Actually, let's go somewhere else — ..."
+- If they just answered X, do not ask a follow-up that overlaps 70%+ with X. Move to a different topic.
 
 ## VOICE RULES (CRITICAL)
 - Keep your responses to 1-2 sentences. This is voice — short and natural.
@@ -236,34 +249,33 @@ function buildSchoolKnowledgeBlock(school: string, knowledge?: string[]): string
 
 function buildApplicantProfileBlock(profile: ApplicantProfile): string {
   const lines: string[] = ['', '## CANDIDATE CONTEXT'];
-  lines.push('You read the following about this candidate before the interview. Use it to ask SPECIFIC, personalized questions:');
+  lines.push('You read the following about this candidate before the interview. Use it to ask SPECIFIC, personalized questions — but do NOT read it back to them.');
 
   if (profile.intendedMajor) {
     lines.push(`- Intended major: ${profile.intendedMajor}`);
   }
-  if (profile.topProjectTitle || profile.topProjectDescription) {
-    lines.push(`- Top project / extracurricular: ${profile.topProjectTitle || ''}`);
-    if (profile.topProjectDescription) {
-      lines.push(`  Description: ${profile.topProjectDescription}`);
-    }
-  }
-  if (profile.recentInfluence) {
-    lines.push(`- Recent book/article they mentioned as influential: ${profile.recentInfluence}`);
-  }
-  if (profile.whyThisSchool) {
-    lines.push(`- What they said about why they want this school: ${profile.whyThisSchool}`);
-  }
 
   if (profile.essayContext) {
     lines.push('');
-    lines.push('## CANDIDATE\'S ESSAY (use to ask specific, probing follow-up questions)');
-    lines.push(`Prompt: "${profile.essayContext.prompt}"`);
-    lines.push(`Opening excerpt: "${profile.essayContext.excerpt}"`);
-    lines.push('Ask 1-2 questions about this essay during the interview — probe for authenticity and depth behind the story.');
+    lines.push('## COMMON APP PERSONAL STATEMENT (you have already read this)');
+    if (profile.essayContext.prompt) {
+      lines.push(`Prompt: "${profile.essayContext.prompt}"`);
+    }
+    lines.push(`Essay excerpt: "${profile.essayContext.excerpt}"`);
+    lines.push('Pick ONE specific, interesting thread from this essay and ask ONE probing follow-up about it — about the moment, the decision, or the internal change. Do NOT ask them to summarize the essay or re-tell the whole story.');
+  }
+
+  if (profile.activitiesSummary && profile.activitiesSummary.length > 0) {
+    lines.push('');
+    lines.push('## ACTIVITIES LIST (you have already read this)');
+    for (const a of profile.activitiesSummary.slice(0, 10)) {
+      lines.push(`- ${a}`);
+    }
+    lines.push('Pick ONE activity to go deep on — usually the one with the most hours/week or the most senior role. Ask about the hardest moment, a concrete decision they made, or what changed in them because of it. Do NOT ask "tell me about your activities" — you already have the list.');
   }
 
   lines.push('');
-  lines.push('IMPORTANT: Use these to ask DEEP follow-ups. Do NOT just ask "tell me about your project" — ask SPECIFIC questions like "you mentioned [X] about your [project] — walk me through how you decided to do that." Personalization is the most important thing.');
+  lines.push('IMPORTANT: Use the essay and activities to ask DEEP follow-ups. Good: "In your essay you wrote about [specific moment] — walk me through what you were actually thinking in that moment." Bad: "Tell me about your Common App essay." Bad: "What activities are you involved in?" You already know these things.');
   lines.push('');
 
   return lines.join('\n');
@@ -303,15 +315,24 @@ Scoring scale:
 - overallRecommendation: 1 (do not recommend) to 5 (strongly recommend)
 - recommendationLabel: "Do not recommend" / "Recommend with concerns" / "Neutral" / "Recommend" / "Strongly recommend"
 - dimension scores: 1-10
-  - communication: clarity, structure, listening, asking thoughtful questions back
+  - communication: clarity, structure, listening, asking thoughtful questions back.
   - intellectualCuriosity: depth of interests, specificity of what excites them, books/ideas they bring up
   - authenticity: real voice vs. coached/rehearsed answers
   - schoolFit: how much they researched the specific school, why this place
   - maturity: how they handle failure, growth, self-awareness, values
 
+COMMUNICATION — WHAT COUNTS AS A WEAKNESS (important, read carefully):
+- DO flag: filler words like "um", "uh", "like", "you know", "sort of" used repeatedly.
+- DO flag: long pauses (5+ seconds of silence or "[pause]" markers) that signal the candidate lost their thread.
+- DO flag: false starts, sentences the candidate abandons mid-way and restarts.
+- DO flag: visible difficulty articulating — circling without landing a point, rambling without a thesis, jargon they can't explain.
+- DO flag: consistently giving the shortest possible answer when depth was invited.
+- DO NOT flag: line breaks or short sentences in the transcript. The transcript is segmented by pause detection, not by meaning — a sentence split across two lines is NOT a weakness. Ignore transcript formatting entirely when judging communication.
+- DO NOT flag: natural pauses for thinking (1-3 seconds). Reflective pauses are a strength, not a weakness.
+
 Guidelines:
 - Be honest and constructive. Vague "great job" feedback is useless. Specific moments are gold.
-- Pull DIRECT QUOTES from the transcript when possible.
+- Pull DIRECT QUOTES from the transcript when possible. When calling out filler words, quote them exactly (e.g., "um, like, I think...").
 - The 'whatTheyWouldWriteInTheReport' field is the most valuable thing in the response. It should feel like a real, slightly raw alumni report — not marketing copy.
 - Strengths and improvements are concrete actions, not platitudes.`;
 

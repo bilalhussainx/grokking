@@ -56,7 +56,15 @@ Scoring Guidelines:
 - For behavioral interviews, weight communication higher and codeQuality lower
 - Be honest and constructive — not overly harsh or overly lenient
 - strengths: 2-4 specific things the candidate did well
-- improvements: 2-4 specific, actionable areas to improve`;
+- improvements: 2-4 specific, actionable areas to improve
+
+COMMUNICATION — WHAT COUNTS AS A WEAKNESS:
+- DO flag: filler words ("um", "uh", "like", "you know") used repeatedly.
+- DO flag: long pauses (5+ seconds or "[pause]" markers) that break the candidate's thread.
+- DO flag: false starts, unfinished sentences, circling without landing a point.
+- DO flag: difficulty articulating — rambling without thesis, jargon they can't explain.
+- DO NOT flag: line breaks or short sentences in the transcript. The transcript is segmented by pause detection, not meaning; sentence splits are NOT a communication weakness. Ignore transcript formatting when scoring.
+- DO NOT flag: natural 1-3 second thinking pauses — those are a strength.`;
 
 // Handle CORS preflight
 export async function OPTIONS() {
