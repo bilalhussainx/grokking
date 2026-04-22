@@ -21,6 +21,7 @@ import SurveyPrompt from "@/components/feedback/SurveyPrompt";
 import XPFlyUp from "@/components/gamification/XPFlyUp";
 import { CoachKairosProvider } from "@/contexts/CoachKairosContext";
 import CoachKairosShell from "@/components/cc/coach/CoachKairosShell";
+import { UpgradeGateProvider } from "@/hooks/useFetchWithUpgrade";
 import AchievementToast from "@/components/gamification/AchievementToast";
 import VariableReward from "@/components/gamification/VariableReward";
 import { GraduationCap, X, FileText, ChevronLeft, Mic } from "lucide-react";
@@ -259,16 +260,18 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           <AIStateProvider>
           <GlossaryProvider>
           <CoachKairosProvider>
-            <AppLayout>
-              {children}
-            </AppLayout>
-            <CoachKairosShell />
-            <CoachFAB />
-            <GamificationOverlays />
-            <GlobalSearch />
-            <ShortcutsHelp />
-            <TranslationBarWrapper />
-            <SurveyPrompt />
+            <UpgradeGateProvider>
+              <AppLayout>
+                {children}
+              </AppLayout>
+              <CoachKairosShell />
+              <CoachFAB />
+              <GamificationOverlays />
+              <GlobalSearch />
+              <ShortcutsHelp />
+              <TranslationBarWrapper />
+              <SurveyPrompt />
+            </UpgradeGateProvider>
           </CoachKairosProvider>
           </GlossaryProvider>
           </AIStateProvider>

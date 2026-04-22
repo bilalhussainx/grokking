@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, unauthorized } from "../../helpers";
+import { requireAuth, unauthorized, ensureStudentProfile } from "../../helpers";
+import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
 
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
@@ -11,26 +12,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "school_id required" }, { status: 400 });
   }
 
-  const { data: profile } = await supabase
-    .from("cc_student_profiles")
-    .select("id")
-    .eq("user_id", user.id)
-    .single();
+  const profile = await ensureStudentProfile(supabase, user);
 
-  if (!profile) {
-    return NextResponse.json({ error: "Profile not found" }, { status: 404 });
-  }
-
+  // Dedupe before counting — an update to an existing row should not count
+  // against the tier cap.
   const { data: existing } = await supabase
     .from("cc_student_schools")
     .select("id")
     .eq("student_id", profile.id)
     .eq("school_id", school_id)
-    .single();
+    .maybeSingle();
 
   if (existing) {
     return NextResponse.json({ error: "School already in list" }, { status: 409 });
   }
+
+  const { count: currentCount } = await supabase
+    .from("cc_student_schools")
+    .select("id", { count: "exact", head: true })
+    .eq("student_id", profile.id);
+
+  const check = await assertCapacity(user.id, "schoolsMax", currentCount ?? 0);
+  if (!check.ok) return blockedResponse(check);
 
   const { data, error } = await supabase
     .from("cc_student_schools")

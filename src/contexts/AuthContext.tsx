@@ -21,9 +21,13 @@ interface AuthContextType {
   profile: UserProfile | null;
   credits: number;
   loading: boolean;
+  isAnonymous: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<{ error?: string }>;
   signUpWithEmail: (email: string, password: string, name: string) => Promise<{ error?: string; confirmed?: boolean }>;
+  // Convert an existing anonymous user to a real account without losing data.
+  // Flips is_anonymous=false on the same user_id so every cc_* row stays put.
+  upgradeToRealUser: (params: { email: string; password: string; name: string }) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   refreshCredits: () => Promise<void>;
 }
@@ -239,6 +243,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {};
   };
 
+  const upgradeToRealUser = async ({
+    email,
+    password,
+    name,
+  }: {
+    email: string;
+    password: string;
+    name: string;
+  }) => {
+    // Anonymous user → real user. Supabase keeps the same auth.users.id, so
+    // every cc_* row owned by the anon stays intact. RLS continues to match
+    // on auth.uid(). No data migration required.
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (!currentUser?.is_anonymous) {
+      return { error: "Not an anonymous user." };
+    }
+
+    // Step 1: set email + password on the anon user. Note: updateUser({email})
+    // on an anon session requires email confirmation to be disabled, OR the
+    // user verifies the email link before is_anonymous flips.
+    const { error: updateErr } = await supabase.auth.updateUser({
+      email,
+      password,
+      data: { full_name: name },
+    });
+    if (updateErr) return { error: updateErr.message };
+
+    // Step 2: mark guest_sessions_audit row as upgraded_to_free_at.
+    // Best-effort — don't block signup UX on analytics.
+    try {
+      await fetch("/api/cc/guest/upgraded", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: "free" }),
+      });
+    } catch {}
+
+    // Step 3: ensure user_profiles + credits row exist (normally made by the
+    // signup trigger; anon users skipped it). Same endpoint real signup uses.
+    await ensureProfile(currentUser, name);
+
+    return {};
+  };
+
   const signOut = async () => {
     // Prevent onAuthStateChange from re-authenticating
     signingOutRef.current = true;
@@ -265,9 +313,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.replace("/login");
   };
 
+  const isAnonymous = Boolean(user?.is_anonymous);
+
   return (
     <AuthContext.Provider
-      value={{ user, profile, credits, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, refreshCredits }}
+      value={{
+        user,
+        profile,
+        credits,
+        loading,
+        isAnonymous,
+        signInWithGoogle,
+        signInWithEmail,
+        signUpWithEmail,
+        upgradeToRealUser,
+        signOut,
+        refreshCredits,
+      }}
     >
       {children}
     </AuthContext.Provider>

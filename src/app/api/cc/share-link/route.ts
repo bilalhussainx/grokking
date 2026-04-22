@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, unauthorized, createAdminSupabase } from "../helpers";
+import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
 import { randomBytes } from "crypto";
 
 interface VisibleSections {
@@ -62,6 +63,12 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if (!auth) return unauthorized();
+
+  // Counselor share link is Pro-only. Returning an existing active link to a
+  // paid user who downgrades would still be gated here — the existing-link
+  // early return happens AFTER the gate.
+  const shareCheck = await assertCapacity(auth.user.id, "counselorShareLink", null);
+  if (!shareCheck.ok) return blockedResponse(shareCheck);
 
   const db = createAdminSupabase();
   const { data: profile } = await db

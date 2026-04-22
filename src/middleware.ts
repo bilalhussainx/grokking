@@ -24,7 +24,69 @@ const PUBLIC_ROUTES = [
 ];
 
 // Route prefixes that are always public
-const PUBLIC_PREFIXES = ["/ref/", "/_next/", "/favicon", "/api/webhooks/", "/api/admin/", "/api/courses/", "/api/submissions", "/api/call/", "/api/cc/intake/", "/api/cc/shared/", "/talk", "/call", "/career", "/admin/survey", "/landing", "/blog", "/about", "/comparison", "/pathways", "/tools", "/privacy", "/terms", "/interviews", "/college-interviews", "/history", "/achievements", "/leaderboard", "/faq", "/intake", "/cc/shared"];
+const PUBLIC_PREFIXES = [
+  "/ref/",
+  "/_next/",
+  "/favicon",
+  "/api/webhooks/",
+  "/api/admin/",
+  "/api/courses/",
+  "/api/submissions",
+  "/api/call/",
+  "/api/cc/intake/",
+  "/api/cc/shared/",
+  "/api/cc/guest/", // guest session audit endpoints — caller identifies self via cookie
+  "/api/leads/",    // exit-intent lead capture (email-only, no auth)
+  "/resume/",       // email resume link landing page — public by design
+  "/talk",
+  "/call",
+  "/career",
+  "/admin/survey",
+  "/landing",
+  "/blog",
+  "/about",
+  "/comparison",
+  "/pathways",
+  "/tools",
+  "/privacy",
+  "/terms",
+  "/interviews",
+  "/college-interviews",
+  "/history",
+  "/achievements",
+  "/leaderboard",
+  "/faq",
+  "/intake",
+  "/cc/shared",
+];
+
+// Routes that anonymous (guest) users can reach, but real-account-required
+// routes cannot. These are the § 8.1 "guest-accessible" routes from the plan.
+// Anything NOT in this list or PUBLIC_* requires a non-anonymous user.
+const GUEST_ACCESSIBLE_PREFIXES = [
+  "/api/cc/coach/",
+  "/api/cc/schools",
+  "/api/cc/school-list",
+  "/api/cc/activities/",
+  "/api/cc/essays/",    // review is gated server-side via tier-gate
+  "/api/cc/chancing/",
+  "/api/cc/me/",        // tier lookup, profile read
+  "/cc/dashboard",
+  "/cc/essays",
+  "/cc/activities-optimizer",
+  "/schools",           // school list builder (root-level route)
+  "/cc/schools",        // legacy alias
+  "/cc/my-schools",     // legacy alias
+];
+
+// Pro-tier-only routes. Non-Pro users (anon or free) get redirected to
+// /pricing?capability=<name> or a 402 for API calls. Server-side tier-gate
+// also enforces these — this is just a cheap middleware short-circuit.
+const PRO_ONLY_PREFIXES = [
+  "/api/cc/financial-aid/",
+  "/api/cc/share-link/",
+  "/cc/share",
+];
 
 function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.includes(pathname)) return true;
@@ -39,31 +101,15 @@ function isPublicRoute(pathname: string): boolean {
   return false;
 }
 
+function matchesAnyPrefix(pathname: string, prefixes: string[]): boolean {
+  return prefixes.some((p) => pathname === p || pathname.startsWith(p + "/") || pathname.startsWith(p));
+}
+
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
   const pathname = request.nextUrl.pathname;
 
-  // Quick cookie check — Supabase stores auth in sb-*-auth-token cookies.
-  // Same heuristic is used on both / and /landing so the two redirects never
-  // disagree (preventing an infinite ping-pong).
-  const hasAuthCookie = request.cookies.getAll().some(c => c.name.includes("auth-token"));
-
-  // Redirect non-logged-in users from / to /landing (cinematic page)
-  if (pathname === "/") {
-    if (!hasAuthCookie) {
-      return NextResponse.redirect(new URL("/landing", request.url));
-    }
-    return response;
-  }
-
-  // Inverse: redirect logged-in users OFF /landing back to the dashboard.
-  // Without this, a flaky cookie detection on / bounces the user to /landing
-  // and every CTA there (which calls router.replace("/")) loops back.
-  if (pathname === "/landing" && hasAuthCookie) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  // Skip public routes
+  // Skip public routes entirely (fastest path)
   if (isPublicRoute(pathname)) return response;
 
   // Create Supabase client with cookie access
@@ -86,11 +132,16 @@ export async function middleware(request: NextRequest) {
   );
 
   // Refresh session (important — extends session lifetime)
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isAnonymous = Boolean(user?.is_anonymous);
+  const isRealUser = Boolean(user && !user.is_anonymous);
 
   if (!user) {
-    // Allow guest access to voice sessions, interview scoring, and the
-    // text-only interview endpoint (guest trial flow).
+    // Legacy unauthenticated-guest whitelist (pre-dates the guest-session flow).
+    // Kept for call/voice endpoints that don't want to initialize an anon session.
     const guestApiRoutes = [
       "/api/ai/voice-session",
       "/api/language/voice-session",
@@ -98,14 +149,11 @@ export async function middleware(request: NextRequest) {
       "/api/interviews/text-message",
     ];
 
-    // API routes: return 401 (non-whitelisted) or pass through (whitelisted)
-    // CRITICAL: must NOT fall through to the page redirect below — that would
-    // turn a POST /api/* into a redirect to /login, and /login (a page) returns
-    // 405 for POST requests, surfacing as the dreaded "API error 405".
     if (pathname.startsWith("/api/")) {
       if (guestApiRoutes.includes(pathname)) {
-        return response; // whitelisted — let the route handler run
+        return response;
       }
+      // API call with no session at all — 401.
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -115,9 +163,59 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Subscription downgrade check moved to API routes — too slow for middleware.
-  // Dynamic import + DB query on every request added 500ms+ latency.
+  // --- Root / landing routing (only for users with a session) -------------
+  if (pathname === "/") {
+    if (isAnonymous) {
+      return NextResponse.redirect(new URL("/landing", request.url));
+    }
+    return response;
+  }
 
+  // Real users hitting /landing bounce to dashboard. Anon users stay on
+  // landing because that's where the hero chat lives.
+  if (pathname === "/landing" && isRealUser) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // --- Pro-only gating ----------------------------------------------------
+  if (matchesAnyPrefix(pathname, PRO_ONLY_PREFIXES)) {
+    // The server-side tier-gate is authoritative. Middleware just avoids
+    // making a DB round-trip by returning 402 for anon users immediately.
+    if (isAnonymous) {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json(
+          { error: "Pro feature", upgradeTo: "pro" },
+          { status: 402 }
+        );
+      }
+      return NextResponse.redirect(
+        new URL(`/pricing?capability=${encodeURIComponent(pathname)}`, request.url)
+      );
+    }
+    // Real users fall through — API handlers still call assertCapacity.
+    return response;
+  }
+
+  // --- Anonymous access permissions ---------------------------------------
+  if (isAnonymous) {
+    if (matchesAnyPrefix(pathname, GUEST_ACCESSIBLE_PREFIXES)) {
+      return response;
+    }
+    // Anonymous user hit a real-account-only route.
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json(
+        { error: "Sign up to continue", upgradeTo: "free" },
+        { status: 402 }
+      );
+    }
+    // Send them to signup with a return path so they land back where they wanted.
+    const signupUrl = new URL("/signup", request.url);
+    signupUrl.searchParams.set("next", pathname);
+    signupUrl.searchParams.set("reason", "anon-gated");
+    return NextResponse.redirect(signupUrl);
+  }
+
+  // Real user — already authenticated; fall through to handler.
   return response;
 }
 

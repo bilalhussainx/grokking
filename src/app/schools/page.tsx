@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Search, Building2, List, GitCompare, MessageSquare } from "lucide-react";
 import SchoolCard from "@/components/cc/SchoolCard";
 import SchoolCompareModal from "@/components/cc/SchoolCompareModal";
@@ -72,6 +72,19 @@ export default function SchoolsPage() {
   useEffect(() => {
     loadMySchools();
   }, [loadMySchools]);
+
+  // Auto-open Coach Kairos on first mount so guests arriving from the hero
+  // chat handoff link continue the conversation without an extra click. Only
+  // opens once per page visit — if the user closes it, it stays closed.
+  const coachAutoOpened = useRef(false);
+  useEffect(() => {
+    if (coachAutoOpened.current) return;
+    if (!coach.isOpen) {
+      coach.open();
+    }
+    coachAutoOpened.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const search = useCallback(async (q: string, state: string, type: string) => {
     setBrowseLoading(true);

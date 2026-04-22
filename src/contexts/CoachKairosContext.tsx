@@ -123,16 +123,37 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
     }
   }, [user, pathname, messages.length, isLoading]);
 
+  // Deep-link params. `?coach=open` pops the coach; `?focus=intake` additionally
+  // forces intake mode + seeds the opening assistant message so the legacy
+  // /onboarding redirect lands the user in a conversational intake.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("coach") === "open") {
+    const wantsOpen = params.get("coach") === "open";
+    const focus = params.get("focus");
+
+    if (!wantsOpen && !focus) return;
+
+    if (wantsOpen) setIsOpen(true);
+
+    if (focus === "intake") {
       setIsOpen(true);
-      const url = new URL(window.location.href);
-      url.searchParams.delete("coach");
-      window.history.replaceState({}, "", url.pathname);
+      setCurrentMode("intake");
+      // Seed a proactive intake message only if conversation is empty. Wait for
+      // history load to settle (isLoading=false, messages.length=0) to avoid
+      // racing the history fetch — re-run the effect via proactiveSent gate.
+      if (!proactiveSent.current && !isLoading && messages.length === 0) {
+        proactiveSent.current = true;
+        sendMessageInternal("hi");
+      }
     }
-  }, []);
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("coach");
+    url.searchParams.delete("focus");
+    window.history.replaceState({}, "", url.pathname + (url.search || ""));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading]);
 
   async function sendProactiveMessage() {
     await sendMessageInternal("hi");

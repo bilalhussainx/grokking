@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, unauthorized } from "../../helpers";
+import { requireAuth, unauthorized, createAdminSupabase, ensureStudentProfile } from "../../helpers";
 import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
+import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -198,6 +199,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Upload a PDF or image" }, { status: 400 });
   }
 
+  // Tier gate: guests blocked, free gets 1 lifetime parse, pro unlimited.
+  // Counter lives on cc_student_profiles.resume_parses_count.
+  const db = createAdminSupabase();
+  const profile = await ensureStudentProfile(auth.supabase, auth.user);
+
+  const { data: parseStats } = await db
+    .from("cc_student_profiles")
+    .select("resume_parses_count")
+    .eq("id", profile.id)
+    .maybeSingle();
+
+  const priorCount = (parseStats as { resume_parses_count?: number } | null)?.resume_parses_count ?? 0;
+  const parseCheck = await assertCapacity(auth.user.id, "resumeParsesMax", priorCount);
+  if (!parseCheck.ok) return blockedResponse(parseCheck);
+
   const ok = await deductCredits(auth.user.id, CREDIT_COSTS.coach_text * 5, "resume_parse");
   if (!ok) {
     return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
@@ -230,6 +246,11 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+
+  await db
+    .from("cc_student_profiles")
+    .update({ resume_parses_count: priorCount + 1 })
+    .eq("id", profile.id);
 
   return NextResponse.json({ parsed: result.parsed });
 }

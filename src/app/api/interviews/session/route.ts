@@ -4,7 +4,7 @@
 // DELETE: abandon a session
 
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/supabase-auth";
+import { createServerSupabase, createAdminSupabase } from "@/lib/supabase-auth";
 import {
   deductCredits,
   hasUsedFreeInterview,
@@ -16,6 +16,7 @@ import {
   recordTurn,
   endSession,
 } from "@/lib/interview-session";
+import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
 import {
   buildAdaptiveContext,
   buildAdaptivePromptExtension,
@@ -36,6 +37,20 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  // Tier gate: guests blocked, free gets 1 lifetime mock interview, pro unlimited.
+  const admin = createAdminSupabase();
+  const { count: priorInterviews } = await admin
+    .from("interview_sessions")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
+  const interviewCheck = await assertCapacity(
+    user.id,
+    "mockInterviewsMax",
+    priorInterviews ?? 0
+  );
+  if (!interviewCheck.ok) return blockedResponse(interviewCheck);
 
   // Credit gate: first interview is free, subsequent ones cost credits
   const usedFree = await hasUsedFreeInterview(user.id);

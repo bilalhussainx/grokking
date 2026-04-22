@@ -3,6 +3,7 @@ import { requireAuth, unauthorized, createAdminSupabase } from "../../helpers";
 import { callLLMJSON, type ChatMessage } from "@/lib/cc/llm-stream";
 import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
 import { ACTIVITY_WRITING_RULES, ACTIVITY_EXEMPLARS, ACTIVITY_ACTION_VERBS } from "@/lib/cc/activity-exemplars";
+import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
 
 interface ActivityRow {
   position: number;
@@ -53,11 +54,6 @@ export async function POST() {
   const auth = await requireAuth();
   if (!auth) return unauthorized();
 
-  const ok = await deductCredits(auth.user.id, CREDIT_COSTS.coach_text, "activities_optimize");
-  if (!ok) {
-    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
-  }
-
   const db = createAdminSupabase();
 
   const { data: profile } = await db
@@ -75,6 +71,21 @@ export async function POST() {
     .select("position, activity_type, organization, role, description_150, star_situation, star_task, star_action, star_result, grades_participated, hours_per_week, weeks_per_year")
     .eq("student_id", profile.id)
     .order("position") as { data: ActivityRow[] | null };
+
+  // Tier gate: guests get 3 bullets optimized, free users + pro get up to 10.
+  // We enforce by capping the activities list sent to the LLM, not by blocking —
+  // this way guests still see real value, just not on all 10 slots.
+  const bulletCheck = await assertCapacity(
+    auth.user.id,
+    "activityBulletsMax",
+    activities?.length ?? 0
+  );
+  if (!bulletCheck.ok) return blockedResponse(bulletCheck);
+
+  const ok = await deductCredits(auth.user.id, CREDIT_COSTS.coach_text, "activities_optimize");
+  if (!ok) {
+    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+  }
 
   const { data: honors } = await db
     .from("cc_honors")

@@ -10,6 +10,7 @@ import {
 } from "@/lib/cc/coach-prompt-builder";
 import { streamChat, type ChatMessage } from "@/lib/cc/openrouter";
 import { runCoachExtraction } from "@/lib/cc/coach-extract";
+import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
 
 function extractEssayIdFromPath(path: string | null | undefined): string | null {
   if (!path) return null;
@@ -57,6 +58,18 @@ export async function POST(req: NextRequest) {
   if (!profile) {
     return new Response(JSON.stringify({ error: "Could not create profile" }), { status: 500 });
   }
+
+  // Tier gate — count today's user messages (role=user) for this student.
+  // Anonymous users have a tighter cap; Pro is unlimited (fast-path).
+  const { count: todayMessages } = await supabase
+    .from("cc_coach_conversations")
+    .select("id", { count: "exact", head: true })
+    .eq("student_id", profile.id)
+    .eq("role", "user")
+    .gte("created_at", new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString());
+
+  const check = await assertCapacity(user.id, "coachMessagesPerDay", todayMessages ?? 0);
+  if (!check.ok) return blockedResponse(check);
 
   // Fetch academic profile
   const { data: academic } = await supabase
