@@ -108,6 +108,15 @@ function ProfilePageInner() {
     fetchProfile();
   }, [fetchProfile]);
 
+  const saveAffordability = useCallback(async (value: string) => {
+    await fetch("/api/cc/profile/identity", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ affordability_value: value }),
+    });
+    fetchProfile();
+  }, [fetchProfile]);
+
   if (loading || !profileData) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -133,6 +142,7 @@ function ProfilePageInner() {
           onSaveHonor={saveHonor}
           onDeleteHonor={deleteHonor}
           onSaveFinancial={saveFinancial}
+          onSaveAffordability={saveAffordability}
           onComplete={() => setShowWizard(false)}
         />
       </div>
@@ -183,7 +193,15 @@ function ProfilePageInner() {
       )}
       {activeTab === 2 && <ActivitiesForm activities={(profileData as { activities: never[] }).activities} onSave={saveActivity as never} onDelete={deleteActivity} />}
       {activeTab === 3 && <HonorsForm honors={(profileData as { honors: never[] }).honors} onSave={saveHonor as never} onDelete={deleteHonor} />}
-      {activeTab === 4 && <FinancialForm data={(profileData as { financial: never }).financial} onSave={saveFinancial as never} />}
+      {activeTab === 4 && (
+        <FinancialForm
+          data={(profileData as { financial: never }).financial}
+          onSave={saveFinancial as never}
+          affordabilityValue={(profileData as { profile: { affordability_value?: string | null } }).profile.affordability_value as never}
+          isInternational={!!(profileData as { profile: { is_international?: boolean | null } }).profile.is_international}
+          onAffordabilityChange={saveAffordability as never}
+        />
+      )}
     </div>
   );
 }

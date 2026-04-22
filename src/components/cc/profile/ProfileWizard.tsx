@@ -32,13 +32,14 @@ interface Props {
   onSaveHonor: (honor: Record<string, unknown>) => Promise<void>;
   onDeleteHonor: (id: string) => Promise<void>;
   onSaveFinancial: (fields: Record<string, unknown>) => Promise<void>;
+  onSaveAffordability: (value: string) => Promise<void>;
   onComplete: () => void;
 }
 
 export default function ProfileWizard({
   profileData, onSaveIdentity, onSaveAcademic,
   onSaveActivity, onDeleteActivity, onSaveHonor, onDeleteHonor,
-  onSaveFinancial, onComplete,
+  onSaveFinancial, onSaveAffordability, onComplete,
 }: Props) {
   const [step, setStep] = useState(0);
 
@@ -103,7 +104,13 @@ export default function ProfileWizard({
             <HonorsForm honors={profileData.honors as never} onSave={onSaveHonor as never} onDelete={onDeleteHonor} />
           )}
           {currentStep.key === "financial" && (
-            <FinancialForm data={profileData.financial as never} onSave={onSaveFinancial as never} />
+            <FinancialForm
+              data={profileData.financial as never}
+              onSave={onSaveFinancial as never}
+              affordabilityValue={(profileData.profile as { affordability_value?: string | null }).affordability_value as never}
+              isInternational={!!(profileData.profile as { is_international?: boolean | null }).is_international}
+              onAffordabilityChange={onSaveAffordability as never}
+            />
           )}
         </motion.div>
       </AnimatePresence>

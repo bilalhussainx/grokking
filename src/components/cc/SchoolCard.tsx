@@ -26,6 +26,7 @@ interface Props {
   applicationPlan?: string | null;
   showAddButton?: boolean;
   added?: boolean;
+  aidWarning?: "need-aware";
 }
 
 const BAND_COLORS: Record<string, string> = {
@@ -43,7 +44,7 @@ const PLAN_OPTIONS: { value: string; label: string; early?: boolean }[] = [
   { value: "rolling", label: "Rolling" },
 ];
 
-export default function SchoolCard({ school, onAdd, onRemove, onPlanChange, listEntryId, chancingBand, applicationPlan, showAddButton, added }: Props) {
+export default function SchoolCard({ school, onAdd, onRemove, onPlanChange, listEntryId, chancingBand, applicationPlan, showAddButton, added, aidWarning }: Props) {
   const acceptPct = Math.round((school.acceptance_rate || 0) * 100);
 
   return (
@@ -57,6 +58,14 @@ export default function SchoolCard({ school, onAdd, onRemove, onPlanChange, list
             {chancingBand && (
               <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${BAND_COLORS[chancingBand] || BAND_COLORS.unknown}`}>
                 {chancingBand}
+              </span>
+            )}
+            {aidWarning === "need-aware" && (
+              <span
+                title="This school is need-aware for your status — applying will factor aid need into admission"
+                className="px-2 py-0.5 rounded-full text-[10px] font-medium border bg-amber-500/15 text-amber-400 border-amber-500/30"
+              >
+                ⚠ Need-aware intl
               </span>
             )}
             <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all" />

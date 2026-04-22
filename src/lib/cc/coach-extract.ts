@@ -2,6 +2,11 @@ import { createAdminSupabase } from "@/lib/supabase-server";
 import { chatOnce, type ChatMessage } from "@/lib/cc/openrouter";
 import { convertToUS4, formatRawGPADisplay, type GradingSystem } from "@/lib/cc/gpa-converter";
 import { ACTIVITY_RUBRIC_COMPACT, ACTIVITY_ACTION_VERBS } from "@/lib/cc/activity-exemplars";
+import { financialNeedFromAffordability, type AffordabilityValue } from "@/lib/cc/affordability";
+
+const VALID_AFFORDABILITY: ReadonlySet<AffordabilityValue> = new Set<AffordabilityValue>([
+  "zero", "under_10k", "10k_20k", "20k_30k", "30k_50k", "50k_plus",
+]);
 
 type AdminSupabase = ReturnType<typeof createAdminSupabase>;
 
@@ -164,6 +169,7 @@ async function extractSchoolPreferences(supabase: AdminSupabase, studentId: stri
       role: "system",
       content: `Extract school preferences from this conversation. Return ONLY valid JSON:
 {
+  "affordability_value": "zero" | "under_10k" | "10k_20k" | "20k_30k" | "30k_50k" | "50k_plus" | null,
   "financial_need": "essential" | "important" | "nice-to-have" | "not-a-concern" | null,
   "income_bracket": string | null,
   "location_type": "big-city" | "college-town" | "suburban" | "no-preference" | null,
@@ -172,7 +178,16 @@ async function extractSchoolPreferences(supabase: AdminSupabase, studentId: stri
   "needs_international_full_need": boolean | null,
   "extracurriculars_summary": string | null,
   "campus_size_preference": "small" | "large" | "no-preference" | null
-}`,
+}
+
+Affordability detection rules:
+- "I can't pay anything" / "I need full aid" / "my family has no money for college" / "zero dollars" → affordability_value="zero"
+- "up to $10k" / "under 10k" / "less than ten thousand" → "under_10k"
+- "$10k–$20k" / "between 10 and 20" → "10k_20k"
+- "$20k–$30k" → "20k_30k"
+- "$30k–$50k" → "30k_50k"
+- "cost not a concern" / "can pay full tuition" / "any price is fine" → "50k_plus"
+Always prefer a specific affordability_value over financial_need when both are clear.`,
     },
     { role: "user", content: transcript },
   ];
@@ -187,7 +202,17 @@ async function extractSchoolPreferences(supabase: AdminSupabase, studentId: stri
     updated_at: new Date().toISOString(),
   };
 
+  const rawAffordability =
+    typeof data.affordability_value === "string" && VALID_AFFORDABILITY.has(data.affordability_value as AffordabilityValue)
+      ? (data.affordability_value as AffordabilityValue)
+      : null;
+
   if (data.financial_need) upsert.financial_need = data.financial_need;
+  // If the LLM didn't supply financial_need but did give affordability, derive it
+  // so cc_school_preferences stays consistent with cc_student_profiles.
+  if (!upsert.financial_need && rawAffordability) {
+    upsert.financial_need = financialNeedFromAffordability(rawAffordability);
+  }
   if (data.income_bracket) upsert.income_bracket = data.income_bracket;
   if (data.location_type) upsert.location_type = data.location_type;
   if (data.preferred_regions?.length) upsert.preferred_regions = data.preferred_regions;
@@ -195,6 +220,13 @@ async function extractSchoolPreferences(supabase: AdminSupabase, studentId: stri
   if (data.needs_international_full_need !== null) upsert.needs_international_full_need = data.needs_international_full_need;
   if (data.extracurriculars_summary) upsert.extracurriculars_summary = data.extracurriculars_summary;
   if (data.campus_size_preference) upsert.campus_size_preference = data.campus_size_preference;
+
+  if (rawAffordability) {
+    await supabase
+      .from("cc_student_profiles")
+      .update({ affordability_value: rawAffordability, updated_at: new Date().toISOString() })
+      .eq("id", studentId);
+  }
 
   await supabase.from("cc_school_preferences").upsert(upsert, { onConflict: "student_id" });
 }

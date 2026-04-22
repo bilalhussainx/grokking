@@ -26,12 +26,27 @@ export async function POST(req: NextRequest) {
 
   const { data: allSchools } = await admin
     .from("cc_schools")
-    .select("id, name, acceptance_rate, avg_net_price, test_policy, state, school_type, meets_full_need")
+    .select("id, name, acceptance_rate, avg_net_price, test_policy, state, school_type, meets_full_need, need_blind_international, ipeds_id")
     .order("name");
 
   if (!allSchools || allSchools.length === 0) {
     return NextResponse.json({ error: "No schools in database" }, { status: 500 });
   }
+
+  type SchoolRow = {
+    id: string;
+    name: string;
+    acceptance_rate: number;
+    avg_net_price: number;
+    test_policy: string;
+    state: string;
+    school_type: string;
+    meets_full_need: boolean;
+    need_blind_international: boolean;
+    ipeds_id: number | null;
+  };
+  const typedSchools = allSchools as SchoolRow[];
+  const needsFullAid = !!(profile as { needs_full_aid?: boolean | null }).needs_full_aid;
 
   const academic = Array.isArray(profile.cc_academic_profiles)
     ? profile.cc_academic_profiles[0]
@@ -52,6 +67,9 @@ export async function POST(req: NextRequest) {
     profile.is_international ? "International student" : null,
   ].filter(Boolean);
 
+  if (needsFullAid) {
+    profileParts.push("Affordability: $0 (needs full aid — must filter toward need-blind-international or meets-full-need schools)");
+  }
   if (preferences?.financial_need) profileParts.push(`Financial aid need: ${preferences.financial_need}`);
   if (preferences?.income_bracket) profileParts.push(`Family income: ${preferences.income_bracket}`);
   if (preferences?.location_type) profileParts.push(`Preferred setting: ${preferences.location_type}`);
@@ -65,13 +83,20 @@ export async function POST(req: NextRequest) {
 
   const profileSummary = profileParts.join(", ");
 
-  let filteredSchools = allSchools;
-  if (preferences?.needs_international_full_need) {
-    const fullNeed = allSchools.filter((s: { meets_full_need: boolean }) => s.meets_full_need);
+  let filteredSchools: SchoolRow[] = typedSchools;
+
+  if (needsFullAid && profile.is_international) {
+    const pool = typedSchools.filter((s) => s.need_blind_international || s.meets_full_need);
+    if (pool.length >= 15) filteredSchools = pool;
+  } else if (needsFullAid) {
+    const pool = typedSchools.filter((s) => s.meets_full_need);
+    if (pool.length >= 15) filteredSchools = pool;
+  } else if (preferences?.needs_international_full_need) {
+    const fullNeed = typedSchools.filter((s) => s.meets_full_need);
     if (fullNeed.length >= 30) filteredSchools = fullNeed;
   }
 
-  const schoolList = filteredSchools.map((s: { name: string; state: string; school_type: string; acceptance_rate: number; avg_net_price: number; test_policy: string }) =>
+  const schoolList = filteredSchools.map((s) =>
     `${s.name} | ${s.state} | ${s.school_type} | accept: ${Math.round((s.acceptance_rate || 0) * 100)}% | net: $${s.avg_net_price || "?"} | test: ${s.test_policy}`
   ).join("\n");
 
@@ -83,6 +108,8 @@ Available schools:
 ${schoolList}
 
 Create a balanced list of 8-12 schools from the available schools above. Categorize each as "reach", "match", or "safety" based on the student's profile. Include at least 2 safety schools, 3-4 match schools, and 2-4 reach schools.
+
+${needsFullAid ? `FULL-AID CONSTRAINT: This student needs 100% of demonstrated financial need met. At least 6 of your recommendations must be need-blind-for-international or meets-full-need schools. Always include several of: MIT, Harvard, Yale, Princeton, Dartmouth, Amherst, Williams, Bowdoin if they appear in the candidate list. Do NOT recommend need-aware schools for internationals without flagging aid risk.` : ""}
 
 For each school, provide a brief one-sentence reason for the recommendation.
 
@@ -136,11 +163,15 @@ Respond in JSON format:
     return NextResponse.json({ error: "AI generation failed" }, { status: 500 });
   }
 
-  const schoolNameMap = new Map(allSchools.map((s) => [s.name.toLowerCase(), s]));
-  for (const sug of suggestions) {
+  const schoolNameMap = new Map(typedSchools.map((s) => [s.name.toLowerCase(), s]));
+  type Suggestion = (typeof suggestions)[number] & { aid_warning?: "need-aware" };
+  for (const sug of suggestions as Suggestion[]) {
     const match = schoolNameMap.get(sug.name.toLowerCase());
     if (match) {
       sug.school_id = match.id;
+      if (needsFullAid && profile.is_international && !match.need_blind_international) {
+        sug.aid_warning = "need-aware";
+      }
     }
   }
 

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import { AFFORDABILITY_OPTIONS, type AffordabilityValue } from "@/lib/cc/affordability";
+import CSSProfileCallout from "./CSSProfileCallout";
 
 interface FinancialData {
   household_income_bracket?: string | null;
@@ -17,6 +19,9 @@ interface FinancialData {
 interface Props {
   data: FinancialData | null;
   onSave: (fields: Partial<FinancialData>) => Promise<void>;
+  affordabilityValue?: AffordabilityValue | null;
+  isInternational?: boolean;
+  onAffordabilityChange?: (value: AffordabilityValue) => Promise<void>;
 }
 
 const INCOME_BRACKETS = ["$0-30k", "$30-48k", "$48-75k", "$75-110k", "$110k+"];
@@ -29,8 +34,15 @@ function Nudge({ show, text }: { show: boolean; text: string }) {
 
 const inputClass = "w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#D4AF37]/50";
 
-export default function FinancialForm({ data, onSave }: Props) {
+export default function FinancialForm({
+  data,
+  onSave,
+  affordabilityValue,
+  isInternational,
+  onAffordabilityChange,
+}: Props) {
   const [form, setForm] = useState<FinancialData>(data || {});
+  const [localAffordability, setLocalAffordability] = useState<AffordabilityValue | null>(affordabilityValue ?? null);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const save = useCallback((field: string, value: unknown) => {
@@ -45,11 +57,42 @@ export default function FinancialForm({ data, onSave }: Props) {
     save(field, value);
   };
 
+  const onPickAffordability = async (value: AffordabilityValue) => {
+    setLocalAffordability(value);
+    if (onAffordabilityChange) await onAffordabilityChange(value);
+  };
+
   return (
     <div className="space-y-5">
       <p className="text-sm text-white/40 leading-relaxed">
         This information is private and never shared with colleges. It helps Coach Kairos estimate your net price at each school and find scholarships you qualify for.
       </p>
+
+      <div>
+        <label className="block text-sm text-white/60 mb-2">How much can your family contribute per year? *</label>
+        <p className="text-xs text-white/40 mb-3">This is what you can realistically pay toward college — separate from income.</p>
+        <div className="flex flex-col gap-2">
+          {AFFORDABILITY_OPTIONS.map((opt) => {
+            const active = localAffordability === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => onPickAffordability(opt.value)}
+                className={`text-left px-4 py-3 rounded-xl border text-sm transition-all ${
+                  active
+                    ? "border-[#D4AF37] bg-[#D4AF37]/10 text-white"
+                    : "border-white/10 text-white/60 hover:border-white/20"
+                }`}
+              >
+                <div className={`font-medium ${active ? "text-[#D4AF37]" : "text-white/80"}`}>{opt.label}</div>
+                {"sublabel" in opt && opt.sublabel && <div className="text-xs text-white/40 mt-0.5">{opt.sublabel}</div>}
+              </button>
+            );
+          })}
+        </div>
+        {localAffordability === "zero" && isInternational && <CSSProfileCallout />}
+      </div>
 
       <div>
         <label className="block text-sm text-white/60 mb-2">Household income bracket *</label>

@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
   // Fetch or create student profile
   let { data: profile } = await supabase
     .from("cc_student_profiles")
-    .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at")
+    .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at, affordability_value, needs_full_aid")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     const { data: newProfile } = await supabase
       .from("cc_student_profiles")
       .insert({ user_id: user.id })
-      .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at")
+      .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at, affordability_value, needs_full_aid")
       .single();
     profile = newProfile;
   }
@@ -351,6 +351,8 @@ export async function POST(req: NextRequest) {
     preferences: preferences ?? null,
     focusEssay,
     applicationSnapshot,
+    affordabilityValue: (profile as { affordability_value?: string | null }).affordability_value as never ?? null,
+    needsFullAid: !!(profile as { needs_full_aid?: boolean | null }).needs_full_aid,
   };
 
   const systemPrompt = buildSystemPrompt(coachContext);

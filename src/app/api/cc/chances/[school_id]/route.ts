@@ -30,6 +30,7 @@ RULES:
 - Be honest. A 3.4 GPA at a Harvard-tier school is a reach even with great essays. Say so.
 - Probability ranges: extreme-reach (1-9%), reach (10-29%), match (30-60%), safety (61-90%).
 - For schools with <15% acceptance rate, only "match" or "safety" if the student is objectively top-tier.
+- If the student has needsFullAid=true and the school is NOT need-blind for internationals (needBlindInternational=false), downgrade the band by one tier and flag the aid-admission risk in weaknesses.
 
 Return JSON ONLY:
 {
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sch
 
   const { data: profile } = await db
     .from("cc_student_profiles")
-    .select("id, preferred_name, legal_first_name, grade_level, state_province, country, is_first_gen, is_international")
+    .select("id, preferred_name, legal_first_name, grade_level, state_province, country, is_first_gen, is_international, affordability_value, needs_full_aid")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sch
 
   const { data: school } = await db
     .from("cc_schools")
-    .select("id, name, city, state, acceptance_rate, sat_25, sat_75, act_25, act_75, avg_hs_gpa, school_type, test_policy, meets_full_need, first_gen_programs, alumni_interview_program, persona_slug")
+    .select("id, name, city, state, acceptance_rate, sat_25, sat_75, act_25, act_75, avg_hs_gpa, school_type, test_policy, meets_full_need, need_blind_international, first_gen_programs, alumni_interview_program, persona_slug")
     .eq("id", school_id)
     .maybeSingle();
 
@@ -139,6 +140,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sch
       international: profile.is_international,
       incomeBracket: financial?.household_income_bracket,
       pellEligible: financial?.pell_eligible_estimate,
+      affordabilityValue: (profile as { affordability_value?: string | null }).affordability_value ?? null,
+      needsFullAid: !!(profile as { needs_full_aid?: boolean | null }).needs_full_aid,
     },
     academics: academic ? {
       gpaUnweighted: academic.gpa_unweighted,
@@ -192,6 +195,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sch
     avgHsGpa: school.avg_hs_gpa,
     testPolicy: school.test_policy,
     meetsFullNeed: school.meets_full_need,
+    needBlindInternational: !!(school as { need_blind_international?: boolean | null }).need_blind_international,
     firstGenPrograms: school.first_gen_programs,
     alumniInterviewProgram: school.alumni_interview_program,
   };

@@ -29,6 +29,8 @@ describe("buildSystemPrompt", () => {
     preferences: null,
     focusEssay: null,
     applicationSnapshot: null,
+    affordabilityValue: null,
+    needsFullAid: false,
   };
 
   it("includes personality guidelines", () => {
@@ -69,5 +71,43 @@ describe("buildSystemPrompt", () => {
     const ctx: CoachContext = { ...baseContext, hasEssays: false };
     const prompt = buildSystemPrompt(ctx);
     expect(prompt).toContain("essay");
+  });
+
+  it("surfaces full-aid guidance in school-builder when needsFullAid is true", () => {
+    const ctx: CoachContext = {
+      ...baseContext,
+      mode: "school-builder",
+      affordabilityValue: "zero",
+      needsFullAid: true,
+      isInternational: true,
+      country: "PK",
+    };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("CSS Profile");
+    expect(prompt).toContain("need-blind");
+    expect(prompt).toMatch(/MIT|Harvard|Yale|Princeton|Amherst/);
+  });
+
+  it("excludes full-aid guidance in school-builder when needsFullAid is false", () => {
+    const ctx: CoachContext = {
+      ...baseContext,
+      mode: "school-builder",
+      affordabilityValue: "30k_50k",
+      needsFullAid: false,
+    };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).not.toContain("need-blind for international");
+    expect(prompt).not.toContain("CSS Profile");
+  });
+
+  it("includes affordability context in the profile summary when needsFullAid is true", () => {
+    const ctx: CoachContext = {
+      ...baseContext,
+      affordabilityValue: "zero",
+      needsFullAid: true,
+    };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("$0");
+    expect(prompt.toLowerCase()).toContain("full financial aid");
   });
 });

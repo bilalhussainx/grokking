@@ -1,5 +1,6 @@
 import type { CoachMode } from "./coach-mode-detector";
 import { ACTIVITY_RUBRIC_COMPACT, ACTIVITY_ACTION_VERBS, ESSAY_REVIEW_PRINCIPLES, ESSAY_EXPERT_TIPS, ESSAY_STRUCTURAL_PATTERNS } from "./activity-exemplars";
+import type { AffordabilityValue } from "./affordability";
 
 export interface SchoolPreferences {
   financial_need: string | null;
@@ -79,6 +80,8 @@ export interface CoachContext {
   preferences: SchoolPreferences | null;
   focusEssay: FocusEssay | null;
   applicationSnapshot: ApplicationSnapshot | null;
+  affordabilityValue: AffordabilityValue | null;
+  needsFullAid: boolean;
 }
 
 const PERSONALITY = `You are Coach Kairos, a college admissions counselor who guides high school students through their entire application journey. Your personality:
@@ -117,6 +120,8 @@ export function buildSystemPrompt(ctx: CoachContext): string {
     if (ctx.satTotal) parts.push(`SAT: ${ctx.satTotal}`);
     if (ctx.actComposite) parts.push(`ACT: ${ctx.actComposite}`);
     if (ctx.schoolCount > 0) parts.push(`School list: ${ctx.schoolCount} schools (${ctx.schoolSummary})`);
+    if (ctx.needsFullAid) parts.push("Affordability: $0 — needs full financial aid (100% of demonstrated need)");
+    else if (ctx.affordabilityValue) parts.push(`Affordability: ${formatAffordability(ctx.affordabilityValue)}`);
     sections.push(`\nStudent profile:\n${parts.join("\n")}`);
   }
 
@@ -143,6 +148,17 @@ export function buildSystemPrompt(ctx: CoachContext): string {
   sections.push(`\n${getModeInstructions(ctx)}`);
 
   return sections.join("\n");
+}
+
+function formatAffordability(v: AffordabilityValue): string {
+  switch (v) {
+    case "zero": return "$0 (full aid)";
+    case "under_10k": return "under $10k/year";
+    case "10k_20k": return "$10k–$20k/year";
+    case "20k_30k": return "$20k–$30k/year";
+    case "30k_50k": return "$30k–$50k/year";
+    case "50k_plus": return "$50k+/year (cost not primary concern)";
+  }
 }
 
 function formatAppSnapshot(s: ApplicationSnapshot): string {
@@ -253,20 +269,28 @@ ${ctx.gpaRawDisplay ? `The student's original grade is ${ctx.gpaRawDisplay} (con
 If they're taking SAT/ACT, ask for their score (or expected score).
 Keep it quick — "What's your GPA?" is fine as an opener. If the student volunteers a percentage, CGPA, A-Level, or IB score instead of a 4.0, accept it — convert precisely (e.g. 87% ≈ 3.48) and give band context before moving on.`;
 
-    case "school-builder":
+    case "school-builder": {
+      const fullAidBlock = ctx.needsFullAid
+        ? `
+
+FULL-AID CONSTRAINT (CRITICAL): This student has set affordability to $0 and needs 100% of demonstrated financial need met. Your recommendations MUST prioritize schools that are need-blind for ${ctx.isInternational ? "international" : "domestic"} students AND meet full demonstrated need. Safe recommendations for this student include: MIT, Harvard, Yale, Princeton, Dartmouth, Amherst, Williams, Bowdoin${ctx.isInternational ? " (all need-blind for internationals and meet 100% of need)" : ""}. Do NOT recommend schools that are need-aware for the student's status (most state schools, most private schools that aren't the ~8 need-blind-for-internationals or the broader need-blind-for-domestic list) without flagging the aid risk plainly: "X meets full need for admitted students but is need-aware — applying will reduce your admission odds."${ctx.isInternational ? `
+
+CSS PROFILE: Because the student is international and needs full aid, mention in passing that most of their target schools use the CSS Profile (not FAFSA). Point them to [CSS Profile Guide](/profile/css-guide) once for context — don't belabor it.` : ""}`
+        : "";
       return `MODE: SCHOOL BUILDER
 Guide the student through building their school list. Ask these questions ONE AT A TIME (skip any you already have answers for from their profile):
 1. How important is financial aid? (Essential / Important / Nice-to-have / Not a concern)
-   - If Essential or Important: approximate family income bracket
+   - If Essential or Important: approximate family income bracket${ctx.needsFullAid ? "\n   - SKIP this question — the student has already set affordability to $0 (full aid needed). Go straight to location/major." : ""}
 2. What kind of place? (Big city / College town / Suburban / No preference)
    - Follow-up: any particular region? (Northeast, Southeast, Midwest, West Coast, Southwest, Anywhere)
 3. What do they want to study? (free text, suggest common options)
-${ctx.isInternational ? "4. Do they need schools that meet full financial need for international students?" : ""}
+${ctx.isInternational && !ctx.needsFullAid ? "4. Do they need schools that meet full financial need for international students?" : ""}
 
 After gathering preferences, say "Let me build your list — give me a moment..." and the system will generate recommendations.
 Present the recommendations grouped by reach/match/safety with a one-line reason for each school.
 The student can accept all, remove specific schools, or ask for alternatives.
-When the student approves the list, confirm: "Done — those schools are being added to your list. Head to [School List Builder](/schools) to see them." Then stop — don't suggest essays or interviews yet.`;
+When the student approves the list, confirm: "Done — those schools are being added to your list. Head to [School List Builder](/schools) to see them." Then stop — don't suggest essays or interviews yet.${fullAidBlock}`;
+    }
 
     case "school-browse":
       return `MODE: SCHOOL BROWSE
