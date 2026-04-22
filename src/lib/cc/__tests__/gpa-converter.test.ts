@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { convertToUS4, detectGradingSystem } from "../gpa-converter";
+import {
+  convertToUS4,
+  detectGradingSystem,
+  convertPercentageToGPA,
+  formatRawGPADisplay,
+} from "../gpa-converter";
 
 describe("convertToUS4", () => {
   describe("percentage system", () => {
@@ -76,6 +81,72 @@ describe("convertToUS4", () => {
       expect(result.gpaLow).toBeGreaterThanOrEqual(3.0);
       expect(result.gpaHigh).toBeLessThanOrEqual(3.5);
     });
+  });
+});
+
+describe("convertPercentageToGPA", () => {
+  it("converts 87% to 3.48 with Excellent band", () => {
+    const r = convertPercentageToGPA(87);
+    expect(r.gpaPrecise).toBe(3.48);
+    expect(r.band).toBe("Excellent");
+    expect(r.usCourseContext).toMatch(/A-/);
+    expect(r.howCollegesEvaluate).toMatch(/80–89%|80-89%/);
+  });
+
+  it("converts 95% to 3.8 with Outstanding band", () => {
+    const r = convertPercentageToGPA(95);
+    expect(r.gpaPrecise).toBe(3.8);
+    expect(r.band).toBe("Outstanding");
+  });
+
+  it("converts 55% to 2.2 with Satisfactory band", () => {
+    const r = convertPercentageToGPA(55);
+    expect(r.gpaPrecise).toBe(2.2);
+    expect(r.band).toBe("Satisfactory");
+  });
+
+  it("converts 100% to 4.0 with Outstanding band", () => {
+    const r = convertPercentageToGPA(100);
+    expect(r.gpaPrecise).toBe(4);
+    expect(r.band).toBe("Outstanding");
+  });
+
+  it("89% is still Excellent (upper boundary)", () => {
+    expect(convertPercentageToGPA(89).band).toBe("Excellent");
+  });
+
+  it("90% is Outstanding (lower boundary)", () => {
+    expect(convertPercentageToGPA(90).band).toBe("Outstanding");
+  });
+
+  it("throws for -1", () => {
+    expect(() => convertPercentageToGPA(-1)).toThrow();
+  });
+
+  it("throws for 101", () => {
+    expect(() => convertPercentageToGPA(101)).toThrow();
+  });
+});
+
+describe("formatRawGPADisplay", () => {
+  it("renders percentage with country context for Pakistan", () => {
+    expect(formatRawGPADisplay("percentage", 87, "PK")).toBe("87% (Pakistani)");
+  });
+
+  it("renders percentage without country when unknown", () => {
+    expect(formatRawGPADisplay("percentage", 87)).toBe("87%");
+  });
+
+  it("renders CGPA /10 display", () => {
+    expect(formatRawGPADisplay("cgpa10", 8.5)).toBe("8.5 / 10 CGPA");
+  });
+
+  it("renders A-Levels display", () => {
+    expect(formatRawGPADisplay("a-levels", 6)).toMatch(/A-Level/);
+  });
+
+  it("renders IB display", () => {
+    expect(formatRawGPADisplay("ib", 7)).toMatch(/IB/);
   });
 });
 

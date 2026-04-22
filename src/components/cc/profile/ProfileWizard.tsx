@@ -90,7 +90,11 @@ export default function ProfileWizard({
             <IdentityForm data={profileData.profile as never} onSave={onSaveIdentity as never} />
           )}
           {currentStep.key === "academic" && (
-            <AcademicForm data={profileData.academic as never} onSave={onSaveAcademic as never} />
+            <AcademicForm
+              data={profileData.academic as never}
+              onSave={onSaveAcademic as never}
+              countryCode={(profileData.profile as { country?: string | null }).country ?? null}
+            />
           )}
           {currentStep.key === "activities" && (
             <ActivitiesForm activities={profileData.activities as never} onSave={onSaveActivity as never} onDelete={onDeleteActivity} />

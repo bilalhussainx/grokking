@@ -1,6 +1,6 @@
 import { createAdminSupabase } from "@/lib/supabase-server";
 import { chatOnce, type ChatMessage } from "@/lib/cc/openrouter";
-import { convertToUS4, type GradingSystem } from "@/lib/cc/gpa-converter";
+import { convertToUS4, formatRawGPADisplay, type GradingSystem } from "@/lib/cc/gpa-converter";
 import { ACTIVITY_RUBRIC_COMPACT, ACTIVITY_ACTION_VERBS } from "@/lib/cc/activity-exemplars";
 
 type AdminSupabase = ReturnType<typeof createAdminSupabase>;
@@ -96,9 +96,10 @@ async function extractAcademic(supabase: AdminSupabase, studentId: string, trans
   "sat_total": number | null,
   "act_composite": number | null,
   "grading_system": "percentage" | "cgpa10" | "a-levels" | "ib" | null,
-  "original_score": number | null
+  "original_score": number | null,
+  "original_score_display": string | null
 }
-If the student gave a non-US grade (percentage, CGPA, A-levels, IB), put the system in grading_system and their score in original_score. Put the converted US GPA in gpa_unweighted.`,
+If the student gave a non-US grade (percentage, CGPA, A-levels, IB), put the system in grading_system and their numeric score in original_score. Put the converted US GPA in gpa_unweighted. Also write the human-readable form (e.g. "87%", "8.5 / 10 CGPA", "A-Level A") in original_score_display.`,
     },
     { role: "user", content: transcript },
   ];
@@ -114,11 +115,35 @@ If the student gave a non-US grade (percentage, CGPA, A-levels, IB), put the sys
     data.gpa_unweighted = Math.round(((conversion.gpaLow + conversion.gpaHigh) / 2) * 100) / 100;
   }
 
+  // Derive a canonical display string if the LLM didn't produce one. Look up the
+  // student's country so percentage grades get the country-flavored label
+  // ("87% (Pakistani)") that Coach Kairos and the profile read view rely on.
+  let countryCode: string | null = null;
+  if (data.grading_system && data.original_score != null) {
+    const { data: profile } = await supabase
+      .from("cc_student_profiles")
+      .select("country")
+      .eq("id", studentId)
+      .maybeSingle();
+    countryCode = profile?.country ?? null;
+    if (!data.original_score_display) {
+      data.original_score_display = formatRawGPADisplay(
+        data.grading_system as GradingSystem,
+        data.original_score,
+        countryCode ?? undefined
+      );
+    }
+  }
+
   const update: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (data.gpa_unweighted) update.gpa_unweighted = data.gpa_unweighted;
   if (data.test_strategy) update.test_strategy = data.test_strategy;
   if (data.sat_total) update.sat_total = data.sat_total;
   if (data.act_composite) update.act_composite = data.act_composite;
+  if (data.grading_system && data.original_score != null) {
+    update.gpa_raw_value = data.original_score;
+    update.gpa_raw_display = data.original_score_display;
+  }
 
   const { data: existing } = await supabase
     .from("cc_academic_profiles")

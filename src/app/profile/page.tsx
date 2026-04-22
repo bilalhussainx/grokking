@@ -174,7 +174,13 @@ function ProfilePageInner() {
       </div>
 
       {activeTab === 0 && <IdentityForm data={(profileData as { profile: never }).profile} onSave={saveIdentity as never} />}
-      {activeTab === 1 && <AcademicForm data={(profileData as { academic: never }).academic} onSave={saveAcademic as never} />}
+      {activeTab === 1 && (
+        <AcademicForm
+          data={(profileData as { academic: never }).academic}
+          onSave={saveAcademic as never}
+          countryCode={(profileData as { profile: { country?: string | null } }).profile.country ?? null}
+        />
+      )}
       {activeTab === 2 && <ActivitiesForm activities={(profileData as { activities: never[] }).activities} onSave={saveActivity as never} onDelete={deleteActivity} />}
       {activeTab === 3 && <HonorsForm honors={(profileData as { honors: never[] }).honors} onSave={saveHonor as never} onDelete={deleteHonor} />}
       {activeTab === 4 && <FinancialForm data={(profileData as { financial: never }).financial} onSave={saveFinancial as never} />}

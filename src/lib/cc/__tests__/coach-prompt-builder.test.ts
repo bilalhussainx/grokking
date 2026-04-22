@@ -11,6 +11,7 @@ describe("buildSystemPrompt", () => {
     isInternational: false,
     isFirstGen: false,
     gpaUnweighted: 3.8,
+    gpaRawDisplay: null,
     testStrategy: "SAT",
     satTotal: 1450,
     actComposite: null,
@@ -26,6 +27,8 @@ describe("buildSystemPrompt", () => {
     hasInterviewSessions: false,
     latestEssayReview: null,
     preferences: null,
+    focusEssay: null,
+    applicationSnapshot: null,
   };
 
   it("includes personality guidelines", () => {

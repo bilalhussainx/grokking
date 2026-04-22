@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
   // Fetch academic profile
   const { data: academic } = await supabase
     .from("cc_academic_profiles")
-    .select("gpa_unweighted, test_strategy, sat_total, act_composite")
+    .select("gpa_unweighted, gpa_raw_value, gpa_raw_display, test_strategy, sat_total, act_composite")
     .eq("student_id", profile.id)
     .maybeSingle();
 
@@ -333,6 +333,7 @@ export async function POST(req: NextRequest) {
     isInternational: profile.is_international ?? false,
     isFirstGen: profile.is_first_gen ?? false,
     gpaUnweighted: academic?.gpa_unweighted ?? null,
+    gpaRawDisplay: academic?.gpa_raw_display ?? null,
     testStrategy: academic?.test_strategy ?? null,
     satTotal: academic?.sat_total ?? null,
     actComposite: academic?.act_composite ?? null,

@@ -61,6 +61,7 @@ export interface CoachContext {
   isInternational: boolean;
   isFirstGen: boolean;
   gpaUnweighted: number | null;
+  gpaRawDisplay: string | null;
   testStrategy: string | null;
   satTotal: number | null;
   actComposite: number | null;
@@ -105,7 +106,13 @@ export function buildSystemPrompt(ctx: CoachContext): string {
     else if (ctx.country) parts.push(`Location: ${ctx.country}${ctx.state ? `, ${ctx.state}` : ""}`);
     if (ctx.isInternational) parts.push("International student: yes");
     if (ctx.isFirstGen) parts.push("First-generation college student: yes");
-    if (ctx.gpaUnweighted) parts.push(`GPA (unweighted): ${ctx.gpaUnweighted}`);
+    if (ctx.gpaUnweighted) {
+      parts.push(
+        ctx.gpaRawDisplay
+          ? `GPA: ${ctx.gpaRawDisplay} → ~${ctx.gpaUnweighted.toFixed(2)} US 4.0`
+          : `GPA (unweighted): ${ctx.gpaUnweighted}`
+      );
+    }
     if (ctx.testStrategy) parts.push(`Test strategy: ${ctx.testStrategy}`);
     if (ctx.satTotal) parts.push(`SAT: ${ctx.satTotal}`);
     if (ctx.actComposite) parts.push(`ACT: ${ctx.actComposite}`);
@@ -221,14 +228,30 @@ When you have all the info, say something like "Great, I've got a good picture o
         return `MODE: ACADEMIC (International Student)
 This student is from ${ctx.country || "outside the US"} and likely doesn't have a US-style GPA.
 Ask what grading system their school uses: Percentage (0-100), CGPA out of 10, A-levels (A*-E), or IB (1-7).
-Once they give their score, convert it to an approximate US 4.0 GPA and confirm: "That's roughly a X.X-X.X on the US 4.0 scale. Sound right?"
+
+PERCENTAGE (common in Pakistan, India, Bangladesh, Nigeria, Sri Lanka, Nepal):
+- The 100-point scale grades harder than the US system — a 90%+ is exceptional, not merely an "A".
+- Convert precisely using pct/100 × 4.0 (e.g. 87% ≈ 3.48, 92% ≈ 3.68), AND give band context:
+  • 90–100% = Outstanding → comparable to a US 3.8–4.0 GPA. Competitive for highly selective colleges.
+  • 80–89% = Excellent → ~3.2–3.5 US GPA. US admissions officers read this as very competitive once they understand the system.
+  • 70–79% = Very Good → ~2.8–3.2 US GPA. Competitive for mid-tier universities.
+  • 60–69% = Good → ~2.4–2.8 US GPA. Average performance; competitive for many public universities.
+  • 50–59% = Satisfactory → ~2.0–2.4 US GPA. Target less-selective colleges with holistic review.
+- After they give the score, respond with two things: (1) the converted US 4.0, (2) the band and a one-line "how US colleges will read this". Example: "Your 87% converts to roughly 3.48 on the US 4.0 scale. That's Excellent in the Pakistani system and US admissions officers recognize your system grades harder than American schools — 85%+ is seen as very competitive."
+- Remind them: "Attach your official marksheet (transcript) to your application — it shows admissions the grade in your school's original format."
+
+CGPA/10 (India, Bangladesh): divide by 2.5 for rough US 4.0 (e.g. 8.5 CGPA ≈ 3.4).
+A-LEVELS: A*=4.0, A=3.8, B=3.3, C=2.7, D=2.0, E=1.3.
+IB: 7=4.0, 6=3.7, 5=3.3, 4=2.7.
+
+Once they give their score, convert it and confirm: "That's roughly X.XX on the US 4.0 scale. Sound right?"
 Then ask about their testing plan: SAT, ACT, both, test-optional, or undecided.
 If they're taking SAT/ACT, ask for their score (or expected score).`;
       }
       return `MODE: ACADEMIC
-Ask for the student's unweighted GPA (on a 4.0 scale). Then ask about their testing plan: SAT, ACT, both, test-optional, or undecided.
+${ctx.gpaRawDisplay ? `The student's original grade is ${ctx.gpaRawDisplay} (converted to ~${ctx.gpaUnweighted?.toFixed(2)} US 4.0). Reference the original form when discussing their academics — e.g. "your ${ctx.gpaRawDisplay}" — not just the converted number.\n` : ""}Ask for the student's unweighted GPA (on a 4.0 scale). Then ask about their testing plan: SAT, ACT, both, test-optional, or undecided.
 If they're taking SAT/ACT, ask for their score (or expected score).
-Keep it quick — "What's your GPA?" is fine as an opener.`;
+Keep it quick — "What's your GPA?" is fine as an opener. If the student volunteers a percentage, CGPA, A-Level, or IB score instead of a 4.0, accept it — convert precisely (e.g. 87% ≈ 3.48) and give band context before moving on.`;
 
     case "school-builder":
       return `MODE: SCHOOL BUILDER

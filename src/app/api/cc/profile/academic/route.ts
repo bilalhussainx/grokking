@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, unauthorized } from "../../helpers";
 
 const ALLOWED_FIELDS = [
-  "gpa_unweighted", "gpa_weighted", "gpa_scale", "class_rank", "class_size",
-  "courses", "ap_ib_courses", "test_strategy", "sat_total", "sat_math",
-  "sat_erw", "act_composite", "act_subscores", "toefl_score", "ielts_score",
-  "duolingo_english_score",
+  "gpa_unweighted", "gpa_weighted", "gpa_scale", "gpa_raw_value", "gpa_raw_display",
+  "class_rank", "class_size", "courses", "ap_ib_courses", "test_strategy",
+  "sat_total", "sat_math", "sat_erw", "act_composite", "act_subscores",
+  "toefl_score", "ielts_score", "duolingo_english_score",
 ];
 
 export async function PATCH(req: NextRequest) {
