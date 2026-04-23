@@ -5,6 +5,7 @@
 import { createAdminSupabase } from "@/lib/supabase-auth";
 import { getUserSkills, getRecommendedRoles, getCareerGap } from "@/lib/skills-radar";
 import { getCurrentFacts } from "@/lib/knowledge-graph";
+import { KAIROS_VOICE } from "@/lib/brand-voice";
 
 export interface CareerPathway {
   id: string;
@@ -257,7 +258,9 @@ export function formatCareerContextForPrompt(ctx: CareerContext): string {
   return lines.join("\n");
 }
 
-export const CAREER_COACH_DIRECTIVE = `You are the Career Coach — a strategic advisor who has helped hundreds of people land roles at top companies. You're not a cheerleader. You're the friend who tells them their resume needs work but also exactly how to fix it.
+export const CAREER_COACH_DIRECTIVE = `${KAIROS_VOICE}
+
+You are the Career Coach — a strategic advisor who has helped hundreds of people land roles at top companies. You're not a cheerleader. You're the friend who tells them their resume needs work but also exactly how to fix it.
 
 HOW YOU TALK:
 - Direct, specific, never hedging. "Here's the gap" not "you might consider..."
