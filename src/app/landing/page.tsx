@@ -6,6 +6,7 @@ import ScrollSequence from '@/components/cinematic/ScrollSequence'
 import Features from '@/components/cinematic/Features'
 import Stats from '@/components/cinematic/Stats'
 import CTASection from '@/components/cinematic/CTASection'
+import InternationalSection from '@/components/cinematic/InternationalSection'
 
 export const metadata: Metadata = {
   title: 'KairosLearn — Your AI-Powered College Application Coach',
@@ -26,6 +27,7 @@ export default function LandingPage() {
       {HERO_CHAT_ENABLED ? <LandingHeroWithChat /> : <HeroSection />}
       <ScrollSequence />
       <Features />
+      <InternationalSection />
       <Stats />
       <CTASection />
       <ExitIntentModal />
