@@ -90,7 +90,7 @@ export default function ReorderPanel({
           }}
           className="px-6 py-2 rounded-xl bg-[#D4AF37] text-black text-sm font-semibold hover:bg-[#C4A030] transition-colors"
         >
-          Accept Recommended Order
+          Accept recommended order
         </button>
       )}
 

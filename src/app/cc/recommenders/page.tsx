@@ -258,7 +258,7 @@ export default function RecommendersPage() {
                           <textarea value={contextNotes} onChange={(e) => setContextNotes(e.target.value)} rows={2} placeholder="e.g., I had them for AP Chem junior year, they supervised my independent research project..." className={`${inputClass} resize-none`} />
                         </div>
                         <button onClick={() => generateBragSheet(rec.id)} className="px-4 py-1.5 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#C4A030]">
-                          Generate Brag Sheet
+                          Generate brag sheet
                         </button>
                       </div>
                     )}
@@ -310,7 +310,7 @@ export default function RecommendersPage() {
                           </div>
                         </div>
                         <button onClick={() => generateEmail(rec.id)} className="px-4 py-1.5 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#C4A030]">
-                          Draft Ask Email
+                          Draft ask email
                         </button>
                       </div>
                     )}

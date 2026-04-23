@@ -504,7 +504,7 @@ export default function CollegeInterviewSetup() {
             ) : (
               <>
                 <GraduationCap className="w-4 h-4" />
-                {selectedPersona ? `Start ${selectedPersona.shortName} interview` : "Start Practice Interview"}
+                {selectedPersona ? `Start ${selectedPersona.shortName} interview` : "Start practice interview"}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </>
             )}

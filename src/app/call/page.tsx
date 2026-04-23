@@ -239,7 +239,7 @@ export default function CallPage() {
             >
               <div className="relative z-10 flex items-center justify-center gap-2">
                 <Phone className="w-5 h-5" />
-                Start Translated Call
+                Start translated call
               </div>
               {/* Shine effect */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -450,7 +450,7 @@ export default function CallPage() {
           className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold hover:opacity-90 transition-opacity"
           whileTap={{ scale: 0.98 }}
         >
-          Start New Call
+          Start new call
         </motion.button>
       </motion.div>
     </div>

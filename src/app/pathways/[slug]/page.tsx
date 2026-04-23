@@ -294,7 +294,7 @@ export default function PathwayDetailPage() {
                   <PlayCircle className="w-6 h-6 text-[#D4AF37]" />
                   <div>
                     <h3 className="text-base font-semibold text-white">
-                      Start Interview Practice
+                      Start interview practice
                     </h3>
                     <p className="text-sm text-white/40">
                       Practice{" "}

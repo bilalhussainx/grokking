@@ -208,7 +208,7 @@ export default function InterviewScorecard() {
             onClick={() => router.push("/interviews")}
             className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-violet-600 text-white text-sm font-semibold hover:from-blue-400 hover:to-violet-500 transition-all shadow-lg shadow-blue-500/20"
           >
-            Start Another Interview
+            Start another interview
           </button>
         </div>
       </div>

@@ -305,7 +305,7 @@ export default function PlacementPage() {
             onClick={handleStart}
             className="px-8 py-3 rounded-lg bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition-colors"
           >
-            Start Placement Test
+            Start placement test
           </button>
 
           {/* Manual level override */}
@@ -429,10 +429,10 @@ export default function PlacementPage() {
               <div className="flex flex-col items-center gap-3">
                 <Mic className="w-8 h-8 text-slate-500" />
                 <p className="text-sm text-slate-400 text-center">
-                  Voice input will be available when you click Start Voice Session.
+                  Voice input will be available when you click Start voice session.
                 </p>
                 <button className="px-4 py-2 rounded-lg bg-indigo-500/20 text-indigo-400 text-sm font-medium hover:bg-indigo-500/30 transition-colors">
-                  Start Voice Session
+                  Start voice session
                 </button>
               </div>
             </div>
