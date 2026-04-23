@@ -218,12 +218,13 @@ export default function SchoolDetailPage({
             </span>
           )}
           {school.css_profile_required && (
-            <span
-              title="CSS Profile required for international aid"
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60 font-medium"
+            <Link
+              href="/profile/css-guide"
+              title="CSS Profile required for international aid — click to open our step-by-step guide"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] bg-white/5 hover:bg-[#D4AF37]/10 border border-white/10 hover:border-[#D4AF37]/30 text-white/60 hover:text-[#D4AF37] font-medium transition-colors"
             >
-              <ClipboardList className="w-3 h-3" /> CSS Profile
-            </span>
+              <ClipboardList className="w-3 h-3" /> CSS Profile guide
+            </Link>
           )}
         </div>
       )}
@@ -366,9 +367,12 @@ export default function SchoolDetailPage({
           {(school.css_profile_required || school.fafsa_required_international) && (
             <div className="flex flex-wrap gap-1.5">
               {school.css_profile_required && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60">
-                  <ClipboardList className="w-3 h-3" /> CSS Profile required for intl aid
-                </span>
+                <Link
+                  href="/profile/css-guide"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-white/5 hover:bg-[#D4AF37]/10 border border-white/10 hover:border-[#D4AF37]/30 text-white/60 hover:text-[#D4AF37] transition-colors"
+                >
+                  <ClipboardList className="w-3 h-3" /> CSS Profile required for intl aid →
+                </Link>
               )}
               {school.fafsa_required_international && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60">
