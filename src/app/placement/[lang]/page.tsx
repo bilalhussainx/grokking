@@ -347,7 +347,7 @@ export default function PlacementPage() {
             <CheckCircle className="w-8 h-8 text-emerald-400" />
           </div>
 
-          <h1 className="text-3xl font-bold text-slate-100 mb-2">Assessment Complete!</h1>
+          <h1 className="text-3xl font-bold text-slate-100 mb-2">Assessment complete</h1>
           <p className="text-slate-400 mb-8">
             Based on your responses, we&apos;ve determined your level.
           </p>

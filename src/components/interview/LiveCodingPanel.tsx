@@ -625,7 +625,7 @@ export default function LiveCodingPanel({
               {/* Success banner */}
               {results?.allPassed && submitted && (
                 <div className="mt-2 p-2 bg-green-500/10 border border-green-500/20 rounded text-green-400 text-sm text-center">
-                  All test cases passed! Solution accepted.
+                  All test cases passed. Solution accepted.
                 </div>
               )}
 

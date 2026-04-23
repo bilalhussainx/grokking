@@ -130,7 +130,7 @@ export default function InterviewScorecard() {
       <SignupPrompt
         show={showSignupPrompt}
         onDismiss={() => setShowSignupPrompt(false)}
-        title="Great interview!"
+        title="Great interview."
         message="Sign up to save your results, track your progress, and practice unlimited interviews."
       />
       <div className="max-w-3xl mx-auto px-6 py-10">
