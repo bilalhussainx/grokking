@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css"></head><body>
+<div class="card card-landing" style="min-height:180px;padding:0;overflow:hidden;position:relative">
+  <div style="padding:24px 24px 18px;position:relative;z-index:2">
+    <div style="font-family:'Cormorant Garamond',serif;font-weight:300;font-size:28px;line-height:1.1;color:#f2ede3">With <em style="color:#d4a84b;font-style:italic">grain</em> — quiet film overlay.</div>
+    <div style="font-size:12px;color:rgba(242,237,227,.55);margin-top:6px;font-weight:300;line-height:1.7;max-width:520px">Fixed SVG turbulence, 0.035 opacity, animated on 10 keyframes over 0.6s. Applied to landing only; app is always clean.</div>
+    <div class="mono" style="font-size:9.5px;color:rgba(242,237,227,.40);margin-top:10px">feTurbulence · baseFrequency 0.9 · translate() noise loop</div>
+  </div>
+  <svg style="position:absolute;inset:-50%;width:200%;height:200%;opacity:.12;z-index:1;pointer-events:none" xmlns="http://www.w3.org/2000/svg">
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/></filter>
+    <rect width="100%" height="100%" filter="url(#n)"/>
+  </svg>
+</div>
+</body></html>

@@ -1,0 +1,7 @@
+/* Shared styles for both UI kits */
+@import url('../colors_and_type.css');
+
+html,body { margin:0; padding:0; background:#000; color:#f0ece2; font-family:Inter,-apple-system,sans-serif; }
+*,*::before,*::after { box-sizing:border-box; }
+.screen-frame { position:relative; }
+.no-scrollbar::-webkit-scrollbar { display:none; }

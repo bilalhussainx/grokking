@@ -1,0 +1,66 @@
+/* =========================================================================
+ * preview/_card.css — shared card chrome for Design System tab
+ * Target ~700×150px, minimal framing.
+ * ========================================================================= */
+@import url('../colors_and_type.css');
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: 'Inter', -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.card {
+  box-sizing: border-box;
+  width: 700px;
+  min-height: 150px;
+  padding: 20px 24px;
+  background: #0a0a0a;
+  color: #f0ece2;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-landing {
+  background: #05080d;
+  color: #f2ede3;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-weight: 300;
+}
+
+.row { display: flex; align-items: center; }
+.col { display: flex; flex-direction: column; }
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-5 { gap: 20px; }
+.gap-6 { gap: 24px; }
+.flex-wrap { flex-wrap: wrap; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+
+.label {
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  font-weight: 500;
+}
+.label-landing {
+  color: rgba(242,237,227,.45);
+  letter-spacing: 0.26em;
+}
+.mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.token {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,.50);
+}
