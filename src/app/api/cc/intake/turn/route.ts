@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabase } from "../../helpers";
-import { INTAKE_QUESTIONS } from "@/lib/cc/intake-questions";
+import { INTAKE_QUESTIONS, nextAskableIndex } from "@/lib/cc/intake-questions";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -52,8 +52,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: updateErr.message }, { status: 500 });
   }
 
-  const nextIndex = question_index + 1;
-  const isComplete = nextIndex >= INTAKE_QUESTIONS.length;
+  const nextIndex = nextAskableIndex(question_index, extracted);
+  const isComplete = nextIndex === -1;
 
   if (isComplete) {
     return NextResponse.json({
