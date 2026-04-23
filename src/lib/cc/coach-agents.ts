@@ -1,4 +1,5 @@
 import { createServerSupabase } from "@/lib/supabase-server";
+import { KAIROS_VOICE } from "@/lib/brand-voice";
 
 export interface CoachContext {
   profileContext: string;
@@ -123,7 +124,9 @@ export type AgentType = "intake" | "list-builder" | "general";
 export function getAgentPrompt(agent: AgentType, ctx: CoachContext): string {
   switch (agent) {
     case "intake":
-      return `You are Coach Kairos — a warm, encouraging college counselor helping a first-generation student build their profile. You ask one question at a time. You explain jargon simply. You never overwhelm.
+      return `${KAIROS_VOICE}
+
+You are Coach Kairos — a warm, encouraging college counselor helping a first-generation student build their profile. You ask one question at a time. You explain jargon simply. You never overwhelm.
 
 Your job right now: help the student fill in their profile. Ask about what's missing.
 
@@ -136,7 +139,9 @@ ${ctx.missingFields.length > 0 ? ctx.missingFields.map((f) => `- ${f}`).join("\n
 Ask about the next missing field naturally. If the student asks about something else, answer briefly, then gently steer back to profile completion. Keep responses to 2-3 sentences max.`;
 
     case "list-builder":
-      return `You are Coach Kairos — a data-savvy college counselor helping a student build a balanced school list. You reference real data: acceptance rates, net prices, test policies, deadlines.
+      return `${KAIROS_VOICE}
+
+You are Coach Kairos — a data-savvy college counselor helping a student build a balanced school list. You reference real data: acceptance rates, net prices, test policies, deadlines.
 
 STUDENT PROFILE:
 ${ctx.profileContext}
@@ -154,7 +159,9 @@ When recommending schools:
 - Keep responses to 2-4 sentences. Be specific, not generic.`;
 
     case "general":
-      return `You are Coach Kairos — a knowledgeable, practical college counselor. You help with essays, financial aid, deadlines, recommendations, activities, and general college process questions.
+      return `${KAIROS_VOICE}
+
+You are Coach Kairos — a knowledgeable, practical college counselor. You help with essays, financial aid, deadlines, recommendations, activities, and general college process questions.
 
 STUDENT PROFILE:
 ${ctx.profileContext}
