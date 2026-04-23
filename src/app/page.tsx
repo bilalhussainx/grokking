@@ -194,6 +194,14 @@ export default function HomePage() {
     })
     .sort((a, b) => (courseProgress[b.slug] ?? 0) - (courseProgress[a.slug] ?? 0));
 
+  // Anonymous visitors → cinematic /landing. The pre-auth marketing surface
+  // lives at /landing; / is reserved for the logged-in counselor dashboard.
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/landing");
+    }
+  }, [loading, user, router]);
+
   // Load user preferences — always sync from Supabase on login
   useEffect(() => {
     // Try localStorage first for instant load
@@ -277,279 +285,18 @@ export default function HomePage() {
         animate="visible"
       >
         {/* ====================================================================
-            NON-LOGGED-IN EXPERIENCE — COLLEGE COUNSELOR FIRST
+            NON-LOGGED-IN EXPERIENCE — redirect to /landing (handled by effect above).
+            Render a minimal placeholder while the redirect resolves.
             ==================================================================== */}
         {!user && !loading && (
-          <>
-            {/* ── SECTION 1: HERO — College Counselor ── */}
-            <motion.div variants={item} className="relative text-center mb-20 pt-8">
-              <div
-                className="absolute -z-20 inset-0 h-[600px] w-full opacity-30
-                bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)]
-                bg-[size:4rem_4rem]
-                [mask-image:radial-gradient(ellipse_80%_60%_at_50%_20%,#000_40%,transparent_100%)]"
-              />
-              <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-                <motion.div
-                  className="absolute top-0 left-1/4 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-[120px]"
-                  animate={{ x: [0, 40, -10, 0], y: [0, -30, 10, 0], scale: [1, 1.2, 0.95, 1] }}
-                  transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <motion.div
-                  className="absolute top-10 right-1/4 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-[120px]"
-                  animate={{ x: [0, -35, 15, 0], y: [0, 30, -15, 0], scale: [1, 1.15, 1.05, 1] }}
-                  transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-                />
-              </div>
-
-              <motion.div
-                className="flex justify-center mb-8"
-                initial={{ scale: 0.3, opacity: 0, filter: "blur(20px)" }}
-                animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
-                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <KairosLogo size="xl" showText={false} />
-              </motion.div>
-
-              <motion.div
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 text-[#D4AF37] text-xs font-medium mb-6"
-                initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.4, 0.25, 1] }}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                Free for every student &middot; No credit card &middot; Speaks your language
-              </motion.div>
-
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1]">
-                <BlurReveal
-                  text="Your free AI"
-                  className="text-white"
-                  delay={0.3}
-                />
-                <br />
-                <span className="inline-block">
-                  <BlurReveal
-                    text="college counselor."
-                    className="italic text-[#D4AF37]"
-                    delay={0.6}
-                  />
-                </span>
-              </h1>
-
-              <motion.p
-                className="mt-6 text-lg sm:text-xl text-white/55 max-w-2xl mx-auto leading-relaxed"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
-              >
-                For <strong className="text-white/80">first-gen students</strong>. Build your school list, write winning essays, navigate financial aid, and practice interviews — all with an AI that speaks <strong className="text-white/80">your language</strong>.
-              </motion.p>
-
-              <motion.div
-                className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.65, ease: [0.25, 0.4, 0.25, 1] }}
-              >
-                <Link
-                  href="/intake"
-                  className="group w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-base hover:bg-[#C4A030] transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
-                >
-                  <GraduationCap className="w-4 h-4" />
-                  Start your free plan
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                </Link>
-              </motion.div>
-            </motion.div>
-
-            {/* ── SECTION 2: THREE PERSONA TESTIMONIALS ── */}
-            <StaggerReveal className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-20" delay={0.1}>
-              {[
-                {
-                  name: "Maria",
-                  emoji: "🇲🇽",
-                  label: "First-gen, Spanish-speaking family",
-                  quote: "My parents don't speak English, so nobody at home could explain what FAFSA even means. Coach Kairos walked me through everything — in Spanish for my mom, in English for me. I applied to 12 schools and got into 4.",
-                  stat: "12 schools applied",
-                },
-                {
-                  name: "Jamal",
-                  emoji: null,
-                  label: "Low-income, no college-educated relatives",
-                  quote: "I didn't even know you could negotiate financial aid. Kairos helped me compare award letters, draft an appeal, and save $8,000/year. None of my family had been through this before.",
-                  stat: "$8K saved in aid",
-                },
-                {
-                  name: "Priya",
-                  emoji: "🇮🇳",
-                  label: "International student from India",
-                  quote: "The US application process is totally different from India. Kairos explained Common App, helped me find need-blind schools for internationals, and prepped me for my MIT interview.",
-                  stat: "Need-blind schools found",
-                },
-              ].map((persona) => (
-                <motion.div
-                  key={persona.name}
-                  variants={staggerChild}
-                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#141414] p-7"
-                  whileHover={{ scale: 1.02, borderColor: "rgba(212, 175, 55, 0.4)", y: -4 }}
-                  transition={springSnappy}
-                >
-                  <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#D4AF37]/5 rounded-full blur-3xl group-hover:bg-[#D4AF37]/10 transition-colors" />
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-4">
-                      {persona.emoji
-                        ? <span className="text-2xl">{persona.emoji}</span>
-                        : <span className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37] font-bold text-sm shrink-0">{persona.name[0]}</span>
-                      }
-                      <div>
-                        <p className="text-white font-semibold">{persona.name}</p>
-                        <p className="text-white/40 text-xs">{persona.label}</p>
-                      </div>
-                    </div>
-                    <p className="text-white/60 text-sm leading-relaxed mb-4">&ldquo;{persona.quote}&rdquo;</p>
-                    <span className="inline-block px-2.5 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium">
-                      {persona.stat}
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </StaggerReveal>
-
-            {/* ── SECTION 3: WHAT COACH KAIROS DOES ── */}
-            <ScrollReveal className="mb-20" delay={0.1} direction="up">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl sm:text-3xl font-bold text-white">
-                  Everything a $10,000 counselor does. Free.
-                </h2>
-                <p className="mt-2 text-sm sm:text-base text-white/50 max-w-xl mx-auto">
-                  Coach Kairos guides you from &ldquo;I have no idea where to start&rdquo; through &ldquo;I got in.&rdquo;
-                </p>
-              </div>
-              <StaggerReveal className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" delay={0.15}>
-                {[
-                  { icon: MessageSquare, label: "Voice Intake", desc: "Tell Kairos about yourself in a 5-minute conversation — type or speak" },
-                  { icon: Building2, label: "School List Builder", desc: "AI-generated reach/match/safety list based on your profile and goals" },
-                  { icon: BookOpen, label: "Essay Studio", desc: "Brainstorm, outline, and polish your essays — Kairos coaches, never writes for you" },
-                  { icon: Shield, label: "Financial Aid Navigator", desc: "FAFSA walkthrough, CSS Profile help, and scholarship matching" },
-                  { icon: Users, label: "Interview Prep", desc: "Practice with AI personas trained on real Harvard, Yale, and Stanford interviews" },
-                  { icon: Globe, label: "In Your Language", desc: "Speaks Spanish, Hindi, Mandarin, and more — for you and your parents" },
-                ].map((feature) => {
-                  const Icon = feature.icon;
-                  return (
-                    <motion.div
-                      key={feature.label}
-                      variants={staggerChild}
-                      className="bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 rounded-2xl p-5 transition-all"
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center mb-3">
-                        <Icon className="w-5 h-5 text-[#D4AF37]" />
-                      </div>
-                      <h4 className="text-white font-semibold mb-1">{feature.label}</h4>
-                      <p className="text-slate-400 text-xs leading-relaxed">{feature.desc}</p>
-                    </motion.div>
-                  );
-                })}
-              </StaggerReveal>
-            </ScrollReveal>
-
-            {/* ── SECTION 4: SOCIAL PROOF NUMBERS ── */}
-            <ScrollReveal className="mb-20" direction="scale">
-              <div className="rounded-2xl border border-white/10 bg-[#141414] p-8">
-                <StaggerReveal className="grid grid-cols-2 md:grid-cols-4 gap-8" delay={0.1}>
-                  {[
-                    { value: "550+", label: "Schools in Database", icon: Building2 },
-                    { value: "17", label: "Languages Supported", icon: Globe },
-                    { value: "200+", label: "Terms Explained", icon: BookOpen },
-                    { value: "$0", label: "Cost to Students", icon: GraduationCap },
-                  ].map((stat) => {
-                    const StatIcon = stat.icon;
-                    return (
-                      <motion.div key={stat.label} variants={staggerChild} className="text-center">
-                        <StatIcon className="w-5 h-5 text-white/20 mx-auto mb-2" />
-                        <div className="text-3xl sm:text-4xl font-bold text-white">{stat.value}</div>
-                        <div className="text-xs text-white/40 mt-1 font-medium">{stat.label}</div>
-                      </motion.div>
-                    );
-                  })}
-                </StaggerReveal>
-              </div>
-            </ScrollReveal>
-
-            {/* ── SECTION 5: SUPPLEMENTAL LEARNING (de-emphasized) ── */}
-            <ScrollReveal className="mb-20" delay={0.1}>
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-xl font-bold text-white/70">Supplemental Learning</h2>
-                  <p className="mt-1 text-xs text-white/40">AP courses, coding, and more to strengthen your application</p>
-                </div>
-                <Link
-                  href="/courses"
-                  className="text-sm text-[#D4AF37] hover:text-[#C4A030] font-medium flex items-center gap-1 transition-colors"
-                >
-                  All courses <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {["coding-interview", "python-fundamentals", "react-development"].map((slug) => {
-                  const course = courses.find(c => c.slug === slug);
-                  if (!course) return null;
-                  return (
-                    <Link key={course.slug} href={`/course/${course.slug}`}>
-                      <motion.div
-                        className="group rounded-xl bg-[#141414] border border-white/10 hover:border-[#D4AF37]/40 p-5 h-full cursor-pointer transition-all"
-                        whileHover={{ scale: 1.02 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <span className="text-3xl">{course.icon}</span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${course.tier === 'pro' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' : 'border-white/20 text-white/70'}`}>
-                            {course.tier === 'pro' ? 'PRO' : 'FREE'}
-                          </span>
-                        </div>
-                        <h4 className="text-white font-semibold">{course.title}</h4>
-                        <p className="text-slate-400 text-sm mt-1 line-clamp-2">{course.description}</p>
-                      </motion.div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </ScrollReveal>
-
-            {/* ── SECTION 6: FINAL CTA ── */}
-            <ScrollReveal className="mb-16" direction="scale">
-              <div className="relative rounded-2xl border border-white/10 bg-[#141414] p-10 text-center overflow-hidden">
-                <div className="absolute inset-0 pointer-events-none">
-                  <motion.div
-                    className="absolute top-0 left-1/4 w-40 h-40 bg-[#D4AF37]/8 rounded-full blur-[80px]"
-                    animate={{ x: [0, 20, 0], y: [0, -15, 0] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                  <motion.div
-                    className="absolute bottom-0 right-1/4 w-40 h-40 bg-[#D4AF37]/5 rounded-full blur-[80px]"
-                    animate={{ x: [0, -20, 0], y: [0, 15, 0] }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                </div>
-                <div className="relative z-10">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                    You deserve the same guidance as a prep-school kid.
-                  </h2>
-                  <p className="text-white/50 text-sm sm:text-base max-w-md mx-auto mb-8">
-                    Start free. No credit card. Coach Kairos is here whenever you need help — in your language.
-                  </p>
-                  <Link
-                    href="/intake"
-                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#D4AF37] text-black font-semibold text-base hover:bg-[#C4A030] transition-all hover:-translate-y-0.5 active:translate-y-0"
-                  >
-                    <GraduationCap className="w-5 h-5" />
-                    Start your free plan
-                  </Link>
-                </div>
-              </div>
-            </ScrollReveal>
-          </>
+          <div
+            className="flex items-center justify-center py-24 text-white/30 text-sm"
+            aria-live="polite"
+          >
+            Loading…
+          </div>
         )}
+
 
         {/* ====================================================================
             LOGGED-IN EXPERIENCE
