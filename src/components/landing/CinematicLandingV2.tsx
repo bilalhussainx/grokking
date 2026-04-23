@@ -612,6 +612,10 @@ function Hero() {
             </Link>
             <button
               type="button"
+              onClick={() => {
+                const el = document.getElementById("demo-video");
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
               style={{
                 background: "transparent",
                 color: "#f2ede3",
@@ -849,6 +853,133 @@ function ForgottenStudent() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ───────── Demo video ─────────
+function DemoVideo() {
+  return (
+    <section
+      id="demo-video"
+      style={{
+        background: "#05080d",
+        padding: "110px 80px 130px",
+        position: "relative",
+        borderTop: "1px solid rgba(242,237,227,.06)",
+      }}
+    >
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 60 }}>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 14,
+              marginBottom: 22,
+            }}
+          >
+            <span style={{ width: 26, height: 1, background: "#d4a84b" }} />
+            <span
+              style={{
+                color: "#d4a84b",
+                letterSpacing: ".32em",
+                fontSize: 10.5,
+                textTransform: "uppercase",
+                fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
+              }}
+            >
+              Ninety seconds
+            </span>
+            <span style={{ width: 26, height: 1, background: "#d4a84b" }} />
+          </div>
+          <h2
+            style={{
+              fontFamily: "var(--font-cormorant), 'Cormorant Garamond', serif",
+              fontWeight: 300,
+              fontSize: 56,
+              lineHeight: 1.05,
+              color: "#f2ede3",
+              margin: 0,
+              letterSpacing: "-.01em",
+              maxWidth: 820,
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            Intake, school list, essays, interview — <em style={{ color: "#d4a84b", fontStyle: "italic" }}>in one walk.</em>
+          </h2>
+        </div>
+
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            paddingTop: "56.25%" /* 16:9 */,
+            background: "#0a0d15",
+            border: "1px solid rgba(212,168,75,0.30)",
+            boxShadow: "0 40px 100px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,168,75,0.08)",
+            overflow: "hidden",
+          }}
+        >
+          {/* If a rendered MP4 is present, prefer it. Otherwise the live HTML
+              preview renders the same 5-scene composition in an iframe. */}
+          <video
+            src="/media/kairos-demo.mp4"
+            poster="/media/kairos-demo-poster.jpg"
+            controls
+            preload="metadata"
+            playsInline
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              background: "#0a0d15",
+            }}
+            onError={(e) => {
+              // Fallback to the self-playing HTML preview if the MP4 is missing.
+              const video = e.currentTarget;
+              const wrap = video.parentElement;
+              if (!wrap) return;
+              video.style.display = "none";
+              const existing = wrap.querySelector("iframe");
+              if (existing) return;
+              const iframe = document.createElement("iframe");
+              iframe.src = "/media/kairos-demo.html";
+              iframe.title = "KairosLearn 90-second demo";
+              iframe.loading = "lazy";
+              iframe.style.cssText =
+                "position:absolute;inset:0;width:100%;height:100%;border:0;background:#05080d;";
+              wrap.appendChild(iframe);
+            }}
+          />
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 16,
+            marginTop: 32,
+            fontSize: 11.5,
+            color: "rgba(242,237,227,.45)",
+            fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
+            letterSpacing: ".04em",
+          }}
+        >
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <span style={{ width: 6, height: 6, borderRadius: 999, background: "#34d399" }} />
+            Live walk-through
+          </span>
+          <span>·</span>
+          <span>90 seconds</span>
+          <span>·</span>
+          <span>Captured from the product</span>
         </div>
       </div>
     </section>
@@ -1783,6 +1914,7 @@ export default function CinematicLandingV2() {
     >
       <Hero />
       <ForgottenStudent />
+      <DemoVideo />
       <Pipeline />
       <Testimonials />
       <Pricing />
