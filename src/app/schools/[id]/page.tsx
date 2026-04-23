@@ -307,6 +307,90 @@ export default function SchoolDetailPage({
 
       {tab === "aid" && (
         <div className="space-y-4">
+          {school.need_blind_international && (
+            <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/30">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-green-300 font-semibold text-sm">
+                  🔓 Need-Blind for International Students
+                </span>
+              </div>
+              <p className="text-green-200/90 text-xs leading-relaxed">
+                This school does not consider your ability to pay when making admission decisions. If admitted, they will meet 100% of your demonstrated financial need.
+              </p>
+              {school.pct_international_students_receiving_aid != null && (
+                <p className="text-green-200 text-xs mt-2 font-medium">
+                  {Math.round(school.pct_international_students_receiving_aid)}% of international students at this school receive financial aid.
+                </p>
+              )}
+            </div>
+          )}
+
+          {school.meets_full_need_international && !school.need_blind_international && (
+            <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-yellow-300 font-semibold text-sm">
+                  ⚠ Need-Aware, Meets Full Need
+                </span>
+              </div>
+              <p className="text-yellow-200/90 text-xs leading-relaxed">
+                This school meets 100% of your financial need if admitted, but your application may be less competitive if you need significant aid. Apply strategically.
+              </p>
+            </div>
+          )}
+
+          {(school.pct_international_students_receiving_aid != null || school.avg_aid_package_international != null) && (
+            <div className="grid grid-cols-2 gap-3">
+              {school.pct_international_students_receiving_aid != null && (
+                <StatCard
+                  icon={Users}
+                  label="Intl students w/ aid"
+                  value={`${Math.round(school.pct_international_students_receiving_aid)}%`}
+                />
+              )}
+              {school.avg_aid_package_international != null && (
+                <StatCard
+                  icon={DollarSign}
+                  label="Avg intl aid package"
+                  value={`$${school.avg_aid_package_international.toLocaleString()}`}
+                />
+              )}
+              {school.avg_aid_package_international != null && school.cost_of_attendance && (
+                <StatCard
+                  icon={DollarSign}
+                  label="Net cost (intl)"
+                  value={`$${Math.max(0, school.cost_of_attendance - school.avg_aid_package_international).toLocaleString()}`}
+                />
+              )}
+            </div>
+          )}
+
+          {(school.css_profile_required || school.fafsa_required_international) && (
+            <div className="flex flex-wrap gap-1.5">
+              {school.css_profile_required && (
+                <span className="px-2 py-0.5 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60">
+                  📋 CSS Profile required for intl aid
+                </span>
+              )}
+              {school.fafsa_required_international && (
+                <span className="px-2 py-0.5 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60">
+                  📋 FAFSA required
+                </span>
+              )}
+            </div>
+          )}
+
+          {school.international_aid_notes && (
+            <div className="p-3 rounded-lg bg-white/[0.03] border border-white/10 text-xs text-white/70 leading-relaxed">
+              {school.international_aid_notes}
+            </div>
+          )}
+
+          {school.aid_policy_verified_date && (
+            <p className="text-[10px] text-white/30 text-right">
+              Policy verified: {school.aid_policy_verified_date}
+            </p>
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <StatCard
               icon={DollarSign}
