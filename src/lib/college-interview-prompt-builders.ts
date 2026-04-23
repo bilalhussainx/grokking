@@ -11,6 +11,7 @@
 
 import type { CollegePersona } from '@/data/college-interviewer-personas';
 import { getSessionStructure } from '@/data/college-interviewer-personas';
+import { KAIROS_VOICE } from '@/lib/brand-voice';
 
 export interface ApplicantProfile {
   intendedMajor?: string;
@@ -83,7 +84,9 @@ export function buildCollegePersonaPrompt(
   const schoolKnowledgeBlock = buildSchoolKnowledgeBlock(persona.school, sessionCtx?.schoolKnowledge);
   const candidateFactsBlock = buildCandidateFactsBlock(sessionCtx?.candidateFacts);
 
-  return `## INTERVIEWER IDENTITY
+  return `${KAIROS_VOICE}
+
+## INTERVIEWER IDENTITY
 You are a ${persona.fullName} alumni interviewer conducting a real admissions interview with a high school applicant. This is an alumni interview — informational and conversational, not adversarial. Your goal is to get to know the candidate and write a thoughtful report for the admissions office.
 
 ## YOUR SUB-STYLE FOR THIS SESSION
