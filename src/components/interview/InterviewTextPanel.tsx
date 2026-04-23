@@ -246,19 +246,20 @@ export default function InterviewTextPanel({
           </div>
         )}
         {transcript.map((entry: TranscriptEntry, i: number) => (
-          <div key={i}>
+          <div key={i} className="flex items-start gap-2">
+            {entry.role !== "user" && (
+              <span className="kl-coach-avatar" aria-hidden>K</span>
+            )}
             {entry.role === "user" ? (
-              <div className="flex justify-end">
-                <div className="bg-blue-500/15 border border-blue-500/20 rounded-lg px-3 py-2 max-w-[85%]">
-                  <p className="text-xs text-white/80 leading-relaxed whitespace-pre-wrap">{entry.text}</p>
-                </div>
+              <div className="kl-coach-bubble kl-coach-user">
+                <p className="text-xs leading-relaxed whitespace-pre-wrap">{entry.text}</p>
               </div>
             ) : (
-              <div className="p-2.5 rounded-lg border-l-2 border-violet-500/40 bg-violet-500/5">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="text-[10px] text-white/30 uppercase tracking-wider font-medium">Interviewer</span>
+              <div className="kl-coach-bubble kl-coach-ai flex-1 min-w-0">
+                <div className="text-[10px] text-white/40 uppercase tracking-wider font-medium mb-1">
+                  Interviewer
                 </div>
-                <p className="text-white/80 text-xs leading-relaxed whitespace-pre-wrap">{entry.text}</p>
+                <p className="text-xs leading-relaxed whitespace-pre-wrap">{entry.text}</p>
               </div>
             )}
           </div>
