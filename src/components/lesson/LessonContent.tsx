@@ -382,7 +382,7 @@ function CopyButton({ getText }: { getText: () => string }) {
       }}
       className="text-[10px] text-white/20 hover:text-white/50 transition-colors"
     >
-      {copied ? "Copied!" : "Copy"}
+      {copied ? "Copied" : "Copy"}
     </button>
   );
 }

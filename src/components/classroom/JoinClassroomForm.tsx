@@ -21,7 +21,7 @@ export default function JoinClassroomForm({ onJoin }: JoinClassroomFormProps) {
     setSuccess("");
     try {
       await onJoin(code.trim().toUpperCase());
-      setSuccess("Enrolled successfully!");
+      setSuccess("Enrolled successfully.");
       setCode("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to join");

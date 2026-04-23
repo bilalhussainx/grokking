@@ -218,7 +218,7 @@ export default function SessionRoom({ session, userId, userName, userRole }: Pro
 
         {/* Join code */}
         <button onClick={copyCode} className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-mono hover:bg-white/10 transition-colors">
-          <Copy className="w-3 h-3" />{copied ? "Copied!" : session.join_code}
+          <Copy className="w-3 h-3" />{copied ? "Copied" : session.join_code}
         </button>
 
         {/* Teacher controls */}
@@ -444,7 +444,7 @@ export default function SessionRoom({ session, userId, userName, userRole }: Pro
                             <span className="text-[var(--muted-foreground)] text-lg"> / 100</span>
                           </div>
                           <p className={`text-sm font-semibold ${gradeResult.passed ? "text-emerald-400" : "text-red-400"}`}>
-                            {gradeResult.passed ? "Passed!" : "Not yet — keep trying!"}
+                            {gradeResult.passed ? "Passed." : "Not yet — keep trying."}
                           </p>
                         </div>
 

@@ -181,7 +181,7 @@ export default function SettingsPage() {
                 {referralLink}
               </code>
               <Button variant="outline" size="sm" onClick={copyReferral} className="border-white/10">
-                {copied ? "Copied!" : "Copy"}
+                {copied ? "Copied" : "Copy"}
               </Button>
             </div>
           </CardContent>

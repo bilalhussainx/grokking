@@ -313,7 +313,7 @@ export default function PromptLab({ userRole, userId, sendBroadcast }: Props) {
                 onClick={copyResult}
                 className="ml-auto rounded-lg px-2.5 py-1 text-xs text-[var(--muted-foreground)] hover:text-white transition-colors flex items-center gap-1"
               >
-                <Copy className="w-3 h-3" /> {copied ? "Copied!" : "Copy"}
+                <Copy className="w-3 h-3" /> {copied ? "Copied" : "Copy"}
               </button>
             )}
           </div>
