@@ -551,3 +551,113 @@
   background: rgba(34, 197, 94, 0.15);
   border-color: rgba(34, 197, 94, 0.3);
 }
+
+/* =========================================================================
+ * Interview Setup — school + language pick tiles, step numbers
+ * ========================================================================= */
+.kl-step-num {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+  font-family: var(--kl-font-sans, Inter, sans-serif);
+}
+.kl-step-num .kl-step-n {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--kl-radius-full);
+  background: var(--kl-gold-app, #D4AF37);
+  color: #000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.kl-iv-tile {
+  background: var(--kl-app-card, #141414);
+  border: 1px solid var(--kl-app-border, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color var(--kl-dur-fast, 150ms) ease-out,
+              background var(--kl-dur-fast, 150ms) ease-out;
+}
+.kl-iv-tile:hover {
+  border-color: var(--kl-app-gold-edge, rgba(212, 175, 55, 0.22));
+}
+.kl-iv-tile.is-selected {
+  border-color: var(--kl-gold-app, #D4AF37);
+  background: rgba(212, 175, 55, 0.07);
+}
+.kl-iv-tile .kl-iv-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.kl-iv-tile .kl-iv-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--kl-radius-full);
+  background: var(--kl-gold-app);
+}
+.kl-iv-tile .kl-iv-badge {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--kl-font-sans, Inter, sans-serif);
+}
+.kl-iv-tile .kl-iv-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  margin-top: 2px;
+}
+.kl-iv-tile .kl-iv-sub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.45;
+}
+
+.kl-lang-tile {
+  background: var(--kl-app-card, #141414);
+  border: 1px solid var(--kl-app-border, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color var(--kl-dur-fast, 150ms) ease-out,
+              background var(--kl-dur-fast, 150ms) ease-out;
+}
+.kl-lang-tile:hover {
+  border-color: var(--kl-app-gold-edge, rgba(212, 175, 55, 0.22));
+}
+.kl-lang-tile.is-selected {
+  border-color: var(--kl-gold-app, #D4AF37);
+  background: rgba(212, 175, 55, 0.07);
+}
+.kl-lang-tile .kl-lang-flag {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.kl-lang-tile .kl-lang-native {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 500;
+}
+.kl-lang-tile .kl-lang-en {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.02em;
+}

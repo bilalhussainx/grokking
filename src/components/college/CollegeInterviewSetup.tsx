@@ -45,6 +45,20 @@ const SCHOOL_BADGES: Record<string, { color: string; accent: string }> = {
   "mit-undergrad":       { color: "from-slate-400/20 to-slate-900/10",  accent: "bg-slate-400"   },
 };
 
+// Design bundle brand dots (screens-2.jsx SCHOOLS array).
+const SCHOOL_DOT_COLOR: Record<string, string> = {
+  "harvard-undergrad":   "#A51C30",
+  "yale-undergrad":      "#0F4D92",
+  "princeton-undergrad": "#E77500",
+  "columbia-undergrad":  "#9BCBEB",
+  "penn-undergrad":      "#990000",
+  "brown-undergrad":     "#9B2226",
+  "dartmouth-undergrad": "#00693E",
+  "cornell-undergrad":   "#B31B1B",
+  "stanford-undergrad":  "#8C1515",
+  "mit-undergrad":       "#8A8B8C",
+};
+
 export default function CollegeInterviewSetup() {
   const router = useRouter();
   const { startInterview } = useInterview();
@@ -311,33 +325,36 @@ export default function CollegeInterviewSetup() {
             {SCHOOLS.map((s) => {
               const isSelected = collegePersonaId === s.id;
               const badge = SCHOOL_BADGES[s.id] || { color: "from-[#D4AF37]/20 to-[#D4AF37]/5", accent: "bg-[#D4AF37]" };
+              const dotColor = (SCHOOL_DOT_COLOR[s.id] || "#D4AF37");
               return (
                 <motion.button
                   key={s.id}
+                  type="button"
                   onClick={() => setCollegePersonaId(s.id)}
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  className={`group relative overflow-hidden p-3.5 rounded-2xl border text-left transition-all ${
-                    isSelected
-                      ? "bg-[#D4AF37]/[0.06] border-[#D4AF37]/40 ring-1 ring-[#D4AF37]/20 shadow-lg shadow-[#D4AF37]/10"
-                      : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]"
-                  }`}
+                  className={`kl-iv-tile text-left ${isSelected ? "is-selected" : ""}`}
+                  aria-pressed={isSelected}
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${badge.color} opacity-40 pointer-events-none`} />
-                  <div className="relative">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className={`w-2 h-2 rounded-full ${badge.accent} ${isSelected ? "" : "opacity-60"}`} />
-                      <div className={`text-[10px] uppercase tracking-wide ${isSelected ? "text-[#D4AF37]" : "text-white/30"}`}>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${badge.color} opacity-30 pointer-events-none rounded-xl`} />
+                  <div className="relative w-full">
+                    <div className="kl-iv-top">
+                      <span
+                        className="kl-iv-dot"
+                        style={{ background: dotColor, opacity: isSelected ? 1 : 0.8 }}
+                        aria-hidden
+                      />
+                      <span className="kl-iv-badge" style={{ color: isSelected ? "var(--kl-gold-app,#D4AF37)" : undefined }}>
                         {isSelected ? "Selected" : "Ivy+"}
-                      </div>
+                      </span>
                     </div>
-                    <div className={`text-[15px] font-semibold mb-0.5 ${isSelected ? "text-white" : "text-white/85"}`}>
+                    <div className="kl-iv-name" style={{ color: isSelected ? dotColor : "#fff" }}>
                       {s.shortName}
                     </div>
-                    <div className="text-[10px] text-white/35 leading-tight">{s.fullName}</div>
+                    <div className="kl-iv-sub">{s.fullName}</div>
                     {isSelected && (
-                      <CheckCircle2 className="w-4 h-4 text-[#D4AF37] absolute top-0 right-0" />
+                      <CheckCircle2 className="w-4 h-4 text-[var(--kl-gold-app,#D4AF37)] absolute top-0 right-0" />
                     )}
                   </div>
                 </motion.button>
@@ -425,21 +442,14 @@ export default function CollegeInterviewSetup() {
                   key={l.code}
                   type="button"
                   onClick={() => setFeedbackLanguage(l.code)}
-                  className={`px-2.5 py-2.5 rounded-xl border text-left transition-colors ${
-                    isSelected
-                      ? "bg-[#D4AF37]/[0.08] border-[#D4AF37]/40 ring-1 ring-[#D4AF37]/20"
-                      : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]"
-                  }`}
+                  className={`kl-lang-tile text-left ${isSelected ? "is-selected" : ""}`}
+                  aria-pressed={isSelected}
                 >
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm">{l.flag}</span>
-                    <span className={`text-[11px] font-semibold ${isSelected ? "text-white" : "text-white/70"}`}>
-                      {l.nativeLabel}
-                    </span>
+                  <span className="kl-lang-flag" aria-hidden>{l.flag}</span>
+                  <div className="min-w-0">
+                    <div className="kl-lang-native truncate">{l.nativeLabel}</div>
+                    {l.code !== "en" && <div className="kl-lang-en truncate">{l.label}</div>}
                   </div>
-                  {l.code !== "en" && (
-                    <span className="text-[9px] text-white/35 mt-0.5 block">{l.label}</span>
-                  )}
                 </button>
               );
             })}
