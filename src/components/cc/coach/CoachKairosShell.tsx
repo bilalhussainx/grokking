@@ -9,7 +9,9 @@ import { useState } from "react";
 import CoachChat from "./CoachChat";
 import { COACH_LANGUAGES, getCoachLanguage } from "@/lib/cc/coach-languages";
 
-const HIDDEN_PATHS = ["/login", "/signup", "/onboarding", "/landing", "/talk"];
+// Pages where the floating Coach drawer is suppressed because the page has its
+// own dedicated Coach surface (brainstorm, voice), or is a pre-auth surface.
+const HIDDEN_PATHS = ["/login", "/signup", "/onboarding", "/landing", "/talk", "/cc/essays/"];
 
 export default function CoachKairosShell() {
   const { user } = useAuth();
