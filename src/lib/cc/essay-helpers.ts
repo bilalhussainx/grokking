@@ -1,5 +1,6 @@
 import { createAdminSupabase } from "@/lib/supabase-server";
 import { ESSAY_REVIEW_PRINCIPLES, ESSAY_EXPERT_TIPS, ESSAY_STRUCTURAL_PATTERNS } from "./activity-exemplars";
+import { KAIROS_VOICE } from "@/lib/brand-voice";
 
 export interface EssayContext {
   studentName: string;
@@ -152,7 +153,9 @@ export function getBrainstormSystemPrompt(ctx: EssayContext): string {
     ? `\n\n[SYSTEM NUDGE] The student has shared enough — this turn, surface 2-3 concrete themes using the <<THEMES_READY>> block and ask which one resonates. Do not ask another open-ended discovery question.`
     : "";
 
-  return `You are a college essay brainstorm coach helping ${ctx.studentName} write a ${ctx.essayType === "personal_statement" ? "Common App personal statement" : "supplemental essay"}.
+  return `${KAIROS_VOICE}
+
+You are a college essay brainstorm coach helping ${ctx.studentName} write a ${ctx.essayType === "personal_statement" ? "Common App personal statement" : "supplemental essay"}.
 
 Prompt: "${ctx.promptText}"
 Word limit: ${ctx.wordLimit}
@@ -227,7 +230,9 @@ export function getOutlineDiscussSystemPrompt(
     )
     .join("\n\n");
 
-  return `You are an outline coach helping ${ctx.studentName} choose between 3 outline options for their ${ctx.essayType === "personal_statement" ? "personal statement" : "supplemental essay"}.
+  return `${KAIROS_VOICE}
+
+You are an outline coach helping ${ctx.studentName} choose between 3 outline options for their ${ctx.essayType === "personal_statement" ? "personal statement" : "supplemental essay"}.
 
 Prompt: "${ctx.promptText}"
 Word limit: ${ctx.wordLimit}
@@ -322,7 +327,9 @@ export function getDraftCoachSystemPrompt(
     .map((p, i) => `[P${i + 1}] ${p}`)
     .join("\n\n");
 
-  return `You are a college essay drafting coach helping ${ctx.studentName} while they write.
+  return `${KAIROS_VOICE}
+
+You are a college essay drafting coach helping ${ctx.studentName} while they write.
 
 Essay type: ${ctx.essayType === "personal_statement" ? "Common App personal statement" : "supplemental"}
 Prompt: "${ctx.promptText}"
@@ -406,7 +413,9 @@ Return valid JSON only in this shape:
 }
 
 export function getQuickCheckSystemPrompt(ctx: EssayContext): string {
-  return `You are reviewing a college essay draft in progress for ${ctx.studentName}.
+  return `${KAIROS_VOICE}
+
+You are reviewing a college essay draft in progress for ${ctx.studentName}.
 
 Prompt: "${ctx.promptText}"
 Word limit: ${ctx.wordLimit}
