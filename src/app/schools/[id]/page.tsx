@@ -49,6 +49,14 @@ interface SchoolDetail {
   website_url: string | null;
   graduation_rate_6y: number | null;
   alumni_interview_program: boolean | null;
+  need_blind_international: boolean | null;
+  meets_full_need_international: boolean | null;
+  pct_international_students_receiving_aid: number | null;
+  avg_aid_package_international: number | null;
+  css_profile_required: boolean | null;
+  fafsa_required_international: boolean | null;
+  international_aid_notes: string | null;
+  aid_policy_verified_date: string | null;
 }
 
 interface Supplement {
@@ -186,6 +194,35 @@ export default function SchoolDetailPage({
           )}
         </div>
       </div>
+
+      {(school.need_blind_international || school.meets_full_need_international || school.css_profile_required) && (
+        <div className="flex flex-wrap gap-2 mb-6">
+          {school.need_blind_international && (
+            <span
+              title="Need-blind for international students — citizenship does not affect admission odds"
+              className="px-2.5 py-1 rounded-md text-[11px] bg-green-500/15 border border-green-500/30 text-green-300 font-medium"
+            >
+              🔓 Need-blind intl
+            </span>
+          )}
+          {school.meets_full_need_international && !school.need_blind_international && (
+            <span
+              title="Meets 100% of demonstrated need for admitted international students, but is need-aware in admissions"
+              className="px-2.5 py-1 rounded-md text-[11px] bg-yellow-500/15 border border-yellow-500/30 text-yellow-300 font-medium"
+            >
+              ⚠ Need-aware · full need
+            </span>
+          )}
+          {school.css_profile_required && (
+            <span
+              title="CSS Profile required for international aid"
+              className="px-2.5 py-1 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60 font-medium"
+            >
+              📋 CSS Profile
+            </span>
+          )}
+        </div>
+      )}
 
       <div className="flex gap-1 mb-6 p-1 rounded-xl bg-white/5 border border-white/10">
         {(
