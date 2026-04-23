@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Search, Building2, List, GitCompare, MessageSquare, Globe, Unlock, BadgePercent, ClipboardList, type LucideIcon } from "lucide-react";
 import SchoolCard from "@/components/cc/SchoolCard";
 import SchoolCompareModal from "@/components/cc/SchoolCompareModal";
+import { ChanceBadge, tierFromBand } from "@/components/cc/ChanceBadge";
 import { useCoachKairos } from "@/contexts/CoachKairosContext";
 
 interface School {
@@ -156,13 +157,6 @@ export default function SchoolsPage() {
     return acc;
   }, {});
 
-  const BAND_LABELS: Record<string, string> = {
-    reach: "Reach",
-    match: "Match",
-    safety: "Safety",
-    unknown: "Unclassified",
-  };
-
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <div className="flex items-center gap-3 mb-6">
@@ -277,12 +271,11 @@ export default function SchoolsPage() {
               {BAND_ORDER.map((band) => {
                 const list = grouped[band];
                 if (!list || list.length === 0) return null;
+                const tier = tierFromBand(band);
                 return (
                   <div key={band}>
                     <div className="flex items-center gap-2 mb-3">
-                      <h2 className="text-xs font-semibold text-white/40 uppercase tracking-widest">
-                        {BAND_LABELS[band]}
-                      </h2>
+                      <ChanceBadge tier={tier} />
                       <span className="text-xs text-white/20">({list.length})</span>
                     </div>
                     <div className="grid gap-3">
