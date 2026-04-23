@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Calendar, Clock } from 'lucide-react';
+import { ArrowRight, Calendar, Clock, FileText } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'KairosLearn Blog - AI Education, Coding, Languages & Learning Tips',
@@ -57,7 +57,7 @@ export default function BlogPage() {
             >
               {/* Image placeholder */}
               <div className="aspect-video bg-gradient-to-br from-[#D4AF37] to-[#8B7355] flex items-center justify-center">
-                <span className="text-white text-6xl">📝</span>
+                <FileText className="w-16 h-16 text-white/60" />
               </div>
 
               {/* Content */}

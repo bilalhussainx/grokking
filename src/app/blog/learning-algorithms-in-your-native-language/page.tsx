@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock, Share2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Share2, Globe } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Why You Should Learn Algorithms in Your Native Language | KairosLearn Blog',
@@ -61,7 +61,7 @@ export default function BlogPostPage() {
 
         {/* Featured Image Placeholder */}
         <div className="aspect-video bg-gradient-to-br from-[#D4AF37] to-[#8B7355] rounded-2xl mb-12 flex items-center justify-center">
-          <span className="text-white text-8xl">🌍</span>
+          <Globe className="w-20 h-20 text-white/60" />
         </div>
 
         {/* Content */}

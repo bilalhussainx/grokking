@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Check, X, ArrowRight } from 'lucide-react';
+import { Check, X, ArrowRight, Mic, Globe, BookOpen, Rocket } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'KairosLearn vs LeetCode - Which Coding Platform is Better?',
@@ -167,8 +167,8 @@ export default function VsLeetCodePage() {
 
         <div className="grid md:grid-cols-2 gap-8">
           <div className="bg-[#141414] rounded-2xl p-8 border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
-            <h3 className="text-2xl font-bold text-white mb-4">
-              🎤 Voice-First Learning
+            <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Mic className="w-5 h-5 text-[#D4AF37]" /> Voice-First Learning
             </h3>
             <p className="text-gray-300 mb-4">
               LeetCode is text-based. KairosLearn lets you <strong>talk to your AI tutor</strong> in real-time.
@@ -180,8 +180,8 @@ export default function VsLeetCodePage() {
           </div>
 
           <div className="bg-[#141414] rounded-2xl p-8 border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
-            <h3 className="text-2xl font-bold text-white mb-4">
-              🌍 17 Languages, Not Just English
+            <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Globe className="w-5 h-5 text-[#D4AF37]" /> 17 Languages, Not Just English
             </h3>
             <p className="text-gray-300 mb-4">
               LeetCode is primarily English. KairosLearn supports <strong>Spanish, French, German, Japanese, Hindi, Italian, Dutch, and 10 more languages</strong>.
@@ -192,8 +192,8 @@ export default function VsLeetCodePage() {
           </div>
 
           <div className="bg-[#141414] rounded-2xl p-8 border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
-            <h3 className="text-2xl font-bold text-white mb-4">
-              📚 Structured Courses, Not Just Problems
+            <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-[#D4AF37]" /> Structured Courses, Not Just Problems
             </h3>
             <p className="text-gray-300 mb-4">
               LeetCode gives you problems. KairosLearn gives you <strong>complete courses</strong> — from Python basics to MERN stack,
@@ -205,8 +205,8 @@ export default function VsLeetCodePage() {
           </div>
 
           <div className="bg-[#141414] rounded-2xl p-8 border border-white/10 hover:bg-white/5 hover:border-[#D4AF37]/30 transition">
-            <h3 className="text-2xl font-bold text-white mb-4">
-              🚀 Beyond Coding
+            <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Rocket className="w-5 h-5 text-[#D4AF37]" /> Beyond Coding
             </h3>
             <p className="text-gray-300 mb-4">
               LeetCode is coding-only. KairosLearn also teaches <strong>languages, finance, philosophy, and more</strong>.
@@ -231,12 +231,12 @@ export default function VsLeetCodePage() {
               Choose KairosLearn if you:
             </h3>
             <ul className="space-y-2 text-gray-300">
-              <li>✅ Want to <strong>learn fundamentals</strong>, not just solve problems</li>
-              <li>✅ Prefer <strong>voice explanations</strong> over reading walls of text</li>
-              <li>✅ Are a <strong>non-native English speaker</strong> and want to learn in your language</li>
-              <li>✅ Want <strong>structured courses</strong> with modules, exercises, and projects</li>
-              <li>✅ Need <strong>AI tutoring</strong> that adapts to your level</li>
-              <li>✅ Want to learn <strong>more than just coding</strong> (languages, finance, etc.)</li>
+              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" /> Want to <strong>learn fundamentals</strong>, not just solve problems</li>
+              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" /> Prefer <strong>voice explanations</strong> over reading walls of text</li>
+              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" /> Are a <strong>non-native English speaker</strong> and want to learn in your language</li>
+              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" /> Want <strong>structured courses</strong> with modules, exercises, and projects</li>
+              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" /> Need <strong>AI tutoring</strong> that adapts to your level</li>
+              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" /> Want to learn <strong>more than just coding</strong> (languages, finance, etc.)</li>
             </ul>
           </div>
 
@@ -245,11 +245,11 @@ export default function VsLeetCodePage() {
               Choose LeetCode if you:
             </h3>
             <ul className="space-y-2 text-gray-300">
-              <li>✅ Only care about <strong>grinding interview problems</strong></li>
-              <li>✅ Want <strong>company-specific problem tags</strong> (e.g., "Google hard")</li>
-              <li>✅ Prefer <strong>community discussion forums</strong></li>
-              <li>✅ Are comfortable with <strong>English-only content</strong></li>
-              <li>✅ Don't need AI tutoring or explanations</li>
+              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" /> Only care about <strong>grinding interview problems</strong></li>
+              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" /> Want <strong>company-specific problem tags</strong> (e.g., "Google hard")</li>
+              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" /> Prefer <strong>community discussion forums</strong></li>
+              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" /> Are comfortable with <strong>English-only content</strong></li>
+              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" /> Don't need AI tutoring or explanations</li>
             </ul>
           </div>
         </div>
@@ -280,10 +280,10 @@ export default function VsLeetCodePage() {
               28 courses completely free. Premium courses available.
             </p>
             <ul className="space-y-2 text-sm text-gray-300 mb-8">
-              <li>✅ AI voice tutoring</li>
-              <li>✅ 17 languages</li>
-              <li>✅ 2,284+ lessons</li>
-              <li>✅ Free trial for premium</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#D4AF37] shrink-0" /> AI voice tutoring</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#D4AF37] shrink-0" /> 17 languages</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#D4AF37] shrink-0" /> 2,284+ lessons</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#D4AF37] shrink-0" /> Free trial for premium</li>
             </ul>
             <Link
               href="/pricing"
@@ -304,10 +304,10 @@ export default function VsLeetCodePage() {
               Premium subscription for full access.
             </p>
             <ul className="space-y-2 text-sm text-gray-300 mb-8">
-              <li>✅ Company-tagged problems</li>
-              <li>✅ Video explanations</li>
-              <li>✅ Premium-only problems</li>
-              <li>✅ Interview simulator</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-gray-500 shrink-0" /> Company-tagged problems</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-gray-500 shrink-0" /> Video explanations</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-gray-500 shrink-0" /> Premium-only problems</li>
+              <li className="flex items-center gap-2"><Check className="w-4 h-4 text-gray-500 shrink-0" /> Interview simulator</li>
             </ul>
             <a
               href="https://leetcode.com/subscribe"

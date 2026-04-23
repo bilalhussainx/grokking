@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, GraduationCap, Code, Users, Sparkles } from 'lucide-react';
+import { ArrowRight, GraduationCap, Code, Users, Sparkles, Briefcase, Rocket } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'About KairosLearn - AI-Powered Learning Platform',
@@ -138,10 +138,10 @@ export default function AboutPage() {
               Founder & CEO
             </p>
             <div className="text-left text-sm text-gray-300 space-y-2">
-              <p>🎓 <strong>Harvard CS</strong> (Class of 2022)</p>
-              <p>👨‍🏫 <strong>Former CS Instructor</strong> at Milton Academy (2022-2024)</p>
-              <p>💼 <strong>Senior Full-Stack Developer</strong> at Penomo Protocol (MERN stack)</p>
-              <p>🚀 <strong>Built with AI</strong> — ships fast using Claude Code</p>
+              <p className="flex items-center gap-2"><GraduationCap className="w-4 h-4 text-gray-400 shrink-0" /><strong>Harvard CS</strong> (Class of 2022)</p>
+              <p className="flex items-center gap-2"><Users className="w-4 h-4 text-gray-400 shrink-0" /><strong>Former CS Instructor</strong> at Milton Academy (2022-2024)</p>
+              <p className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-gray-400 shrink-0" /><strong>Senior Full-Stack Developer</strong> at Penomo Protocol (MERN stack)</p>
+              <p className="flex items-center gap-2"><Rocket className="w-4 h-4 text-gray-400 shrink-0" /><strong>Built with AI</strong> — ships fast using Claude Code</p>
             </div>
             <div className="mt-6 flex justify-center gap-4">
               <a
