@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search, MessageSquare, Star, Gem, GraduationCap, Target, Library, Building2, Calendar } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTopNav } from "@/contexts/TopNavContext";
@@ -25,6 +26,8 @@ export default function TopNav({
   const { overrides } = useTopNav();
   const { isDark, toggle: toggleDarkMode } = useTheme();
   const { level, gems, xpMultiplier } = useXP();
+  const pathname = usePathname();
+  const showAutosave = pathname?.startsWith("/cc") ?? false;
 
   // Props override context (for backward compat), context overrides defaults
   const courseTitle = propCourseTitle ?? overrides.courseTitle;
@@ -64,6 +67,16 @@ export default function TopNav({
 
       {/* Right section */}
       <div className="flex items-center gap-2 sm:gap-3">
+        {showAutosave && (
+          <span
+            className="hidden md:inline-flex items-center gap-1.5 font-mono text-[11px] text-white/50"
+            aria-live="polite"
+          >
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden />
+            saved
+          </span>
+        )}
+
         {courseTitle && (
           <div className="hidden sm:flex items-center gap-2.5">
             <div className="w-28 h-1.5 bg-white/10 rounded-full overflow-hidden">
