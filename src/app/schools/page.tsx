@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Building2, List, GitCompare, MessageSquare } from "lucide-react";
+import { Search, Building2, List, GitCompare, MessageSquare, Globe } from "lucide-react";
 import SchoolCard from "@/components/cc/SchoolCard";
 import SchoolCompareModal from "@/components/cc/SchoolCompareModal";
 import { useCoachKairos } from "@/contexts/CoachKairosContext";
@@ -47,6 +47,9 @@ export default function SchoolsPage() {
   const [stateFilter, setStateFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  const [needBlindIntl, setNeedBlindIntl] = useState(false);
+  const [meetsFullNeedIntl, setMeetsFullNeedIntl] = useState(false);
+  const [cssProfileRequired, setCssProfileRequired] = useState(false);
 
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showCompare, setShowCompare] = useState(false);
@@ -86,12 +89,15 @@ export default function SchoolsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const search = useCallback(async (q: string, state: string, type: string) => {
+  const search = useCallback(async (q: string, state: string, type: string, nbi: boolean, mfni: boolean, css: boolean) => {
     setBrowseLoading(true);
     const body: Record<string, unknown> = { limit: 50 };
     if (q) body.query = q;
     if (state) body.state = state;
     if (type) body.type = type;
+    if (nbi) body.need_blind_international = true;
+    if (mfni) body.meets_full_need_international = true;
+    if (css) body.css_profile_required = true;
 
     const res = await fetch("/api/cc/schools/search", {
       method: "POST",
@@ -106,8 +112,8 @@ export default function SchoolsPage() {
   }, []);
 
   useEffect(() => {
-    if (tab === "browse") search(query, stateFilter, typeFilter);
-  }, [query, stateFilter, typeFilter, search, tab]);
+    if (tab === "browse") search(query, stateFilter, typeFilter, needBlindIntl, meetsFullNeedIntl, cssProfileRequired);
+  }, [query, stateFilter, typeFilter, needBlindIntl, meetsFullNeedIntl, cssProfileRequired, search, tab]);
 
   const handleAdd = async (schoolId: string) => {
     const res = await fetch("/api/cc/school-list/add", {
@@ -197,7 +203,7 @@ export default function SchoolsPage() {
           My Schools {mySchools.length > 0 && `(${mySchools.length})`}
         </button>
         <button
-          onClick={() => { setTab("browse"); search(query, stateFilter, typeFilter); }}
+          onClick={() => { setTab("browse"); search(query, stateFilter, typeFilter, needBlindIntl, meetsFullNeedIntl, cssProfileRequired); }}
           className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
             tab === "browse"
               ? "bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30"
@@ -251,7 +257,7 @@ export default function SchoolsPage() {
                     </p>
                   </button>
                   <button
-                    onClick={() => { setTab("browse"); search("", "", ""); }}
+                    onClick={() => { setTab("browse"); search("", "", "", false, false, false); }}
                     className="group text-left p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:border-white/20 transition-all"
                   >
                     <div className="flex items-center gap-2 mb-1.5">
@@ -333,6 +339,25 @@ export default function SchoolsPage() {
             </select>
           </div>
 
+          <details className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden">
+            <summary className="cursor-pointer px-4 py-3 text-[11px] uppercase tracking-wider text-white/60 flex items-center gap-2 hover:bg-white/[0.02]">
+              <Globe className="w-3.5 h-3.5 text-[#D4AF37]" />
+              Financial aid for international students
+            </summary>
+            <div className="px-4 pb-4 space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <FilterPill active={needBlindIntl} onClick={() => setNeedBlindIntl((v) => !v)} icon="🔓" label="Need-blind intl" />
+                <FilterPill active={meetsFullNeedIntl} onClick={() => setMeetsFullNeedIntl((v) => !v)} icon="💯" label="Meets full need intl" />
+                <FilterPill active={cssProfileRequired} onClick={() => setCssProfileRequired((v) => !v)} icon="📋" label="Accepts CSS Profile" />
+              </div>
+              {needBlindIntl && (
+                <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-xs text-green-200 leading-relaxed">
+                  🔓 Showing schools that are need-blind for international students. These schools will not penalize you for needing financial aid. There are currently {schools.length} in our database.
+                </div>
+              )}
+            </div>
+          </details>
+
           {browseLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-[#D4AF37]" />
@@ -355,5 +380,21 @@ export default function SchoolsPage() {
         </>
       )}
     </div>
+  );
+}
+
+function FilterPill({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: string; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+        active
+          ? "bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#D4AF37]"
+          : "bg-white/5 border-white/10 text-white/60 hover:text-white/80 hover:bg-white/10"
+      }`}
+    >
+      <span className="mr-1">{icon}</span>
+      {label}
+    </button>
   );
 }
