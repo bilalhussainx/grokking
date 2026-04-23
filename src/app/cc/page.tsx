@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import FirstGenResourcesCard from "@/components/cc/resources/FirstGenResourcesCard";
 import InternationalGuideCard from "@/components/cc/resources/InternationalGuideCard";
+import StatsStrip from "@/components/cc/dashboard/StatsStrip";
 
 const TOOLS = [
   {
@@ -123,6 +124,8 @@ export default function CCDashboard() {
             interviews, activities, recommendations, and more.
           </p>
         </motion.div>
+
+        <StatsStrip className="mb-6" />
 
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 gap-4"
