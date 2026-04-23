@@ -30,7 +30,7 @@ RULES:
 - Be honest. A 3.4 GPA at a Harvard-tier school is a reach even with great essays. Say so.
 - Probability ranges: extreme-reach (1-9%), reach (10-29%), match (30-60%), safety (61-90%).
 - For schools with <15% acceptance rate, only "match" or "safety" if the student is objectively top-tier.
-- If the student has needsFullAid=true and the school is NOT need-blind for internationals (needBlindInternational=false), downgrade the band by one tier and flag the aid-admission risk in weaknesses.
+- If needsFullAid=true and the school's needBlindInternational=false, downgrade the band by one tier and flag aid-admission risk in weaknesses. If in addition meetsFullNeedInternational=true, note that the student would still receive full aid *if admitted* — the risk is admission odds, not affordability. If meetsFullNeedInternational=false as well, also warn that affordability is uncertain even post-admission.
 
 Return JSON ONLY:
 {
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sch
 
   const { data: school } = await db
     .from("cc_schools")
-    .select("id, name, city, state, acceptance_rate, sat_25, sat_75, act_25, act_75, avg_hs_gpa, school_type, test_policy, meets_full_need, need_blind_international, first_gen_programs, alumni_interview_program, persona_slug")
+    .select("id, name, city, state, acceptance_rate, sat_25, sat_75, act_25, act_75, avg_hs_gpa, school_type, test_policy, meets_full_need, need_blind_international, meets_full_need_international, pct_international_students_receiving_aid, first_gen_programs, alumni_interview_program, persona_slug")
     .eq("id", school_id)
     .maybeSingle();
 
@@ -196,6 +196,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sch
     testPolicy: school.test_policy,
     meetsFullNeed: school.meets_full_need,
     needBlindInternational: !!(school as { need_blind_international?: boolean | null }).need_blind_international,
+    meetsFullNeedInternational: !!(school as { meets_full_need_international?: boolean | null }).meets_full_need_international,
+    pctInternationalReceivingAid: (school as { pct_international_students_receiving_aid?: number | null }).pct_international_students_receiving_aid ?? null,
     firstGenPrograms: school.first_gen_programs,
     alumniInterviewProgram: school.alumni_interview_program,
   };
