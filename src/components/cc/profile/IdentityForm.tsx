@@ -212,15 +212,22 @@ export default function IdentityForm({ data, onSave }: Props) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={form.is_first_gen || false}
-            onChange={(e) => update("is_first_gen", e.target.checked)}
-            className="w-4 h-4 rounded accent-[#D4AF37]"
-          />
-          <span className="text-sm text-white/70">First-generation college student</span>
-        </label>
+        <div className="space-y-2">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.is_first_gen || false}
+              onChange={(e) => update("is_first_gen", e.target.checked)}
+              className="w-4 h-4 rounded accent-[#D4AF37]"
+            />
+            <span className="text-sm text-white/70">First-generation college student</span>
+          </label>
+          {(form.is_first_gen === true || form.is_first_gen === null || form.is_first_gen === undefined) && (
+            <div className="p-3 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-xs text-[#D4AF37]/90 leading-relaxed">
+              First-gen applicants bring valuable perspectives to college campuses. Many top schools specifically seek first-gen students — and we&apos;ll help you tell that story in your application.
+            </div>
+          )}
+        </div>
         <label className="flex items-center gap-3 cursor-pointer">
           <input
             type="checkbox"
