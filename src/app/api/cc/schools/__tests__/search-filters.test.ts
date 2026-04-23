@@ -5,16 +5,16 @@ let lastChain: any;
 
 function createMockChain() {
   const chain = {
-    eq: vi.fn(function () {
+    eq: vi.fn(function (this: unknown) {
       return this;
     }),
-    ilike: vi.fn(function () {
+    ilike: vi.fn(function (this: unknown) {
       return this;
     }),
-    order: vi.fn(function () {
+    order: vi.fn(function (this: unknown) {
       return this;
     }),
-    limit: vi.fn(function () {
+    limit: vi.fn(function (this: unknown) {
       return this;
     }),
     then: vi.fn((resolve) => resolve({ data: [], error: null })),
