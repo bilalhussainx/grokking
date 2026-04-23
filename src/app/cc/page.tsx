@@ -16,14 +16,25 @@ import {
 import FirstGenResourcesCard from "@/components/cc/resources/FirstGenResourcesCard";
 import InternationalGuideCard from "@/components/cc/resources/InternationalGuideCard";
 import StatsStrip from "@/components/cc/dashboard/StatsStrip";
+import { ChipBar, type ChipOption } from "@/components/cc/ChipBar";
 
-const TOOLS = [
+type ToolPhase = "brainstorm" | "outline" | "draft" | "revise";
+
+const TOOLS: {
+  title: string;
+  desc: string;
+  href: string;
+  icon: typeof BookOpen;
+  status: string;
+  phase: ToolPhase;
+}[] = [
   {
     title: "Essay Studio",
     desc: "AI-guided brainstorming, outline generation, and draft coaching. Personal statements, supplementals, and Why Us essays.",
     href: "/cc/essays",
     icon: BookOpen,
     status: "active",
+    phase: "draft",
   },
   {
     title: "Interview Prep",
@@ -31,6 +42,7 @@ const TOOLS = [
     href: "/college-interviews",
     icon: Target,
     status: "active",
+    phase: "revise",
   },
   {
     title: "Activities Optimizer",
@@ -38,6 +50,7 @@ const TOOLS = [
     href: "/cc/activities-optimizer",
     icon: ClipboardList,
     status: "active",
+    phase: "outline",
   },
   {
     title: "Recommendations Coach",
@@ -45,6 +58,7 @@ const TOOLS = [
     href: "/cc/recommenders",
     icon: Users,
     status: "active",
+    phase: "outline",
   },
   {
     title: "School List Builder",
@@ -52,6 +66,7 @@ const TOOLS = [
     href: "/intake",
     icon: Building2,
     status: "active",
+    phase: "brainstorm",
   },
   {
     title: "Counselor Share Link",
@@ -59,7 +74,18 @@ const TOOLS = [
     href: "/cc/share-settings",
     icon: Share2,
     status: "active",
+    phase: "revise",
   },
+];
+
+type PhaseFilter = "all" | ToolPhase;
+
+const PHASE_OPTIONS: ChipOption<PhaseFilter>[] = [
+  { value: "all", label: "All", count: TOOLS.length },
+  { value: "brainstorm", label: "Brainstorm" },
+  { value: "outline", label: "Outline" },
+  { value: "draft", label: "Draft" },
+  { value: "revise", label: "Revise" },
 ];
 
 const container = {
@@ -78,6 +104,7 @@ interface ProfileFlags {
 
 export default function CCDashboard() {
   const [flags, setFlags] = useState<ProfileFlags>({ is_first_gen: null, is_international: null });
+  const [phase, setPhase] = useState<PhaseFilter>("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -127,13 +154,21 @@ export default function CCDashboard() {
 
         <StatsStrip className="mb-6" />
 
+        <ChipBar
+          options={PHASE_OPTIONS}
+          active={phase}
+          onChange={setPhase}
+          className="mb-4"
+          ariaLabel="Filter tools by application phase"
+        />
+
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           variants={container}
           initial="hidden"
           animate="visible"
         >
-          {TOOLS.map((tool) => {
+          {TOOLS.filter((t) => phase === "all" || t.phase === phase).map((tool) => {
             const Icon = tool.icon;
             return (
               <motion.div key={tool.title} variants={item}>
