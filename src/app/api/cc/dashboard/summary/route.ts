@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth, unauthorized, createAdminSupabase } from "../../helpers";
 import { chatOnce } from "@/lib/cc/openrouter";
+import { KAIROS_VOICE } from "@/lib/brand-voice";
 
 interface SchoolRow {
   id: string;
@@ -167,7 +168,7 @@ Do not invent facts. Under 40 words.`;
 
   try {
     const text = await chatOnce([
-      { role: "system", content: "You are a pragmatic, warm senior college counselor." },
+      { role: "system", content: `${KAIROS_VOICE}\n\nYou are a pragmatic, warm senior college counselor.` },
       { role: "user", content: prompt },
     ]);
     return stripGreetings(text).trim() || null;
