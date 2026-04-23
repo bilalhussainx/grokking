@@ -50,7 +50,7 @@ export default function InternationalSection() {
               marginBottom: 14,
             }}
           >
-            For international students
+            FOR INTERNATIONAL STUDENTS
           </p>
           <h2
             style={{
@@ -62,7 +62,7 @@ export default function InternationalSection() {
               marginBottom: 20,
             }}
           >
-            Applying to US colleges{' '}
+            Applying to US colleges —{' '}
             <em style={{ fontStyle: 'italic', color: '#34d399' }}>
               from outside the US?
             </em>
