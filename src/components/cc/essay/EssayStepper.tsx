@@ -1,12 +1,12 @@
 "use client";
 
-import { Check, MessageCircle, List, PenLine, Eye } from "lucide-react";
+import { Check } from "lucide-react";
 
 const PHASES = [
-  { key: "brainstorm", label: "Brainstorm", icon: MessageCircle },
-  { key: "outline", label: "Outline", icon: List },
-  { key: "draft", label: "Draft", icon: PenLine },
-  { key: "revise", label: "Revise", icon: Eye },
+  { key: "brainstorm", label: "Brainstorm" },
+  { key: "outline", label: "Outline" },
+  { key: "draft", label: "Draft" },
+  { key: "revise", label: "Revise" },
 ] as const;
 
 type Phase = (typeof PHASES)[number]["key"];
@@ -22,30 +22,52 @@ export default function EssayStepper({ currentPhase, onPhaseClick }: EssaySteppe
   const currentIndex = PHASE_ORDER.indexOf(currentPhase);
 
   return (
-    <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10">
+    <ol className="kl-stepper" aria-label="Essay phase progress">
       {PHASES.map((phase, i) => {
-        const isActive = phase.key === currentPhase;
-        const isCompleted = i < currentIndex;
-        const Icon = isCompleted ? Check : phase.icon;
+        const isDone = i < currentIndex;
+        const isActive = i === currentIndex;
+        const isDisabled = i > currentIndex;
+        const stateClass = isDone ? "is-done" : isActive ? "is-active" : "";
 
         return (
-          <button
-            key={phase.key}
-            onClick={() => onPhaseClick(phase.key)}
-            disabled={i > currentIndex}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              isActive
-                ? "bg-[#D4AF37]/20 text-[#D4AF37]"
-                : isCompleted
-                  ? "text-white/50 hover:text-white/70 cursor-pointer"
-                  : "text-white/20 cursor-not-allowed"
-            }`}
-          >
-            <Icon className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{phase.label}</span>
-          </button>
+          <li key={phase.key} className="flex items-center">
+            <button
+              type="button"
+              onClick={() => onPhaseClick(phase.key)}
+              disabled={isDisabled}
+              aria-current={isActive ? "step" : undefined}
+              aria-label={`${phase.label} phase`}
+              className="flex items-center gap-2 group"
+              style={{ cursor: isDisabled ? "not-allowed" : "pointer" }}
+            >
+              <span className={`kl-stepper-step ${stateClass}`}>
+                {isDone ? (
+                  <Check className="w-3 h-3" strokeWidth={2.5} />
+                ) : (
+                  String(i + 1).padStart(2, "0")
+                )}
+              </span>
+              <span
+                className={`hidden sm:inline text-[11px] font-medium transition-colors ${
+                  isActive
+                    ? "text-[var(--kl-gold-app,#D4AF37)]"
+                    : isDone
+                      ? "text-white/60 group-hover:text-white/80"
+                      : "text-white/30"
+                }`}
+              >
+                {phase.label}
+              </span>
+            </button>
+            {i < PHASES.length - 1 && (
+              <span
+                className={`kl-stepper-connector ${isDone ? "is-done" : ""}`}
+                aria-hidden
+              />
+            )}
+          </li>
         );
       })}
-    </div>
+    </ol>
   );
 }
