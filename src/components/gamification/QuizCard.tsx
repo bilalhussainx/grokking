@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useXP } from "@/contexts/XPContext";
+import { Trophy, ThumbsUp, BookOpen } from "lucide-react";
 
 interface QuizQuestion {
   prompt: string;
@@ -232,12 +233,12 @@ export default function QuizCard({
             ) : (
               /* Results screen */
               <div className="text-center py-4">
-                <div className="text-4xl mb-3">
+                <div className="mb-3 flex justify-center">
                   {correctCount === questions.length
-                    ? "🎉"
+                    ? <Trophy className="w-8 h-8 text-yellow-400" />
                     : correctCount >= 2
-                    ? "👏"
-                    : "📚"}
+                    ? <ThumbsUp className="w-8 h-8 text-emerald-400" />
+                    : <BookOpen className="w-8 h-8 text-blue-400" />}
                 </div>
                 <h3 className="text-white font-bold text-lg mb-1">
                   {correctCount === questions.length

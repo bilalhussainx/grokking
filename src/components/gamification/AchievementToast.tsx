@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Gem } from "lucide-react";
 
 export interface Achievement {
   id: string;
@@ -68,8 +69,8 @@ export default function AchievementToast({ achievements, onDismiss }: Achievemen
                 Achievement Unlocked
               </p>
             </div>
-            <span className="text-sm font-medium text-amber-400 whitespace-nowrap">
-              +{achievement.gems} 💎
+            <span className="text-sm font-medium text-amber-400 whitespace-nowrap flex items-center gap-1">
+              +{achievement.gems} <Gem className="w-3.5 h-3.5" />
             </span>
           </motion.div>
         ))}

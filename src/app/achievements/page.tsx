@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, Trophy, Lock } from "lucide-react";
+import { ArrowLeft, Trophy, Lock, Gem } from "lucide-react";
 import { RARITY_COLORS, type Achievement } from "@/lib/achievements-types";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -101,7 +101,11 @@ export default function AchievementsPage() {
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-3xl">{isUnlocked ? ach.icon : "🔒"}</span>
+                      {isUnlocked ? (
+                        <span className="text-3xl">{ach.icon}</span>
+                      ) : (
+                        <Lock className="w-6 h-6 text-white/20" />
+                      )}
                       {isUnlocked && (
                         <span className="text-[10px] font-semibold text-emerald-400 uppercase">
                           Unlocked
@@ -114,7 +118,7 @@ export default function AchievementsPage() {
                     <p className="text-[10px] text-white/40 leading-snug mb-2">
                       {ach.description}
                     </p>
-                    <p className="text-[10px] text-purple-300 font-semibold">+{ach.gemReward} 💎</p>
+                    <p className="text-[10px] text-purple-300 font-semibold flex items-center gap-1">+{ach.gemReward} <Gem className="w-3 h-3" /></p>
                   </motion.div>
                 );
               })}
