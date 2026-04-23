@@ -8,6 +8,7 @@ import ReorderPanel from "@/components/cc/activities/ReorderPanel";
 import GapAnalysis from "@/components/cc/activities/GapAnalysis";
 import ResumeUpload from "@/components/cc/activities/ResumeUpload";
 import BulletEditor from "@/components/cc/activities/BulletEditor";
+import { Tabs, type TabOption } from "@/components/cc/Tabs";
 
 type Tab = "edit" | "review" | "reorder" | "gaps";
 
@@ -158,38 +159,27 @@ export default function ActivitiesOptimizerPage() {
       {showUpload && <ResumeUpload onImported={() => { loadProfile(); setShowUpload(false); }} />}
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 mb-6">
-        {TABS.map((t) => {
-          const disabled = t.requiresResult && !result;
-          return (
-            <button
-              key={t.key}
-              onClick={() => !disabled && setTab(t.key)}
-              disabled={disabled}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                tab === t.key
-                  ? "bg-[#D4AF37]/20 text-[#D4AF37]"
-                  : disabled
-                  ? "text-white/20 cursor-not-allowed"
-                  : "text-white/40 hover:text-white/60"
-              }`}
-            >
-              <t.icon className="w-3.5 h-3.5" />
-              {t.label}
-            </button>
-          );
-        })}
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <Tabs
+          ariaLabel="Activities optimizer sections"
+          active={tab}
+          onChange={setTab}
+          options={TABS.map((t) => ({
+            value: t.key,
+            label: t.label,
+            icon: t.icon,
+            disabled: t.requiresResult && !result,
+          })) satisfies TabOption<Tab>[]}
+        />
 
-        <div className="ml-auto">
-          <button
-            onClick={runOptimization}
-            disabled={loading || !hasContent}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#C4A030] disabled:opacity-40 transition-colors"
-          >
-            {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-            {loading ? "Analyzing..." : result ? "Re-analyze" : "Run full review"}
-          </button>
-        </div>
+        <button
+          onClick={runOptimization}
+          disabled={loading || !hasContent}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#C4A030] disabled:opacity-40 transition-colors shrink-0"
+        >
+          {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+          {loading ? "Analyzing..." : result ? "Re-analyze" : "Run full review"}
+        </button>
       </div>
 
       {error && <p className="text-xs text-red-400 mb-3">{error}</p>}

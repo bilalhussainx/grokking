@@ -5,6 +5,7 @@ import { Search, Building2, List, GitCompare, MessageSquare, Globe, Unlock, Badg
 import SchoolCard from "@/components/cc/SchoolCard";
 import SchoolCompareModal from "@/components/cc/SchoolCompareModal";
 import { ChanceBadge, tierFromBand } from "@/components/cc/ChanceBadge";
+import { Tabs } from "@/components/cc/Tabs";
 import { useCoachKairos } from "@/contexts/CoachKairosContext";
 
 interface School {
@@ -184,30 +185,25 @@ export default function SchoolsPage() {
       )}
 
       {/* Tab switcher */}
-      <div className="flex gap-1 mb-6 p-1 rounded-xl bg-white/5 border border-white/10">
-        <button
-          onClick={() => setTab("my-list")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
-            tab === "my-list"
-              ? "bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30"
-              : "text-white/40 hover:text-white/60"
-          }`}
-        >
-          <List className="w-4 h-4" />
-          My Schools {mySchools.length > 0 && `(${mySchools.length})`}
-        </button>
-        <button
-          onClick={() => { setTab("browse"); search(query, stateFilter, typeFilter, needBlindIntl, meetsFullNeedIntl, cssProfileRequired); }}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
-            tab === "browse"
-              ? "bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30"
-              : "text-white/40 hover:text-white/60"
-          }`}
-        >
-          <Search className="w-4 h-4" />
-          Browse
-        </button>
-      </div>
+      <Tabs
+        className="mb-6 w-full"
+        ariaLabel="My schools vs browse"
+        active={tab}
+        onChange={(next) => {
+          setTab(next);
+          if (next === "browse") {
+            search(query, stateFilter, typeFilter, needBlindIntl, meetsFullNeedIntl, cssProfileRequired);
+          }
+        }}
+        options={[
+          {
+            value: "my-list",
+            label: `My Schools${mySchools.length > 0 ? ` (${mySchools.length})` : ""}`,
+            icon: List,
+          },
+          { value: "browse", label: "Browse", icon: Search },
+        ]}
+      />
 
       {tab === "my-list" && (
         <>

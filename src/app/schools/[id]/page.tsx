@@ -20,6 +20,7 @@ import {
   ClipboardList,
   AlertTriangle,
 } from "lucide-react";
+import { Tabs, type TabOption } from "@/components/cc/Tabs";
 
 interface SchoolDetail {
   id: string;
@@ -227,28 +228,21 @@ export default function SchoolDetailPage({
         </div>
       )}
 
-      <div className="flex gap-1 mb-6 p-1 rounded-xl bg-white/5 border border-white/10">
-        {(
-          [
-            { id: "overview", label: "Overview", Icon: Info },
-            { id: "aid", label: "Aid & Loans", Icon: DollarSign },
-            { id: "supplements", label: `Supplements${supplements.length ? ` (${supplements.length})` : ""}`, Icon: FileText },
-          ] as { id: Tab; label: string; Icon: typeof Info }[]
-        ).map(({ id: tabId, label, Icon }) => (
-          <button
-            key={tabId}
-            onClick={() => setTab(tabId)}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium transition-all ${
-              tab === tabId
-                ? "bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30"
-                : "text-white/40 hover:text-white/60"
-            }`}
-          >
-            <Icon className="w-3.5 h-3.5" />
-            {label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        className="mb-6 w-full"
+        ariaLabel="School detail sections"
+        active={tab}
+        onChange={setTab}
+        options={[
+          { value: "overview" as Tab, label: "Overview", icon: Info },
+          { value: "aid" as Tab, label: "Aid & Loans", icon: DollarSign },
+          {
+            value: "supplements" as Tab,
+            label: `Supplements${supplements.length ? ` (${supplements.length})` : ""}`,
+            icon: FileText,
+          },
+        ] satisfies TabOption<Tab>[]}
+      />
 
       {tab === "overview" && (
         <div className="space-y-4">
