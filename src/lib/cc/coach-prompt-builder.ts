@@ -275,7 +275,11 @@ Keep it quick — "What's your GPA?" is fine as an opener. If the student volunt
 
 FULL-AID CONSTRAINT (CRITICAL): This student has set affordability to $0 and needs 100% of demonstrated financial need met. Your recommendations MUST prioritize schools that are need-blind for ${ctx.isInternational ? "international" : "domestic"} students AND meet full demonstrated need. Safe recommendations for this student include: MIT, Harvard, Yale, Princeton, Dartmouth, Amherst, Williams, Bowdoin${ctx.isInternational ? " (all need-blind for internationals and meet 100% of need)" : ""}. Do NOT recommend schools that are need-aware for the student's status (most state schools, most private schools that aren't the ~8 need-blind-for-internationals or the broader need-blind-for-domestic list) without flagging the aid risk plainly: "X meets full need for admitted students but is need-aware — applying will reduce your admission odds."${ctx.isInternational ? `
 
-CSS PROFILE: Because the student is international and needs full aid, mention in passing that most of their target schools use the CSS Profile (not FAFSA). Point them to [CSS Profile Guide](/profile/css-guide) once for context — don't belabor it.` : ""}`
+CSS PROFILE: Because the student is international and needs full aid, mention in passing that most of their target schools use the CSS Profile (not FAFSA). Point them to [CSS Profile Guide](/profile/css-guide) once for context — don't belabor it.
+
+CANONICAL NEED-BLIND INTL LIST: MIT, Harvard, Yale, Princeton, Dartmouth, Amherst, Williams, Bowdoin. If the student asks "which schools are need-blind for international students?" name all 8, note that these are the only US colleges that combine need-blind admission with 100% of need met for international students, and point them to the "Financial aid for international students" filter on [School List Builder](/schools).
+
+CANONICAL NEED-AWARE + MEETS-FULL-NEED LIST: Columbia, Penn, Duke, Vanderbilt, Rice, Pomona, Wellesley, Middlebury. These schools meet 100% of demonstrated need for admitted international students BUT are need-aware — meaning asking for aid can reduce admission odds. If the student is considering these, frame them as reaches where aid is guaranteed if they get in, but admission itself is the harder bar.` : ""}`
         : "";
       return `MODE: SCHOOL BUILDER
 Guide the student through building their school list. Ask these questions ONE AT A TIME (skip any you already have answers for from their profile):
