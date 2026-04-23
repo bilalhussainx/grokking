@@ -5,6 +5,8 @@ import {
   parseNameGrade,
   parseLocation,
   parseFirstGen,
+  parseInternationalStatus,
+  parseParentsEducation,
   languageToCode,
 } from "@/lib/cc/intake-questions";
 
@@ -41,6 +43,14 @@ export async function POST(req: NextRequest) {
   const { name, grade } = parseNameGrade(fields.name_grade || "");
   const { state, country } = parseLocation(fields.location || "");
   const firstGen = parseFirstGen(fields.first_gen || "");
+  const parentsEdu = parseParentsEducation(fields.parents_education || "");
+  const isIntl = country !== "US" && country !== "CA"
+    ? parseInternationalStatus(fields.international_status || "") ?? true
+    : false;
+  const citizenship =
+    typeof fields.citizenship_status === "string" && fields.citizenship_status.trim()
+      ? fields.citizenship_status.trim()
+      : null;
   const langCode = languageToCode(fields.home_language || "English");
 
   const profileInsert: Record<string, unknown> = {
@@ -48,8 +58,12 @@ export async function POST(req: NextRequest) {
     grade_level: grade,
     state_province: state,
     country,
+    home_country_code: country,
     home_language: langCode,
     is_first_gen: firstGen,
+    parents_education: parentsEdu,
+    is_international: isIntl,
+    citizenship_status: citizenship,
     profile_completion_pct: 15,
     intake_completed_at: new Date().toISOString(),
   };
@@ -78,6 +92,9 @@ export async function POST(req: NextRequest) {
           name, grade, state, country,
           language: fields.home_language || "English",
           first_gen: firstGen,
+          parents_education: parentsEdu,
+          is_international: isIntl,
+          citizenship_status: citizenship,
           worries: fields.worries || null,
           interested_schools: fields.schools_interest || null,
         },
@@ -113,6 +130,9 @@ export async function POST(req: NextRequest) {
       country,
       language: fields.home_language || "English",
       first_gen: firstGen,
+      parents_education: parentsEdu,
+      is_international: isIntl,
+      citizenship_status: citizenship,
       worries: fields.worries || null,
       interested_schools: fields.schools_interest || null,
     },
