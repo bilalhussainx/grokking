@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Toggle } from "@/components/cc/Toggle";
 
 const ACTIVITY_TYPES = [
   "Academic", "Art", "Athletics", "Career", "Community Service",
@@ -137,10 +138,11 @@ export default function ActivitiesForm({ activities, onSave, onDelete }: Props) 
                   <input type="number" min="0" max="52" value={act.weeks_per_year ?? ""} onChange={(e) => onSave({ position: act.position, weeks_per_year: Number(e.target.value) })} className={inputClass} />
                 </div>
                 <div className="flex items-end pb-1">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={act.is_continuing ?? true} onChange={(e) => onSave({ position: act.position, is_continuing: e.target.checked })} className="w-4 h-4 rounded accent-[#D4AF37]" />
-                    <span className="text-xs text-white/50">Continuing</span>
-                  </label>
+                  <Toggle
+                    checked={act.is_continuing ?? true}
+                    onChange={(v) => onSave({ position: act.position, is_continuing: v })}
+                    label="Continuing"
+                  />
                 </div>
               </div>
 

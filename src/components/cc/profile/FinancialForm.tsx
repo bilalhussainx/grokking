@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import { AFFORDABILITY_OPTIONS, type AffordabilityValue } from "@/lib/cc/affordability";
 import CSSProfileCallout from "./CSSProfileCallout";
+import { Toggle } from "@/components/cc/Toggle";
 
 interface FinancialData {
   household_income_bracket?: string | null;
@@ -134,14 +135,16 @@ export default function FinancialForm({
       </div>
 
       <div className="space-y-3">
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" checked={form.free_reduced_lunch || false} onChange={(e) => update("free_reduced_lunch", e.target.checked)} className="w-4 h-4 rounded accent-[#D4AF37]" />
-          <span className="text-sm text-white/70">Qualifies for free/reduced lunch</span>
-        </label>
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" checked={form.willing_to_take_loans || false} onChange={(e) => update("willing_to_take_loans", e.target.checked)} className="w-4 h-4 rounded accent-[#D4AF37]" />
-          <span className="text-sm text-white/70">Willing to take student loans</span>
-        </label>
+        <Toggle
+          checked={!!form.free_reduced_lunch}
+          onChange={(v) => update("free_reduced_lunch", v)}
+          label="Qualifies for free/reduced lunch"
+        />
+        <Toggle
+          checked={!!form.willing_to_take_loans}
+          onChange={(v) => update("willing_to_take_loans", v)}
+          label="Willing to take student loans"
+        />
       </div>
 
       {form.willing_to_take_loans && (
@@ -152,14 +155,16 @@ export default function FinancialForm({
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" checked={form.fafsa_submitted || false} onChange={(e) => update("fafsa_submitted", e.target.checked)} className="w-4 h-4 rounded accent-[#D4AF37]" />
-          <span className="text-sm text-white/70">FAFSA submitted</span>
-        </label>
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" checked={form.css_profile_submitted || false} onChange={(e) => update("css_profile_submitted", e.target.checked)} className="w-4 h-4 rounded accent-[#D4AF37]" />
-          <span className="text-sm text-white/70">CSS Profile submitted</span>
-        </label>
+        <Toggle
+          checked={!!form.fafsa_submitted}
+          onChange={(v) => update("fafsa_submitted", v)}
+          label="FAFSA submitted"
+        />
+        <Toggle
+          checked={!!form.css_profile_submitted}
+          onChange={(v) => update("css_profile_submitted", v)}
+          label="CSS Profile submitted"
+        />
       </div>
     </div>
   );
