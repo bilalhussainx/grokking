@@ -110,4 +110,34 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toContain("$0");
     expect(prompt.toLowerCase()).toContain("full financial aid");
   });
+
+  it("lists all 8 canonical need-blind schools for intl full-aid students in school-builder mode", () => {
+    const ctx: CoachContext = {
+      ...baseContext,
+      mode: "school-builder",
+      isInternational: true,
+      country: "PK",
+      affordabilityValue: "zero",
+      needsFullAid: true,
+    };
+    const prompt = buildSystemPrompt(ctx);
+    for (const school of ["MIT", "Harvard", "Yale", "Princeton", "Dartmouth", "Amherst", "Williams", "Bowdoin"]) {
+      expect(prompt).toContain(school);
+    }
+  });
+
+  it("mentions the need-aware-meets-full-need distinction for intl full-aid students", () => {
+    const ctx: CoachContext = {
+      ...baseContext,
+      mode: "school-builder",
+      isInternational: true,
+      country: "PK",
+      affordabilityValue: "zero",
+      needsFullAid: true,
+    };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt.toLowerCase()).toMatch(/need-aware/);
+    const needAwareSchools = ["Columbia", "Penn", "Duke", "Vanderbilt", "Rice", "Pomona", "Wellesley", "Middlebury"];
+    expect(needAwareSchools.some((s) => prompt.includes(s))).toBe(true);
+  });
 });
