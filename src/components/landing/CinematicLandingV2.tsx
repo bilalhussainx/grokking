@@ -925,7 +925,7 @@ function DemoVideo() {
           }}
         >
           <iframe
-            src="/kairos-demo-video.html"
+            src="/media/kairos-final-demo.html"
             title="KairosLearn 90-second demo"
             loading="lazy"
             allow="autoplay; fullscreen"
