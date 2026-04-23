@@ -710,3 +710,223 @@
 .kl-essay-prose p {
   margin: 0 0 1em 0;
 }
+
+/* =========================================================================
+ * Inputs (form fields, search, coach composer)
+ * ========================================================================= */
+.kl-input-label {
+  font-size: 10.5px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.60);
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+  font-family: var(--kl-font-sans, Inter, sans-serif);
+}
+.kl-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #fff;
+  font-family: var(--kl-font-sans, Inter, sans-serif);
+  outline: none;
+  transition: border-color var(--kl-dur-fast, 150ms) ease-out;
+}
+.kl-input:focus {
+  border-color: var(--kl-app-gold-edge, rgba(212, 175, 55, 0.40));
+}
+.kl-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.kl-composer {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--kl-app-gold-edge, rgba(212, 175, 55, 0.30));
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.kl-composer input {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-size: 13px;
+  flex: 1;
+  outline: none;
+  font-family: var(--kl-font-sans, Inter, sans-serif);
+}
+.kl-composer input::placeholder {
+  color: rgba(255, 255, 255, 0.40);
+}
+.kl-composer-send {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--kl-gold-app, #D4AF37);
+  color: #000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.kl-composer-send:hover {
+  background: var(--kl-gold-hover-app, #C4A030);
+}
+
+/* =========================================================================
+ * Toggle + tab segmented
+ * ========================================================================= */
+.kl-toggle {
+  width: 36px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: var(--kl-radius-full);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  border: 0;
+  padding: 0;
+  transition: background var(--kl-dur-fast, 150ms) ease-out;
+}
+.kl-toggle .kl-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--kl-radius-full);
+  background: rgba(255, 255, 255, 0.70);
+  transition: left var(--kl-dur-fast, 150ms) ease-out,
+              background var(--kl-dur-fast, 150ms) ease-out;
+}
+.kl-toggle.is-on {
+  background: var(--kl-gold-app, #D4AF37);
+}
+.kl-toggle.is-on .kl-toggle-thumb {
+  left: calc(100% - 18px);
+  background: #000;
+}
+
+.kl-tabs {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 2px;
+  display: inline-flex;
+  gap: 2px;
+}
+.kl-tab {
+  padding: 5px 14px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.60);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--kl-font-sans, Inter, sans-serif);
+  transition: background var(--kl-dur-fast, 150ms) ease-out, color var(--kl-dur-fast, 150ms) ease-out;
+}
+.kl-tab.is-active {
+  background: var(--kl-gold-app, #D4AF37);
+  color: #000;
+  font-weight: 500;
+}
+
+/* =========================================================================
+ * Activity bullet card (Activities Optimizer)
+ * ========================================================================= */
+.kl-activity-bullet {
+  background: var(--kl-app-card, #141414);
+  border: 1px solid var(--kl-app-border, rgba(255, 255, 255, 0.08));
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.kl-activity-bullet .kl-activity-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.kl-activity-bullet .kl-activity-kind {
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.40);
+  font-weight: 500;
+  font-family: var(--kl-font-sans, Inter, sans-serif);
+}
+.kl-activity-bullet .kl-activity-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  margin-top: 4px;
+}
+.kl-activity-bullet .kl-activity-counter {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.40);
+  font-family: var(--kl-font-mono, 'JetBrains Mono', monospace);
+  flex-shrink: 0;
+}
+.kl-activity-bullet .kl-activity-body {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+/* =========================================================================
+ * Sidebar nav — left-rail app navigation
+ * ========================================================================= */
+.kl-sidebar {
+  background: rgba(5, 8, 13, 0.4);
+  border-right: 1px solid var(--kl-app-border, rgba(255, 255, 255, 0.08));
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 240px;
+  flex-shrink: 0;
+}
+.kl-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.60);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background var(--kl-dur-fast, 150ms) ease-out,
+              color var(--kl-dur-fast, 150ms) ease-out;
+  text-decoration: none;
+  font-family: var(--kl-font-sans, Inter, sans-serif);
+}
+.kl-sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.90);
+}
+.kl-sidebar-link.is-active {
+  background: rgba(212, 175, 55, 0.10);
+  color: var(--kl-gold-app, #D4AF37);
+}
+.kl-sidebar-section {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  padding: 12px 12px 6px;
+  font-family: var(--kl-font-sans, Inter, sans-serif);
+}
