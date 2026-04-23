@@ -31,13 +31,25 @@ export default function InterviewRoom() {
 
   if (!questionPlan || !sessionId) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+      <div
+        className="kl-surface-app min-h-screen flex items-center justify-center"
+        style={{ background: "var(--kl-app-bg, #000)" }}
+      >
         <div className="text-center px-6">
-          <div className="w-16 h-16 bg-violet-500/15 border border-violet-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Mic className="w-8 h-8 text-violet-400" />
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            style={{
+              background: "rgba(212,175,55,0.1)",
+              border: "1px solid rgba(212,175,55,0.22)",
+            }}
+          >
+            <Mic className="w-8 h-8 text-[var(--kl-gold-app,#D4AF37)]" />
           </div>
           <p className="text-white/50 mb-4">No interview session found.</p>
-          <Link href="/interviews" className="text-cyan-400 underline text-sm">
+          <Link
+            href="/interviews"
+            className="text-[var(--kl-gold-app,#D4AF37)] underline text-sm hover:text-[var(--kl-gold-hover-app,#C4A030)]"
+          >
             Start a new interview
           </Link>
         </div>
@@ -49,20 +61,37 @@ export default function InterviewRoom() {
   const presetLabel = preset ? preset.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()) : "Mock";
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
-      {/* Header bar */}
-      <div className="h-14 border-b border-white/[0.06] flex items-center justify-between px-4 bg-slate-950/80 backdrop-blur-xl shrink-0">
+    <div
+      className="kl-surface-app h-screen flex flex-col"
+      style={{ background: "var(--kl-app-bg, #000)" }}
+    >
+      {/* Header bar — interview HUD */}
+      <div
+        className="h-14 flex items-center justify-between px-4 backdrop-blur-xl shrink-0 border-b"
+        style={{
+          borderColor: "var(--kl-app-border, rgba(255,255,255,0.08))",
+          background: "rgba(0,0,0,0.8)",
+        }}
+      >
         <div className="flex items-center gap-3">
-          <Link href="/interviews" className="p-1.5 rounded-lg hover:bg-white/5 transition">
-            <ArrowLeft className="w-4 h-4 text-white/40" />
+          <Link
+            href="/interviews"
+            className="p-1.5 rounded-lg hover:bg-white/5 transition-colors text-white/40 hover:text-white/70"
+            aria-label="Back to interviews"
+          >
+            <ArrowLeft className="w-4 h-4" />
           </Link>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-sm font-semibold text-white/80">
+            <span
+              className="inline-block w-2 h-2 rounded-full animate-pulse"
+              style={{ background: "var(--kl-state-reach, #f87171)" }}
+              aria-hidden
+            />
+            <span className="text-sm font-semibold text-white/85">
               {presetLabel} Interview
             </span>
           </div>
-          <span className="hidden sm:inline text-xs text-white/30 capitalize px-2 py-0.5 bg-white/5 rounded-full">
+          <span className="kl-chip hidden sm:inline-flex capitalize" style={{ cursor: "default" }}>
             {interviewType}
           </span>
         </div>
@@ -70,12 +99,17 @@ export default function InterviewRoom() {
 
       {/* Mobile tab switcher — only when editor is available */}
       {showEditor && (
-        <div className="md:hidden flex border-b border-white/[0.06] shrink-0">
+        <div
+          className="md:hidden flex border-b shrink-0"
+          style={{ borderColor: "var(--kl-app-border, rgba(255,255,255,0.08))" }}
+        >
           <button
             onClick={() => setMobileTab("voice")}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition ${
+            aria-selected={mobileTab === "voice"}
+            role="tab"
+            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
               mobileTab === "voice"
-                ? "text-cyan-400 border-b-2 border-cyan-400 bg-cyan-500/5"
+                ? "text-[var(--kl-gold-app,#D4AF37)] bg-[var(--kl-gold-app,#D4AF37)]/5 border-b-2 border-[var(--kl-gold-app,#D4AF37)]"
                 : "text-white/40 hover:text-white/60"
             }`}
           >
@@ -84,9 +118,11 @@ export default function InterviewRoom() {
           </button>
           <button
             onClick={() => setMobileTab("code")}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition ${
+            aria-selected={mobileTab === "code"}
+            role="tab"
+            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
               mobileTab === "code"
-                ? "text-violet-400 border-b-2 border-violet-400 bg-violet-500/5"
+                ? "text-[var(--kl-gold-app,#D4AF37)] bg-[var(--kl-gold-app,#D4AF37)]/5 border-b-2 border-[var(--kl-gold-app,#D4AF37)]"
                 : "text-white/40 hover:text-white/60"
             }`}
           >
