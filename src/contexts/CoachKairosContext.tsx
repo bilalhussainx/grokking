@@ -292,6 +292,18 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
       setIsStreaming(false);
     }
 
+    // Broadcast a completion event so data-backed pages (/schools, /cc/essays,
+    // activities optimizer, etc.) can refetch state that the coach may have
+    // mutated server-side via runCoachExtraction. Any listener can ignore it
+    // when not relevant.
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("kairos:message-complete", {
+          detail: { mode: currentMode, content: finalContent, source: extra?.sourceEvent ?? null },
+        })
+      );
+    }
+
     if (voiceEnabled && finalContent.trim()) {
       setIsSpeaking(true);
       speak(finalContent, language)

@@ -78,6 +78,17 @@ export default function SchoolsPage() {
     loadMySchools();
   }, [loadMySchools]);
 
+  // Refetch when Coach Kairos completes a message. The coach extracts school
+  // mentions ("I've added Stanford, MIT, …") into cc_student_schools on the
+  // server — without this listener, the user has to manually refresh /schools
+  // to see anything the coach added during the current session.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => loadMySchools();
+    window.addEventListener("kairos:message-complete", handler);
+    return () => window.removeEventListener("kairos:message-complete", handler);
+  }, [loadMySchools]);
+
   // Auto-open Coach Kairos on first mount so guests arriving from the hero
   // chat handoff link continue the conversation without an extra click. Only
   // opens once per page visit — if the user closes it, it stays closed.

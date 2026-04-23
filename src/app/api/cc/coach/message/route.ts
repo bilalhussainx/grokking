@@ -400,11 +400,11 @@ export async function POST(req: NextRequest) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: chunk, mode })}\n\n`));
         });
 
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true, mode })}\n\n`));
-        controller.close();
-
-        // Save assistant message, then run extraction. Await the whole chain so
-        // the route handler doesn't cut off background work when the response closes.
+        // Save assistant message, then run extraction BEFORE emitting `done` +
+        // closing. Previously close() fired first and the client got `done:true`
+        // while the extraction (which inserts cc_student_schools, etc.) was
+        // still running — any client that refetched on `done` would miss the
+        // writes. Now `done` comes after extraction so a refetch reads fresh rows.
         console.log(`[coach/message] stream done, mode=${mode}, about to save+extract`);
         try {
           const { error: insertErr } = await supabase.from("cc_coach_conversations").insert({
@@ -424,6 +424,9 @@ export async function POST(req: NextRequest) {
         } catch (err) {
           console.error("[coach/message] post-stream task failed:", err);
         }
+
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true, mode })}\n\n`));
+        controller.close();
       } catch {
         controller.enqueue(
           encoder.encode(`data: ${JSON.stringify({ error: "Failed to generate response" })}\n\n`)
