@@ -12,12 +12,20 @@ interface IdentityData {
   state_province?: string | null;
   country?: string | null;
   home_language?: string | null;
+  preferred_language?: string | null;
   is_first_gen?: boolean | null;
   is_international?: boolean | null;
   citizenship_status?: string | null;
   race_ethnicity?: string[] | null;
   gender?: string | null;
 }
+
+const COACH_LANGUAGE_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: "en", label: "English" },
+  { value: "ur", label: "اردو (Urdu)" },
+  { value: "hi", label: "हिंदी (Hindi)" },
+  { value: "pa", label: "ਪੰਜਾਬੀ (Punjabi)" },
+];
 
 interface Props {
   data: IdentityData;
@@ -153,6 +161,20 @@ export default function IdentityForm({ data, onSave }: Props) {
             <option value="OTHER">Other</option>
           </select>
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm text-white/60 mb-1">Coach Kairos language</label>
+        <select
+          value={form.preferred_language || "en"}
+          onChange={(e) => update("preferred_language", e.target.value)}
+          className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#D4AF37]/50"
+        >
+          {COACH_LANGUAGE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+        <Nudge show={(form.preferred_language || "en") !== "en"} text="Coach Kairos will always reply in this language." />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

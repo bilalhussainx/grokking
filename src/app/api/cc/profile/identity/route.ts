@@ -5,7 +5,7 @@ import { financialNeedFromAffordability, type AffordabilityValue } from "@/lib/c
 const ALLOWED_FIELDS = [
   "legal_first_name", "preferred_name", "grade_level", "graduation_year",
   "high_school_name", "high_school_ceeb_code", "state_province", "country",
-  "home_language", "is_first_gen", "is_international", "citizenship_status",
+  "home_language", "preferred_language", "is_first_gen", "is_international", "citizenship_status",
   "race_ethnicity", "gender",
   "affordability_value",
 ];

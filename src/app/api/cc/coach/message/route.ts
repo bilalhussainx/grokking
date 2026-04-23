@@ -11,6 +11,7 @@ import {
 import { streamChat, type ChatMessage } from "@/lib/cc/openrouter";
 import { runCoachExtraction } from "@/lib/cc/coach-extract";
 import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
+import { detectMessageLanguage, buildLanguageInstruction } from "@/lib/cc/detect-language";
 
 function extractEssayIdFromPath(path: string | null | undefined): string | null {
   if (!path) return null;
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
   // Fetch or create student profile
   let { data: profile } = await supabase
     .from("cc_student_profiles")
-    .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at, affordability_value, needs_full_aid")
+    .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at, affordability_value, needs_full_aid, preferred_language")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
     const { data: newProfile } = await supabase
       .from("cc_student_profiles")
       .insert({ user_id: user.id })
-      .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at, affordability_value, needs_full_aid")
+      .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at, affordability_value, needs_full_aid, preferred_language")
       .single();
     profile = newProfile;
   }
@@ -355,7 +356,10 @@ export async function POST(req: NextRequest) {
     needsFullAid: !!(profile as { needs_full_aid?: boolean | null }).needs_full_aid,
   };
 
-  const systemPrompt = buildSystemPrompt(coachContext);
+  const detectedLang = detectMessageLanguage(message);
+  const preferredLang = (profile as { preferred_language?: string | null }).preferred_language ?? null;
+  const languageInstruction = buildLanguageInstruction(detectedLang, preferredLang);
+  const systemPrompt = buildSystemPrompt(coachContext) + languageInstruction;
 
   // Fetch recent conversation history
   const { data: history } = await supabase
