@@ -135,10 +135,10 @@ export default function CCDashboard() {
             return (
               <motion.div key={tool.title} variants={item}>
                 <Link href={tool.href}>
-                  <div className="group h-full rounded-2xl border border-white/10 bg-[#141414] hover:border-[#D4AF37]/40 p-6 transition-all cursor-pointer">
+                  <div className="kl-card-primary group h-full cursor-pointer">
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center shrink-0">
-                        <Icon className="w-5 h-5 text-[#D4AF37]" />
+                      <div className="kl-card-icon shrink-0" style={{ marginBottom: 0 }}>
+                        <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
