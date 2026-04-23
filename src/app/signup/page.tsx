@@ -95,7 +95,7 @@ export default function SignupPage() {
     const supabase = (await import("@/lib/supabase-browser")).createBrowserSupabase();
     await supabase.auth.resend({ type: "signup", email });
     setLoading(false);
-    alert("Confirmation email resent! Check your inbox.");
+    alert("Confirmation email resent. Check your inbox.");
   };
 
   if (success) {

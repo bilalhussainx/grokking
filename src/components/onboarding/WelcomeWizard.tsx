@@ -171,7 +171,7 @@ export default function WelcomeWizard({ userName, onComplete }: WelcomeWizardPro
             >
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-[var(--foreground)]">
-                  Welcome{userName ? `, ${userName}` : ""}!
+                  Welcome{userName ? `, ${userName}` : ""}
                 </h2>
                 <p className="text-sm text-[var(--muted-foreground)] mt-2">
                   What do you need help with?

@@ -117,7 +117,7 @@ export default function WelcomeModal({ userName }: WelcomeModalProps) {
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-white">
                   Welcome to KairosLearn
-                  {firstName ? `, ${firstName}` : ""}!
+                  {firstName ? `, ${firstName}` : ""}
                 </h2>
                 <p className="mt-2 text-sm text-white/50">
                   Here&apos;s what you can do
