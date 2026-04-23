@@ -223,12 +223,17 @@ export default function HomePage() {
             setUserInterests(prefs.learning_interests);
           }
         } else {
-          // Onboarding not completed — redirect to onboarding with the
-          // ?new=1 flag so the onboarding page clears stale localStorage
-          // and renders the form fresh. (Bug fix 2026-04-07: without the
-          // flag, an unfinished onboarding could loop if localStorage and
-          // DB disagreed.)
-          router.push('/onboarding?new=1');
+          // Onboarding not completed — open the coach in intake mode.
+          // The legacy /onboarding wizard now just redirects back here, so
+          // we skip the middleman. Guard against pushing when the browser
+          // is already at the intake URL, otherwise we'd hit a loop when
+          // the user lands on /?coach=open&focus=intake directly.
+          const sp = new URLSearchParams(window.location.search);
+          const alreadyAtIntake =
+            sp.get('coach') === 'open' && sp.get('focus') === 'intake';
+          if (!alreadyAtIntake) {
+            router.replace('/?coach=open&focus=intake');
+          }
         }
       })
       .catch(() => {});
@@ -758,7 +763,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {inProgressCourses.map((course) => {
                 const progress = courseProgress[course.slug] ?? 0;
-                const encouragement = progress >= 75 ? "Almost there!" : progress >= 50 ? "Halfway done!" : progress >= 25 ? "Great start!" : "Keep going!";
+                const encouragement = progress >= 75 ? "Almost there." : progress >= 50 ? "Halfway there." : progress >= 25 ? "Great start." : "Keep going.";
                 return (
                   <Link key={course.slug} href={`/course/${course.slug}`}>
                     <div className="rounded-xl bg-[#141414] border border-white/10 p-4 hover:border-[#D4AF37]/40 transition-all cursor-pointer h-full">

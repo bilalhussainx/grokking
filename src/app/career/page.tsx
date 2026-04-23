@@ -429,7 +429,7 @@ export default function CareerPage() {
 
                           {gap.missingSkills.length === 0 && (
                             <p className="text-emerald-400 text-sm font-medium">
-                              You have all the required skills for this role!
+                              You have all the required skills for this role.
                             </p>
                           )}
                         </div>
