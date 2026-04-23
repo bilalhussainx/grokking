@@ -64,11 +64,11 @@ export default function HeroSection() {
       <div className={styles.bottomFade} aria-hidden="true" />
 
       <div ref={contentRef} className={styles.content} id="hero-content">
-        <p className={styles.eyebrow} id="he">Essays · Activities · School List · Interviews · Recommendations · Sharing</p>
+        <p className={styles.eyebrow} id="he">AI COLLEGE COUNSELOR</p>
 
         <h1 className={styles.headline}>
           <span className={styles.clipLine}>
-            <span className={styles.clipInner} id="hl1">Your college app,</span>
+            <span className={styles.clipInner} id="hl1">Your college application —</span>
           </span>
           <span className={styles.clipLine}>
             <span className={styles.clipInner} id="hl2">
@@ -82,7 +82,7 @@ export default function HeroSection() {
         </p>
 
         <div className={styles.ctas} id="hc">
-          <Link href="/signup" className="cine-btn-primary">Start Your Application — Free</Link>
+          <Link href="/signup" className="cine-btn-primary">Start your application — free</Link>
           <Link href="/cc" className="cine-btn-outline">Explore Coach Kairos</Link>
         </div>
       </div>
