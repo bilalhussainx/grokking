@@ -1,6 +1,7 @@
 import type { CoachMode } from "./coach-mode-detector";
 import { ACTIVITY_RUBRIC_COMPACT, ACTIVITY_ACTION_VERBS, ESSAY_REVIEW_PRINCIPLES, ESSAY_EXPERT_TIPS, ESSAY_STRUCTURAL_PATTERNS } from "./activity-exemplars";
 import type { AffordabilityValue } from "./affordability";
+import { KAIROS_VOICE } from "@/lib/brand-voice";
 
 export interface SchoolPreferences {
   financial_need: string | null;
@@ -99,7 +100,7 @@ const PERSONALITY = `You are Coach Kairos, a college admissions counselor who gu
 - Never recommend the same school twice in one response. When the student already has schools on their list, do not re-suggest ones that are already there — check the "School list" in the application snapshot before proposing adds.`;
 
 export function buildSystemPrompt(ctx: CoachContext): string {
-  const sections: string[] = [PERSONALITY];
+  const sections: string[] = [KAIROS_VOICE, PERSONALITY];
 
   if (ctx.studentName || ctx.grade || ctx.gpaUnweighted) {
     const parts: string[] = [];
