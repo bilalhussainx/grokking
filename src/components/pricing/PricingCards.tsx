@@ -106,7 +106,7 @@ export default function PricingCards() {
           <Check className="w-10 h-10 text-[#D4AF37]" />
         </div>
         <h2 className="text-2xl font-bold text-white mb-2">
-          Welcome to Pro!
+          Welcome to Pro
         </h2>
         <p className="text-white/50">
           Your subscription is active. Redirecting to your dashboard...

@@ -64,7 +64,7 @@ export default function SubsidizedPage() {
       {claimed ? (
         <div className="p-6 rounded-2xl border border-green-500/30 bg-green-500/10 text-center">
           <Check className="w-10 h-10 text-green-400 mx-auto mb-3" />
-          <h2 className="text-lg font-bold text-white mb-1">Pro Activated!</h2>
+          <h2 className="text-lg font-bold text-white mb-1">Pro activated</h2>
           <p className="text-sm text-white/60">Redirecting to pricing page...</p>
         </div>
       ) : result?.eligible ? (
@@ -72,7 +72,7 @@ export default function SubsidizedPage() {
           <div className="flex items-start gap-3 mb-6">
             <Sparkles className="w-5 h-5 text-[#D4AF37] shrink-0 mt-0.5" />
             <div>
-              <h2 className="text-lg font-semibold text-white mb-1">You qualify!</h2>
+              <h2 className="text-lg font-semibold text-white mb-1">You qualify.</h2>
               <p className="text-sm text-white/60">{result.reason}</p>
             </div>
           </div>

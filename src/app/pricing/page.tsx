@@ -106,7 +106,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Do you offer team or classroom pricing?",
-    a: "Yes! Our Teams plan is $10/seat/month (minimum 5 seats) and includes classroom management, student progress dashboards, homework assignment, and admin controls. Contact us for details.",
+    a: "Yes. Our Teams plan is $10/seat/month (minimum 5 seats) and includes classroom management, student progress dashboards, homework assignment, and admin controls. Contact us for details.",
   },
   {
     q: "What are AI credits?",
