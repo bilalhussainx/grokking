@@ -142,7 +142,7 @@ export default function LanguageLessonPage({
         {/* Course Completion */}
         {isLastLesson && course?.nextCourseSlug && (
           <div className="mt-8 p-6 rounded-xl bg-gradient-to-r from-emerald-500/10 to-indigo-500/10 border border-emerald-500/20 text-center">
-            <h3 className="text-xl font-bold text-emerald-400 mb-2">Course Complete!</h3>
+            <h3 className="text-xl font-bold text-emerald-400 mb-2">Course complete</h3>
             <p className="text-slate-400 mb-4">You&apos;ve finished {course.title}. Ready for the next level?</p>
             <Link
               href={`/course/${course.nextCourseSlug}`}
@@ -155,7 +155,7 @@ export default function LanguageLessonPage({
         )}
         {isLastLesson && !course?.nextCourseSlug && (
           <div className="mt-8 p-6 rounded-xl bg-gradient-to-r from-yellow-500/10 to-emerald-500/10 border border-yellow-500/20 text-center">
-            <h3 className="text-xl font-bold text-yellow-400 mb-2">Mastery Achieved!</h3>
+            <h3 className="text-xl font-bold text-yellow-400 mb-2">Mastery achieved</h3>
             <p className="text-slate-400">You&apos;ve completed the highest level. Keep practicing in voice chat!</p>
           </div>
         )}

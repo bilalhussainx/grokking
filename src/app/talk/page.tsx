@@ -168,7 +168,7 @@ function TalkPageInner() {
     <SignupPrompt
       show={showSignupPrompt}
       onDismiss={() => setShowSignupPrompt(false)}
-      title="Great conversation!"
+      title="Good conversation."
       message="Sign up to save your progress and get unlimited sessions."
     />
   );
@@ -449,7 +449,7 @@ function TalkPageInner() {
           >
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20">
               <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
-              <span className="text-xs font-medium text-indigo-400">Listening — speak now!</span>
+              <span className="text-xs font-medium text-indigo-400">Listening — speak when ready</span>
             </div>
           </motion.div>
         )}

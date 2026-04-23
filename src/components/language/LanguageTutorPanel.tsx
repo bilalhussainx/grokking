@@ -257,7 +257,7 @@ export function LanguageTutorPanel({
                 "text-xs font-medium",
                 voiceAgent.isSpeaking ? "text-emerald-400" : voiceAgent.micMuted ? "text-red-400" : "text-indigo-400"
               )}>
-                {voiceAgent.isSpeaking ? "Tutor speaking..." : voiceAgent.micMuted ? "Mic muted" : "Listening — speak now!"}
+                {voiceAgent.isSpeaking ? "Tutor speaking..." : voiceAgent.micMuted ? "Mic muted" : "Listening — speak when ready"}
               </span>
             </div>
             <button
