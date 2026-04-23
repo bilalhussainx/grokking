@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Building2, List, GitCompare, MessageSquare, Globe } from "lucide-react";
+import { Search, Building2, List, GitCompare, MessageSquare, Globe, Unlock, BadgePercent, ClipboardList, type LucideIcon } from "lucide-react";
 import SchoolCard from "@/components/cc/SchoolCard";
 import SchoolCompareModal from "@/components/cc/SchoolCompareModal";
 import { useCoachKairos } from "@/contexts/CoachKairosContext";
@@ -346,13 +346,14 @@ export default function SchoolsPage() {
             </summary>
             <div className="px-4 pb-4 space-y-3">
               <div className="flex flex-wrap gap-2">
-                <FilterPill active={needBlindIntl} onClick={() => setNeedBlindIntl((v) => !v)} icon="🔓" label="Need-blind intl" />
-                <FilterPill active={meetsFullNeedIntl} onClick={() => setMeetsFullNeedIntl((v) => !v)} icon="💯" label="Meets full need intl" />
-                <FilterPill active={cssProfileRequired} onClick={() => setCssProfileRequired((v) => !v)} icon="📋" label="Accepts CSS Profile" />
+                <FilterPill active={needBlindIntl} onClick={() => setNeedBlindIntl((v) => !v)} icon={Unlock} label="Need-blind intl" />
+                <FilterPill active={meetsFullNeedIntl} onClick={() => setMeetsFullNeedIntl((v) => !v)} icon={BadgePercent} label="Meets full need intl" />
+                <FilterPill active={cssProfileRequired} onClick={() => setCssProfileRequired((v) => !v)} icon={ClipboardList} label="Accepts CSS Profile" />
               </div>
               {needBlindIntl && (
-                <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-xs text-green-200 leading-relaxed">
-                  🔓 Showing schools that are need-blind for international students. These schools will not penalize you for needing financial aid. There are currently {schools.length} in our database.
+                <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-xs text-green-200 leading-relaxed flex items-start gap-2">
+                  <Unlock className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  Showing schools that are need-blind for international students. These schools will not penalize you for needing financial aid. There are currently {schools.length} in our database.
                 </div>
               )}
             </div>
@@ -383,17 +384,17 @@ export default function SchoolsPage() {
   );
 }
 
-function FilterPill({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: string; label: string }) {
+function FilterPill({ active, onClick, icon: Icon, label }: { active: boolean; onClick: () => void; icon: LucideIcon; label: string }) {
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border flex items-center gap-1.5 ${
         active
           ? "bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#D4AF37]"
           : "bg-white/5 border-white/10 text-white/60 hover:text-white/80 hover:bg-white/10"
       }`}
     >
-      <span className="mr-1">{icon}</span>
+      <Icon className="w-3.5 h-3.5" />
       {label}
     </button>
   );

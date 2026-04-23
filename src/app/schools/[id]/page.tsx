@@ -16,6 +16,9 @@ import {
   ChevronRight,
   Loader2,
   ExternalLink,
+  Unlock,
+  ClipboardList,
+  AlertTriangle,
 } from "lucide-react";
 
 interface SchoolDetail {
@@ -200,25 +203,25 @@ export default function SchoolDetailPage({
           {school.need_blind_international && (
             <span
               title="Need-blind for international students — citizenship does not affect admission odds"
-              className="px-2.5 py-1 rounded-md text-[11px] bg-green-500/15 border border-green-500/30 text-green-300 font-medium"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] bg-green-500/15 border border-green-500/30 text-green-300 font-medium"
             >
-              🔓 Need-blind intl
+              <Unlock className="w-3 h-3" /> Need-blind intl
             </span>
           )}
           {school.meets_full_need_international && !school.need_blind_international && (
             <span
               title="Meets 100% of demonstrated need for admitted international students, but is need-aware in admissions"
-              className="px-2.5 py-1 rounded-md text-[11px] bg-yellow-500/15 border border-yellow-500/30 text-yellow-300 font-medium"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] bg-yellow-500/15 border border-yellow-500/30 text-yellow-300 font-medium"
             >
-              ⚠ Need-aware · full need
+              <AlertTriangle className="w-3 h-3" /> Need-aware · full need
             </span>
           )}
           {school.css_profile_required && (
             <span
               title="CSS Profile required for international aid"
-              className="px-2.5 py-1 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60 font-medium"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60 font-medium"
             >
-              📋 CSS Profile
+              <ClipboardList className="w-3 h-3" /> CSS Profile
             </span>
           )}
         </div>
@@ -310,8 +313,9 @@ export default function SchoolDetailPage({
           {school.need_blind_international && (
             <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/30">
               <div className="flex items-center gap-2 mb-2">
+                <Unlock className="w-4 h-4 text-green-300 shrink-0" />
                 <span className="text-green-300 font-semibold text-sm">
-                  🔓 Need-Blind for International Students
+                  Need-Blind for International Students
                 </span>
               </div>
               <p className="text-green-200/90 text-xs leading-relaxed">
@@ -328,8 +332,9 @@ export default function SchoolDetailPage({
           {school.meets_full_need_international && !school.need_blind_international && (
             <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30">
               <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-yellow-300 shrink-0" />
                 <span className="text-yellow-300 font-semibold text-sm">
-                  ⚠ Need-Aware, Meets Full Need
+                  Need-Aware, Meets Full Need
                 </span>
               </div>
               <p className="text-yellow-200/90 text-xs leading-relaxed">
@@ -367,13 +372,13 @@ export default function SchoolDetailPage({
           {(school.css_profile_required || school.fafsa_required_international) && (
             <div className="flex flex-wrap gap-1.5">
               {school.css_profile_required && (
-                <span className="px-2 py-0.5 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60">
-                  📋 CSS Profile required for intl aid
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60">
+                  <ClipboardList className="w-3 h-3" /> CSS Profile required for intl aid
                 </span>
               )}
               {school.fafsa_required_international && (
-                <span className="px-2 py-0.5 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60">
-                  📋 FAFSA required
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-white/5 border border-white/10 text-white/60">
+                  <ClipboardList className="w-3 h-3" /> FAFSA required
                 </span>
               )}
             </div>
