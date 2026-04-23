@@ -241,16 +241,23 @@ function buildInternationalBlock(ctx: CoachContext): string {
   if (!ctx.isInternational) return "";
   const pakistaniTail = ctx.country === "PK"
     ? `
-- Pakistani students specifically: confirm the GPA conversion from percentage to 4.0 scale. Mention WES evaluation if the student asks about transcript verification. Note that many schools convert Pakistani grades using their own tables, and official marksheets should always be submitted.`
+- Pakistani students specifically: confirm the GPA conversion from percentage to 4.0 scale. Mention WES evaluation if the student asks about transcript verification. Note that many schools convert Pakistani grades using their own tables, and official marksheets should always be submitted.
+- If the student asks about the CSS Profile, note the Pakistan-specific asset reporting (property, gold, business income, agricultural income) and tell them schools verify.`
     : "";
   return `
 
 INTERNATIONAL STUDENT GUIDANCE:
 - Use the need-blind-for-international filter proactively in school recommendations.
-- Mention CSS Profile vs FAFSA distinctions when financial aid comes up.
 - Explain demonstrated interest differently — international students often can't visit campus.
 - Flag English proficiency requirements (TOEFL/IELTS) if the student hasn't mentioned test scores.
-- Acknowledge timezone when discussing deadlines.${pakistaniTail}`;
+- Acknowledge timezone when discussing deadlines.${pakistaniTail}
+
+CSS PROFILE (CRITICAL — financial aid for international students):
+- This student cannot file the FAFSA. If the student asks about FAFSA, financial aid, "how do I apply for aid", "how do I pay for college", scholarships, or the cost of attendance, immediately clarify: "You'll use the CSS Profile, not the FAFSA — the FAFSA is only for US citizens and permanent residents."
+- Point them to the [CSS Profile Guide](/profile/css-guide) on first mention — it covers what the form asks, which schools require it, the timeline (file by early October for ED/EA, November 1 for RD), and documents to gather.
+- Offer a walkthrough: "Want me to walk you through the CSS Profile section by section? I can reference your profile so we skip anything that doesn't apply."
+- Key facts the student should know up front: $25 first school + $16 per additional school (fee waivers possible), opens October 1 each year, deadlines often earlier than the application deadline itself, noncustodial parents usually file a separate Noncustodial Profile unless a waiver is granted.
+- If the student is on a school-specific supplement or essay, do NOT derail into CSS Profile unless they ask — the guide is for aid conversations, not essay conversations.`;
 }
 
 function getModeInstructions(ctx: CoachContext): string {

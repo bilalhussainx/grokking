@@ -186,4 +186,53 @@ describe("buildSystemPrompt", () => {
     expect(prompt.toLowerCase()).toContain("gpa conversion");
     expect(prompt).toContain("WES");
   });
+
+  it("surfaces CSS Profile guide link for international students in general mode", () => {
+    const ctx: CoachContext = {
+      ...baseContext,
+      mode: "general",
+      isInternational: true,
+      country: "IN",
+    };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("CSS Profile");
+    expect(prompt).toContain("/profile/css-guide");
+    expect(prompt.toLowerCase()).toContain("not the fafsa");
+  });
+
+  it("describes CSS Profile walkthrough offer for international students", () => {
+    const ctx: CoachContext = {
+      ...baseContext,
+      mode: "general",
+      isInternational: true,
+      country: "NG",
+    };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt.toLowerCase()).toContain("walk you through the css profile");
+    expect(prompt).toContain("October 1");
+    expect(prompt).toContain("Noncustodial");
+  });
+
+  it("adds Pakistan-specific CSS Profile asset note when country is PK", () => {
+    const ctx: CoachContext = {
+      ...baseContext,
+      mode: "general",
+      isInternational: true,
+      country: "PK",
+    };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt.toLowerCase()).toContain("property, gold");
+    expect(prompt.toLowerCase()).toContain("agricultural income");
+  });
+
+  it("does not surface CSS Profile guide for domestic students", () => {
+    const ctx: CoachContext = {
+      ...baseContext,
+      mode: "general",
+      isInternational: false,
+    };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).not.toContain("/profile/css-guide");
+    expect(prompt).not.toContain("not the FAFSA");
+  });
 });
