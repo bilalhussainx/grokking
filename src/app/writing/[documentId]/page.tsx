@@ -380,7 +380,7 @@ export default function DocumentEditorPage() {
                       >
                         <Sparkles className="w-6 h-6 mx-auto mb-2 text-emerald-400" />
                         <p className="text-sm font-semibold text-emerald-400">
-                          Pipeline Complete!
+                          Pipeline complete
                         </p>
                         <p className="text-xs text-[var(--muted-foreground)] mt-1">
                           Your document has been through all 5 stages.

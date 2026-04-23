@@ -54,7 +54,7 @@ export default function ReorderPanel({
       {isAlreadyOptimal ? (
         <div className="p-4 rounded-xl border border-green-500/20 bg-green-500/5 text-center">
           <Check className="w-6 h-6 text-green-400 mx-auto mb-2" />
-          <p className="text-sm text-green-400">Your current order is already optimal!</p>
+          <p className="text-sm text-green-400">Your current order is already optimal.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-[1fr,auto,1fr] gap-4">

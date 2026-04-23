@@ -55,7 +55,7 @@ export default function QuickAcademicPrompt({ onComplete }: Props) {
       >
         <Check className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
         <p className="text-sm font-medium text-emerald-300">
-          Got it! Coach Kairos can now recommend schools for you.
+          Got it. Coach Kairos can now recommend schools for you.
         </p>
       </motion.div>
     );

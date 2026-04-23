@@ -95,7 +95,7 @@ export default function GapAnalysis({ gaps, flags, overallStrength }: GapAnalysi
 
       {gaps.length === 0 && flags.length === 0 && (
         <div className="p-4 rounded-xl border border-green-500/20 bg-green-500/5 text-center">
-          <p className="text-sm text-green-400">No gaps or red flags found — your list looks solid!</p>
+          <p className="text-sm text-green-400">No gaps or red flags found — your list looks solid.</p>
         </div>
       )}
     </div>

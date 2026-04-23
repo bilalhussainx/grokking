@@ -174,10 +174,10 @@ export default function InterviewRoadmapPage() {
             <div className="text-center mb-8">
               <CheckCircle className="w-16 h-16 text-[#D4AF37] mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-white mb-2">
-                Your Personalized Roadmap is Ready, {formData.name}!
+                Your personalized roadmap is ready, {formData.name}.
               </h2>
               <p className="text-gray-300">
-                Your roadmap is ready below! Bookmark this page to reference it later.
+                Your roadmap is ready below. Bookmark this page to reference it later.
               </p>
             </div>
 
