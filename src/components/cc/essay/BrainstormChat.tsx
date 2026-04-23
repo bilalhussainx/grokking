@@ -186,12 +186,16 @@ export default function BrainstormChat({
   });
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [voiceOn, setVoiceOn] = useState(false);
+  const [voiceUnsupported, setVoiceUnsupported] = useState<string | null>(null);
+  const [voiceInterim, setVoiceInterim] = useState("");
   const [rightTab, setRightTab] = useState<"tips" | "canvas">("tips");
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const startedRef = useRef(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
 
   const currentLang = LANGUAGES.find((l) => l.code === langCode) ?? LANGUAGES[0];
   const userTurnCount = messages.filter((m) => m.role === "user").length;
@@ -246,6 +250,12 @@ export default function BrainstormChat({
     }
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("coach-language-change", { detail: code }));
+    }
+    // If voice is on, restart the recognizer in the new locale so the student's
+    // next utterance is transcribed correctly.
+    if (voiceOn) {
+      stopRecognition();
+      setTimeout(() => startRecognition(), 100);
     }
   };
 
@@ -310,8 +320,96 @@ export default function BrainstormChat({
     );
   };
 
+  // ── Voice input via Web Speech API ───────────────────────────────────────
+  // Browser-native dictation (Chrome/Edge/Safari). When voice mode is on, the
+  // user's speech in the chosen language is transcribed live into the input
+  // field. Final transcripts auto-send so the student doesn't have to hit
+  // Enter after each utterance. No backend change needed — transcripts go
+  // through the normal /api/cc/essays/<id>/brainstorm streaming endpoint.
+  //
+  // BCP-47 locale map — keeps the recognizer in the student's chosen language.
+  const LOCALE: Record<string, string> = {
+    en: "en-US", es: "es-ES", hi: "hi-IN", ur: "ur-PK",
+    pa: "pa-IN", fr: "fr-FR", ja: "ja-JP",
+  };
+
+  const startRecognition = () => {
+    if (typeof window === "undefined") return false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      setVoiceUnsupported(
+        "Voice input isn't supported in this browser. Chrome, Edge, or Safari works best.",
+      );
+      return false;
+    }
+    const rec = new SR();
+    rec.lang = LOCALE[langCode] ?? "en-US";
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onresult = (event: any) => {
+      let interim = "";
+      let finalText = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) finalText += t;
+        else interim += t;
+      }
+      setVoiceInterim(interim);
+      if (finalText.trim()) {
+        setVoiceInterim("");
+        sendMessage(finalText.trim());
+      }
+    };
+    rec.onerror = () => {
+      setVoiceInterim("");
+    };
+    rec.onend = () => {
+      // Auto-restart while voice toggle is still on, unless we're streaming.
+      if (recognitionRef.current && voiceOn && !streaming) {
+        try {
+          rec.start();
+        } catch {
+          /* ignore duplicate-start errors */
+        }
+      }
+    };
+    try {
+      rec.start();
+    } catch {
+      /* mic might already be live */
+    }
+    recognitionRef.current = rec;
+    setVoiceUnsupported(null);
+    return true;
+  };
+
+  const stopRecognition = () => {
+    const rec = recognitionRef.current;
+    recognitionRef.current = null;
+    setVoiceInterim("");
+    if (rec) {
+      try { rec.stop(); } catch { /* ignore */ }
+    }
+  };
+
+  useEffect(() => {
+    return () => stopRecognition();
+  }, []);
+
   const handleVoiceToggle = () => {
-    setVoiceOn((v) => !v);
+    setVoiceOn((prev) => {
+      const next = !prev;
+      if (next) {
+        const ok = startRecognition();
+        if (!ok) return false;
+      } else {
+        stopRecognition();
+      }
+      return next;
+    });
   };
 
   const phaseExchangesLabel = `${userTurnCount} exchange${userTurnCount === 1 ? "" : "s"}`;
@@ -458,26 +556,98 @@ export default function BrainstormChat({
             </div>
           )}
 
-          {/* Chat thread */}
-          <div className="kl-chat-thread flex-1 overflow-y-auto" style={{ maxHeight: "calc(100vh - 340px)" }}>
-            {messages.map((msg, i) => (
-              <div key={i} className={`kl-msg-row ${msg.role === "user" ? "is-user" : ""}`}>
-                <div className={`kl-msg-avatar ${msg.role === "user" ? "is-user" : "is-coach"}`} aria-hidden>
-                  {msg.role === "user" ? "S" : "K"}
-                </div>
-                <div className={`kl-msg-bubble ${msg.role === "user" ? "is-user" : "is-coach"}`}>
-                  {msg.content
-                    ? renderRich(msg.content)
-                    : <span className="inline-block w-4 h-4 border-2 border-white/20 border-t-[var(--kl-gold-app,#D4AF37)] rounded-full animate-spin" />}
-                </div>
+          {/* Chat thread — inline theme picker renders directly under the last
+              assistant message so the student sees clickable themes exactly
+              where they just read the coach ask "which of these resonates". */}
+          {(() => {
+            const lastAssistantIdx = [...messages].reverse().findIndex((m) => m.role === "assistant");
+            const lastIdx = lastAssistantIdx === -1 ? -1 : messages.length - 1 - lastAssistantIdx;
+            return (
+              <div className="kl-chat-thread flex-1 overflow-y-auto" style={{ maxHeight: "calc(100vh - 340px)" }}>
+                {messages.map((msg, i) => (
+                  <div key={i}>
+                    <div className={`kl-msg-row ${msg.role === "user" ? "is-user" : ""}`}>
+                      <div className={`kl-msg-avatar ${msg.role === "user" ? "is-user" : "is-coach"}`} aria-hidden>
+                        {msg.role === "user" ? "S" : "K"}
+                      </div>
+                      <div className={`kl-msg-bubble ${msg.role === "user" ? "is-user" : "is-coach"}`}>
+                        {msg.content
+                          ? renderRich(msg.content)
+                          : <span className="inline-block w-4 h-4 border-2 border-white/20 border-t-[var(--kl-gold-app,#D4AF37)] rounded-full animate-spin" />}
+                      </div>
+                    </div>
+                    {i === lastIdx && themes.length > 0 && !streaming && (
+                      <div
+                        className="mt-3 ml-11 mr-0 p-4 rounded-xl"
+                        style={{
+                          background: "rgba(212,175,55,0.06)",
+                          border: "1px solid var(--kl-app-gold-edge, rgba(212, 175, 55, 0.22))",
+                          maxWidth: 620,
+                        }}
+                      >
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <Sparkles className="w-3.5 h-3.5 text-[var(--kl-gold-app,#D4AF37)]" />
+                          <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[var(--kl-gold-app,#D4AF37)] font-mono">
+                            Pick a theme to develop
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {themes.map((theme) => {
+                            const selected = selectedThemes.includes(theme);
+                            return (
+                              <button
+                                key={theme}
+                                type="button"
+                                onClick={() => toggleTheme(theme)}
+                                className={`kl-theme-chip ${selected ? "is-selected" : "is-hot"}`}
+                                style={{ padding: "8px 14px", fontSize: 13 }}
+                              >
+                                <span className="kl-chip-dot" aria-hidden />
+                                <span className="leading-snug">{theme}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {selectedThemes.length > 0 ? (
+                          <button
+                            type="button"
+                            onClick={() => onAdvanceToOutline(selectedThemes)}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--kl-gold-app,#D4AF37)] text-black text-[13px] font-semibold hover:bg-[var(--kl-gold-hover-app,#C4A030)] transition-colors"
+                          >
+                            Continue with {selectedThemes.length} theme{selectedThemes.length === 1 ? "" : "s"}
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        ) : (
+                          <div className="text-[11.5px] text-white/50 italic">
+                            Tap one or more chips above, then press{" "}
+                            <strong className="text-white/75 not-italic">Continue</strong>.
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <div ref={bottomRef} />
               </div>
-            ))}
-            <div ref={bottomRef} />
-          </div>
+            );
+          })()}
 
           {errorBanner && (
             <div className="px-3 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-xs text-red-300">
               {errorBanner}
+            </div>
+          )}
+
+          {voiceUnsupported && (
+            <div className="px-3 py-2 rounded-lg border border-amber-500/30 bg-amber-500/10 text-xs text-amber-300">
+              {voiceUnsupported}
+            </div>
+          )}
+
+          {voiceOn && voiceInterim && (
+            <div className="px-3 py-2 rounded-lg border border-[var(--kl-app-gold-edge,rgba(212,175,55,0.22))] bg-[var(--kl-gold-app,#D4AF37)]/10 text-xs text-[var(--kl-gold-app,#D4AF37)] flex items-center gap-2">
+              <VoiceWaveform active />
+              <span className="italic">{voiceInterim}</span>
             </div>
           )}
 
