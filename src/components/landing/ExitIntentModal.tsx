@@ -7,6 +7,7 @@
 //
 // Plan: docs/superpowers/plans/2026-04-22-guest-trial-funnel.md § 8.5
 import { useEffect, useRef, useState } from "react";
+import { X, Check } from "lucide-react";
 
 const EXIT_INTENT_ENABLED =
   process.env.NEXT_PUBLIC_EXIT_INTENT_ENABLED !== "false";
@@ -103,15 +104,15 @@ export default function ExitIntentModal({ armThreshold = "productive" }: Props) 
       >
         <button
           onClick={() => setShown(false)}
-          className="absolute top-3 right-3 text-white/40 hover:text-white/70 text-sm"
+          className="absolute top-3 right-3 text-white/40 hover:text-white/70"
           aria-label="Close"
         >
-          ✕
+          <X className="w-4 h-4" />
         </button>
 
         {submitted ? (
           <div className="text-center py-4">
-            <div className="text-2xl mb-3">✓</div>
+            <div className="mb-3 flex justify-center"><Check className="w-6 h-6 text-emerald-400" /></div>
             <div className="text-lg text-white font-medium mb-2">
               Got it — we&apos;ll be in touch.
             </div>

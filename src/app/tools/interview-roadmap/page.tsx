@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Printer, ArrowRight, CheckCircle } from 'lucide-react';
+import { Printer, ArrowRight, CheckCircle, Calendar } from 'lucide-react';
 
 export default function InterviewRoadmapPage() {
   const [formData, setFormData] = useState({
@@ -182,8 +182,8 @@ export default function InterviewRoadmapPage() {
             </div>
 
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-white mb-4">
-                📅 {formData.timeframe === '3months' ? '12-Week' : '24-Week'} Plan for {formData.experience.charAt(0).toUpperCase() + formData.experience.slice(1)} Level
+              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-[#D4AF37]" /> {formData.timeframe === '3months' ? '12-Week' : '24-Week'} Plan for {formData.experience.charAt(0).toUpperCase() + formData.experience.slice(1)} Level
               </h3>
               <div className="space-y-4">
                 {currentRoadmap.map((phase, index) => (

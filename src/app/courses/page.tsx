@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { Star } from 'lucide-react';
 import { courses } from '@/data';
 import { getAllLessons } from '@/data/types';
 import { getAllLanguageCourses } from '@/data/languages';
@@ -171,8 +172,8 @@ export default function CoursesPage() {
                           {course.icon}
                         </span>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25">
-                            ★ Recommended
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25">
+                            <Star className="w-3 h-3" /> Recommended
                           </span>
                           <span
                             className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${

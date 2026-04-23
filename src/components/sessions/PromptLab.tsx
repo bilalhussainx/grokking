@@ -3,7 +3,8 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FlaskConical, Play, Loader2, Copy, RotateCcw, Globe,
-  Code2, Sparkles, ChevronDown, History, Wand2
+  Code2, Sparkles, ChevronDown, History, Wand2,
+  Home, BarChart3, FileText, Gamepad2, Package, type LucideIcon,
 } from "lucide-react";
 import type { SessionBroadcastEvent } from "@/types/sessions";
 
@@ -22,40 +23,40 @@ interface PromptRun {
   userId: string;
 }
 
-const PROMPT_TEMPLATES = [
+const PROMPT_TEMPLATES: { label: string; icon: LucideIcon; system: string; prompt: string }[] = [
   {
     label: "Landing Page",
-    icon: "🏠",
+    icon: Home,
     system: "You are a frontend developer. Generate complete, self-contained HTML with inline CSS and JavaScript. Use modern design with gradients, shadows, and animations. The page must be fully functional with no external dependencies.",
     prompt: "Create a modern SaaS landing page for a productivity app called 'FlowState'. Include a hero section with gradient background, feature cards with icons (use emoji), pricing table with 3 tiers, and a footer. Use a dark theme with purple accents.",
   },
   {
     label: "Dashboard UI",
-    icon: "📊",
+    icon: BarChart3,
     system: "You are a UI developer. Generate complete HTML with inline CSS and JS. Create a realistic dashboard with charts (use CSS/SVG), stats cards, and interactive elements. Dark theme, modern design.",
     prompt: "Build a real-time analytics dashboard with: 4 stat cards (revenue, users, conversion rate, avg session), a bar chart showing weekly data (use CSS bars), a recent activity feed, and a sidebar navigation. Dark theme with blue accents.",
   },
   {
     label: "Interactive Form",
-    icon: "📝",
+    icon: FileText,
     system: "You are a frontend developer. Generate complete HTML with inline CSS and JavaScript. Create a polished, accessible form with real-time validation and smooth animations.",
     prompt: "Create a multi-step signup wizard with 3 steps: Personal Info, Preferences, and Confirmation. Include field validation, progress indicator, smooth transitions between steps, and a review summary on the final step. Modern glassmorphism style.",
   },
   {
     label: "Game UI",
-    icon: "🎮",
+    icon: Gamepad2,
     system: "You are a creative developer. Generate complete HTML with inline CSS and JavaScript. Build a simple but polished browser game with smooth animations.",
     prompt: "Create a memory card matching game. 4x4 grid of cards that flip on click. Track score and moves. Include a timer, win detection with confetti animation, and a restart button. Neon/retro theme.",
   },
   {
     label: "Component Library",
-    icon: "🧩",
+    icon: Package,
     system: "You are a design systems engineer. Generate a showcase page with multiple UI components, each in its own section. Include interactive states (hover, active, disabled). All inline CSS.",
     prompt: "Create a component showcase page with: buttons (primary, secondary, ghost, danger), input fields with labels, toggle switches, dropdown menus, notification toasts, modal dialog, and a data table with sortable columns. Dark theme.",
   },
   {
     label: "Custom Prompt",
-    icon: "✨",
+    icon: Sparkles,
     system: "You are a frontend developer. Generate complete, self-contained HTML with inline CSS and JavaScript. The output should be a fully functional web page or application.",
     prompt: "",
   },
@@ -200,7 +201,7 @@ export default function PromptLab({ userRole, userId, sendBroadcast }: Props) {
                 : "text-[var(--muted-foreground)] hover:text-white hover:bg-white/5"
             }`}
           >
-            <span>{t.icon}</span>
+            {(() => { const Icon = t.icon; return <Icon className="w-3.5 h-3.5" />; })()}
             {t.label}
           </button>
         ))}

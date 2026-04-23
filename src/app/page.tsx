@@ -375,7 +375,7 @@ export default function HomePage() {
                 },
                 {
                   name: "Jamal",
-                  emoji: "🎓",
+                  emoji: null,
                   label: "Low-income, no college-educated relatives",
                   quote: "I didn't even know you could negotiate financial aid. Kairos helped me compare award letters, draft an appeal, and save $8,000/year. None of my family had been through this before.",
                   stat: "$8K saved in aid",
@@ -398,7 +398,10 @@ export default function HomePage() {
                   <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#D4AF37]/5 rounded-full blur-3xl group-hover:bg-[#D4AF37]/10 transition-colors" />
                   <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-4">
-                      <span className="text-2xl">{persona.emoji}</span>
+                      {persona.emoji
+                        ? <span className="text-2xl">{persona.emoji}</span>
+                        : <span className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37] font-bold text-sm shrink-0">{persona.name[0]}</span>
+                      }
                       <div>
                         <p className="text-white font-semibold">{persona.name}</p>
                         <p className="text-white/40 text-xs">{persona.label}</p>

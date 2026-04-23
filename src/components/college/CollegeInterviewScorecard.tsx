@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ArrowLeft, RotateCcw, FileText, AlertCircle, Star } from "lucide-react";
+import { Loader2, ArrowLeft, RotateCcw, FileText, AlertCircle, Star, Check } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
 import { useAuth } from "@/contexts/AuthContext";
 import SignupPrompt from "@/components/auth/SignupPrompt";
@@ -217,7 +217,7 @@ export default function CollegeInterviewScorecard() {
             <ul className="space-y-2">
               {sc.strengths.map((s, i) => (
                 <li key={i} className="text-sm text-white/80 leading-snug flex gap-2">
-                  <span className="text-emerald-400 shrink-0">✓</span>
+                  <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
                   <span>{s}</span>
                 </li>
               ))}

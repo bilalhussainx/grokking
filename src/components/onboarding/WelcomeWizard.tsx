@@ -7,7 +7,8 @@ import Confetti from "@/components/gamification/Confetti";
 import {
   Code2, TrendingUp, Languages, Brain,
   Clock, Zap, Rocket, Mic, Search, GraduationCap, Keyboard,
-  ChevronRight, Check, ArrowRight,
+  ChevronRight, Check, ArrowRight, FileEdit, Target, Building2, ClipboardList,
+  type LucideIcon,
 } from "lucide-react";
 import { courses } from "@/data";
 import { COACH_LANGUAGES } from "@/lib/cc/coach-languages";
@@ -69,13 +70,13 @@ const AI_FEATURES = [
 ];
 
 function getRecommendedCourses(selectedInterests: Set<Interest>) {
-  const recommended: { slug: string; title: string; icon: string; reason: string }[] = [];
+  const recommended: { slug: string; title: string; icon: LucideIcon; reason: string }[] = [];
 
-  const CC_PAGES: Record<Interest, { slug: string; title: string; icon: string; reason: string }> = {
-    essays: { slug: "__cc_essays__", title: "Essay Studio", icon: "✍️", reason: "Start brainstorming your personal statement" },
-    interviews: { slug: "__cc_interviews__", title: "Interview Prep", icon: "🎯", reason: "Practice with Ivy+ alumni personas" },
-    schools: { slug: "__cc_schools__", title: "School List Builder", icon: "🏫", reason: "Build your reach, match, and safety list" },
-    activities: { slug: "__cc_activities__", title: "Activities Optimizer", icon: "📋", reason: "Optimize your Common App activities list" },
+  const CC_PAGES: Record<Interest, { slug: string; title: string; icon: LucideIcon; reason: string }> = {
+    essays: { slug: "__cc_essays__", title: "Essay Studio", icon: FileEdit, reason: "Start brainstorming your personal statement" },
+    interviews: { slug: "__cc_interviews__", title: "Interview Prep", icon: Target, reason: "Practice with Ivy+ alumni personas" },
+    schools: { slug: "__cc_schools__", title: "School List Builder", icon: Building2, reason: "Build your reach, match, and safety list" },
+    activities: { slug: "__cc_activities__", title: "Activities Optimizer", icon: ClipboardList, reason: "Optimize your Common App activities list" },
   };
 
   for (const interest of selectedInterests) {
@@ -385,7 +386,7 @@ export default function WelcomeWizard({ userName, onComplete }: WelcomeWizardPro
                           : "border-[var(--border)] bg-[var(--card)] hover:bg-[var(--card-hover)]"
                       }`}
                     >
-                      <span className="text-2xl">{course.icon}</span>
+                      {(() => { const Icon = course.icon; return <Icon className="w-6 h-6 text-[var(--muted-foreground)] shrink-0" />; })()}
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium text-[var(--foreground)]">{course.title}</div>
                         <div className="text-[11px] text-[var(--muted-foreground)]">{course.reason}</div>

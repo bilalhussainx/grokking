@@ -160,9 +160,11 @@ export default function InterviewPrepPage() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
                   {persona ? (
-                    <span className="text-lg">{SCHOOL_EMOJIS[persona.id] || "🎓"}</span>
+                    SCHOOL_EMOJIS[persona.id]
+                      ? <span className="text-lg">{SCHOOL_EMOJIS[persona.id]}</span>
+                      : <GraduationCap className="w-5 h-5 text-white/60" />
                   ) : (
-                    <span className="text-lg opacity-30">🎓</span>
+                    <GraduationCap className="w-5 h-5 text-white/20" />
                   )}
                   <div>
                     <p className="text-sm font-medium text-white">

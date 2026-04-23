@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import { Check, X } from "lucide-react";
 import { useCredentialWallet } from "@/hooks/useCredentialWallet";
 
 interface Diploma {
@@ -138,7 +139,7 @@ function CredentialsPageInner() {
                 </p>
               )}
               {wallet.linkedToSupabase && (
-                <p className="text-emerald-400">✓ Wallet linked</p>
+                <p className="text-emerald-400 flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Wallet linked</p>
               )}
               <button
                 type="button"
@@ -203,11 +204,13 @@ function CredentialsPageInner() {
                     {d.description}
                   </p>
                   <p
-                    className={`mb-4 text-xs ${
+                    className={`mb-4 text-xs flex items-start gap-1 ${
                       d.eligible ? "text-emerald-400" : "text-purple-200/50"
                     }`}
                   >
-                    {d.eligible ? "✓ " : "✗ "}
+                    {d.eligible
+                      ? <Check className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                      : <X className="w-3.5 h-3.5 shrink-0 mt-0.5" />}
                     {d.reason}
                   </p>
                   <div className="mt-auto">
