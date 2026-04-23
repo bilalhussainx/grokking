@@ -138,7 +138,7 @@ export default function DailyMissions() {
               <h3 className="text-sm font-bold text-white">Today's Missions</h3>
               <p className="text-[10px] text-white/40">
                 {allComplete
-                  ? "All done! See you tomorrow."
+                  ? "All done. See you tomorrow."
                   : `${completedCount}/${DAILY_MISSIONS.length} complete · resets at midnight`}
               </p>
             </div>
@@ -226,7 +226,7 @@ export default function DailyMissions() {
           >
             <div className="text-center">
               <Trophy className="w-12 h-12 text-[#D4AF37] mx-auto mb-2" />
-              <p className="text-lg font-bold text-white">All missions complete!</p>
+              <p className="text-lg font-bold text-white">All missions complete.</p>
               <p className="text-xs text-white/60">+100 XP bonus &middot; streak protected</p>
             </div>
           </motion.div>

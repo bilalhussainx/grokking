@@ -84,7 +84,7 @@ export default function DidYouKnowCard({
                   >
                     <Sparkles className="w-3 h-3 text-yellow-400" />
                     <span className="text-[11px] font-semibold text-yellow-400">
-                      +5 XP earned!
+                      +5 XP earned
                     </span>
                   </motion.div>
                 )}

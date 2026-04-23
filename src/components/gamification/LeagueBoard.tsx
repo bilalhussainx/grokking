@@ -42,7 +42,7 @@ export default function LeagueBoard() {
   if (!data || data.members.length === 0) {
     return (
       <div className="text-center py-12 text-white/40">
-        No leaderboard data yet. Start earning XP!
+        No leaderboard data yet. Start earning XP.
       </div>
     );
   }

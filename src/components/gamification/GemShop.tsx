@@ -79,7 +79,7 @@ export default function GemShop() {
 
       if (res.ok) {
         setOwned((prev) => new Set([...prev, item.id]));
-        setToast(`Purchased ${item.name}!`);
+        setToast(`Purchased ${item.name}.`);
         refreshProfile();
         setTimeout(() => setToast(null), 3000);
       } else {

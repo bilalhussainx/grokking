@@ -27,7 +27,7 @@ export default function StreakBadge() {
     <div className="hidden sm:flex items-center gap-3">
       <div
         className={`flex items-center gap-1 px-2 py-1 rounded-lg border ${bgClass} ${textClass} text-xs font-semibold ${shouldPulse ? "animate-pulse" : ""}`}
-        title={`${streak}-day learning streak!`}
+        title={`${streak}-day learning streak`}
       >
         <Flame className="w-3.5 h-3.5" />
         {streak}

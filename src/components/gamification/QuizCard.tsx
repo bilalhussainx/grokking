@@ -241,7 +241,7 @@ export default function QuizCard({
                 </div>
                 <h3 className="text-white font-bold text-lg mb-1">
                   {correctCount === questions.length
-                    ? "Perfect Score!"
+                    ? "Perfect score"
                     : `${correctCount}/${questions.length} Correct`}
                 </h3>
                 <p className="text-white/50 text-sm mb-2">
