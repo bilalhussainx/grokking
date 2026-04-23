@@ -924,37 +924,18 @@ function DemoVideo() {
             overflow: "hidden",
           }}
         >
-          {/* If a rendered MP4 is present, prefer it. Otherwise the live HTML
-              preview renders the same 5-scene composition in an iframe. */}
-          <video
-            src="/media/kairos-demo.mp4"
-            poster="/media/kairos-demo-poster.jpg"
-            controls
-            preload="metadata"
-            playsInline
+          <iframe
+            src="/KairosLearn Demo Video.html"
+            title="KairosLearn 90-second demo"
+            loading="lazy"
+            allow="autoplay; fullscreen"
             style={{
               position: "absolute",
               inset: 0,
               width: "100%",
               height: "100%",
-              objectFit: "cover",
-              background: "#0a0d15",
-            }}
-            onError={(e) => {
-              // Fallback to the self-playing HTML preview if the MP4 is missing.
-              const video = e.currentTarget;
-              const wrap = video.parentElement;
-              if (!wrap) return;
-              video.style.display = "none";
-              const existing = wrap.querySelector("iframe");
-              if (existing) return;
-              const iframe = document.createElement("iframe");
-              iframe.src = "/media/kairos-demo.html";
-              iframe.title = "KairosLearn 90-second demo";
-              iframe.loading = "lazy";
-              iframe.style.cssText =
-                "position:absolute;inset:0;width:100%;height:100%;border:0;background:#05080d;";
-              wrap.appendChild(iframe);
+              border: 0,
+              background: "#05080d",
             }}
           />
         </div>
