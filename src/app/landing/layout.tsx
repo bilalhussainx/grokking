@@ -1,23 +1,8 @@
-import { Cormorant_Garamond, DM_Sans } from 'next/font/google'
+import type { ReactNode } from 'react'
 
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
-  display: 'swap',
-})
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  variable: '--font-dm-sans',
-  display: 'swap',
-})
-
-export default function LandingLayout({ children }: { children: React.ReactNode }) {
+export default function LandingLayout({ children }: { children: ReactNode }) {
   return (
-    <div className={`${cormorant.variable} ${dmSans.variable}`}>
+    <div className="kl-surface-landing">
       {children}
     </div>
   )
