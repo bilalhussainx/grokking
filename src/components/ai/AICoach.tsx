@@ -989,25 +989,28 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
           </div>
         )}
         {messages.map((msg) => (
-          <div key={msg.id}>
+          <div key={msg.id} className="flex items-start gap-2">
+            {msg.role !== 'user' && (
+              <span className="kl-coach-avatar" aria-hidden>K</span>
+            )}
             {msg.role === 'user' ? (
-              <div className="flex justify-end">
-                <div className="bg-blue-500/15 border border-blue-500/20 rounded-lg px-3 py-2 max-w-[85%]">
-                  <p className="text-xs text-white/80 leading-relaxed">{msg.text}</p>
-                </div>
+              <div className="kl-coach-bubble kl-coach-user">
+                <p className="text-xs leading-relaxed whitespace-pre-wrap">{msg.text}</p>
               </div>
             ) : (
-              <div className={`p-2.5 rounded-lg border-l-2 ${getTypeColor(msg.type)}`}>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="text-sm">{getTypeIcon(msg.type)}</span>
-                  <span className="text-[10px] text-white/30 uppercase tracking-wider font-medium">
-                    {msg.type === 'scroll' ? 'reading along' : msg.type || 'coach'}
-                  </span>
-                </div>
-                <p className="text-white/80 text-xs leading-relaxed whitespace-pre-wrap">
+              <div className="kl-coach-bubble kl-coach-ai flex-1 min-w-0">
+                {msg.type && msg.type !== 'coach' && (
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className="text-sm">{getTypeIcon(msg.type)}</span>
+                    <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium">
+                      {msg.type === 'scroll' ? 'reading along' : msg.type}
+                    </span>
+                  </div>
+                )}
+                <p className="text-xs leading-relaxed whitespace-pre-wrap">
                   {msg.text}
                   {isStreaming && messages[messages.length - 1]?.id === msg.id && (
-                    <span className="inline-block w-1.5 h-3.5 bg-blue-400 ml-0.5 animate-pulse" />
+                    <span className="inline-block w-1.5 h-3.5 bg-[var(--kl-gold-app,#D4AF37)] ml-0.5 animate-pulse" />
                   )}
                 </p>
               </div>
