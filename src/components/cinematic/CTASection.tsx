@@ -25,7 +25,7 @@ export default function CTASection() {
           marginBottom: 28,
         }}
       >
-        Your counselor is waiting
+        YOUR COUNSELOR IS WAITING
       </p>
 
       <h2
@@ -42,8 +42,8 @@ export default function CTASection() {
           marginRight: 'auto',
         }}
       >
-        Every student deserves a counselor who{' '}
-        <em style={{ fontStyle: 'italic', color: '#d4a84b' }}>actually knows them.</em>
+        Every student deserves a counselor —{' '}
+        <em style={{ fontStyle: 'italic', color: '#d4a84b' }}>one who actually knows them.</em>
       </h2>
 
       <p
