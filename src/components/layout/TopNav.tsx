@@ -10,6 +10,7 @@ import { useXP } from "@/contexts/XPContext";
 import CreditBadge from "@/components/auth/CreditBadge";
 import StreakBadge from "@/components/gamification/StreakBadge";
 import { KairosLogoIcon } from "@/components/ui/SamsaraLogo";
+import TopNavLanguagePicker from "@/components/layout/TopNavLanguagePicker";
 
 interface TopNavProps {
   courseTitle?: string;
@@ -76,6 +77,8 @@ export default function TopNav({
             saved
           </span>
         )}
+
+        {user && <TopNavLanguagePicker className="hidden md:inline-block" />}
 
         {courseTitle && (
           <div className="hidden sm:flex items-center gap-2.5">
