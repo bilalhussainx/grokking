@@ -140,4 +140,50 @@ describe("buildSystemPrompt", () => {
     const needAwareSchools = ["Columbia", "Penn", "Duke", "Vanderbilt", "Rice", "Pomona", "Wellesley", "Middlebury"];
     expect(needAwareSchools.some((s) => prompt.includes(s))).toBe(true);
   });
+
+  it("includes first-gen guidance block when isFirstGen is true", () => {
+    const ctx: CoachContext = { ...baseContext, mode: "general", isFirstGen: true };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("QuestBridge");
+    expect(prompt).toContain("Posse");
+    expect(prompt).toContain("College Advising Corps");
+    for (const school of ["UMich", "UNC-Chapel Hill", "UT Austin", "Vassar", "Amherst", "Williams"]) {
+      expect(prompt).toContain(school);
+    }
+  });
+
+  it("excludes first-gen guidance block when isFirstGen is false", () => {
+    const ctx: CoachContext = { ...baseContext, mode: "general", isFirstGen: false };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).not.toContain("QuestBridge");
+    expect(prompt).not.toContain("Posse");
+  });
+
+  it("includes unconditional international block when isInternational is true and needsFullAid is false", () => {
+    const ctx: CoachContext = {
+      ...baseContext,
+      mode: "school-builder",
+      isInternational: true,
+      country: "IN",
+      needsFullAid: false,
+      affordabilityValue: "30k_50k",
+    };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("CSS Profile");
+    expect(prompt).toContain("TOEFL");
+    expect(prompt.toLowerCase()).toContain("timezone");
+  });
+
+  it("includes Pakistani-specific guidance when isInternational and country is PK", () => {
+    const ctx: CoachContext = {
+      ...baseContext,
+      mode: "general",
+      isInternational: true,
+      country: "PK",
+    };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt.toLowerCase()).toContain("pakistan");
+    expect(prompt.toLowerCase()).toContain("gpa conversion");
+    expect(prompt).toContain("WES");
+  });
 });

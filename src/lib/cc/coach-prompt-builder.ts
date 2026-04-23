@@ -224,6 +224,35 @@ function formatFocusEssay(e: FocusEssay): string {
   return lines.join("\n");
 }
 
+function buildFirstGenBlock(ctx: CoachContext): string {
+  if (!ctx.isFirstGen) return "";
+  return `
+
+FIRST-GEN GUIDANCE (CRITICAL): This student is the first in their family to attend college. Adjust your guidance accordingly:
+- Proactively surface QuestBridge National College Match, Posse Foundation, and College Advising Corps — these are dedicated first-gen support programs.
+- Recommend schools known for strong first-gen support: UMich, UNC-Chapel Hill, UT Austin, Vassar, Amherst, Williams. Mention these by name when relevant.
+- Frame essay brainstorming around identity, family, and community — not just extracurriculars and achievements.
+- Explain processes the student may not know: demonstrated interest, ED vs EA strategy, FAFSA priority deadlines, the CommonApp workflow itself.
+- NEVER assume the student has college-educated parents to review applications or fill out financial aid forms.
+- Always offer to explain any college term the student might not know.`;
+}
+
+function buildInternationalBlock(ctx: CoachContext): string {
+  if (!ctx.isInternational) return "";
+  const pakistaniTail = ctx.country === "PK"
+    ? `
+- Pakistani students specifically: confirm the GPA conversion from percentage to 4.0 scale. Mention WES evaluation if the student asks about transcript verification. Note that many schools convert Pakistani grades using their own tables, and official marksheets should always be submitted.`
+    : "";
+  return `
+
+INTERNATIONAL STUDENT GUIDANCE:
+- Use the need-blind-for-international filter proactively in school recommendations.
+- Mention CSS Profile vs FAFSA distinctions when financial aid comes up.
+- Explain demonstrated interest differently — international students often can't visit campus.
+- Flag English proficiency requirements (TOEFL/IELTS) if the student hasn't mentioned test scores.
+- Acknowledge timezone when discussing deadlines.${pakistaniTail}`;
+}
+
 function getModeInstructions(ctx: CoachContext): string {
   switch (ctx.mode) {
     case "intake":
@@ -262,12 +291,12 @@ IB: 7=4.0, 6=3.7, 5=3.3, 4=2.7.
 
 Once they give their score, convert it and confirm: "That's roughly X.XX on the US 4.0 scale. Sound right?"
 Then ask about their testing plan: SAT, ACT, both, test-optional, or undecided.
-If they're taking SAT/ACT, ask for their score (or expected score).`;
+If they're taking SAT/ACT, ask for their score (or expected score).${buildFirstGenBlock(ctx)}${buildInternationalBlock(ctx)}`;
       }
       return `MODE: ACADEMIC
 ${ctx.gpaRawDisplay ? `The student's original grade is ${ctx.gpaRawDisplay} (converted to ~${ctx.gpaUnweighted?.toFixed(2)} US 4.0). Reference the original form when discussing their academics — e.g. "your ${ctx.gpaRawDisplay}" — not just the converted number.\n` : ""}Ask for the student's unweighted GPA (on a 4.0 scale). Then ask about their testing plan: SAT, ACT, both, test-optional, or undecided.
 If they're taking SAT/ACT, ask for their score (or expected score).
-Keep it quick — "What's your GPA?" is fine as an opener. If the student volunteers a percentage, CGPA, A-Level, or IB score instead of a 4.0, accept it — convert precisely (e.g. 87% ≈ 3.48) and give band context before moving on.`;
+Keep it quick — "What's your GPA?" is fine as an opener. If the student volunteers a percentage, CGPA, A-Level, or IB score instead of a 4.0, accept it — convert precisely (e.g. 87% ≈ 3.48) and give band context before moving on.${buildFirstGenBlock(ctx)}${buildInternationalBlock(ctx)}`;
 
     case "school-builder": {
       const fullAidBlock = ctx.needsFullAid
@@ -293,7 +322,7 @@ ${ctx.isInternational && !ctx.needsFullAid ? "4. Do they need schools that meet 
 After gathering preferences, say "Let me build your list — give me a moment..." and the system will generate recommendations.
 Present the recommendations grouped by reach/match/safety with a one-line reason for each school.
 The student can accept all, remove specific schools, or ask for alternatives.
-When the student approves the list, confirm: "Done — those schools are being added to your list. Head to [School List Builder](/schools) to see them." Then stop — don't suggest essays or interviews yet.${fullAidBlock}`;
+When the student approves the list, confirm: "Done — those schools are being added to your list. Head to [School List Builder](/schools) to see them." Then stop — don't suggest essays or interviews yet.${fullAidBlock}${buildFirstGenBlock(ctx)}${buildInternationalBlock(ctx)}`;
     }
 
     case "school-browse":
@@ -357,14 +386,14 @@ Your job right now:
 2. Tell them the next move is the [Activities Optimizer](/cc/activities-optimizer) — polishing bullets with the 150-char Common App rubric matters before supplements.
 3. Preview what comes after: once activities are clean, each school on their list has its own supplements to tackle (visible in [School List](/schools) — clicking a school opens its supplement prompts).
 4. End with ONE link: the activities optimizer. Don't drop multiple CTAs.
-Keep it to 3 sentences max.`;
+Keep it to 3 sentences max.${buildFirstGenBlock(ctx)}${buildInternationalBlock(ctx)}`;
       }
       if (ctx.hasEssayReviewed && ctx.hasActivitiesOptimized && !ctx.hasSupplementsStarted) {
         return `MODE: ESSAY (supplements handoff)
 Essay is reviewed, activities are optimized. Next: school-specific supplements.
 
 Point them to [School List](/schools) — each school card clicks through to a detail page showing its supplement prompts. Starting a supplement spins up a full brainstorm → outline → draft → review cycle, same workflow they already used.
-One CTA, keep it tight.`;
+One CTA, keep it tight.${buildFirstGenBlock(ctx)}${buildInternationalBlock(ctx)}`;
       }
       return `MODE: ESSAY
 Help the student with their college essays. You can:
@@ -380,7 +409,7 @@ ${ESSAY_EXPERT_TIPS}
 ${ESSAY_STRUCTURAL_PATTERNS}
 
 ${ESSAY_REVIEW_PRINCIPLES}
-${ctx.hasEssays && !ctx.hasEssayReviewed ? "\nThe student has a draft in progress — nudge them to request a full review in [Essay Studio](/cc/essays) when they feel ready." : ""}`;
+${ctx.hasEssays && !ctx.hasEssayReviewed ? "\nThe student has a draft in progress — nudge them to request a full review in [Essay Studio](/cc/essays) when they feel ready." : ""}${buildFirstGenBlock(ctx)}${buildInternationalBlock(ctx)}`;
     }
 
     case "interview":
@@ -409,7 +438,7 @@ ${ESSAY_EXPERT_TIPS}
 
 ${ESSAY_STRUCTURAL_PATTERNS}
 
-${ESSAY_REVIEW_PRINCIPLES}`;
+${ESSAY_REVIEW_PRINCIPLES}${buildFirstGenBlock(ctx)}${buildInternationalBlock(ctx)}`;
     }
   }
 }
