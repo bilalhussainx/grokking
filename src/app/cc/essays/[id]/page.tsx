@@ -129,15 +129,28 @@ export default function EssayWorkspace({
         <div className="flex items-start gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-              <span className="px-2 py-0.5 rounded-md text-[10px] bg-[#D4AF37]/15 text-[#D4AF37] uppercase tracking-wide font-medium">
+              <span
+                className="px-2.5 py-0.5 rounded-md text-[10px] uppercase tracking-wide font-semibold"
+                style={{
+                  background: "rgba(212,175,55,0.14)",
+                  color: "var(--kl-gold-app, #D4AF37)",
+                  letterSpacing: "0.15em",
+                }}
+              >
                 {essay.essay_type.startsWith("supplement") ? "Supplement" : "Personal Statement"}
               </span>
-              <span className="px-2 py-0.5 rounded-md text-[10px] bg-white/5 border border-white/10 text-white/70 tabular-nums">
+              <span
+                className="text-[11px] tabular-nums"
+                style={{
+                  fontFamily: "var(--kl-font-mono, 'JetBrains Mono', monospace)",
+                  color: "rgba(255,255,255,0.55)",
+                }}
+              >
                 {essay.word_limit} word max
               </span>
               {essay.current_draft && (
-                <span className="text-[10px] text-white/40 tabular-nums">
-                  {essay.current_draft.trim().split(/\s+/).filter(Boolean).length} / {essay.word_limit} words drafted
+                <span className="text-[11px] text-white/45 tabular-nums">
+                  · {essay.current_draft.trim().split(/\s+/).filter(Boolean).length} / {essay.word_limit} words drafted
                 </span>
               )}
             </div>
@@ -236,18 +249,21 @@ export default function EssayWorkspace({
                   </span>
                 </button>
 
-                <h3 className="text-xs text-white/40 uppercase tracking-wide mb-3">Your Draft</h3>
-                <div className="text-sm text-white/80 leading-7 whitespace-pre-wrap">
+                <h3 className="text-xs text-white/40 uppercase tracking-wide mb-3">Your draft</h3>
+                <div className="kl-essay-prose whitespace-pre-wrap">
                   {essay.current_draft || "No draft yet."}
                 </div>
               </div>
             </div>
-            <div className="w-80 shrink-0 border-l border-white/10 min-h-0 overflow-hidden">
+            <aside
+              className="shrink-0 border-l border-white/10 min-h-0 overflow-hidden"
+              style={{ width: 370 }}
+            >
               <RevisionPanel
                 review={essay.revision_comments}
                 loading={reviewLoading}
               />
-            </div>
+            </aside>
           </div>
         )}
       </div>

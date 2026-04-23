@@ -661,3 +661,52 @@
   color: rgba(255, 255, 255, 0.45);
   letter-spacing: 0.02em;
 }
+
+/* =========================================================================
+ * Essay Review — right-rail pinned comments
+ * ========================================================================= */
+.kl-pin {
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--kl-app-border, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.kl-pin .kl-pin-tag {
+  flex-shrink: 0;
+  width: 28px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(212, 175, 55, 0.14);
+  color: var(--kl-gold-app, #D4AF37);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-family: var(--kl-font-mono, 'JetBrains Mono', monospace);
+}
+.kl-pin .kl-pin-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.kl-pin .kl-pin-body {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.55;
+}
+
+/* Essay draft prose block */
+.kl-essay-prose {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.88);
+}
+.kl-essay-prose p {
+  margin: 0 0 1em 0;
+}
