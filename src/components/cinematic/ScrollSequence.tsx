@@ -23,7 +23,7 @@ const PANELS = [
   {
     id:  'seq-p3',
     num: '03 — The Full Picture',
-    heading: <>Every piece, <em>one platform</em></>,
+    heading: <>Every piece — <em>one platform.</em></>,
     body:
       'School list builder with chancing data. Activities optimizer with Common App formatting. Recommendations coach with brag sheets and email drafts. Share everything with your counselor in one link.',
     visual: 'path',
