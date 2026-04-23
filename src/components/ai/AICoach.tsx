@@ -646,10 +646,10 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
   const handleCelebrate = () => {
     if (deepgram.isConnected) {
       deepgram.sendPromptUpdate('The student just solved the problem! Celebrate their achievement and suggest what to try next.');
-      addMessage('I solved it!', 'user', 'user');
+      addMessage('I solved it.', 'user', 'user');
     } else {
       // Reconnect voice for celebration
-      addMessage('I solved it!', 'user', 'user');
+      addMessage('I solved it.', 'user', 'user');
       startVoiceCelebrate().catch(() => {
         sendEvent('Student solved it! Celebrate and suggest next steps.', 'celebrating');
       });
