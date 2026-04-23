@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   BookOpen,
@@ -12,6 +13,8 @@ import {
   ArrowRight,
   GraduationCap,
 } from "lucide-react";
+import FirstGenResourcesCard from "@/components/cc/resources/FirstGenResourcesCard";
+import InternationalGuideCard from "@/components/cc/resources/InternationalGuideCard";
 
 const TOOLS = [
   {
@@ -67,7 +70,39 @@ const item = {
   visible: { y: 0, opacity: 1, transition: { duration: 0.5 } },
 };
 
+interface ProfileFlags {
+  is_first_gen: boolean | null;
+  is_international: boolean | null;
+}
+
 export default function CCDashboard() {
+  const [flags, setFlags] = useState<ProfileFlags>({ is_first_gen: null, is_international: null });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/cc/profile", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && data?.profile) {
+          setFlags({
+            is_first_gen: data.profile.is_first_gen ?? null,
+            is_international: data.profile.is_international ?? null,
+          });
+        }
+      } catch {
+        /* unauthenticated or no profile — cards just stay hidden */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const showFirstGen = flags.is_first_gen === true;
+  const showIntl = flags.is_international === true;
+
   return (
     <div className="min-h-screen bg-[var(--background)]">
       <div className="max-w-4xl mx-auto px-4 pt-16 pb-20">
@@ -123,6 +158,13 @@ export default function CCDashboard() {
             );
           })}
         </motion.div>
+
+        {(showFirstGen || showIntl) && (
+          <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {showFirstGen && <FirstGenResourcesCard />}
+            {showIntl && <InternationalGuideCard />}
+          </div>
+        )}
       </div>
     </div>
   );
