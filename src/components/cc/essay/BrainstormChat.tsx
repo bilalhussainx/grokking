@@ -48,37 +48,97 @@ const LANGUAGES: Lang[] = [
 
 const STORAGE_KEY = "coach-language";
 
+// Extract the leading **bold** label from a theme string, fall back to the
+// first sentence or first 60 chars. Used to dedupe "The school leap — ..."
+// against a later "The school leap: ..." emission.
+function themeKey(t: string): string {
+  const bold = t.match(/\*\*([^*]+)\*\*/);
+  if (bold) return bold[1].trim().toLowerCase();
+  const first = t.split(/[—–:.,]/)[0].trim().toLowerCase();
+  return first.slice(0, 60);
+}
+
+function dedupeThemes(list: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const t of list) {
+    const cleaned = t.replace(/\*\*/g, "").replace(/^["'`]|["'`]$/g, "").trim();
+    if (!cleaned) continue;
+    const k = themeKey(cleaned);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(cleaned);
+  }
+  return out;
+}
+
+// Pull "**Label** — description" paragraphs (prose-form themes) from the text.
+// Catches the case where the coach lists themes as paragraphs rather than
+// bullets, e.g. "**The school leap** — skipping a grade, switching…".
+function extractBoldLabelThemes(text: string): string[] {
+  const out: string[] = [];
+  const paragraphs = text.split(/\n{1,}/);
+  for (const p of paragraphs) {
+    // Only consider paragraphs that START with **Label** (with optional leading
+    // bullet/number) to avoid grabbing inline bolded words from prose.
+    const m = p.match(/^\s*(?:\d+[.)]|[-*•])?\s*\*\*([^*]+)\*\*\s*([—–\-:,]\s*.+)?$/);
+    if (!m) continue;
+    const label = m[1].trim();
+    const tail = (m[2] || "").replace(/^[—–\-:,]\s*/, "").trim();
+    // Keep the description so the chip reads naturally, cap at ~180 chars.
+    const joined = tail ? `${label} — ${tail}` : label;
+    out.push(joined.slice(0, 180));
+  }
+  return out;
+}
+
 function parseThemesBlock(text: string): {
   displayText: string;
   themes: string[];
   awaitingThemes: boolean;
 } {
   const tagged = text.match(/<<THEMES_READY>>([\s\S]*?)<<END_THEMES>>/);
+  const displayText = tagged
+    ? text.replace(/<<THEMES_READY>>[\s\S]*?<<END_THEMES>>\s*/, "").trim()
+    : text;
+
+  // Collect theme candidates from THREE sources and union them:
+  //   1. the tagged <<THEMES_READY>> block (if present)
+  //   2. numbered/bulleted list items in the prose
+  //   3. **Bold label** paragraphs (prose-form themes)
+  // The LLM sometimes emits the block with 2 items but then writes a 3rd
+  // option in prose below (which previously went missing). Unioning catches
+  // all three regardless of which format the model chose.
+  const collected: string[] = [];
+
   if (tagged) {
-    const themes = tagged[1]
-      .split("\n")
-      .map((line) => line.replace(/^\s*[-*]\s*/, "").trim())
-      .filter((line) => line.length > 0);
-    const displayText = text
-      .replace(/<<THEMES_READY>>[\s\S]*?<<END_THEMES>>\s*/, "")
-      .trim();
-    return { displayText, themes, awaitingThemes: false };
+    for (const line of tagged[1].split("\n")) {
+      const v = line.replace(/^\s*[-*]\s*/, "").trim();
+      if (v) collected.push(v);
+    }
   }
+
+  const itemRe = /^\s*(?:\d+[.)]|[-*•])\s+(.+?)\s*$/gm;
+  for (const m of text.matchAll(itemRe)) {
+    const v = m[1].trim();
+    if (v && v.length < 200) collected.push(v);
+  }
+
+  for (const b of extractBoldLabelThemes(text)) {
+    collected.push(b);
+  }
+
+  const themes = dedupeThemes(collected);
 
   const choiceCue =
     /\b(which|pick|choose)\b[^\n?]*\b(feels|resonates|sounds|most|one|these)\b/i.test(text) ||
-    /\b(here are|i have enough|surface.*themes|three concrete themes|two concrete themes)\b/i.test(text);
+    /\b(here are|i have enough|surface.*themes|three concrete themes|two concrete themes|three directions|two directions)\b/i.test(text);
 
-  const itemRe = /^\s*(?:\d+[.)]|[-*•])\s+(.+?)\s*$/gm;
-  const matches = [...text.matchAll(itemRe)];
-  if (matches.length >= 2) {
-    const themes = matches
-      .map((m) => m[1].replace(/\*\*/g, "").replace(/^["'`]|["'`]$/g, "").trim())
-      .filter((t) => t.length > 0 && t.length < 200);
-    return { displayText: text, themes, awaitingThemes: false };
+  if (tagged || themes.length >= 2) {
+    return { displayText, themes, awaitingThemes: false };
   }
 
-  return { displayText: text, themes: [], awaitingThemes: choiceCue };
+  return { displayText, themes: [], awaitingThemes: choiceCue };
 }
 
 function normalizeTranscript(raw: unknown): Message[] {
@@ -213,21 +273,34 @@ export default function BrainstormChat({
   }, []);
 
   useEffect(() => {
+    // Walk messages newest-first. If we find an awaitingThemes hit with no
+    // parsed list, keep searching earlier for a list (the coach may have
+    // listed themes in an earlier turn and just re-prompted). If we find a
+    // list, we union it with any later-mentioned themes in subsequent
+    // assistant messages so the student sees every option the AI has
+    // surfaced — not just the most recent batch.
+    const collected: string[] = [];
+    let sawAwaitingLatest = false;
+    let latestListIndex = -1;
     for (let i = messages.length - 1; i >= 0; i--) {
       if (messages[i].role !== "assistant") continue;
       const parsed = parseThemesBlock(messages[i].content);
       if (parsed.themes.length > 0) {
-        setThemes(parsed.themes);
-        setAwaitingThemes(false);
-        if (parsed.themes.length > 0 && rightTab !== "canvas") setRightTab("canvas");
-        return;
+        if (latestListIndex === -1) latestListIndex = i;
+        collected.push(...parsed.themes);
+      } else if (parsed.awaitingThemes && latestListIndex === -1 && collected.length === 0) {
+        // Most recent assistant turn promised themes but didn't write them —
+        // flag recovery UI. But keep scanning earlier turns for any real list.
+        if (!sawAwaitingLatest) sawAwaitingLatest = true;
       }
-      if (parsed.awaitingThemes) {
-        setAwaitingThemes(true);
-        return;
-      }
+      // Stop once we've gone back 3 assistant messages — older turns are
+      // likely stale topic directions that shouldn't clutter the canvas.
+      if (latestListIndex !== -1 && i < latestListIndex - 4) break;
     }
-    setAwaitingThemes(false);
+    const deduped = dedupeThemes(collected);
+    setThemes(deduped);
+    setAwaitingThemes(sawAwaitingLatest && deduped.length === 0);
+    if (deduped.length > 0 && rightTab !== "canvas") setRightTab("canvas");
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
