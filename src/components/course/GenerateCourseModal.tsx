@@ -191,7 +191,7 @@ export default function GenerateCourseModal({
           {status === "ready" && (
             <div className="text-center space-y-3 py-4">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <p className="text-lg font-bold">Course Ready!</p>
+              <p className="text-lg font-bold">Course ready</p>
               <p className="text-sm text-white/50">
                 Your course has been generated and is ready to explore.
               </p>

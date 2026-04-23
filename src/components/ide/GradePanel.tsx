@@ -78,7 +78,7 @@ export default function GradePanel({ grade, onClose }: GradePanelProps) {
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-[var(--foreground)]">
-                  {grade.passed ? "Great Work!" : grade.overall >= 50 ? "Almost There" : "Keep Trying"}
+                  {grade.passed ? "Great work" : grade.overall >= 50 ? "Almost there" : "Keep trying"}
                 </h3>
                 <p className="text-[10px] text-[var(--muted-foreground)]">AI Auto-Grade</p>
               </div>

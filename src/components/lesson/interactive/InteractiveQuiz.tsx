@@ -131,7 +131,7 @@ export default function InteractiveQuiz({ questions, title }: InteractiveQuizPro
             isCorrect ? "bg-emerald-500/10 text-emerald-200" : "bg-amber-500/10 text-amber-200"
           }`}>
             <p className="font-semibold mb-1">
-              {isCorrect ? "Correct!" : "Not quite."}
+              {isCorrect ? "Correct." : "Not quite."}
             </p>
             <p className="text-white/60">{q.explanation}</p>
           </div>
@@ -144,7 +144,7 @@ export default function InteractiveQuiz({ questions, title }: InteractiveQuizPro
               <div className="text-sm text-white/60">
                 Score: <span className="font-bold text-white">{score}/{questions.length}</span>
                 {score === questions.length && (
-                  <span className="ml-2 text-emerald-400">Perfect!</span>
+                  <span className="ml-2 text-emerald-400">Perfect.</span>
                 )}
               </div>
               <button

@@ -192,7 +192,7 @@ export default function InlineFillBlank({
         >
           {allCorrect ? (
             <>
-              <CheckCircle className="w-4 h-4" /> All correct — well done!
+              <CheckCircle className="w-4 h-4" /> All correct — well done.
             </>
           ) : (
             <>
