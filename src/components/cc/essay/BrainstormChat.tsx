@@ -15,11 +15,18 @@ interface BrainstormChatProps {
 }
 
 // Parses "<<THEMES_READY>>\n- a\n- b\n<<END_THEMES>>" out of the AI reply.
-// Falls back to detecting a markdown-numbered/bulleted theme list when the model
-// skips the structured tags (it happens — "1. **Theme** — description").
-// Returns { displayText, themes } where displayText has the tag block stripped
-// (markdown fallback leaves displayText as-is so the chat still reads naturally).
-function parseThemesBlock(text: string): { displayText: string; themes: string[] } {
+// Falls back to detecting a numbered/bulleted theme list when the model skips
+// the structured tags.
+// Returns { displayText, themes, awaitingThemes } where:
+//   - displayText has the tag block stripped (fallback leaves it as-is)
+//   - themes is the extracted list (empty if none found)
+//   - awaitingThemes is true when the AI clearly said themes are coming but
+//     the parser couldn't find them — triggers a UI recovery prompt.
+function parseThemesBlock(text: string): {
+  displayText: string;
+  themes: string[];
+  awaitingThemes: boolean;
+} {
   const tagged = text.match(/<<THEMES_READY>>([\s\S]*?)<<END_THEMES>>/);
   if (tagged) {
     const themes = tagged[1]
@@ -29,25 +36,30 @@ function parseThemesBlock(text: string): { displayText: string; themes: string[]
     const displayText = text
       .replace(/<<THEMES_READY>>[\s\S]*?<<END_THEMES>>\s*/, "")
       .trim();
-    return { displayText, themes };
+    return { displayText, themes, awaitingThemes: false };
   }
 
-  // Markdown fallback: look for 2+ "1. **Label**" or "- **Label**" items AND a
-  // choice cue ("which feels most", "which resonates", "pick one", etc.).
+  // Choice cue: "which of these...", "pick one", "which resonates", etc.
+  // If the AI also says "I have enough"/"here are" the themes SHOULD be present.
   const choiceCue =
-    /\b(which|pick|choose)\b[^\n?]*\b(feels|resonates|sounds|most|one)\b/i.test(text);
-  if (!choiceCue) return { displayText: text, themes: [] };
+    /\b(which|pick|choose)\b[^\n?]*\b(feels|resonates|sounds|most|one|these)\b/i.test(text) ||
+    /\b(here are|i have enough|surface.*themes|three concrete themes|two concrete themes)\b/i.test(text);
 
-  // Capture the full line after the list marker so themes include the descriptor
-  // (e.g. "Sandbox-to-deployment — the frustration with small models...").
-  const itemRe = /^\s*(?:\d+[.)]|[-*])\s+(.+?)\s*$/gm;
-  const matches = [...text.matchAll(itemRe)].filter((m) => /\*\*/.test(m[1]));
-  if (matches.length < 2) return { displayText: text, themes: [] };
+  // Numbered/bulleted list — allow items WITH OR WITHOUT **bold** markers so we
+  // catch "1. The violin as identity" as well as "1. **Violin** — identity".
+  const itemRe = /^\s*(?:\d+[.)]|[-*•])\s+(.+?)\s*$/gm;
+  const matches = [...text.matchAll(itemRe)];
 
-  const themes = matches
-    .map((m) => m[1].replace(/\*\*/g, "").trim())
-    .filter((t) => t.length > 0);
-  return { displayText: text, themes };
+  if (matches.length >= 2) {
+    const themes = matches
+      .map((m) => m[1].replace(/\*\*/g, "").replace(/^["'`]|["'`]$/g, "").trim())
+      .filter((t) => t.length > 0 && t.length < 200); // drop paragraphs
+    return { displayText: text, themes, awaitingThemes: false };
+  }
+
+  // Choice cue with no parseable list → AI promised themes but forgot to write
+  // them. The UI surfaces a one-click recovery so the student isn't stuck.
+  return { displayText: text, themes: [], awaitingThemes: choiceCue };
 }
 
 function normalizeTranscript(raw: unknown): Message[] {
@@ -82,6 +94,7 @@ export default function BrainstormChat({
   const [streaming, setStreaming] = useState(false);
   const [themes, setThemes] = useState<string[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
+  const [awaitingThemes, setAwaitingThemes] = useState(false);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const startedRef = useRef(false);
@@ -101,15 +114,23 @@ export default function BrainstormChat({
   }, []);
 
   // Re-parse themes whenever the transcript changes (handles reload from DB too).
+  // Also track the "AI promised themes but didn't list them" state so the UI can
+  // surface a recovery prompt.
   useEffect(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
       if (messages[i].role !== "assistant") continue;
       const parsed = parseThemesBlock(messages[i].content);
       if (parsed.themes.length > 0) {
         setThemes(parsed.themes);
+        setAwaitingThemes(false);
+        return;
+      }
+      if (parsed.awaitingThemes) {
+        setAwaitingThemes(true);
         return;
       }
     }
+    setAwaitingThemes(false);
   }, [messages]);
 
   const sendMessage = async (text: string) => {
@@ -177,6 +198,10 @@ export default function BrainstormChat({
   // if the AI hasn't emitted the block yet.
   const showForceThemesButton = userTurnCount >= 4 && themes.length === 0 && !streaming;
 
+  // Specific recovery: AI said "which of these" / "I have enough" but the parser
+  // found no theme list. Surface a clearer banner with a one-click resend.
+  const showAwaitingRecovery = awaitingThemes && themes.length === 0 && !streaming;
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto space-y-4 p-4">
@@ -239,7 +264,28 @@ export default function BrainstormChat({
         </div>
       )}
 
-      {showForceThemesButton && (
+      {showAwaitingRecovery && (
+        <div className="px-4 py-3 border-t border-[#D4AF37]/20 bg-[#D4AF37]/[0.05] flex items-start gap-3">
+          <Sparkles className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-xs text-white/80 leading-relaxed mb-2">
+              The coach mentioned themes but didn&apos;t list them. Ask it to write them out.
+            </p>
+            <button
+              onClick={() =>
+                sendMessage(
+                  "Please list the 2-3 concrete themes now as a numbered list — one theme per line, under 15 words each.",
+                )
+              }
+              className="px-3 py-1.5 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#C4A030] transition-colors"
+            >
+              List the themes
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showForceThemesButton && !showAwaitingRecovery && (
         <div className="px-4 py-2 border-t border-white/10 bg-white/5 flex justify-end">
           <button
             onClick={() =>
