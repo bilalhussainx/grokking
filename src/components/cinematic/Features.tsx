@@ -368,7 +368,7 @@ export default function Features() {
       {/* SECTION 1 — The counselor that never sleeps */}
       <Section>
         <EyebrowHeadline
-          eyebrow="Always on"
+          eyebrow="ALWAYS ON"
           headline="The counselor that"
           highlight="never sleeps."
         />
@@ -392,7 +392,7 @@ And it speaks Hindi, Punjabi, and Urdu.`,
       {/* SECTION 2 — Built for the student everyone forgot */}
       <Section>
         <EyebrowHeadline
-          eyebrow="Built for you"
+          eyebrow="BUILT FOR YOU"
           headline="Built for the student"
           highlight="everyone forgot."
         />
@@ -447,8 +447,8 @@ And it speaks Hindi, Punjabi, and Urdu.`,
       {/* SECTION 3 — The full application, in one place */}
       <Section>
         <EyebrowHeadline
-          eyebrow="One platform, every stage"
-          headline="The full application,"
+          eyebrow="ONE PLATFORM, EVERY STAGE"
+          headline="The full application —"
           highlight="in one place."
         />
         <PipelineFlow />
@@ -471,7 +471,7 @@ And it speaks Hindi, Punjabi, and Urdu.`,
       {/* SECTION 4 — $10/month */}
       <Section>
         <EyebrowHeadline
-          eyebrow="Pricing"
+          eyebrow="PRICING"
           headline="What $10 a month"
           highlight="buys you."
         />
