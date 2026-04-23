@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-auth";
 import type { CompanyPersona } from "@/data/interview-personas";
 import type { CollegePersona } from "@/data/college-interviewer-personas";
+import { KAIROS_VOICE } from "@/lib/brand-voice";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -105,7 +106,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!systemPrompt) {
-    systemPrompt = `You are conducting a ${interviewType} interview. Ask one question at a time and adapt to the candidate's answers. Keep responses to 2-4 sentences — this is a text chat, not a lecture.`;
+    systemPrompt = `${KAIROS_VOICE}\n\nYou are conducting a ${interviewType} interview. Ask one question at a time and adapt to the candidate's answers. Keep responses to 2-4 sentences — this is a text chat, not a lecture.`;
   }
 
   // Agent context for memory-aware interviews
