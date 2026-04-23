@@ -8,6 +8,7 @@
 // Spec: docs/superpowers/specs/2026-04-07-multilingual-interviews-design.md
 
 import type { CompanyPersona } from '@/data/interview-personas';
+import { KAIROS_VOICE } from '@/lib/brand-voice';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Section 1: Company persona prompt
@@ -225,6 +226,7 @@ export function buildInterviewerSystemPrompt(
   language: string,
 ): string {
   return [
+    KAIROS_VOICE,
     buildCompanyPersonaPrompt(persona),
     getInterviewerCodeMixingPrompt(language),
   ]
