@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 
 export const metadata = {
-  title: "College Counselor — Kairos.ai",
+  title: "College Counselor — KairosLearn",
   description: "Your AI-powered college application toolkit",
 };
 
 export default function CCLayout({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+  return <div className="kl-surface-app">{children}</div>;
 }
