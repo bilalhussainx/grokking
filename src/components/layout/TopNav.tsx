@@ -91,7 +91,7 @@ export default function TopNav({
             {xpMultiplier > 1 && (
               <div
                 className="flex items-center px-1.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold animate-pulse cursor-default"
-                title={`${xpMultiplier}x XP multiplier active!`}
+                title={`${xpMultiplier}x XP multiplier active`}
               >
                 {xpMultiplier}x
               </div>
