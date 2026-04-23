@@ -438,7 +438,7 @@ export default function AICoach() {
           );
         }
       } catch {
-        fullText = "I'm here to help!";
+        fullText = "I'm here to help.";
         setMessages((prev) =>
           prev.map((m) => m.id === msgId ? { ...m, text: fullText } : m)
         );
@@ -774,7 +774,7 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
       case 'greeting': return '\u{1F3A4} Greeting...';
       case 'text-monitoring': return '\u{1F4D6} Reading along...';
       case 'voice-active': return '\u{1F3A4} Listening...';
-      case 'celebrating': return '\u{1F389} Celebrating!';
+      case 'celebrating': return '\u{1F389} Celebrating';
     }
   };
 
@@ -782,7 +782,7 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
   const getTeachingModeIndicator = () => {
     switch (teachingMode) {
       case 'challenge':
-        return <span className="text-[10px] text-amber-400 font-semibold">{'\u26A1'} Challenge Mode — 2x XP!</span>;
+        return <span className="text-[10px] text-amber-400 font-semibold">{'\u26A1'} Challenge Mode — 2x XP</span>;
       case 'story':
         return <span className="text-[10px] text-emerald-400 font-semibold">{'\u{1F4D6}'} Story Time</span>;
       case 'speed-round':
@@ -823,7 +823,7 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
         {/* Challenge mode XP badge */}
         {teachingMode === 'challenge' && (
           <div className="mt-1 px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded text-[10px] text-amber-400 font-semibold inline-block">
-            2x XP Active!
+            2x XP active
           </div>
         )}
       </div>
@@ -948,7 +948,7 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                   <span className="text-[11px] text-emerald-400 font-medium">
-                    {deepgram.micMuted ? 'Mic muted' : coachMode === 'celebrating' ? 'Celebrating!' : 'Listening...'}
+                    {deepgram.micMuted ? 'Mic muted' : coachMode === 'celebrating' ? 'Celebrating' : 'Listening...'}
                   </span>
                 </div>
               )}
@@ -1032,7 +1032,7 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
         <button onClick={handleCelebrate} disabled={isStreaming}
           className="flex-1 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 rounded-lg flex items-center justify-center gap-1 transition-colors text-[11px] font-semibold disabled:opacity-30">
           <Trophy className="w-3 h-3" />
-          Solved!
+          Solved
         </button>
       </div>
 
