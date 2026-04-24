@@ -68,14 +68,26 @@ export async function POST(
     { role: "system", content: systemPrompt },
     {
       role: "user",
-      content: `Brainstorm conversation:\n${brainstormSummary}\n\n${themesText}\n\nGenerate 3 outline options as JSON.`,
+      content: `Brainstorm conversation:\n${brainstormSummary}\n\n${themesText}\n\nGenerate EXACTLY 3 outline options as JSON. If you find yourself running out of room, shorten bullet detail — NEVER drop an option.`,
     },
   ];
 
-  const result = await callLLMJSON<{ outlines: unknown[] }>(messages, { maxTokens: 1500 });
+  // Bumped from 1500 → 3500 tokens. At 1500 the 3rd option was getting
+  // truncated mid-generation and the JSON parser fell back to the first
+  // two valid entries, which is why the UI was showing only 2 cards.
+  const result = await callLLMJSON<{ outlines: unknown[] }>(messages, { maxTokens: 3500 });
 
-  if (!result?.outlines) {
+  if (!result?.outlines || !Array.isArray(result.outlines) || result.outlines.length === 0) {
     return NextResponse.json({ error: "Failed to generate outlines" }, { status: 500 });
+  }
+
+  // If the model still returned fewer than 3 options, log so we can catch the
+  // pattern but serve what we have — client shows a soft warning when count
+  // is below 3.
+  if (result.outlines.length < 3) {
+    console.warn(
+      `[outline/generate] model returned ${result.outlines.length} outlines; expected 3`,
+    );
   }
 
   await db

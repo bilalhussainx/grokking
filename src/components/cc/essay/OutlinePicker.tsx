@@ -331,6 +331,39 @@ export default function OutlinePicker({
             </div>
           )}
 
+          {outlines.length < 3 && (
+            <div
+              className="rounded-xl flex items-start justify-between gap-3"
+              style={{
+                border: "1px solid var(--kl-app-gold-edge, rgba(212,175,55,0.22))",
+                background: "rgba(212,175,55,0.05)",
+                padding: "12px 14px",
+              }}
+            >
+              <div className="flex items-start gap-2.5 min-w-0">
+                <Sparkles className="w-3.5 h-3.5 text-[var(--kl-gold-app,#D4AF37)] shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-[12.5px] font-semibold text-white mb-0.5">
+                    Only {outlines.length} option{outlines.length === 1 ? "" : "s"} returned — expected 3
+                  </div>
+                  <div className="text-[11.5px] text-white/60">
+                    Coach Kairos was supposed to draft three structurally different paths.
+                    Regenerate to get the full set.
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={generateOutlines}
+                disabled={loading}
+                className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--kl-gold-app,#D4AF37)] text-[var(--kl-gold-app,#D4AF37)] text-[11.5px] font-semibold hover:bg-[var(--kl-gold-app,#D4AF37)]/10 transition-colors disabled:opacity-40"
+              >
+                {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+                Regenerate
+              </button>
+            </div>
+          )}
+
           {/* Sticky-style CTA row */}
           <div
             className="rounded-2xl flex items-center justify-between gap-4"

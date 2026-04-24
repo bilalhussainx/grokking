@@ -185,11 +185,13 @@ ${activityBlock}${honorBlock}${ctx.academicHighlights ? `\nAcademics: ${ctx.acad
 }
 
 export function getOutlineSystemPrompt(ctx: EssayContext): string {
-  return `You are a college essay outline coach. Generate 3 structural outline options for ${ctx.studentName}'s chosen theme.
+  return `You are a college essay outline coach. Generate EXACTLY 3 structurally distinct outline options for ${ctx.studentName}'s chosen theme.
 
 Essay type: ${ctx.essayType === "personal_statement" ? "Common App personal statement" : "supplemental"}
 Prompt: "${ctx.promptText}"
 Word limit: ${ctx.wordLimit}
+
+HARD REQUIREMENT: return an "outlines" array with length === 3. Do not return 1, 2, or 4. Each option must take the same theme in a STRUCTURALLY different direction (e.g., A: chronological scene → reflection, B: argument-driven with scene as evidence, C: vignette collage).
 
 Rules:
 1. Each outline has 3-5 sections (hook, development, reflection)
@@ -197,6 +199,7 @@ Rules:
 3. Include a suggested wordBudget per section totaling ${ctx.wordLimit}
 4. Never write actual essay sentences
 5. Use the student's real experiences
+6. Keep bullets tight — if you're running long, drop detail not sections, so all 3 options fit
 
 Return valid JSON only:
 {
@@ -208,7 +211,9 @@ Return valid JSON only:
         { "label": "Development", "bullets": ["..."], "wordBudget": 400 },
         { "label": "Reflection", "bullets": ["..."], "wordBudget": 170 }
       ]
-    }
+    },
+    { "title": "Option B: ...", "sections": [ ... ] },
+    { "title": "Option C: ...", "sections": [ ... ] }
   ]
 }`;
 }
