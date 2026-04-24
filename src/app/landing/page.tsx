@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import CinematicLandingV2 from "@/components/landing/CinematicLandingV2";
 import ExitIntentModal from "@/components/landing/ExitIntentModal";
+import LoggedOutToast from "@/components/landing/LoggedOutToast";
 
 export const metadata: Metadata = {
   title: "KairosLearn — Every student deserves a counselor who actually knows them.",
@@ -19,6 +21,11 @@ export default function LandingPage() {
     >
       <CinematicLandingV2 />
       <ExitIntentModal />
+      {/* useSearchParams reads the query string — wrap in Suspense so Next.js
+          doesn't bail out of static generation for the landing page. */}
+      <Suspense fallback={null}>
+        <LoggedOutToast />
+      </Suspense>
     </main>
   );
 }
