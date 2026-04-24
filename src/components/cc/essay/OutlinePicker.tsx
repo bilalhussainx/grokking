@@ -764,32 +764,67 @@ function StructureTipsPanel() {
       <div className="kl-rail-card">
         <div className="kl-rail-eyebrow">
           <Lightbulb className="w-3 h-3" />
-          What each section does
+          Essay shapes
         </div>
         <div className="kl-rail-body">
-          Every strong personal statement breaks into three structural beats. Use the word-budget chips
-          on each section as rough targets — you can stretch a little past them in the draft.
+          Not every essay is Hook → Development → Reflection. The three options Coach Kairos drafts
+          each use a <em>different</em> structural form so you can feel which one fits your story.
+          Glance at the section labels and word-budget splits on each card — the shape is in there.
         </div>
         <div className="kl-tip-list">
           <div className="kl-tip-item">
             <span className="kl-tip-dot" />
             <span>
-              <strong>Hook</strong> — a <em>specific</em> moment that drops the reader straight into
-              the scene. Not a thesis, not a summary — a 3-sentence scene they can picture.
+              <strong>Chronological</strong> — scene &rarr; turning beat &rarr; reframe. Best when
+              one specific day carries the weight.
             </span>
           </div>
           <div className="kl-tip-item">
             <span className="kl-tip-dot" />
             <span>
-              <strong>Development</strong> — what the moment meant, what it set in motion, what
-              changed because of it. This is where your thinking shows.
+              <strong>Vignette collage</strong> — 3&ndash;5 small scenes, no single thesis. Meaning
+              comes from what the reader sees stacked.
             </span>
           </div>
           <div className="kl-tip-item">
             <span className="kl-tip-dot" />
             <span>
-              <strong>Reflection</strong> — not a tidy lesson. The honest, slightly unresolved
-              answer to &ldquo;what do you carry forward from this?&rdquo;
+              <strong>In medias res</strong> — drop into the hardest moment first, then flash back,
+              then return to finish it. High-stakes openings.
+            </span>
+          </div>
+          <div className="kl-tip-item">
+            <span className="kl-tip-dot" />
+            <span>
+              <strong>Argument-first</strong> — a claim you&rsquo;re willing to defend, then lived
+              evidence, then a reframe that complicates the claim.
+            </span>
+          </div>
+          <div className="kl-tip-item">
+            <span className="kl-tip-dot" />
+            <span>
+              <strong>Braided</strong> — two storylines alternating, converging at the end.
+            </span>
+          </div>
+          <div className="kl-tip-item">
+            <span className="kl-tip-dot" />
+            <span>
+              <strong>Cyclical / bookend</strong> — an opening image that returns transformed in the
+              final section.
+            </span>
+          </div>
+          <div className="kl-tip-item">
+            <span className="kl-tip-dot" />
+            <span>
+              <strong>Letter / second-person</strong> — addressed to a person, place, or younger
+              self. Intimacy over argument.
+            </span>
+          </div>
+          <div className="kl-tip-item">
+            <span className="kl-tip-dot" />
+            <span>
+              <strong>Question-driven</strong> — open on a question, each section is an attempt at
+              answering, final beat admits what&rsquo;s still unresolved.
             </span>
           </div>
         </div>
@@ -801,9 +836,10 @@ function StructureTipsPanel() {
           Picking between options
         </div>
         <div className="kl-rail-body text-[12.5px]">
-          Pick the outline whose <strong>hook</strong> you can already picture writing. If two feel
-          equally strong, pick the one with the more specific hook beat — it&rsquo;s easier to draft
-          from a concrete scene than from an idea.
+          Pick the structure whose <strong>opening section</strong> you can already picture writing.
+          If two feel equally strong, pick the one with the <em>most specific</em> opening beat —
+          it&rsquo;s easier to draft from a concrete scene than from an idea. Word budgets are
+          rough targets; stretch up to ±10% freely.
         </div>
       </div>
 
@@ -817,8 +853,8 @@ function StructureTipsPanel() {
         </div>
         <div className="kl-rail-body text-[12.5px]">
           Tell the coach what&rsquo;s off in the <strong>Outline coach</strong> tab — then press{" "}
-          <em>Refine into a new outline</em> and it&rsquo;ll draft a fourth option shaped by the
-          discussion.
+          <em>Refine into a new outline</em> and it&rsquo;ll draft a fourth option in a form you
+          haven&rsquo;t seen yet.
         </div>
       </div>
     </>

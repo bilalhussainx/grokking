@@ -185,37 +185,61 @@ ${activityBlock}${honorBlock}${ctx.academicHighlights ? `\nAcademics: ${ctx.acad
 }
 
 export function getOutlineSystemPrompt(ctx: EssayContext): string {
-  return `You are a college essay outline coach. Generate EXACTLY 3 structurally distinct outline options for ${ctx.studentName}'s chosen theme.
+  return `You are a college essay outline coach. Generate EXACTLY 3 structurally DIFFERENT outline options for ${ctx.studentName}'s chosen theme.
 
 Essay type: ${ctx.essayType === "personal_statement" ? "Common App personal statement" : "supplemental"}
 Prompt: "${ctx.promptText}"
 Word limit: ${ctx.wordLimit}
 
-HARD REQUIREMENT: return an "outlines" array with length === 3. Do not return 1, 2, or 4. Each option must take the same theme in a STRUCTURALLY different direction (e.g., A: chronological scene → reflection, B: argument-driven with scene as evidence, C: vignette collage).
+HARD REQUIREMENT: return an "outlines" array with length === 3. Do not return 1, 2, or 4.
 
-Rules:
-1. Each outline has 3-5 sections (hook, development, reflection)
-2. Each bullet is a structural direction, not prose — max 15 words
-3. Include a suggested wordBudget per section totaling ${ctx.wordLimit}
-4. Never write actual essay sentences
-5. Use the student's real experiences
-6. Keep bullets tight — if you're running long, drop detail not sections, so all 3 options fit
+## STRUCTURAL DIVERSITY IS NON-NEGOTIABLE
 
-Return valid JSON only:
+The three options MUST use three DIFFERENT essay structures — not three flavors of the same shape. Do NOT default every option to "Hook → Development → Reflection". That template kills versatility.
+
+Pick any THREE of the following forms for the three options (one form per option, all three different):
+
+- **Chronological narrative** — ~3 sections: opening scene, turning beat, present-day reframe. Hook is a literal in-scene moment.
+- **Vignette collage** — 3-5 micro-scenes, each ~80-120 words, no single thesis sentence. Meaning emerges from juxtaposition.
+- **In medias res** — drop into the hardest moment first (~200-250 words), then flashback sections, then come back to the moment and finish it.
+- **Argument-first** — open with a specific claim / observation (~40-70 words), then 2-3 evidence sections from lived experience, then a reframe that complicates the opening claim.
+- **Braided structure** — two storylines that alternate (e.g., a music moment and a political moment) across 4 sections, converging at the end.
+- **Cyclical / bookend** — an opening image, 2-3 middle sections of story, returns to the same image transformed in the last section.
+- **Epistolary / second-person** — addressed to a person, place, or younger self. Sections are "letter beats": arrival, the thing I can't say, what I needed you to know, where I am now.
+- **Question-driven** — open on a question, each section is an attempt at answering it, final section says which answer is still unresolved.
+
+## SECTION LABELS, COUNTS, WORD BUDGETS MUST VARY ACROSS OPTIONS
+
+- Label sections to describe THIS specific outline, not generic shells. Good labels: "The moment before the bow touches the string", "Letter to my 12-year-old self", "Three Tuesdays at the festival", "What I told my mother", "The question I keep refusing to answer". BAD labels: plain "Hook", "Development", "Reflection" on every option — that's the old template.
+- Section COUNTS should differ: e.g. Option A has 3 sections, Option B has 4, Option C has 5. Never give all three options the same number of sections.
+- Word BUDGETS should differ. Never give two options the same split. The sum of each option's sections should total within ±5% of ${ctx.wordLimit}, but the split itself should reflect the structure (a vignette option has 4-5 near-equal budgets; an in-medias-res option has a fat opening scene; an argument-first option has a short claim and fat evidence).
+
+## TITLES MUST HINT AT STRUCTURE
+
+Format: "Option A: <descriptive hook of the structure>". Examples: "Option A: Chronological — the Turkish festival as the through-line", "Option B: Vignette collage — three Tuesdays", "Option C: Letter to my 17-year-old self". Do not use generic headlines like "Option A: Music and Identity".
+
+## BULLET RULES
+
+1. Each bullet is a structural direction, not prose — max 15 words
+2. Never write actual essay sentences
+3. Use the student's real experiences from the brainstorm transcript
+4. If you're running long, shorten bullet detail — never drop an option
+
+Return valid JSON only. Shape (labels / counts / budgets shown are EXAMPLES, not templates to copy):
 {
   "outlines": [
     {
-      "title": "Option A: ...",
+      "title": "Option A: <structural descriptor>",
       "sections": [
-        { "label": "Hook", "bullets": ["..."], "wordBudget": 80 },
-        { "label": "Development", "bullets": ["..."], "wordBudget": 400 },
-        { "label": "Reflection", "bullets": ["..."], "wordBudget": 170 }
+        { "label": "<specific label for THIS section>", "bullets": ["..."], "wordBudget": <integer> }
       ]
     },
-    { "title": "Option B: ...", "sections": [ ... ] },
-    { "title": "Option C: ...", "sections": [ ... ] }
+    { "title": "Option B: <DIFFERENT structural descriptor>", "sections": [ ... with DIFFERENT count and DIFFERENT budgets ... ] },
+    { "title": "Option C: <DIFFERENT structural descriptor again>", "sections": [ ... with DIFFERENT count and DIFFERENT budgets ... ] }
   ]
-}`;
+}
+
+Self-check before returning: are the three options (a) structurally distinct forms from the list above, (b) using non-generic section labels specific to this student's story, (c) with different section counts across A/B/C, (d) with different word budgets across A/B/C? If any answer is no, revise before emitting.`;
 }
 
 export function getOutlineDiscussSystemPrompt(

@@ -72,10 +72,13 @@ export async function POST(
     },
   ];
 
-  // Bumped from 1500 → 3500 tokens. At 1500 the 3rd option was getting
-  // truncated mid-generation and the JSON parser fell back to the first
-  // two valid entries, which is why the UI was showing only 2 cards.
-  const result = await callLLMJSON<{ outlines: unknown[] }>(messages, { maxTokens: 3500 });
+  // Bumped from 1500 → 3500 → 4500 tokens. The structural-diversity prompt
+  // asks for three STRUCTURALLY different forms (vignettes / in-medias-res /
+  // braided / letter / cyclical) with varying section counts (3-5) and
+  // varying budgets, which is chunkier than the old Hook/Development/
+  // Reflection template. 4500 gives enough headroom so the third option
+  // never truncates regardless of form mix.
+  const result = await callLLMJSON<{ outlines: unknown[] }>(messages, { maxTokens: 4500 });
 
   if (!result?.outlines || !Array.isArray(result.outlines) || result.outlines.length === 0) {
     return NextResponse.json({ error: "Failed to generate outlines" }, { status: 500 });
