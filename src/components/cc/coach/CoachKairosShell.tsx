@@ -9,9 +9,13 @@ import { useState } from "react";
 import CoachChat from "./CoachChat";
 import { COACH_LANGUAGES, getCoachLanguage } from "@/lib/cc/coach-languages";
 
-// Pages where the floating Coach drawer is suppressed because the page has its
-// own dedicated Coach surface (brainstorm, voice), or is a pre-auth surface.
-const HIDDEN_PATHS = ["/login", "/signup", "/onboarding", "/landing", "/talk", "/cc/essays/"];
+// Pages where the floating Coach drawer is suppressed — pre-auth surfaces and
+// pages where the page IS the voice UI. Essay workspace used to be suppressed
+// but the Revise phase's 'Talk through with Coach' button needs the drawer to
+// actually open, so essays are allowed again. On brainstorm/outline/draft the
+// floating drawer is a secondary entry point — students typically use the
+// in-page chats instead, and having both open is harmless.
+const HIDDEN_PATHS = ["/login", "/signup", "/onboarding", "/landing", "/talk"];
 
 export default function CoachKairosShell() {
   const { user } = useAuth();

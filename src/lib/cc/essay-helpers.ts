@@ -13,6 +13,15 @@ export interface EssayContext {
   brainstormTranscript: { role: string; content: string }[] | null;
   outlineJson: Record<string, unknown> | null;
   currentDraft: string | null;
+  // When the current essay is a supplement, this carries the student's approved
+  // Common App personal statement so the supplement coaching can reference it
+  // ("you already covered music in your main essay — this supplement should go
+  // somewhere else"). Null when there is no PS yet or the current essay IS the PS.
+  parentPersonalStatement: {
+    promptText: string;
+    draft: string;
+    themes: string[];
+  } | null;
 }
 
 export async function buildEssayContext(
@@ -94,6 +103,44 @@ export async function buildEssayContext(
     return null;
   }
 
+  // If this essay is a supplement, load the student's most-recent Common App
+  // personal statement draft so downstream prompts can reference it. We pick
+  // the latest-updated personal_statement row with a draft. Null when missing
+  // or when the current essay IS the PS.
+  let parentPersonalStatement: EssayContext["parentPersonalStatement"] = null;
+  const isSupplement = (essay.essay_type || "").startsWith("supplement");
+  if (isSupplement) {
+    const { data: ps } = await db
+      .from("cc_essays")
+      .select("prompt_text, current_draft, revision_comments, outline_json")
+      .eq("student_id", profile.id)
+      .eq("essay_type", "personal_statement")
+      .not("current_draft", "is", null)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (ps?.current_draft) {
+      // Extract themes from the outline (if any) so the supplement coach can
+      // explicitly steer AWAY from themes already covered.
+      const outlineThemes: string[] = [];
+      const outlineJson = parseJsonField<{
+        sections?: { label?: string }[];
+        title?: string;
+      }>(ps.outline_json);
+      if (outlineJson?.title) outlineThemes.push(outlineJson.title);
+      if (outlineJson?.sections) {
+        for (const s of outlineJson.sections) {
+          if (s.label) outlineThemes.push(s.label);
+        }
+      }
+      parentPersonalStatement = {
+        promptText: ps.prompt_text || "",
+        draft: ps.current_draft,
+        themes: outlineThemes.slice(0, 8),
+      };
+    }
+  }
+
   return {
     studentName: profile.preferred_name || profile.legal_first_name || "Student",
     activities: activityList,
@@ -105,6 +152,7 @@ export async function buildEssayContext(
     brainstormTranscript: parseJsonField<{ role: string; content: string }[]>(essay.brainstorm_transcript),
     outlineJson: parseJsonField<Record<string, unknown>>(essay.outline_json),
     currentDraft: essay.current_draft,
+    parentPersonalStatement,
   };
 }
 
@@ -124,6 +172,20 @@ export function getBrainstormSystemPrompt(ctx: EssayContext): string {
 
   const supplementKickoff = isSupplement && isFirstTurn && ctx.activities.length > 0
     ? `\n\n[SUPPLEMENT KICKOFF] This is a supplemental essay and the student has an activities list loaded. In your FIRST message, briefly name 2-3 specific activities/honors from the list that could anchor this prompt and explain in one line each why they might fit (angle, not plot). Then ask which one sparks the most energy — OR whether there's a story off the list they want to bring in. Do not ask a generic "what do you want to write about?" question.`
+    : "";
+
+  // When this is a supplement and the student has a Common App personal
+  // statement on file, steer the coach AWAY from repeating the PS's theme.
+  // The supplement's whole job is to surface a DIFFERENT side of the student.
+  const parentPSBlock = isSupplement && ctx.parentPersonalStatement
+    ? `\n\n[PARENT COMMON APP ESSAY — DO NOT REPEAT]
+The student's Common App personal statement is already written and covers these ideas (paraphrased below). Your job coaching this supplement is to help them find a DIFFERENT angle — an unrelated activity, a harder truth, a smaller moment, a contradiction to the PS's story. Do NOT suggest topics that clearly overlap with the PS.
+
+PS prompt: "${ctx.parentPersonalStatement.promptText.slice(0, 220)}"
+PS themes already covered: ${ctx.parentPersonalStatement.themes.slice(0, 6).join(" · ") || "(none extracted)"}
+PS draft opening (first 600 chars): """${ctx.parentPersonalStatement.draft.slice(0, 600)}"""
+
+When the student proposes a topic that's clearly a rehash of the PS, gently push back — "That's close to what's already in your main essay. What's a DIFFERENT facet of you a reader wouldn't get from that draft?" — and suggest 1-2 angles from their activities list that aren't covered in the PS.`
     : "";
 
   // Struggle detection — treat this like a real counselor noticing the student
@@ -181,7 +243,7 @@ Rules:
 <<END_THEMES>>
 Then ask the student which theme resonates most. The block MUST appear verbatim — the UI parses it to advance the student to the outline step. Do not use the block until you have real material to draw on (minimum 2 exchanges).
 8. Never output the block in the first message.
-${activityBlock}${honorBlock}${ctx.academicHighlights ? `\nAcademics: ${ctx.academicHighlights}` : ""}${supplementKickoff}${struggleNudge}${nudge}`;
+${activityBlock}${honorBlock}${ctx.academicHighlights ? `\nAcademics: ${ctx.academicHighlights}` : ""}${parentPSBlock}${supplementKickoff}${struggleNudge}${nudge}`;
 }
 
 export function getOutlineSystemPrompt(ctx: EssayContext): string {
@@ -462,6 +524,22 @@ export function getReviewSystemPrompt(ctx: EssayContext): string {
     ? `\nStudent's activities (to flag resume-dumping AND to rate how the essay complements the rest of the application):\n${ctx.activities.slice(0, 10).map((a) => `- ${a}`).join("\n")}`
     : "\n(No activities list available — score activitiesComplement against a generic 'solid applicant' baseline.)";
 
+  // For supplements, flag topic overlap with the student's Common App
+  // personal statement. Admissions readers read the whole packet — a
+  // supplement that rehashes the PS wastes real estate.
+  const parentPSHint = ctx.essayType.startsWith("supplement") && ctx.parentPersonalStatement
+    ? `\n\n[PARENT COMMON APP ESSAY]
+The student's Common App personal statement covers:
+PS prompt: "${ctx.parentPersonalStatement.promptText.slice(0, 200)}"
+PS themes: ${ctx.parentPersonalStatement.themes.slice(0, 6).join(" · ") || "(none extracted)"}
+PS opening: """${ctx.parentPersonalStatement.draft.slice(0, 500)}"""
+
+When reviewing THIS supplement:
+- If the supplement rehashes the PS's angle or story, drop overallScore by 10-15 and add a high-severity comment type="ps-overlap" flagging exactly what duplicates the PS.
+- If the supplement surfaces a NEW side of the student (different activity, different thread, different voice), call that out in strengths — "This widens the application beyond the PS".
+- applicationFit axis should explicitly reward the supplement for adding signal the PS can't carry on its own.`
+    : "";
+
   return `You are a senior admissions reader at a top-10 US college, reviewing ${ctx.studentName}'s draft. Your job is to give a holistic, honest read — not a template.
 
 Prompt: "${ctx.promptText}"
@@ -526,7 +604,7 @@ Include a one-paragraph nextStepReason explaining the recommendation in plain la
 4. Flag any paragraph that repeats accomplishments already on the activities list.
 5. Example snippets under 15 words.
 6. Severity = "positive" | "suggestion" | "issue".
-7. Mix severities — positive comments are valid and build trust.${activitiesHint}
+7. Mix severities — positive comments are valid and build trust.${activitiesHint}${parentPSHint}
 
 Return valid JSON only:
 {
