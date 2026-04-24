@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { BookOpen, Clock, Layers, ArrowRight, Lock, CheckCircle, Mic } from "lucide-react";
 import { courses } from "@/data";
-import { getAllLessons, type Course } from "@/data/types";
+import { getAllLessons, type Course, type Lesson } from "@/data/types";
 import { getLanguageCourse } from "@/data/languages";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -80,7 +80,12 @@ export default function CourseOverviewPage() {
   // COURSE OVERVIEW PAGE — shown to logged-out users (or timeout fallback)
   if (!course) return null;
 
-  const allLessons = hardcodedCourse ? getAllLessons(hardcodedCourse) : course.modules.flatMap(m => m.lessons);
+  // Union of arrays (Lesson[] | LanguageLesson[]) can't be flat-mapped with a
+  // single callback signature without a cast — we only need length + basic
+  // props downstream, so narrowing to the Lesson shape is safe here.
+  const allLessons: Lesson[] = hardcodedCourse
+    ? getAllLessons(hardcodedCourse)
+    : (course.modules.flatMap((m) => m.lessons) as Lesson[]);
   const isFree = "tier" in course ? course.tier === "free" : true;
   const estimatedHours = Math.max(1, Math.round(allLessons.length * 0.25));
 

@@ -515,9 +515,7 @@ export default function BrainstormChat({
         {PHASES.map((p) => (
           <div
             key={p.n}
-            className={`kl-phase-node ${
-              p.status === "active" ? "is-active" : p.status === "done" ? "is-done" : ""
-            }`}
+            className={`kl-phase-node ${p.status === "active" ? "is-active" : ""}`}
           >
             <div className="kl-phase-num">{p.n}</div>
             <div className="kl-phase-label">{p.label}</div>

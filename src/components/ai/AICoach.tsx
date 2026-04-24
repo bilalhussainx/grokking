@@ -999,7 +999,7 @@ Greet by name. Reference THIS topic specifically. ${hasCodingExercise ? "Ask: wa
               </div>
             ) : (
               <div className="kl-coach-bubble kl-coach-ai flex-1 min-w-0">
-                {msg.type && msg.type !== 'coach' && (
+                {msg.type && (
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <span className="text-sm">{getTypeIcon(msg.type)}</span>
                     <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium">
