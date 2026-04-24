@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { ArrowLeft, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, ClipboardCheck, MessageSquare } from "lucide-react";
 import EssayStepper from "@/components/cc/essay/EssayStepper";
 import BrainstormChat from "@/components/cc/essay/BrainstormChat";
 import OutlinePicker from "@/components/cc/essay/OutlinePicker";
@@ -26,6 +26,18 @@ interface EssayData {
     overallNotes: string;
     wordCount: number;
     promptFitScore: number;
+    overallScore?: number;
+    scoreBreakdown?: {
+      promptFit: number;
+      voiceAuthenticity: number;
+      specificity: number;
+      reflectionDepth: number;
+      structuralCraft: number;
+      applicationFit: number;
+    };
+    strengths?: string[];
+    suggestedNextStep?: "polish" | "restructure" | "re-brainstorm" | "ready";
+    nextStepReason?: string;
   } | null;
 }
 
@@ -116,14 +128,10 @@ export default function EssayWorkspace({
     );
   }
 
-  // Brainstorm + outline + draft phases render their own full phase bar +
-  // prompt subhead internally (matches the standalone mockup). Showing the
-  // compact EssayStepper + the legacy prompt banner on top as well just
-  // duplicates the information and breaks the cinematic flow — so on those
-  // phases we render a slim back-link row only. Revise still uses the legacy
-  // banner because it hasn't been redesigned yet.
-  const phaseOwnsBanner =
-    activePhase === "brainstorm" || activePhase === "outline" || activePhase === "draft";
+  // All four phases now render their own full phase bar + prompt subhead
+  // internally. The parent just needs a slim back-link row — the legacy
+  // double-header (EssayStepper + prompt banner) is fully retired.
+  const phaseOwnsBanner = true;
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
@@ -233,61 +241,161 @@ export default function EssayWorkspace({
         )}
 
         {activePhase === "revise" && (
-          <div className="flex h-full">
-            <div className="flex-1 p-4 overflow-y-auto">
-              <div className="max-w-2xl mx-auto">
-                <button
-                  onClick={() => {
-                    coach.open();
-                    coach.sendMessage(
-                      "My essay review just came back — give me your read: where it's landing, what's weak, and how it fits the rest of my application.",
-                      { essayId: id, sourceEvent: "review-landed" }
-                    );
-                  }}
-                  // Disabled until the review has actually persisted. Otherwise
-                  // the coach opens, POSTs /api/cc/coach/message, re-reads the
-                  // essay before revision_comments is visible, and responds
-                  // "content didn't come through on my end". The button enables
-                  // once revision_comments is on the client (which means the
-                  // Supabase write returned).
-                  disabled={reviewLoading || !essay.revision_comments}
-                  className="w-full mb-4 flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/15 transition-colors text-left group disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#D4AF37]/10"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-[#D4AF37]">
-                      {reviewLoading || !essay.revision_comments
-                        ? "Review is still landing — one moment…"
-                        : "Review landed. Activity optimizer is up next — supplements come after."}
-                    </p>
-                    <p className="text-[11px] text-white/40 mt-0.5">
-                      {reviewLoading || !essay.revision_comments
-                        ? "Coach Kairos will be ready as soon as the feedback is saved."
-                        : "Ask Coach Kairos to walk you through what to tackle."}
-                    </p>
-                  </div>
-                  <span className="text-[11px] text-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity">
-                    Open coach →
-                  </span>
-                </button>
-
-                <h3 className="text-xs text-white/40 uppercase tracking-wide mb-3">Your draft</h3>
-                <div className="kl-essay-prose whitespace-pre-wrap">
-                  {essay.current_draft || "No draft yet."}
-                </div>
-              </div>
-            </div>
-            <aside
-              className="shrink-0 border-l border-white/10 min-h-0 overflow-hidden"
-              style={{ width: 370 }}
-            >
-              <RevisionPanel
-                review={essay.revision_comments}
-                loading={reviewLoading}
-              />
-            </aside>
-          </div>
+          <ReviseView
+            essay={essay}
+            reviewLoading={reviewLoading}
+            onNavigatePhase={setActivePhase}
+            onOpenCoach={() => {
+              coach.open();
+              coach.sendMessage(
+                "My essay review just came back — give me your read: where it's landing, what's weak, and how it fits the rest of my application.",
+                { essayId: id, sourceEvent: "review-landed" }
+              );
+            }}
+          />
         )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Revise view — matches brainstorm/outline/draft layout (phase bar + subhead
+// + two-column grid). Draft text on the left, RevisionPanel on the right.
+// ─────────────────────────────────────────────────────────────────────────
+
+function ReviseView({
+  essay,
+  reviewLoading,
+  onNavigatePhase,
+  onOpenCoach,
+}: {
+  essay: EssayData;
+  reviewLoading: boolean;
+  onNavigatePhase: (phase: Phase) => void;
+  onOpenCoach: () => void;
+}) {
+  const review = essay.revision_comments;
+  const overall = review?.overallScore ?? (review ? Math.round((review.promptFitScore ?? 0) * 100) : null);
+
+  const phaseNodes = [
+    { n: "01", label: "Brainstorm", status: "is-done" as const, meta: "Complete" },
+    {
+      n: "02", label: "Outline", status: "is-done" as const,
+      meta: essay.outline_json ? `${essay.outline_json.sections.length} sections` : "Complete",
+    },
+    {
+      n: "03", label: "Draft", status: "is-done" as const,
+      meta: essay.current_draft
+        ? `${essay.current_draft.trim().split(/\s+/).filter(Boolean).length} / ${essay.word_limit} words`
+        : "Complete",
+    },
+    {
+      n: "04", label: "Revise", status: "is-active" as const,
+      meta: review ? `Score ${overall ?? "—"} · ${review.comments.length} notes` : "Awaiting review",
+      pct: review ? 100 : 30,
+    },
+  ];
+
+  return (
+    <div
+      className="kl-surface-app w-full"
+      style={{ padding: "22px 28px", display: "flex", flexDirection: "column", gap: 18 }}
+    >
+      <div className="kl-phase-bar">
+        {phaseNodes.map((p) => (
+          <button
+            key={p.n}
+            type="button"
+            onClick={() => onNavigatePhase(
+              p.label === "Brainstorm" ? "brainstorm"
+              : p.label === "Outline" ? "outline"
+              : p.label === "Draft" ? "draft" : "revise"
+            )}
+            className={`kl-phase-node ${p.status === "is-active" ? "is-active" : "is-done"}`}
+            style={{ textAlign: "left", background: "transparent", border: "none", cursor: "pointer" }}
+          >
+            <div className="kl-phase-num">{p.n}</div>
+            <div className="kl-phase-label">{p.label}</div>
+            <div className="kl-phase-meta">{p.meta}</div>
+            {p.status === "is-active" && (
+              <div className="kl-phase-fill" style={{ width: `${p.pct ?? 0}%` }} />
+            )}
+            {p.status === "is-done" && <div className="kl-phase-fill" />}
+          </button>
+        ))}
+      </div>
+
+      <div className="kl-bs-subhead">
+        <div className="flex items-center gap-3.5 min-w-0 flex-1">
+          <span
+            className="kl-prompt-badge"
+            style={{
+              background: "var(--kl-phase-revise-bg, rgba(34,197,94,0.20))",
+              color: "var(--kl-phase-revise-fg, #86efac)",
+              borderColor: "rgba(34,197,94,0.28)",
+            }}
+          >
+            <ClipboardCheck className="w-3 h-3" />
+            Revise
+          </span>
+          <div className="min-w-0">
+            <div className="text-[13.5px] leading-snug">
+              <em className="not-italic text-white/95 font-medium">Holistic read of your draft.</em>{" "}
+              <span className="text-white/45">
+                Score reflects how this essay lands in the context of the full application — not a raw English-class grade.
+              </span>
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={onOpenCoach}
+          disabled={reviewLoading || !review}
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12.5px] font-semibold transition-colors shrink-0"
+          style={{
+            background: "rgba(212,175,55,0.12)",
+            border: "1px solid var(--kl-app-gold-edge, rgba(212,175,55,0.22))",
+            color: "var(--kl-gold-app,#D4AF37)",
+            opacity: reviewLoading || !review ? 0.4 : 1,
+            cursor: reviewLoading || !review ? "not-allowed" : "pointer",
+          }}
+          title={!review ? "Review still landing" : "Open Coach Kairos to talk through the feedback"}
+        >
+          <MessageSquare className="w-3.5 h-3.5" />
+          Talk through with Coach
+        </button>
+      </div>
+
+      <div className="grid items-start gap-5" style={{ gridTemplateColumns: "1fr 400px" }}>
+        {/* Draft prose */}
+        <div
+          className="rounded-2xl overflow-y-auto"
+          style={{
+            background: "rgba(255,255,255,0.015)",
+            border: "1px solid var(--kl-app-border, rgba(255,255,255,0.08))",
+            padding: "28px 32px",
+            maxHeight: "calc(100vh - 260px)",
+          }}
+        >
+          <div
+            className="text-[10px] uppercase tracking-[0.22em] text-white/40 mb-4"
+            style={{ fontFamily: "var(--kl-font-mono, 'JetBrains Mono', monospace)" }}
+          >
+            Your draft
+          </div>
+          <div className="kl-essay-prose whitespace-pre-wrap">
+            {essay.current_draft || "No draft yet."}
+          </div>
+        </div>
+
+        {/* Scorecard + comments + jump-back rail */}
+        <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 260px)" }}>
+          <RevisionPanel
+            review={review}
+            loading={reviewLoading}
+            onNavigatePhase={onNavigatePhase}
+          />
+        </div>
       </div>
     </div>
   );

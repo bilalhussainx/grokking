@@ -12,7 +12,21 @@ interface ReviewComment {
   severity: string;
 }
 
+interface ScoreBreakdown {
+  promptFit: number;
+  voiceAuthenticity: number;
+  specificity: number;
+  reflectionDepth: number;
+  structuralCraft: number;
+  applicationFit: number;
+}
+
 interface ReviewResult {
+  overallScore?: number;
+  scoreBreakdown?: ScoreBreakdown;
+  strengths?: string[];
+  suggestedNextStep?: "polish" | "restructure" | "re-brainstorm" | "ready";
+  nextStepReason?: string;
   comments: ReviewComment[];
   overallNotes: string;
   wordCount: number;
@@ -89,7 +103,10 @@ export async function POST(
     { role: "user", content: `Review this draft:\n\n${ctx.currentDraft}` },
   ];
 
-  const review = await callLLMJSON<ReviewResult>(messages, { maxTokens: 2000 });
+  // Bumped from 2000 → 4000. The new review schema carries overallScore +
+  // 6-axis scoreBreakdown + 3-5 strengths + suggestedNextStep + up to 12
+  // variable comments — richer than the old fixed-7 shape.
+  const review = await callLLMJSON<ReviewResult>(messages, { maxTokens: 4000 });
 
   if (!review) {
     return NextResponse.json({ error: "Review generation failed" }, { status: 500 });
