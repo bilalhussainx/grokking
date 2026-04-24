@@ -116,13 +116,14 @@ export default function EssayWorkspace({
     );
   }
 
-  // Brainstorm + outline phases render their own full phase bar + prompt
-  // subhead internally (matches the standalone mockup). Showing the compact
-  // EssayStepper + the legacy prompt banner on top as well just duplicates
-  // the information and breaks the cinematic flow — so on those two phases
-  // we render a slim back-link row only. Draft + revise still use the legacy
-  // banner because they haven't been redesigned yet.
-  const phaseOwnsBanner = activePhase === "brainstorm" || activePhase === "outline";
+  // Brainstorm + outline + draft phases render their own full phase bar +
+  // prompt subhead internally (matches the standalone mockup). Showing the
+  // compact EssayStepper + the legacy prompt banner on top as well just
+  // duplicates the information and breaks the cinematic flow — so on those
+  // phases we render a slim back-link row only. Revise still uses the legacy
+  // banner because it hasn't been redesigned yet.
+  const phaseOwnsBanner =
+    activePhase === "brainstorm" || activePhase === "outline" || activePhase === "draft";
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
