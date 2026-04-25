@@ -8,6 +8,7 @@ export type LanguageOption = {
   label: string;
   nativeLabel: string;
   flag: string;
+  mode?: "voice" | "text-only";
 };
 
 export function LanguagePicker({
@@ -87,6 +88,9 @@ export function LanguagePicker({
                   <span aria-hidden>{opt.flag}</span>
                   <span className="flex-1">{opt.nativeLabel}</span>
                   <span className="text-[10px] text-white/40">{opt.label}</span>
+                  {opt.mode === "text-only" && (
+                    <span className="text-[9px] uppercase tracking-wide text-white/40 ml-1">Text</span>
+                  )}
                 </button>
               </li>
             );
