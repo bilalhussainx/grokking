@@ -14,6 +14,7 @@ import {
   ArrowRight,
   Paperclip,
 } from "lucide-react";
+import VoiceQualityCheck from "@/components/voice/VoiceQualityCheck";
 
 interface Message {
   role: "user" | "assistant";
@@ -256,6 +257,17 @@ export default function BrainstormChat({
         /* non-fatal — start with empty list */
       });
   }, [essayId]);
+
+  // Voice quality check (Feature 1A) — only shown the first time the user
+  // turns voice on. Fail-open: if the lookup fails we treat as already-passed
+  // so we don't nag.
+  const [voiceCheckPassed, setVoiceCheckPassed] = useState<boolean | null>(null);
+  useEffect(() => {
+    fetch("/api/cc/profile/voice")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setVoiceCheckPassed(Boolean(d?.voiceQualityCheckPassedAt)))
+      .catch(() => setVoiceCheckPassed(true));
+  }, []);
 
   const [langCode, setLangCode] = useState<string>(() => {
     if (typeof window === "undefined") return "en";
@@ -659,6 +671,13 @@ export default function BrainstormChat({
       {/* Two column: chat + right rail */}
       <div className="grid items-start gap-5" style={{ gridTemplateColumns: "1fr 380px" }}>
         <div className="flex flex-col gap-4 min-w-0">
+          {voiceOn && voiceCheckPassed === false && langCode !== "ur" && (
+            <VoiceQualityCheck
+              language={langCode}
+              onPassed={() => setVoiceCheckPassed(true)}
+            />
+          )}
+
           {voiceOn && (
             <div className="kl-voice-banner" style={{ direction: currentLang.isRTL ? "rtl" : "ltr" }}>
               <VoiceWaveform active />
