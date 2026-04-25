@@ -67,6 +67,26 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
     if (storedVoice === "true") setVoiceEnabledState(true);
   }, []);
 
+  // Mirror the active coach language to <html lang>. Browsers, screen readers,
+  // and the [lang="ur"] RTL CSS rule all key off this attribute.
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = language;
+    }
+  }, [language]);
+
+  // Listen to the TopNav picker's coach-language-change event so picking a
+  // language anywhere in the app updates the coach in real-time.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onChange = (e: Event) => {
+      const code = (e as CustomEvent<string>).detail;
+      if (typeof code === "string" && code) setLanguageState(code);
+    };
+    window.addEventListener("coach-language-change", onChange);
+    return () => window.removeEventListener("coach-language-change", onChange);
+  }, []);
+
   useEffect(() => {
     if (!user) return;
     fetch("/api/cc/profile/voice")
