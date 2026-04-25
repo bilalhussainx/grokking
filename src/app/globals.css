@@ -1,6 +1,14 @@
 @import "tailwindcss" source(none);
 @import "./tokens.css";
+@import "@fontsource/noto-nastaliq-urdu/400.css";
 @source "../**/*.{ts,tsx,js,jsx,mdx}";
+
+[lang="ur"] {
+  direction: rtl;
+  text-align: right;
+  font-family: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", serif;
+  line-height: 2.0;
+}
 
 @plugin "@tailwindcss/typography";
 
