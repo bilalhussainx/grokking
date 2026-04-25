@@ -594,18 +594,32 @@ export default function BrainstormChat({
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={handleVoiceToggle}
-            aria-pressed={voiceOn}
-            className={`kl-voice-toggle ${voiceOn ? "is-on" : ""}`}
-          >
-            <span className="kl-voice-dot">
-              {voiceOn ? <Mic className="w-3.5 h-3.5" /> : <MicOff className="w-3.5 h-3.5" />}
-            </span>
-            <span>{voiceOn ? "Voice on" : "Voice off"}</span>
-            {voiceOn && <VoiceWaveform active />}
-          </button>
+          {langCode === "ur" ? (
+            <button
+              type="button"
+              disabled
+              className="kl-voice-toggle is-disabled"
+              title="Voice for Urdu coming soon — switch to Hindi for voice"
+            >
+              <span className="kl-voice-dot">
+                <MicOff className="w-3.5 h-3.5" />
+              </span>
+              <span>Voice off</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleVoiceToggle}
+              aria-pressed={voiceOn}
+              className={`kl-voice-toggle ${voiceOn ? "is-on" : ""}`}
+            >
+              <span className="kl-voice-dot">
+                {voiceOn ? <Mic className="w-3.5 h-3.5" /> : <MicOff className="w-3.5 h-3.5" />}
+              </span>
+              <span>{voiceOn ? "Voice on" : "Voice off"}</span>
+              {voiceOn && <VoiceWaveform active />}
+            </button>
+          )}
         </div>
       </div>
 
@@ -641,7 +655,10 @@ export default function BrainstormChat({
                       <div className={`kl-msg-avatar ${msg.role === "user" ? "is-user" : "is-coach"}`} aria-hidden>
                         {msg.role === "user" ? "S" : "K"}
                       </div>
-                      <div className={`kl-msg-bubble ${msg.role === "user" ? "is-user" : "is-coach"}`}>
+                      <div
+                        dir="auto"
+                        className={`kl-msg-bubble ${msg.role === "user" ? "is-user" : "is-coach"}`}
+                      >
                         {msg.content
                           ? renderRich(msg.content)
                           : <span className="inline-block w-4 h-4 border-2 border-white/20 border-t-[var(--kl-gold-app,#D4AF37)] rounded-full animate-spin" />}
@@ -728,6 +745,7 @@ export default function BrainstormChat({
             <textarea
               ref={textareaRef}
               value={input}
+              dir="auto"
               onChange={(e) => {
                 setInput(e.target.value);
                 const ta = e.currentTarget;
@@ -749,17 +767,30 @@ export default function BrainstormChat({
               <button type="button" className="kl-tool-btn" title="Attach" aria-label="Attach">
                 <Paperclip className="w-4 h-4" />
               </button>
-              <button
-                type="button"
-                onClick={handleVoiceToggle}
-                className="kl-tool-btn"
-                aria-pressed={voiceOn}
-                aria-label="Toggle voice"
-                title="Voice"
-                style={{ color: voiceOn ? "var(--kl-gold-app,#D4AF37)" : undefined }}
-              >
-                {voiceOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-              </button>
+              {langCode === "ur" ? (
+                <button
+                  type="button"
+                  disabled
+                  className="kl-tool-btn"
+                  aria-label="Voice not available for Urdu"
+                  title="Voice for Urdu coming soon — switch to Hindi for voice"
+                  style={{ opacity: 0.4, cursor: "not-allowed" }}
+                >
+                  <MicOff className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleVoiceToggle}
+                  className="kl-tool-btn"
+                  aria-pressed={voiceOn}
+                  aria-label="Toggle voice"
+                  title="Voice"
+                  style={{ color: voiceOn ? "var(--kl-gold-app,#D4AF37)" : undefined }}
+                >
+                  {voiceOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
+                </button>
+              )}
               <button
                 type="submit"
                 className="kl-tool-btn is-primary"
