@@ -50,7 +50,10 @@ export default function CoachMessage({ role, content, isStreaming }: Props) {
         animate={{ opacity: 1, y: 0 }}
         className="flex justify-end"
       >
-        <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-br-md bg-[#D4AF37]/20 text-white text-sm leading-relaxed">
+        <div
+          dir="auto"
+          className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-br-md bg-[#D4AF37]/20 text-white text-sm leading-relaxed"
+        >
           {content}
         </div>
       </motion.div>
@@ -69,7 +72,7 @@ export default function CoachMessage({ role, content, isStreaming }: Props) {
         <GraduationCap className="w-3.5 h-3.5 text-[#D4AF37]" />
       </div>
       <div className="max-w-[85%]">
-        <div className="text-sm text-white/80 leading-relaxed">
+        <div dir="auto" className="text-sm text-white/80 leading-relaxed">
           {renderContent(content)}
           {isStreaming && <span className="inline-block w-1.5 h-4 bg-[#D4AF37] ml-0.5 animate-pulse" />}
         </div>

@@ -83,6 +83,7 @@ export default function CoachChat() {
         <div className="flex gap-2">
           <input
             type="text"
+            dir="auto"
             value={displayValue}
             onChange={(e) => {
               if (isListening) return;
