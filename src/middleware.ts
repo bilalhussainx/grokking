@@ -163,6 +163,27 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // --- One-time language picker (Feature 1A) ------------------------------
+  // Real users (not anon) who haven't seen the picker get bounced to the picker
+  // route once. Skip the API surface, the picker itself, and shared/auth flows.
+  const isPickerExempt =
+    pathname === "/onboarding/language" ||
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/onboarding/") ||
+    pathname.startsWith("/cc/shared") ||
+    pathname.startsWith("/auth/");
+
+  if (isRealUser && !isPickerExempt) {
+    const { data: profile } = await supabase
+      .from("cc_student_profiles")
+      .select("language_picker_seen_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (profile && profile.language_picker_seen_at == null) {
+      return NextResponse.redirect(new URL("/onboarding/language", request.url));
+    }
+  }
+
   // --- Root / landing routing (only for users with a session) -------------
   if (pathname === "/") {
     if (isAnonymous) {
