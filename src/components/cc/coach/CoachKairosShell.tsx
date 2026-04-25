@@ -7,7 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap, X, Volume2, VolumeX, Languages, Check } from "lucide-react";
 import { useState } from "react";
 import CoachChat from "./CoachChat";
-import { COACH_LANGUAGES, getCoachLanguage } from "@/lib/cc/coach-languages";
+import { COACH_LANGUAGES, getCoachLanguage, isVoiceLanguage } from "@/lib/cc/coach-languages";
+import HandToParentButton from "@/components/family-mode/HandToParentButton";
+import FamilyModeView from "@/components/family-mode/FamilyModeView";
 
 // Pages where the floating Coach drawer is suppressed — pre-auth surfaces and
 // pages where the page IS the voice UI. Essay workspace used to be suppressed
@@ -24,6 +26,7 @@ export default function CoachKairosShell() {
     language, setLanguage,
     voiceEnabled, setVoiceEnabled,
     isSpeaking, stopSpeaking,
+    familyMode, toggleFamilyMode,
   } = useCoachKairos();
   const pathname = usePathname();
   const [langMenuOpen, setLangMenuOpen] = useState(false);
@@ -35,6 +38,12 @@ export default function CoachKairosShell() {
 
   return (
     <>
+      {familyMode && (
+        <FamilyModeView
+          language={language}
+          onExit={() => toggleFamilyMode(false)}
+        />
+      )}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -87,6 +96,10 @@ export default function CoachKairosShell() {
                 </div>
 
                 <div className="flex items-center gap-1">
+                  <HandToParentButton
+                    onClick={() => toggleFamilyMode(true)}
+                    disabled={!isVoiceLanguage(language)}
+                  />
                   <div className="relative">
                     <button
                       onClick={() => setLangMenuOpen((o) => !o)}

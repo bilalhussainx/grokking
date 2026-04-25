@@ -35,6 +35,8 @@ interface CoachKairosContextValue {
   setVoiceEnabled: (enabled: boolean) => void;
   isSpeaking: boolean;
   stopSpeaking: () => void;
+  familyMode: boolean;
+  toggleFamilyMode: (on?: boolean) => void;
 }
 
 const CoachKairosContext = createContext<CoachKairosContextValue | null>(null);
@@ -53,6 +55,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   const [language, setLanguageState] = useState<string>(DEFAULT_COACH_LANGUAGE);
   const [voiceEnabled, setVoiceEnabledState] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [familyMode, setFamilyMode] = useState(false);
   const proactiveSent = useRef(false);
   const historyLoaded = useRef(false);
 
@@ -336,6 +339,10 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   const close = useCallback(() => setIsOpen(false), []);
   const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
 
+  const toggleFamilyMode = useCallback((on?: boolean) => {
+    setFamilyMode((prev) => (on === undefined ? !prev : on));
+  }, []);
+
   return (
     <CoachKairosContext.Provider
       value={{
@@ -343,6 +350,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
         messages, sendMessage, isStreaming, currentMode, isLoading,
         language, setLanguage, voiceEnabled, setVoiceEnabled,
         isSpeaking, stopSpeaking,
+        familyMode, toggleFamilyMode,
       }}
     >
       {children}
