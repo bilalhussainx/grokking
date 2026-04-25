@@ -240,6 +240,23 @@ export default function BrainstormChat({
   const [awaitingThemes, setAwaitingThemes] = useState(false);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
 
+  // Bilingual canvas extraction (Feature 1A) — feature-flagged + silent fallback.
+  type CanvasFragment = { turnId: string; fragment: string; tags: string[]; createdAt: string };
+  const [fragments, setFragments] = useState<CanvasFragment[]>([]);
+
+  // Hydrate any previously-extracted fragments on mount.
+  useEffect(() => {
+    fetch(`/api/cc/essays/${essayId}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        const f = data?.essay?.canvas_fragments ?? data?.canvas_fragments;
+        if (Array.isArray(f)) setFragments(f as CanvasFragment[]);
+      })
+      .catch(() => {
+        /* non-fatal — start with empty list */
+      });
+  }, [essayId]);
+
   const [langCode, setLangCode] = useState<string>(() => {
     if (typeof window === "undefined") return "en";
     return localStorage.getItem(STORAGE_KEY) || "en";
@@ -373,6 +390,22 @@ export default function BrainstormChat({
           updated[updated.length - 1] = { role: "assistant", content: parsed.displayText };
           return updated;
         });
+      }
+
+      // Bilingual canvas extraction (R1, R8) — feature-flagged, fails silently.
+      if (process.env.NEXT_PUBLIC_BILINGUAL_CANVAS_ENABLED === "true") {
+        try {
+          const xRes = await fetch(`/api/cc/essays/${essayId}/canvas-extract`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+          if (xRes.ok) {
+            const f = (await xRes.json()) as CanvasFragment;
+            if (f.fragment) setFragments((prev) => [...prev, f]);
+          }
+        } catch (err) {
+          console.warn("[canvas-extract] failed silently", err);
+        }
       }
     } catch {
       setErrorBanner("Connection error. Please try again.");
@@ -676,7 +709,7 @@ export default function BrainstormChat({
                         <div className="flex items-center gap-2 mb-2.5">
                           <Sparkles className="w-3.5 h-3.5 text-[var(--kl-gold-app,#D4AF37)]" />
                           <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[var(--kl-gold-app,#D4AF37)] font-mono">
-                            Pick a theme to develop
+                            Pick a direction to develop
                           </span>
                         </div>
                         <div className="flex flex-wrap gap-2 mb-3">
@@ -892,14 +925,39 @@ export default function BrainstormChat({
             </>
           ) : (
             <>
+              {/* Fragments — bilingual canvas extraction (Feature 1A) */}
               <div className="kl-rail-card">
                 <div className="kl-rail-eyebrow">
                   <Sparkles className="w-3 h-3" />
-                  Emerging themes
+                  Fragments
+                </div>
+                {fragments.length === 0 ? (
+                  <div className="kl-rail-body text-[12.5px] italic">
+                    The coach will lift specific moments from your brainstorm and translate them to
+                    English here — material you can use directly when you start drafting.
+                  </div>
+                ) : (
+                  <ul className="space-y-3">
+                    {fragments.map((f) => (
+                      <li key={f.turnId}>
+                        <p className="text-[13px] text-white/85 italic" dir="auto">&ldquo;{f.fragment}&rdquo;</p>
+                        {f.tags.length > 0 && (
+                          <p className="text-[10.5px] text-white/45 mt-1">{f.tags.join(" · ")}</p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="kl-rail-card">
+                <div className="kl-rail-eyebrow">
+                  <Sparkles className="w-3 h-3" />
+                  Directions
                 </div>
                 {themes.length === 0 ? (
                   <div className="kl-rail-body text-[12.5px]">
-                    As you share more, Coach Kairos will surface 2–3 concrete themes here. Pick the
+                    As you share more, Coach Kairos will surface 2–3 concrete directions here. Pick the
                     one that feels most like <em>your</em> story to move to outline.
                   </div>
                 ) : (
