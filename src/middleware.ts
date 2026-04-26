@@ -109,10 +109,9 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
   const pathname = request.nextUrl.pathname;
 
-  // Skip public routes entirely (fastest path)
-  if (isPublicRoute(pathname)) return response;
-
-  // Create Supabase client with cookie access
+  // Create Supabase client with cookie access. Hoisted above the public-route
+  // early-return because the Feature 1A picker check runs for "/" and other
+  // public-but-authenticated paths too.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -139,6 +138,40 @@ export async function middleware(request: NextRequest) {
   const isAnonymous = Boolean(user?.is_anonymous);
   const isRealUser = Boolean(user && !user.is_anonymous);
 
+  // --- One-time language picker (Feature 1A) ------------------------------
+  // Real users (not anon) who haven't seen the picker get bounced to the picker
+  // route once. Runs BEFORE isPublicRoute so authenticated users landing on
+  // "/" or "/landing" are caught. Skip the API surface, the picker itself,
+  // billing webhooks, shared content, and auth callbacks.
+  const isPickerExempt =
+    pathname === "/onboarding/language" ||
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/onboarding/") ||
+    pathname.startsWith("/cc/shared") ||
+    pathname.startsWith("/auth/") ||
+    pathname.startsWith("/_next/") ||
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname === "/landing";
+
+  if (user && isRealUser && !isPickerExempt) {
+    const { data: profile } = await supabase
+      .from("cc_student_profiles")
+      .select("language_picker_seen_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    // Redirect if (a) the user has no profile row yet (brand-new account —
+    // the row is created lazily by ensureStudentProfile when they hit a
+    // coach API) OR (b) the picker timestamp is still null. Either way the
+    // first thing the user should see is the picker.
+    if (!profile || profile.language_picker_seen_at == null) {
+      return NextResponse.redirect(new URL("/onboarding/language", request.url));
+    }
+  }
+
+  // Skip remaining public-route checks (fastest path)
+  if (isPublicRoute(pathname)) return response;
+
   if (!user) {
     // Legacy unauthenticated-guest whitelist (pre-dates the guest-session flow).
     // Kept for call/voice endpoints that don't want to initialize an anon session.
@@ -161,27 +194,6 @@ export async function middleware(request: NextRequest) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
-  }
-
-  // --- One-time language picker (Feature 1A) ------------------------------
-  // Real users (not anon) who haven't seen the picker get bounced to the picker
-  // route once. Skip the API surface, the picker itself, and shared/auth flows.
-  const isPickerExempt =
-    pathname === "/onboarding/language" ||
-    pathname.startsWith("/api/") ||
-    pathname.startsWith("/onboarding/") ||
-    pathname.startsWith("/cc/shared") ||
-    pathname.startsWith("/auth/");
-
-  if (isRealUser && !isPickerExempt) {
-    const { data: profile } = await supabase
-      .from("cc_student_profiles")
-      .select("language_picker_seen_at")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (profile && profile.language_picker_seen_at == null) {
-      return NextResponse.redirect(new URL("/onboarding/language", request.url));
-    }
   }
 
   // --- Root / landing routing (only for users with a session) -------------

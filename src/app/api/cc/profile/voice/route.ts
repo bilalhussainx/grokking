@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, unauthorized } from "../../helpers";
+import { requireAuth, unauthorized, ensureStudentProfile } from "../../helpers";
 import { COACH_LANGUAGES } from "@/lib/cc/coach-languages";
 
 const ALLOWED_LANGS = new Set(COACH_LANGUAGES.map((l) => l.code));
@@ -47,6 +47,18 @@ export async function PATCH(req: NextRequest) {
 
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: "No fields to update" }, { status: 400 });
+  }
+
+  // Ensure the profile row exists before updating — brand-new users hit this
+  // endpoint from /onboarding/language before any coach API has run.
+  // ensureStudentProfile is a no-op if the row already exists.
+  try {
+    await ensureStudentProfile(auth.supabase, auth.user);
+  } catch (err) {
+    return NextResponse.json(
+      { error: `Failed to provision profile: ${err instanceof Error ? err.message : String(err)}` },
+      { status: 500 },
+    );
   }
 
   const { error } = await auth.supabase
