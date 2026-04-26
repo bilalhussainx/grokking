@@ -1,0 +1,82 @@
+{
+  "MIT": {
+    "deadline_ea": "2025-11-01", "deadline_rd": "2026-01-04",
+    "deadline_financial_aid": "2025-11-15", "deadline_css_profile": "2025-11-15", "deadline_fafsa": "2025-11-15",
+    "portal_url": "https://apply.mit.edu", "portal_login_note": "Use your MIT applicant email" },
+  "Harvard": {
+    "deadline_rea": "2025-11-01", "deadline_rd": "2026-01-01",
+    "deadline_financial_aid": "2025-11-01", "deadline_css_profile": "2025-11-01", "deadline_fafsa": "2026-02-01",
+    "portal_url": "https://college.harvard.edu/admissions" },
+  "Yale": {
+    "deadline_rea": "2025-11-01", "deadline_rd": "2026-01-02",
+    "deadline_financial_aid": "2025-11-01", "deadline_css_profile": "2025-11-01", "deadline_fafsa": "2026-02-15",
+    "portal_url": "https://admissions.yale.edu" },
+  "Princeton": {
+    "deadline_rea": "2025-11-01", "deadline_rd": "2026-01-01",
+    "deadline_financial_aid": "2025-11-09", "deadline_css_profile": "2025-11-09", "deadline_fafsa": "2026-02-01",
+    "portal_url": "https://admission.princeton.edu" },
+  "Stanford": {
+    "deadline_rea": "2025-11-01", "deadline_rd": "2026-01-05",
+    "deadline_financial_aid": "2025-11-15", "deadline_css_profile": "2025-11-15", "deadline_fafsa": "2026-02-15",
+    "portal_url": "https://admission.stanford.edu" },
+  "Columbia": {
+    "deadline_ed": "2025-11-01", "deadline_rd": "2026-01-01",
+    "deadline_financial_aid": "2025-11-01", "deadline_css_profile": "2025-11-01", "deadline_fafsa": "2026-02-15",
+    "portal_url": "https://undergrad.admissions.columbia.edu" },
+  "UPenn": {
+    "deadline_ed": "2025-11-01", "deadline_rd": "2026-01-05",
+    "deadline_financial_aid": "2025-11-15", "deadline_css_profile": "2025-11-15", "deadline_fafsa": "2026-02-15",
+    "portal_url": "https://admissions.upenn.edu" },
+  "Cornell": {
+    "deadline_ed": "2025-11-01", "deadline_rd": "2026-01-02",
+    "deadline_financial_aid": "2025-11-15", "deadline_css_profile": "2025-11-15", "deadline_fafsa": "2026-02-15",
+    "portal_url": "https://admissions.cornell.edu" },
+  "Brown": {
+    "deadline_ed": "2025-11-01", "deadline_rd": "2026-01-03",
+    "deadline_financial_aid": "2025-11-01", "deadline_css_profile": "2025-11-01", "deadline_fafsa": "2026-02-15",
+    "portal_url": "https://admission.brown.edu" },
+  "Dartmouth": {
+    "deadline_ed": "2025-11-01", "deadline_rd": "2026-01-03",
+    "deadline_financial_aid": "2025-11-01", "deadline_css_profile": "2025-11-01", "deadline_fafsa": "2026-02-15",
+    "portal_url": "https://admissions.dartmouth.edu" },
+  "Georgetown": {
+    "deadline_rea": "2025-11-01", "deadline_rd": "2026-01-10",
+    "deadline_financial_aid": "2026-02-01", "deadline_css_profile": "2026-02-01", "deadline_fafsa": "2026-02-01",
+    "portal_url": "https://uadmissions.georgetown.edu" },
+  "UCLA": {
+    "deadline_rd": "2025-11-30",
+    "deadline_financial_aid": "2026-03-02", "deadline_fafsa": "2026-03-02",
+    "portal_url": "https://admission.ucla.edu" },
+  "UMich": {
+    "deadline_ea": "2025-11-01", "deadline_rd": "2026-02-01",
+    "deadline_financial_aid": "2026-03-31", "deadline_css_profile": "2026-03-31", "deadline_fafsa": "2026-03-31",
+    "portal_url": "https://admissions.umich.edu" },
+  "UNC": {
+    "deadline_ea": "2025-10-15", "deadline_rd": "2026-01-15",
+    "deadline_financial_aid": "2026-03-01", "deadline_css_profile": "2026-03-01", "deadline_fafsa": "2026-03-01",
+    "portal_url": "https://admissions.unc.edu" },
+  "NYU": {
+    "deadline_ed": "2025-11-01", "deadline_edii": "2026-01-01", "deadline_rd": "2026-01-05",
+    "deadline_financial_aid": "2026-02-15", "deadline_css_profile": "2026-02-15", "deadline_fafsa": "2026-02-15",
+    "portal_url": "https://www.nyu.edu/admissions" },
+  "Northwestern": {
+    "deadline_ed": "2025-11-01", "deadline_rd": "2026-01-02",
+    "deadline_financial_aid": "2025-11-01", "deadline_css_profile": "2025-11-01", "deadline_fafsa": "2026-02-15",
+    "portal_url": "https://admissions.northwestern.edu" },
+  "Duke": {
+    "deadline_ed": "2025-11-01", "deadline_rd": "2026-01-02",
+    "deadline_financial_aid": "2025-11-15", "deadline_css_profile": "2025-11-15", "deadline_fafsa": "2026-02-01",
+    "portal_url": "https://admissions.duke.edu" },
+  "USC": {
+    "deadline_ea": "2025-11-01", "deadline_rd": "2026-01-15",
+    "deadline_financial_aid": "2026-02-10", "deadline_css_profile": "2026-02-10", "deadline_fafsa": "2026-02-10",
+    "portal_url": "https://admission.usc.edu" },
+  "Vanderbilt": {
+    "deadline_ed": "2025-11-01", "deadline_edii": "2026-01-01", "deadline_rd": "2026-01-01",
+    "deadline_financial_aid": "2026-02-01", "deadline_css_profile": "2026-02-01", "deadline_fafsa": "2026-02-01",
+    "portal_url": "https://admissions.vanderbilt.edu" },
+  "BU": {
+    "deadline_ed": "2025-11-01", "deadline_rd": "2026-01-04",
+    "deadline_financial_aid": "2026-02-15", "deadline_css_profile": "2026-02-15", "deadline_fafsa": "2026-02-15",
+    "portal_url": "https://www.bu.edu/admissions" }
+}

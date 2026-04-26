@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, unauthorized, ensureStudentProfile } from "../../helpers";
 import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
+import { lookupSchoolDeadlines } from "@/lib/applications/deadlines";
 
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
@@ -35,6 +36,16 @@ export async function POST(req: NextRequest) {
   const check = await assertCapacity(user.id, "schoolsMax", currentCount ?? 0);
   if (!check.ok) return blockedResponse(check);
 
+  // Auto-populate deadlines from data/school-deadlines-2026.json (Feature 2).
+  // Look up by school name from cc_schools so the seed (keyed on common
+  // school names) matches without requiring an explicit school_id mapping.
+  const { data: schoolMeta } = await supabase
+    .from("cc_schools")
+    .select("name")
+    .eq("id", school_id)
+    .maybeSingle();
+  const deadlinesSeed = schoolMeta?.name ? lookupSchoolDeadlines(schoolMeta.name) : null;
+
   const { data, error } = await supabase
     .from("cc_student_schools")
     .insert({
@@ -42,6 +53,7 @@ export async function POST(req: NextRequest) {
       school_id,
       chancing_band: chancing_band || "unknown",
       application_status: "researching",
+      ...(deadlinesSeed ?? {}),
     })
     .select("id")
     .single();
