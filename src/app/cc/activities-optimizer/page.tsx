@@ -9,6 +9,7 @@ import GapAnalysis from "@/components/cc/activities/GapAnalysis";
 import ResumeUpload from "@/components/cc/activities/ResumeUpload";
 import BulletEditor from "@/components/cc/activities/BulletEditor";
 import { Tabs, type TabOption } from "@/components/cc/Tabs";
+import NarrativeReport from "@/components/activities/NarrativeReport";
 
 type Tab = "edit" | "review" | "reorder" | "gaps";
 
@@ -183,6 +184,8 @@ export default function ActivitiesOptimizerPage() {
       </div>
 
       {error && <p className="text-xs text-red-400 mb-3">{error}</p>}
+
+      {hasContent && <NarrativeReport activitiesCount={activities.length} />}
 
       {tab === "edit" && (
         <div className="space-y-4">
