@@ -1,0 +1,22 @@
+{
+  "MIT": { "plans": ["EA", "RD"], "is_public": false, "need_aware_for_internationals": false },
+  "Harvard": { "plans": ["REA", "RD"], "is_public": false, "need_aware_for_internationals": false },
+  "Yale": { "plans": ["REA", "RD"], "is_public": false, "need_aware_for_internationals": false },
+  "Princeton": { "plans": ["REA", "RD"], "is_public": false, "need_aware_for_internationals": false },
+  "Stanford": { "plans": ["REA", "RD"], "is_public": false, "need_aware_for_internationals": false },
+  "Georgetown": { "plans": ["REA", "RD"], "is_public": false, "need_aware_for_internationals": true },
+  "Columbia": { "plans": ["ED", "RD"], "is_public": false, "need_aware_for_internationals": false },
+  "UPenn": { "plans": ["ED", "RD"], "is_public": false, "need_aware_for_internationals": false },
+  "Cornell": { "plans": ["ED", "RD"], "is_public": false, "need_aware_for_internationals": false },
+  "Brown": { "plans": ["ED", "RD"], "is_public": false, "need_aware_for_internationals": false },
+  "Dartmouth": { "plans": ["ED", "RD"], "is_public": false, "need_aware_for_internationals": false },
+  "Northwestern": { "plans": ["ED", "RD"], "is_public": false, "need_aware_for_internationals": true },
+  "Duke": { "plans": ["ED", "RD"], "is_public": false, "need_aware_for_internationals": true },
+  "NYU": { "plans": ["ED", "EDII", "RD"], "is_public": false, "need_aware_for_internationals": true },
+  "Vanderbilt": { "plans": ["ED", "EDII", "RD"], "is_public": false, "need_aware_for_internationals": true },
+  "USC": { "plans": ["EA", "RD"], "is_public": false, "need_aware_for_internationals": true },
+  "BU": { "plans": ["ED", "RD"], "is_public": false, "need_aware_for_internationals": true },
+  "UCLA": { "plans": ["RD"], "is_public": true, "need_aware_for_internationals": true },
+  "UMich": { "plans": ["EA", "RD"], "is_public": true, "need_aware_for_internationals": true },
+  "UNC": { "plans": ["EA", "RD"], "is_public": true, "need_aware_for_internationals": true }
+}

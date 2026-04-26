@@ -20,6 +20,12 @@ import {
   type DeadlineKey,
   type KanbanColumn,
 } from "@/lib/applications/deadlines";
+import {
+  checkREAConflict,
+  edWarningState,
+  schoolAcceptsPlan,
+  APPLICATION_PLAN_EXPLAINER_TABLE,
+} from "@/lib/applications/ed-strategy";
 
 const PLAN_OPTIONS = ["RD", "EA", "ED", "EDII", "REA", "QuestBridge", "Coalition"] as const;
 const STATUS_OPTIONS = [
@@ -52,16 +58,45 @@ const DEADLINE_LABEL: Record<DeadlineKey, string> = {
   deadline_fafsa: "FAFSA",
 };
 
+type StudentAffordability = {
+  affordabilityValue: number | null;
+  needsFullAid: boolean;
+  isInternational: boolean;
+};
+
 export default function ApplicationBoard() {
   const [rows, setRows] = useState<SchoolDeadlineRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [planExplainerOpen, setPlanExplainerOpen] = useState(false);
+  const [aff, setAff] = useState<StudentAffordability>({
+    affordabilityValue: null,
+    needsFullAid: true,
+    isInternational: false,
+  });
 
   useEffect(() => {
     fetch("/api/cc/applications/list")
       .then((r) => r.ok ? r.json() : Promise.reject(new Error(`Status ${r.status}`)))
       .then((data) => setRows(data.rows ?? []))
       .catch((e) => setError(String(e)));
+
+    // Pull the student's affordability profile so the ED-warning state
+    // machine can compute safe / warning / block. Uses an existing endpoint
+    // (cc/me already returns these fields); fall back to a conservative
+    // 'aid-dependent' assumption if the lookup fails.
+    fetch("/api/cc/me")
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (d?.profile) {
+          setAff({
+            affordabilityValue: d.profile.affordability_value ?? null,
+            needsFullAid: Boolean(d.profile.needs_full_aid),
+            isInternational: Boolean(d.profile.is_international),
+          });
+        }
+      })
+      .catch(() => { /* fail-open with conservative defaults */ });
   }, []);
 
   const columns = useMemo(() => {
@@ -129,10 +164,14 @@ export default function ApplicationBoard() {
 
   const urgentCount = upcomingFive.filter((u) => u.days < 14 && u.days >= 0).length;
 
+  const reaConflict = checkREAConflict(
+    rows.map((r) => ({ schoolName: r.school_name, plan: r.application_plan })),
+  );
+
   return (
     <div className="px-6 py-6 max-w-7xl mx-auto">
       {urgentCount > 0 && (
-        <div className="mb-5 px-4 py-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-200 text-sm flex items-center gap-2">
+        <div className="mb-3 px-4 py-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-200 text-sm flex items-center gap-2">
           <TriangleAlert className="w-4 h-4 shrink-0" />
           <span>
             <strong>Deadline alert:</strong> {urgentCount} deadline{urgentCount !== 1 ? "s" : ""} within 14 days.
@@ -140,16 +179,81 @@ export default function ApplicationBoard() {
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold text-white">Applications</h1>
-        <a
-          href="/api/cc/applications/ical"
-          download
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[12px] text-white/80 hover:bg-white/10"
+      {reaConflict.conflict && (
+        <div className="mb-3 px-4 py-3 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-100 text-sm">
+          <div className="flex items-center gap-2 mb-1">
+            <TriangleAlert className="w-4 h-4 shrink-0" />
+            <strong>REA conflict</strong>
+          </div>
+          <p>{reaConflict.message}</p>
+        </div>
+      )}
+
+      {planExplainerOpen && (
+        <div
+          className="fixed inset-0 z-[10000] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setPlanExplainerOpen(false)}
         >
-          <Download className="w-3.5 h-3.5" />
-          Export to calendar (.ics)
-        </a>
+          <div
+            className="bg-[#0a0a0a] border border-white/10 rounded-2xl max-w-3xl w-full max-h-[80vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-5 py-3 border-b border-white/10 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-white">ED / EA / REA / RD — which plan?</h3>
+              <button
+                onClick={() => setPlanExplainerOpen(false)}
+                className="text-white/40 hover:text-white/70 text-xs"
+              >
+                Close
+              </button>
+            </div>
+            <div className="overflow-y-auto p-5">
+              <table className="w-full text-[12.5px] text-white/85">
+                <thead className="text-white/55 border-b border-white/10">
+                  <tr>
+                    <th className="text-left py-2 pr-3">Plan</th>
+                    <th className="text-left py-2 pr-3">Binding?</th>
+                    <th className="text-left py-2 pr-3">Benefit</th>
+                    <th className="text-left py-2 pr-3">Restriction</th>
+                    <th className="text-left py-2">Best for</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {APPLICATION_PLAN_EXPLAINER_TABLE.map((row) => (
+                    <tr key={row.plan} className="border-b border-white/5 align-top">
+                      <td className="py-2.5 pr-3 font-semibold">{row.plan}</td>
+                      <td className="py-2.5 pr-3">{row.binding ? "Yes" : "No"}</td>
+                      <td className="py-2.5 pr-3">{row.benefit}</td>
+                      <td className="py-2.5 pr-3 text-white/65">{row.restriction}</td>
+                      <td className="py-2.5 text-white/65">{row.best}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+        <h1 className="text-xl font-semibold text-white">Applications</h1>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setPlanExplainerOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[12px] text-white/80 hover:bg-white/10"
+          >
+            Which plan should I choose?
+          </button>
+          <a
+            href="/api/cc/applications/ical"
+            download
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[12px] text-white/80 hover:bg-white/10"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Export to calendar (.ics)
+          </a>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
@@ -169,6 +273,7 @@ export default function ApplicationBoard() {
                   expanded={expandedId === row.id}
                   onToggle={() => setExpandedId((id) => (id === row.id ? null : row.id))}
                   onUpdate={(u) => updateRow(row.id, u)}
+                  affordability={aff}
                 />
               ))}
               {columns[col].length === 0 && (
@@ -236,18 +341,29 @@ function SchoolCard({
   expanded,
   onToggle,
   onUpdate,
+  affordability,
 }: {
   row: SchoolDeadlineRow;
   expanded: boolean;
   onToggle: () => void;
   onUpdate: (u: Partial<SchoolDeadlineRow>) => void;
+  affordability: StudentAffordability;
 }) {
   const next = nextUpcomingDeadline(row);
   const days = next ? daysUntil(next.date) : null;
   const urgency = days !== null ? urgencyClass(days) : "ok";
   const progress = componentProgress(row);
-  const showEDWarning =
-    row.application_plan === "ED" || row.application_plan === "EDII" || row.application_plan === "REA";
+  const isED = row.application_plan === "ED" || row.application_plan === "EDII";
+  const planNotAccepted =
+    row.application_plan != null && !schoolAcceptsPlan(row.school_name, row.application_plan);
+  const edWarning = isED
+    ? edWarningState({
+        schoolName: row.school_name,
+        affordabilityValue: affordability.affordabilityValue,
+        needsFullAid: affordability.needsFullAid,
+        isInternational: affordability.isInternational,
+      })
+    : null;
 
   return (
     <div
@@ -323,10 +439,40 @@ function SchoolCard({
             </select>
           </div>
 
-          {showEDWarning && (
+          {planNotAccepted && (
             <div className="px-3 py-2 rounded bg-amber-500/15 border border-amber-500/40 text-[11.5px] text-amber-100">
-              <strong>ED warning:</strong> Early Decision is binding. If you depend on financial
-              aid, consider EA or RD so you can compare aid offers before committing.
+              <strong>Heads up:</strong> {row.school_name} doesn&apos;t offer {row.application_plan}.
+              Confirm on the school&apos;s admissions page.
+            </div>
+          )}
+
+          {edWarning && (
+            <div
+              className={`px-3 py-2 rounded text-[11.5px] border ${
+                edWarning.state === "block"
+                  ? "bg-rose-500/15 border-rose-500/50 text-rose-100"
+                  : edWarning.state === "warning"
+                    ? "bg-amber-500/15 border-amber-500/40 text-amber-100"
+                    : "bg-emerald-500/15 border-emerald-500/40 text-emerald-100"
+              }`}
+            >
+              <strong>
+                {edWarning.state === "block"
+                  ? "ED not recommended"
+                  : edWarning.state === "warning"
+                    ? "ED warning"
+                    : "ED looks safe"}
+                :
+              </strong>{" "}
+              {edWarning.headline}
+              <p className="mt-1.5 opacity-90">{edWarning.explanation}</p>
+              {edWarning.alternatives.length > 0 && (
+                <ul className="list-disc pl-4 mt-1.5 space-y-0.5">
+                  {edWarning.alternatives.map((alt, i) => (
+                    <li key={i}>{alt}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
 
