@@ -1,0 +1,70 @@
+[
+  { "school_name": "MIT", "prompts": [
+    { "type": "short_answer", "text": "We know you lead a busy life, full of activities, many of which are required of you. Tell us about something you do simply for the pleasure of it.", "word_limit": 100, "required": true },
+    { "type": "community", "text": "Describe the world you come from — for example, your family, community, or school. How has that world shaped your dreams and aspirations?", "word_limit": 225, "required": true },
+    { "type": "intellectual", "text": "MIT students work to improve their communities in different ways, from tackling the world's biggest challenges to being a good friend. Describe one way in which you have contributed to your community, whether in your family, the classroom, your neighborhood, etc.", "word_limit": 225, "required": true }
+  ]},
+  { "school_name": "Harvard", "prompts": [
+    { "type": "challenge", "text": "Briefly describe an intellectual experience that was important to you.", "word_limit": 150, "required": true },
+    { "type": "community", "text": "Briefly describe any of your extracurricular activities, employment experience, travel, or family responsibilities that have shaped who you are.", "word_limit": 150, "required": true },
+    { "type": "intellectual", "text": "How do you hope to use your Harvard education in the future?", "word_limit": 150, "required": true },
+    { "type": "diversity", "text": "Top 3 things your roommates might like to know about you.", "word_limit": 150, "required": true },
+    { "type": "intellectual", "text": "Harvard has long recognized the importance of student body diversity of all kinds. We welcome you to write about distinctive aspects of your background, personal development or the intellectual interests you might bring to your Harvard classmates.", "word_limit": 150, "required": true }
+  ]},
+  { "school_name": "Yale", "prompts": [
+    { "type": "why_school", "text": "Students at Yale have plenty of time to explore their academic interests before committing to one or more major fields of study. Many students either modify their original academic direction or change their minds entirely. As of this moment, what academic areas seem to fit your interests or goals most comfortably? Please indicate up to three from the list provided.", "word_limit": 35, "required": true },
+    { "type": "why_school", "text": "Tell us about a topic or idea that excites you and is related to one or more academic areas you selected above. Why are you drawn to it?", "word_limit": 200, "required": true },
+    { "type": "community", "text": "What is it about Yale that has led you to apply?", "word_limit": 125, "required": true }
+  ]},
+  { "school_name": "Princeton", "prompts": [
+    { "type": "intellectual", "text": "At Princeton, we value diverse perspectives and the ability to have respectful dialogue about difficult issues. Share a time when you had a conversation with a person or a group of people about a difficult topic. What insight did you gain, and how would you incorporate that knowledge into your thinking in the future?", "word_limit": 250, "required": true },
+    { "type": "diversity", "text": "Princeton has a longstanding commitment to service and civic engagement. Tell us how your story intersects (or will intersect) with these ideals.", "word_limit": 250, "required": true },
+    { "type": "intellectual", "text": "What brings you joy?", "word_limit": 50, "required": true }
+  ]},
+  { "school_name": "Stanford", "prompts": [
+    { "type": "intellectual", "text": "The Stanford community is deeply curious and driven to learn in and out of the classroom. Reflect on an idea or experience that makes you genuinely excited about learning.", "word_limit": 250, "required": true },
+    { "type": "diversity", "text": "Virtually all of Stanford's undergraduates live on campus. Write a note to your future roommate that reveals something about you or that will help your roommate — and us — get to know you better.", "word_limit": 250, "required": true },
+    { "type": "community", "text": "Tell us about something that is meaningful to you and why.", "word_limit": 250, "required": true }
+  ]},
+  { "school_name": "Columbia", "prompts": [
+    { "type": "intellectual", "text": "List the titles of the books, essays, poems, short stories or plays you read outside of academic courses that you enjoyed most during secondary school.", "word_limit": 100, "required": true },
+    { "type": "diversity", "text": "A hallmark of the Columbia experience is being able to learn and live in a community with a wide range of perspectives. How do you or would you learn from and contribute to diverse, collaborative communities?", "word_limit": 150, "required": true },
+    { "type": "why_school", "text": "Why are you interested in attending Columbia University?", "word_limit": 150, "required": true }
+  ]},
+  { "school_name": "UPenn", "prompts": [
+    { "type": "community", "text": "Write a short thank-you note to someone you have not yet thanked and would like to acknowledge.", "word_limit": 200, "required": true },
+    { "type": "why_school", "text": "How will you explore community at Penn? Consider how Penn will help shape your perspective, and how your perspective will help shape Penn.", "word_limit": 200, "required": true },
+    { "type": "why_school", "text": "Considering the specific undergraduate school to which you are applying, describe how you intend to explore your academic and intellectual interests at Penn.", "word_limit": 200, "required": true }
+  ]},
+  { "school_name": "Cornell", "prompts": [
+    { "type": "why_school", "text": "Tell us why you would like to study at this specific Cornell college.", "word_limit": 650, "required": true }
+  ]},
+  { "school_name": "Brown", "prompts": [
+    { "type": "why_school", "text": "Brown's Open Curriculum allows students to explore broadly while also diving deeply into their academic pursuits. Tell us about an academic interest (or interests) that excites you, and how you might use the Open Curriculum to pursue it.", "word_limit": 200, "required": true },
+    { "type": "community", "text": "Students entering Brown often find that making their home on College Hill naturally invites reflection on where they came from. Share how an aspect of your growing up has inspired or challenged you, and what unique contributions this might allow you to make to the Brown community.", "word_limit": 200, "required": true },
+    { "type": "intellectual", "text": "Brown students care deeply about their work and the world around them. Tell us about a time you were challenged by a perspective that differed from your own. How did you respond?", "word_limit": 200, "required": true }
+  ]},
+  { "school_name": "Dartmouth", "prompts": [
+    { "type": "why_school", "text": "Dartmouth celebrates the ways in which its profound sense of place informs its profound sense of purpose. As you seek admission to Dartmouth's Class of 2030, what aspects of the College's academic program, community, or campus environment attract your interest?", "word_limit": 100, "required": true },
+    { "type": "intellectual", "text": "Choose one of the prompts below: 'Be yourself, everyone else is taken' Oscar Wilde / What aspects of your background, your identity, or your school, hometown, or community are integral to who you are?", "word_limit": 250, "required": true }
+  ]},
+  { "school_name": "Georgetown", "prompts": [
+    { "type": "why_school", "text": "Briefly discuss the significance to you of the school or summer activity in which you have been most involved.", "word_limit": 200, "required": true },
+    { "type": "why_school", "text": "As Georgetown is a diverse community, the Admissions Committee would like to know more about you in your own words. Please submit a brief essay, either personal or creative, which you feel best describes you.", "word_limit": 650, "required": true },
+    { "type": "why_school", "text": "Why are you interested in this Georgetown school?", "word_limit": 400, "required": true }
+  ]},
+  { "school_name": "NYU", "prompts": [
+    { "type": "why_school", "text": "We would like to know more about your interest in NYU. What motivated you to apply to NYU? Why have you applied or expressed interest in a particular campus, school, college, program, and or area of study?", "word_limit": 400, "required": true }
+  ]},
+  { "school_name": "UMich", "prompts": [
+    { "type": "community", "text": "Everyone belongs to many different communities and/or groups defined by (among other things) shared geography, religion, ethnicity, income, cuisine, interest, race, ideology, or intellectual heritage. Choose one of the communities to which you belong, and describe that community and your place within it.", "word_limit": 300, "required": true },
+    { "type": "why_school", "text": "Describe the unique qualities that attract you to the specific undergraduate College or School to which you are applying at the University of Michigan.", "word_limit": 550, "required": true }
+  ]},
+  { "school_name": "Northwestern", "prompts": [
+    { "type": "why_school", "text": "Other parts of your application give us a sense of how you might contribute to Northwestern. But we also want to consider how Northwestern will contribute to your interests and goals. In 300 words or less, help us understand how a Northwestern education will help you live a life of purpose.", "word_limit": 300, "required": true }
+  ]},
+  { "school_name": "USC", "prompts": [
+    { "type": "why_school", "text": "Describe how you plan to pursue your academic interests and why you want to explore them at USC specifically.", "word_limit": 250, "required": true },
+    { "type": "intellectual", "text": "What is something about yourself that is essential to understanding you?", "word_limit": 250, "required": true }
+  ]}
+]
