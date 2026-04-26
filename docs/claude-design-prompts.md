@@ -3,8 +3,23 @@
 Drop these into your existing KairosLearn claude.ai/design project (the same one
 that produced the landing page + essay foundation UI). Section 0 establishes
 the design system once — paste it as the FIRST message in any new chat in that
-project so every subsequent design is consistent. Sections 1-17 are the
-per-feature prompts; each one references the design system without re-stating it.
+project so every subsequent design is consistent.
+
+**Read the IA spec (Section 0a) before any feature section.** Features 1-17
+are not standalone destinations — they're modules surfaced through a single
+adaptive home dashboard. Sections 0b through 0e design that home + the
+navigation chrome. Sections 1-17 design the inner surfaces those modules
+open into.
+
+If you're starting from scratch, do these in order:
+1. Section 0 (design system primer)
+2. Section 0a (information architecture — read-only spec)
+3. Section 0b (multi-step onboarding) — supersedes Feature 1A Screen 1
+4. Section 0c (adaptive home dashboard) — supersedes the standalone
+   /cc/dashboard-junior, /cc/dashboard-grade9, /cc/dashboard-transfer pages
+5. Section 0d (navigation chrome — sidebar + command palette)
+6. Section 0e (per-phase module ordering rules)
+7. Sections 1-17 (inner feature surfaces)
 
 ---
 
@@ -54,35 +69,439 @@ re-mocking it.
 
 ---
 
+## Section 0a — Information architecture (read-only spec)
+
+This is **NOT a prompt**. It's the IA narrative the next four prompts (0b–0e)
+operate against. Read it once so the dashboard prompts make sense; don't
+paste this into claude.ai/design.
+
+### 1. User journeys
+
+KairosLearn has 6 distinct user contexts. Onboarding captures three signals
+(grade, transfer flag, top concern) and the platform computes the rest from
+state (school list size, essay phases, submitted dates). Each context renders
+a different home dashboard:
+
+| Context              | Trigger                                                                  | What matters most right now                              |
+| -------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------- |
+| **Grade 9**          | grade_level = 9                                                          | Course rigor habit, "what matters in admissions"         |
+| **Grade 10**         | grade_level = 10                                                         | PSAT prep, summer planning, early major exploration      |
+| **Grade 11 / Junior**| grade_level = 11                                                         | School list draft, SAT/ACT, brainstorm (no draft yet)    |
+| **Senior writing**   | grade_level = 12 + has school list + essay phase != submitted/final      | Application tracker, supplements, ED warning, voice coach|
+| **Senior submitted** | grade_level = 12 + 1+ school in submitted/decisions phase                | Waitlist watcher, financial aid, interviews              |
+| **Transfer**         | is_transfer_student = true (overrides grade)                             | Why-transfer essay, professor recs, transfer school list |
+
+### 2. Phase auto-detection (no extra onboarding question)
+
+For senior users we compute `phase` server-side from existing tables:
+
+```ts
+phase = "decisions"   if any cc_student_schools.application_status in (accepted, rejected, deposited, deferred)
+      = "post_submit" if any school is "submitted" + at least one is still pending
+      = "writing"     if has school list + has essay rows in outline/draft/revise
+      = "list_build"  if has school list but no essays drafted
+      = "discover"    if no school list yet
+```
+
+Phase shifts the dashboard hero card without re-onboarding.
+
+### 3. Where every feature lives
+
+| Feature | Inner route (deep link) | How users discover it |
+| - | - | - |
+| 1A Voice / multilingual | header language picker + coach drawer | Always visible chrome |
+| 1B Translate-for-parent | inline button on docs | Contextual |
+| 1B Working-late prompt | bottom-right toast after 10pm | Auto |
+| 2 Application tracker | `/applications` | Sidebar (senior+) + dashboard module (writing/post_submit) |
+| 3 Narrative diagnosis | `/cc/activities-optimizer` | Sidebar + dashboard module (G11+ once 3+ activities) |
+| 4 Supplements | `/cc/essays/supplements` | Sidebar (senior writing+) + dashboard module |
+| 5 ED warning | inside Application tracker (state) | Auto-surfaces inside Feature 2 |
+| 6 Waitlist | `/cc/waitlist` | Sidebar + dashboard module (post_submit, only if any school is waitlisted) |
+| 7 Recommenders | `/cc/recommenders` | Sidebar (senior+) + dashboard module (writing) |
+| 8 Interview reflection | `/cc/interview-prep/reflect` | Sidebar (senior+) |
+| 9 Test strategy | `/cc/test-strategy` | Sidebar (G10–G12) + dashboard module (G11) |
+| 10 Parent portal | `/parent/[token]` (parent-only) | Student invites from coach drawer or settings |
+| 11 Course rigor | `/cc/courses` | Sidebar (G9–G12) + dashboard module (G9–G11) |
+| 12 Major exploration | `/cc/majors` | Sidebar + dashboard module (G9–G11) |
+| 13 Visits | `/cc/visits` | Sidebar (G11–G12) |
+| 14 Summer planning | `/cc/summer` | Sidebar (G9–G11) + dashboard module (G9–G10 spring) |
+| 15 Junior dashboard | merged into adaptive home | — |
+| 16 Grade 9 dashboard | merged into adaptive home | — |
+| 17 Transfer dashboard | merged into adaptive home | — |
+
+### 4. Navigation chrome
+
+Three persistent surfaces:
+
+- **TopNav** (existing): logo + language picker + coach button + profile menu. No change.
+- **Left sidebar** (NEW): collapsible. Grouped feature links. Filtered by user context — a grade 9 user does not see "Application tracker" in the sidebar at all.
+- **Command palette** (NEW): `Cmd/Ctrl + K`. Search-first jump to any allowed feature, any school, any essay. Power-user shortcut.
+
+### 5. The "no overload" rule
+
+Even in senior writing phase the dashboard must NEVER show more than:
+
+- 1 hero card (the next step)
+- 3 priority modules
+- 1 secondary tile grid (4-6 tiles, NOT 17)
+- 1 supporting widget row (XP / streak / school count)
+
+The sidebar holds the rest. Anything not in the dashboard's 3+6 visible
+surfaces gets reached via sidebar or command palette. **The dashboard is
+tomorrow's todo list; the sidebar is the full toolbox.**
+
+---
+
+## Section 0b — Multi-step onboarding (supersedes Feature 1A Screen 1)
+
+```
+Design a multi-step onboarding flow for KairosLearn at /onboarding. The flow
+runs once on first sign-in and decides which dashboard the user lands on.
+
+Match the existing landing-page hero aesthetic: cinematic dark, gold accents,
+soft fade transitions between steps. Single full-screen surface; the user
+progresses through steps without page reloads. A small progress dot row
+across the top (4 dots, gold for current).
+
+STEP 1 — Language (the existing 18-tile picker, kept verbatim from
+Feature 1A Screen 1). Native script + greeting + voice/text-only badge.
+After pick, fade to Step 2.
+
+STEP 2 — Who are you?
+Two large rounded-2xl cards in a 2-column layout (stacks on mobile):
+
+  [Card A — High school student]
+  Heading: "I'm in high school"
+  Caption: "Looking ahead to college applications."
+
+  [Card B — Transfer applicant]
+  Heading: "I'm applying to transfer"
+  Caption: "Already in college, looking to switch schools."
+
+Tapping Card A advances to Step 3a (grade picker).
+Tapping Card B advances to Step 3b (transfer profile mini-form).
+
+STEP 3a — What grade are you in? (only after Card A)
+4 pill buttons in a row: Grade 9 / Grade 10 / Grade 11 / Grade 12.
+Below each pill, a single-line caption in 11px white/55:
+- Grade 9: "Build the foundation"
+- Grade 10: "Add depth + take PSAT"
+- Grade 11: "Junior year — runway"
+- Grade 12: "It's go time"
+
+After pick, advance to Step 4.
+
+STEP 3b — Transfer mini-form (only after Card B)
+Compact form, all on one screen:
+- Current school (text)
+- Credits completed (number)
+- Target term (text, e.g. "Fall 2026")
+- "Why transferring?" textarea (3 rows)
+Gold "Continue" button advances directly to the dashboard (skips Step 4).
+
+STEP 4 — What's your top concern? (only for Grade 11/12)
+6 chip-style cards (3-col grid, stacks on mobile). Each card has a small
+icon, a one-word headline, and a sub-caption:
+- Calendar icon — "Deadlines" — "Tracking when everything is due"
+- DollarSign icon — "Aid" — "Making sure I can afford it"
+- FileText icon — "Essays" — "Writing the personal statement"
+- Activity icon — "Activities" — "Telling my story"
+- MessageSquare icon — "Interviews" — "Getting ready to be interviewed"
+- Compass icon — "I don't know yet" — "Tell me where to start"
+
+Multi-select, max 2. The selections become the dashboard's pinned modules.
+Gold "Take me to my dashboard" button advances to /dashboard.
+
+For Grade 9/10 students, SKIP Step 4 — go straight to dashboard. Their
+dashboard surfaces what's age-appropriate by default.
+
+INTERACTION DETAILS:
+- Each step fades in (200ms). The previous step never re-appears (no back
+  button — friction is intentional; the user can change everything later
+  in /settings).
+- The progress dots show step number, not feature labels.
+- After last step, save the full profile + redirect to /dashboard.
+- All copy in steps 2-4 is English regardless of language pick — the
+  language pick affects Coach Kairos's voice/text, not the platform UI.
+```
+
+---
+
+## Section 0c — Adaptive home dashboard (supersedes Features 15/16/17)
+
+```
+Design ONE dashboard at /dashboard that adaptively renders six variants
+based on user context. Don't design six separate pages — design one layout
+that swaps its content. Each variant must be obviously the same product
+(same chrome, same density, same tile language) so users don't feel like
+they're in three different apps over the year.
+
+UNIVERSAL FRAME (every variant):
+- Top header (60-80px tall): "[time-aware greeting], [Preferred Name]"
+  e.g. "Good evening, Bilal" (12px white/55 above), 24px white/90 heading.
+  Right side: status line "[Grade 12 · Senior writing] · Day 12 of essay
+  season" or "[Grade 9 · Building foundation]". Tone signals where they
+  are without nagging.
+
+- HERO CARD (always 1, full-width on tablet+, the most prominent block):
+  This is "your next step". One specific action. Must be phase-aware
+  (see Section 0e). For example:
+  - Grade 9: "Pick one harder course for next year and add it to your
+    course list." Button: gold "Add a course →"
+  - Grade 11 spring: "Build your school list — aim for 10-15 schools
+    across reach/match/safety." Button: "Open the school list builder →"
+  - Grade 12 with ED 8 days away: "MIT EA deadline in 8 days. You have
+    3 components incomplete." Button (rose): "View MIT checklist →"
+  - Senior with waitlist: "[School] waitlisted you. Decide whether to
+    stay and write a LOCI." Button: "Open Waitlist →"
+
+  Hero card has the gold-edged "premium moment" treatment from the
+  landing page — subtle gold border, faint gold glow on hover, large
+  serif (Cormorant) for the action sentence.
+
+- PRIORITY MODULES (1-3 cards in a row, same row width as hero):
+  Phase-specific (see Section 0e). Each is a compact preview of a
+  feature WITH the data already loaded:
+  - "Application tracker" — shows next 3 deadlines + days-until,
+    "Open board →" link
+  - "Supplements" — shows total required + percent complete + next
+    school to tackle
+  - "Activities optimizer" — shows count + a single "Analyze your story"
+    nudge if 3+ logged
+  - "Test strategy" — shows recommended test + next sitting date
+  Etc. (See Section 0e for the per-phase mapping.)
+
+  Each priority module is a full card you can interact with, NOT just
+  a tile that links out. The point is to do the work HERE without
+  needing to navigate.
+
+- SECONDARY TILE GRID (4-6 tiles in 3-col / 2-col mobile):
+  Lower-priority features for this user context. Each tile is a small
+  rounded-xl card with: lucide icon (gold) + 12.5px label + 10px caption.
+  These are THE WAY to discover features that aren't pinned to the
+  priority row. Tile labels match the sidebar exactly so users learn
+  the vocabulary.
+
+- WIDGET STRIP (bottom, optional):
+  Small horizontal strip with: XP today / streak day count / total schools
+  on list / total activities logged. Each is a number + label, mono font
+  for numbers, no big chart. This rewards return visits without becoming
+  a Duolingo-style game.
+
+VARIANT — Grade 9
+- Hero: "Pick the harder math option" or "Join one club this semester"
+- Priority modules: "Track your courses", "Plan your summer"
+- Tile grid: Major exploration / Visits (virtual tours) / Course rigor
+  analysis (locked until 4+ courses) / Coach Kairos chat
+- NO modules: Application tracker, Essay Studio, SAT/ACT, Interviews,
+  Supplements, Waitlist, Aid
+
+VARIANT — Grade 10
+- Hero: "Take the PSAT this October" or "Plan a meaningful summer"
+- Priority modules: "Course rigor", "Summer planning"
+- Tile grid: Major exploration / Visits / Activities (low-stakes) /
+  Coach Kairos
+- LOCKED tiles (visible but greyed): Application tracker, Essay Studio
+  with caption "Unlocks junior spring"
+
+VARIANT — Grade 11 / Junior
+- Hero: time-of-year-aware. Fall: "Enter your courses + start the school
+  list draft." Spring: "Take SAT/ACT + brainstorm your personal statement."
+  Summer: "Lock the PS brainstorm, log activities."
+- Priority modules: "School list draft", "SAT/ACT plan", "Activities
+  optimizer"
+- Tile grid: Brainstorm-only Essay Studio (with caption "draft + revise
+  unlock at grade 12") / Course rigor / Summer experiences / Major
+  exploration / Visits / Coach
+- Countdown widget: "X days until Common App opens"
+
+VARIANT — Senior writing (grade 12 + active essays)
+- Hero: phase-aware. Most common: "Next deadline: [School] in [N] days.
+  Open the checklist →"
+- Priority modules: "Application tracker" (showing next 3 deadlines),
+  "Supplements" (X / Y complete), "Personal statement phase" (current
+  phase + nudge to next)
+- Tile grid: Activities / Recommenders / Test scores (final) / Visits
+  (demonstrated interest counter) / Coach Kairos / Aid
+- Sidebar surfaces ED warnings prominently if applicable.
+
+VARIANT — Senior submitted / decisions
+- Hero: depends on what's happening. If a school is waitlisted: "[School]
+  waitlisted you. Decide and write a LOCI →". If decisions in flight:
+  "[School] decision drops [Date]." If aid offers in: "Compare your aid
+  packages →"
+- Priority modules: "Waitlist watcher" (if any), "Decisions tracker"
+  (which schools have responded), "Financial aid comparator"
+- Tile grid: Interview reflection / Application tracker (history mode) /
+  Coach
+- The tone shifts to calmer, less urgent — the work is mostly done.
+
+VARIANT — Transfer
+- Hero: "Refine your why-transfer essay — it's the heart of your file."
+- Priority modules: "Why-transfer essay", "Transfer school list",
+  "Professor recs" (transfer-specific)
+- Tile grid: Course evaluations / Coach Kairos / Translate-for-parent
+- Hidden: SAT/ACT (most transfers don't retake), Activities optimizer
+  (less central for transfers)
+
+EMPTY STATES:
+For each variant, design what the dashboard looks like the moment after
+onboarding when nothing is filled in. The hero changes to "Tell us about
+yourself — start with your schools" / "Tell us your courses" etc. The
+priority modules show empty-state captions instead of data.
+
+REGRESSION GUARDRAIL: don't show MORE than 1 hero + 3 priority modules
++ 6 tiles + 1 widget row. Anything else lives in the sidebar.
+```
+
+---
+
+## Section 0d — Persistent navigation chrome
+
+```
+Design two navigation surfaces that wrap every authenticated page:
+
+SURFACE 1 — Left sidebar (NEW)
+Width: 240px expanded, 64px collapsed. Toggle button in TopNav. Persistent
+across all dashboard routes. Background: same as page (#05080d).
+
+Content (top to bottom):
+- Logo/brand at top (matches TopNav)
+- "Your dashboard" link (Home icon) — always present, takes user to
+  /dashboard
+- Section divider — small uppercase 10px white/35 caption "Apply"
+  - Application tracker (Calendar icon)
+  - Supplements (FileText icon)
+  - Recommenders (Mail icon)
+  - Test strategy (ChartBar icon)
+  - Interviews (MessageSquare icon)
+  - Waitlist (Hourglass icon) — only visible if user has any waitlisted
+- Section divider — "Profile"
+  - Activities (Activity icon)
+  - Course rigor (BookOpen icon)
+  - Major exploration (Compass icon)
+  - Visits (MapPin icon)
+  - Summer experiences (Sun icon)
+- Section divider — "Tools"
+  - Coach Kairos (GraduationCap icon — opens drawer not new page)
+  - Settings (Settings icon)
+
+VISIBILITY RULES (the sidebar filters by user context):
+- Grade 9: only "Apply" section is hidden entirely. "Profile" + "Tools"
+  visible. Course rigor, Major exploration, Summer, Visits, Coach,
+  Settings.
+- Grade 10: same as Grade 9, plus Test strategy enters "Apply".
+- Grade 11: full "Profile" + Test strategy + Activities + Brainstorm-only
+  Essay Studio in "Apply".
+- Grade 12 (writing): everything visible.
+- Grade 12 (post-submit): everything visible. Waitlist becomes prominent.
+- Transfer: hide Test strategy, hide standard Recommenders item — replace
+  with "Professor recs". Application tracker shows transfer-specific copy.
+
+Active state: gold left-border (3px), gold icon, white text. Hover: white/5
+background. Section dividers do NOT collapse — they stay visible even when
+the sidebar collapses (just smaller text, abbreviation).
+
+When collapsed (64px wide), only icons show. Tooltip on hover. Active state
+is a gold left-border still.
+
+SURFACE 2 — Command palette (NEW)
+Triggered by Cmd/Ctrl+K. Modal overlay with search input at top, results
+below. Results grouped under headers:
+- "Pages" (any sidebar destination)
+- "Schools" (user's school list — type a school name to jump)
+- "Essays" (user's essay drafts)
+- "Actions" (e.g. "Generate LOCI", "Run rigor analysis", "Translate brag
+  sheet for parent")
+
+Each result: icon + label + small caption. Active row has gold left-border.
+Up/down arrow keys navigate, Enter selects.
+
+Bottom of palette: tiny caption "Press / to ask Coach Kairos instead" —
+typing / opens the coach drawer.
+
+The palette is the power-user backstop: even when a feature isn't in the
+sidebar (e.g. Translate-for-parent button is contextual), it's reachable
+via the palette. So nothing in the product is undiscoverable.
+```
+
+---
+
+## Section 0e — Per-phase module ordering (read-only spec)
+
+This is **NOT a prompt** — it's the rule book Section 0c follows. Use it
+when reviewing dashboard mockups to verify the right modules surface for
+each context. Don't paste this into claude.ai/design either.
+
+### Hero card content rules
+
+| Context                      | Hero says                                                                | Hero CTA                                  |
+| ---------------------------- | ------------------------------------------------------------------------ | ----------------------------------------- |
+| G9, no courses               | "Add the courses you're taking this year."                               | Add a course →                            |
+| G9, has courses              | "Pick one club you want to commit to for the year."                      | Coach Kairos                              |
+| G10, fall                    | "Take the PSAT this October — register today if you haven't."            | Open Test strategy →                      |
+| G10, spring                  | "Plan one meaningful summer experience."                                 | Plan summer →                             |
+| G11, fall, no school list    | "Start your school list draft — 10-15 schools."                          | Open school list →                        |
+| G11, fall, has list, no test | "Take a diagnostic SAT or ACT this fall."                                | Open Test strategy →                      |
+| G11, spring                  | "Brainstorm your personal statement — no draft yet."                     | Open brainstorm →                         |
+| G11, summer                  | "Lock your activity list. Plan supplements for fall."                    | Open Activities →                         |
+| G12, fall, no PS draft       | "Outline your personal statement — first deadline is [date]."            | Open Essay Studio →                       |
+| G12, fall, deadline <14d     | "[School] [plan] deadline in [N] days."                                  | View [School] checklist → (rose-urgent)   |
+| G12, post-submit, normal     | "Decisions drop [next school + date]. Stay calm."                        | Application tracker →                     |
+| G12, post-submit, waitlisted | "[School] waitlisted you. Decide whether to stay + write a LOCI."        | Open Waitlist →                           |
+| G12, decisions in            | "Compare your aid packages."                                             | Open Aid →                                |
+| Transfer, no profile         | "Tell us about your transfer — current school + why."                    | Complete profile →                        |
+| Transfer, has profile        | "Refine your why-transfer essay — it's the heart of your file."          | Open Essay Studio →                       |
+
+### Priority module mapping
+
+| Context              | Module 1                          | Module 2                       | Module 3                         |
+| -------------------- | --------------------------------- | ------------------------------ | -------------------------------- |
+| G9                   | Course rigor (count + analyze CTA)| Summer plan (next milestone)   | (none — keep it light)           |
+| G10                  | Test strategy (PSAT date)         | Course rigor                   | Summer plan                      |
+| G11 fall             | School list (count + bands)       | Test strategy (test + date)    | Course rigor                     |
+| G11 spring           | School list                       | Brainstorm (latest theme)      | Activities (count)               |
+| G11 summer           | Activities (with narrative CTA)   | School list (band balance)     | Brainstorm                       |
+| G12 writing          | Application tracker (next 3 deadlines) | Supplements (X/Y complete) | Personal statement phase         |
+| G12 post-submit      | Decisions tracker                 | Waitlist (if any)              | Aid                              |
+| Transfer             | Why-transfer essay                | Transfer school list           | Professor recs                   |
+
+### Secondary tile grid (always 4-6 tiles)
+
+| Context        | Tiles                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| G9             | Track courses, Major exploration, Plan summer, Coach Kairos                              |
+| G10            | Track courses, Major exploration, Plan summer, Visits (virtual tours), Coach            |
+| G11            | Brainstorm (locked: Draft + Revise), Course rigor, Major exploration, Visits, Coach, Aid |
+| G12 writing    | Activities, Recommenders, Test scores (final), Visits, Coach, Aid                        |
+| G12 submitted  | Interview reflection, Tracker (history), Coach                                            |
+| Transfer       | Course evaluations, Coach, Translate-for-parent                                          |
+
+### Locked-but-visible tiles
+
+For Grade 9 / 10, show Application tracker / Essay Studio / Test strategy
+as **greyed tiles** with captions like "Unlocks junior year". This builds
+anticipation rather than hiding the platform's depth.
+
+For Grade 11, show Draft + Revise Essay phases as greyed-but-visible inside
+the brainstorm tile. Caption: "Drafting unlocks senior fall."
+
+---
+
 ## Section 1 — Feature 1A: Hindi/Punjabi Voice + Multilingual Coach
 
 ```
-Design 4 screens for Feature 1A: multilingual voice + family mode.
+Design 3 screens for Feature 1A (the language picker is now Step 1 of the
+multi-step onboarding in Section 0b — don't redesign it here).
 
-Screen 1 — First-login language picker (/onboarding/language)
-A full-screen 18-tile picker. Each tile is a 4:3 card showing:
-- Native script name (the language's own script, large — 28-32px)
-- One-line greeting in that language ("I'm here to listen to your story" /
-  "میں تمہاری کہانی سننے کے لیے یہاں ہوں" / "मैं तुम्हारी कहानी सुनने के लिए यहाँ हूँ" etc.)
-- A small pill at the bottom: gold "🎙 Voice" or white-30% "📝 Text only"
-The 18 tiles in a 6-column grid (collapses to 3 on tablet, 2 on mobile).
-Tap to select; show a gold-bordered selection state. Gold loading spinner
-overlays the picked tile while saving. No skip button — the user must pick.
-Below the grid: small caption in 11px white-35%: "The platform interface stays
-in English. Coach Kairos speaks your chosen language. Urdu is text-only —
-voice support coming soon."
-The 17 voice languages are: en, es, fr, de, it, nl, ja, hi, bn, ta, te, gu,
-kn, ml, mr, pa, od. The 18th is ur (text-only, RTL, Nastaliq script — render
-it correctly).
-
-Screen 2 — Coach drawer (right slide-out, 400px) in Urdu mode
+Screen 1 — Coach drawer (right slide-out, 400px) in Urdu mode
 The drawer already exists; design the Urdu STATE of it. Header has Languages
 icon + Family-Mode (Users) icon + voice toggle (greyed/disabled with tooltip
 "Voice for Urdu coming soon — try Hindi for voice"). Bubbles render RTL in
 Nastaliq. A typed message in mixed script: "میں MIT جانا چاہتا ہوں" — "MIT"
 stays LTR inside the RTL flow. Composer textarea is dir="auto".
 
-Screen 3 — Family Mode overlay
+Screen 2 — Family Mode overlay
 Full-screen modal overlay (sits ABOVE whatever route the student was on).
 Black/85 + backdrop blur. Top bar: language label on left, "Hand back to
 student" link on right (gold). Centered: a 96x96 gold mic button (circle).
@@ -91,7 +510,7 @@ spinner). Below the mic: localised "Tap to speak" / "Listening…" / "Coach
 Kairos is thinking…" caption. Above the mic: last 4 turn bubbles (parent
 on right white/10, coach on left gold/15).
 
-Screen 4 — Story Canvas with Fragments + Directions cards
+Screen 3 — Story Canvas with Fragments + Directions cards
 Right rail of the brainstorm page. Two stacked cards:
 - "Fragments" card (top, NEW) — shows English fragments extracted from
   non-English brainstorm turns. Each fragment is an italicised quote with
@@ -632,6 +1051,12 @@ in white/65 below if present. Border-bottom on each row.
 
 ## Section 16 — Feature 15: Junior Year Dashboard
 
+> **Merged into Section 0c (Adaptive home dashboard) — variant "Grade 11 / Junior".**
+> Don't design a separate `/cc/dashboard-junior` page. The kept code at
+> `src/app/cc/dashboard-junior/page.tsx` exists as a deep link, but the
+> primary surface is the conditionally-rendered `/dashboard`. Use the
+> Section 0c prompt and the Junior variant rules in Section 0e.
+
 ```
 Design 1 screen at /cc/dashboard-junior.
 
@@ -673,6 +1098,11 @@ centered card "This dashboard is for grade 11. Your profile says grade [N]"
 ---
 
 ## Section 17 — Feature 16: Grade 9 Dashboard
+
+> **Merged into Section 0c (Adaptive home dashboard) — variant "Grade 9".**
+> Don't design a separate `/cc/dashboard-grade9` page. Use Section 0c +
+> the Grade 9 rules in Section 0e (different hero copy, smaller priority
+> module set, locked-but-visible tiles for Apply features).
 
 ```
 Design 1 screen at /cc/dashboard-grade9.
@@ -728,6 +1158,11 @@ Wrong-grade message: same pattern as junior dashboard.
 
 ## Section 18 — Feature 17: Transfer Student Dashboard
 
+> **Merged into Section 0c (Adaptive home dashboard) — variant "Transfer".**
+> The transfer profile mini-form is captured in Section 0b (onboarding
+> Step 3b). Use Section 0c + the Transfer variant rules in Section 0e.
+> The standalone `/cc/dashboard-transfer` route stays as a deep link only.
+
 ```
 Design 1 screen at /cc/dashboard-transfer.
 
@@ -782,28 +1217,48 @@ Tile grid (2 tiles per row, 4 total):
    section. Iterate within that chat until handoff-ready, then start a new
    chat for the next feature so context stays fresh.
 
-2. **Generate in groups of related features** for visual consistency:
-   - Group A: 2 + 5 (the application tracker pair)
-   - Group B: 6 + 7 + 8 (the post-application support trio)
-   - Group C: 11 + 12 + 14 (the exploration / planning trio)
-   - Group D: 15 + 16 + 17 (the three role-specific dashboards)
-   - Standalones: 1A + 1B (voice/multilingual), 3 (narrative diagnosis),
-     4 (supplements), 9 (test strategy), 10 (parent portal), 13 (visits)
+2. **Architecture FIRST — features SECOND.** Don't even open feature prompts
+   until the IA layer is settled. The order:
+   - Sprint 1 (IA): Section 0 + 0a + 0b + 0c + 0d. Output: agreed home
+     dashboard variants, agreed sidebar, agreed onboarding flow.
+   - Sprint 2 (priority modules): Sections 2 + 4 + 5 + 7 + 9 (the writing-
+     phase senior path, since that's the most commercially valuable user).
+   - Sprint 3 (post-submit): Sections 6 + 8 (waitlist + interview reflection).
+   - Sprint 4 (G9–G11 + transfer paths): Sections 11 + 12 + 13 + 14 +
+     review of the Grade 9 / Grade 10 / Junior / Transfer dashboard
+     variants from Section 0c.
+   - Sprint 5 (multilingual + parent surfaces): Sections 1 + 1B + 10.
+   - Sprint 6 (polish): Section 3 (narrative diagnosis is iterative anyway).
 
-3. **Hand-off bundles**: when each feature design is ready, click "Hand off
+3. **Generate in groups of related features** for visual consistency:
+   - Group A: 2 + 5 (the application tracker pair — same surface)
+   - Group B: 6 + 7 + 8 (post-application support trio)
+   - Group C: 11 + 12 + 14 (exploration / planning trio)
+   - Standalones: 1A + 1B (voice / multilingual), 3 (narrative diagnosis),
+     4 (supplements), 9 (test strategy), 10 (parent portal), 13 (visits)
+   - The three "dashboard" features (15/16/17) are no longer separate —
+     they're variants in Section 0c.
+
+4. **Hand-off bundles**: when each feature design is ready, click "Hand off
    to Claude Code" in claude.ai/design. Take the URL or exported notes and
    either (a) paste them into a new Claude Code chat alongside one of the
    `feat(N)` commits to refine the existing implementation, or (b) save
    them under `docs/superpowers/designs/2026-XX-XX-feature-N/` so future
    sessions can reference them.
 
-4. **Iterate on density**: claude.ai/design tends to over-pad mockups. If a
+5. **Iterate on density**: claude.ai/design tends to over-pad mockups. If a
    screen feels too sparse, ask explicitly "tighten the density to match the
    existing Essay Studio" — that pulls it toward the right rhythm.
 
-5. **Don't redesign chrome**: if claude.ai/design proposes a new sidebar /
-   nav / footer, push back hard. All these features live INSIDE the existing
-   (dashboard) layout.
+6. **Don't redesign chrome (after Sprint 1)**: once the sidebar from Section
+   0d is settled, no later prompt should reinvent it. If claude.ai/design
+   proposes a new sidebar / nav / footer in a feature design, push back
+   hard. All later features live INSIDE the chrome from Sprint 1.
+
+7. **The "no overload" enforcement**: review every dashboard mockup against
+   the rule in Section 0a — at most 1 hero + 3 priority modules + 6 tiles
+   + 1 widget row. If a variant exceeds that, the answer is more sidebar,
+   not more dashboard.
 
 ---
 
