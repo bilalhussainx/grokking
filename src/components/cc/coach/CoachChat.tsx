@@ -12,11 +12,13 @@ import CoachMessage from "./CoachMessage";
 // path also works but keep this list for messaging purposes.
 const VOICE_SUPPORTED_LANGUAGES = ["en", "es", "fr", "de", "nl", "it", "ja", "hi", "pa", "bn", "ta", "te", "gu", "kn", "ml", "mr", "od"];
 
-const COACH_KAIROS_VOICE_PROMPT = `You are Coach Kairos, an experienced college counselor for Coach Kairos / KairosLearn.
-You're having a voice conversation with a student about their college applications. Keep replies
-short and conversational — 2-3 sentences max per turn unless they ask for depth. Listen warmly,
-ask follow-up questions, and use the student's chosen language. Don't lecture; help them think
-out loud about their story, school list, essays, or financial situation.`;
+// Fallback prompt used only if /api/cc/coach/voice-prompt is unreachable.
+// The real prompt is fetched at start time so voice mode honors the user's
+// intake state, school list, essay progress, etc.
+const COACH_KAIROS_VOICE_FALLBACK_PROMPT = `You are Coach Kairos, an experienced college counselor.
+You're having a voice conversation about the student's college applications. Keep replies short
+(1-2 sentences). Guide them through intake -> school list -> activity list -> essays -> interviews
+-> financial aid. Use their chosen language. No markdown — plain spoken sentences only.`;
 
 export default function CoachChat() {
   const {
@@ -68,9 +70,25 @@ export default function CoachChat() {
       console.warn("[CoachChat] voice not supported for", language);
       return;
     }
+    // Fetch the dynamic Coach Kairos system prompt so voice mode honors the
+    // user's intake stage, school list, essay progress, etc. Fall back to a
+    // generic prompt if the endpoint is unreachable.
+    let systemPrompt = COACH_KAIROS_VOICE_FALLBACK_PROMPT;
+    try {
+      const res = await fetch("/api/cc/coach/voice-prompt");
+      if (res.ok) {
+        const data = (await res.json()) as { systemPrompt?: string };
+        if (data.systemPrompt && data.systemPrompt.length > 100) {
+          systemPrompt = data.systemPrompt;
+        }
+      }
+    } catch (err) {
+      console.warn("[CoachChat] voice-prompt fetch failed; using fallback", err);
+    }
+
     await voiceAgent.start({
       personaId: "coach-kairos",
-      systemPrompt: COACH_KAIROS_VOICE_PROMPT,
+      systemPrompt,
       voiceProvider: "deepgram",
       voiceId: "aura-2-thalia-en",
       language,

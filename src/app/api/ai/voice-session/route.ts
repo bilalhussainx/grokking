@@ -20,9 +20,15 @@ const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 
 // Voice agent LLM brain — OpenRouter primary, Kimi fallback.
-// Defaults to Claude Sonnet 4.5 for the most natural voice (Kimi sounds robotic).
-// Override per-deployment via OPENROUTER_VOICE_MODEL env var if needed.
+// Coach Kairos uses Haiku 4.5 for sub-second first-token (the user is in a
+// real-time conversation; Sonnet's 1.5-2s TTFT was the source of the 'voice
+// reply takes 2s' complaint). Sonnet stays as the default for lessons-mode
+// AICoach where natural prose matters more than turn-taking speed.
+// Override per-deployment via OPENROUTER_VOICE_MODEL or
+// OPENROUTER_VOICE_MODEL_COACH env vars.
 const VOICE_LLM_MODEL = process.env.OPENROUTER_VOICE_MODEL || "anthropic/claude-sonnet-4.5";
+const VOICE_LLM_MODEL_COACH =
+  process.env.OPENROUTER_VOICE_MODEL_COACH || "anthropic/claude-haiku-4.5";
 
 // Handle CORS preflight — browsers send OPTIONS before POST with credentials
 export async function OPTIONS() {
@@ -78,6 +84,11 @@ export async function POST(req: NextRequest) {
     mode = "coach", // "coach" | "interviewer"
     language = "en",
     lessonContext,
+    // Optional client-supplied system prompt — used by Coach Kairos voice
+    // mode (CoachChat) which fetches the dynamic intake/school/essay-aware
+    // prompt from /api/cc/coach/voice-prompt before opening the WS. When
+    // present, this fully replaces the persona prompt.
+    systemPrompt: clientSystemPrompt,
     // Interview mode extras
     companyPersonaId,
     questionPlan,
@@ -288,6 +299,13 @@ Your responses will be spoken aloud by a text-to-speech engine. You MUST:
     contextPrompt += `\n\n## SOLUTION CODE (only reveal if student is truly stuck)\n\`\`\`\n${lessonContext.solutionCode.slice(0, 1500)}\n\`\`\``;
   }
 
+  // Client override (Coach Kairos voice mode): replaces the entire prompt
+  // with the dynamic, intake-aware prompt fetched from /api/cc/coach/voice-prompt.
+  // Keep userProfileContext appended so per-user XP/streak signals still flow.
+  if (mode === "coach" && typeof clientSystemPrompt === "string" && clientSystemPrompt.length > 100) {
+    contextPrompt = clientSystemPrompt + (userProfileContext ? "\n" + userProfileContext : "");
+  }
+
   const greeting = persona.greeting(lessonTitle);
 
   // Build the Deepgram Voice Agent settings
@@ -309,16 +327,19 @@ Your responses will be spoken aloud by a text-to-speech engine. You MUST:
         provider: {
           type: "deepgram",
           model: "nova-3",
+          // Faster turn-end detection (default ~700ms). 300ms feels snappier
+          // for a coach conversation where short-turn back-and-forth dominates.
+          endpointing: 300,
         },
       },
-      // OpenRouter primary (Claude Sonnet 4.5 — natural conversation),
-      // Kimi/Moonshot fallback if OPENROUTER_API_KEY is missing.
-      // Spec: 2026-04-07-llm-router-design (Coach Kairos parity)
+      // OpenRouter primary, Kimi/Moonshot fallback. Coach mode uses the
+      // faster Haiku model for sub-second TTFT; lesson AICoach keeps Sonnet
+      // for richer prose. Both models honor the SAME prompt — only TTFT differs.
       think: OPENROUTER_API_KEY
         ? {
             provider: {
               type: "open_ai",
-              model: VOICE_LLM_MODEL,
+              model: mode === "coach" ? VOICE_LLM_MODEL_COACH : VOICE_LLM_MODEL,
             },
             endpoint: {
               url: "https://openrouter.ai/api/v1/chat/completions",
