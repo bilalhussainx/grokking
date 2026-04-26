@@ -40,7 +40,20 @@ export default function CoachChat() {
       return;
     }
     start((finalText) => {
-      setInput((prev) => (prev ? prev + " " + finalText : finalText).trim());
+      // Auto-send when voice input ends so the user doesn't have to press
+      // Send after speaking. Combines anything they had typed before tapping
+      // mic with the transcript, then dispatches in one go.
+      setInput((prev) => {
+        const combined = (prev ? `${prev} ${finalText}` : finalText).trim();
+        if (combined && !isStreaming) {
+          // Defer send by a tick so React commits the cleared input first.
+          setTimeout(() => {
+            void sendMessage(combined);
+          }, 0);
+          return "";
+        }
+        return combined;
+      });
     });
   }
 
