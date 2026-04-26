@@ -37,6 +37,10 @@ interface CoachKairosContextValue {
   stopSpeaking: () => void;
   familyMode: boolean;
   toggleFamilyMode: (on?: boolean) => void;
+  // Append a turn that came from outside the normal sendMessage flow — used
+  // by the voice-agent path so transcription + agent reply land in the same
+  // message list the text flow uses.
+  appendVoiceTurn: (role: "user" | "assistant", content: string) => void;
 }
 
 const CoachKairosContext = createContext<CoachKairosContextValue | null>(null);
@@ -343,6 +347,20 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
     setFamilyMode((prev) => (on === undefined ? !prev : on));
   }, []);
 
+  const appendVoiceTurn = useCallback((role: "user" | "assistant", content: string) => {
+    if (!content.trim()) return;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        role,
+        content: content.trim(),
+        mode: "voice",
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+  }, []);
+
   return (
     <CoachKairosContext.Provider
       value={{
@@ -351,6 +369,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
         language, setLanguage, voiceEnabled, setVoiceEnabled,
         isSpeaking, stopSpeaking,
         familyMode, toggleFamilyMode,
+        appendVoiceTurn,
       }}
     >
       {children}
