@@ -38,6 +38,7 @@ const PUBLIC_PREFIXES = [
   "/api/cc/guest/", // guest session audit endpoints — caller identifies self via cookie
   "/api/leads/",    // exit-intent lead capture (email-only, no auth)
   "/resume/",       // email resume link landing page — public by design
+  "/parent/",       // Feature 10 — token-gated parent portal, no auth needed
   "/talk",
   "/call",
   "/career",
