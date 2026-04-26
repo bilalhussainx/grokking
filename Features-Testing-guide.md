@@ -189,3 +189,108 @@ How to manually verify each implemented feature. Each feature lists the prerequi
 6. **Score log.** Add an SAT attempt: 2024-10-05, total 1480. Reload — appears in Score history.
 
 ---
+
+## Phase 3 — Broader Audience
+
+### Feature 10 — Parent Communication Portal
+
+**Prereqs:** Migration `20260426_feature_10_parent_portal.sql` applied.
+
+**Tests:**
+1. **Create invite.**
+   ```bash
+   curl -X POST http://localhost:3000/api/cc/parent-invite \
+     -H "Content-Type: application/json" -H "Cookie: <session>" \
+     -d '{"parentEmail":"abu@example.com","parentName":"Abu","preferredLanguage":"ur"}'
+   ```
+   Returns `{ invite: {...}, inviteUrl: "http://localhost:3000/parent/<token>" }`.
+2. **Token-only auth.** Open the inviteUrl in an incognito window (no Supabase session). Page renders the parent portal — no redirect to `/login`.
+3. **Localization.** With `preferredLanguage: ur`, the page renders RTL with Urdu headings ("خوش آمدید", "درخواست کی حیثیت", etc.). Repeat with `hi`, `pa`, `en`.
+4. **Privacy.** Parent portal shows school list with chancing band + status, financial aid posture summary, essay-stage counts. Verify it does NOT show: brainstorm transcripts, draft content, GPA struggles.
+5. **Expiry.** In Supabase, set `expires_at` to a past date. Reload the URL. Page shows "Invite expired".
+
+### Feature 11 — Course Rigor
+
+**Prereqs:** Migration `20260426_features_11_14.sql` applied.
+
+**Tests:**
+1. **Add courses.** Visit `/cc/courses`. Add 4 AP courses (AP Calc BC, AP Bio, AP Chem, AP Lit) all grade 11.
+2. **Analyze rigor.** Click "Analyze rigor". Within seconds: rigor badge ("most_rigorous" or "very_rigorous") + a summary that NAMES specific courses, + strengths + gaps.
+3. **International translation.** In Supabase, set `is_international = true, country = 'PK'`. Add 4 FSc-Pre Med courses. Re-analyze. The `internationalNote` field in the response should explain how FSc translates for U.S. readers.
+
+### Feature 12 — Major + career exploration
+
+**Prereqs:** Migration `20260426_features_11_14.sql` applied.
+
+**Tests:**
+1. **Quiz with chips.** Visit `/cc/majors`. Click 3 chips (e.g. "biology", "philosophy", "social justice"). Click "Suggest majors".
+2. **Result shape.** Within seconds: narrative thread blockquote + 4-6 suggested majors each with fitScore (1-10) + 3-5 career paths.
+3. **Persistence.** Reload `/cc/majors`. Saved exploration is still visible (re-hydrated from `cc_major_explorations`).
+
+### Feature 13 — College visit tracker
+
+**Prereqs:** Migration `20260426_features_11_14.sql` applied. At least 1 school in your school list.
+
+**Tests:**
+1. **Log visit.** Visit `/cc/visits`. Pick a school from the dropdown, set date, type "in_person", click Add. Visit appears in History.
+2. **Demonstrated interest indicator.** Log 2 visits to the same school. The "Demonstrated interest" section shows "2 touchpoints" in emerald green. 1 = amber. 0 = grey.
+3. **Virtual tour links.** The fixed list of 5 (MIT/Harvard/Stanford/Yale/Princeton) is clickable.
+
+### Feature 14 — Summer experience planning
+
+**Prereqs:** Migration `20260426_features_11_14.sql` applied.
+
+**Tests:**
+1. **Add experience.** Visit `/cc/summer`. Add "AKU summer hospital volunteer" / Volunteer / 2025-06-15 → 2025-08-15. Appears in Logged.
+2. **South Asian alternatives card.** Visible by default — shows 7 hardcoded entries explicitly tagged for Pakistani / international applicants.
+3. **Honest framing.** "Family business shift work — log honestly as 'job'" entry is visible (this is the "translate culturally for admissions" promise).
+
+---
+
+## Phase 4 — New User-Type Dashboards
+
+### Feature 15 — Junior Year (grade 11) Dashboard
+
+**Prereqs:** Migration `20260426_phase_4_dashboards.sql` applied. Set `grade_level = 11` for the test profile.
+
+**Tests:**
+1. **Visit `/cc/dashboard-junior`.** Renders. Header shows "Junior year" + "X days until Common App opens (August 1)" countdown that counts down realistically.
+2. **Phase checklist.** 6 phases shown with tile-style links to schools / test-strategy / essays / activities-optimizer / visits.
+3. **Brainstorm-only note.** The Essay Studio tile carries "Draft + revise unlock at grade 12".
+4. **Wrong grade redirect.** Set `grade_level = 12`. Visit `/cc/dashboard-junior`. Page shows "This dashboard is for grade 11. Your profile says grade 12" + back link.
+
+### Feature 16 — Grade 9 Dashboard
+
+**Prereqs:** Set `grade_level = 9` for the test profile.
+
+**Tests:**
+1. **Visit `/cc/dashboard-grade9`.** Renders 4-year game plan with the current grade highlighted in gold.
+2. **What-matters list.** 5 entries each with `<thing>` + `<why>`.
+3. **Tile grid limited.** Only Courses / Majors / Summer tiles. Footer: "Essay Studio, Application Tracker, SAT/ACT Strategy, Interview Prep, and Financial Aid are unlocked at grade 11."
+4. **Wrong grade redirect.** Set `grade_level = 11`. Visit `/cc/dashboard-grade9`. Shows mismatched-grade message.
+
+### Feature 17 — Transfer Student Dashboard
+
+**Prereqs:** Migration `20260426_phase_4_dashboards.sql` applied.
+
+**Tests:**
+1. **Empty state.** Visit `/cc/dashboard-transfer` for a fresh user. Form shows: current school, credits completed, target term, why-transfer essay prompt.
+2. **Save profile.** Fill in: "UC Davis", credits 30, "Fall 2026", "Wanted research access I can't get at my current school". Click Save. Form replaced with read-only summary view + "Edit" button.
+3. **GPA recovery framing.** Amber-bordered card visible: "A weaker first-year GPA followed by an upward trajectory is one of the most common transfer narratives…"
+4. **Tile grid points at transfer-specific tools.** Why-transfer essay (Essay Studio), Transfer school list (Applications), Professor recs (Recommenders), Course evaluations (Courses).
+
+---
+
+## End-of-Phase-4 final checklist
+
+After all 17 features pass their individual tests, verify cross-feature stability:
+
+1. **TypeScript.** `npx tsc --noEmit` returns clean for everything in `src/`.
+2. **Unit tests.** `pnpm test:unit` is all-green (181+ tests).
+3. **English regression.** Walk a full senior flow in English: pick language → onboarding → add 3 schools → enter activities → run rigor analysis → run narrative diagnosis → start a personal-statement brainstorm → start an MIT supplement → log a campus visit → log a summer experience → log an interview reflection → take the SAT/ACT quiz → invite a parent → mark one school waitlisted → generate a LOCI. Each surface should work without regressions.
+4. **Hindi text regression.** Switch to Hindi via TopNav. Brainstorm in Hindi → confirm Devanagari reply + Fragments card extraction.
+5. **Urdu RTL regression.** Switch to Urdu. Type a coach drawer message — RTL/Nastaliq, voice toggle disabled, mixed-script content (Urdu + English school names) renders correctly.
+6. **Voice latency regression.** With Coach Kairos in Français, voice mode replies within ~500-800ms.
+7. **All migrations applied.** Run the verification queries in each Phase's prereqs to confirm the schema is current.
+
+---
