@@ -37,9 +37,12 @@ const LANG_MAP: Record<string, string> = {
 };
 
 // How long to wait after the last interim result before auto-stopping the
-// recognition. 1500ms matches Siri/ChatGPT voice; long enough to allow
-// natural pauses between words but short enough to feel responsive.
-const SILENCE_AUTO_STOP_MS = 1500;
+// recognition. 2500ms is forgiving enough for natural between-word pauses
+// (e.g. "bonjour, comme ça va") while still feeling responsive.
+const SILENCE_AUTO_STOP_MS = 2500;
+// Maximum time to wait BEFORE the user starts talking. If they tap mic and
+// don't speak in 8s, give up.
+const MAX_INITIAL_WAIT_MS = 8000;
 
 export function useSpeechToText(languageCode: string = "en") {
   const [isListening, setIsListening] = useState(false);
@@ -80,11 +83,14 @@ export function useSpeechToText(languageCode: string = "en") {
       rec.lang = LANG_MAP[languageCode] || "en-US";
 
       let accumulatedFinal = "";
+      let lastInterim = "";
+      let hasReceivedSpeech = false;
 
-      // Reset the silence timer on every result (final or interim). When the
-      // user stops talking for SILENCE_AUTO_STOP_MS, auto-stop so the message
-      // dispatches without requiring a second mic tap.
-      const armSilenceTimer = () => {
+      // Reset the silence timer on every interim/final result. The first
+      // result also flips us out of "waiting for speech" mode so subsequent
+      // resets use the shorter SILENCE_AUTO_STOP_MS rather than the longer
+      // initial-wait timeout.
+      const armSilenceTimer = (timeout: number) => {
         clearSilenceTimer();
         silenceTimerRef.current = window.setTimeout(() => {
           try {
@@ -92,7 +98,7 @@ export function useSpeechToText(languageCode: string = "en") {
           } catch {
             // ignore
           }
-        }, SILENCE_AUTO_STOP_MS);
+        }, timeout);
       };
 
       rec.onresult = (event: SpeechRecognitionEventLike) => {
@@ -107,7 +113,9 @@ export function useSpeechToText(languageCode: string = "en") {
           }
         }
         setInterim(interimText);
-        armSilenceTimer();
+        if (interimText) lastInterim = interimText;
+        hasReceivedSpeech = true;
+        armSilenceTimer(SILENCE_AUTO_STOP_MS);
       };
 
       rec.onerror = () => {
@@ -118,19 +126,29 @@ export function useSpeechToText(languageCode: string = "en") {
         clearSilenceTimer();
         setIsListening(false);
         setInterim("");
-        const text = accumulatedFinal.trim();
+        // Prefer accumulated final results, but fall back to the last interim
+        // we saw if the browser cut off before finalising. Chrome with
+        // continuous=true sometimes drops pending interims when stop() fires,
+        // which would otherwise truncate "bonjour comme ça va" to "bon".
+        const finalText = accumulatedFinal.trim();
+        const fallback = lastInterim.trim();
+        // Use whichever is longer — final is authoritative when present, but
+        // a long interim is better than a short final fragment.
+        const text = finalText.length >= fallback.length ? finalText : fallback;
         if (text && finalHandlerRef.current) {
           finalHandlerRef.current(text);
         }
+        // suppress unused-warning — kept for future "drop silent recordings" logic
+        void hasReceivedSpeech;
       };
 
       recognitionRef.current = rec;
       try {
         rec.start();
         setIsListening(true);
-        // Arm the timer immediately so a user who taps mic and never speaks
-        // doesn't get stuck listening forever.
-        armSilenceTimer();
+        // Arm the long initial-wait timer; once the user starts speaking
+        // onresult will swap to the shorter silence timer.
+        armSilenceTimer(MAX_INITIAL_WAIT_MS);
       } catch {
         setIsListening(false);
       }
