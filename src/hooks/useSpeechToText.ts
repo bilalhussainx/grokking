@@ -36,12 +36,18 @@ const LANG_MAP: Record<string, string> = {
   hi: "hi-IN",
 };
 
+// How long to wait after the last interim result before auto-stopping the
+// recognition. 1500ms matches Siri/ChatGPT voice; long enough to allow
+// natural pauses between words but short enough to feel responsive.
+const SILENCE_AUTO_STOP_MS = 1500;
+
 export function useSpeechToText(languageCode: string = "en") {
   const [isListening, setIsListening] = useState(false);
   const [interim, setInterim] = useState("");
   const [supported, setSupported] = useState<boolean | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const finalHandlerRef = useRef<((text: string) => void) | null>(null);
+  const silenceTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -50,6 +56,13 @@ export function useSpeechToText(languageCode: string = "en") {
       (window as unknown as { webkitSpeechRecognition?: new () => SpeechRecognitionLike }).webkitSpeechRecognition;
     setSupported(!!SR);
   }, []);
+
+  const clearSilenceTimer = () => {
+    if (silenceTimerRef.current != null) {
+      window.clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+  };
 
   const start = useCallback(
     (onFinal: (text: string) => void) => {
@@ -68,6 +81,20 @@ export function useSpeechToText(languageCode: string = "en") {
 
       let accumulatedFinal = "";
 
+      // Reset the silence timer on every result (final or interim). When the
+      // user stops talking for SILENCE_AUTO_STOP_MS, auto-stop so the message
+      // dispatches without requiring a second mic tap.
+      const armSilenceTimer = () => {
+        clearSilenceTimer();
+        silenceTimerRef.current = window.setTimeout(() => {
+          try {
+            rec.stop();
+          } catch {
+            // ignore
+          }
+        }, SILENCE_AUTO_STOP_MS);
+      };
+
       rec.onresult = (event: SpeechRecognitionEventLike) => {
         let interimText = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -80,6 +107,7 @@ export function useSpeechToText(languageCode: string = "en") {
           }
         }
         setInterim(interimText);
+        armSilenceTimer();
       };
 
       rec.onerror = () => {
@@ -87,6 +115,7 @@ export function useSpeechToText(languageCode: string = "en") {
       };
 
       rec.onend = () => {
+        clearSilenceTimer();
         setIsListening(false);
         setInterim("");
         const text = accumulatedFinal.trim();
@@ -99,6 +128,9 @@ export function useSpeechToText(languageCode: string = "en") {
       try {
         rec.start();
         setIsListening(true);
+        // Arm the timer immediately so a user who taps mic and never speaks
+        // doesn't get stuck listening forever.
+        armSilenceTimer();
       } catch {
         setIsListening(false);
       }
@@ -107,6 +139,7 @@ export function useSpeechToText(languageCode: string = "en") {
   );
 
   const stop = useCallback(() => {
+    clearSilenceTimer();
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
@@ -120,6 +153,7 @@ export function useSpeechToText(languageCode: string = "en") {
 
   useEffect(() => {
     return () => {
+      clearSilenceTimer();
       if (recognitionRef.current) {
         try {
           recognitionRef.current.abort();
