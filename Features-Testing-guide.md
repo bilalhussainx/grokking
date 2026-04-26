@@ -132,3 +132,60 @@ How to manually verify each implemented feature. Each feature lists the prerequi
 7. **Plan-not-accepted note.** Set MIT plan to ED. Expanded card shows "Heads up: MIT doesn't offer ED" (MIT is EA-only).
 
 ---
+
+## Phase 2 — Complete the Senior Counselor Pipeline
+
+### Feature 6 — Waitlist management
+
+**Prereqs:** Migration `20260426_feature_6_waitlist.sql` applied. At least one school in your school list.
+
+**Tests:**
+1. **Waitlist auto-listing.** On `/applications`, change a school's status to "waitlisted". Visit `/cc/waitlist`. Expect that school in the list.
+2. **LOCI generation.** Click "Open LOCI generator". Fill "What's new since you applied" with 1-2 specific updates. Fill "Why this school is right" with one specific program. Click "Generate LOCI". Within seconds: 250-300 word letter that names your update, names the school's specific program, signs off with your preferred name.
+3. **Save + send.** Click "Save draft". Reload `/cc/waitlist` — the saved draft is reflected. Click "Mark as sent". The card now shows a green "LOCI sent" badge.
+4. **No regression.** Change status to "considering" on `/applications`. The school disappears from `/cc/waitlist`.
+
+### Feature 7 — Teacher recommendation submissions + ask emails
+
+**Prereqs:** Migration `20260426_feature_7_recommenders.sql` applied. The existing `/cc/recommenders` page is unchanged; new endpoints can be exercised via curl.
+
+**Tests:**
+1. **Add a teacher.** Use the existing UI on `/cc/recommenders` to add Mr. Smith (AP Calc).
+2. **Generate ask email.**
+   ```bash
+   curl -X POST http://localhost:3000/api/cc/recommenders/ask-email-text \
+     -H "Content-Type: application/json" -H "Cookie: <session>" \
+     -d '{"recommenderId":"<id>","teacherName":"Mr. Smith","subject":"AP Calculus","relationship":"Pushed me on related rates problems"}'
+   ```
+   Expect a 150-200 word email body that names AP Calc + the relationship + asks if they can write a STRONG letter + offers brag sheet/transcript.
+3. **Track submission per school.**
+   ```bash
+   curl -X PATCH http://localhost:3000/api/cc/recommenders/submission \
+     -H "Content-Type: application/json" -H "Cookie: <session>" \
+     -d '{"recommenderId":"<recId>","studentSchoolId":"<schoolId>","submitted":true}'
+   ```
+   Returns `{ ok: true }`. Then GET `/api/cc/recommenders/submission` — see the row with `submitted: true, submitted_at: ...`.
+
+### Feature 8 — Interview reflection + questions to ask
+
+**Prereqs:** Migration `20260426_feature_8_interview_reflection.sql` applied.
+
+**Tests:**
+1. **School-specific questions.** Visit `/cc/interview-prep/reflect`. In the "Generate questions to ask" card, enter "MIT" + interests "robotics, biology". Click Generate. Expect 3 specific questions naming MIT-specific items (e.g. UROP, IAP, the makerspace) — none generic.
+2. **Different schools differ.** Generate for "Georgetown" — questions reference different programs (e.g. School of Foreign Service, Jesuit values). Outputs must NOT be the same as MIT.
+3. **Reflection + AI feedback.** Fill the reflection form: school = "Yale", went-well = "I got into a real conversation about my Quranic studies activity", was-hard = "Talking about my GPA struggles", confidence = 7. Click Save. Within seconds the past-reflections list shows your entry with a 120-180 word AI feedback paragraph that names the Quranic studies moment specifically + names the GPA-talk moment as the work-on point.
+4. **Confidence trend.** Submit 3+ reflections. The "Confidence trend" bar chart appears (only renders ≥2 entries with confidence_score set).
+
+### Feature 9 — SAT/ACT strategy engine
+
+**Prereqs:** Migration `20260426_feature_9_test_strategy.sql` applied.
+
+**Tests:**
+1. **Quiz recommendation — SAT.** Visit `/cc/test-strategy`. Answer all 6 questions choosing SAT options. Click "Get my recommendation". Recommendation card shows "Recommended: SAT" + reasons + a "Register →" link to satsuite.collegeboard.org.
+2. **Quiz recommendation — ACT.** Reset, choose ACT options. Recommendation flips to ACT with a link to act.org.
+3. **Quiz BOTH.** Mix evenly. Recommendation says "BOTH" with a "weak — take both diagnostics" note.
+4. **Fee waiver — eligible.** Check "I receive free or reduced-price lunch". Submit quiz. Fee-waiver banner: green, "You qualify based on free/reduced-price lunch...".
+5. **Fee waiver — international.** In Supabase set `is_international = true` for the test user. Resubmit. Banner: white/grey, "SAT/ACT fee waivers are only available to U.S. domestic students..."
+6. **Score log.** Add an SAT attempt: 2024-10-05, total 1480. Reload — appears in Score history.
+
+---
