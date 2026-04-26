@@ -92,6 +92,44 @@ export function formatConversion(conv: GPAConversion): string {
   return `${conv.gpaLow.toFixed(1)}-${conv.gpaHigh.toFixed(1)}`;
 }
 
+// Feature 1B — voice-friendly explanation strings keyed by language. Used by
+// the "Speak my GPA conversion" button in the GPA display, piped through the
+// existing TTS provider router. Plain spoken sentences only — no markdown.
+type GPAExplanationContext = {
+  rawScore: number;
+  rawDisplay: string;       // e.g. "87% FSc" or "8.4 CGPA"
+  conversion: GPAConversion;
+  system: GradingSystem;
+};
+
+export function buildGPAExplanation(
+  language: string,
+  ctx: GPAExplanationContext,
+): string {
+  const gpaText = formatConversion(ctx.conversion);
+  const systemName: Record<GradingSystem, string> = {
+    percentage: "percentage system",
+    cgpa10: "CGPA system",
+    "a-levels": "A-Levels",
+    ib: "IB",
+  };
+
+  switch (language) {
+    case "ur":
+      return `آپ کا ${ctx.rawDisplay} امریکی پیمانے پر تقریباً ${gpaText} GPA کے برابر ہے۔ یہ ایک اچھا اسکور ہے۔ امریکی یونیورسٹیاں جانتی ہیں کہ پاکستانی نظام تعلیم سخت ہوتا ہے، لیکن آپ کو Additional Information section میں اپنے گریڈنگ سسٹم کی وضاحت کرنی چاہیے تاکہ ایڈمیشن آفیسر اسے صحیح طور پر سمجھ سکے۔`;
+    case "hi":
+      return `आपका ${ctx.rawDisplay} अमेरिकी पैमाने पर लगभग ${gpaText} GPA के बराबर है। यह एक अच्छा स्कोर है। अमेरिकी यूनिवर्सिटी जानती हैं कि आपकी ग्रेडिंग प्रणाली अलग है, लेकिन आपको Additional Information section में इसे समझाना चाहिए ताकि एडमिशन ऑफिसर इसे सही ढंग से समझ सकें।`;
+    case "pa":
+      return `ਤੁਹਾਡਾ ${ctx.rawDisplay} ਅਮਰੀਕੀ ਪੈਮਾਨੇ ਉੱਤੇ ਲਗਭਗ ${gpaText} GPA ਦੇ ਬਰਾਬਰ ਹੈ। ਇਹ ਇੱਕ ਚੰਗਾ ਸਕੋਰ ਹੈ। ਅਮਰੀਕੀ ਯੂਨੀਵਰਸਿਟੀਆਂ ਜਾਣਦੀਆਂ ਹਨ ਕਿ ਗ੍ਰੇਡਿੰਗ ਸਿਸਟਮ ਵੱਖਰਾ ਹੈ, ਪਰ Additional Information section ਵਿੱਚ ਆਪਣੇ ਸਿਸਟਮ ਦੀ ਵਿਆਖਿਆ ਕਰੋ।`;
+    case "es":
+      return `Tu ${ctx.rawDisplay} equivale aproximadamente a un GPA de ${gpaText} en la escala estadounidense. Las universidades de Estados Unidos saben que tu sistema de calificación es diferente — explícalo brevemente en la sección Additional Information para que el oficial de admisiones lo entienda correctamente.`;
+    case "fr":
+      return `Ton ${ctx.rawDisplay} correspond environ à un GPA de ${gpaText} sur l'échelle américaine. Les universités américaines savent que ton système de notation est différent — explique-le brièvement dans la section Additional Information pour que l'agent d'admission le comprenne correctement.`;
+    default:
+      return `Your ${ctx.rawDisplay} converts to approximately a ${gpaText} GPA on the U.S. scale. U.S. universities understand that the ${systemName[ctx.system]} is more rigorous than American grading — but you should briefly explain your grading system in the Additional Information section so the admissions officer reads your transcript correctly.`;
+  }
+}
+
 export interface PercentageBand {
   min: number;
   max: number;

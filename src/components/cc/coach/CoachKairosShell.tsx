@@ -10,6 +10,7 @@ import CoachChat from "./CoachChat";
 import { COACH_LANGUAGES, getCoachLanguage, isVoiceLanguage } from "@/lib/cc/coach-languages";
 import HandToParentButton from "@/components/family-mode/HandToParentButton";
 import FamilyModeView from "@/components/family-mode/FamilyModeView";
+import WorkingLatePrompt from "@/components/cc/WorkingLatePrompt";
 
 // Pages where the floating Coach drawer is suppressed — pre-auth surfaces and
 // pages where the page IS the voice UI. Essay workspace used to be suppressed
@@ -44,6 +45,7 @@ export default function CoachKairosShell() {
           onExit={() => toggleFamilyMode(false)}
         />
       )}
+      <WorkingLatePrompt />
       <AnimatePresence>
         {!isOpen && (
           <motion.button
