@@ -139,15 +139,20 @@ export async function middleware(request: NextRequest) {
   const isAnonymous = Boolean(user?.is_anonymous);
   const isRealUser = Boolean(user && !user.is_anonymous);
 
-  // --- One-time language picker (Feature 1A) ------------------------------
-  // Real users (not anon) who haven't seen the picker get bounced to the picker
-  // route once. Runs BEFORE isPublicRoute so authenticated users landing on
-  // "/" or "/landing" are caught. Skip the API surface, the picker itself,
-  // billing webhooks, shared content, and auth callbacks.
-  const isPickerExempt =
-    pathname === "/onboarding/language" ||
-    pathname.startsWith("/api/") ||
+  // --- One-time onboarding gate -------------------------------------------
+  // Real users (not anon) who haven't completed onboarding get bounced to
+  // /onboarding (multi-step: language -> role -> grade/transfer -> concerns).
+  // Runs BEFORE isPublicRoute so authenticated users landing on "/" or
+  // "/landing" are caught. Skip the API surface, /onboarding itself, billing
+  // webhooks, shared content, and auth callbacks.
+  // NB: language_picker_seen_at is the onboarding-complete sentinel — it's
+  // set by /api/cc/onboarding/complete. The standalone /onboarding/language
+  // page is preserved as a deep link (settings flow) but middleware no
+  // longer redirects to it.
+  const isOnboardingExempt =
+    pathname === "/onboarding" ||
     pathname.startsWith("/onboarding/") ||
+    pathname.startsWith("/api/") ||
     pathname.startsWith("/cc/shared") ||
     pathname.startsWith("/auth/") ||
     pathname.startsWith("/_next/") ||
@@ -155,7 +160,7 @@ export async function middleware(request: NextRequest) {
     pathname === "/signup" ||
     pathname === "/landing";
 
-  if (user && isRealUser && !isPickerExempt) {
+  if (user && isRealUser && !isOnboardingExempt) {
     const { data: profile } = await supabase
       .from("cc_student_profiles")
       .select("language_picker_seen_at")
@@ -163,10 +168,10 @@ export async function middleware(request: NextRequest) {
       .maybeSingle();
     // Redirect if (a) the user has no profile row yet (brand-new account —
     // the row is created lazily by ensureStudentProfile when they hit a
-    // coach API) OR (b) the picker timestamp is still null. Either way the
-    // first thing the user should see is the picker.
+    // coach API) OR (b) the onboarding sentinel is still null. Either way
+    // the first thing the user should see is the multi-step onboarding.
     if (!profile || profile.language_picker_seen_at == null) {
-      return NextResponse.redirect(new URL("/onboarding/language", request.url));
+      return NextResponse.redirect(new URL("/onboarding", request.url));
     }
   }
 
