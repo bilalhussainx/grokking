@@ -5,10 +5,17 @@
  * The design bundle is the source of truth for visual specs. This component renders the
  * entire single-page cinematic landing (Nav → Hero → ForgottenStudent → Pipeline →
  * Testimonials → Pricing → FinalCTA → Footer) at a 1280px design width.
+ *
+ * Mobile responsiveness is layered in via cinematic-landing-mobile.css — the
+ * component still emits its desktop-first inline styles, and the stylesheet
+ * overrides specific patterns at <=960 / <=760 / <=480 breakpoints. The hook
+ * is the data-landing="cinematic" attribute on the outer wrapper.
  */
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
+
+import "./cinematic-landing-mobile.css";
 
 // ───────── Grain overlay ─────────
 function Grain({ opacity = 0.08 }: { opacity?: number }) {
@@ -1883,6 +1890,7 @@ export default function CinematicLandingV2() {
   return (
     <div
       className="kl-surface-landing"
+      data-landing="cinematic"
       style={{
         width: "100%",
         maxWidth: 1280,

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
@@ -74,6 +74,18 @@ export const metadata: Metadata = {
   verification: {
     google: 'KNMPohxROF74CLkjabDN0V0iiaeRPJ9WvQIObQik8HA',
   },
+};
+
+// Without an explicit viewport export, Next.js App Router does NOT emit a
+// viewport meta tag — mobile browsers default to desktop width (980px) and
+// scale-shrink the page. Setting it explicitly fixes the "everything looks
+// tiny on mobile" rendering across the whole site.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // Allow zoom — accessibility (don't lock to 1.0).
+  maximumScale: 5,
+  themeColor: "#05080d",
 };
 
 export default function RootLayout({
