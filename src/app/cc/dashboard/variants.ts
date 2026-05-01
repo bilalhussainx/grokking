@@ -1,24 +1,28 @@
 // Variant configuration for the adaptive dashboard. One row per user
 // context. The page picks the row at render time and the shell renders.
+//
+// Icons are referenced by string name (IconName) — not by component reference —
+// because the variant config is built on the server and passed to a client
+// component, and React component functions can't cross the Server→Client
+// serialization boundary. The actual lucide-react component lookup happens
+// inside AdaptiveDashboard.tsx via a small ICONS registry.
 
-import type { LucideIcon } from "lucide-react";
-import {
-  Calendar,
-  BookOpen,
-  ChartNoAxesColumn,
-  Compass,
-  FileText,
-  Activity,
-  MessageSquare,
-  GraduationCap,
-  Sun,
-  MapPin,
-  Mail,
-  Hourglass,
-  DollarSign,
-  Sparkles,
-  ArrowLeftRight,
-} from "lucide-react";
+export type IconName =
+  | "calendar"
+  | "book"
+  | "chart"
+  | "compass"
+  | "fileText"
+  | "activity"
+  | "message"
+  | "grad"
+  | "sun"
+  | "mapPin"
+  | "mail"
+  | "hourglass"
+  | "dollar"
+  | "sparkles"
+  | "arrowLeftRight";
 
 export type VariantKey =
   | "g9"
@@ -66,7 +70,7 @@ export type Hero = {
 
 export type PriorityCard = {
   href: string;
-  icon: LucideIcon;
+  icon: IconName;
   label: string;
   valueKind: "num" | "text";
   valueNum?: string;
@@ -78,7 +82,7 @@ export type PriorityCard = {
 
 export type Tile = {
   href: string;
-  icon: LucideIcon;
+  icon: IconName;
   label: string;
   cap?: string;
   locked?: boolean;
@@ -260,7 +264,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
       return [
         {
           href: "/cc/courses",
-          icon: BookOpen,
+          icon: "book",
           label: "Course rigor",
           valueKind: "num",
           valueNum: String(d.activitiesCount === 0 ? 0 : d.activitiesCount),
@@ -269,7 +273,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/summer",
-          icon: Sun,
+          icon: "sun",
           label: "Summer plan",
           valueKind: "text",
           valueText: "Pick one thing",
@@ -277,7 +281,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/majors",
-          icon: Compass,
+          icon: "compass",
           label: "Major exploration",
           valueKind: "text",
           valueText: "Low-stakes",
@@ -288,7 +292,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
       return [
         {
           href: "/cc/test-strategy",
-          icon: ChartNoAxesColumn,
+          icon: "chart",
           label: "Test strategy",
           valueKind: "text",
           valueText: d.satRecommendation ? d.satRecommendation : "Take the quiz",
@@ -296,7 +300,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/courses",
-          icon: BookOpen,
+          icon: "book",
           label: "Course rigor",
           valueKind: "num",
           valueNum: String(d.activitiesCount),
@@ -305,7 +309,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/summer",
-          icon: Sun,
+          icon: "sun",
           label: "Summer plan",
           valueKind: "text",
           valueText: "1-2 things",
@@ -316,7 +320,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
       return [
         {
           href: "/schools",
-          icon: GraduationCap,
+          icon: "grad",
           label: "School list",
           valueKind: "num",
           valueNum: String(d.schoolCount),
@@ -325,7 +329,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/test-strategy",
-          icon: ChartNoAxesColumn,
+          icon: "chart",
           label: "Test strategy",
           valueKind: "text",
           valueText: d.satRecommendation ?? "Take the quiz",
@@ -333,7 +337,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/activities-optimizer",
-          icon: Activity,
+          icon: "activity",
           label: "Activities",
           valueKind: "num",
           valueNum: String(d.activitiesCount),
@@ -345,7 +349,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
       return [
         {
           href: "/applications",
-          icon: Calendar,
+          icon: "calendar",
           label: "Applications",
           valueKind: "text",
           valueText: d.nextDeadline
@@ -358,7 +362,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/essays/supplements",
-          icon: FileText,
+          icon: "fileText",
           label: "Supplements",
           valueKind: "num",
           valueNum: `${d.essaysSubmittedCount}`,
@@ -367,7 +371,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/essays",
-          icon: Sparkles,
+          icon: "sparkles",
           label: "Personal statement",
           valueKind: "text",
           valueText: "Draft phase",
@@ -378,7 +382,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
       return [
         {
           href: "/applications",
-          icon: Calendar,
+          icon: "calendar",
           label: "Decisions tracker",
           valueKind: "num",
           valueNum: String(d.essaysSubmittedCount),
@@ -387,7 +391,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/waitlist",
-          icon: Hourglass,
+          icon: "hourglass",
           label: "Waitlist",
           valueKind: "text",
           valueText: d.hasWaitlistedSchool ? "Active" : "—",
@@ -395,7 +399,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/visits",
-          icon: MapPin,
+          icon: "mapPin",
           label: "Visits",
           valueKind: "text",
           valueText: "Demonstrated interest",
@@ -406,7 +410,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
       return [
         {
           href: "/applications",
-          icon: Calendar,
+          icon: "calendar",
           label: "Aid comparator",
           valueKind: "text",
           valueText: "Run the math",
@@ -414,7 +418,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/waitlist",
-          icon: Hourglass,
+          icon: "hourglass",
           label: "Waitlist",
           valueKind: "text",
           valueText: d.hasWaitlistedSchool ? "Active" : "—",
@@ -422,7 +426,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/interview-prep/reflect",
-          icon: MessageSquare,
+          icon: "message",
           label: "Interview reflection",
           valueKind: "text",
           valueText: "Track + grow",
@@ -433,7 +437,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
       return [
         {
           href: "/cc/essays",
-          icon: FileText,
+          icon: "fileText",
           label: "Why-transfer essay",
           valueKind: "text",
           valueText: "Edit + revise",
@@ -441,7 +445,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/applications",
-          icon: ArrowLeftRight,
+          icon: "arrowLeftRight",
           label: "Transfer schools",
           valueKind: "num",
           valueNum: String(d.schoolCount),
@@ -450,7 +454,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         },
         {
           href: "/cc/recommenders",
-          icon: Mail,
+          icon: "mail",
           label: "Professor recs",
           valueKind: "text",
           valueText: "College profs",
@@ -462,7 +466,7 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
       return [
         {
           href: "/?coach=open&focus=intake",
-          icon: Sparkles,
+          icon: "sparkles",
           label: "Coach Kairos",
           valueKind: "text",
           valueText: "Start here",
@@ -479,64 +483,64 @@ function buildTiles(key: VariantKey): Tile[] {
   switch (key) {
     case "g9":
       return [
-        { href: "/cc/courses", icon: BookOpen, label: "Track your courses" },
-        { href: "/cc/majors", icon: Compass, label: "Major exploration", cap: "Low-stakes — try the interest quiz." },
-        { href: "/cc/summer", icon: Sun, label: "Plan your summer" },
-        { href: "/?coach=open", icon: Sparkles, label: "Coach Kairos" },
-        { href: "#", icon: Calendar, label: "Application tracker", cap: "Unlocks junior year.", locked: true },
-        { href: "#", icon: FileText, label: "Essay Studio", cap: "Unlocks junior year.", locked: true },
+        { href: "/cc/courses", icon: "book", label: "Track your courses" },
+        { href: "/cc/majors", icon: "compass", label: "Major exploration", cap: "Low-stakes — try the interest quiz." },
+        { href: "/cc/summer", icon: "sun", label: "Plan your summer" },
+        { href: "/?coach=open", icon: "sparkles", label: "Coach Kairos" },
+        { href: "#", icon: "calendar", label: "Application tracker", cap: "Unlocks junior year.", locked: true },
+        { href: "#", icon: "fileText", label: "Essay Studio", cap: "Unlocks junior year.", locked: true },
       ];
     case "g10":
       return [
-        { href: "/cc/courses", icon: BookOpen, label: "Track your courses" },
-        { href: "/cc/test-strategy", icon: ChartNoAxesColumn, label: "Test strategy", cap: "PSAT 10 first." },
-        { href: "/cc/majors", icon: Compass, label: "Major exploration" },
-        { href: "/cc/summer", icon: Sun, label: "Plan your summer" },
-        { href: "/cc/visits", icon: MapPin, label: "Virtual tours" },
-        { href: "/?coach=open", icon: Sparkles, label: "Coach Kairos" },
+        { href: "/cc/courses", icon: "book", label: "Track your courses" },
+        { href: "/cc/test-strategy", icon: "chart", label: "Test strategy", cap: "PSAT 10 first." },
+        { href: "/cc/majors", icon: "compass", label: "Major exploration" },
+        { href: "/cc/summer", icon: "sun", label: "Plan your summer" },
+        { href: "/cc/visits", icon: "mapPin", label: "Virtual tours" },
+        { href: "/?coach=open", icon: "sparkles", label: "Coach Kairos" },
       ];
     case "junior":
       return [
-        { href: "/cc/essays", icon: FileText, label: "Brainstorm only", cap: "Draft + revise unlock at grade 12." },
-        { href: "/cc/courses", icon: BookOpen, label: "Course rigor" },
-        { href: "/cc/majors", icon: Compass, label: "Major exploration" },
-        { href: "/cc/summer", icon: Sun, label: "Summer experiences" },
-        { href: "/cc/visits", icon: MapPin, label: "Visits" },
-        { href: "/?coach=open", icon: Sparkles, label: "Coach Kairos" },
+        { href: "/cc/essays", icon: "fileText", label: "Brainstorm only", cap: "Draft + revise unlock at grade 12." },
+        { href: "/cc/courses", icon: "book", label: "Course rigor" },
+        { href: "/cc/majors", icon: "compass", label: "Major exploration" },
+        { href: "/cc/summer", icon: "sun", label: "Summer experiences" },
+        { href: "/cc/visits", icon: "mapPin", label: "Visits" },
+        { href: "/?coach=open", icon: "sparkles", label: "Coach Kairos" },
       ];
     case "senior_writing":
       return [
-        { href: "/cc/activities-optimizer", icon: Activity, label: "Activities" },
-        { href: "/cc/recommenders", icon: Mail, label: "Recommenders" },
-        { href: "/cc/test-strategy", icon: ChartNoAxesColumn, label: "Test scores (final)" },
-        { href: "/cc/visits", icon: MapPin, label: "Visits" },
-        { href: "/?coach=open", icon: Sparkles, label: "Coach Kairos" },
-        { href: "/applications", icon: DollarSign, label: "Aid posture" },
+        { href: "/cc/activities-optimizer", icon: "activity", label: "Activities" },
+        { href: "/cc/recommenders", icon: "mail", label: "Recommenders" },
+        { href: "/cc/test-strategy", icon: "chart", label: "Test scores (final)" },
+        { href: "/cc/visits", icon: "mapPin", label: "Visits" },
+        { href: "/?coach=open", icon: "sparkles", label: "Coach Kairos" },
+        { href: "/applications", icon: "dollar", label: "Aid posture" },
       ];
     case "senior_post_submit":
       return [
-        { href: "/cc/interview-prep/reflect", icon: MessageSquare, label: "Interview reflection" },
-        { href: "/applications", icon: Calendar, label: "Application history" },
-        { href: "/cc/visits", icon: MapPin, label: "Visit log" },
-        { href: "/?coach=open", icon: Sparkles, label: "Coach Kairos" },
+        { href: "/cc/interview-prep/reflect", icon: "message", label: "Interview reflection" },
+        { href: "/applications", icon: "calendar", label: "Application history" },
+        { href: "/cc/visits", icon: "mapPin", label: "Visit log" },
+        { href: "/?coach=open", icon: "sparkles", label: "Coach Kairos" },
       ];
     case "senior_decisions":
       return [
-        { href: "/applications", icon: Calendar, label: "Application history" },
-        { href: "/cc/interview-prep/reflect", icon: MessageSquare, label: "Interview reflection" },
-        { href: "/?coach=open", icon: Sparkles, label: "Coach Kairos" },
+        { href: "/applications", icon: "calendar", label: "Application history" },
+        { href: "/cc/interview-prep/reflect", icon: "message", label: "Interview reflection" },
+        { href: "/?coach=open", icon: "sparkles", label: "Coach Kairos" },
       ];
     case "transfer":
       return [
-        { href: "/cc/courses", icon: BookOpen, label: "Course evaluations" },
-        { href: "/?coach=open", icon: Sparkles, label: "Coach Kairos" },
-        { href: "/cc/recommenders", icon: Mail, label: "Translate-for-parent docs" },
+        { href: "/cc/courses", icon: "book", label: "Course evaluations" },
+        { href: "/?coach=open", icon: "sparkles", label: "Coach Kairos" },
+        { href: "/cc/recommenders", icon: "mail", label: "Translate-for-parent docs" },
       ];
     case "unknown":
     default:
       return [
-        { href: "/cc/courses", icon: BookOpen, label: "Track your courses" },
-        { href: "/?coach=open&focus=intake", icon: Sparkles, label: "Talk to Coach Kairos" },
+        { href: "/cc/courses", icon: "book", label: "Track your courses" },
+        { href: "/?coach=open&focus=intake", icon: "sparkles", label: "Talk to Coach Kairos" },
       ];
   }
 }

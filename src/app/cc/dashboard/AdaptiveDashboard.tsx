@@ -3,8 +3,46 @@
 import "./dashboard.css";
 
 import Link from "next/link";
-import { ArrowRight, Flame, MapPin, GraduationCap } from "lucide-react";
-import type { DashboardData, Variant, VariantKey } from "./variants";
+import {
+  Activity,
+  ArrowLeftRight,
+  ArrowRight,
+  BookOpen,
+  Calendar,
+  ChartNoAxesColumn,
+  Compass,
+  DollarSign,
+  FileText,
+  Flame,
+  GraduationCap,
+  Hourglass,
+  Mail,
+  MapPin,
+  MessageSquare,
+  Sparkles,
+  Sun,
+} from "lucide-react";
+import type { DashboardData, IconName, Variant, VariantKey } from "./variants";
+
+// Variants ship icon names as strings (Server→Client serialization can't carry
+// React component references). Resolve them to the actual lucide components here.
+const ICONS: Record<IconName, typeof Sparkles> = {
+  activity: Activity,
+  arrowLeftRight: ArrowLeftRight,
+  book: BookOpen,
+  calendar: Calendar,
+  chart: ChartNoAxesColumn,
+  compass: Compass,
+  dollar: DollarSign,
+  fileText: FileText,
+  grad: GraduationCap,
+  hourglass: Hourglass,
+  mail: Mail,
+  mapPin: MapPin,
+  message: MessageSquare,
+  sparkles: Sparkles,
+  sun: Sun,
+};
 
 const VARIANT_LABEL: Record<VariantKey, string> = {
   g9: "Grade 9 · building foundation",
@@ -86,7 +124,7 @@ export default function AdaptiveDashboard({
         {/* Priority modules */}
         <section className="priority" aria-label="Priority modules">
           {variant.priority.map((p) => {
-            const Ic = p.icon;
+            const Ic = ICONS[p.icon] ?? Sparkles;
             return (
               <Link
                 key={`${p.label}-${p.href}`}
@@ -123,7 +161,7 @@ export default function AdaptiveDashboard({
             <div className="tile-row-label">Everything else</div>
             <section className="tiles" aria-label="Feature tiles">
               {variant.tiles.map((t) => {
-                const Ic = t.icon;
+                const Ic = ICONS[t.icon] ?? Sparkles;
                 if (t.locked) {
                   return (
                     <div key={`${t.label}-${t.href}`} className="tile locked" aria-disabled>
