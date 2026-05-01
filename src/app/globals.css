@@ -3,11 +3,17 @@
 @import "@fontsource/noto-nastaliq-urdu/400.css";
 @source "../**/*.{ts,tsx,js,jsx,mdx}";
 
+/* Urdu / Nastaliq — font hinting only. We deliberately do NOT set
+   `direction: rtl` here. Setting it on `[lang="ur"]` flipped the
+   ENTIRE dashboard chrome the moment a user picked Urdu in onboarding
+   (because <html lang="ur"> propagates the lang attribute). Direction
+   is handled per-element via `dir="auto"` on the surfaces that actually
+   render Urdu text (coach bubbles, brainstorm composer, family-mode
+   bubbles). The browser flips those automatically based on the first
+   strong-direction character. */
 [lang="ur"] {
-  direction: rtl;
-  text-align: right;
   font-family: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", serif;
-  line-height: 2.0;
+  line-height: 1.85;
 }
 
 @plugin "@tailwindcss/typography";
