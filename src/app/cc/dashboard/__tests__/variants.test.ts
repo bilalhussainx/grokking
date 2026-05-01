@@ -111,7 +111,7 @@ describe("buildVariant — hero", () => {
   it("transfer with no profile -> 'tell us where you are'", () => {
     const v = buildVariant("transfer", { ...baseData, transferCurrentSchool: null });
     expect(v.hero.headline).toMatch(/where you are/i);
-    expect(v.hero.ctaHref).toBe("/cc/dashboard-transfer");
+    expect(v.hero.ctaHref).toBe("/cc/transfer-profile");
   });
   it("transfer with profile -> why-transfer essay", () => {
     const v = buildVariant("transfer", {

@@ -233,7 +233,7 @@ function pickHero(key: VariantKey, d: DashboardData): Hero {
           headline: "Tell us <em>where you are</em> — current school + why.",
           body: "Transfer admissions is a different game — different deadlines, different essays, different acceptance rates. Five lines on the why now means a sharper coach later.",
           ctaLabel: "Complete your profile →",
-          ctaHref: "/cc/dashboard-transfer",
+          ctaHref: "/cc/transfer-profile",
         };
       }
       return {
