@@ -11,7 +11,7 @@ import { Loader2 } from "lucide-react";
  * checkout URL; we redirect into it.
  *
  * Behavior:
- *   - Unauth user: route to /auth/login?next=/pricing&intent=upgrade so
+ *   - Unauth user: route to /login?next=/pricing&intent=upgrade so
  *     Stripe gets a real signed-in user (and an email) at checkout.
  *   - Auth + Stripe configured: redirect to session.url
  *   - Auth + Stripe not configured: show inline error.
@@ -31,7 +31,7 @@ export default function ProCheckoutButton({
   const onClick = async () => {
     setError(null);
     if (!user) {
-      router.push("/auth/login?next=/pricing&intent=upgrade");
+      router.push("/login?next=/pricing&intent=upgrade");
       return;
     }
     setOpening(true);

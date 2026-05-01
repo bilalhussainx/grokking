@@ -207,7 +207,7 @@ function Nav() {
       </div>
       <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
         <Link
-          href="/auth/login"
+          href="/login"
           style={{
             fontSize: 11,
             letterSpacing: ".24em",

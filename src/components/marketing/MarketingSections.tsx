@@ -67,7 +67,7 @@ export function FinalCTA({
   body,
   primaryHref = "/intake",
   primaryLabel = "Start for free",
-  secondaryHref = "/auth/login",
+  secondaryHref = "/login",
   secondaryLabel = "Sign in",
 }: {
   headline: string; // may include <em>

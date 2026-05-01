@@ -57,7 +57,7 @@ export default function MarketingShell({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="kl-mkt-cta">
-            <Link href="/auth/login" className="kl-mkt-cta-ghost">
+            <Link href="/login" className="kl-mkt-cta-ghost">
               Sign in
             </Link>
             <Link href="/intake" className="kl-mkt-cta-gold">
@@ -89,7 +89,7 @@ export default function MarketingShell({ children }: { children: ReactNode }) {
               ))}
             </nav>
             <div className="kl-mkt-mobile-cta">
-              <Link href="/auth/login" className="kl-mkt-cta-ghost">
+              <Link href="/login" className="kl-mkt-cta-ghost">
                 Sign in
               </Link>
               <Link href="/intake" className="kl-mkt-cta-gold">
@@ -121,7 +121,7 @@ export default function MarketingShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="kl-mkt-foot-cta">
-            <Link href="/auth/login">Sign in</Link>
+            <Link href="/login">Sign in</Link>
             <Link href="/intake" className="kl-mkt-cta-gold">
               Start for free <ArrowRight size={14} />
             </Link>
