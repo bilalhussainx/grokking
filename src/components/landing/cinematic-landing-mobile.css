@@ -7,6 +7,45 @@
    — !important wins back.
    ───────────────────────────────────────────────────────────────────── */
 
+/* Smooth-scroll for in-page nav anchors (Counselor / Essays / Schools / etc).
+   Adds a small offset so the sticky-floating top nav doesn't cover the
+   anchor target.  */
+html { scroll-behavior: smooth; }
+[data-landing="cinematic"] section[id] { scroll-margin-top: 80px; }
+
+/* Headings should never overflow horizontally — common issue on the
+   88px Hero h1 between 1024-1280px when the viewport leaves design grid. */
+[data-landing="cinematic"] h1,
+[data-landing="cinematic"] h2,
+[data-landing="cinematic"] h3 {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* ────────── Mid-size desktop (<=1180px) ────────── */
+/* The component is hand-tuned for 1280px. Between 1180 and 1280 things
+   feel a touch cramped because horizontal padding (80px both sides +
+   1280-cap content) leaves <1120px of content. Tighten gutters first. */
+@media (max-width: 1180px) {
+  [data-landing="cinematic"] section {
+    padding-left: 56px !important;
+    padding-right: 56px !important;
+  }
+  [data-landing="cinematic"] [style*="grid-template-columns: 1fr 480px"] {
+    padding: 160px 56px 80px !important;
+  }
+  /* Hero headline — 88px is too aggressive at this width */
+  [data-landing="cinematic"] [style*="font-size: 88"] {
+    font-size: clamp(56px, 7.4vw, 80px) !important;
+    line-height: 1 !important;
+  }
+  /* Section H2s at 56-64px — let them shrink with viewport */
+  [data-landing="cinematic"] [style*="font-size: 64"],
+  [data-landing="cinematic"] [style*="font-size: 56"] {
+    font-size: clamp(40px, 5.4vw, 56px) !important;
+  }
+}
+
 /* ────────── Tablet + small desktop (<=960px) ────────── */
 @media (max-width: 960px) {
   [data-landing="cinematic"] {
@@ -29,20 +68,53 @@
     margin: 0 auto !important;
   }
 
-  /* Sectional horizontal padding */
+  /* Sectional horizontal padding (universal — covers section + the various
+     hand-coded paddings like 130px 80px / 110px 80px / 0 80px / 130px 0). */
   [data-landing="cinematic"] section {
     padding-left: 32px !important;
     padding-right: 32px !important;
   }
+  [data-landing="cinematic"] [style*="padding: 130px 80px"],
+  [data-landing="cinematic"] [style*="padding: 110px 80px"],
+  [data-landing="cinematic"] [style*="padding: 0 80px"] {
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
 
-  /* 5-column pipeline -> 2 columns */
+  /* Headline scaling at this width — h2 stays readable */
+  [data-landing="cinematic"] [style*="font-size: 56"],
+  [data-landing="cinematic"] [style*="font-size: 64"],
+  [data-landing="cinematic"] [style*="font-size: 68"] {
+    font-size: clamp(36px, 6vw, 48px) !important;
+    line-height: 1.06 !important;
+  }
+  [data-landing="cinematic"] [style*="font-size: 88"] {
+    font-size: clamp(48px, 8vw, 68px) !important;
+    line-height: 1.02 !important;
+  }
+
+  /* Pipeline 5-col -> 2-col */
   [data-landing="cinematic"] [style*="grid-template-columns: repeat(5"] {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  /* 4-column footer columns -> 2 columns */
+  /* 4-column footer -> 2-col */
   [data-landing="cinematic"] [style*="grid-template-columns: repeat(4"] {
     grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* 3-col cards (ForgottenStudent, Testimonials) -> 1-col so cards stay tall
+     enough not to look orphaned at 720-960. Skip if you want 2-col here. */
+  [data-landing="cinematic"] [style*="grid-template-columns: repeat(3"] {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+
+  /* Section header rows (the eyebrow + "view all" link side-by-side) */
+  [data-landing="cinematic"] [style*="display: flex"][style*="align-items: flex-end"][style*="justify-content: space-between"] {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 24px !important;
   }
 }
 
@@ -91,8 +163,8 @@
     display: none !important;
   }
 
-  /* Massive number displays (testimonial counters, pricing numbers, large
-     section headlines that aren't h1/h2/h3) — collapse to a sane size. */
+  /* Massive number displays — fluid scaling for clean transitions across
+     all viewport widths in this band. */
   [data-landing="cinematic"] [style*="font-size: 88"],
   [data-landing="cinematic"] [style*="font-size:88"],
   [data-landing="cinematic"] [style*="font-size: 78"],
@@ -100,21 +172,26 @@
   [data-landing="cinematic"] [style*="font-size: 76"],
   [data-landing="cinematic"] [style*="font-size: 72"],
   [data-landing="cinematic"] [style*="font-size: 68"] {
-    font-size: 40px !important;
-    line-height: 1.05 !important;
+    font-size: clamp(36px, 9vw, 52px) !important;
+    line-height: 1.04 !important;
   }
   [data-landing="cinematic"] [style*="font-size: 64"],
   [data-landing="cinematic"] [style*="font-size: 60"],
   [data-landing="cinematic"] [style*="font-size: 58"],
   [data-landing="cinematic"] [style*="font-size: 56"] {
-    font-size: 32px !important;
+    font-size: clamp(30px, 7.4vw, 42px) !important;
     line-height: 1.05 !important;
   }
   [data-landing="cinematic"] [style*="font-size: 52"],
   [data-landing="cinematic"] [style*="font-size: 50"],
   [data-landing="cinematic"] [style*="font-size: 48"] {
-    font-size: 28px !important;
+    font-size: clamp(26px, 6vw, 36px) !important;
     line-height: 1.1 !important;
+  }
+  [data-landing="cinematic"] [style*="font-size: 32"],
+  [data-landing="cinematic"] [style*="font-size: 30"] {
+    font-size: clamp(20px, 4.5vw, 26px) !important;
+    line-height: 1.2 !important;
   }
 
   /* Nav — drop the middle links, make sticky bar wrap */

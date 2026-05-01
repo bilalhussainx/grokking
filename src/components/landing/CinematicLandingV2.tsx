@@ -177,11 +177,33 @@ function Nav() {
           fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
         }}
       >
-        <span>Counselor</span>
-        <span>Essays</span>
-        <span>Schools</span>
-        <span>Pricing</span>
-        <span>Stories</span>
+        {(
+          [
+            ["Counselor", "#counselor"],
+            ["Essays", "#pipeline"],
+            ["Schools", "#pipeline"],
+            ["Pricing", "#pricing"],
+            ["Stories", "#stories"],
+          ] as const
+        ).map(([label, href]) => (
+          <a
+            key={label}
+            href={href}
+            style={{
+              color: "inherit",
+              textDecoration: "none",
+              transition: "color .15s ease",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "#d4a84b";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "rgba(242,237,227,.70)";
+            }}
+          >
+            {label}
+          </a>
+        ))}
       </div>
       <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
         <Link
@@ -468,6 +490,7 @@ function CoachDemo() {
 function Hero() {
   return (
     <section
+      id="counselor"
       style={{
         position: "relative",
         minHeight: 860,
@@ -984,7 +1007,7 @@ function Pipeline() {
     { n: "05", t: "Financial Aid", sub: "$0 is the goal", copy: "Net price calculators, CSS Profile prep, scholarship matching. We fight for the number." },
   ];
   return (
-    <section style={{ background: "#05080d", padding: "0 80px 130px", position: "relative" }}>
+    <section id="pipeline" style={{ background: "#05080d", padding: "0 80px 130px", position: "relative" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <div style={{ marginBottom: 60, maxWidth: 720 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 22 }}>
@@ -1132,6 +1155,7 @@ function Testimonials() {
   ];
   return (
     <section
+      id="stories"
       style={{
         background: "#0c1120",
         padding: "130px 80px",
@@ -1283,51 +1307,9 @@ function Testimonials() {
             </div>
           ))}
         </div>
-        {/* proof strip */}
-        <div
-          style={{
-            marginTop: 80,
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 40,
-            paddingTop: 44,
-            borderTop: "1px solid rgba(242,237,227,.10)",
-          }}
-        >
-          {[
-            ["12,400+", "Students served"],
-            ["$18.2M", "Aid unlocked"],
-            ["40+", "Languages"],
-            ["96%", "Rec'd they'd return"],
-          ].map(([n, l]) => (
-            <div key={n}>
-              <div
-                style={{
-                  fontFamily: "var(--font-cormorant), 'Cormorant Garamond', serif",
-                  fontWeight: 300,
-                  fontSize: 58,
-                  lineHeight: 1,
-                  color: "#d4a84b",
-                  letterSpacing: "-.02em",
-                }}
-              >
-                {n}
-              </div>
-              <div
-                style={{
-                  fontSize: 10.5,
-                  letterSpacing: ".26em",
-                  textTransform: "uppercase",
-                  color: "rgba(242,237,227,.55)",
-                  marginTop: 10,
-                  fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
-                }}
-              >
-                {l}
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Proof strip removed 2026-05-01: metrics were placeholder, not real.
+            Bring it back once we have verifiable numbers from the production
+            cohort. */}
       </div>
     </section>
   );
@@ -1350,7 +1332,7 @@ function Pricing() {
     "Unavailable nights, weekends, crisis moments",
   ];
   return (
-    <section style={{ background: "#05080d", padding: "130px 80px", position: "relative" }}>
+    <section id="pricing" style={{ background: "#05080d", padding: "130px 80px", position: "relative" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 70 }}>
           <div
