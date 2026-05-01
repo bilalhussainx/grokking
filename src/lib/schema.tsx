@@ -2,17 +2,17 @@
 
 import { Course, Lesson, Module } from '@/data/types';
 
-const BASE_URL = 'https://samsara.ai';
+const BASE_URL = 'https://kairoslearn.com';
 
 // Organization schema (used on every page)
 export function organizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Samsara.ai',
+    name: 'KairosLearn',
     url: BASE_URL,
     logo: `${BASE_URL}/logo.png`,
-    description: 'AI-powered learning platform with voice coaching across 7 domains',
+    description: 'AI college counselor for every student — intake, school list, essays, interviews, and financial aid.',
     sameAs: [],
   };
 }
@@ -22,7 +22,7 @@ export function websiteSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Samsara.ai',
+    name: 'KairosLearn',
     url: BASE_URL,
     potentialAction: {
       '@type': 'SearchAction',
@@ -45,7 +45,7 @@ export function courseSchema(course: Course) {
     url: `${BASE_URL}/course/${course.slug}`,
     provider: {
       '@type': 'Organization',
-      name: 'Samsara.ai',
+      name: 'KairosLearn',
       url: BASE_URL,
     },
     hasCourseInstance: {
@@ -67,7 +67,7 @@ export function lessonSchema(course: Course, lesson: Lesson, module: Module) {
     '@context': 'https://schema.org',
     '@type': 'LearningResource',
     name: lesson.title,
-    description: `${lesson.title} — part of ${course.title} on Samsara.ai`,
+    description: `${lesson.title} — part of ${course.title} on KairosLearn`,
     url: `${BASE_URL}/course/${course.slug}/${lesson.slug}`,
     isPartOf: {
       '@type': 'Course',
@@ -76,7 +76,7 @@ export function lessonSchema(course: Course, lesson: Lesson, module: Module) {
     },
     learningResourceType: lesson.starterCode ? 'interactive exercise' : 'lesson',
     inLanguage: 'en',
-    provider: { '@type': 'Organization', name: 'Samsara.ai' },
+    provider: { '@type': 'Organization', name: 'KairosLearn' },
   };
 }
 
