@@ -3,6 +3,7 @@
 import "./dashboard.css";
 
 import Link from "next/link";
+import { useCallback, type MouseEvent } from "react";
 import {
   Activity,
   ArrowLeftRight,
@@ -22,7 +23,17 @@ import {
   Sparkles,
   Sun,
 } from "lucide-react";
+import { useCoachKairos } from "@/contexts/CoachKairosContext";
 import type { DashboardData, IconName, Variant, VariantKey } from "./variants";
+
+// Any href that starts with "/" or "?" pointing at the legacy "open coach via
+// URL" mechanism. We intercept clicks on these and call openWithVariant
+// in-place — that way the user stays on /cc/dashboard with their grade-correct
+// variant rendered, instead of bouncing through `/` → onboarding logic →
+// landing back on the senior dashboard.
+function isCoachOpenHref(href: string): boolean {
+  return href.includes("coach=open");
+}
 
 // Variants ship icon names as strings (Server→Client serialization can't carry
 // React component references). Resolve them to the actual lucide components here.
@@ -70,6 +81,14 @@ export default function AdaptiveDashboard({
   variant: Variant;
   variantKey: VariantKey;
 }) {
+  const coach = useCoachKairos();
+  const handleCoachClick = useCallback(
+    (e: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
+      e.preventDefault();
+      coach.openWithVariant(variantKey);
+    },
+    [coach, variantKey],
+  );
   return (
     <div className="kl-dash">
       <div className="container">
@@ -112,12 +131,18 @@ export default function AdaptiveDashboard({
           />
           <p>{variant.hero.body}</p>
           <div className="cta-row">
-            <Link href={variant.hero.ctaHref} className="btn-gold">
-              {variant.hero.ctaLabel} <ArrowRight size={14} />
-            </Link>
-            <Link href="/?coach=open" className="btn-ghost">
+            {isCoachOpenHref(variant.hero.ctaHref) ? (
+              <button type="button" onClick={handleCoachClick} className="btn-gold">
+                {variant.hero.ctaLabel} <ArrowRight size={14} />
+              </button>
+            ) : (
+              <Link href={variant.hero.ctaHref} className="btn-gold">
+                {variant.hero.ctaLabel} <ArrowRight size={14} />
+              </Link>
+            )}
+            <button type="button" onClick={handleCoachClick} className="btn-ghost">
               Talk to Coach Kairos
-            </Link>
+            </button>
           </div>
         </section>
 
@@ -125,12 +150,9 @@ export default function AdaptiveDashboard({
         <section className="priority" aria-label="Priority modules">
           {variant.priority.map((p) => {
             const Ic = ICONS[p.icon] ?? Sparkles;
-            return (
-              <Link
-                key={`${p.label}-${p.href}`}
-                href={p.href}
-                className={"priority-card" + (p.urgent ? " urgent" : "")}
-              >
+            const isCoach = isCoachOpenHref(p.href);
+            const inner = (
+              <>
                 <div className="ic" aria-hidden>
                   <Ic size={16} />
                 </div>
@@ -150,6 +172,24 @@ export default function AdaptiveDashboard({
                   )}
                 </div>
                 <div className="meta">{p.meta}</div>
+              </>
+            );
+            const className = "priority-card" + (p.urgent ? " urgent" : "");
+            if (isCoach) {
+              return (
+                <button
+                  key={`${p.label}-${p.href}`}
+                  type="button"
+                  onClick={handleCoachClick}
+                  className={className}
+                >
+                  {inner}
+                </button>
+              );
+            }
+            return (
+              <Link key={`${p.label}-${p.href}`} href={p.href} className={className}>
+                {inner}
               </Link>
             );
           })}
@@ -171,6 +211,22 @@ export default function AdaptiveDashboard({
                       <div className="tlabel">{t.label}</div>
                       {t.cap && <div className="tcap">{t.cap}</div>}
                     </div>
+                  );
+                }
+                if (isCoachOpenHref(t.href)) {
+                  return (
+                    <button
+                      key={`${t.label}-${t.href}`}
+                      type="button"
+                      onClick={handleCoachClick}
+                      className="tile"
+                    >
+                      <div className="tic" aria-hidden>
+                        <Ic size={16} />
+                      </div>
+                      <div className="tlabel">{t.label}</div>
+                      {t.cap && <div className="tcap">{t.cap}</div>}
+                    </button>
                   );
                 }
                 return (

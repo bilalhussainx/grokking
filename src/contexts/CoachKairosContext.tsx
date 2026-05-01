@@ -24,6 +24,12 @@ interface CoachKairosContextValue {
   open: () => void;
   close: () => void;
   toggle: () => void;
+  // Open the drawer in-place for a specific dashboard variant. Seeds an
+  // opening assistant message from src/lib/cc/variant-walkthroughs.ts so the
+  // student sees a step-by-step plan tailored to their grade / phase rather
+  // than the generic senior intake. No-op past the first turn so it doesn't
+  // re-seed an ongoing conversation.
+  openWithVariant: (variantKey: string) => void;
   messages: CoachMessage[];
   sendMessage: (text: string, extra?: CoachSendContext) => Promise<void>;
   isStreaming: boolean;
@@ -343,6 +349,27 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   const close = useCallback(() => setIsOpen(false), []);
   const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
 
+  const openWithVariant = useCallback(async (variantKey: string) => {
+    setIsOpen(true);
+    // Don't overwrite an in-flight load.
+    if (isLoading) return;
+    // Don't reseed an ongoing conversation — just open the drawer.
+    if (messages.length > 0) return;
+    proactiveSent.current = true;
+    const { getWalkthroughSeed } = await import("@/lib/cc/variant-walkthroughs");
+    const seed = getWalkthroughSeed(variantKey as Parameters<typeof getWalkthroughSeed>[0]);
+    setCurrentMode(seed.mode);
+    setMessages([
+      {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: seed.greeting,
+        mode: seed.mode,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+  }, [messages.length, isLoading]);
+
   const toggleFamilyMode = useCallback((on?: boolean) => {
     setFamilyMode((prev) => (on === undefined ? !prev : on));
   }, []);
@@ -364,7 +391,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   return (
     <CoachKairosContext.Provider
       value={{
-        isOpen, open, close, toggle,
+        isOpen, open, close, toggle, openWithVariant,
         messages, sendMessage, isStreaming, currentMode, isLoading,
         language, setLanguage, voiceEnabled, setVoiceEnabled,
         isSpeaking, stopSpeaking,

@@ -194,6 +194,11 @@
   text-decoration: none;
   color: inherit;
   min-height: 168px;
+  /* Buttons (coach-open cards) need user-agent defaults stripped so they
+     visually match the <a> siblings. */
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 .kl-dash .priority-card:hover {
   border-color: rgba(212, 175, 55, 0.40);
@@ -289,6 +294,9 @@
   text-decoration: none;
   color: inherit;
   cursor: pointer;
+  /* Same reset as priority-card — works for both <a> and <button>. */
+  font: inherit;
+  text-align: left;
 }
 .kl-dash .tile:hover {
   border-color: rgba(212, 175, 55, 0.40);
