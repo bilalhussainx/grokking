@@ -207,7 +207,7 @@ export default function OnboardingPage() {
   };
 
   const goToDashboard = () => {
-    router.push("/?coach=open&focus=intake");
+    router.push("/cc/dashboard");
   };
 
   const onSkip = async () => {

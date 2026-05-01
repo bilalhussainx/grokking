@@ -1,0 +1,387 @@
+/* ─────────────────────────────────────────────────────────────────────
+   Adaptive dashboard for Coach Kairos. Same cinematic aesthetic as the
+   onboarding flow (fonts, gold accents, grain). One shell, six variants
+   selected at render-time by computeVariant().
+   ─────────────────────────────────────────────────────────────────── */
+
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..600;1,300..500&family=DM+Sans:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+.kl-dash {
+  --kl-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  min-height: 100vh;
+  background:
+    radial-gradient(900px 500px at 80% -10%, rgba(212, 175, 55, 0.05), transparent 70%),
+    radial-gradient(700px 400px at 0% 100%, rgba(168, 85, 247, 0.03), transparent 70%),
+    #05080d;
+  color: #f0ece2;
+  font-family: "Inter", -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+.kl-dash *,
+.kl-dash *::before,
+.kl-dash *::after {
+  box-sizing: border-box;
+}
+
+.kl-dash .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 40px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ───── Header ───── */
+.kl-dash .top-line {
+  font-size: 11.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(242, 237, 227, 0.55);
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.kl-dash .top-line .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #d4a84b;
+  box-shadow: 0 0 8px rgba(212, 168, 75, 0.55);
+}
+.kl-dash h1.greet {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 300;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.05;
+  letter-spacing: -0.012em;
+  color: #f2ede3;
+  margin: 8px 0 4px;
+}
+.kl-dash h1.greet em {
+  color: #d4a84b;
+  font-style: italic;
+}
+.kl-dash .status-line {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13.5px;
+  font-weight: 300;
+  color: rgba(242, 237, 227, 0.6);
+  margin: 0;
+}
+
+/* ───── Hero card ───── */
+.kl-dash .hero {
+  margin-top: 36px;
+  padding: 32px 36px;
+  border-radius: 18px;
+  border: 1px solid rgba(212, 175, 55, 0.40);
+  background:
+    linear-gradient(180deg, rgba(212, 175, 55, 0.08), rgba(212, 175, 55, 0.02)),
+    rgba(5, 8, 13, 0.6);
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.15),
+    0 24px 60px -22px rgba(212, 175, 55, 0.30);
+  position: relative;
+  overflow: hidden;
+}
+.kl-dash .hero .eyebrow {
+  font-size: 10.5px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #d4a84b;
+  font-family: "DM Sans", sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.kl-dash .hero .eyebrow .rule {
+  width: 26px;
+  height: 1px;
+  background: #d4a84b;
+}
+.kl-dash .hero h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 300;
+  font-size: clamp(22px, 3vw, 30px);
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  color: #f2ede3;
+  margin: 14px 0 12px;
+}
+.kl-dash .hero h2 em {
+  color: #d4a84b;
+  font-style: italic;
+}
+.kl-dash .hero p {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 300;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(242, 237, 227, 0.7);
+  margin: 0 0 22px;
+  max-width: 640px;
+}
+.kl-dash .hero .cta-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.kl-dash .btn-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border-radius: 10px;
+  background: #d4af37;
+  color: #05080d;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition:
+    transform 0.2s var(--kl-ease-out),
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 12px 28px -10px rgba(212, 175, 55, 0.45);
+}
+.kl-dash .btn-gold:hover {
+  transform: translateY(-1px);
+  background: #c4a030;
+}
+.kl-dash .btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(242, 237, 227, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font: 500 13px "DM Sans", sans-serif;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.kl-dash .btn-ghost:hover {
+  color: #f2ede3;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ───── Priority module row ───── */
+.kl-dash .priority {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.kl-dash .priority-card {
+  padding: 22px 22px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.2s var(--kl-ease-out);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  min-height: 168px;
+}
+.kl-dash .priority-card:hover {
+  border-color: rgba(212, 175, 55, 0.40);
+  background: rgba(212, 175, 55, 0.04);
+  transform: translateY(-2px);
+}
+.kl-dash .priority-card .ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  color: #d4a84b;
+  display: grid;
+  place-items: center;
+}
+.kl-dash .priority-card .label {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  font-size: 11.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(242, 237, 227, 0.55);
+}
+.kl-dash .priority-card .value {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 300;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.012em;
+  color: #f2ede3;
+}
+.kl-dash .priority-card .value .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 32px;
+  font-weight: 500;
+  color: #d4af37;
+  letter-spacing: -0.02em;
+}
+.kl-dash .priority-card .meta {
+  margin-top: auto;
+  font-size: 12px;
+  color: rgba(242, 237, 227, 0.55);
+  font-family: "DM Sans", sans-serif;
+}
+.kl-dash .priority-card.urgent {
+  border-color: rgba(244, 63, 94, 0.45);
+  background: rgba(244, 63, 94, 0.05);
+}
+.kl-dash .priority-card.urgent .ic {
+  background: rgba(244, 63, 94, 0.1);
+  border-color: rgba(244, 63, 94, 0.35);
+  color: #fda4af;
+}
+.kl-dash .priority-card.urgent .value .num {
+  color: #fda4af;
+}
+
+/* ───── Tile grid ───── */
+.kl-dash .tile-row-label {
+  margin-top: 36px;
+  margin-bottom: 14px;
+  font-size: 10.5px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(242, 237, 227, 0.45);
+  font-family: "DM Sans", sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.kl-dash .tile-row-label::before {
+  content: "";
+  width: 26px;
+  height: 1px;
+  background: rgba(212, 175, 55, 0.35);
+}
+.kl-dash .tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.kl-dash .tile {
+  padding: 18px 18px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.18s var(--kl-ease-out);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 100px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.kl-dash .tile:hover {
+  border-color: rgba(212, 175, 55, 0.40);
+  background: rgba(212, 175, 55, 0.04);
+}
+.kl-dash .tile.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.kl-dash .tile.locked:hover {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+.kl-dash .tile .tic {
+  color: #d4a84b;
+}
+.kl-dash .tile .tlabel {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #f2ede3;
+}
+.kl-dash .tile .tcap {
+  font-size: 11.5px;
+  color: rgba(242, 237, 227, 0.55);
+  font-family: "DM Sans", sans-serif;
+  line-height: 1.45;
+  margin-top: auto;
+}
+
+/* ───── Widget strip ───── */
+.kl-dash .widgets {
+  margin-top: 36px;
+  padding: 18px 24px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.kl-dash .widget {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.kl-dash .widget .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: #f2ede3;
+  letter-spacing: -0.02em;
+}
+.kl-dash .widget .lbl {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(242, 237, 227, 0.45);
+  font-family: "DM Sans", sans-serif;
+}
+.kl-dash .widget .gold {
+  color: #d4a84b;
+}
+
+/* Mobile */
+@media (max-width: 760px) {
+  .kl-dash .container {
+    padding: 24px 18px 60px;
+  }
+  .kl-dash .hero {
+    padding: 22px 22px 20px;
+    margin-top: 24px;
+  }
+  .kl-dash .priority,
+  .kl-dash .tiles {
+    grid-template-columns: 1fr;
+  }
+  .kl-dash .widgets {
+    padding: 14px 18px;
+    gap: 12px 24px;
+  }
+  .kl-dash .widget {
+    flex-basis: calc(50% - 12px);
+  }
+  .kl-dash .cta-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .kl-dash .cta-row > * {
+    justify-content: center;
+    text-align: center;
+  }
+}
