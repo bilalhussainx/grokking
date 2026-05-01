@@ -86,43 +86,98 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/cc/dashboard");
 
-  const { data: profile } = await supabase
-    .from("cc_student_profiles")
-    .select(
-      "id, preferred_name, grade_level, is_transfer_student, is_international, language_picker_seen_at, transfer_current_school, transfer_target_term",
-    )
-    .eq("user_id", user.id)
-    .maybeSingle<ProfileRow>();
+  // Profile lookup — tolerate a partial schema (production may not have run
+  // the latest migrations yet). Try the full select first; if it errors,
+  // fall back to the minimal columns we know exist.
+  let profile: ProfileRow | null = null;
+  try {
+    const full = await supabase
+      .from("cc_student_profiles")
+      .select(
+        "id, preferred_name, grade_level, is_transfer_student, is_international, language_picker_seen_at, transfer_current_school, transfer_target_term",
+      )
+      .eq("user_id", user.id)
+      .maybeSingle<ProfileRow>();
+    if (full.error) throw full.error;
+    profile = full.data;
+  } catch {
+    const fallback = await supabase
+      .from("cc_student_profiles")
+      .select("id, preferred_name, grade_level, is_international, language_picker_seen_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (fallback.data) {
+      profile = {
+        ...fallback.data,
+        is_transfer_student: false,
+        transfer_current_school: null,
+        transfer_target_term: null,
+      } as ProfileRow;
+    }
+  }
 
   if (!profile || profile.language_picker_seen_at == null) {
     redirect("/onboarding");
   }
 
-  const [{ data: schools }, { data: essays }, { data: testPlan }, { data: activities }] =
-    await Promise.all([
+  // Each side-table query is wrapped so a missing migration (e.g. cc_test_plan
+  // or deadline_* columns) degrades to empty data instead of throwing the
+  // whole server-component render. Parallelized via Promise.all.
+  async function safe<T>(
+    p: PromiseLike<{ data: T | null; error: unknown }>,
+  ): Promise<T | null> {
+    try {
+      const { data, error } = await p;
+      if (error) return null;
+      return data;
+    } catch {
+      return null;
+    }
+  }
+
+  // Schools — try the full row; fall back to a minimal select if the
+  // deadline_* columns don't exist yet (Feature 2 migration not applied).
+  let schools: Partial<StudentSchoolRow>[] | null = await safe<Partial<StudentSchoolRow>[]>(
+    supabase
+      .from("cc_student_schools")
+      .select(
+        `application_status, chancing_band,
+         deadline_ea, deadline_ed, deadline_edii, deadline_rea, deadline_rd,
+         deadline_financial_aid, deadline_css_profile, deadline_fafsa,
+         cc_schools(name)`,
+      )
+      .eq("student_id", profile.id),
+  );
+  if (!schools) {
+    schools = await safe<Partial<StudentSchoolRow>[]>(
       supabase
         .from("cc_student_schools")
-        .select(
-          `application_status, chancing_band,
-           deadline_ea, deadline_ed, deadline_edii, deadline_rea, deadline_rd,
-           deadline_financial_aid, deadline_css_profile, deadline_fafsa,
-           cc_schools(name)`,
-        )
+        .select("application_status, chancing_band, cc_schools(name)")
         .eq("student_id", profile.id),
+    );
+  }
+
+  const [essays, testPlan, activities] = await Promise.all([
+    safe(
       supabase
         .from("cc_essays")
         .select("phase, essay_type")
         .eq("student_id", profile.id),
+    ),
+    safe(
       supabase
         .from("cc_test_plan")
         .select("recommended_test, next_sitting_date")
         .eq("student_id", profile.id)
         .maybeSingle(),
+    ),
+    safe(
       supabase
         .from("cc_activities")
         .select("id, impact_score")
         .eq("student_id", profile.id),
-    ]);
+    ),
+  ]);
 
   const schoolList = (schools ?? []) as StudentSchoolRow[];
   const essayList = (essays ?? []) as { phase: string | null; essay_type: string | null }[];
