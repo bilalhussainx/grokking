@@ -59,6 +59,8 @@ const PUBLIC_PREFIXES = [
   "/faq",
   "/intake",
   "/cc/shared",
+  "/product/",  // marketing pages: /product/counselor, /product/essays, /product/schools
+  "/stories",   // marketing testimonials page
 ];
 
 // Routes that anonymous (guest) users can reach, but real-account-required

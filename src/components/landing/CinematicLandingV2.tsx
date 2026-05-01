@@ -179,18 +179,18 @@ function Nav() {
       >
         {(
           [
-            ["Counselor", "#counselor"],
-            ["Essays", "#pipeline"],
-            ["Schools", "#pipeline"],
-            ["Pricing", "#pricing"],
-            ["Stories", "#stories"],
+            ["Counselor", "/product/counselor"],
+            ["Essays", "/product/essays"],
+            ["Schools", "/product/schools"],
+            ["Pricing", "/pricing"],
+            ["Stories", "/stories"],
           ] as const
         ).map(([label, href]) => (
-          <a
+          <Link
             key={label}
             href={href}
             style={{
-              color: "inherit",
+              color: "rgba(242,237,227,.70)",
               textDecoration: "none",
               transition: "color .15s ease",
             }}
@@ -202,7 +202,7 @@ function Nav() {
             }}
           >
             {label}
-          </a>
+          </Link>
         ))}
       </div>
       <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
