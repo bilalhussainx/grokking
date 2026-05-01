@@ -1,14 +1,6 @@
 import type { Metadata } from "next";
-import {
-  ListChecks,
-  Target,
-  DollarSign,
-  Calendar,
-  TrendingUp,
-  Globe,
-} from "lucide-react";
 import MarketingShell from "@/components/marketing/MarketingShell";
-import { FeatureGrid, FinalCTA } from "@/components/marketing/MarketingSections";
+import { FeatureGrid, FinalCTA, type IconName } from "@/components/marketing/MarketingSections";
 
 export const metadata: Metadata = {
   title: "Schools — list builder + chancing + deadlines",
@@ -16,34 +8,34 @@ export const metadata: Metadata = {
     "Build a balanced school list with reach / match / safety classification, real chances of admission, and every deadline tracked. Replace the spreadsheet your family is using.",
 };
 
-const FEATURES = [
+const FEATURES: { icon: IconName; title: string; body: string }[] = [
   {
-    icon: ListChecks,
+    icon: "listChecks",
     title: "Balanced list builder",
     body: "Search 1,500+ U.S. schools, get reach / match / safety bands based on your actual profile, and stop applying to 15 reaches with zero safeties. Average list: 10-15 schools.",
   },
   {
-    icon: Target,
+    icon: "target",
     title: "Real chances, not gut feel",
     body: "Acceptance rates calibrated by GPA, test score, country of origin, and demographics. We tell you the number and explain the gap.",
   },
   {
-    icon: Calendar,
+    icon: "calendar",
     title: "Every deadline, auto-loaded",
     body: "EA / ED / EDII / REA / RD plus financial-aid + CSS Profile + FAFSA. The board flips red 14 days out and shows you which components are still incomplete.",
   },
   {
-    icon: DollarSign,
+    icon: "dollar",
     title: "Net price per school",
     body: "Estimated aid you'd receive at every school on your list — based on your family's affordability profile, not the sticker price. ED warning fires when aid is at risk.",
   },
   {
-    icon: TrendingUp,
+    icon: "trend",
     title: "Demonstrated interest",
     body: "Some schools track every campus visit, info session, and rep meeting. Log them in one place and see the running touchpoint count per school.",
   },
   {
-    icon: Globe,
+    icon: "globe",
     title: "International + first-gen aware",
     body: "We mark the schools that are need-aware vs need-blind for international applicants. Same for first-gen-friendly schools and 100%-of-need-met lists.",
   },

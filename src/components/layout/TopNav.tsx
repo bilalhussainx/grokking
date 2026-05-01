@@ -2,13 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Moon, Sun, Menu, BookOpen, LogOut, Mic, Crown, Search, MessageSquare, Star, Gem, GraduationCap, Target, Library, Building2, Calendar } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  Moon,
+  Sun,
+  Menu,
+  BookOpen,
+  LogOut,
+  Mic,
+  Crown,
+  Search,
+  MessageSquare,
+  Library,
+  Building2,
+  Calendar,
+  MoreHorizontal,
+  Settings,
+  Target,
+} from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTopNav } from "@/contexts/TopNavContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useXP } from "@/contexts/XPContext";
 import CreditBadge from "@/components/auth/CreditBadge";
-import StreakBadge from "@/components/gamification/StreakBadge";
 import { KairosLogoIcon } from "@/components/ui/SamsaraLogo";
 import TopNavLanguagePicker from "@/components/layout/TopNavLanguagePicker";
 
@@ -18,6 +33,19 @@ interface TopNavProps {
   onToggleSidebar?: () => void;
 }
 
+// Secondary feature shortcuts that used to crowd the nav. Moved into a
+// dropdown so the bar stays readable. Order = importance to a logged-in
+// applicant on a daily basis.
+const MORE_LINKS: { href: string; label: string; icon: typeof BookOpen; cap?: string }[] = [
+  { href: "/talk", label: "Voice talk", icon: Mic, cap: "Open a voice session" },
+  { href: "/cc/dashboard", label: "Coach Kairos dashboard", icon: BookOpen, cap: "Adaptive home" },
+  { href: "/applications", label: "Applications", icon: Calendar, cap: "Deadlines + tracker" },
+  { href: "/my-schools", label: "School list", icon: Building2 },
+  { href: "/career/interviews", label: "Career interviews", icon: Target, cap: "Tech interview prep" },
+  { href: "/courses", label: "Courses", icon: BookOpen },
+  { href: "/glossary", label: "Glossary", icon: Library },
+];
+
 export default function TopNav({
   courseTitle: propCourseTitle,
   progress: propProgress = 0,
@@ -26,14 +54,49 @@ export default function TopNav({
   const { user, profile, signOut } = useAuth();
   const { overrides } = useTopNav();
   const { isDark, toggle: toggleDarkMode } = useTheme();
-  const { level, gems, xpMultiplier } = useXP();
   const pathname = usePathname();
   const showAutosave = pathname?.startsWith("/cc") ?? false;
 
-  // Props override context (for backward compat), context overrides defaults
   const courseTitle = propCourseTitle ?? overrides.courseTitle;
   const progress = propCourseTitle ? propProgress : (overrides.progress ?? 0);
   const onToggleSidebar = propOnToggleSidebar ?? overrides.onToggleSidebar;
+
+  // Dropdown state (More + Avatar)
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [avatarOpen, setAvatarOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement | null>(null);
+  const avatarRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (moreRef.current && !moreRef.current.contains(t)) setMoreOpen(false);
+      if (avatarRef.current && !avatarRef.current.contains(t)) setAvatarOpen(false);
+    };
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMoreOpen(false);
+        setAvatarOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, []);
+
+  // Close dropdowns on route change
+  useEffect(() => {
+    setMoreOpen(false);
+    setAvatarOpen(false);
+  }, [pathname]);
+
+  const initial = ((user?.user_metadata as Record<string, unknown> | undefined)?.full_name as string | undefined ?? user?.email ?? "U")
+    .toString()
+    .charAt(0)
+    .toUpperCase();
 
   return (
     <nav className="sticky top-0 z-50 h-14 flex items-center justify-between px-4 bg-black/90 backdrop-blur-2xl border-b border-white/10">
@@ -51,7 +114,9 @@ export default function TopNav({
 
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <KairosLogoIcon size={28} />
-          <span className="text-lg font-bold tracking-tight hidden sm:inline text-white">Kairos<span className="text-amber-400">.ai</span></span>
+          <span className="text-lg font-bold tracking-tight hidden sm:inline text-white">
+            Kairos<span className="text-amber-400">.ai</span>
+          </span>
           <span className="text-lg font-bold tracking-tight sm:hidden text-amber-400">K.</span>
         </Link>
 
@@ -66,19 +131,17 @@ export default function TopNav({
         )}
       </div>
 
-      {/* Right section */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      {/* Right section — minimal: language, billing, search, more, avatar */}
+      <div className="flex items-center gap-2 sm:gap-2.5">
         {showAutosave && (
           <span
-            className="hidden md:inline-flex items-center gap-1.5 font-mono text-[11px] text-white/50"
+            className="hidden md:inline-flex items-center gap-1.5 font-mono text-[11px] text-white/45"
             aria-live="polite"
           >
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden />
             saved
           </span>
         )}
-
-        {user && <TopNavLanguagePicker className="hidden md:inline-block" />}
 
         {courseTitle && (
           <div className="hidden sm:flex items-center gap-2.5">
@@ -94,37 +157,11 @@ export default function TopNav({
           </div>
         )}
 
-        {/* Streak + Level + Gems + Credit Badge */}
-        {user && <StreakBadge />}
-        {user && (
-          <div className="hidden sm:flex items-center gap-1">
-            <div
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold cursor-default"
-              title={`Level ${level}`}
-            >
-              <Star className="w-3 h-3" /> Lv.{level}
-            </div>
-            {xpMultiplier > 1 && (
-              <div
-                className="flex items-center px-1.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold animate-pulse cursor-default"
-                title={`${xpMultiplier}x XP multiplier active`}
-              >
-                {xpMultiplier}x
-              </div>
-            )}
-          </div>
-        )}
-        {user && (
-          <div
-            className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold cursor-default"
-            title={`${gems} gems`}
-          >
-            <Gem className="w-3 h-3" /> {gems}
-          </div>
-        )}
+        {user && <TopNavLanguagePicker className="hidden md:inline-block" />}
+
         {user && <CreditBadge />}
 
-        {/* Upgrade button for free users */}
+        {/* Upgrade for free users */}
         {user && profile?.role === "student" && (
           <Link
             href="/pricing"
@@ -135,126 +172,166 @@ export default function TopNav({
           </Link>
         )}
 
+        {/* Search (Cmd+K) — always visible */}
         <button
           onClick={() => {
             window.dispatchEvent(new CustomEvent("open-global-search"));
           }}
-          className="flex items-center gap-2 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs hover:bg-white/10 hover:text-[#D4AF37] transition-all"
-          title="Search courses and lessons (Ctrl+K)"
+          className="flex items-center gap-2 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[40px] sm:min-h-0 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs hover:bg-white/10 hover:text-[#D4AF37] transition-all"
+          title="Search (Ctrl+K)"
+          aria-label="Search"
         >
           <Search className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Search</span>
-          <kbd className="hidden sm:inline ml-1 px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-mono">
-            Ctrl K
+          <span className="hidden md:inline">Search</span>
+          <kbd className="hidden md:inline ml-1 px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-mono">
+            ⌘K
           </kbd>
         </button>
 
-        <Link
-          href="/college-interviews"
-          className="hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-semibold hover:bg-[#D4AF37]/25 transition-all"
-          title="Practice your college admissions interview"
-        >
-          <GraduationCap className="w-3.5 h-3.5" />
-          <span>College</span>
-        </Link>
-
-        <Link
-          href="/career/interviews"
-          className="hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-white/[0.04] border border-white/10 text-white/80 text-xs font-medium hover:bg-white/[0.08] transition-all"
-          title="Practice your tech interview"
-        >
-          <Target className="w-3.5 h-3.5" />
-          <span>Career</span>
-        </Link>
-
-        <Link
-          href="/talk"
-          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition-all"
-          title="Start a voice conversation"
-        >
-          <Mic className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Talk</span>
-        </Link>
-
-        <Link
-          href="/courses"
-          className="hidden sm:flex p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-[#D4AF37] transition-colors"
-          aria-label="Browse Courses"
-          title="Browse Courses"
-        >
-          <BookOpen className="w-[18px] h-[18px]" />
-        </Link>
-
-        <Link
-          href="/glossary"
-          className="hidden sm:flex p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-[#D4AF37] transition-colors"
-          aria-label="Glossary"
-          title="Glossary"
-        >
-          <Library className="w-[18px] h-[18px]" />
-        </Link>
-
-        <Link
-          href="/my-schools"
-          className="hidden sm:flex p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-[#D4AF37] transition-colors"
-          aria-label="My Schools"
-          title="My School List"
-        >
-          <Building2 className="w-[18px] h-[18px]" />
-        </Link>
-
-        <Link
-          href="/timeline"
-          className="hidden sm:flex p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-[#D4AF37] transition-colors"
-          aria-label="Timeline"
-          title="Deadlines & Tasks"
-        >
-          <Calendar className="w-[18px] h-[18px]" />
-        </Link>
-
-        <button
-          onClick={toggleDarkMode}
-          className="hidden sm:flex p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-[#D4AF37] transition-colors"
-          aria-label="Toggle dark mode"
-        >
-          {isDark ? (
-            <Sun className="w-[18px] h-[18px]" />
-          ) : (
-            <Moon className="w-[18px] h-[18px]" />
-          )}
-        </button>
-
+        {/* More dropdown — consolidates the secondary feature links */}
         {user && (
-          <div className="flex items-center gap-2">
-            <Link
-              href="/settings"
-              className="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#D4AF37] to-[#8B7355] text-black text-xs font-bold shadow-md shadow-[#D4AF37]/20 hover:ring-2 hover:ring-[#D4AF37]/50 transition-all"
-              title="Settings"
-            >
-              {(user.user_metadata?.full_name || user.email || "U").charAt(0).toUpperCase()}
-            </Link>
-            {typeof window !== "undefined" && !localStorage.getItem("survey-completed") && (
-              // Plain <a> — Next.js <Link> prefetches as RSC and 404s on
-              // static files in public/. (Bug fix 2026-04-07)
-              <a
-                href="/survey.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => localStorage.setItem("survey-completed", "true")}
-                className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition-colors"
-                title="Give feedback"
-              >
-                <MessageSquare className="w-3 h-3" />
-                Feedback
-              </a>
-            )}
+          <div ref={moreRef} className="relative">
             <button
-              onClick={() => signOut()}
-              className="hidden sm:flex p-1.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-[#D4AF37] transition-colors"
-              aria-label="Log out"
+              type="button"
+              onClick={() => {
+                setMoreOpen((v) => !v);
+                setAvatarOpen(false);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs hover:bg-white/10 hover:text-[#D4AF37] transition-all"
+              aria-haspopup="menu"
+              aria-expanded={moreOpen}
+              title="More"
             >
-              <LogOut className="w-[18px] h-[18px]" />
+              <MoreHorizontal className="w-4 h-4" />
+              <span className="hidden lg:inline">More</span>
             </button>
+
+            {moreOpen && (
+              <div
+                role="menu"
+                className="absolute right-0 top-full mt-2 z-50 min-w-[260px] rounded-xl bg-[#0a0a0a] border border-white/10 shadow-2xl overflow-hidden"
+              >
+                {MORE_LINKS.map((l) => {
+                  const Ic = l.icon;
+                  const active = pathname?.startsWith(l.href);
+                  return (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      role="menuitem"
+                      className={
+                        "flex items-start gap-3 px-3.5 py-2.5 text-sm transition-colors " +
+                        (active
+                          ? "bg-[#D4AF37]/10 text-[#D4AF37]"
+                          : "text-white/80 hover:bg-white/5 hover:text-[#D4AF37]")
+                      }
+                    >
+                      <Ic className="w-4 h-4 mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[13px] font-medium">{l.label}</div>
+                        {l.cap && (
+                          <div className="text-[11px] text-white/45 mt-0.5 leading-snug">
+                            {l.cap}
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Avatar dropdown — settings, feedback, sign out, theme */}
+        {user && (
+          <div ref={avatarRef} className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setAvatarOpen((v) => !v);
+                setMoreOpen(false);
+              }}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#D4AF37] to-[#8B7355] text-black text-xs font-bold shadow-md shadow-[#D4AF37]/20 hover:ring-2 hover:ring-[#D4AF37]/50 transition-all"
+              aria-haspopup="menu"
+              aria-expanded={avatarOpen}
+              aria-label="Account menu"
+            >
+              {initial}
+            </button>
+
+            {avatarOpen && (
+              <div
+                role="menu"
+                className="absolute right-0 top-full mt-2 z-50 min-w-[220px] rounded-xl bg-[#0a0a0a] border border-white/10 shadow-2xl overflow-hidden"
+              >
+                <div className="px-3.5 py-3 border-b border-white/5">
+                  {(() => {
+                    const meta = user.user_metadata as Record<string, unknown> | undefined;
+                    const fullName = typeof meta?.full_name === "string" ? meta.full_name : null;
+                    return (
+                      <>
+                        <div className="text-[13px] text-white/90 font-medium truncate">
+                          {fullName ?? user.email}
+                        </div>
+                        {fullName && user.email && (
+                          <div className="text-[11.5px] text-white/45 truncate mt-0.5">
+                            {user.email}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+
+                <Link
+                  href="/settings"
+                  role="menuitem"
+                  className="flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] text-white/80 hover:bg-white/5 hover:text-[#D4AF37] transition-colors"
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </Link>
+
+                {typeof window !== "undefined" && !localStorage.getItem("survey-completed") && (
+                  // Plain <a> — Next.js <Link> prefetches as RSC and 404s on
+                  // static files in public/.
+                  <a
+                    href="/survey.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => localStorage.setItem("survey-completed", "true")}
+                    role="menuitem"
+                    className="flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] text-white/80 hover:bg-white/5 hover:text-[#D4AF37] transition-colors"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Send feedback
+                  </a>
+                )}
+
+                <button
+                  type="button"
+                  onClick={toggleDarkMode}
+                  role="menuitem"
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] text-white/80 hover:bg-white/5 hover:text-[#D4AF37] transition-colors text-left"
+                >
+                  {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                  {isDark ? "Light mode" : "Dark mode"}
+                </button>
+
+                <div className="border-t border-white/5">
+                  <button
+                    type="button"
+                    onClick={() => signOut()}
+                    role="menuitem"
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] text-rose-300 hover:bg-rose-500/10 transition-colors text-left"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign out
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

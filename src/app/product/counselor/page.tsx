@@ -1,14 +1,6 @@
 import type { Metadata } from "next";
-import {
-  Mic,
-  GraduationCap,
-  MessageSquare,
-  Clock,
-  Languages,
-  ShieldCheck,
-} from "lucide-react";
 import MarketingShell from "@/components/marketing/MarketingShell";
-import { FeatureGrid, FinalCTA } from "@/components/marketing/MarketingSections";
+import { FeatureGrid, FinalCTA, type IconName } from "@/components/marketing/MarketingSections";
 
 export const metadata: Metadata = {
   title: "Coach Kairos — your AI college counselor",
@@ -16,34 +8,34 @@ export const metadata: Metadata = {
     "Voice-first AI counseling for college applicants in 18 languages. Trained on your profile, your grades, your school list. Available at 3 a.m. on a Saturday.",
 };
 
-const FEATURES = [
+const FEATURES: { icon: IconName; title: string; body: string }[] = [
   {
-    icon: Mic,
+    icon: "mic",
     title: "Voice-first, 18 languages",
     body: "Talk through your school list in Hindi, your essay in Punjabi, your aid forms in Spanish. Coach Kairos speaks back in the same language with sub-second latency.",
   },
   {
-    icon: GraduationCap,
+    icon: "grad",
     title: "Trained on your profile",
     body: "Your GPA, your test scores, your activities, your school list — Coach Kairos has the full picture before you start typing. No re-explaining yourself every conversation.",
   },
   {
-    icon: MessageSquare,
+    icon: "message",
     title: "Family Mode for parents",
     body: "Hand the phone to a parent who doesn't speak English. Coach Kairos switches to their language, simplifies the jargon, and answers their financial-aid questions directly.",
   },
   {
-    icon: Clock,
+    icon: "clock",
     title: "Available when humans aren't",
     body: "11 p.m. the night before a deadline. 6 a.m. before school. The hour your counselor isn't picking up. Coach Kairos is one tap away.",
   },
   {
-    icon: Languages,
+    icon: "languages",
     title: "Mixed-script aware",
     body: "Type 'میں MIT جانا چاہتا ہوں' and Coach reads it correctly — Urdu RTL, MIT in English, no copy-paste. Same for every language we support.",
   },
   {
-    icon: ShieldCheck,
+    icon: "shield",
     title: "Privacy by default",
     body: "We never store raw audio. Conversations are scoped to your account. Family Mode runs in a separate transcript so handing the phone to a parent doesn't leak essay drafts.",
   },
