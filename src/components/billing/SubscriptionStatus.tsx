@@ -268,7 +268,7 @@ export default function SubscriptionStatus() {
           className="block text-center py-3 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-sm hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25"
         >
           <Crown className="w-4 h-4 inline mr-2" />
-          Upgrade to Pro -- $10/mo
+          Upgrade to Pro -- $12/mo
         </a>
       )}
     </div>

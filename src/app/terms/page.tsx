@@ -40,10 +40,10 @@ export default function TermsOfServicePage() {
             Access to 28 free courses, limited AI coaching credits, and basic voice tutoring.
             Free accounts may have usage limits that reset monthly.
           </p>
-          <h3>Pro Plan ($10/month)</h3>
+          <h3>Pro Plan ($12/month)</h3>
           <p>
             Access to all 69+ courses, unlimited AI coaching, full voice tutoring in 17 languages,
-            and priority support. Billed monthly through Paddle. You may cancel at any time.
+            and priority support. Billed monthly through Stripe. You may cancel at any time.
           </p>
 
           <h2>5. Payments and Refunds</h2>

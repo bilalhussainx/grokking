@@ -468,11 +468,11 @@ And it speaks Hindi, Punjabi, and Urdu.`,
         </div>
       </Section>
 
-      {/* SECTION 4 — $10/month */}
+      {/* SECTION 4 — $12/month */}
       <Section>
         <EyebrowHeadline
           eyebrow="PRICING"
-          headline="What $10 a month"
+          headline="What $12 a month"
           highlight="buys you."
         />
         <div style={{ maxWidth: 760, margin: '0 auto 40px', textAlign: 'center' }}>
@@ -508,7 +508,7 @@ And it speaks Hindi, Punjabi, and Urdu.`,
               fontStyle: 'italic',
             }}
           >
-            KairosLearn Pro: $10/month. All the tools a $50,000 counselor would use.
+            KairosLearn Pro: $12/month. All the tools a $50,000 counselor would use.
           </p>
         </div>
         <PricingTable />

@@ -78,7 +78,7 @@ export default function HeroSection() {
         </h1>
 
         <p className={styles.sub} id="hs">
-          Essay brainstorming and drafting. Activities optimization. Mock interviews with Harvard, Yale, Stanford, and MIT alumni personas. School list building. Recommendation coaching. One platform, every piece of your application. $10/mo.
+          Essay brainstorming and drafting. Activities optimization. Mock interviews with Harvard, Yale, Stanford, and MIT alumni personas. School list building. Recommendation coaching. One platform, every piece of your application. $12/mo.
         </p>
 
         <div className={styles.ctas} id="hc">

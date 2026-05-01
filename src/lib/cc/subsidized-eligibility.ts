@@ -63,14 +63,14 @@ export async function checkSubsidizedEligibility(
   if (profile.is_first_gen) {
     return {
       eligible: false,
-      reason: "You're first-gen, but your income bracket doesn't qualify. Pro is $10/month with full access.",
+      reason: "You're first-gen, but your income bracket doesn't qualify. Pro is $12/month with full access.",
       missingFields: [],
     };
   }
 
   return {
     eligible: false,
-    reason: "Based on your profile, you don't currently qualify for subsidized Pro. Pro is $10/month.",
+    reason: "Based on your profile, you don't currently qualify for subsidized Pro. Pro is $12/month.",
     missingFields: [],
   };
 }

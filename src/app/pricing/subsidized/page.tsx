@@ -123,7 +123,7 @@ export default function SubsidizedPage() {
 
           <div className="mt-6 pt-4 border-t border-white/10">
             <p className="text-xs text-white/40">
-              Pro is $10/month for students who don&apos;t qualify for subsidized access.
+              Pro is $12/month for students who don&apos;t qualify for subsidized access.
               Every dollar helps us keep the platform free for those who need it most.
             </p>
           </div>

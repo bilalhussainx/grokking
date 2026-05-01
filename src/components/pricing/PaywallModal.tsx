@@ -110,7 +110,7 @@ export default function PaywallModal({ courseTitle, trigger, onClose }: PaywallM
                 className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold text-sm hover:from-amber-400 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2"
               >
                 <Crown className={`w-4 h-4 transition-transform ${hovering ? "scale-110" : ""}`} />
-                Upgrade to Pro — $10/mo
+                Upgrade to Pro — $12/mo
               </button>
               <p className="text-[10px] text-white/20 mt-3">Cancel anytime. 7-day money-back guarantee.</p>
             </>
