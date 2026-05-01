@@ -1,115 +1,479 @@
-// src/app/pricing/page.tsx
 import type { Metadata } from "next";
-import PricingCards from "@/components/pricing/PricingCards";
+import Link from "next/link";
+import { ArrowRight, Check, Minus } from "lucide-react";
+import MarketingShell from "@/components/marketing/MarketingShell";
+import { FinalCTA } from "@/components/marketing/MarketingSections";
+import ProCheckoutButton from "@/components/marketing/ProCheckoutButton";
 
 export const metadata: Metadata = {
-  title: "Pricing - Kairos.ai | Learn Smarter with AI",
+  title: "Pricing — KairosLearn",
   description:
-    "Start free with 28 courses and 300 AI credits. Upgrade to Pro for $10/month to unlock all 69 courses, unlimited AI credits, and full voice coaching in 17 languages.",
-  openGraph: {
-    title: "Pricing - Kairos.ai",
-    description:
-      "AI-powered learning for $10/month. 69 courses, unlimited AI credits, voice coaching in 17 languages.",
-    type: "website",
-  },
+    "Free forever for the first three schools. Upgrade to Pro at $12 / month for unlimited everything — schools, essays, voice sessions, languages, mock interviews, and the full FAFSA + aid comparator.",
 };
+
+type Row = {
+  feature: string;
+  free: string | true | false;
+  pro: string | true | false;
+};
+
+const COMPARE: Row[] = [
+  { feature: "School list", free: "3 schools", pro: "Unlimited" },
+  { feature: "Essay drafts", free: "1", pro: "Unlimited" },
+  { feature: "Voice sessions", free: "3 / month", pro: "Unlimited" },
+  { feature: "Languages", free: "English only", pro: "Hindi, Punjabi, French, Spanish + 14 more" },
+  { feature: "Interview prep", free: "1 mock", pro: "Unlimited" },
+  { feature: "Financial aid", free: "Basic", pro: "Full FAFSA + aid comparator" },
+  { feature: "Application tracker", free: true, pro: true },
+  { feature: "Activities optimizer", free: true, pro: true },
+  { feature: "Coach Kairos chat", free: true, pro: true },
+  { feature: "Family Mode (parent voice)", free: false, pro: true },
+  { feature: "Reuse detector across supplements", free: false, pro: true },
+  { feature: "Translate-for-parent (any document)", free: false, pro: true },
+  { feature: "Priority support", free: false, pro: true },
+];
+
+function Cell({ value }: { value: string | true | false }) {
+  if (value === true) {
+    return (
+      <span style={{ color: "#d4a84b", display: "inline-flex", alignItems: "center" }}>
+        <Check size={16} strokeWidth={2.2} />
+      </span>
+    );
+  }
+  if (value === false) {
+    return (
+      <span style={{ color: "rgba(242,237,227,.30)", display: "inline-flex", alignItems: "center" }}>
+        <Minus size={16} strokeWidth={2} />
+      </span>
+    );
+  }
+  return <span style={{ color: "#f2ede3", fontSize: 13 }}>{value}</span>;
+}
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-black">
-      {/* Hero */}
-      <section className="relative pt-24 pb-16 px-4 overflow-hidden">
-        {/* Gradient orbs */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-20 right-1/4 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none" />
+    <MarketingShell>
+      <section className="kl-mkt-hero">
+        <div className="kl-mkt-eyebrow">
+          <span className="rule" /> Pricing
+        </div>
+        <h1 className="kl-mkt-h1">
+          Free where it counts. <em>Pro</em> where it pays for itself.
+        </h1>
+        <p className="kl-mkt-lede">
+          Three schools and one essay are enough to feel the product. The full cycle —
+          unlimited schools, voice in your language, family mode, the aid comparator —
+          is one upgrade away.
+        </p>
+      </section>
 
-        <div className="relative z-10 text-center max-w-2xl mx-auto">
-          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-6">
-            <span className="text-white">
-              Simple Pricing
+      {/* Subsidized banner — keep the route, restyle */}
+      <section
+        className="kl-mkt-section"
+        style={{ paddingTop: 0, paddingBottom: 28 }}
+      >
+        <Link
+          href="/pricing/subsidized"
+          style={{
+            display: "block",
+            padding: "16px 22px",
+            borderRadius: 12,
+            border: "1px solid rgba(212,175,55,.32)",
+            background: "rgba(212,175,55,.05)",
+            color: "#d4a84b",
+            textDecoration: "none",
+            fontSize: 13.5,
+            textAlign: "center",
+            transition: "background .15s ease",
+            fontFamily: "'DM Sans', sans-serif",
+          }}
+        >
+          First-generation or low-income student?{" "}
+          <strong style={{ textDecoration: "underline", textUnderlineOffset: 2 }}>
+            You may qualify for free Pro access →
+          </strong>
+        </Link>
+      </section>
+
+      {/* Tier cards */}
+      <section className="kl-mkt-section" style={{ paddingTop: 0 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: 18,
+            maxWidth: 880,
+            margin: "0 auto",
+          }}
+        >
+          {/* Free */}
+          <div
+            style={{
+              padding: "32px 30px",
+              borderRadius: 18,
+              border: "1px solid rgba(255,255,255,.10)",
+              background: "rgba(255,255,255,.02)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 11,
+                  letterSpacing: ".22em",
+                  textTransform: "uppercase",
+                  color: "rgba(242,237,227,.55)",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 500,
+                }}
+              >
+                Free
+              </div>
+              <div
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontWeight: 300,
+                  fontSize: 44,
+                  lineHeight: 1,
+                  color: "#f2ede3",
+                  marginTop: 12,
+                  letterSpacing: "-.02em",
+                }}
+              >
+                $0{" "}
+                <span style={{ fontSize: 14, color: "rgba(242,237,227,.45)" }}>forever</span>
+              </div>
+              <p
+                style={{
+                  marginTop: 12,
+                  fontSize: 13.5,
+                  color: "rgba(242,237,227,.62)",
+                  lineHeight: 1.6,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                For students testing whether the product fits before committing. Real
+                feature access — just capped.
+              </p>
+            </div>
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 13.5,
+                color: "rgba(242,237,227,.78)",
+              }}
+            >
+              {[
+                "3 schools",
+                "1 essay draft",
+                "3 voice sessions / month",
+                "English only",
+                "1 mock interview",
+                "Basic financial-aid view",
+              ].map((f) => (
+                <li
+                  key={f}
+                  style={{ display: "flex", alignItems: "center", gap: 10 }}
+                >
+                  <Check size={14} style={{ color: "rgba(242,237,227,.55)", flexShrink: 0 }} />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/intake"
+              className="kl-mkt-cta-ghost"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                padding: "13px 20px",
+                border: "1px solid rgba(255,255,255,.18)",
+                borderRadius: 10,
+                marginTop: "auto",
+              }}
+            >
+              Start free
+            </Link>
+          </div>
+
+          {/* Pro */}
+          <div
+            style={{
+              padding: "32px 30px",
+              borderRadius: 18,
+              border: "1px solid rgba(212,175,55,.45)",
+              background:
+                "linear-gradient(180deg, rgba(212,175,55,.10), rgba(212,175,55,.02)), rgba(5,8,13,.6)",
+              boxShadow: "0 24px 60px -22px rgba(212,175,55,.30)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+              position: "relative",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                top: 16,
+                right: 18,
+                fontSize: 9,
+                letterSpacing: ".22em",
+                textTransform: "uppercase",
+                color: "#05080d",
+                background: "#d4af37",
+                padding: "4px 10px",
+                borderRadius: 999,
+                fontWeight: 700,
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              Recommended
             </span>
-          </h1>
-          <p className="text-lg text-white/50 leading-relaxed">
-            Start free with 28 courses and 300 AI credits.
-            <br className="hidden sm:block" />
-            Upgrade when you need full access to all 69 courses and unlimited AI.
-          </p>
+            <div>
+              <div
+                style={{
+                  fontSize: 11,
+                  letterSpacing: ".22em",
+                  textTransform: "uppercase",
+                  color: "#d4a84b",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 500,
+                }}
+              >
+                Pro
+              </div>
+              <div
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontWeight: 300,
+                  fontSize: 44,
+                  lineHeight: 1,
+                  color: "#f2ede3",
+                  marginTop: 12,
+                  letterSpacing: "-.02em",
+                }}
+              >
+                $12{" "}
+                <span style={{ fontSize: 14, color: "rgba(242,237,227,.55)" }}>/ month</span>
+              </div>
+              <p
+                style={{
+                  marginTop: 12,
+                  fontSize: 13.5,
+                  color: "rgba(242,237,227,.7)",
+                  lineHeight: 1.6,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                For the full cycle. Less than one hour with a private counselor — for the
+                whole senior year.
+              </p>
+            </div>
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 13.5,
+                color: "#f2ede3",
+              }}
+            >
+              {[
+                "Unlimited schools",
+                "Unlimited essay drafts + supplements",
+                "Unlimited voice sessions",
+                "18 languages incl. Hindi, Punjabi, French, Spanish",
+                "Unlimited mock interviews",
+                "Full FAFSA + aid comparator",
+                "Family Mode (parent voice)",
+                "Translate-for-parent docs",
+              ].map((f) => (
+                <li
+                  key={f}
+                  style={{ display: "flex", alignItems: "center", gap: 10 }}
+                >
+                  <Check size={14} style={{ color: "#d4a84b", flexShrink: 0 }} />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <ProCheckoutButton
+              className="kl-mkt-cta-gold"
+              // Override layout to fill the card width.
+            >
+              Start Pro <ArrowRight size={14} />
+            </ProCheckoutButton>
+            <p
+              style={{
+                fontSize: 11.5,
+                color: "rgba(242,237,227,.45)",
+                margin: 0,
+                textAlign: "center",
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              First month free. Cancel anytime.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Subsidized access banner */}
-      <section className="max-w-2xl mx-auto px-4 pb-8">
-        <a
-          href="/pricing/subsidized"
-          className="block p-4 rounded-2xl border border-[#D4AF37]/20 bg-[#D4AF37]/5 hover:bg-[#D4AF37]/10 transition-all text-center"
+      {/* Comparison table */}
+      <section className="kl-mkt-section" style={{ paddingTop: 36 }}>
+        <div className="kl-mkt-eyebrow">
+          <span className="rule" /> Side-by-side
+        </div>
+        <h2 className="kl-mkt-h2">
+          What you get on <em>each tier.</em>
+        </h2>
+        <div
+          style={{
+            marginTop: 28,
+            border: "1px solid rgba(255,255,255,.08)",
+            borderRadius: 14,
+            overflow: "hidden",
+            background: "rgba(255,255,255,.02)",
+          }}
         >
-          <p className="text-sm text-[#D4AF37] font-medium">
-            First-generation or low-income student? You may qualify for{" "}
-            <span className="font-bold underline underline-offset-2">free Pro access</span>.
-          </p>
-        </a>
-      </section>
-
-      {/* Pricing Cards */}
-      <section className="px-4 pb-20">
-        <PricingCards />
+          {/* Header row */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(200px, 1.5fr) 1fr 1fr",
+              alignItems: "center",
+              padding: "14px 22px",
+              borderBottom: "1px solid rgba(255,255,255,.06)",
+              fontSize: 10.5,
+              letterSpacing: ".22em",
+              textTransform: "uppercase",
+              color: "rgba(242,237,227,.45)",
+              fontFamily: "'DM Sans', sans-serif",
+              fontWeight: 500,
+            }}
+          >
+            <span>Feature</span>
+            <span>Free</span>
+            <span style={{ color: "#d4a84b" }}>Pro</span>
+          </div>
+          {COMPARE.map((row, i) => (
+            <div
+              key={row.feature}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(200px, 1.5fr) 1fr 1fr",
+                alignItems: "center",
+                padding: "14px 22px",
+                borderBottom: i === COMPARE.length - 1 ? "none" : "1px solid rgba(255,255,255,.04)",
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 13.5,
+                color: "rgba(242,237,227,.78)",
+              }}
+            >
+              <span>{row.feature}</span>
+              <Cell value={row.free} />
+              <Cell value={row.pro} />
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* FAQ */}
-      <section className="max-w-3xl mx-auto px-4 pb-24">
-        <h2 className="text-2xl font-bold text-white text-center mb-10">
-          Frequently Asked Questions
-        </h2>
-        <div className="space-y-4">
+      <section className="kl-mkt-section" style={{ paddingTop: 0 }}>
+        <div className="kl-mkt-eyebrow">
+          <span className="rule" /> Frequently asked
+        </div>
+        <h2 className="kl-mkt-h2">Quick answers.</h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24 }}>
           {FAQ_ITEMS.map(({ q, a }) => (
             <details
               key={q}
-              className="group rounded-xl border border-white/10 bg-[#141414] overflow-hidden"
+              style={{
+                borderRadius: 12,
+                border: "1px solid rgba(255,255,255,.08)",
+                background: "rgba(255,255,255,.02)",
+                overflow: "hidden",
+              }}
             >
-              <summary className="cursor-pointer px-6 py-4 text-sm font-medium text-white/80 hover:text-white transition-colors list-none flex items-center justify-between">
+              <summary
+                style={{
+                  cursor: "pointer",
+                  listStyle: "none",
+                  padding: "16px 22px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: "#f2ede3",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
                 {q}
-                <span className="text-white/30 group-open:rotate-45 transition-transform text-lg">
-                  +
-                </span>
+                <span style={{ color: "rgba(242,237,227,.40)", fontSize: 18 }}>+</span>
               </summary>
-              <div className="px-6 pb-4 text-sm text-white/50 leading-relaxed">
+              <div
+                style={{
+                  padding: "0 22px 18px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 13.5,
+                  color: "rgba(242,237,227,.62)",
+                  lineHeight: 1.65,
+                }}
+              >
                 {a}
               </div>
             </details>
           ))}
         </div>
       </section>
-    </div>
+
+      <FinalCTA
+        headline="Try Pro for <em>one month</em>, free."
+        body="If it's not pulling its weight, cancel from settings. We don't email-trap you to keep the subscription."
+        primaryLabel="Start Pro free"
+      />
+    </MarketingShell>
   );
 }
 
 const FAQ_ITEMS = [
   {
-    q: "What's included in the Free plan?",
-    a: "You get access to 28 courses covering CS fundamentals, introductory finance, and language basics. You also receive 300 AI credits per month for the AI Coach, hints, and grading. Basic voice coaching is included.",
-  },
-  {
-    q: "What does Pro unlock?",
-    a: "Pro gives you access to all 69 courses (including advanced CS, system design, interview prep, and all religious studies/philosophy courses), unlimited AI credits, full voice coaching in 17 languages, mock interview practice, and priority support.",
-  },
-  {
     q: "Can I cancel anytime?",
-    a: "Yes. You can cancel your Pro subscription at any time from your account settings. You'll retain access to Pro features until the end of your current billing period.",
+    a: "Yes. Cancel from your account settings — you keep Pro access until the end of the billing period. No phone calls, no retention emails.",
   },
   {
-    q: "Is there a free trial?",
-    a: "New users get a 1-month free Pro trial on signup. After the trial ends, you can continue on the Free plan or upgrade to Pro.",
+    q: "Is there really a free trial?",
+    a: "Yes. New users get the first month of Pro free on signup. You'll see a single charge of $12 thirty days later only if you don't cancel.",
   },
   {
-    q: "What payment methods do you accept?",
-    a: "We accept all major credit and debit cards, PayPal, Apple Pay, and Google Pay through our payment partner Paddle. Paddle also handles VAT/sales tax automatically based on your location.",
+    q: "Why $12 instead of free?",
+    a: "Voice sessions cost real money to run (Deepgram + Sarvam STT/TTS, OpenRouter LLM tokens). $12/mo covers infrastructure plus the team building this. We keep a meaningful free tier so cost isn't the barrier — but the model is built around the Pro flow.",
   },
   {
-    q: "Do you offer team or classroom pricing?",
-    a: "Yes. Our Teams plan is $10/seat/month (minimum 5 seats) and includes classroom management, student progress dashboards, homework assignment, and admin controls. Contact us for details.",
+    q: "Do you offer free Pro for low-income or first-gen students?",
+    a: "Yes. See the subsidized-access link near the top of the page — if you qualify, Pro is free for the full senior year.",
   },
   {
-    q: "What are AI credits?",
-    a: "AI credits are used when you interact with the AI Coach (hints, code grading, voice sessions, mock interviews). Free users get 300/month. Pro users get unlimited credits.",
+    q: "What payment methods?",
+    a: "All major credit + debit cards, PayPal, Apple Pay, Google Pay through Paddle. Paddle handles VAT/sales tax automatically.",
+  },
+  {
+    q: "Refund policy?",
+    a: "Cancel within 14 days of a charge for a full refund — no questions. After that, the standard rule is no mid-cycle refund, but write us if something is wrong and we'll figure it out.",
   },
 ];
