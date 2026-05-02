@@ -20,120 +20,19 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Home, Calendar, FileText, Mail, BarChart3, MessageSquare, Hourglass,
-  Activity, BookOpen, Compass, MapPin, Sun, GraduationCap, Settings,
-  ChevronLeft, ChevronRight, Edit3, Users,
-} from "lucide-react";
+import { Home, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCoachKairos } from "@/contexts/CoachKairosContext";
+import {
+  type SidebarGrade,
+  type IconName,
+  type NavSection,
+  ICONS,
+  visibleFor,
+} from "./sidebar-data";
 
-// Variant key — matches dashboard variants.ts. Senior phases collapse to a
-// single sidebar shape since they share the same nav content; the design
-// only distinguishes "senior-writing" vs "senior-decisions" for the
-// waitlist-row pulse, which we drive via a separate `pulseWaitlist` prop.
-export type SidebarGrade =
-  | "g9" | "g10" | "junior"
-  | "senior_writing" | "senior_post_submit" | "senior_decisions"
-  | "transfer" | "unknown";
-
-type IconName =
-  | "home" | "calendar" | "fileText" | "mail" | "chartBar" | "msgSquare"
-  | "hourglass" | "activity" | "bookOpen" | "compass" | "mapPin" | "sun"
-  | "cap" | "settings" | "edit3" | "users";
-
-const ICONS: Record<IconName, typeof Home> = {
-  home: Home, calendar: Calendar, fileText: FileText, mail: Mail,
-  chartBar: BarChart3, msgSquare: MessageSquare, hourglass: Hourglass,
-  activity: Activity, bookOpen: BookOpen, compass: Compass, mapPin: MapPin,
-  sun: Sun, cap: GraduationCap, settings: Settings, edit3: Edit3, users: Users,
-};
-
-type NavItem = {
-  id: string;
-  label: string;
-  icon: IconName;
-  href: string;
-  // Which variant keys see this item. Senior phases share most items.
-  grades: SidebarGrade[];
-  // Optional override label/grades for transfer applicants.
-  transferLabel?: string;
-  transferGrades?: SidebarGrade[];
-  // Tools/Coach row opens the drawer instead of navigating.
-  drawer?: boolean;
-  // Waitlist row pulses on first appearance for senior_decisions users.
-  pulseOnAppear?: boolean;
-};
-
-type NavSection = {
-  id: "apply" | "profile" | "tools";
-  name: string;
-  abbr: string;
-  items: NavItem[];
-  lockedFor?: SidebarGrade[];
-  lockedCaption?: string;
-};
-
-const SENIOR_GRADES: SidebarGrade[] = [
-  "senior_writing", "senior_post_submit", "senior_decisions",
-];
-
-const SECTIONS: NavSection[] = [
-  {
-    id: "apply", name: "Apply", abbr: "A",
-    lockedFor: ["g9"], lockedCaption: "Unlocks junior year",
-    items: [
-      { id: "tracker", label: "Application tracker", icon: "calendar", href: "/applications",
-        grades: ["junior", ...SENIOR_GRADES, "transfer"] },
-      { id: "whyTransfer", label: "Why-transfer essay", icon: "edit3", href: "/cc/essays?type=transfer",
-        grades: ["transfer"] },
-      { id: "supplements", label: "Supplements", icon: "fileText", href: "/cc/essays/supplements",
-        grades: ["junior", ...SENIOR_GRADES] },
-      { id: "recs", label: "Recommenders", icon: "mail", href: "/cc/recommenders",
-        grades: ["junior", ...SENIOR_GRADES],
-        transferLabel: "Professor recs", transferGrades: ["transfer"] },
-      { id: "tests", label: "Test strategy", icon: "chartBar", href: "/cc/test-strategy",
-        grades: ["g10", "junior", "senior_writing"] },
-      { id: "interviews", label: "Interviews", icon: "msgSquare", href: "/cc/interview-prep",
-        grades: SENIOR_GRADES },
-      { id: "waitlist", label: "Waitlist", icon: "hourglass", href: "/cc/waitlist",
-        grades: ["senior_decisions"], pulseOnAppear: true },
-    ],
-  },
-  {
-    id: "profile", name: "Profile", abbr: "P",
-    items: [
-      { id: "activities", label: "Activities", icon: "activity", href: "/cc/activities-optimizer",
-        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer"] },
-      { id: "rigor", label: "Course rigor", icon: "bookOpen", href: "/cc/courses",
-        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer"] },
-      { id: "major", label: "Major exploration", icon: "compass", href: "/cc/majors",
-        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer"] },
-      { id: "visits", label: "Visits", icon: "mapPin", href: "/cc/visits",
-        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer"] },
-      { id: "summer", label: "Summer experiences", icon: "sun", href: "/cc/summer",
-        grades: ["g9", "g10", "junior", ...SENIOR_GRADES] },
-    ],
-  },
-  {
-    id: "tools", name: "Tools", abbr: "T",
-    items: [
-      { id: "coach", label: "Coach Kairos", icon: "cap", href: "#coach",
-        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer"], drawer: true },
-      { id: "settings", label: "Settings", icon: "settings", href: "/account/settings",
-        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer"] },
-    ],
-  },
-];
-
-function visibleFor(grade: SidebarGrade): NavSection[] {
-  return SECTIONS.map((sec) => ({
-    ...sec,
-    items: sec.items.filter((it) =>
-      it.grades.includes(grade) ||
-      (it.transferGrades?.includes(grade) ?? false),
-    ),
-  }));
-}
+// Re-export the variant key so existing imports of `SidebarGrade` from this
+// module (e.g. dashboards passing the prop in) keep working unchanged.
+export type { SidebarGrade } from "./sidebar-data";
 
 const STORAGE_KEY = "kairos_sidebar_mode";
 
