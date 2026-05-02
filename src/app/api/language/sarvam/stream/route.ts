@@ -138,7 +138,18 @@ export async function POST(req: NextRequest) {
                   const ttsData = await ttsResp.json();
                   if (ttsData.audios?.[0]) {
                     send({ type: 'audio', base64: ttsData.audios[0] });
+                  } else {
+                    // Sarvam Bulbul-v3 sometimes returns 200 with an empty
+                    // audios array on certain inputs (very short, very long,
+                    // special chars). Used to skip silently — log it now so
+                    // we have a signal when greetings audibly fail.
+                    console.warn('[SarvamStream] Sarvam returned 200 but empty audios', {
+                      targetLang, textLength: greetingText.length, response: ttsData,
+                    });
                   }
+                } else {
+                  const errText = await ttsResp.text().catch(() => '');
+                  console.error('[SarvamStream] Sarvam TTS non-OK:', ttsResp.status, errText);
                 }
               } catch (err) {
                 console.error('[SarvamStream] Greeting TTS error:', err);
