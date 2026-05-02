@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import { requireAuth, unauthorized, createAdminSupabase } from "../../helpers";
 import { chatOnce } from "@/lib/cc/openrouter";
 import { KAIROS_VOICE } from "@/lib/brand-voice";
+import { selectVariant, type VariantKey, type StatusTone } from "@/app/cc/dashboard/variants";
+import { priorityWidgetsFor, footerWidgetsFor } from "@/lib/cc/dashboard-priority-widgets";
+import type {
+  CourseRow,
+  WhyTransferEssay,
+  PriorityWidget,
+  WidgetItem,
+} from "@/components/cc/dashboard/sections/types";
 
 interface SchoolRow {
   id: string;
@@ -192,6 +200,47 @@ function stripGreetings(text: string): string {
   return out;
 }
 
+// Inline copy of variants.ts:statusToneFor (which is private). Inlining here
+// keeps Task 15 scoped to a single file.
+function statusToneFor(key: VariantKey): StatusTone {
+  switch (key) {
+    case "g9": return "leaf";
+    case "g10": return "sky";
+    case "junior": return "gold";
+    case "senior_writing": return "gold";
+    case "senior_post_submit": return "leaf";
+    case "senior_decisions": return "leaf";
+    case "transfer": return "sky";
+    default: return "gold";
+  }
+}
+
+// Days until next Common App opens (Aug 1). Lifted from
+// src/app/cc/dashboard/page.tsx:63 (private there).
+function daysUntilCommonAppOpen(): number {
+  const now = new Date();
+  const year = now.getFullYear();
+  // Common App opens Aug 1 each cycle.
+  let target = new Date(year, 7, 1);
+  if (now > target) target = new Date(year + 1, 7, 1);
+  return Math.max(0, Math.ceil((target.getTime() - now.getTime()) / 86_400_000));
+}
+
+// Per-variant status label for the Greeting pill.
+function statusLabelFor(key: VariantKey): string {
+  switch (key) {
+    case "g9": return "Grade 9 · Building foundation";
+    case "g10": return "Grade 10 · Adding depth";
+    case "junior": return "Junior · runway to senior year";
+    case "senior_writing": return "Senior · writing phase";
+    case "senior_post_submit": return "Senior · submitted, waiting";
+    case "senior_decisions": return "Senior · decisions in";
+    case "transfer": return "Transfer applicant";
+    case "unknown":
+    default: return "Welcome";
+  }
+}
+
 export async function GET() {
   const auth = await requireAuth();
   if (!auth) return unauthorized();
@@ -201,7 +250,7 @@ export async function GET() {
 
   const { data: profile } = await db
     .from("cc_student_profiles")
-    .select("id, profile_completion_pct, intake_completed_at, preferred_name, legal_first_name")
+    .select("id, profile_completion_pct, intake_completed_at, preferred_name, legal_first_name, grade_level, is_transfer_student, dashboard_observations_enabled")
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -224,6 +273,17 @@ export async function GET() {
       activities: { logged: 0, optimized: 0, topThree: [] },
       brief: null,
       hasMetCoach: false,
+      // ─── new fields, additive defaults ───
+      firstName: null,
+      variantKey: "unknown" as VariantKey,
+      statusLabel: "Welcome",
+      statusTone: "gold" as StatusTone,
+      courses: null,
+      psatPlan: null,
+      whyTransferEssay: null,
+      priorityWidgets: [],
+      footerWidgets: [],
+      observations: {},
     });
   }
 
@@ -271,6 +331,59 @@ export async function GET() {
   const supplements = (supplementsRes.data as unknown as SupplementRow[]) || [];
   const activities = (activitiesRes.data as { id: string; organization: string | null; role: string | null; impact_score: number | null; description_150: string | null }[]) || [];
   const coachHistory = (coachHistoryRes.data as { id: string }[]) || [];
+
+  // Variant-aware data fetches — additive to the existing legacy fields.
+  const [coursesRes, whyTransferRes, observationsRes] = await Promise.all([
+    db
+      .from("cc_courses")
+      .select("id, course_name, level, grade")
+      .eq("student_id", studentId),
+    db
+      .from("cc_essays")
+      .select("id, phase, word_count")
+      .eq("student_id", studentId)
+      .eq("essay_type", "why_transfer")
+      .maybeSingle(),
+    // Skip the observations query when the user opted out.
+    (profile?.dashboard_observations_enabled === false
+      ? Promise.resolve({ data: [] as Array<{ module_label: string; observation: string; eyebrow: string }> })
+      : db
+          .from("cc_dashboard_observations")
+          .select("module_label, observation, eyebrow")
+          .eq("student_id", studentId)
+          .gt("expires_at", new Date().toISOString())
+    ),
+  ]);
+
+  const courses: CourseRow[] | null = coursesRes.data
+    ? (coursesRes.data as Array<{ id: string; course_name: string; level: string | null; grade: string | null }>)
+        .map((c) => ({
+          id: c.id,
+          courseName: c.course_name,
+          level: c.level,
+          grade: c.grade,
+          inProgress: c.grade == null,
+        }))
+    : null;
+
+  const whyTransferRow = whyTransferRes.data as
+    | { id: string; phase: string | null; word_count: number | null }
+    | null;
+  const whyTransferEssay: WhyTransferEssay | null = whyTransferRow
+    ? {
+        id: whyTransferRow.id,
+        phase: whyTransferRow.phase ?? "brainstorm",
+        wordCount: whyTransferRow.word_count ?? 0,
+        wordTarget: 650,  // standard transfer essay target
+      }
+    : null;
+
+  const observations: Record<string, { observation: string; eyebrow: string }> =
+    ((observationsRes.data ?? []) as Array<{ module_label: string; observation: string; eyebrow: string }>)
+      .reduce((acc, row) => {
+        acc[row.module_label] = { observation: row.observation, eyebrow: row.eyebrow };
+        return acc;
+      }, {} as Record<string, { observation: string; eyebrow: string }>);
 
   // Personal statement = cc_essays row where essay_type == 'personal_statement' (or no supplement_id)
   const psEssay = essays.find((e) => e.essay_type === "personal_statement" || (e.essay_type === "common_app" && !e.supplement_id));
@@ -394,7 +507,30 @@ export async function GET() {
       })
     : null;
 
+  // Compute variant + widget bundles. Calling selectVariant with the
+  // already-fetched profile + studentSchools shape avoids re-querying.
+  const variantKey = selectVariant(
+    {
+      is_transfer_student: profile?.is_transfer_student ?? null,
+      grade_level: profile?.grade_level ?? null,
+    },
+    studentSchools.map((ss) => ({ application_status: ss.application_status })),
+  );
+  const statusLabel = statusLabelFor(variantKey);
+  const statusTone = statusToneFor(variantKey);
+
+  const priorityWidgets: PriorityWidget[] = priorityWidgetsFor(variantKey, observations);
+  const footerWidgets: WidgetItem[] = footerWidgetsFor(variantKey, {
+    schoolCount: studentSchools.length,
+    activitiesCount: activities.length,
+    essaysSubmittedCount: essays.filter((e) => e.phase === "revised" || e.phase === "submitted").length,
+    daysToCommonApp: daysUntilCommonAppOpen(),
+  });
+
+  const firstName = profile?.preferred_name || profile?.legal_first_name || null;
+
   return NextResponse.json({
+    // existing — UNCHANGED
     setup,
     schools,
     personalStatement,
@@ -405,5 +541,16 @@ export async function GET() {
     },
     brief,
     hasMetCoach,
+    // new — additive
+    firstName,
+    variantKey,
+    statusLabel,
+    statusTone,
+    courses,
+    psatPlan: null,
+    whyTransferEssay,
+    priorityWidgets,
+    footerWidgets,
+    observations,
   });
 }
