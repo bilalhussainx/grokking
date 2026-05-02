@@ -1,7 +1,11 @@
 // POST /api/cc/onboarding/complete — saves the full multi-step onboarding
 // payload (language + role + grade OR transfer profile + concerns) in one
-// transaction. Sets language_picker_seen_at as the onboarding-complete
-// sentinel so middleware stops redirecting the user back to /onboarding.
+// transaction. Sets BOTH language_picker_seen_at (middleware sentinel — so
+// we stop redirecting back to /onboarding) AND intake_completed_at (coach
+// mode-detector sentinel — so the coach doesn't ask name+grade on every
+// first turn). The new multi-step onboarding captures the same identity
+// surface the legacy /intake captured, so both flags should flip together.
+// Cross-persona regression confirmed in 2026-05-02 OpenClaw audit (AUD-P1-002).
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, unauthorized, ensureStudentProfile } from "../../helpers";
 import { COACH_LANGUAGES } from "@/lib/cc/coach-languages";
@@ -51,9 +55,11 @@ export async function POST(req: NextRequest) {
     .filter((c): c is string => typeof c === "string" && ALLOWED_CONCERNS.has(c))
     .slice(0, 2);
 
+  const now = new Date().toISOString();
   const update: Record<string, unknown> = {
     home_language: body.language,
-    language_picker_seen_at: new Date().toISOString(),
+    language_picker_seen_at: now,
+    intake_completed_at: now,
     concerns: cleanedConcerns,
   };
 
