@@ -7,6 +7,7 @@ import { requireAuth, unauthorized, createAdminSupabase } from "../../helpers";
 import { detectMode } from "@/lib/cc/coach-mode-detector";
 import { buildSystemPrompt, type CoachContext } from "@/lib/cc/coach-prompt-builder";
 import { buildLanguageInstruction } from "@/lib/cc/detect-language";
+import { pickCoachLanguage } from "@/lib/cc/language-fallback";
 
 const VOICE_TAIL = `
 
@@ -146,12 +147,14 @@ export async function GET() {
     variantKey: null,
   };
 
-  // Voice mode prefers the user's chosen home_language over message-detection
-  // (no message yet to detect from).
-  const preferredLang =
-    (profile as { preferred_language?: string | null }).preferred_language ??
-    (profile as { home_language?: string | null }).home_language ??
-    null;
+  // Voice mode prefers the user's chosen language over message-detection
+  // (no message yet to detect from). pickCoachLanguage encapsulates the
+  // preferred_language → home_language fallback so the same logic runs
+  // here and in the text-coach path.
+  const preferredLang = pickCoachLanguage(profile as {
+    preferred_language?: string | null;
+    home_language?: string | null;
+  });
   const languageInstruction = buildLanguageInstruction("unknown", preferredLang);
 
   const systemPrompt = buildSystemPrompt(coachContext) + languageInstruction + VOICE_TAIL;
