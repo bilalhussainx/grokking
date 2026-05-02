@@ -271,6 +271,13 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
     setMessages((prev) => [...prev, assistantMsg]);
 
     let finalContent = "";
+    // Captured from the SSE `done` frame at end of stream. Task 4 of
+    // the Coach Action Execution Reliability plan extends the route's
+    // done frame with `extracted` (count of DB rows added) and `actionKinds`
+    // (which canonical actions the LLM emitted). Declared at function
+    // scope so the post-try broadcast (below) can read them.
+    let extracted = 0;
+    let actionKinds: string[] = [];
 
     try {
       const res = await fetch("/api/cc/coach/message", {
@@ -313,7 +320,11 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
           if (!line.startsWith("data: ")) continue;
           try {
             const data = JSON.parse(line.slice(6));
-            if (data.done) break;
+            if (data.done) {
+              if (typeof data.extracted === "number") extracted = data.extracted;
+              if (Array.isArray(data.actionKinds)) actionKinds = data.actionKinds as string[];
+              break;
+            }
             if (data.mode) setCurrentMode(data.mode);
             if (data.text) {
               finalContent += data.text;
@@ -343,13 +354,21 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
     }
 
     // Broadcast a completion event so data-backed pages (/schools, /cc/essays,
-    // activities optimizer, etc.) can refetch state that the coach may have
-    // mutated server-side via runCoachExtraction. Any listener can ignore it
-    // when not relevant.
+    // activities optimizer, dashboard, etc.) can refetch state that the coach
+    // mutated server-side via runCoachExtraction. `extracted` is the count of
+    // schools added in this turn (0 when no DB writes happened); `actionKinds`
+    // names the canonical actions the LLM emitted (e.g. ["add_schools"]).
+    // Listeners can use these to decide whether the event is relevant.
     if (typeof window !== "undefined") {
       window.dispatchEvent(
         new CustomEvent("kairos:message-complete", {
-          detail: { mode: currentMode, content: finalContent, source: extra?.sourceEvent ?? null },
+          detail: {
+            mode: currentMode,
+            content: finalContent,
+            source: extra?.sourceEvent ?? null,
+            extracted,
+            actionKinds,
+          },
         })
       );
     }
