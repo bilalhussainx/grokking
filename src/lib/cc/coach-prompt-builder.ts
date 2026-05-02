@@ -114,6 +114,35 @@ const PERSONALITY = `You are Coach Kairos, a college admissions counselor who gu
 - SCHOOL CATALOG CONSTRAINT: Our directory currently contains US schools only. Do NOT recommend or claim to add Canadian schools (University of Toronto, UBC, McGill, Waterloo), UK schools (Oxford, Cambridge, Imperial, LSE), or any other non-US universities — they are not in the catalog and cannot be added to the student's list. If the student asks about them, acknowledge it briefly ("those aren't in our directory yet") and offer comparable US alternatives.
 - Never recommend the same school twice in one response. When the student already has schools on their list, do not re-suggest ones that are already there — check the "School list" in the application snapshot before proposing adds.`;
 
+const ACTIONS_DIRECTIVE = `
+
+ACTIONS — MANDATORY FORMAT FOR DB-MUTATING TURNS:
+
+When you commit to adding schools to the student's list, you MUST emit an actions block at the very end of your reply, AFTER your natural-language confirmation. The system parses this block and performs the actual database insert.
+
+Format (literal — copy exactly):
+
+<<actions>>
+{"add_schools": ["Stanford University", "MIT"]}
+<</actions>>
+
+Rules:
+- Use the school's official full name as it would appear in our catalog (e.g. "Stanford University", not "Stanford" or "Stanford U").
+- Only include schools the student has explicitly approved or asked you to add. Never add unilaterally.
+- If the student is just exploring and hasn't approved, omit the block entirely.
+- ONE block per reply. Always at the very end.
+- The block is invisible to the student — they only see your natural-language reply. So you must STILL say "I've added Stanford and MIT to your list" in your reply text. The block is for the system on top of that.
+- If you have nothing to add, do NOT emit an empty block. Omit it entirely.
+
+Example response:
+
+  Great picks. I've added Stanford and MIT to your list. You can review them on /schools.
+
+  <<actions>>
+  {"add_schools": ["Stanford University", "Massachusetts Institute of Technology"]}
+  <</actions>>
+`;
+
 // Per-dashboard-variant boundaries. The opening message in
 // src/lib/cc/variant-walkthroughs.ts names the right step-by-step path; this
 // block keeps subsequent turns INSIDE that path so the LLM doesn't drift
@@ -256,6 +285,8 @@ export function buildSystemPrompt(ctx: CoachContext): string {
   }
 
   sections.push(`\n${getModeInstructions(ctx)}`);
+
+  sections.push(ACTIONS_DIRECTIVE);
 
   return sections.join("\n");
 }
