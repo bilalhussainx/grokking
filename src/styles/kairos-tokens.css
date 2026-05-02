@@ -1,0 +1,289 @@
+/*
+ * KairosLearn — Core Design Tokens
+ * ---------------------------------
+ * Two surfaces with a shared DNA (dark + gold):
+ *   1. Landing/marketing  — cinematic, serif-display, navy #05080d + cream
+ *   2. Product (College Counselor app)  — functional, sans, near-black + gold
+ *
+ * The brand accent `--gold` is the same visual gesture across both, but each
+ * surface has its own text/bg palette. Pick the surface by adding either
+ * `.kl-surface-landing` or `.kl-surface-app` to a parent element (both are
+ * dark-mode; there is no light mode).
+ */
+
+/* =========================================================================
+ * FONTS — Google Fonts (already what the codebase pulls via next/font)
+ * ========================================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* =========================================================================
+ * ROOT: BRAND COLORS (shared across surfaces)
+ * ========================================================================= */
+:root {
+  /* ── Brand accent — the gold ─────────────────────────────────────────── */
+  /* Landing uses the warmer antique gold; the app uses a slightly richer gold.
+     Treat them as two tuned variants of the same idea. */
+  --kl-gold-landing:   #d4a84b;   /* antique, warm; marketing */
+  --kl-gold-app:       #D4AF37;   /* richer; product */
+  --kl-gold-hover-app: #C4A030;   /* active/pressed in product */
+  --kl-gold-bright:    #F4D03F;   /* hyperlink hover in product */
+
+  /* ── Landing palette ─────────────────────────────────────────────────── */
+  --kl-bg-deep:    #05080d;        /* page background */
+  --kl-bg-raised: #0c1120;         /* slightly elevated */
+  --kl-cream-100: #f2ede3;         /* primary text */
+  --kl-cream-60:  rgba(242,237,227,.60); /* secondary text */
+  --kl-cream-28:  rgba(242,237,227,.28); /* tertiary / scroll cue */
+  --kl-cream-18:  rgba(242,237,227,.18); /* outline-button border */
+  --kl-cream-09:  rgba(242,237,227,.09); /* hairline dividers */
+
+  --kl-gold-22: rgba(212,168,75,.22);
+  --kl-gold-07: rgba(212,168,75,.07);
+  --kl-gold-landing-overlay: rgba(212,168,75,.18);
+
+  /* ── App palette ─────────────────────────────────────────────────────── */
+  --kl-app-bg:         #000000;    /* app page bg — true black */
+  --kl-app-card:       #141414;    /* card surface */
+  --kl-app-card-hover: #1a1a1a;
+  --kl-app-popover:    #151515;    /* menu / popover */
+  --kl-app-fg:         #f0ece2;    /* body text */
+  --kl-app-fg-muted:   #a0a0a0;    /* secondary text */
+  --kl-app-border:     rgba(255,255,255,.08);
+  --kl-app-border-2:   rgba(255,255,255,.10);
+  --kl-app-muted:      rgba(255,255,255,.06);
+  --kl-app-muted-2:    rgba(255,255,255,.05);
+
+  --kl-app-gold-bg:    rgba(212,175,55,.10);   /* gold tint — primary */
+  --kl-app-gold-bg-2:  rgba(212,175,55,.15);
+  --kl-app-gold-bg-3:  rgba(212,175,55,.20);   /* user chat bubble */
+  --kl-app-gold-edge:  rgba(212,175,55,.30);   /* gold border */
+  --kl-app-gold-edge-2:rgba(212,175,55,.40);   /* hover border */
+
+  /* ── Semantic states (app only — never used on landing) ──────────────── */
+  --kl-state-reach:    #f87171;                /* red-400 */
+  --kl-state-reach-bg: rgba(239,68,68,.20);
+  --kl-state-reach-edge: rgba(239,68,68,.30);
+  --kl-state-match:    #4ade80;                /* green-400 */
+  --kl-state-match-bg: rgba(34,197,94,.20);
+  --kl-state-match-edge: rgba(34,197,94,.30);
+  --kl-state-safety:   #60a5fa;                /* blue-400 */
+  --kl-state-safety-bg: rgba(59,130,246,.20);
+  --kl-state-safety-edge: rgba(59,130,246,.30);
+
+  --kl-phase-brainstorm-fg: #d8b4fe;           /* purple-300 */
+  --kl-phase-brainstorm-bg: rgba(168,85,247,.20);
+  --kl-phase-outline-fg:    #93c5fd;           /* blue-300 */
+  --kl-phase-outline-bg:    rgba(59,130,246,.20);
+  --kl-phase-draft-fg:      #fcd34d;           /* amber-300 */
+  --kl-phase-draft-bg:      rgba(245,158,11,.20);
+  --kl-phase-revise-fg:     #86efac;           /* green-300 */
+  --kl-phase-revise-bg:     rgba(34,197,94,.20);
+
+  --kl-warn-fg:   #fbbf24;                     /* amber-400 */
+  --kl-warn-bg:   rgba(245,158,11,.10);
+  --kl-warn-edge: rgba(245,158,11,.20);
+  --kl-speaking:  #38bdf8;                     /* sky-400, voice coach live */
+  --kl-success:   #34d399;                     /* emerald-400, streaming */
+
+  /* =======================================================================
+   * TYPOGRAPHY — font families
+   * ======================================================================= */
+  --kl-font-display: 'Cormorant Garamond', Georgia, serif;      /* landing */
+  --kl-font-body:    'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; /* landing */
+  --kl-font-sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;   /* app */
+  --kl-font-mono:    'JetBrains Mono', ui-monospace, Menlo, monospace;
+
+  /* ── Fluid type scale ─────────────────────────────────────────────────── */
+  /* Landing scale (clamp-based, cinematic) */
+  --kl-fs-hero:       clamp(68px, 9.5vw, 128px);  /* display 1 — Cormorant 300 italic */
+  --kl-fs-section:    clamp(38px, 4.5vw, 58px);   /* display 2 */
+  --kl-fs-seq:        clamp(26px, 3vw, 36px);     /* sequence heading */
+  --kl-fs-lead:       clamp(15px, 2vw, 18px);     /* hero sub + lead */
+
+  /* App scale (discrete px) */
+  --kl-fs-app-h1:     24px;   /* page title */
+  --kl-fs-app-h2:     16px;   /* section header / card title */
+  --kl-fs-app-h3:     14px;   /* sub-heading */
+  --kl-fs-app-body:   14px;   /* body copy */
+  --kl-fs-app-sm:     12px;   /* button label, row meta */
+  --kl-fs-app-xs:     11px;   /* timestamps, badges */
+  --kl-fs-app-2xs:    10px;   /* eyebrow / UPPERCASE labels */
+
+  /* ── Line heights ─────────────────────────────────────────────────────── */
+  --kl-lh-tight:    0.92;
+  --kl-lh-heading:  1.10;
+  --kl-lh-body:     1.55;
+  --kl-lh-relaxed:  1.75;    /* landing .sub copy */
+  --kl-lh-prose:    1.85;    /* feature cards */
+
+  /* ── Letterspacing ────────────────────────────────────────────────────── */
+  --kl-ls-hero:     -0.02em;     /* tight tracking on display */
+  --kl-ls-body:     0;
+  --kl-ls-eyebrow:  0.32em;      /* UPPERCASE section labels (landing) */
+  --kl-ls-button:   0.12em;      /* landing button */
+  --kl-ls-app-kbd:  0.10em;      /* app UPPERCASE eyebrow */
+
+  /* =======================================================================
+   * SPACING / RADII / SHADOWS / MOTION
+   * ======================================================================= */
+  /* Radii — landing is square (brutalist), app is rounded */
+  --kl-radius-none: 0;                /* landing buttons, feature cards */
+  --kl-radius-sm:   6px;              /* app small chips */
+  --kl-radius-md:   8px;              /* app inputs / small buttons */
+  --kl-radius-lg:   12px;             /* app rows, pills */
+  --kl-radius-xl:   12px;             /* rounded-xl in tailwind */
+  --kl-radius-2xl:  16px;             /* primary card */
+  --kl-radius-full: 9999px;           /* avatar, floating coach launcher */
+
+  /* Spacing scale */
+  --kl-s-0: 0;
+  --kl-s-1: 4px;
+  --kl-s-2: 8px;
+  --kl-s-3: 12px;
+  --kl-s-4: 16px;
+  --kl-s-5: 20px;
+  --kl-s-6: 24px;
+  --kl-s-8: 32px;
+  --kl-s-10: 40px;
+  --kl-s-12: 48px;
+  --kl-s-16: 64px;
+  --kl-s-20: 80px;
+  --kl-s-24: 96px;
+
+  /* Shadows — subtle, almost nonexistent on landing */
+  --kl-shadow-sm:   0 1px 2px rgba(0,0,0,.3);
+  --kl-shadow-md:   0 8px 24px rgba(0,0,0,.35);
+  --kl-shadow-lg:   0 8px 32px rgba(0,0,0,.50);
+  --kl-shadow-pop:  0 20px 50px -12px rgba(0,0,0,.6);
+  --kl-shadow-gold: 0 0 0 1px rgba(212,175,55,.30),
+                    0 0 40px -6px rgba(212,175,55,.25);
+
+  /* Backdrop / grain */
+  --kl-backdrop-blur: blur(24px);
+  --kl-backdrop-blur-sm: blur(12px);
+
+  /* Motion — measured, cinematic on landing; snappy in app */
+  --kl-ease-out:   cubic-bezier(0.22, 1, 0.36, 1);     /* power3.out-ish */
+  --kl-ease-in:    cubic-bezier(0.64, 0, 0.78, 0);
+  --kl-ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --kl-dur-instant: 120ms;
+  --kl-dur-fast:    200ms;
+  --kl-dur-base:    300ms;
+  --kl-dur-slow:    500ms;
+  --kl-dur-cine:    900ms;    /* landing hero reveals */
+}
+
+/* =========================================================================
+ * SEMANTIC TYPE CLASSES — LANDING
+ * ========================================================================= */
+.kl-surface-landing {
+  background: var(--kl-bg-deep);
+  color: var(--kl-cream-100);
+  font-family: var(--kl-font-body);
+  font-weight: 300;
+}
+
+.kl-surface-landing .kl-h-hero {
+  font-family: var(--kl-font-display);
+  font-weight: 300;
+  font-size: var(--kl-fs-hero);
+  line-height: var(--kl-lh-tight);
+  letter-spacing: var(--kl-ls-hero);
+}
+.kl-surface-landing .kl-h-hero em {
+  font-style: italic;
+  color: var(--kl-gold-landing);
+}
+
+.kl-surface-landing .kl-h-section {
+  font-family: var(--kl-font-display);
+  font-weight: 300;
+  font-size: var(--kl-fs-section);
+  line-height: var(--kl-lh-heading);
+}
+.kl-surface-landing .kl-h-section em {
+  font-style: italic;
+  color: var(--kl-gold-landing);
+}
+
+.kl-surface-landing .kl-eyebrow {
+  font-family: var(--kl-font-body);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: var(--kl-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--kl-gold-landing);
+}
+
+.kl-surface-landing .kl-lead {
+  font-size: var(--kl-fs-lead);
+  line-height: var(--kl-lh-relaxed);
+  color: var(--kl-cream-60);
+  font-weight: 300;
+}
+
+.kl-surface-landing .kl-body {
+  font-size: 14px;
+  line-height: var(--kl-lh-prose);
+  color: var(--kl-cream-60);
+  font-weight: 300;
+}
+
+.kl-surface-landing .kl-mono-label {
+  font-size: 9.5px;
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+  color: var(--kl-cream-28);
+}
+
+/* =========================================================================
+ * SEMANTIC TYPE CLASSES — APP
+ * ========================================================================= */
+.kl-surface-app {
+  background: var(--kl-app-bg);
+  color: var(--kl-app-fg);
+  font-family: var(--kl-font-sans);
+  font-feature-settings: "cv11", "ss01";
+}
+
+.kl-surface-app .kl-h1 {
+  font-size: var(--kl-fs-app-h1);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+.kl-surface-app .kl-h2 {
+  font-size: var(--kl-fs-app-h2);
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.005em;
+}
+.kl-surface-app .kl-h3 {
+  font-size: var(--kl-fs-app-h3);
+  font-weight: 600;
+  color: #fff;
+}
+.kl-surface-app .kl-body {
+  font-size: var(--kl-fs-app-body);
+  color: rgba(255,255,255,.80);
+  line-height: var(--kl-lh-body);
+}
+.kl-surface-app .kl-sm {
+  font-size: var(--kl-fs-app-sm);
+  color: rgba(255,255,255,.50);
+}
+.kl-surface-app .kl-xs {
+  font-size: var(--kl-fs-app-xs);
+  color: rgba(255,255,255,.40);
+}
+.kl-surface-app .kl-kbd {
+  font-size: var(--kl-fs-app-2xs);
+  letter-spacing: var(--kl-ls-app-kbd);
+  text-transform: uppercase;
+  color: rgba(255,255,255,.40);
+  font-weight: 500;
+}
+.kl-surface-app .kl-mono {
+  font-family: var(--kl-font-mono);
+  font-variant-numeric: tabular-nums;
+}

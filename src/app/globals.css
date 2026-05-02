@@ -1,5 +1,6 @@
 @import "tailwindcss" source(none);
 @import "./tokens.css";
+@import "../styles/kairos-tokens.css";
 @import "@fontsource/noto-nastaliq-urdu/400.css";
 @source "../**/*.{ts,tsx,js,jsx,mdx}";
 
@@ -474,4 +475,11 @@ pre code.hljs {
 .cine-sec-title em {
   font-style: italic;
   color: var(--cine-gold);
+}
+
+/* Sidebar waitlist-row pulse — matches handoff sb-pulse keyframe. */
+@keyframes kairos-sb-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(212,175,55,.6); }
+  70%  { box-shadow: 0 0 0 8px rgba(212,175,55,0); }
+  100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
 }
