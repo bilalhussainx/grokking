@@ -20,6 +20,10 @@ interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
   credits: number;
+  // True once credits have been fetched at least once. Lets UI consumers
+  // show "—" instead of "0" during the brief loading window after signup
+  // (AUD-X-004 OpenClaw 2026-05-02).
+  creditsLoaded: boolean;
   loading: boolean;
   isAnonymous: boolean;
   signInWithGoogle: () => Promise<void>;
@@ -38,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [credits, setCredits] = useState(0);
+  const [creditsLoaded, setCreditsLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const signingOutRef = useRef(false);
   const ensureProfilePromiseRef = useRef<Promise<void> | null>(null);
@@ -72,7 +77,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (res.ok) {
           const { profile: serverProfile, credits: serverCredits } = await res.json();
           if (serverProfile) setProfile(serverProfile as UserProfile);
-          if (typeof serverCredits === "number") setCredits(serverCredits);
+          if (typeof serverCredits === "number") {
+            setCredits(serverCredits);
+            setCreditsLoaded(true);
+          }
           return;
         }
       } catch {
@@ -83,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await fetchProfile(_authUser.id);
       const { data: bal } = await supabase.rpc("get_credit_balance", { p_user_id: _authUser.id });
       setCredits((bal as number) || 0);
+      setCreditsLoaded(true);
     };
 
     ensureProfilePromiseRef.current = doEnsure().finally(() => {
@@ -101,6 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { credits: serverCredits } = await res.json();
         if (typeof serverCredits === "number") {
           setCredits(serverCredits);
+          setCreditsLoaded(true);
           return;
         }
       }
@@ -108,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Fallback to browser RPC
     const { data } = await supabase.rpc("get_credit_balance", { p_user_id: user.id });
     setCredits((data as number) || 0);
+    setCreditsLoaded(true);
   }, [user, supabase]);
 
   // Initialize auth state
@@ -135,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               await fetchProfile(session.user.id);
               const { data } = await supabase.rpc("get_credit_balance", { p_user_id: session.user.id });
               setCredits((data as number) || 0);
+              setCreditsLoaded(true);
             }
           } catch {
             // Will retry next page load
@@ -168,6 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(null);
           setProfile(null);
           setCredits(0);
+          setCreditsLoaded(false);
           setLoading(false);
           return;
         }
@@ -180,6 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(null);
           setProfile(null);
           setCredits(0);
+          setCreditsLoaded(false);
         }
         setLoading(false);
       }
@@ -294,6 +308,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setProfile(null);
     setCredits(0);
+    setCreditsLoaded(false);
     // Sign out from Supabase (global = revoke all sessions server-side)
     await supabase.auth.signOut({ scope: "global" });
     // Manually clear all Supabase auth cookies and localStorage
@@ -331,6 +346,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         profile,
         credits,
+        creditsLoaded,
         loading,
         isAnonymous,
         signInWithGoogle,

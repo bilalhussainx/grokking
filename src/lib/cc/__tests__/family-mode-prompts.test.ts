@@ -1,12 +1,16 @@
 import { describe, it, expect } from "vitest";
 import { familyModeSystemPrompt } from "../family-mode-prompts";
-import { FAMILY_MODE_STRINGS, FAMILY_MODE_LANGUAGES } from "../family-mode-strings";
+import {
+  FAMILY_MODE_STRINGS,
+  FAMILY_MODE_LANGUAGES,
+  NO_VOICE_FAMILY_MODE_LANGUAGES,
+} from "../family-mode-strings";
 
 describe("family-mode-strings", () => {
-  it("covers all 17 voice languages", () => {
-    expect(FAMILY_MODE_LANGUAGES).toHaveLength(17);
+  it("covers 17 voice languages + 1 text-only (Urdu) = 18 total", () => {
+    expect(FAMILY_MODE_LANGUAGES).toHaveLength(18);
   });
-  it("each language has all 6 string keys", () => {
+  it("each language has all 6 required string keys", () => {
     const required = ["tapToSpeak", "listening", "handBack", "thinking", "paused", "goodbye"] as const;
     for (const code of FAMILY_MODE_LANGUAGES) {
       const strings = FAMILY_MODE_STRINGS[code];
@@ -16,8 +20,13 @@ describe("family-mode-strings", () => {
       }
     }
   });
-  it("excludes Urdu (no voice support)", () => {
-    expect(FAMILY_MODE_LANGUAGES as readonly string[]).not.toContain("ur");
+  it("Urdu is included as text-only (AUD-P4-001)", () => {
+    expect(FAMILY_MODE_LANGUAGES as readonly string[]).toContain("ur");
+    expect(NO_VOICE_FAMILY_MODE_LANGUAGES.has("ur")).toBe(true);
+  });
+  it("Urdu has typeHere + send strings for the text-input UI", () => {
+    expect(FAMILY_MODE_STRINGS.ur.typeHere).toBeTruthy();
+    expect(FAMILY_MODE_STRINGS.ur.send).toBeTruthy();
   });
 });
 
