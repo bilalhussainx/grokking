@@ -13,6 +13,7 @@ import { runCoachExtraction } from "@/lib/cc/coach-extract";
 import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
 import { detectMessageLanguage, buildLanguageInstruction } from "@/lib/cc/detect-language";
 import { parseActionsBlock, stripActionsBlock } from "@/lib/cc/coach-actions-block";
+import { pickCoachLanguage } from "@/lib/cc/language-fallback";
 
 function extractEssayIdFromPath(path: string | null | undefined): string | null {
   if (!path) return null;
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
   // Fetch or create student profile
   let { data: profile } = await supabase
     .from("cc_student_profiles")
-    .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at, affordability_value, needs_full_aid, preferred_language")
+    .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at, affordability_value, needs_full_aid, preferred_language, home_language")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
     const { data: newProfile } = await supabase
       .from("cc_student_profiles")
       .insert({ user_id: user.id })
-      .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at, affordability_value, needs_full_aid, preferred_language")
+      .select("id, preferred_name, grade_level, country, state_province, is_first_gen, is_international, intake_completed_at, affordability_value, needs_full_aid, preferred_language, home_language")
       .single();
     profile = newProfile;
   }
@@ -371,7 +372,14 @@ export async function POST(req: NextRequest) {
   };
 
   const detectedLang = detectMessageLanguage(message);
-  const preferredLang = (profile as { preferred_language?: string | null }).preferred_language ?? null;
+  // Use pickCoachLanguage so onboarding's home_language write is honored
+  // even when preferred_language is unset. See plan
+  // docs/superpowers/plans/2026-05-02-coach-multilang-translation-fixes.md
+  // — schema split fix, Task 3.
+  const preferredLang = pickCoachLanguage(profile as {
+    preferred_language?: string | null;
+    home_language?: string | null;
+  });
   const languageInstruction = buildLanguageInstruction(detectedLang, preferredLang);
   const systemPrompt = buildSystemPrompt(coachContext) + languageInstruction;
 
