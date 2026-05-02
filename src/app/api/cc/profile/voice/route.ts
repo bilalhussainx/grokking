@@ -37,6 +37,11 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Unsupported language" }, { status: 400 });
     }
     update.home_language = body.language;
+    // Mirror to preferred_language so the text-coach API path (which reads
+    // preferred_language for its language directive) stays in sync.
+    // Backfill for existing rows lives in
+    // supabase/migrations/20260502_backfill_preferred_language.sql.
+    update.preferred_language = body.language;
   }
   if (body.markPickerSeen) {
     update.language_picker_seen_at = new Date().toISOString();
