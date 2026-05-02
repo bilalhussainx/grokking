@@ -12,6 +12,7 @@ import { streamChat, type ChatMessage } from "@/lib/cc/openrouter";
 import { runCoachExtraction } from "@/lib/cc/coach-extract";
 import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
 import { detectMessageLanguage, buildLanguageInstruction } from "@/lib/cc/detect-language";
+import { parseActionsBlock, stripActionsBlock } from "@/lib/cc/coach-actions-block";
 
 function extractEssayIdFromPath(path: string | null | undefined): string | null {
   if (!path) return null;
@@ -407,23 +408,75 @@ export async function POST(req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       let fullResponse = "";
+      // Holdback buffer for the chunk-stripping logic. We never forward the
+      // last HOLDBACK chars to the client because the start of `<<actions>>`
+      // could span chunk boundaries. Once we detect the tag, we stop
+      // forwarding the rest of the response entirely.
+      const HOLDBACK = 12; // longer than `<<actions>>` (11) for safety
+      let pending = ""; // accumulated chars not yet forwarded
+      let actionsTagSeen = false;
+
+      function flushForward(): string {
+        // Forward everything except the last HOLDBACK chars. If we've already
+        // seen the actions tag, forward nothing (everything pending is now
+        // suppressed for good).
+        if (actionsTagSeen) return "";
+        if (pending.length <= HOLDBACK) return "";
+        const cut = pending.length - HOLDBACK;
+        const out = pending.slice(0, cut);
+        pending = pending.slice(cut);
+        return out;
+      }
+
       try {
         await streamChat(llmMessages, (chunk) => {
           fullResponse += chunk;
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: chunk, mode })}\n\n`));
+          if (!actionsTagSeen) {
+            pending += chunk;
+            // Detect actions tag opening in pending. If it appears, drop
+            // everything from the tag onward — never goes on the wire.
+            const idx = pending.indexOf("<<actions>>");
+            if (idx >= 0) {
+              const before = pending.slice(0, idx);
+              if (before) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: before, mode })}\n\n`));
+              }
+              actionsTagSeen = true;
+              pending = "";
+              return;
+            }
+            // No tag yet — forward all but the holdback tail.
+            const out = flushForward();
+            if (out) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: out, mode })}\n\n`));
+            }
+          }
+          // Once actionsTagSeen, suppress all further chunks.
         });
+
+        // Stream finished. If we never saw the actions tag, flush whatever
+        // remains in `pending` (the final HOLDBACK chars).
+        if (!actionsTagSeen && pending) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: pending, mode })}\n\n`));
+          pending = "";
+        }
+
+        // Parse actions + clean the response for DB persistence.
+        const actions = parseActionsBlock(fullResponse);
+        const cleanResponse = stripActionsBlock(fullResponse);
 
         // Save assistant message, then run extraction BEFORE emitting `done` +
         // closing. Previously close() fired first and the client got `done:true`
         // while the extraction (which inserts cc_student_schools, etc.) was
         // still running — any client that refetched on `done` would miss the
         // writes. Now `done` comes after extraction so a refetch reads fresh rows.
-        console.log(`[coach/message] stream done, mode=${mode}, about to save+extract`);
+        console.log(`[coach/message] stream done, mode=${mode}, actionsBlockSeen=${actionsTagSeen}`);
+        let schoolsAddedCount = 0;
         try {
           const { error: insertErr } = await supabase.from("cc_coach_conversations").insert({
             student_id: profileId,
             role: "assistant",
-            content: fullResponse,
+            content: cleanResponse, // CLEAN — strips <<actions>> block
             mode,
             page_context: page_context || "/",
           });
@@ -432,13 +485,27 @@ export async function POST(req: NextRequest) {
           // Always run extraction — the coach may mention schools/activities in
           // any mode (including school-browse while the user is on /schools).
           // runCoachExtraction short-circuits internally when there's nothing to save.
-          console.log(`[coach/message] dispatching runCoachExtraction(${profileId}, ${mode})`);
-          await runCoachExtraction(profileId, mode);
+          console.log(`[coach/message] dispatching runCoachExtraction(${profileId}, ${mode}, actions=${actions ? "block" : "null"})`);
+          const result = await runCoachExtraction(profileId, mode);
+          // runCoachExtraction return shape may include schoolsAddedCount once
+          // Task 4 ships. Until then, infer from the result.extracted boolean.
+          const r = result as { extracted: boolean; schoolsAddedCount?: number };
+          schoolsAddedCount = r.schoolsAddedCount ?? (r.extracted ? 0 : 0);
         } catch (err) {
           console.error("[coach/message] post-stream task failed:", err);
         }
 
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true, mode })}\n\n`));
+        const actionKinds = actions ? Object.keys(actions).filter((k) => {
+          const v = (actions as Record<string, unknown>)[k];
+          return Array.isArray(v) ? v.length > 0 : v != null;
+        }) : [];
+
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+          done: true,
+          mode,
+          extracted: schoolsAddedCount,
+          actionKinds,
+        })}\n\n`));
         controller.close();
       } catch {
         controller.enqueue(
