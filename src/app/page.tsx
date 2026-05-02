@@ -19,6 +19,8 @@ import DashboardWalkthrough from "@/components/onboarding/DashboardWalkthrough";
 import KairosLogo from "@/components/ui/SamsaraLogo";
 import OnboardingChecklist from "@/components/cc/dashboard/OnboardingChecklist";
 import CounselorDashboard from "@/components/cc/dashboard/CounselorDashboard";
+import Sidebar, { type SidebarGrade } from "@/components/nav/Sidebar";
+import CommandPalette from "@/components/nav/CommandPalette";
 
 
 const container = {
@@ -292,7 +294,20 @@ export default function HomePage() {
       .finally(() => setDashboardLoading(false));
   }, [user]);
 
-  return (
+  // The legacy `walkthroughVariant` state already fetches grade_level +
+  // is_transfer_student to drive the variant-aware DashboardWalkthrough.
+  // Reuse the same value as the Sidebar's `grade` prop so the nav rail
+  // matches the user's variant on the root home surface (which renders
+  // the CounselorDashboard, not the new AdaptiveDashboard).
+  //
+  // Sidebar + CommandPalette are mounted here because src/app/cc/layout.tsx
+  // only wraps /cc/* routes — the root `/` lands on this page directly.
+  // Logged-out users redirect to /landing via the effect above and never
+  // see the chrome.
+  const sidebarGrade: SidebarGrade = (walkthroughVariant as SidebarGrade | undefined) ?? "unknown";
+  const showAppShell = Boolean(user && !loading);
+
+  const homeContent = (
     <div className="min-h-screen bg-[var(--background)]">
       {/* First-time welcome modal */}
       {user && <WelcomeModal userName={profile?.full_name} />}
@@ -659,6 +674,23 @@ export default function HomePage() {
 
         {/* Testimonials removed — will add real user feedback when available */}
       </motion.div>
+    </div>
+  );
+
+  // Logged-in users get the app shell (sidebar + cmd-K palette) wrapped
+  // around the home dashboard. Logged-out users fall through to the
+  // /landing redirect handled above; render `homeContent` naked while
+  // the redirect resolves.
+  if (!showAppShell) return homeContent;
+
+  return (
+    <div
+      className="kl-surface-app flex min-h-screen"
+      style={{ background: "var(--kl-app-bg, #000)" }}
+    >
+      <Sidebar grade={sidebarGrade} />
+      <main className="flex-1 min-w-0">{homeContent}</main>
+      <CommandPalette />
     </div>
   );
 }
