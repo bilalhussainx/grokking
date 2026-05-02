@@ -1,5 +1,6 @@
 // Feature 5 — ED financial-aid warning state machine + REA conflict checker.
 import plansData from "@/data/school-application-plans.json";
+import type { AffordabilityValue } from "@/lib/cc/affordability";
 
 type SchoolPlanInfo = {
   plans: string[];
@@ -110,6 +111,83 @@ export function checkREAConflict(
     reaSchool: reaSchool.schoolName,
     conflictingSchools: conflicting,
     message: `You selected REA for ${reaSchool.schoolName}. REA restricts EA/ED to other private schools — change ${conflicting.join(", ")} to RD, or drop your ${reaSchool.schoolName} REA application.`,
+  };
+}
+
+// ED Cost Estimator — surfaces a $-figure for the warning UI so students see
+// concrete numbers before binding to ED. We don't claim school-specific
+// accuracy — the methodology line frames it as approximate.
+//
+// Tier-based COA (sticker price ranges from 2024-25 average data):
+//   - Top private (Ivy + peer schools): ~$95k
+//   - Top public out-of-state: ~$65k
+//   - Top public in-state: ~$35k
+//   - Default: $75k
+//
+// Then: estimated_aid = (COA - EFC) × percent_of_need_met
+// Where EFC is mapped from the student's affordability bracket and
+// percent_of_need_met is 100% for full-need-meeting schools, 75% otherwise.
+
+const TIER_COA = {
+  top_private: 95000,
+  top_public_oos: 65000,
+  top_public_in: 35000,
+  default: 75000,
+} as const;
+
+const FULL_NEED_SCHOOLS = new Set([
+  "MIT", "Harvard", "Yale", "Princeton", "Stanford", "Columbia", "Penn", "Brown", "Dartmouth", "Cornell",
+  "Amherst", "Williams", "Bowdoin", "Pomona", "Wellesley", "Middlebury", "Duke", "Vanderbilt", "Rice",
+  "Northwestern", "Notre Dame", "Georgetown", "UChicago", "Caltech", "JHU",
+]);
+
+function efcFromBracket(b: AffordabilityValue | null): number {
+  switch (b) {
+    case "zero": return 0;
+    case "under_10k": return 5000;
+    case "10k_20k": return 15000;
+    case "20k_30k": return 25000;
+    case "30k_50k": return 40000;
+    case "50k_plus": return 70000;
+    default: return 25000;
+  }
+}
+
+function tierForSchool(schoolName: string): keyof typeof TIER_COA {
+  if (FULL_NEED_SCHOOLS.has(schoolName)) return "top_private";
+  if (/^(University of|Texas|Michigan|Berkeley|UCLA|UNC|Virginia)/i.test(schoolName)) return "top_public_oos";
+  return "default";
+}
+
+export type EDCostEstimate = {
+  coa: number;
+  expectedFamilyContribution: number;
+  estimatedAid: number;
+  estimatedOutOfPocket: number;
+  meetsFullNeed: boolean;
+  methodology: string;
+};
+
+export function estimateEDCost(input: {
+  schoolName: string;
+  affordabilityValue: AffordabilityValue | null;
+}): EDCostEstimate {
+  const tier = tierForSchool(input.schoolName);
+  const coa = TIER_COA[tier];
+  const efc = efcFromBracket(input.affordabilityValue);
+  const need = Math.max(0, coa - efc);
+  const meetsFullNeed = FULL_NEED_SCHOOLS.has(input.schoolName);
+  const aid = meetsFullNeed ? need : Math.round(need * 0.75);
+  const outOfPocket = Math.max(0, coa - aid);
+  return {
+    coa,
+    expectedFamilyContribution: efc,
+    estimatedAid: aid,
+    estimatedOutOfPocket: outOfPocket,
+    meetsFullNeed,
+    methodology: meetsFullNeed
+      ? `${input.schoolName} commits to meeting 100% of demonstrated need. Estimate uses your affordability bracket as expected family contribution.`
+      : `${input.schoolName} doesn't publicly commit to meeting full need; estimate assumes ~75% of need met. Run the school's official Net Price Calculator for a tighter number.`,
   };
 }
 

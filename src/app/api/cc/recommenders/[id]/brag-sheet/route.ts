@@ -130,5 +130,35 @@ Generate the brag sheet JSON.`,
     return NextResponse.json({ error: "Generation failed" }, { status: 500 });
   }
 
+  // PDF branch: caller can request `?format=pdf` (or pass {format: "pdf"} in
+  // the body) and we stream a real PDF instead of JSON. The LLM call is the
+  // expensive part; rendering on top is cheap, so we always run it once and
+  // fork on output format.
+  const url = new URL(req.url);
+  const format = url.searchParams.get("format") ?? (body as { format?: string }).format;
+  if (format === "pdf") {
+    const { renderBragSheetPdf } = await import("@/lib/recommenders/brag-sheet-pdf");
+    const pdf = await renderBragSheetPdf({
+      studentName,
+      recommenderName: rec.name as string,
+      recommenderRole: (rec.recommender_type as string | null) ?? "Recommender",
+      recommenderSubject: (rec.subject as string | null) ?? null,
+      introduction: bragSheet.introduction,
+      academicHighlights: bragSheet.academicHighlights,
+      activityHighlights: bragSheet.activityHighlights,
+      personalQualities: bragSheet.personalQualities,
+      specificAnecdotes: bragSheet.specificAnecdotes,
+      closingNote: bragSheet.closingNote,
+    });
+    const fileSafeName = studentName.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "");
+    return new Response(new Uint8Array(pdf), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="brag-sheet-${fileSafeName || "student"}.pdf"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
   return NextResponse.json({ bragSheet });
 }

@@ -1,6 +1,7 @@
 // src/middleware.ts
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { isGrade9BlockedPath } from "@/lib/cc/grade-route-policy";
 
 // Routes that don't require authentication
 const PUBLIC_ROUTES = [
@@ -166,15 +167,23 @@ export async function middleware(request: NextRequest) {
   if (user && isRealUser && !isOnboardingExempt) {
     const { data: profile } = await supabase
       .from("cc_student_profiles")
-      .select("language_picker_seen_at")
+      .select("language_picker_seen_at, grade_level")
       .eq("user_id", user.id)
-      .maybeSingle();
+      .maybeSingle<{ language_picker_seen_at: string | null; grade_level: number | null }>();
     // Redirect if (a) the user has no profile row yet (brand-new account —
     // the row is created lazily by ensureStudentProfile when they hit a
     // coach API) OR (b) the onboarding sentinel is still null. Either way
     // the first thing the user should see is the multi-step onboarding.
     if (!profile || profile.language_picker_seen_at == null) {
       return NextResponse.redirect(new URL("/onboarding", request.url));
+    }
+    // Grade-9 route guard (Feature 16). Page-level checks already exist on
+    // the standalone dashboards but not on the per-feature surfaces. Block at
+    // the edge so a 14-year-old following a deep link can't open senior tools.
+    if (profile.grade_level === 9 && isGrade9BlockedPath(pathname)) {
+      const url = new URL("/cc/dashboard", request.url);
+      url.searchParams.set("blocked", "grade9");
+      return NextResponse.redirect(url);
     }
   }
 

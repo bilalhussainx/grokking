@@ -3,7 +3,7 @@
 import "./dashboard.css";
 
 import Link from "next/link";
-import { useCallback, useEffect, type MouseEvent } from "react";
+import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import {
   Activity,
   ArrowLeftRight,
@@ -90,6 +90,20 @@ export default function AdaptiveDashboard({
     coach.setVariantKey(variantKey);
     return () => coach.setVariantKey(null);
   }, [coach, variantKey]);
+  // Surface the grade-9 redirect reason if the middleware bounced the user
+  // here. Read from the URL on mount and stash to state so navigation away
+  // doesn't keep flashing the banner. Banner is dismissible.
+  const [showG9Block, setShowG9Block] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("blocked") === "grade9") {
+      setShowG9Block(true);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("blocked");
+      window.history.replaceState({}, "", url.pathname + (url.search || ""));
+    }
+  }, []);
   const handleCoachClick = useCallback(
     (e: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
       e.preventDefault();
@@ -100,6 +114,41 @@ export default function AdaptiveDashboard({
   return (
     <div className="kl-dash">
       <div className="container">
+        {showG9Block && (
+          <div
+            role="status"
+            style={{
+              marginBottom: 16,
+              padding: "10px 14px",
+              borderRadius: 10,
+              border: "1px solid rgba(212, 175, 55, 0.40)",
+              background: "rgba(212, 175, 55, 0.06)",
+              color: "#f2ede3",
+              fontSize: 13,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
+            <span>That tool unlocks junior year — let&apos;s keep building your foundation here.</span>
+            <button
+              type="button"
+              onClick={() => setShowG9Block(false)}
+              aria-label="Dismiss"
+              style={{
+                marginLeft: "auto",
+                background: "transparent",
+                border: "none",
+                color: "rgba(242, 237, 227, 0.55)",
+                cursor: "pointer",
+                fontSize: 16,
+                lineHeight: 1,
+              }}
+            >
+              ×
+            </button>
+          </div>
+        )}
         {/* Header */}
         <div className="top-line" aria-label="Status">
           <span className="dot" />

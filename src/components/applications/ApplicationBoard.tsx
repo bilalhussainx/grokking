@@ -23,9 +23,11 @@ import {
 import {
   checkREAConflict,
   edWarningState,
+  estimateEDCost,
   schoolAcceptsPlan,
   APPLICATION_PLAN_EXPLAINER_TABLE,
 } from "@/lib/applications/ed-strategy";
+import type { AffordabilityValue } from "@/lib/cc/affordability";
 
 const PLAN_OPTIONS = ["RD", "EA", "ED", "EDII", "REA", "QuestBridge", "Coalition"] as const;
 const STATUS_OPTIONS = [
@@ -60,6 +62,10 @@ const DEADLINE_LABEL: Record<DeadlineKey, string> = {
 
 type StudentAffordability = {
   affordabilityValue: number | null;
+  // The bracket string ("zero" | "under_10k" | ... | "50k_plus") — same field
+  // from /api/cc/me, kept separately so estimateEDCost can work without us
+  // rewriting edWarningState's number-typed input.
+  affordabilityBracket: string | null;
   needsFullAid: boolean;
   isInternational: boolean;
 };
@@ -71,6 +77,7 @@ export default function ApplicationBoard() {
   const [planExplainerOpen, setPlanExplainerOpen] = useState(false);
   const [aff, setAff] = useState<StudentAffordability>({
     affordabilityValue: null,
+    affordabilityBracket: null,
     needsFullAid: true,
     isInternational: false,
   });
@@ -91,6 +98,10 @@ export default function ApplicationBoard() {
         if (d?.profile) {
           setAff({
             affordabilityValue: d.profile.affordability_value ?? null,
+            affordabilityBracket:
+              typeof d.profile.affordability_value === "string"
+                ? d.profile.affordability_value
+                : null,
             needsFullAid: Boolean(d.profile.needs_full_aid),
             isInternational: Boolean(d.profile.is_international),
           });
@@ -364,6 +375,12 @@ function SchoolCard({
         isInternational: affordability.isInternational,
       })
     : null;
+  const edCostEstimate = isED
+    ? estimateEDCost({
+        schoolName: row.school_name,
+        affordabilityValue: (affordability.affordabilityBracket as AffordabilityValue | null) ?? null,
+      })
+    : null;
 
   return (
     <div
@@ -466,6 +483,25 @@ function SchoolCard({
               </strong>{" "}
               {edWarning.headline}
               <p className="mt-1.5 opacity-90">{edWarning.explanation}</p>
+              {edCostEstimate && (
+                <div className="mt-2 pt-2 border-t border-current/20 grid grid-cols-3 gap-2 text-[10.5px]">
+                  <div>
+                    <div className="opacity-60 uppercase tracking-wider">Sticker</div>
+                    <div className="font-semibold tabular-nums">${edCostEstimate.coa.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div className="opacity-60 uppercase tracking-wider">Est. aid</div>
+                    <div className="font-semibold tabular-nums">${edCostEstimate.estimatedAid.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div className="opacity-60 uppercase tracking-wider">Out-of-pocket</div>
+                    <div className="font-semibold tabular-nums">${edCostEstimate.estimatedOutOfPocket.toLocaleString()}/yr</div>
+                  </div>
+                  <p className="col-span-3 mt-1 opacity-70 text-[10px]">
+                    {edCostEstimate.methodology}
+                  </p>
+                </div>
+              )}
               {edWarning.alternatives.length > 0 && (
                 <ul className="list-disc pl-4 mt-1.5 space-y-0.5">
                   {edWarning.alternatives.map((alt, i) => (

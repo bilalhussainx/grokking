@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { GraduationCap, Clock, CheckCircle, ArrowRight, BookOpen, Loader2 } from "lucide-react";
 import { matchSchoolToPersona, SUPPORTED_SCHOOLS } from "@/lib/cc/school-persona-matcher";
+import ConfidenceTrendChart from "@/components/interview/ConfidenceTrendChart";
+
+type ConfidencePoint = { interview_date: string | null; school_name: string; confidence_score: number };
 
 interface School {
   id: string;
@@ -63,6 +66,7 @@ export default function InterviewPrepPage() {
   const [expandedScorecard, setExpandedScorecard] = useState<string | null>(null);
   const [scorecardData, setScorecardData] = useState<Record<string, unknown> | null>(null);
   const [scorecardLoading, setScorecardLoading] = useState(false);
+  const [confidencePoints, setConfidencePoints] = useState<ConfidencePoint[]>([]);
 
   useEffect(() => {
     Promise.all([
@@ -74,6 +78,11 @@ export default function InterviewPrepPage() {
         setSessionData(sessionRes.sessions || {});
       })
       .finally(() => setLoading(false));
+
+    fetch("/api/cc/interview-reflection/history")
+      .then((r) => (r.ok ? r.json() : { history: [] }))
+      .then((d) => setConfidencePoints(d.history ?? []))
+      .catch(() => setConfidencePoints([]));
   }, []);
 
   const loadScorecard = async (sessionId: string) => {
@@ -141,6 +150,10 @@ export default function InterviewPrepPage() {
         <p className="text-sm text-white/40 mt-1">
           Practice alumni interviews for schools on your list
         </p>
+      </div>
+
+      <div className="mb-6">
+        <ConfidenceTrendChart points={confidencePoints} />
       </div>
 
       {!hasAnyPersona && (
