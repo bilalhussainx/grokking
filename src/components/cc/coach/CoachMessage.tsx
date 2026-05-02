@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { GraduationCap } from "lucide-react";
 import Link from "next/link";
+import { useCoachKairos } from "@/contexts/CoachKairosContext";
+import { isGrade9BlockedPath } from "@/lib/cc/grade-route-policy";
 
 interface Props {
   role: "assistant" | "user";
@@ -16,6 +18,19 @@ const ACTION_PATTERNS: { pattern: RegExp; href: string; label: string }[] = [
   { pattern: /\b(interview|mock interview)\b/i, href: "/college-interviews", label: "Interview Prep" },
   { pattern: /\b(activities|extracurricular)\b/i, href: "/cc/activities-optimizer", label: "Activities Optimizer" },
 ];
+
+// Hrefs in the action-pattern list that are locked for grade 9 — filter them
+// so a G9 student never sees an "Essay Studio →" chip pointing at a route
+// that middleware will redirect (AUD-P1-003 OpenClaw 2026-05-02).
+function filterChipsForVariant(
+  actions: { href: string; label: string }[],
+  variantKey: string | null,
+): { href: string; label: string }[] {
+  if (variantKey === "g9") {
+    return actions.filter((a) => !isGrade9BlockedPath(a.href));
+  }
+  return actions;
+}
 
 function renderContent(text: string) {
   const parts = text.split(/(\[.*?\]\(.*?\))/g);
@@ -60,7 +75,10 @@ export default function CoachMessage({ role, content, isStreaming }: Props) {
     );
   }
 
-  const quickActions = !isStreaming ? getQuickActions(content) : [];
+  const { currentVariantKey } = useCoachKairos();
+  const quickActions = !isStreaming
+    ? filterChipsForVariant(getQuickActions(content), currentVariantKey)
+    : [];
 
   return (
     <motion.div

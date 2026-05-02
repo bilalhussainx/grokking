@@ -34,6 +34,10 @@ interface CoachKairosContextValue {
   // ongoing turns include the variant guidance block in the system prompt.
   // Pass null to clear (e.g. when navigating off the dashboard).
   setVariantKey: (variantKey: string | null) => void;
+  // Read the active variant for variant-aware UI (e.g. filter "Essay Studio →"
+  // chips out for grade 9). Mirrors the ref used by sendMessage but is
+  // re-render-safe.
+  currentVariantKey: string | null;
   messages: CoachMessage[];
   sendMessage: (text: string, extra?: CoachSendContext) => Promise<void>;
   isStreaming: boolean;
@@ -74,8 +78,10 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   // openWithVariant. Null elsewhere so the API doesn't apply variant guidance
   // when the student is on, say, an essay page (the variant is dashboard-
   // scoped). Stored in a ref because we need to read it inside sendMessage
-  // without re-creating the function on every variant change.
+  // without re-creating the function on every variant change. Mirrored to
+  // state for re-render-safe UI consumers (chip filtering).
   const variantKeyRef = useRef<string | null>(null);
+  const [currentVariantKey, setCurrentVariantKey] = useState<string | null>(null);
   const proactiveSent = useRef(false);
   const historyLoaded = useRef(false);
 
@@ -362,10 +368,12 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
 
   const setVariantKey = useCallback((variantKey: string | null) => {
     variantKeyRef.current = variantKey;
+    setCurrentVariantKey(variantKey);
   }, []);
 
   const openWithVariant = useCallback(async (variantKey: string) => {
     variantKeyRef.current = variantKey;
+    setCurrentVariantKey(variantKey);
     setIsOpen(true);
     // Don't overwrite an in-flight load.
     if (isLoading) return;
@@ -407,7 +415,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   return (
     <CoachKairosContext.Provider
       value={{
-        isOpen, open, close, toggle, openWithVariant, setVariantKey,
+        isOpen, open, close, toggle, openWithVariant, setVariantKey, currentVariantKey,
         messages, sendMessage, isStreaming, currentMode, isLoading,
         language, setLanguage, voiceEnabled, setVoiceEnabled,
         isSpeaking, stopSpeaking,

@@ -35,6 +35,10 @@ export default function ShareSettingsPage() {
   const [copied, setCopied] = useState(false);
   const [revoking, setRevoking] = useState(false);
   const [confirmRevoke, setConfirmRevoke] = useState(false);
+  // Surface a 402 (free tier hits Pro gate) instead of failing silently —
+  // AUD-P3-003 caught the previous behavior where the button just spun and
+  // returned to idle with no UI feedback.
+  const [generateError, setGenerateError] = useState<{ message: string; tier?: string } | null>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -52,16 +56,22 @@ export default function ShareSettingsPage() {
 
   const generateLink = async () => {
     setGenerating(true);
+    setGenerateError(null);
     const res = await fetch("/api/cc/share-link", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ visibleSections: sections }),
     });
     const data = await res.json();
-    if (data.shareToken) {
+    if (res.ok && data.shareToken) {
       setShareToken(data.shareToken);
       setShareUrl(data.shareUrl);
       setSections(data.visibleSections);
+    } else {
+      setGenerateError({
+        message: data.error ?? `Couldn't generate the link (${res.status}).`,
+        tier: data.tier,
+      });
     }
     setGenerating(false);
   };
@@ -154,17 +164,29 @@ export default function ShareSettingsPage() {
       </div>
 
       {!shareToken ? (
-        <button
-          onClick={generateLink}
-          disabled={generating}
-          className="w-full py-3 rounded-lg bg-[#D4AF37] text-black font-semibold hover:bg-[#C4A030] disabled:opacity-50 flex items-center justify-center gap-2"
-        >
-          {generating ? (
-            <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</>
-          ) : (
-            <><Link2 className="w-4 h-4" /> Generate Share Link</>
+        <>
+          <button
+            onClick={generateLink}
+            disabled={generating}
+            className="w-full py-3 rounded-lg bg-[#D4AF37] text-black font-semibold hover:bg-[#C4A030] disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {generating ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</>
+            ) : (
+              <><Link2 className="w-4 h-4" /> Generate Share Link</>
+            )}
+          </button>
+          {generateError && (
+            <div className="mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[12.5px] text-amber-100 leading-relaxed">
+              <div className="font-semibold mb-1">{generateError.message}</div>
+              {generateError.tier === "free" ? (
+                <Link href="/pricing" className="inline-block mt-1 px-3 py-1.5 rounded-md bg-[#D4AF37] text-black text-[12px] font-semibold hover:bg-[#C4A030]">
+                  Upgrade to Pro →
+                </Link>
+              ) : null}
+            </div>
           )}
-        </button>
+        </>
       ) : (
         <div className="space-y-3">
           <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
