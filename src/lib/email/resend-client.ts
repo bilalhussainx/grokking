@@ -1,6 +1,8 @@
 import { Resend } from "resend";
 
-const FROM = process.env.RESEND_FROM_EMAIL ?? "Coach Kairos <coach@kairoslearn.com>";
+// Sender address. Defaults to Bilal's verified mailbox so dev / staging
+// don't need the env var set; prod overrides via RESEND_FROM_EMAIL.
+const FROM = process.env.RESEND_FROM_EMAIL ?? "Coach Kairos <bilal@kairoslearn.com>";
 
 export type SendEmailInput = {
   to: string;
