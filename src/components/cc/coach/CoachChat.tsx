@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { Send, Mic, MicOff } from "lucide-react";
+import Link from "next/link";
+import { Send, Mic, MicOff, CheckCircle2 } from "lucide-react";
 import { useCoachKairos } from "@/contexts/CoachKairosContext";
 import { useVoiceAgent, type VoiceAgentCallbacks } from "@/hooks/useVoiceAgent";
 import CoachMessage from "./CoachMessage";
@@ -32,6 +33,29 @@ export default function CoachChat() {
 
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Inline toast surfaces when the coach actually mutates DB state (e.g.
+  // adds schools via the canonical <<actions>> block). Listens to the
+  // window event the CoachKairosContext broadcasts after every turn.
+  // Auto-dismisses after 4s.
+  const [actionToast, setActionToast] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ extracted?: number; actionKinds?: string[] }>).detail;
+      const count = detail?.extracted ?? 0;
+      if (count > 0) {
+        setActionToast(`Added ${count} school${count === 1 ? "" : "s"} to your list`);
+      }
+    };
+    window.addEventListener("kairos:message-complete", handler);
+    return () => window.removeEventListener("kairos:message-complete", handler);
+  }, []);
+  useEffect(() => {
+    if (!actionToast) return;
+    const t = setTimeout(() => setActionToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [actionToast]);
 
   // ------------------------------------------------------------------
   // Voice agent (Deepgram WebSocket / Sarvam orchestrated, bundled STT+LLM+TTS)
@@ -179,6 +203,16 @@ export default function CoachChat() {
       {voiceAgent.error && (
         <div className="mx-4 mb-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/25 text-[11px] text-amber-300">
           {voiceAgent.error}
+        </div>
+      )}
+
+      {actionToast && (
+        <div className="mx-4 mb-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-[11px] text-emerald-300 flex items-center gap-2">
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          <span>{actionToast}</span>
+          <Link href="/schools" className="ml-auto underline hover:text-emerald-200">
+            Open list →
+          </Link>
         </div>
       )}
 
