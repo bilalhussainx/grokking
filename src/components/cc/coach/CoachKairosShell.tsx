@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap, X, Volume2, VolumeX, Languages, Check } from "lucide-react";
 import { useState } from "react";
 import CoachChat from "./CoachChat";
-import { COACH_LANGUAGES, getCoachLanguage, isVoiceLanguage } from "@/lib/cc/coach-languages";
+import { COACH_LANGUAGES, getCoachLanguage } from "@/lib/cc/coach-languages";
+import { FAMILY_MODE_LANGUAGES } from "@/lib/cc/family-mode-strings";
 import HandToParentButton from "@/components/family-mode/HandToParentButton";
 import FamilyModeView from "@/components/family-mode/FamilyModeView";
 import WorkingLatePrompt from "@/components/cc/WorkingLatePrompt";
@@ -100,7 +101,7 @@ export default function CoachKairosShell() {
                 <div className="flex items-center gap-1">
                   <HandToParentButton
                     onClick={() => toggleFamilyMode(true)}
-                    disabled={!isVoiceLanguage(language)}
+                    disabled={!(FAMILY_MODE_LANGUAGES as readonly string[]).includes(language)}
                   />
                   <div className="relative">
                     <button

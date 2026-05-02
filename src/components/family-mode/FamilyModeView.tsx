@@ -1,9 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Send } from "lucide-react";
 import FamilyModeMicButton from "./FamilyModeMicButton";
-import { FAMILY_MODE_STRINGS, type FamilyModeLang } from "@/lib/cc/family-mode-strings";
+import {
+  FAMILY_MODE_STRINGS,
+  NO_VOICE_FAMILY_MODE_LANGUAGES,
+  type FamilyModeLang,
+} from "@/lib/cc/family-mode-strings";
 import { getCoachLanguage } from "@/lib/cc/coach-languages";
 
 const IDLE_TIMEOUT_MS = 5 * 60 * 1000;
@@ -33,8 +37,37 @@ export default function FamilyModeView({
   const [turns, setTurns] = useState<Turn[]>([]);
   const [state, setState] = useState<"idle" | "listening" | "thinking">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [textInput, setTextInput] = useState("");
   const idleRef = useRef<number | null>(null);
   const recognitionRef = useRef<RecognitionRef>(null);
+
+  // Languages without browser SpeechRecognition (currently: Urdu) get a text
+  // input instead of the mic. AUD-P4-001 — keeps Family Mode usable for Urdu
+  // parents instead of the previous "button disabled" no-go.
+  const textOnly = NO_VOICE_FAMILY_MODE_LANGUAGES.has(language);
+
+  const sendTextMessage = async (transcript: string) => {
+    const t = transcript.trim();
+    if (!t) return;
+    setTurns((prev) => [...prev, { role: "parent", content: t }]);
+    setTextInput("");
+    setState("thinking");
+    try {
+      const res = await fetch("/api/cc/coach/family-mode/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: t, language }),
+      });
+      if (res.ok) {
+        const { reply } = await res.json();
+        setTurns((prev) => [...prev, { role: "coach", content: reply }]);
+      }
+    } catch (err) {
+      console.warn("[family-mode] text message failed", err);
+    } finally {
+      setState("idle");
+    }
+  };
 
   // Idle timeout — exits after 5 minutes of no input
   useEffect(() => {
@@ -134,13 +167,40 @@ export default function FamilyModeView({
           ))}
         </div>
 
-        <FamilyModeMicButton state={state} onTap={startListening} />
+        {textOnly ? (
+          <form
+            onSubmit={(e) => { e.preventDefault(); sendTextMessage(textInput); }}
+            className="w-full max-w-md flex items-center gap-2"
+          >
+            <input
+              type="text"
+              dir="auto"
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              placeholder={strings.typeHere ?? "Type here…"}
+              disabled={state === "thinking"}
+              className="flex-1 px-4 py-3 rounded-2xl bg-white/10 border border-white/15 text-white text-[14px] placeholder:text-white/35 focus:outline-none focus:border-[#D4AF37]/50 disabled:opacity-40"
+            />
+            <button
+              type="submit"
+              disabled={!textInput.trim() || state === "thinking"}
+              aria-label={strings.send ?? "Send"}
+              className="p-3 rounded-2xl bg-[#D4AF37] text-black hover:bg-[#C4A030] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </form>
+        ) : (
+          <FamilyModeMicButton state={state} onTap={startListening} />
+        )}
         <p className="text-[13px] text-white/60">
-          {state === "listening"
-            ? strings.listening
-            : state === "thinking"
-              ? strings.thinking
-              : strings.tapToSpeak}
+          {state === "thinking"
+            ? strings.thinking
+            : textOnly
+              ? (strings.typeHere ?? strings.tapToSpeak)
+              : state === "listening"
+                ? strings.listening
+                : strings.tapToSpeak}
         </p>
         {error && <p className="text-[12px] text-rose-300">{error}</p>}
       </div>

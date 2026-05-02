@@ -1,8 +1,17 @@
 export const FAMILY_MODE_LANGUAGES = [
   "en", "es", "fr", "de", "it", "nl", "ja",
   "hi", "bn", "ta", "te", "gu", "kn", "ml", "mr", "pa", "od",
+  // Urdu is text-only — no browser SpeechRecognition support and Sarvam
+  // Urdu STT isn't wired into FamilyModeView. Listed here so the parent
+  // hand-off button stays enabled for Urdu families. AUD-P4-001 (OpenClaw
+  // 2026-05-02). FamilyModeView checks NO_VOICE_FAMILY_MODE_LANGUAGES
+  // below and renders a text input instead of the mic.
+  "ur",
 ] as const;
 export type FamilyModeLang = typeof FAMILY_MODE_LANGUAGES[number];
+
+// Languages where the parent types instead of speaking.
+export const NO_VOICE_FAMILY_MODE_LANGUAGES = new Set<string>(["ur"]);
 
 export type FamilyModeStrings = {
   tapToSpeak: string;
@@ -11,6 +20,9 @@ export type FamilyModeStrings = {
   thinking: string;
   paused: string;
   goodbye: string;
+  // Used only by the text-mode UI for languages in NO_VOICE_FAMILY_MODE_LANGUAGES.
+  typeHere?: string;
+  send?: string;
 };
 
 export const FAMILY_MODE_STRINGS: Record<FamilyModeLang, FamilyModeStrings> = {
@@ -31,4 +43,5 @@ export const FAMILY_MODE_STRINGS: Record<FamilyModeLang, FamilyModeStrings> = {
   mr: { tapToSpeak: "बोलण्यासाठी टॅप करा", listening: "ऐकत आहे…", handBack: "विद्यार्थ्याला परत द्या", thinking: "Coach Kairos विचार करत आहे…", paused: "सुरू ठेवण्यासाठी माइक टॅप करा", goodbye: "फॅमिली मोड समाप्त" },
   pa: { tapToSpeak: "ਬੋਲਣ ਲਈ ਟੈਪ ਕਰੋ", listening: "ਸੁਣ ਰਿਹਾ ਹਾਂ…", handBack: "ਵਿਦਿਆਰਥੀ ਨੂੰ ਵਾਪਸ ਦਿਓ", thinking: "Coach Kairos ਸੋਚ ਰਿਹਾ ਹੈ…", paused: "ਜਾਰੀ ਰੱਖਣ ਲਈ ਮਾਇਕ ਟੈਪ ਕਰੋ", goodbye: "ਫੈਮਿਲੀ ਮੋਡ ਖਤਮ" },
   od: { tapToSpeak: "କଥା କହିବାକୁ ଟାପ୍ କରନ୍ତୁ", listening: "ଶୁଣୁଛି…", handBack: "ଛାତ୍ରଙ୍କୁ ଫେରାଇଦିଅନ୍ତୁ", thinking: "Coach Kairos ଚିନ୍ତା କରୁଛି…", paused: "ଜାରି ରଖିବାକୁ ମାଇକ୍ ଟାପ୍ କରନ୍ତୁ", goodbye: "ପରିବାର ମୋଡ୍ ସମାପ୍ତ" },
+  ur: { tapToSpeak: "ٹیپ کر کے بولیں", listening: "سن رہا ہوں…", handBack: "طالبعلم کو واپس دیں", thinking: "Coach Kairos سوچ رہا ہے…", paused: "جاری رکھنے کے لیے مائیک پر ٹیپ کریں", goodbye: "فیملی موڈ ختم", typeHere: "یہاں لکھیں…", send: "بھیجیں" },
 };
