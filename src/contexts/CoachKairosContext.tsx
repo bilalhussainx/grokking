@@ -49,6 +49,11 @@ interface CoachKairosContextValue {
   setVoiceEnabled: (enabled: boolean) => void;
   isSpeaking: boolean;
   stopSpeaking: () => void;
+  // Last TTS failure code, or null if voice played successfully or hasn't
+  // run. Codes mirror SpeakResult.reason from useCoachVoice. UI consumers
+  // (CoachChat) render a banner when this is non-null.
+  ttsError: string | null;
+  clearTtsError: () => void;
   familyMode: boolean;
   toggleFamilyMode: (on?: boolean) => void;
   // Append a turn that came from outside the normal sendMessage flow — used
@@ -73,6 +78,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   const [language, setLanguageState] = useState<string>(DEFAULT_COACH_LANGUAGE);
   const [voiceEnabled, setVoiceEnabledState] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [ttsError, setTtsError] = useState<string | null>(null);
   const [familyMode, setFamilyMode] = useState(false);
   // Active dashboard variant — set by AdaptiveDashboard via setVariantKey or
   // openWithVariant. Null elsewhere so the API doesn't apply variant guidance
@@ -376,7 +382,14 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
     if (voiceEnabled && finalContent.trim()) {
       setIsSpeaking(true);
       speak(finalContent, language)
-        .catch(() => {})
+        .then((res) => {
+          if (!res.ok && res.reason) setTtsError(res.reason);
+          else setTtsError(null);
+        })
+        .catch((err) => {
+          console.error("[CoachKairos] speak() threw unexpectedly:", err);
+          setTtsError("AUDIO_PLAY_FAILED");
+        })
         .finally(() => setIsSpeaking(false));
     }
   }
@@ -438,6 +451,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
         messages, sendMessage, isStreaming, currentMode, isLoading,
         language, setLanguage, voiceEnabled, setVoiceEnabled,
         isSpeaking, stopSpeaking,
+        ttsError, clearTtsError: () => setTtsError(null),
         familyMode, toggleFamilyMode,
         appendVoiceTurn,
       }}

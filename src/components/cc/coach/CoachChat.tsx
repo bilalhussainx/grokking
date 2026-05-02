@@ -29,6 +29,8 @@ export default function CoachChat() {
     isLoading,
     language,
     appendVoiceTurn,
+    ttsError,
+    clearTtsError,
   } = useCoachKairos();
 
   const [input, setInput] = useState("");
@@ -203,6 +205,29 @@ export default function CoachChat() {
       {voiceAgent.error && (
         <div className="mx-4 mb-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/25 text-[11px] text-amber-300">
           {voiceAgent.error}
+        </div>
+      )}
+
+      {ttsError && (
+        <div className="mx-4 mb-2 px-3 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/25 text-[11px] text-rose-300 flex items-center gap-2">
+          <span>
+            Voice playback failed
+            {ttsError === "TTS_EMPTY_AUDIO"
+              ? " — Hindi voice glitched, try another reply"
+              : ttsError.startsWith("VOICE_UNSUPPORTED:")
+                ? ` — voice not yet supported for this language`
+                : ttsError === "AUDIO_PLAY_FAILED"
+                  ? " — your browser blocked audio playback"
+                  : ""}
+            .
+          </span>
+          <button
+            onClick={clearTtsError}
+            className="ml-auto underline hover:text-rose-200"
+            type="button"
+          >
+            Dismiss
+          </button>
         </div>
       )}
 
