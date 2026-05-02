@@ -157,7 +157,7 @@ export default async function DashboardPage() {
     );
   }
 
-  const [essays, testPlan, activities] = await Promise.all([
+  const [essays, testPlan, activities, satAttempt] = await Promise.all([
     safe(
       supabase
         .from("cc_essays")
@@ -176,6 +176,17 @@ export default async function DashboardPage() {
         .from("cc_activities")
         .select("id, impact_score")
         .eq("student_id", profile.id),
+    ),
+    // Most recent SAT attempt — drives the junior variant's SAT bars.
+    safe(
+      supabase
+        .from("cc_test_attempts")
+        .select("sat_reading, sat_math, total_score")
+        .eq("student_id", profile.id)
+        .eq("test_type", "SAT")
+        .order("test_date", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ),
   ]);
 
@@ -221,6 +232,32 @@ export default async function DashboardPage() {
   // Activities / test plan
   const activitiesAnalyzed = activityList.some((a) => a.impact_score != null);
 
+  // ─── Phase 2.5 — derive bespoke priority module data ───────────────────
+  // Personal statement phase — drives the senior_writing PS phase bar.
+  const psEssay = essayList.find(
+    (e) => (e as { essay_type: string | null }).essay_type === "personal_statement",
+  );
+  const personalStatementPhase = psEssay?.phase ?? null;
+
+  // Decision counts — senior_post_submit / senior_decisions tracker.
+  const decisionCounts = schoolList.length === 0
+    ? null
+    : {
+        admitted: schoolList.filter(
+          (s) => s.application_status === "accepted" || s.application_status === "deposited",
+        ).length,
+        waitlisted: schoolList.filter((s) => s.application_status === "waitlisted").length,
+        denied: schoolList.filter((s) => s.application_status === "rejected").length,
+        pending: schoolList.filter(
+          (s) => s.application_status === "submitted" || s.application_status === "deferred",
+        ).length,
+      };
+
+  // SAT sub-scores from the most recent attempt.
+  const sat = satAttempt as
+    | { sat_reading?: number | null; sat_math?: number | null; total_score?: number | null }
+    | null;
+
   const data: DashboardData = {
     preferredName: profile.preferred_name ?? null,
     gradeLabel: profile.is_transfer_student
@@ -250,6 +287,11 @@ export default async function DashboardPage() {
     isInternational: Boolean(profile.is_international),
     transferCurrentSchool: profile.transfer_current_school ?? null,
     transferTargetTerm: profile.transfer_target_term ?? null,
+    personalStatementPhase,
+    decisionCounts,
+    satReading: sat?.sat_reading ?? null,
+    satMath: sat?.sat_math ?? null,
+    satTotal: sat?.total_score ?? null,
   };
 
   const variantKey: VariantKey = selectVariant(

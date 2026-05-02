@@ -57,6 +57,25 @@ export type DashboardData = {
   // Transfer-only
   transferCurrentSchool: string | null;
   transferTargetTerm: string | null;
+
+  // ─── Phase 2.5 — feeds bespoke priority module content ─────────────────
+  // Personal statement essay phase. Drives senior_writing's PS phase bar.
+  // Values: 'brainstorm' | 'outline' | 'draft' | 'revise' | 'submitted' |
+  // 'final' | null (no PS row yet).
+  personalStatementPhase: string | null;
+  // Senior decisions tracker — counts grouped by application_status.
+  // Null when the student has no schools on the list yet.
+  decisionCounts: {
+    admitted: number;
+    waitlisted: number;
+    denied: number;
+    pending: number;
+  } | null;
+  // Most recent SAT attempt sub-scores. Drives junior's SAT bars; null
+  // entries render the "Take a diagnostic" empty state instead of bars.
+  satReading: number | null;
+  satMath: number | null;
+  satTotal: number | null;
 };
 
 export type Hero = {
@@ -76,6 +95,44 @@ export type Hero = {
   urgency?: { value: string; label: string };
 };
 
+// Optional rich-content slot rendered inside a priority module. Keeps
+// PriorityCard lean — most cards stay on the simple num/text value path.
+// Discriminated by `kind` so adding more visualization types later
+// (Phase 2.6 aid comparator, articulation breakdown) is one new case +
+// one new sub-component, no other refactor.
+export type PriorityExtra =
+  | {
+      // 4-segment phase progress bar — 1 segment per phase, current
+      // segment highlighted gold, completed segments green.
+      kind: "phaseBar";
+      phases: string[];
+      current: string | null;
+    }
+  | {
+      // Single-line "X of Y · 60%" progress bar.
+      kind: "progressBar";
+      current: number;
+      total: number;
+      tone?: "gold" | "leaf";
+    }
+  | {
+      // Senior decisions tracker — 4-row breakdown of application_status
+      // counts. Renders empty rows ("—") when count = 0.
+      kind: "decisionCounts";
+      admitted: number;
+      waitlisted: number;
+      denied: number;
+      pending: number;
+    }
+  | {
+      // Junior SAT sub-score bars. null reading/math triggers the
+      // "Take a diagnostic" empty state.
+      kind: "satBars";
+      reading: number | null;
+      math: number | null;
+      target: number;
+    };
+
 export type PriorityCard = {
   href: string;
   icon: IconName;
@@ -86,6 +143,9 @@ export type PriorityCard = {
   valueText?: string;
   meta: string;
   urgent?: boolean;
+  // When present, PriorityModule renders the matching widget instead of
+  // the simple value treatment.
+  extra?: PriorityExtra;
 };
 
 export type Tile = {
@@ -366,6 +426,14 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
           valueKind: "text",
           valueText: d.satRecommendation ?? "Take the quiz",
           meta: d.satNextSitting ? `Next sitting: ${d.satNextSitting}` : "Diagnose this fall.",
+          // Phase 2.5 — render Reading / Math / Target SAT bars when the
+          // student has a logged attempt; empty state otherwise.
+          extra: {
+            kind: "satBars",
+            reading: d.satReading,
+            math: d.satMath,
+            target: 1500,
+          },
         },
         {
           href: "/cc/activities-optimizer",
@@ -400,6 +468,14 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
           valueNum: `${d.essaysSubmittedCount}`,
           valueSuffix: `/ ${Math.max(d.essaysTotal, d.essaysSubmittedCount)}`,
           meta: "Tackle by school — soonest deadline first.",
+          // Phase 2.5 — replace flat number with a progress bar so students
+          // see "8 of 23 · 35%" at a glance.
+          extra: {
+            kind: "progressBar",
+            current: d.essaysSubmittedCount,
+            total: Math.max(d.essaysTotal, d.essaysSubmittedCount, 1),
+            tone: "gold",
+          },
         },
         {
           href: "/cc/essays",
@@ -408,6 +484,16 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
           valueKind: "text",
           valueText: "Draft phase",
           meta: "Brainstorm → outline → draft → revise.",
+          // Phase 2.5 — 4-segment phase bar reflecting cc_essays.phase for
+          // the student's personal statement.
+          extra: {
+            kind: "phaseBar",
+            phases: ["Brainstorm", "Outline", "Draft", "Revise"],
+            current: d.personalStatementPhase
+              ? d.personalStatementPhase.charAt(0).toUpperCase() +
+                d.personalStatementPhase.slice(1)
+              : null,
+          },
         },
       ];
     case "senior_post_submit":
@@ -420,6 +506,11 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
           valueNum: String(d.essaysSubmittedCount),
           valueSuffix: "submitted",
           meta: "Decisions roll in mid-March → late-March.",
+          // Phase 2.5 — render the 4-row admitted/waitlisted/denied/pending
+          // breakdown when we have schools logged.
+          extra: d.decisionCounts
+            ? { kind: "decisionCounts", ...d.decisionCounts }
+            : undefined,
         },
         {
           href: "/cc/waitlist",
@@ -443,10 +534,15 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
         {
           href: "/applications",
           icon: "calendar",
-          label: "Aid comparator",
+          label: "Decisions",
           valueKind: "text",
-          valueText: "Run the math",
+          valueText: "What landed",
           meta: "May 1 deposit deadline.",
+          // Phase 2.5 — 4-row breakdown so the student sees their full
+          // admit/waitlist/deny/pending picture in one card.
+          extra: d.decisionCounts
+            ? { kind: "decisionCounts", ...d.decisionCounts }
+            : undefined,
         },
         {
           href: "/cc/waitlist",

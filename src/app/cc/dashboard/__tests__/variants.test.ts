@@ -23,6 +23,11 @@ const baseData: DashboardData = {
   isInternational: false,
   transferCurrentSchool: null,
   transferTargetTerm: null,
+  personalStatementPhase: null,
+  decisionCounts: null,
+  satReading: null,
+  satMath: null,
+  satTotal: null,
 };
 
 describe("selectVariant", () => {
@@ -211,5 +216,96 @@ describe("buildVariant — handoff Phase 2 fields", () => {
     expect(buildVariant("g9", baseData).widgets?.[0].tone).toBe("gold");
     expect(buildVariant("junior", baseData).widgets?.[0].tone).toBe("gold");
     expect(buildVariant("senior_writing", baseData).widgets?.[0].tone).toBe("gold");
+  });
+});
+
+// ─── Phase 2.5 — bespoke priority module content (extras) ────────────────
+describe("buildVariant — Phase 2.5 priority extras", () => {
+  it("senior_writing PS card has phaseBar with capitalized current phase", () => {
+    const v = buildVariant("senior_writing", { ...baseData, personalStatementPhase: "draft" });
+    const ps = v.priority.find((p) => p.label === "Personal statement");
+    expect(ps?.extra?.kind).toBe("phaseBar");
+    if (ps?.extra?.kind === "phaseBar") {
+      expect(ps.extra.current).toBe("Draft");
+      expect(ps.extra.phases).toEqual(["Brainstorm", "Outline", "Draft", "Revise"]);
+    }
+  });
+
+  it("senior_writing PS phaseBar.current is null when no PS exists", () => {
+    const v = buildVariant("senior_writing", { ...baseData, personalStatementPhase: null });
+    const ps = v.priority.find((p) => p.label === "Personal statement");
+    if (ps?.extra?.kind === "phaseBar") {
+      expect(ps.extra.current).toBeNull();
+    }
+  });
+
+  it("senior_writing supplements has progressBar extra", () => {
+    const v = buildVariant("senior_writing", {
+      ...baseData,
+      essaysSubmittedCount: 8,
+      essaysTotal: 23,
+    });
+    const sup = v.priority.find((p) => p.label === "Supplements");
+    expect(sup?.extra?.kind).toBe("progressBar");
+    if (sup?.extra?.kind === "progressBar") {
+      expect(sup.extra.current).toBe(8);
+      expect(sup.extra.total).toBe(23);
+      expect(sup.extra.tone).toBe("gold");
+    }
+  });
+
+  it("senior_post_submit decisions tracker has decisionCounts when schools exist", () => {
+    const v = buildVariant("senior_post_submit", {
+      ...baseData,
+      decisionCounts: { admitted: 4, waitlisted: 1, denied: 3, pending: 6 },
+    });
+    const card = v.priority.find((p) => p.label === "Decisions tracker");
+    expect(card?.extra?.kind).toBe("decisionCounts");
+    if (card?.extra?.kind === "decisionCounts") {
+      expect(card.extra.admitted).toBe(4);
+      expect(card.extra.waitlisted).toBe(1);
+      expect(card.extra.denied).toBe(3);
+      expect(card.extra.pending).toBe(6);
+    }
+  });
+
+  it("senior_post_submit decisions tracker omits extra when no decisionCounts", () => {
+    const v = buildVariant("senior_post_submit", { ...baseData, decisionCounts: null });
+    const card = v.priority.find((p) => p.label === "Decisions tracker");
+    expect(card?.extra).toBeUndefined();
+  });
+
+  it("senior_decisions Decisions card has decisionCounts breakdown", () => {
+    const v = buildVariant("senior_decisions", {
+      ...baseData,
+      decisionCounts: { admitted: 2, waitlisted: 0, denied: 1, pending: 3 },
+    });
+    const card = v.priority[0];
+    expect(card.extra?.kind).toBe("decisionCounts");
+  });
+
+  it("junior test strategy has satBars with target=1500", () => {
+    const v = buildVariant("junior", {
+      ...baseData,
+      satReading: 720,
+      satMath: 670,
+      satTotal: 1390,
+    });
+    const tests = v.priority.find((p) => p.label === "Test strategy");
+    expect(tests?.extra?.kind).toBe("satBars");
+    if (tests?.extra?.kind === "satBars") {
+      expect(tests.extra.target).toBe(1500);
+      expect(tests.extra.reading).toBe(720);
+      expect(tests.extra.math).toBe(670);
+    }
+  });
+
+  it("junior satBars carries null reading/math when no test attempt", () => {
+    const v = buildVariant("junior", { ...baseData });
+    const tests = v.priority.find((p) => p.label === "Test strategy");
+    if (tests?.extra?.kind === "satBars") {
+      expect(tests.extra.reading).toBeNull();
+      expect(tests.extra.math).toBeNull();
+    }
   });
 });
