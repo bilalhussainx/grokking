@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        ...(useOpenRouter ? { "HTTP-Referer": "https://kairos.ai", "X-Title": "Kairos.ai Career Coach" } : {}),
+        ...(useOpenRouter ? { "HTTP-Referer": "https://kairoslearn.com", "X-Title": "KairosLearn Career Coach" } : {}),
       },
       body: JSON.stringify({
         model,

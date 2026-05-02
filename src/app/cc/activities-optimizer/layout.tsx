@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export const metadata = {
-  title: "Activities Optimizer — Kairos.ai",
+  title: "Activities Optimizer — KairosLearn",
   description: "AI-powered optimization for your college application activities and honors",
 };
 

@@ -190,7 +190,7 @@ CRITICAL: You have the FULL lesson content above. Reference SPECIFIC concepts, t
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${apiKey}`,
-            ...(useOpenRouter ? { "HTTP-Referer": "https://kairos.ai", "X-Title": "Kairos.ai Coach" } : {}),
+            ...(useOpenRouter ? { "HTTP-Referer": "https://kairoslearn.com", "X-Title": "KairosLearn Coach" } : {}),
           },
           body: JSON.stringify({
             model,

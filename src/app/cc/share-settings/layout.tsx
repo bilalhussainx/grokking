@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export const metadata = {
-  title: "Share Settings — Kairos.ai",
+  title: "Share Settings — KairosLearn",
   description: "Generate a share link for counselors and mentors",
 };
 

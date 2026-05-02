@@ -14,22 +14,22 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
     const res = await fetch(`${baseUrl}/api/cc/shared/${token}`, { cache: "no-store" });
     if (!res.ok) {
       return {
-        title: "Shared Portfolio — Kairos.ai",
+        title: "Shared Portfolio — KairosLearn",
         description: "Shared college application materials",
       };
     }
     const data = await res.json();
     return {
-      title: `${data.studentName}'s College Application Portfolio — Kairos.ai`,
+      title: `${data.studentName}'s College Application Portfolio — KairosLearn`,
       description: "Shared college application materials",
       openGraph: {
-        title: `${data.studentName}'s College Application Portfolio — Kairos.ai`,
+        title: `${data.studentName}'s College Application Portfolio — KairosLearn`,
         description: "Shared college application materials",
       },
     };
   } catch {
     return {
-      title: "Shared Portfolio — Kairos.ai",
+      title: "Shared Portfolio — KairosLearn",
       description: "Shared college application materials",
     };
   }

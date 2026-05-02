@@ -20,7 +20,7 @@ const DEFAULT_SECTIONS: VisibleSections = {
 };
 
 function buildShareUrl(token: string): string {
-  const base = process.env.NEXT_PUBLIC_APP_URL || "https://kairos.ai";
+  const base = process.env.NEXT_PUBLIC_APP_URL || "https://kairoslearn.com";
   return `${base}/cc/shared/${token}`;
 }
 

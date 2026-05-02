@@ -33,12 +33,12 @@ export const metadata: Metadata = {
     'free online courses with certificates',
   ],
   openGraph: {
-    title: 'Kairos.ai Courses — Learn Anything with AI',
+    title: 'KairosLearn Courses — Learn Anything with AI',
     description:
       'Browse 60+ courses across 7 domains with AI voice coaching.',
-    url: 'https://kairos.ai/courses',
+    url: 'https://kairoslearn.com/courses',
   },
-  alternates: { canonical: 'https://kairos.ai/courses' },
+  alternates: { canonical: 'https://kairoslearn.com/courses' },
 };
 
 const DOMAIN_ORDER = [
@@ -81,8 +81,8 @@ function courseListSchema() {
         '@type': 'Course',
         name: course.title,
         description: course.description,
-        url: `https://kairos.ai/course/${course.slug}`,
-        provider: { '@type': 'Organization', name: 'Kairos.ai' },
+        url: `https://kairoslearn.com/course/${course.slug}`,
+        provider: { '@type': 'Organization', name: 'KairosLearn' },
         isAccessibleForFree: course.tier === 'free',
       },
     })),
@@ -141,7 +141,7 @@ export default function CoursesPage() {
 
           {/* SEO text — visually hidden but crawlable */}
           <p className="sr-only">
-            Kairos.ai offers {courses.length}+ interactive online courses spanning Computer Science, Language Learning, Religious Studies, Philosophy, Finance & Business, Health & Wellness, and Political Strategy. With {totalLessons}+ lessons, learners can study everything from Python and system design to Islamic studies, Stoic philosophy, meditation, and investing. {freeCourses} courses are completely free with AI voice coaching.
+            KairosLearn offers {courses.length}+ interactive online courses spanning Computer Science, Language Learning, Religious Studies, Philosophy, Finance & Business, Health & Wellness, and Political Strategy. With {totalLessons}+ lessons, learners can study everything from Python and system design to Islamic studies, Stoic philosophy, meditation, and investing. {freeCourses} courses are completely free with AI voice coaching.
           </p>
         </header>
 

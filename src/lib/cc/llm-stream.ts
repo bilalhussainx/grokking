@@ -63,8 +63,8 @@ export async function streamLLM(
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-          "HTTP-Referer": "https://kairos.ai",
-          "X-Title": "Kairos.ai",
+          "HTTP-Referer": "https://kairoslearn.com",
+          "X-Title": "KairosLearn",
         },
         body: JSON.stringify({
           model: opts?.model || "anthropic/claude-sonnet-4-6",
@@ -157,7 +157,7 @@ export async function callLLMJSON<T>(
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        ...(OPENROUTER_API_KEY ? { "HTTP-Referer": "https://kairos.ai" } : {}),
+        ...(OPENROUTER_API_KEY ? { "HTTP-Referer": "https://kairoslearn.com" } : {}),
       },
       body: JSON.stringify({
         model,

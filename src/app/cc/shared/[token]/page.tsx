@@ -40,7 +40,7 @@ export default async function SharedViewPage({ params }: Props) {
   if (!data) {
     return (
       <div className="min-h-screen bg-[#141414] flex flex-col items-center justify-center text-white p-6">
-        <div className="text-[#D4AF37] text-3xl font-bold mb-4">Kairos.ai</div>
+        <div className="text-[#D4AF37] text-3xl font-bold mb-4">KairosLearn</div>
         <p className="text-white/60 text-center max-w-md">
           This link is no longer active. Ask the student for a new one.
         </p>
@@ -52,7 +52,7 @@ export default async function SharedViewPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-[#141414] text-white p-6 max-w-4xl mx-auto">
-      <div className="text-[#D4AF37] text-sm font-semibold mb-1">Kairos.ai</div>
+      <div className="text-[#D4AF37] text-sm font-semibold mb-1">KairosLearn</div>
       <h1 className="text-2xl font-bold mb-6">{data.studentName}&apos;s College Application Portfolio</h1>
 
       {!hasAnySections && (
@@ -174,7 +174,7 @@ export default async function SharedViewPage({ params }: Props) {
       </div>
 
       <div className="mt-12 text-center text-xs text-white/30">
-        Powered by Kairos.ai
+        Powered by KairosLearn
       </div>
     </div>
   );

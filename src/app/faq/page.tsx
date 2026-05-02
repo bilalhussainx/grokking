@@ -7,49 +7,49 @@ import { JsonLd } from '@/lib/schema';
 export const metadata: Metadata = {
   title: 'Frequently Asked Questions',
   description:
-    'Common questions about Kairos.ai — what courses are available, how AI coaching works, pricing, supported languages, and more.',
+    'Common questions about KairosLearn — what courses are available, how AI coaching works, pricing, supported languages, and more.',
   keywords: [
-    'Kairos.ai FAQ',
+    'KairosLearn FAQ',
     'online learning FAQ',
     'AI tutor questions',
     'free online courses',
     'how does AI coaching work',
-    'Kairos.ai pricing',
+    'KairosLearn pricing',
     'meditation course online',
     'coding interview preparation',
     'religious studies online',
   ],
   openGraph: {
-    title: 'FAQ — Kairos.ai',
-    description: 'Common questions about Kairos.ai courses and AI coaching.',
-    url: 'https://kairos.ai/faq',
+    title: 'FAQ — KairosLearn',
+    description: 'Common questions about KairosLearn courses and AI coaching.',
+    url: 'https://kairoslearn.com/faq',
   },
-  alternates: { canonical: 'https://kairos.ai/faq' },
+  alternates: { canonical: 'https://kairoslearn.com/faq' },
 };
 
 const FAQ_ITEMS = [
   {
-    question: 'What is Kairos.ai?',
+    question: 'What is KairosLearn?',
     answer:
-      'Kairos.ai is an AI-powered online learning platform that offers interactive courses across Computer Science, Religious Studies, Philosophy, Finance, Health & Wellness, and Political Strategy. Each course includes an AI voice coach that provides real-time explanations, hints, and personalized feedback to help learners master complex subjects at their own pace.',
+      'KairosLearn is an AI-powered online learning platform that offers interactive courses across Computer Science, Religious Studies, Philosophy, Finance, Health & Wellness, and Political Strategy. Each course includes an AI voice coach that provides real-time explanations, hints, and personalized feedback to help learners master complex subjects at their own pace.',
   },
   {
-    question: 'What courses are available on Kairos.ai?',
+    question: 'What courses are available on KairosLearn?',
     answer:
-      'Kairos.ai offers 60+ courses organized into 7 domains. In Computer Science, you can study Python, JavaScript, React, system design, data structures, and coding interview preparation. Religious Studies includes courses on Islam, Christianity, and Buddhism. Philosophy covers Stoic philosophy. Finance courses include personal finance, investing, accounting, and macroeconomics. Health & Wellness features meditation, mental health, and leadership courses. Political Strategy covers geopolitics and international relations.',
+      'KairosLearn offers 60+ courses organized into 7 domains. In Computer Science, you can study Python, JavaScript, React, system design, data structures, and coding interview preparation. Religious Studies includes courses on Islam, Christianity, and Buddhism. Philosophy covers Stoic philosophy. Finance courses include personal finance, investing, accounting, and macroeconomics. Health & Wellness features meditation, mental health, and leadership courses. Political Strategy covers geopolitics and international relations.',
   },
   {
-    question: 'Is Kairos.ai free?',
+    question: 'Is KairosLearn free?',
     answer:
-      'Many courses on Kairos.ai are completely free, including Python Fundamentals, Web Development, Islam: Foundations & Practice, Stoic Philosophy, Meditation & Mindfulness, Mental Health & Resilience, and Personal Finance Mastery. Premium (Pro) courses covering advanced topics like system design, machine learning, investing, and cybersecurity require a Pro subscription.',
+      'Many courses on KairosLearn are completely free, including Python Fundamentals, Web Development, Islam: Foundations & Practice, Stoic Philosophy, Meditation & Mindfulness, Mental Health & Resilience, and Personal Finance Mastery. Premium (Pro) courses covering advanced topics like system design, machine learning, investing, and cybersecurity require a Pro subscription.',
   },
   {
-    question: 'How does AI coaching work on Kairos.ai?',
+    question: 'How does AI coaching work on KairosLearn?',
     answer:
-      'Every course on Kairos.ai includes an AI voice coach that accompanies you through lessons. The coach can explain concepts in plain language, provide progressive hints when you are stuck on coding exercises, celebrate your progress, and answer questions about the material. The AI coach is available in 9 languages including English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, and Punjabi.',
+      'Every course on KairosLearn includes an AI voice coach that accompanies you through lessons. The coach can explain concepts in plain language, provide progressive hints when you are stuck on coding exercises, celebrate your progress, and answer questions about the material. The AI coach is available in 9 languages including English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, and Punjabi.',
   },
   {
-    question: 'What languages does Kairos.ai support?',
+    question: 'What languages does KairosLearn support?',
     answer:
       'The AI voice coaching feature supports 9 languages: English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, and Punjabi. Course content is primarily in English, but the AI coach can explain concepts and provide feedback in any of the supported languages.',
   },
@@ -59,14 +59,14 @@ const FAQ_ITEMS = [
       'The Meditation & Mindfulness Practice course is a free, beginner-level course with 7 modules covering breath awareness, body scans, loving-kindness meditation, mindful living, and emotional regulation. It is grounded in neuroscience research from JAMA, The Lancet, and leading universities. An AI voice coach guides you through each practice and helps you build a sustainable daily meditation habit.',
   },
   {
-    question: 'How do coding exercises work on Kairos.ai?',
+    question: 'How do coding exercises work on KairosLearn?',
     answer:
       'Computer Science courses include interactive coding exercises with an in-browser code editor. You write code directly in the browser, and the AI coach provides progressive hints if you get stuck. Each exercise includes starter code and a solution you can reveal after attempting the problem. Exercises cover Python, JavaScript, TypeScript, C++, and C# depending on the course.',
   },
   {
     question: 'What religious studies courses are available?',
     answer:
-      'Kairos.ai offers three religious studies courses: Islam: Foundations & Practice covers the Quran, Hadith, Five Pillars, and Islamic ethics. Christianity: Ethics & Theology explores scripture, the life of Jesus, denominational differences, and Christian ethics. Buddhism: Path to Inner Peace covers the Four Noble Truths, the Eightfold Path, meditation traditions, and Buddhist ethics. All three courses are free and beginner-friendly.',
+      'KairosLearn offers three religious studies courses: Islam: Foundations & Practice covers the Quran, Hadith, Five Pillars, and Islamic ethics. Christianity: Ethics & Theology explores scripture, the life of Jesus, denominational differences, and Christian ethics. Buddhism: Path to Inner Peace covers the Four Noble Truths, the Eightfold Path, meditation traditions, and Buddhist ethics. All three courses are free and beginner-friendly.',
   },
 ];
 
@@ -96,7 +96,7 @@ export default function FAQPage() {
             Frequently Asked Questions
           </h1>
           <p className="text-slate-400 text-lg">
-            Everything you need to know about Kairos.ai, our courses, AI
+            Everything you need to know about KairosLearn, our courses, AI
             coaching, and pricing.
           </p>
         </header>

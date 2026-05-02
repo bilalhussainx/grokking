@@ -31,7 +31,7 @@ export async function POST(
       .eq("id", id);
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://kairos.ai";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://kairoslearn.com";
   return NextResponse.json({
     share_token: shareToken,
     share_url: `${baseUrl}/cc/essays/shared/${shareToken}`,

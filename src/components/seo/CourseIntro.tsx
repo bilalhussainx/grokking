@@ -21,7 +21,7 @@ export default function CourseIntro({ course }: { course: Course }) {
   return (
     <section className="mb-8">
       <p className="text-slate-300 text-base leading-relaxed">
-        {course.title} is a {tierLabel} online course on Kairos.ai that covers{' '}
+        {course.title} is a {tierLabel} online course on KairosLearn that covers{' '}
         {course.description.charAt(0).toLowerCase() + course.description.slice(1)}{' '}
         The course is part of the {domainLabel} domain and is designed for {levelLabel}-level learners.
         It includes {moduleCount} modules with {totalLessons} lessons

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export const metadata = {
-  title: "Recommendations — Kairos.ai",
+  title: "Recommendations — KairosLearn",
   description: "Manage recommendation letters, generate brag sheets, and draft ask emails",
 };
 

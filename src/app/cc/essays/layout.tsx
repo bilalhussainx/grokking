@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export const metadata = {
-  title: "Essay Studio — Kairos.ai",
+  title: "Essay Studio — KairosLearn",
   description: "AI-guided essay writing for college applications",
 };
 

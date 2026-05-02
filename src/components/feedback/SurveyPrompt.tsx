@@ -74,7 +74,7 @@ export default function SurveyPrompt() {
               <div>
                 <h3 className="text-sm font-semibold text-white mb-1">How's your experience?</h3>
                 <p className="text-xs text-white/50 leading-relaxed">
-                  Take a 2-minute survey to help us improve Kairos.ai. Your feedback directly shapes what we build next.
+                  Take a 2-minute survey to help us improve KairosLearn. Your feedback directly shapes what we build next.
                 </p>
               </div>
             </div>

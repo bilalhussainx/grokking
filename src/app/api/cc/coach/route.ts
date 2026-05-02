@@ -26,7 +26,7 @@ async function classifyWithLLM(message: string, profilePct: number): Promise<Age
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        ...(OPENROUTER_API_KEY ? { "HTTP-Referer": "https://kairos.ai" } : {}),
+        ...(OPENROUTER_API_KEY ? { "HTTP-Referer": "https://kairoslearn.com" } : {}),
       },
       body: JSON.stringify({
         model,

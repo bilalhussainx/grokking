@@ -45,7 +45,7 @@ export default function KairosLogo({
       {/* Logo image */}
       <Image
         src="/kairos-logo.jpg"
-        alt="Kairos.ai"
+        alt="KairosLearn"
         width={s.img}
         height={s.img}
         className="relative rounded-full object-cover ring-1 ring-white/10 bg-white"
@@ -114,7 +114,7 @@ export function KairosLogoIcon({
       )}
       <Image
         src="/kairos-logo.jpg"
-        alt="Kairos.ai"
+        alt="KairosLearn"
         width={size}
         height={size}
         className="relative rounded-full object-cover ring-1 ring-white/10 bg-white"

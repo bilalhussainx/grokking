@@ -284,7 +284,7 @@ export default function PricingCards() {
           </ul>
 
           <a
-            href="mailto:team@kairos.ai?subject=Teams%20Plan%20Inquiry"
+            href="mailto:team@kairoslearn.com?subject=Teams%20Plan%20Inquiry"
             className="block w-full py-3 rounded-xl text-sm font-semibold text-center transition-all border border-white/10 bg-transparent text-white/60 hover:bg-white/10 hover:text-white"
           >
             Contact Us
