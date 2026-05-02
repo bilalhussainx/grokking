@@ -325,7 +325,7 @@ Focus this conversation on practicing the current lesson material.
           // Sarvam Bulbul-v3 silent-output bug — 200 OK with empty audios.
           // Log so we have a signal when responses audibly fail.
           console.warn('[Sarvam TTS] empty audios — possible Bulbul-v3 silent output', {
-            language, textLength: text.length,
+            language, textLength: responseText.length,
           });
         }
       }
