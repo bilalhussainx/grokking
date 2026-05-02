@@ -3,11 +3,11 @@ import path from "node:path";
 
 export default defineConfig({
   test: {
-    environment: "node",
-    include: ["src/**/*.test.ts"],
+    environment: "jsdom",
+    include: ["src/**/*.test.{ts,tsx}"],
     exclude: ["node_modules", ".next", "tests/**"],
     globals: false,
-    setupFiles: [],
+    setupFiles: ["./vitest.setup.ts"],
   },
   resolve: {
     alias: {
