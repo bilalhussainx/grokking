@@ -34,10 +34,22 @@ export async function POST(req: NextRequest) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  const { message, page_context, essay_id, source_event } = await req.json();
+  const { message, page_context, essay_id, source_event, variant_key } = await req.json();
   if (!message || typeof message !== "string") {
     return new Response(JSON.stringify({ error: "Missing message" }), { status: 400 });
   }
+  // variant_key comes from the client when the student opened the coach
+  // from the adaptive dashboard. Validate against the known set so a typo
+  // in the client doesn't poison the system prompt.
+  const VALID_VARIANTS = new Set([
+    "g9", "g10", "junior",
+    "senior_writing", "senior_post_submit", "senior_decisions",
+    "transfer", "unknown",
+  ]);
+  const variantKey: string | null =
+    typeof variant_key === "string" && VALID_VARIANTS.has(variant_key)
+      ? variant_key
+      : null;
 
   const supabase = createAdminSupabase();
 
@@ -354,6 +366,7 @@ export async function POST(req: NextRequest) {
     applicationSnapshot,
     affordabilityValue: (profile as { affordability_value?: string | null }).affordability_value as never ?? null,
     needsFullAid: !!(profile as { needs_full_aid?: boolean | null }).needs_full_aid,
+    variantKey: variantKey as CoachContext["variantKey"],
   };
 
   const detectedLang = detectMessageLanguage(message);

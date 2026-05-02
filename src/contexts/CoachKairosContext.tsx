@@ -30,6 +30,10 @@ interface CoachKairosContextValue {
   // than the generic senior intake. No-op past the first turn so it doesn't
   // re-seed an ongoing conversation.
   openWithVariant: (variantKey: string) => void;
+  // Tell the coach which dashboard variant the user is currently on so
+  // ongoing turns include the variant guidance block in the system prompt.
+  // Pass null to clear (e.g. when navigating off the dashboard).
+  setVariantKey: (variantKey: string | null) => void;
   messages: CoachMessage[];
   sendMessage: (text: string, extra?: CoachSendContext) => Promise<void>;
   isStreaming: boolean;
@@ -66,6 +70,12 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   const [voiceEnabled, setVoiceEnabledState] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [familyMode, setFamilyMode] = useState(false);
+  // Active dashboard variant — set by AdaptiveDashboard via setVariantKey or
+  // openWithVariant. Null elsewhere so the API doesn't apply variant guidance
+  // when the student is on, say, an essay page (the variant is dashboard-
+  // scoped). Stored in a ref because we need to read it inside sendMessage
+  // without re-creating the function on every variant change.
+  const variantKeyRef = useRef<string | null>(null);
   const proactiveSent = useRef(false);
   const historyLoaded = useRef(false);
 
@@ -265,6 +275,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
           page_context: pathname,
           essay_id: extra?.essayId,
           source_event: extra?.sourceEvent,
+          variant_key: variantKeyRef.current,
         }),
       });
 
@@ -349,7 +360,12 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   const close = useCallback(() => setIsOpen(false), []);
   const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
 
+  const setVariantKey = useCallback((variantKey: string | null) => {
+    variantKeyRef.current = variantKey;
+  }, []);
+
   const openWithVariant = useCallback(async (variantKey: string) => {
+    variantKeyRef.current = variantKey;
     setIsOpen(true);
     // Don't overwrite an in-flight load.
     if (isLoading) return;
@@ -391,7 +407,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   return (
     <CoachKairosContext.Provider
       value={{
-        isOpen, open, close, toggle, openWithVariant,
+        isOpen, open, close, toggle, openWithVariant, setVariantKey,
         messages, sendMessage, isStreaming, currentMode, isLoading,
         language, setLanguage, voiceEnabled, setVoiceEnabled,
         isSpeaking, stopSpeaking,

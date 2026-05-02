@@ -3,7 +3,7 @@
 import "./dashboard.css";
 
 import Link from "next/link";
-import { useCallback, type MouseEvent } from "react";
+import { useCallback, useEffect, type MouseEvent } from "react";
 import {
   Activity,
   ArrowLeftRight,
@@ -82,6 +82,14 @@ export default function AdaptiveDashboard({
   variantKey: VariantKey;
 }) {
   const coach = useCoachKairos();
+  // Register the variant with the coach context on mount + clear on unmount.
+  // This ensures every coach turn (including auto-greets that don't go
+  // through openWithVariant) gets the right per-grade guidance block in
+  // the system prompt.
+  useEffect(() => {
+    coach.setVariantKey(variantKey);
+    return () => coach.setVariantKey(null);
+  }, [coach, variantKey]);
   const handleCoachClick = useCallback(
     (e: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
       e.preventDefault();

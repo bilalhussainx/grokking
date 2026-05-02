@@ -140,6 +140,10 @@ export async function GET() {
     affordabilityValue:
       ((profile as { affordability_value?: string | null }).affordability_value as never) ?? null,
     needsFullAid: !!(profile as { needs_full_aid?: boolean | null }).needs_full_aid,
+    // Voice prompt is built once at session start before the variant is
+    // known. Leaving null is fine — the variant block is additive guidance,
+    // and grade context is still surfaced via ctx.grade.
+    variantKey: null,
   };
 
   // Voice mode prefers the user's chosen home_language over message-detection

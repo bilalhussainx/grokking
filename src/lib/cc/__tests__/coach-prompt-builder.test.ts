@@ -31,6 +31,7 @@ describe("buildSystemPrompt", () => {
     applicationSnapshot: null,
     affordabilityValue: null,
     needsFullAid: false,
+    variantKey: null,
   };
 
   it("includes personality guidelines", () => {
@@ -234,5 +235,79 @@ describe("buildSystemPrompt", () => {
     const prompt = buildSystemPrompt(ctx);
     expect(prompt).not.toContain("/profile/css-guide");
     expect(prompt).not.toContain("not the FAFSA");
+  });
+
+  // Per-variant guidance block — keeps the LLM inside the right step-by-step
+  // path on subsequent turns (the opening seed message in
+  // src/lib/cc/variant-walkthroughs.ts only frames turn 1).
+  it("g9 variant locks essays/SAT/applications away", () => {
+    const ctx: CoachContext = { ...baseContext, variantKey: "g9", grade: 9 };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("GRADE 9");
+    expect(prompt.toLowerCase()).toContain("course rigor");
+    expect(prompt.toLowerCase()).toContain("club");
+    expect(prompt.toLowerCase()).toContain("do not push");
+    expect(prompt.toLowerCase()).toContain("essays");
+  });
+
+  it("g10 variant pushes PSAT 10 + summer + depth", () => {
+    const ctx: CoachContext = { ...baseContext, variantKey: "g10", grade: 10 };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("GRADE 10");
+    expect(prompt).toContain("PSAT 10");
+    expect(prompt.toLowerCase()).toContain("summer");
+  });
+
+  it("junior variant blocks personal-statement drafting", () => {
+    const ctx: CoachContext = { ...baseContext, variantKey: "junior", grade: 11 };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("JUNIOR");
+    expect(prompt.toLowerCase()).toContain("brainstorm only");
+    expect(prompt.toLowerCase()).toContain("drafting starts senior fall");
+  });
+
+  it("senior_writing variant orders by deadline pressure", () => {
+    const ctx: CoachContext = { ...baseContext, variantKey: "senior_writing", grade: 12 };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("writing season");
+    expect(prompt.toLowerCase()).toContain("school list locked");
+    expect(prompt.toLowerCase()).toContain("supplements");
+  });
+
+  it("senior_post_submit variant guides demonstrated interest + interview prep", () => {
+    const ctx: CoachContext = { ...baseContext, variantKey: "senior_post_submit", grade: 12 };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("submitted");
+    expect(prompt.toLowerCase()).toContain("demonstrated interest");
+    expect(prompt.toLowerCase()).toContain("plan-b");
+  });
+
+  it("senior_decisions variant prioritizes aid math", () => {
+    const ctx: CoachContext = { ...baseContext, variantKey: "senior_decisions", grade: 12 };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("decisions in");
+    expect(prompt.toLowerCase()).toContain("aid letter");
+    expect(prompt.toLowerCase()).toContain("may 1");
+  });
+
+  it("transfer variant rejects first-year strategies", () => {
+    const ctx: CoachContext = { ...baseContext, variantKey: "transfer" };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).toContain("TRANSFER APPLICANT");
+    expect(prompt.toLowerCase()).toContain("why-transfer essay");
+    expect(prompt.toLowerCase()).toContain("professor");
+    expect(prompt.toLowerCase()).toContain("do not apply");
+  });
+
+  it("variantKey null produces no variant block", () => {
+    const ctx: CoachContext = { ...baseContext, variantKey: null };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).not.toContain("DASHBOARD VARIANT:");
+  });
+
+  it("variantKey 'unknown' produces no variant block", () => {
+    const ctx: CoachContext = { ...baseContext, variantKey: "unknown" };
+    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).not.toContain("DASHBOARD VARIANT:");
   });
 });
