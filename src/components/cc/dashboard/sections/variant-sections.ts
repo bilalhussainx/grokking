@@ -69,7 +69,13 @@ export const SECTION_ORDER: Record<VariantKey, SectionId[]> = {
     "PriorityBrief", "WhyTransferFeatured", "SchoolCardGrid",
     "PriorityWidgetRow", "WidgetStripFooter",
   ],
+  // unknown = user without resolved grade_level. They may still have data
+  // (schools, drafted PS, activities) — sections that return null on empty
+  // slice mean a brand-new user sees PriorityBrief + WidgetStripFooter,
+  // while a user stuck on unknown with data sees their schools/PS/activities
+  // surfaced too.
   unknown: [
-    "PriorityBrief", "WidgetStripFooter",
+    "PriorityBrief", "LoomingDeadlines", "SchoolCardGrid",
+    "PersonalStatementCard", "ActivitiesSnapshot", "WidgetStripFooter",
   ],
 };
