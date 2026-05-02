@@ -1,7 +1,7 @@
 # Unified Variant-Aware Dashboard — Design Spec
 
 **Date:** 2026-05-02
-**Status:** Approved by user (sections 1–3, 2026-05-02)
+**Status:** Implemented behind `?dashboard=v2` flag (2026-05-02). 22 atomic commits, 238/238 tests passing. Plan: `docs/superpowers/plans/2026-05-02-unified-dashboard-implementation.md`. Rollback: remove `?dashboard=v2` from URL — instant fallback to legacy handoff dashboard, no deploy required.
 **Successor to:** Phase 2 (handoff visual treatment) and Phase 2.5 (per-variant priority module content) — both rolled back as design choices in favor of this unified approach
 **Predecessor file kept verbatim:** `src/components/cc/dashboard/CounselorDashboard.tsx` — preserved untouched as a rollback target
 
