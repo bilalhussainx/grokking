@@ -15,6 +15,7 @@ import {
   Paperclip,
 } from "lucide-react";
 import VoiceQualityCheck from "@/components/voice/VoiceQualityCheck";
+import { useVoicePreference } from "@/hooks/useVoicePreference";
 
 interface Message {
   role: "user" | "assistant";
@@ -274,7 +275,10 @@ export default function BrainstormChat({
     return localStorage.getItem(STORAGE_KEY) || "en";
   });
   const [langMenuOpen, setLangMenuOpen] = useState(false);
-  const [voiceOn, setVoiceOn] = useState(false);
+  // Voice mode persists across phase changes (brainstorm → outline → draft →
+  // revise) and page reloads. Same pattern as CoachKairosContext's
+  // `voiceEnabled` — see useVoicePreference for the storage convention.
+  const [voiceOn, setVoiceOn] = useVoicePreference("essay-brainstorm-voice-on");
   const [voiceUnsupported, setVoiceUnsupported] = useState<string | null>(null);
   const [voiceInterim, setVoiceInterim] = useState("");
   const [rightTab, setRightTab] = useState<"tips" | "canvas">("tips");
