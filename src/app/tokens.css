@@ -1420,3 +1420,22 @@
   margin-top: 8px;
   letter-spacing: 0.04em;
 }
+
+/* Mobile-handoff keyframes — referenced by the mobile drawer (waitlist
+   pulse) and search-sheet input (caret blink). Defined here once so every
+   component that uses `animation: sb-pulse ...` works. */
+@keyframes sb-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(212, 175, 55, .6); }
+  70%  { box-shadow: 0 0 0 8px rgba(212, 175, 55, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+@keyframes sb-blink {
+  50% { opacity: 0; }
+}
+
+/* Mobile safe-area helpers. Used by BottomTabBar (bottom inset) and the
+   sticky MobileHeader (top inset) so iOS notch + home indicator don't
+   collide with chrome. */
+.mobile-safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
+.mobile-safe-top    { padding-top:    env(safe-area-inset-top, 0); }
