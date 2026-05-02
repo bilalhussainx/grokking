@@ -28,6 +28,7 @@ const baseData: DashboardData = {
   satReading: null,
   satMath: null,
   satTotal: null,
+  observations: {},
 };
 
 describe("selectVariant", () => {
@@ -307,5 +308,51 @@ describe("buildVariant — Phase 2.5 priority extras", () => {
       expect(tests.extra.reading).toBeNull();
       expect(tests.extra.math).toBeNull();
     }
+  });
+});
+
+// ─── Phase 2.7 — coach nudge callouts ───────────────────────────────────
+describe("buildVariant — Phase 2.7 coach nudges", () => {
+  it("attaches nudge to matching priority card by label", () => {
+    const v = buildVariant("senior_writing", {
+      ...baseData,
+      observations: {
+        "Personal statement": {
+          observation: "¶3 still tells, doesn't show. 15 min if you want to nail it.",
+          eyebrow: "COACH'S NUDGE",
+        },
+      },
+    });
+    const ps = v.priority.find((p) => p.label === "Personal statement");
+    expect(ps?.nudge).toBeDefined();
+    expect(ps?.nudge?.observation).toContain("tells, doesn't show");
+    expect(ps?.nudge?.eyebrow).toBe("COACH'S NUDGE");
+  });
+
+  it("does not attach nudge when observations map is empty", () => {
+    const v = buildVariant("senior_writing", { ...baseData, observations: {} });
+    const ps = v.priority.find((p) => p.label === "Personal statement");
+    expect(ps?.nudge).toBeUndefined();
+  });
+
+  it("ignores observations whose label has no matching card", () => {
+    const v = buildVariant("g9", {
+      ...baseData,
+      observations: { "Personal statement": { observation: "x", eyebrow: "y" } },
+    });
+    // g9 has no Personal statement card — observation should be silently dropped.
+    expect(v.priority.find((p) => p.label === "Personal statement")).toBeUndefined();
+  });
+
+  it("attaches multiple nudges across cards in the same variant", () => {
+    const v = buildVariant("junior", {
+      ...baseData,
+      observations: {
+        "Activities": { observation: "Teaching is your through-line.", eyebrow: "COACH NOTICED" },
+        "Test strategy": { observation: "Math has 100 points to find.", eyebrow: "COACH NOTICED" },
+      },
+    });
+    expect(v.priority.find((p) => p.label === "Activities")?.nudge).toBeDefined();
+    expect(v.priority.find((p) => p.label === "Test strategy")?.nudge).toBeDefined();
   });
 });

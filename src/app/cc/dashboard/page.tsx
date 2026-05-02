@@ -94,10 +94,10 @@ export default async function DashboardPage() {
     const full = await supabase
       .from("cc_student_profiles")
       .select(
-        "id, preferred_name, grade_level, is_transfer_student, is_international, language_picker_seen_at, transfer_current_school, transfer_target_term",
+        "id, preferred_name, grade_level, is_transfer_student, is_international, language_picker_seen_at, transfer_current_school, transfer_target_term, dashboard_observations_enabled",
       )
       .eq("user_id", user.id)
-      .maybeSingle<ProfileRow>();
+      .maybeSingle<ProfileRow & { dashboard_observations_enabled: boolean | null }>();
     if (full.error) throw full.error;
     profile = full.data;
   } catch {
@@ -258,6 +258,29 @@ export default async function DashboardPage() {
     | { sat_reading?: number | null; sat_math?: number | null; total_score?: number | null }
     | null;
 
+  // Phase 2.7 — fetch fresh AI observations unless the user has opted out.
+  // RLS enforces per-user scoping, but we also filter expires_at server-side
+  // so the client never gets stale rows.
+  const observationsEnabled =
+    (profile as { dashboard_observations_enabled?: boolean | null }).dashboard_observations_enabled !== false;
+  let observations: Record<string, { observation: string; eyebrow: string }> = {};
+  if (observationsEnabled) {
+    const obsRows = await safe<Array<{ module_label: string; observation: string; eyebrow: string }>>(
+      supabase
+        .from("cc_dashboard_observations")
+        .select("module_label, observation, eyebrow")
+        .eq("student_id", profile.id)
+        .gt("expires_at", new Date().toISOString()),
+    );
+    observations = (obsRows ?? []).reduce(
+      (acc, row) => {
+        acc[row.module_label] = { observation: row.observation, eyebrow: row.eyebrow };
+        return acc;
+      },
+      {} as Record<string, { observation: string; eyebrow: string }>,
+    );
+  }
+
   const data: DashboardData = {
     preferredName: profile.preferred_name ?? null,
     gradeLabel: profile.is_transfer_student
@@ -292,6 +315,7 @@ export default async function DashboardPage() {
     satReading: sat?.sat_reading ?? null,
     satMath: sat?.sat_math ?? null,
     satTotal: sat?.total_score ?? null,
+    observations,
   };
 
   const variantKey: VariantKey = selectVariant(

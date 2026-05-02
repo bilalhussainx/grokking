@@ -76,6 +76,13 @@ export type DashboardData = {
   satReading: number | null;
   satMath: number | null;
   satTotal: number | null;
+
+  // Phase 2.7 — fresh AI observations keyed by PriorityCard.label. Empty
+  // record when the user has opted out or no observations have been
+  // generated yet. The dashboard page fetches non-expired rows from
+  // cc_dashboard_observations and folds them into this map; buildPriority
+  // attaches them to each card via the .nudge field.
+  observations: Record<string, { observation: string; eyebrow: string }>;
 };
 
 export type Hero = {
@@ -133,6 +140,15 @@ export type PriorityExtra =
       target: number;
     };
 
+// Phase 2.7 — AI-generated observation rendered in a gold callout below the
+// widget content. Populated by buildVariant() from
+// DashboardData.observations, which the dashboard page fetches from
+// cc_dashboard_observations.
+export type CoachNudge = {
+  observation: string;
+  eyebrow: string; // typically "COACH NOTICED" or "COACH'S NUDGE"
+};
+
 export type PriorityCard = {
   href: string;
   icon: IconName;
@@ -146,6 +162,10 @@ export type PriorityCard = {
   // When present, PriorityModule renders the matching widget instead of
   // the simple value treatment.
   extra?: PriorityExtra;
+  // Optional coach observation rendered below the widget. Populated when
+  // observations are fresh in cc_dashboard_observations and the user has
+  // not opted out via dashboard_observations_enabled.
+  nudge?: CoachNudge;
 };
 
 export type Tile = {
@@ -760,10 +780,24 @@ function buildWidgets(key: VariantKey, d: DashboardData): WidgetItem[] {
   }
 }
 
+// Attach freshly generated AI observations to the matching priority cards.
+// Lookup is by card.label so adding a new module requires no extra wiring
+// here — the cron route keys observations on label too.
+function attachNudges(
+  cards: PriorityCard[],
+  observations: Record<string, { observation: string; eyebrow: string }>,
+): PriorityCard[] {
+  return cards.map((card) => {
+    const obs = observations[card.label];
+    if (!obs) return card;
+    return { ...card, nudge: obs };
+  });
+}
+
 export function buildVariant(key: VariantKey, d: DashboardData): Variant {
   return {
     hero: pickHero(key, d),
-    priority: buildPriority(key, d),
+    priority: attachNudges(buildPriority(key, d), d.observations),
     tiles: buildTiles(key),
     statusTone: statusToneFor(key),
     widgets: buildWidgets(key, d),

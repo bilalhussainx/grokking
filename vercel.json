@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/deadline-reminders",
       "schedule": "7 9 * * *"
+    },
+    {
+      "path": "/api/cron/generate-observations",
+      "schedule": "7 4 * * *"
     }
   ]
 }

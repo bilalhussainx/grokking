@@ -72,6 +72,9 @@ export default function PriorityModule({
       </div>
       <div className="flex-1 flex flex-col justify-center" style={{ gap: 6 }}>
         {renderContent(card, isUrgent)}
+        {card.nudge && (
+          <CoachNudge eyebrow={card.nudge.eyebrow} observation={card.nudge.observation} />
+        )}
       </div>
       <div
         className="flex items-center justify-between"
@@ -295,6 +298,46 @@ function DecisionCounts({
           </span>
         </div>
       ))}
+    </div>
+  );
+}
+
+// ─── CoachNudge — Phase 2.7 AI-generated observation in gold callout ────
+// Rendered below the main widget when card.nudge is populated. Voice +
+// styling lift directly from the handoff dashboard.jsx "Coach's nudge"
+// pattern — italic Cormorant Garamond inside a gold-tinted box with a
+// small uppercase eyebrow.
+function CoachNudge({ eyebrow, observation }: { eyebrow: string; observation: string }) {
+  return (
+    <div
+      style={{
+        padding: 10,
+        borderRadius: 8,
+        background: "rgba(212,175,55,.06)",
+        border: "1px solid rgba(212,175,55,.25)",
+        marginTop: 8,
+      }}
+    >
+      <div
+        className="uppercase"
+        style={{
+          fontSize: 11, color: "#d4a84b",
+          letterSpacing: ".10em",
+          marginBottom: 4,
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >
+        {eyebrow}
+      </div>
+      <div
+        style={{
+          fontSize: 12, color: "#f2ede3",
+          fontFamily: "'Cormorant Garamond', serif",
+          fontStyle: "italic", lineHeight: 1.4,
+        }}
+      >
+        &ldquo;{observation}&rdquo;
+      </div>
     </div>
   );
 }

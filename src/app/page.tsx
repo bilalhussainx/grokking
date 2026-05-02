@@ -19,8 +19,8 @@ import DashboardWalkthrough from "@/components/onboarding/DashboardWalkthrough";
 import KairosLogo from "@/components/ui/SamsaraLogo";
 import OnboardingChecklist from "@/components/cc/dashboard/OnboardingChecklist";
 import CounselorDashboard from "@/components/cc/dashboard/CounselorDashboard";
-import Sidebar, { type SidebarGrade } from "@/components/nav/Sidebar";
-import CommandPalette from "@/components/nav/CommandPalette";
+import AppShell from "@/components/nav/AppShell";
+import type { SidebarGrade } from "@/components/nav/Sidebar";
 
 
 const container = {
@@ -682,15 +682,5 @@ export default function HomePage() {
   // /landing redirect handled above; render `homeContent` naked while
   // the redirect resolves.
   if (!showAppShell) return homeContent;
-
-  return (
-    <div
-      className="kl-surface-app flex min-h-screen"
-      style={{ background: "var(--kl-app-bg, #000)" }}
-    >
-      <Sidebar grade={sidebarGrade} />
-      <main className="flex-1 min-w-0">{homeContent}</main>
-      <CommandPalette />
-    </div>
-  );
+  return <AppShell grade={sidebarGrade}>{homeContent}</AppShell>;
 }

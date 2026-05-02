@@ -10,8 +10,8 @@
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
-import Sidebar, { type SidebarGrade } from "@/components/nav/Sidebar";
-import CommandPalette from "@/components/nav/CommandPalette";
+import AppShell from "@/components/nav/AppShell";
+import type { SidebarGrade } from "@/components/nav/Sidebar";
 
 export const metadata = {
   title: "College Counselor — KairosLearn",
@@ -64,11 +64,5 @@ export default async function CCLayout({ children }: { children: ReactNode }) {
     grade = deriveVariant(data);
   }
 
-  return (
-    <div className="kl-surface-app flex min-h-screen" style={{ background: "var(--kl-app-bg, #000)" }}>
-      <Sidebar grade={grade} />
-      <main className="flex-1 min-w-0">{children}</main>
-      <CommandPalette />
-    </div>
-  );
+  return <AppShell grade={grade}>{children}</AppShell>;
 }
