@@ -3,6 +3,7 @@ import { chatOnce, type ChatMessage } from "@/lib/cc/openrouter";
 import { convertToUS4, formatRawGPADisplay, type GradingSystem } from "@/lib/cc/gpa-converter";
 import { ACTIVITY_RUBRIC_COMPACT, ACTIVITY_ACTION_VERBS } from "@/lib/cc/activity-exemplars";
 import { financialNeedFromAffordability, type AffordabilityValue } from "@/lib/cc/affordability";
+import type { CoachActions } from "@/lib/cc/coach-actions-block";
 
 const VALID_AFFORDABILITY: ReadonlySet<AffordabilityValue> = new Set<AffordabilityValue>([
   "zero", "under_10k", "10k_20k", "20k_30k", "30k_50k", "50k_plus",
@@ -10,7 +11,11 @@ const VALID_AFFORDABILITY: ReadonlySet<AffordabilityValue> = new Set<Affordabili
 
 type AdminSupabase = ReturnType<typeof createAdminSupabase>;
 
-export async function runCoachExtraction(studentId: string, mode: string): Promise<{ extracted: boolean; error?: string }> {
+export async function runCoachExtraction(
+  studentId: string,
+  mode: string,
+  actions?: CoachActions | null,
+): Promise<{ extracted: boolean; schoolsAddedCount?: number; error?: string }> {
   const supabase = createAdminSupabase();
 
   // Always pull cross-mode messages — the coach may mention schools, activities,
@@ -45,11 +50,13 @@ export async function runCoachExtraction(studentId: string, mode: string): Promi
     // The coach may claim "I've added X schools" in ANY mode (intake, general,
     // school-builder, etc.). Always try school extraction. The LLM returns {} if
     // nothing was approved, so this is a cheap no-op when irrelevant.
+    let schoolsAddedCount = 0;
     if (mode !== "academic") {
-      await extractAndSaveSchools(supabase, studentId, transcript);
+      const schoolsResult = await extractAndSaveSchools(supabase, studentId, transcript, actions);
+      schoolsAddedCount = schoolsResult.added;
       await extractActivities(supabase, studentId, transcript);
     }
-    return { extracted: true };
+    return { extracted: true, schoolsAddedCount };
   } catch (err) {
     console.error("[extract] Extraction error:", err);
     return { extracted: false, error: String(err) };
@@ -300,7 +307,25 @@ function lookupAlias(name: string): string {
   return name;
 }
 
-async function extractAndSaveSchools(supabase: AdminSupabase, studentId: string, transcript: string) {
+async function extractAndSaveSchools(
+  supabase: AdminSupabase,
+  studentId: string,
+  transcript: string,
+  actions?: CoachActions | null,
+): Promise<{ added: number }> {
+  // Fast path: the LLM emitted a canonical <<actions>> block (parsed by
+  // route.ts via parseActionsBlock and passed in). Trust the structured
+  // names and skip the LLM-based extraction pass entirely.
+  if (actions?.add_schools && actions.add_schools.length > 0) {
+    console.log(`[extract schools] fast path — actions block has ${actions.add_schools.length} schools:`, actions.add_schools.join(", "));
+    const items = actions.add_schools.map((name) => ({ name, band: "unknown" }));
+    return matchAndInsertSchools(supabase, studentId, items);
+  }
+
+  // Legacy path: text-extract from transcript via chatOnce. Kept for back-
+  // compat in case the LLM omits the actions block (older sessions, edge
+  // cases). Once the actions-block adoption is verified in prod, this path
+  // can be deleted.
   const extractionPrompt: ChatMessage[] = [
     {
       role: "system",
@@ -324,7 +349,7 @@ If no schools were approved, return { "schools": [] }`,
   const match = raw.match(/\{[\s\S]*\}/);
   if (!match) {
     console.warn("[extract schools] No JSON in LLM output");
-    return;
+    return { added: 0 };
   }
 
   let data: { schools?: { name: string; band: string }[] };
@@ -332,18 +357,26 @@ If no schools were approved, return { "schools": [] }`,
     data = JSON.parse(match[0]);
   } catch (err) {
     console.warn("[extract schools] JSON parse failed:", err);
-    return;
+    return { added: 0 };
   }
   const schools: { name: string; band: string }[] = data.schools || [];
   if (!schools.length) {
     console.log("[extract schools] LLM returned 0 schools");
-    return;
+    return { added: 0 };
   }
 
-  console.log(`[extract schools] LLM returned ${schools.length} schools:`, schools.map((s) => s.name).join(", "));
+  console.log(`[extract schools] legacy path — LLM returned ${schools.length} schools:`, schools.map((s) => s.name).join(", "));
+  return matchAndInsertSchools(supabase, studentId, schools);
+}
 
+async function matchAndInsertSchools(
+  supabase: AdminSupabase,
+  studentId: string,
+  schools: { name: string; band: string }[],
+): Promise<{ added: number }> {
   const matched: string[] = [];
   const unmatched: string[] = [];
+  let added = 0;
 
   for (const school of schools) {
     const needle = lookupAlias(school.name);
@@ -431,6 +464,7 @@ If no schools were approved, return { "schools": [] }`,
       unmatched.push(`${school.name} (insert error)`);
     } else {
       matched.push(`${school.name} → ${found.name}`);
+      added += 1;
     }
   }
 
@@ -444,6 +478,8 @@ If no schools were approved, return { "schools": [] }`,
     .eq("student_id", studentId);
   if (countErr) console.error("[extract schools] post-insert count failed:", countErr);
   else console.log(`[extract schools] cc_student_schools row count for student=${studentId}: ${count}`);
+
+  return { added };
 }
 
 const ACTIVITY_STOP_WORDS = new Set([

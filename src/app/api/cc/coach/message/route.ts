@@ -486,11 +486,9 @@ export async function POST(req: NextRequest) {
           // any mode (including school-browse while the user is on /schools).
           // runCoachExtraction short-circuits internally when there's nothing to save.
           console.log(`[coach/message] dispatching runCoachExtraction(${profileId}, ${mode}, actions=${actions ? "block" : "null"})`);
-          const result = await runCoachExtraction(profileId, mode);
-          // runCoachExtraction return shape may include schoolsAddedCount once
-          // Task 4 ships. Until then, infer from the result.extracted boolean.
+          const result = await runCoachExtraction(profileId, mode, actions);
           const r = result as { extracted: boolean; schoolsAddedCount?: number };
-          schoolsAddedCount = r.schoolsAddedCount ?? (r.extracted ? 0 : 0);
+          schoolsAddedCount = r.schoolsAddedCount ?? 0;
         } catch (err) {
           console.error("[coach/message] post-stream task failed:", err);
         }
