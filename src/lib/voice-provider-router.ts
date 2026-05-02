@@ -157,6 +157,17 @@ export interface RouterOptions {
 export function getVoiceProviderConfig(options: RouterOptions): VoiceProviderConfig {
   const { language, voiceId } = options;
 
+  // Hard-block voice for languages declared text-only in coach-languages.ts
+  // (e.g. Urdu — no working TTS provider). Previously this fell through to
+  // the English Deepgram default, which played accented English audio of a
+  // translated Urdu response — confusing UX. Throw with a known code so
+  // useCoachVoice can surface a "voice not yet supported for <lang>" banner.
+  if (!DEEPGRAM_TTS_LANGUAGES.includes(language) && !SARVAM_LANGUAGES.includes(language)) {
+    if (language && language !== "en" && language !== "unknown") {
+      throw new Error(`VOICE_UNSUPPORTED:${language}`);
+    }
+  }
+
   // Tier 1: Deepgram STT + TTS for supported languages
   if (DEEPGRAM_TTS_LANGUAGES.includes(language)) {
     return {
