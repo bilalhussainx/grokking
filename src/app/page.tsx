@@ -208,6 +208,22 @@ export default function HomePage() {
     }
   }, [loading, user, router]);
 
+  // Logged-in + onboarded users → /cc/dashboard (the canonical adaptive
+  // dashboard). The legacy CounselorDashboard at / is kept around for
+  // signed-in but not-yet-onboarded users so they can still see the
+  // intake-coach handoff. Preserve any non-intake query params on the way
+  // through; drop focus=intake since onboarded users shouldn't re-enter it.
+  useEffect(() => {
+    if (loading || !user) return;
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("focus") === "intake") return; // intake-coach mode stays here
+    const onboarded = localStorage.getItem("onboarding_complete") === "true";
+    if (!onboarded) return;
+    const search = params.toString();
+    router.replace(search ? `/cc/dashboard?${search}` : "/cc/dashboard");
+  }, [loading, user, router]);
+
   // Load user preferences — always sync from Supabase on login
   useEffect(() => {
     // Try localStorage first for instant load
@@ -305,7 +321,14 @@ export default function HomePage() {
   // Logged-out users redirect to /landing via the effect above and never
   // see the chrome.
   const sidebarGrade: SidebarGrade = (walkthroughVariant as SidebarGrade | undefined) ?? "unknown";
-  const showAppShell = Boolean(user && !loading);
+  // Hide app chrome when the URL marks intake-coach mode — the coach drawer
+  // is the focal point of that flow; competing with a nav rail dilutes it.
+  // Returning users without onboarding_completed land here on every visit
+  // until they finish, so this guard fires for them too.
+  const isIntakeCoachMode =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("focus") === "intake";
+  const showAppShell = Boolean(user && !loading) && !isIntakeCoachMode;
 
   const homeContent = (
     <div className="min-h-screen bg-[var(--background)]">

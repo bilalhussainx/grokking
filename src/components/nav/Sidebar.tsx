@@ -338,7 +338,20 @@ function NavSectionRender({
               Application tools appear when you&apos;re ready to apply.
             </div>
           )
-        : items.map((it) => {
+        : items.length === 0
+          ? mode === "expanded" && (
+              <div
+                className="italic"
+                style={{
+                  margin: "2px 10px 0", padding: "8px 10px",
+                  fontSize: 11, color: "rgba(212,175,55,.55)", lineHeight: 1.5,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                Finish the intake to unlock {section.name.toLowerCase()} tools.
+              </div>
+            )
+          : items.map((it) => {
             const label = (grade === "transfer" && it.transferLabel) ? it.transferLabel : it.label;
             const active = it.drawer ? false : isActive(it.href);
             return (
