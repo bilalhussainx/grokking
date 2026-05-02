@@ -522,16 +522,17 @@ export default function BrainstormChat({
   }, []);
 
   const handleVoiceToggle = () => {
-    setVoiceOn((prev) => {
-      const next = !prev;
-      if (next) {
-        const ok = startRecognition();
-        if (!ok) return false;
-      } else {
-        stopRecognition();
+    const next = !voiceOn;
+    if (next) {
+      const ok = startRecognition();
+      if (!ok) {
+        setVoiceOn(false);
+        return;
       }
-      return next;
-    });
+    } else {
+      stopRecognition();
+    }
+    setVoiceOn(next);
   };
 
   const phaseExchangesLabel = `${userTurnCount} exchange${userTurnCount === 1 ? "" : "s"}`;
