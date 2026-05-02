@@ -52,6 +52,11 @@ export default function SchoolsPage() {
   const [needBlindIntl, setNeedBlindIntl] = useState(false);
   const [meetsFullNeedIntl, setMeetsFullNeedIntl] = useState(false);
   const [cssProfileRequired, setCssProfileRequired] = useState(false);
+  // Auto-expand the international-aid filter set for international students
+  // — AUD-P4-003 caught that Hassan (intl) couldn't find these filters
+  // because they were collapsed behind a <details> accordion. Opening by
+  // default for is_international=true users surfaces them at first paint.
+  const [isInternational, setIsInternational] = useState(false);
 
   const [loadError, setLoadError] = useState<string | null>(null);
   const [showCompare, setShowCompare] = useState(false);
@@ -77,6 +82,15 @@ export default function SchoolsPage() {
   useEffect(() => {
     loadMySchools();
   }, [loadMySchools]);
+
+  // Pull is_international from the profile so we can default-expand the
+  // international-aid filters for those users.
+  useEffect(() => {
+    fetch("/api/cc/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setIsInternational(Boolean(d?.profile?.is_international)))
+      .catch(() => {});
+  }, []);
 
   // Refetch when Coach Kairos completes a message. The coach extracts school
   // mentions ("I've added Stanford, MIT, …") into cc_student_schools on the
@@ -339,7 +353,10 @@ export default function SchoolsPage() {
             </select>
           </div>
 
-          <details className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden">
+          <details
+            open={isInternational}
+            className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden"
+          >
             <summary className="cursor-pointer px-4 py-3 text-[11px] uppercase tracking-wider text-white/60 flex items-center gap-2 hover:bg-white/[0.02]">
               <Globe className="w-3.5 h-3.5 text-[#D4AF37]" />
               Financial aid for international students
