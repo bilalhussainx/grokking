@@ -66,6 +66,14 @@ export type Hero = {
   ctaLabel: string;
   ctaHref: string;
   urgent?: boolean;
+  // Long-form caption rendered below the body — handoff dashboard.jsx
+  // calls this `detail`. Optional; falls back to omitting the line.
+  detail?: string;
+  // Drives the hero's visual treatment in HeroCard. "rose" is for
+  // urgent-deadline overrides only (e.g. "MIT EA in 8 days").
+  ctaTone?: "gold" | "rose";
+  // Right-side mono "Nd / until X" pill for urgent heroes.
+  urgency?: { value: string; label: string };
 };
 
 export type PriorityCard = {
@@ -88,10 +96,29 @@ export type Tile = {
   locked?: boolean;
 };
 
+// Status pill color tone — keys into the same vocabulary the handoff uses
+// (tokens.json → dashboard.statusToneByGrade). "leaf" is a soft green for
+// foundational variants (g9, senior_post_submit), "sky" for transitions
+// (g10, transfer), "gold" for the active senior + junior runway, "rose" is
+// reserved for urgent overrides — currently unused at the variant level
+// because urgency drives ctaTone on the hero instead.
+export type StatusTone = "gold" | "leaf" | "sky" | "rose";
+
+export type WidgetItem = {
+  n: string;          // mono number, can be "47" or "$28K" or "May 1"
+  label: string;      // uppercase eyebrow under the number
+  tone?: "gold";      // primary widget gets gold; others stay white
+  delta?: string;     // optional "+12" / "-3%" — green if leading +, red otherwise
+};
+
 export type Variant = {
   hero: Hero;
   priority: PriorityCard[];
   tiles: Tile[];
+  // New visual fields for the handoff Phase 2 refactor. Optional so
+  // callers can ignore them; the new dashboard reads them when present.
+  statusTone?: StatusTone;
+  widgets?: WidgetItem[];
 };
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -108,6 +135,11 @@ function pickHero(key: VariantKey, d: DashboardData): Hero {
       ctaLabel: "Open Applications →",
       ctaHref: "/applications",
       urgent: true,
+      ctaTone: "rose",
+      urgency: {
+        value: `${d.nextDeadline.days}d`,
+        label: `until ${d.nextDeadline.schoolName}`,
+      },
     };
   }
   if (d.hasWaitlistedSchool && d.waitlistSchoolName) {
@@ -545,11 +577,100 @@ function buildTiles(key: VariantKey): Tile[] {
   }
 }
 
+// Per-variant status pill tone — matches handoff tokens.json
+// dashboard.statusToneByGrade. Senior writing/decisions split by phase to
+// keep the visual distinction the design calls for.
+function statusToneFor(key: VariantKey): StatusTone {
+  switch (key) {
+    case "g9": return "leaf";
+    case "g10": return "sky";
+    case "junior": return "gold";
+    case "senior_writing": return "gold";
+    case "senior_post_submit": return "leaf";
+    case "senior_decisions": return "leaf";
+    case "transfer": return "sky";
+    default: return "gold";
+  }
+}
+
+// Per-variant widget strip — 4 numeric widgets at the bottom of the
+// dashboard. Source values from DashboardData where we have them; fall back
+// to the same sample copy from handoff/dashboard.jsx for fields we don't
+// track yet (XP, day streak — gamification is partial today).
+function buildWidgets(key: VariantKey, d: DashboardData): WidgetItem[] {
+  switch (key) {
+    case "g9":
+      return [
+        { n: "—", label: "XP today", tone: "gold" },
+        { n: "—", label: "Day streak" },
+        { n: String(d.activitiesCount), label: "Courses logged" },
+        { n: String(d.activitiesCount), label: "Activities" },
+      ];
+    case "g10":
+      return [
+        { n: "1,420", label: "PSAT target", tone: "gold" },
+        { n: "—w", label: "Until PSAT" },
+        { n: String(d.activitiesCount), label: "Courses logged" },
+        { n: String(d.activitiesCount), label: "Activities" },
+      ];
+    case "junior":
+      return [
+        { n: String(Math.max(0, d.daysToCommonApp)), label: "Days to Common App", tone: "gold" },
+        { n: "—", label: "Day streak" },
+        { n: String(d.schoolCount), label: "Schools listed" },
+        { n: String(d.activitiesCount), label: "Activities" },
+      ];
+    case "senior_writing":
+      return [
+        { n: String(d.schoolCount), label: "Apps in flight", tone: "gold" },
+        { n: String(d.essaysSubmittedCount), label: "Submitted" },
+        { n: "—", label: "Day streak" },
+        {
+          n: d.essaysTotal > 0
+            ? `${Math.round((d.essaysSubmittedCount / d.essaysTotal) * 100)}%`
+            : "0%",
+          label: "Cycle complete",
+        },
+      ];
+    case "senior_post_submit":
+      return [
+        { n: String(d.schoolCount), label: "Apps in flight", tone: "gold" },
+        { n: String(d.essaysSubmittedCount), label: "Submitted" },
+        { n: "—", label: "Decisions" },
+        { n: "May 1", label: "Commit by" },
+      ];
+    case "senior_decisions":
+      return [
+        { n: "—", label: "Admits", tone: "gold" },
+        { n: "—", label: "Pending" },
+        { n: "—", label: "Best aid offer" },
+        { n: "May 1", label: "Commit by" },
+      ];
+    case "transfer":
+      return [
+        { n: "—", label: "Days to deadline", tone: "gold" },
+        { n: "—", label: "Essay words" },
+        { n: String(d.schoolCount), label: "Schools listed" },
+        { n: "—", label: "Credits transferable" },
+      ];
+    case "unknown":
+    default:
+      return [
+        { n: String(d.schoolCount), label: "Schools", tone: "gold" },
+        { n: String(d.activitiesCount), label: "Activities" },
+        { n: String(d.essaysSubmittedCount), label: "Essays sent" },
+        { n: "—", label: "Streak" },
+      ];
+  }
+}
+
 export function buildVariant(key: VariantKey, d: DashboardData): Variant {
   return {
     hero: pickHero(key, d),
     priority: buildPriority(key, d),
     tiles: buildTiles(key),
+    statusTone: statusToneFor(key),
+    widgets: buildWidgets(key, d),
   };
 }
 

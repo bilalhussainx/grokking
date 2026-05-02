@@ -164,3 +164,52 @@ describe("buildVariant — priority cards", () => {
     expect(apps?.urgent).toBe(true);
   });
 });
+
+// ─── Phase 2 fields (handoff visual treatment) ───────────────────────────
+describe("buildVariant — handoff Phase 2 fields", () => {
+  it("populates statusTone per variant", () => {
+    expect(buildVariant("g9", baseData).statusTone).toBe("leaf");
+    expect(buildVariant("g10", baseData).statusTone).toBe("sky");
+    expect(buildVariant("junior", baseData).statusTone).toBe("gold");
+    expect(buildVariant("senior_writing", baseData).statusTone).toBe("gold");
+    expect(buildVariant("senior_post_submit", baseData).statusTone).toBe("leaf");
+    expect(buildVariant("senior_decisions", baseData).statusTone).toBe("leaf");
+    expect(buildVariant("transfer", baseData).statusTone).toBe("sky");
+  });
+
+  it("urgent deadline hero uses rose tone + urgency block", () => {
+    const v = buildVariant("senior_writing", {
+      ...baseData,
+      urgentDeadlineCount: 2,
+      nextDeadline: { schoolName: "MIT", key: "EA", date: "2026-11-01", days: 8 },
+    });
+    expect(v.hero.ctaTone).toBe("rose");
+    expect(v.hero.urgency).toBeTruthy();
+    expect(v.hero.urgency?.value).toBe("8d");
+    expect(v.hero.urgency?.label).toContain("MIT");
+  });
+
+  it("non-urgent hero leaves ctaTone undefined (defaults to gold)", () => {
+    const v = buildVariant("junior", baseData);
+    expect(v.hero.ctaTone).toBeUndefined();
+    expect(v.hero.urgency).toBeUndefined();
+  });
+
+  it("populates 4 widgets per variant", () => {
+    for (const key of [
+      "g9", "g10", "junior",
+      "senior_writing", "senior_post_submit", "senior_decisions",
+      "transfer",
+    ] as const) {
+      const widgets = buildVariant(key, baseData).widgets;
+      expect(widgets, `missing widgets for ${key}`).toBeDefined();
+      expect(widgets?.length, `wrong widget count for ${key}`).toBe(4);
+    }
+  });
+
+  it("first widget per variant is the gold-tinted primary metric", () => {
+    expect(buildVariant("g9", baseData).widgets?.[0].tone).toBe("gold");
+    expect(buildVariant("junior", baseData).widgets?.[0].tone).toBe("gold");
+    expect(buildVariant("senior_writing", baseData).widgets?.[0].tone).toBe("gold");
+  });
+});
