@@ -10,40 +10,73 @@ interface Step {
   body: string;
 }
 
-const STEPS: Step[] = [
-  {
-    target: "coach",
-    title: "Your AI-Coach",
-    body: "Your first stop. Kairos helps you build your school list and guides the rest of your application.",
-  },
-  {
-    target: "schools",
-    title: "School Builder",
-    body: "Add reach, match, and safety schools — with Coach's help or browse manually.",
-  },
-  {
-    target: "activities",
-    title: "Activities",
-    body: "Log extracurriculars. Coach optimizes them for maximum impact.",
-  },
-  {
-    target: "essays",
-    title: "Essays",
-    body: "Draft your personal statement and supplements with live AI feedback.",
-  },
-  {
-    target: "interview",
-    title: "Interview Prep",
-    body: "Practice mock admissions interviews by voice — in 7+ languages.",
-  },
-  {
-    target: "share",
-    title: "Share",
-    body: "Share progress with your human counselor or parents.",
-  },
+// Variant-specific walkthrough step lists. AUD-P1-004 (OpenClaw 2026-05-02)
+// flagged that the original list pushed grade-9 students through senior-only
+// surfaces (Draft PS, Essay Studio, Activities Optimizer) which directly
+// contradicted the locked tiles on the dashboard ("Unlocks junior year").
+//
+// Per-variant: only steps whose targets are actually surfaced as primary
+// CTAs on that variant's dashboard. Non-rendered targets get skipped at
+// measure-time anyway, but listing only what's relevant keeps the count
+// honest and lets us tailor copy per audience.
+
+const SENIOR_STEPS: Step[] = [
+  { target: "coach", title: "Your AI-Coach", body: "Your first stop. Coach Kairos helps you build your school list and guides the rest of your application." },
+  { target: "schools", title: "School Builder", body: "Add reach, match, and safety schools — with Coach's help or browse manually." },
+  { target: "activities", title: "Activities", body: "Log extracurriculars. Coach optimizes them for maximum impact." },
+  { target: "essays", title: "Essays", body: "Draft your personal statement and supplements with live AI feedback." },
+  { target: "interview", title: "Interview Prep", body: "Practice mock admissions interviews by voice — in 7+ languages." },
+  { target: "share", title: "Share", body: "Share progress with your human counselor or parents." },
 ];
 
-const STORAGE_KEY = "dashboard_walkthrough_seen_v1";
+const G9_STEPS: Step[] = [
+  { target: "coach", title: "Coach Kairos", body: "Your guide for the next four years. Ask anything — Coach calibrates to grade 9." },
+  { target: "courses", title: "Course rigor", body: "Log the courses you're taking. Pick one harder course for next semester." },
+  { target: "summer", title: "Plan your summer", body: "One real summer experience beats three filler ones. Start the plan now." },
+  { target: "majors", title: "Major exploration", body: "Low-stakes interest quiz. No pressure — just a thread to pull on." },
+];
+
+const G10_STEPS: Step[] = [
+  { target: "coach", title: "Coach Kairos", body: "Your guide for grade 10. Coach knows the PSAT-10-then-summer rhythm." },
+  { target: "test", title: "Test strategy", body: "PSAT 10 in October is the diagnostic that sets up junior-year SAT/ACT." },
+  { target: "summer", title: "Summer experience", body: "One 'show, don't tell' thing — research, real job, structured program." },
+  { target: "courses", title: "Course rigor", body: "Add depth in one area. Sophomore year is when admissions starts looking." },
+];
+
+const JUNIOR_STEPS: Step[] = [
+  { target: "coach", title: "Coach Kairos", body: "Junior year is the runway. Coach helps you sequence everything." },
+  { target: "schools", title: "School list draft", body: "10-15 schools, balanced reach / match / safety. The spine of senior year." },
+  { target: "test", title: "Diagnostic test", body: "Real SAT or ACT this fall. Knowing your fit by November = spring to lift the score." },
+  { target: "activities", title: "Activities", body: "Lock the list. Run the narrative diagnosis at 3+ activities." },
+  { target: "essays", title: "Brainstorm only", body: "Spring brainstorming for the personal statement. Drafting unlocks senior fall." },
+];
+
+const TRANSFER_STEPS: Step[] = [
+  { target: "coach", title: "Coach Kairos", body: "Transfer admissions is a different game — Coach speaks TAG, IGETC, articulation." },
+  { target: "transfer-essay", title: "Why-transfer essay", body: "The whole file rests on this one. Five honest lines beats a vague paragraph." },
+  { target: "schools", title: "Transfer school list", body: "Transfer rates differ from first-year — sometimes a lot. Note that on each school." },
+  { target: "share", title: "Share", body: "Share progress with your community college counselor." },
+];
+
+function stepsForVariant(variantKey?: string): Step[] {
+  switch (variantKey) {
+    case "g9": return G9_STEPS;
+    case "g10": return G10_STEPS;
+    case "junior": return JUNIOR_STEPS;
+    case "transfer": return TRANSFER_STEPS;
+    case "senior_writing":
+    case "senior_post_submit":
+    case "senior_decisions":
+    default:
+      return SENIOR_STEPS;
+  }
+}
+
+// Bump the storage key when the step list materially changes per variant
+// (v2 adds variant-aware step lists; users who saw v1 should re-see v2 if
+// they're on a non-senior variant since the v1 walkthrough was wrong for
+// their grade).
+const STORAGE_KEY = "dashboard_walkthrough_seen_v2";
 
 interface Rect {
   top: number;
@@ -52,10 +85,15 @@ interface Rect {
   height: number;
 }
 
-export default function DashboardWalkthrough() {
+export default function DashboardWalkthrough({
+  variantKey,
+}: {
+  variantKey?: string;
+}) {
   const [visible, setVisible] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
+  const steps = stepsForVariant(variantKey);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -65,7 +103,7 @@ export default function DashboardWalkthrough() {
     return () => clearTimeout(timer);
   }, []);
 
-  const step = STEPS[stepIndex];
+  const step = steps[stepIndex];
 
   useLayoutEffect(() => {
     if (!visible) return;
@@ -98,7 +136,7 @@ export default function DashboardWalkthrough() {
   }
 
   function next() {
-    if (stepIndex >= STEPS.length - 1) {
+    if (stepIndex >= steps.length - 1) {
       finish();
     } else {
       setStepIndex((i) => i + 1);
@@ -151,7 +189,7 @@ export default function DashboardWalkthrough() {
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-[#D4AF37]">
-                    {stepIndex + 1} / {STEPS.length}
+                    {stepIndex + 1} / {steps.length}
                   </span>
                 </div>
                 <button
@@ -175,8 +213,8 @@ export default function DashboardWalkthrough() {
                   onClick={next}
                   className="px-3 py-1.5 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#F4D03F] transition-colors flex items-center gap-1"
                 >
-                  {stepIndex >= STEPS.length - 1 ? "Got it" : "Next"}
-                  {stepIndex < STEPS.length - 1 && <ChevronRight className="w-3.5 h-3.5" />}
+                  {stepIndex >= steps.length - 1 ? "Got it" : "Next"}
+                  {stepIndex < steps.length - 1 && <ChevronRight className="w-3.5 h-3.5" />}
                 </button>
               </div>
             </div>

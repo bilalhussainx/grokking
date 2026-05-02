@@ -184,6 +184,10 @@ export default function HomePage() {
   const [userInterests, setUserInterests] = useState<string[]>([]);
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
   const [dashboardLoading, setDashboardLoading] = useState(true);
+  // Variant key for the walkthrough — derived from grade_level + transfer
+  // flag so grade-9 students don't see "Draft your personal statement" steps.
+  // AUD-P1-004 (OpenClaw 2026-05-02).
+  const [walkthroughVariant, setWalkthroughVariant] = useState<string | undefined>(undefined);
   const courseProgress = useCourseProgress();
 
   // Get ALL courses user has started (progress > 0, not 100%), sorted by progress desc
@@ -211,6 +215,21 @@ export default function HomePage() {
     }
 
     if (!user) return;
+
+    // Fetch grade + transfer flag to pick the walkthrough step list. Cheap
+    // single-row read; falls back to undefined (= senior copy) on failure.
+    fetch("/api/cc/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const grade = d?.profile?.grade_level as number | null;
+        const isTransfer = d?.profile?.is_transfer_student as boolean | null;
+        if (isTransfer) setWalkthroughVariant("transfer");
+        else if (grade === 9) setWalkthroughVariant("g9");
+        else if (grade === 10) setWalkthroughVariant("g10");
+        else if (grade === 11) setWalkthroughVariant("junior");
+        else if (grade === 12) setWalkthroughVariant("senior_writing");
+      })
+      .catch(() => {});
 
     // Always fetch from Supabase to restore preferences (handles new devices/browsers)
     fetch('/api/user/preferences')
@@ -346,7 +365,7 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {user && <DashboardWalkthrough />}
+        {user && <DashboardWalkthrough variantKey={walkthroughVariant} />}
 
 
         {/* Continue where you left off — shown above missions when relevant.
