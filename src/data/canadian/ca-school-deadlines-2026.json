@@ -1,0 +1,74 @@
+{
+  "University of Toronto": {
+    "deadline_application": "2027-01-15",
+    "deadline_supplementary": "2027-02-01",
+    "portal_url": "https://future.utoronto.ca/apply/",
+    "portal_login_note": "Apply via OUAC 101 (current Ontario HS students) or 105 (others); supplementary essays for some faculties."
+  },
+  "University of British Columbia": {
+    "deadline_application": "2027-01-15",
+    "deadline_supplementary": null,
+    "portal_url": "https://you.ubc.ca/applying-ubc/",
+    "portal_login_note": "Direct application; Personal Profile (5 short answers) submitted within the application."
+  },
+  "McGill University": {
+    "deadline_application": "2027-01-15",
+    "deadline_supplementary": null,
+    "portal_url": "https://mcgill.ca/undergraduate-admissions/apply",
+    "portal_login_note": "Direct uApply; minimal supplements. Faculty-by-faculty admission."
+  },
+  "University of Waterloo": {
+    "deadline_application": "2027-01-15",
+    "deadline_supplementary": "2027-02-01",
+    "portal_url": "https://uwaterloo.ca/future-students/admissions/",
+    "portal_login_note": "Apply via OUAC 101/105. Engineering, math, and CS applicants MUST complete the Admission Information Form (AIF) — heavily weighted in the decision."
+  },
+  "Queen's University": {
+    "deadline_application": "2027-01-15",
+    "deadline_supplementary": "2027-02-15",
+    "portal_url": "https://www.queensu.ca/admission/",
+    "portal_login_note": "OUAC 101/105 + Personal Statement of Experience (PSE) for most programs."
+  },
+  "Western University": {
+    "deadline_application": "2027-01-15",
+    "deadline_supplementary": null,
+    "portal_url": "https://welcome.uwo.ca/admissions/",
+    "portal_login_note": "OUAC 101/105. Most programs grades-only; some scholarship apps separate."
+  },
+  "McMaster University": {
+    "deadline_application": "2027-01-15",
+    "deadline_supplementary": "2027-02-01",
+    "portal_url": "https://future.mcmaster.ca",
+    "portal_login_note": "OUAC 101/105. Health Sciences and Arts & Science programs require supplementary applications."
+  },
+  "University of Alberta": {
+    "deadline_application": "2027-03-01",
+    "deadline_supplementary": null,
+    "portal_url": "https://www.ualberta.ca/admissions/",
+    "portal_login_note": "ApplyAlberta provincial portal for Alberta universities."
+  },
+  "University of Ottawa": {
+    "deadline_application": "2027-04-01",
+    "deadline_supplementary": null,
+    "portal_url": "https://www.uottawa.ca/undergraduate-admissions/",
+    "portal_login_note": "OUAC 101/105. April 1 is the late deadline; earlier applications get earlier offers."
+  },
+  "Simon Fraser University": {
+    "deadline_application": "2027-01-31",
+    "deadline_supplementary": null,
+    "portal_url": "https://www.sfu.ca/admission.html",
+    "portal_login_note": "Direct SFU application portal."
+  },
+  "Toronto Metropolitan University": {
+    "deadline_application": "2027-02-01",
+    "deadline_supplementary": "2027-02-15",
+    "portal_url": "https://www.torontomu.ca/admissions/",
+    "portal_login_note": "OUAC 101/105. Some programs (RTA, Image Arts, Fashion) require supplementary portfolio."
+  },
+  "York University": {
+    "deadline_application": "2027-02-01",
+    "deadline_supplementary": null,
+    "portal_url": "https://futurestudents.yorku.ca",
+    "portal_login_note": "OUAC 101/105. Most programs grades-driven."
+  }
+}

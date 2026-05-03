@@ -1,0 +1,30 @@
+{
+  "ON": {
+    "name": "OSAP — Ontario Student Assistance Program",
+    "url": "https://www.ontario.ca/page/osap-ontario-student-assistance-program",
+    "eligibility": "Canadian citizens, permanent residents, protected persons. Resident in Ontario for ≥12 consecutive months immediately before starting full-time post-secondary studies (with exceptions). Need-based grants + loans.",
+    "deadline_note": "Apply once you've accepted an offer — typically June for September start.",
+    "international_eligibility": "International students NOT eligible. Limited international scholarships available at each university directly."
+  },
+  "BC": {
+    "name": "StudentAidBC",
+    "url": "https://studentaidbc.ca",
+    "eligibility": "Canadian citizens, permanent residents, protected persons. BC residency required. Need-based grants + loans.",
+    "deadline_note": "Apply once you have a confirmed offer — typically May/June for September start.",
+    "international_eligibility": "International students NOT eligible."
+  },
+  "AB": {
+    "name": "Alberta Student Aid",
+    "url": "https://studentaid.alberta.ca",
+    "eligibility": "Alberta residents who are Canadian citizens, permanent residents, or protected persons.",
+    "deadline_note": "Apply 6-8 weeks before classes start.",
+    "international_eligibility": "International students NOT eligible."
+  },
+  "QC": {
+    "name": "Aide financière aux études (AFE) — Quebec",
+    "url": "https://www.quebec.ca/en/education/student-financial-assistance",
+    "eligibility": "Quebec residents. Loans + bursaries.",
+    "deadline_note": "Apply once admitted; processing takes 4-6 weeks.",
+    "international_eligibility": "International students NOT eligible. Quebec has lower domestic tuition for residents — international tuition is significantly higher."
+  }
+}

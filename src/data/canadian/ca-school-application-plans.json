@@ -1,0 +1,14 @@
+{
+  "University of Toronto":            { "plans": ["RD"],     "is_public": true, "need_aware_for_internationals": true },
+  "University of British Columbia":   { "plans": ["RD"],     "is_public": true, "need_aware_for_internationals": true },
+  "McGill University":                { "plans": ["RD"],     "is_public": true, "need_aware_for_internationals": true },
+  "University of Waterloo":           { "plans": ["rolling"],"is_public": true, "need_aware_for_internationals": true },
+  "Queen's University":               { "plans": ["RD"],     "is_public": true, "need_aware_for_internationals": true },
+  "Western University":               { "plans": ["RD"],     "is_public": true, "need_aware_for_internationals": true },
+  "McMaster University":              { "plans": ["RD"],     "is_public": true, "need_aware_for_internationals": true },
+  "University of Alberta":            { "plans": ["RD"],     "is_public": true, "need_aware_for_internationals": true },
+  "University of Ottawa":             { "plans": ["rolling"],"is_public": true, "need_aware_for_internationals": true },
+  "Simon Fraser University":          { "plans": ["rolling"],"is_public": true, "need_aware_for_internationals": true },
+  "Toronto Metropolitan University":  { "plans": ["RD"],     "is_public": true, "need_aware_for_internationals": true },
+  "York University":                  { "plans": ["RD"],     "is_public": true, "need_aware_for_internationals": true }
+}

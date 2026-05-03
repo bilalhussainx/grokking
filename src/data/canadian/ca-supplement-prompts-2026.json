@@ -1,0 +1,36 @@
+[
+  {
+    "school_name": "University of British Columbia",
+    "prompts": [
+      { "type": "personal", "text": "Tell us about who you are. How would your family, friends, and/or members of your community describe you? If possible, please share with us the role(s) of important culture, values, and/or beliefs in shaping who you are.", "word_limit": 250, "required": true },
+      { "type": "personal", "text": "What is important to you? And why?", "word_limit": 250, "required": true },
+      { "type": "challenge", "text": "Tell us about a difficult or significant situation. What did you do? How does it relate to who you are?", "word_limit": 250, "required": true },
+      { "type": "community", "text": "Describe what you have learned from a meaningful experience involving culture, values, and/or beliefs.", "word_limit": 250, "required": true },
+      { "type": "personal", "text": "Explain what you like to learn outside the classroom and how you do it.", "word_limit": 250, "required": true }
+    ]
+  },
+  {
+    "school_name": "University of Waterloo",
+    "prompts": [
+      { "type": "intellectual", "text": "Why have you chosen this particular program? What experiences have led to your interest? (Admission Information Form, engineering/math/CS applicants — heavily weighted)", "word_limit": 200, "required": true },
+      { "type": "challenge", "text": "Describe an example of overcoming a significant challenge. What did you learn?", "word_limit": 200, "required": true },
+      { "type": "personal", "text": "Tell us about your extracurricular and volunteer activities. Which were most significant and why?", "word_limit": 200, "required": true },
+      { "type": "intellectual", "text": "Discuss your reasons for choosing your top program choice. What do you hope to contribute and gain?", "word_limit": 200, "required": true }
+    ]
+  },
+  {
+    "school_name": "Queen's University",
+    "prompts": [
+      { "type": "personal", "text": "Personal Statement of Experience (PSE): Reflect on your most significant accomplishments and experiences inside and outside the classroom. How have they prepared you for university?", "word_limit": 300, "required": true },
+      { "type": "intellectual", "text": "Why Queen's? What about Queen's specifically appeals to you and your goals?", "word_limit": 200, "required": true }
+    ]
+  },
+  {
+    "school_name": "University of Toronto",
+    "prompts": [
+      { "type": "intellectual", "text": "Why do you want to study at U of T (and at this specific program)? What experiences have led you to this choice? (Required for Engineering, Rotman Commerce, Architecture, and some other programs)", "word_limit": 250, "required": true },
+      { "type": "personal", "text": "Tell us about activities or experiences that have shaped you outside the classroom.", "word_limit": 250, "required": true },
+      { "type": "challenge", "text": "Describe a significant achievement and what it took to get there.", "word_limit": 250, "required": false }
+    ]
+  }
+]
