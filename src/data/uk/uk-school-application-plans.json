@@ -1,0 +1,14 @@
+{
+  "University of Oxford":              { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true },
+  "University of Cambridge":           { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true },
+  "Imperial College London":           { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true },
+  "London School of Economics and Political Science": { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true },
+  "University College London":         { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true },
+  "King's College London":             { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true },
+  "University of Edinburgh":           { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true },
+  "University of Manchester":          { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true },
+  "University of Bristol":             { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true },
+  "University of Warwick":             { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true },
+  "Durham University":                 { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true },
+  "University of St Andrews":          { "plans": ["UCAS"], "is_public": true, "need_aware_for_internationals": true }
+}

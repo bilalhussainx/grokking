@@ -1,0 +1,112 @@
+[
+  {
+    "name": "Saïd Foundation Scholarships",
+    "url": "https://www.saidfoundation.org/scholarships",
+    "schools": ["University of Oxford", "University of Cambridge", "Imperial College London", "London School of Economics and Political Science", "University College London", "King's College London"],
+    "level": "undergraduate",
+    "coverage": "Full tuition + living + flights",
+    "eligibility": "Citizens of Egypt, Iraq, Jordan, Lebanon, Pakistan, Palestine, Syria. Strong academic record. Demonstrated leadership / community impact. Returning to home country after studies.",
+    "deadline": "2027-02-01",
+    "pakistani_relevant": true,
+    "notes": "THE primary undergraduate scholarship for Pakistani students at top UK universities. Application separate from UCAS — apply directly to Saïd Foundation after receiving conditional offer."
+  },
+  {
+    "name": "Reach Oxford Scholarship",
+    "url": "https://www.ox.ac.uk/admissions/undergraduate/fees-and-funding/reach-oxford-scholarship",
+    "schools": ["University of Oxford"],
+    "level": "undergraduate",
+    "coverage": "Full tuition + college fee + living + return flight",
+    "eligibility": "Students from low-income countries (incl. Pakistan) unable to study in their country. Outstanding academic record. Returning home after studies.",
+    "deadline": "Applies via UCAS — selected from offer-holders",
+    "pakistani_relevant": true,
+    "notes": "No separate application — Oxford selects from offer-holders. ~5 awards per year globally. Highly competitive."
+  },
+  {
+    "name": "Cambridge Trust International Scholarship",
+    "url": "https://www.cambridgetrust.org",
+    "schools": ["University of Cambridge"],
+    "level": "undergraduate",
+    "coverage": "Partial to full tuition (need-based)",
+    "eligibility": "International students with offer from Cambridge. Need-based + merit considered.",
+    "deadline": "After offer received, typically March-April",
+    "pakistani_relevant": true,
+    "notes": "Apply via the Cambridge Trust portal after offer."
+  },
+  {
+    "name": "Imperial College President's Undergraduate Scholarship",
+    "url": "https://www.imperial.ac.uk/study/fees-and-funding/undergraduate/scholarships/",
+    "schools": ["Imperial College London"],
+    "level": "undergraduate",
+    "coverage": "£5,000/year",
+    "eligibility": "Open to all incoming undergraduates including international students. Merit-based — top academic performance.",
+    "deadline": "No application — automatic from UCAS data",
+    "pakistani_relevant": true,
+    "notes": "Automatic consideration based on UCAS application + grades."
+  },
+  {
+    "name": "LSE Undergraduate Support Scheme",
+    "url": "https://info.lse.ac.uk/Current-Students/Financial-Support/LSE-Undergraduate-Support-Scheme",
+    "schools": ["London School of Economics and Political Science"],
+    "level": "undergraduate",
+    "coverage": "Up to £18,000/year",
+    "eligibility": "Need-based. Open to UK + international students. Demonstrated financial hardship.",
+    "deadline": "After offer received, May 2027",
+    "pakistani_relevant": true,
+    "notes": "Means-tested. International students must demonstrate parental income."
+  },
+  {
+    "name": "UCL Undergraduate Bursary",
+    "url": "https://www.ucl.ac.uk/scholarships/undergraduate-funding-overseas-students",
+    "schools": ["University College London"],
+    "level": "undergraduate",
+    "coverage": "Various — partial tuition",
+    "eligibility": "Various scholarships; some country-specific. Pakistani students eligible for several.",
+    "deadline": "Varies by award, typically February-April after offer",
+    "pakistani_relevant": true,
+    "notes": "UCL has multiple country-specific awards funded by alumni. Browse the full UCL list after offer."
+  },
+  {
+    "name": "Edinburgh International Undergraduate Scholarship",
+    "url": "https://www.ed.ac.uk/student-funding/undergraduate/international",
+    "schools": ["University of Edinburgh"],
+    "level": "undergraduate",
+    "coverage": "£4,000-£10,000/year",
+    "eligibility": "International students with strong academic offers. Merit-based.",
+    "deadline": "April after offer",
+    "pakistani_relevant": true,
+    "notes": "Automatic consideration; top-ranked applicants notified."
+  },
+  {
+    "name": "Pakistan HEC Need-Based Scholarship",
+    "url": "https://hec.gov.pk",
+    "schools": ["University of Oxford", "University of Cambridge", "Imperial College London", "London School of Economics and Political Science", "University College London", "King's College London", "University of Edinburgh", "University of Manchester"],
+    "level": "undergraduate",
+    "coverage": "Partial tuition + stipend",
+    "eligibility": "Pakistani citizens, low-income, top academic performance. Annual need-based selection.",
+    "deadline": "Varies — typically December-February",
+    "pakistani_relevant": true,
+    "notes": "HEC Pakistan funds limited UK undergraduate scholarships. Highly competitive."
+  },
+  {
+    "name": "Commonwealth Shared Scholarship",
+    "url": "https://cscuk.fcdo.gov.uk/scholarships/commonwealth-shared-scholarships/",
+    "schools": ["various UK Russell Group"],
+    "level": "graduate",
+    "coverage": "Full tuition + living",
+    "eligibility": "Citizens of Commonwealth countries (incl. Pakistan). Master's-level only.",
+    "deadline": "Varies by university — typically October-November",
+    "pakistani_relevant": false,
+    "notes": "FLAG TO STUDENT: This is master's only, not undergraduate. Mention only if asked about graduate funding."
+  },
+  {
+    "name": "Chevening Scholarship",
+    "url": "https://www.chevening.org",
+    "schools": ["various UK"],
+    "level": "graduate",
+    "coverage": "Full tuition + living + flights",
+    "eligibility": "Mid-career professionals. Master's level only.",
+    "deadline": "November",
+    "pakistani_relevant": false,
+    "notes": "FLAG TO STUDENT: This is master's only, not undergraduate. Most undergraduate Pakistani students should NOT pursue Chevening at this stage."
+  }
+]

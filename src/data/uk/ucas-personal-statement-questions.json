@@ -1,0 +1,33 @@
+{
+  "format_version": "2026_cycle",
+  "format_change_note": "From the 2026 cycle (Sep 2025 entry onward), UCAS replaced the single 4000-character free-text personal statement with three structured short-answer questions. Total combined max 4000 characters; each question recommended 750-1500 characters.",
+  "questions": [
+    {
+      "id": 1,
+      "title": "Why do you want to study this course?",
+      "guidance": "Speak to your motivation, intellectual interest, and how the subject connects to where you want to go. UK admissions read the PS for SUBJECT FIT — not the broad 'find your story' framing of US Common App essays. Reference specific aspects of the course that drew you in (modules, faculty research, methodologies). Avoid generic 'I have always loved X' openers.",
+      "char_min": 350,
+      "char_max_recommended": 1500,
+      "required": true
+    },
+    {
+      "id": 2,
+      "title": "How have your qualifications and studies prepared you for this course?",
+      "guidance": "This is the academic foundation question. Reference SPECIFIC topics from your A-Levels / IB / equivalent that connect to the course. For Pakistani students with FSc / HSC: name the relevant board (Federal, Sindh, Punjab) + specific subjects + standout topics. For Cambridge applicants: this is where the admissions tutor judges whether you're prepared for Tripos-pace teaching. Do NOT just list your subjects — show what specific topics you went deep on.",
+      "char_min": 350,
+      "char_max_recommended": 1500,
+      "required": true
+    },
+    {
+      "id": 3,
+      "title": "What else have you done to prepare outside of formal education?",
+      "guidance": "Super-curriculars, NOT extra-curriculars. UK admissions DO NOT care about your debate club presidency or your basketball captaincy unless it's directly relevant to the subject. They care about reading lists, EPQs, online courses (MIT OCW, Coursera), competitions (Olympiads, Challenge), summer schools, work experience in the field, podcasts you listened to, papers you read. Name specific books / papers / problems. 'I read Sapiens' is weaker than 'I read Yuval Harari's chapter on cognitive revolution and it pushed back against assumptions in my Anthropology IB syllabus, particularly...'",
+      "char_min": 350,
+      "char_max_recommended": 1500,
+      "required": true
+    }
+  ],
+  "total_combined_char_max": 4000,
+  "shared_across_choices": true,
+  "notes": "The PS is UCAS-wide — one set of three answers goes to up to 5 university choices. Tailor toward the most-selective school + course in your list. Oxbridge applicants should write FOR Oxbridge; the other 4 choices will read the same PS but are usually less selective."
+}

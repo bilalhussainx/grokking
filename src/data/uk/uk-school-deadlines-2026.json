@@ -1,0 +1,86 @@
+{
+  "University of Oxford": {
+    "deadline_application": "2026-10-15",
+    "deadline_test_registration": "2026-09-30",
+    "oxbridge_or_medical": true,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Oct 15 18:00 UK time. Oxford-specific: choose your COLLEGE during application; submit written work (where required) directly to college; sit admissions test at Pearson VUE; expect interview December. NOTE: cannot also apply to Cambridge in same cycle."
+  },
+  "University of Cambridge": {
+    "deadline_application": "2026-10-15",
+    "deadline_test_registration": "2026-09-30",
+    "oxbridge_or_medical": true,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Oct 15 18:00 UK time. Cambridge-specific: complete the Cambridge Online Preliminary Application (COPA) + SAQ after UCAS; choose a college (or open application); admissions test (TMUA/ESAT/etc. depending on subject); interviews December. NOTE: cannot also apply to Oxford."
+  },
+  "Imperial College London": {
+    "deadline_application": "2027-01-14",
+    "deadline_test_registration": "2026-10-15",
+    "oxbridge_or_medical": false,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Jan 14 18:00 UK time. Medicine and Engineering may require ESAT/MAT/UCAT — register separately. Some courses interview."
+  },
+  "London School of Economics and Political Science": {
+    "deadline_application": "2027-01-14",
+    "deadline_test_registration": "2026-10-15",
+    "oxbridge_or_medical": false,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Jan 14 18:00 UK time. Economics + Maths-and-Economics require TMUA. Highly grades-driven; PS scrutinized."
+  },
+  "University College London": {
+    "deadline_application": "2027-01-14",
+    "deadline_test_registration": null,
+    "oxbridge_or_medical": false,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Jan 14 18:00 UK time. Law applicants take LNAT. Medicine UCAT. Most other courses no test."
+  },
+  "King's College London": {
+    "deadline_application": "2027-01-14",
+    "deadline_test_registration": null,
+    "oxbridge_or_medical": false,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Jan 14 18:00 UK time. Law applicants take LNAT. Medicine UCAT. Some courses interview (medicine, dentistry)."
+  },
+  "University of Edinburgh": {
+    "deadline_application": "2027-01-14",
+    "deadline_test_registration": null,
+    "oxbridge_or_medical": false,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Jan 14 18:00 UK time. SCOTTISH 4-year degree (vs. 3-year English). Most courses no admissions test. Medicine UCAT."
+  },
+  "University of Manchester": {
+    "deadline_application": "2027-01-14",
+    "deadline_test_registration": null,
+    "oxbridge_or_medical": false,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Jan 14 18:00 UK time. Medicine + dentistry UCAT. Most courses no test."
+  },
+  "University of Bristol": {
+    "deadline_application": "2027-01-14",
+    "deadline_test_registration": null,
+    "oxbridge_or_medical": false,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Jan 14 18:00 UK time. Law LNAT. Medicine UCAT."
+  },
+  "University of Warwick": {
+    "deadline_application": "2027-01-14",
+    "deadline_test_registration": "2026-10-15",
+    "oxbridge_or_medical": false,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Jan 14 18:00 UK time. Maths + MORSE require TMUA. Computer Science MAT for some routes."
+  },
+  "Durham University": {
+    "deadline_application": "2027-01-14",
+    "deadline_test_registration": null,
+    "oxbridge_or_medical": false,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Jan 14 18:00 UK time. Law LNAT. Some courses TMUA. Collegiate (like Oxbridge) but college choice less load-bearing."
+  },
+  "University of St Andrews": {
+    "deadline_application": "2027-01-14",
+    "deadline_test_registration": null,
+    "oxbridge_or_medical": false,
+    "portal_url": "https://www.ucas.com",
+    "portal_login_note": "Apply via UCAS by Jan 14 18:00 UK time. SCOTTISH 4-year degree. Most courses no admissions test. Some courses interview."
+  }
+}
