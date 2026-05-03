@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import CinematicLandingV2 from "@/components/landing/CinematicLandingV2";
+import LandingViewportSwitch from "@/components/landing/LandingViewportSwitch";
 import ExitIntentModal from "@/components/landing/ExitIntentModal";
 import LoggedOutToast from "@/components/landing/LoggedOutToast";
 
@@ -19,7 +19,7 @@ export default function LandingPage() {
         overflowX: "hidden",
       }}
     >
-      <CinematicLandingV2 />
+      <LandingViewportSwitch />
       <ExitIntentModal />
       {/* useSearchParams reads the query string — wrap in Suspense so Next.js
           doesn't bail out of static generation for the landing page. */}

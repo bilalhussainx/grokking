@@ -17,7 +17,7 @@ import {
   type DashboardData,
   type VariantKey,
 } from "./variants";
-import AdaptiveDashboard from "./AdaptiveDashboard";
+import AdaptiveDashboardClientSwitch from "./AdaptiveDashboardClientSwitch";
 import AdaptiveDashboardLegacy from "./AdaptiveDashboardLegacy";
 
 export const dynamic = "force-dynamic";
@@ -134,9 +134,10 @@ export default async function DashboardPage({
     redirect("/onboarding");
   }
 
-  // === v2 branch: orchestrator self-fetches via /api/cc/dashboard/summary ===
+  // === v2 branch: client-side viewport switch picks Mobile vs Desktop;
+  // both renderers self-fetch via /api/cc/dashboard/summary ===
   if (useV2) {
-    return <AdaptiveDashboard />;
+    return <AdaptiveDashboardClientSwitch />;
   }
 
   // === Legacy branch: server-side data fetch + variant build, then prop-pass ===
