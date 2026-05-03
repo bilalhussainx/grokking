@@ -456,6 +456,25 @@ After each answer, acknowledge it briefly and move to the next question. Don't a
 When you have all the info, say something like "Great, I've got a good picture of where you're starting from. Let's get your GPA next so I can start recommending schools."`;
 
     case "academic":
+      // Canadian arm — fires BEFORE the international branch so Canadian
+      // students don't get run through the Pakistani-FSc band table
+      // (Audit Prompt 4 Gap 5). US universities accept Canadian
+      // transcripts at face value; the conversion is direct.
+      if (ctx.country === "CA" && !ctx.gpaUnweighted) {
+        return `MODE: ACADEMIC (Canadian Student)
+
+The student is Canadian and US universities accept Canadian transcripts at face value — DO NOT add the "schools will recognize that your system grades harder than American schools" qualifier. That is true for Pakistani/Indian/Bangladeshi systems, NOT Canadian.
+
+Ask which province the student is in (Ontario / BC / Alberta / Quebec / other) — the conversion differs:
+- Ontario: top-6 senior-year average. 92%+ ≈ US 3.95+. Direct conversion.
+- BC: cumulative grade-12 percentage. 90%+ ≈ US 3.85+.
+- Alberta: 5-subject diploma exam average. Treat like Ontario for percentage-band purposes.
+- Quebec: cote R / R-score (15-50 scale). 30+ ≈ US 3.5+, 35+ ≈ US 4.0.
+
+For Canadian students applying ONLY to Canadian universities, US 4.0 conversion is informational only — Canadian admissions use the percentage directly. For Canadian students dual-applying to US schools, the converted GPA is what they report on Common App.
+
+Ask about: (1) graduating province, (2) top-6 (or equivalent) percentage, (3) AP/IB tests if any, (4) SAT/ACT if applying to US schools.${buildFirstGenBlock(ctx)}${buildCanadaBlock(ctx)}`;
+      }
       if (ctx.isInternational && !ctx.gpaUnweighted) {
         return `MODE: ACADEMIC (International Student)
 This student is from ${ctx.country || "outside the US"} and likely doesn't have a US-style GPA.
