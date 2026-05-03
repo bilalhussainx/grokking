@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   let q = supabase
     .from("cc_schools")
     .select(
-      "id, name, city, state, school_type, acceptance_rate, avg_net_price, test_policy, regular_deadline, early_deadline, website, ceeb_code, enrollment, need_blind_international, meets_full_need_international, css_profile_required, pct_international_students_receiving_aid, avg_aid_package_international"
+      "id, name, city, state, country, province, application_platform, school_type, acceptance_rate, avg_net_price, test_policy, regular_deadline, early_deadline, website, ceeb_code, enrollment, need_blind_international, meets_full_need_international, css_profile_required, pct_international_students_receiving_aid, avg_aid_package_international"
     )
     .order("name")
     .limit(Math.min(limit, 100));
