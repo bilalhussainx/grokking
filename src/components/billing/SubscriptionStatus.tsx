@@ -137,7 +137,7 @@ export default function SubscriptionStatus() {
 
         {isPro && (
           <span className="text-2xl font-bold text-white">
-            $10<span className="text-sm text-white/40 font-normal">/mo</span>
+            $12<span className="text-sm text-white/40 font-normal">/mo</span>
           </span>
         )}
       </div>

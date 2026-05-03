@@ -95,8 +95,8 @@ export default function PricingCards() {
     profile?.role === "teacher" ||
     profile?.role === "admin";
 
-  const monthlyPrice = 10;
-  const annualMonthlyPrice = 8;
+  const monthlyPrice = 12;
+  const annualMonthlyPrice = 10;
   const annualTotalPrice = annualMonthlyPrice * 12;
 
   if (checkoutSuccess) {

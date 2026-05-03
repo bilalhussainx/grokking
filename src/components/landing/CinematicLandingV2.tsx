@@ -14,6 +14,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
+import { Maximize2 } from "lucide-react";
 
 import "./cinematic-landing-mobile.css";
 
@@ -891,6 +892,49 @@ function ForgottenStudent() {
 
 // ───────── Demo video ─────────
 function DemoVideo() {
+  // Lazy-mount the iframe — only insert once the section enters the
+  // viewport. The iframe content auto-plays on load, so deferring the
+  // mount also defers auto-play until the user has scrolled to it. Once
+  // in view, the iframe stays mounted (no remount on scroll-out) so the
+  // user can scroll back without restarting the video.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [hasEnteredView, setHasEnteredView] = useState(false);
+
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node || hasEnteredView) return;
+    if (typeof IntersectionObserver === "undefined") {
+      // Browsers without IO support: fall through to immediate mount.
+      setHasEnteredView(true);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setHasEnteredView(true);
+            obs.disconnect();
+            break;
+          }
+        }
+      },
+      // Trigger as soon as any part of the player enters the viewport.
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.1 },
+    );
+    obs.observe(node);
+    return () => obs.disconnect();
+  }, [hasEnteredView]);
+
+  function requestFullscreen() {
+    const el = iframeRef.current;
+    if (!el) return;
+    // requestFullscreen returns a Promise that may reject if the user
+    // hasn't gestured (it's gated on user activation). Swallow the
+    // rejection — the click itself is the activation.
+    el.requestFullscreen?.().catch(() => {});
+  }
+
   return (
     <section
       id="demo-video"
@@ -944,6 +988,7 @@ function DemoVideo() {
         </div>
 
         <div
+          ref={containerRef}
           style={{
             position: "relative",
             width: "100%",
@@ -954,20 +999,70 @@ function DemoVideo() {
             overflow: "hidden",
           }}
         >
-          <iframe
-            src="/media/kairos-final-demo.html"
-            title="KairosLearn 90-second demo"
-            loading="lazy"
-            allow="autoplay; fullscreen"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              border: 0,
-              background: "#05080d",
-            }}
-          />
+          {hasEnteredView ? (
+            <>
+              <iframe
+                ref={iframeRef}
+                src="/media/kairos-final-demo.html"
+                title="KairosLearn 90-second demo"
+                allow="autoplay; fullscreen"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  border: 0,
+                  background: "#05080d",
+                }}
+              />
+              <button
+                type="button"
+                onClick={requestFullscreen}
+                aria-label="Expand demo to fullscreen"
+                style={{
+                  position: "absolute",
+                  bottom: 14,
+                  right: 14,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "8px 12px",
+                  borderRadius: 8,
+                  background: "rgba(5,8,13,.78)",
+                  border: "1px solid rgba(212,168,75,0.30)",
+                  color: "#f2ede3",
+                  fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
+                  fontSize: 11.5,
+                  letterSpacing: ".04em",
+                  cursor: "pointer",
+                  backdropFilter: "blur(8px)",
+                }}
+              >
+                <Maximize2 size={12} />
+                Fit to screen
+              </button>
+            </>
+          ) : (
+            // Placeholder while waiting for scroll. Same gold-border frame
+            // so the layout doesn't shift when the iframe replaces it.
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "rgba(242,237,227,.45)",
+                fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
+                fontSize: 12,
+                letterSpacing: ".22em",
+                textTransform: "uppercase",
+              }}
+            >
+              <span>Scroll to play</span>
+            </div>
+          )}
         </div>
 
         <div
@@ -1369,7 +1464,7 @@ function Pricing() {
               letterSpacing: "-.01em",
             }}
           >
-            $10, or <em style={{ color: "#d4a84b", fontStyle: "italic" }}>$8,000.</em>
+            $12, or <em style={{ color: "#d4a84b", fontStyle: "italic" }}>$8,000.</em>
           </h2>
           <p
             style={{
@@ -1432,7 +1527,7 @@ function Pricing() {
                   letterSpacing: "-.02em",
                 }}
               >
-                $10
+                $12
               </div>
               <div
                 style={{

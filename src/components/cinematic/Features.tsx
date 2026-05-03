@@ -251,7 +251,7 @@ function PipelineFlow() {
 
 function PricingTable() {
   const rows = [
-    { label: 'Monthly cost', school: '$0 (taxpayer funded)', private: '$8,000+', kairos: '$10' },
+    { label: 'Monthly cost', school: '$0 (taxpayer funded)', private: '$8,000+', kairos: '$12' },
     { label: 'Students served', school: '400 per counselor', private: '1 to 1', kairos: 'Unlimited access' },
     { label: 'Available at 11pm', school: 'No', private: 'No', kairos: 'Yes' },
     { label: 'Reads every essay draft', school: 'No', private: 'Sometimes', kairos: 'Always' },
