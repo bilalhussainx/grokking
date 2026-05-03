@@ -146,6 +146,15 @@ This document is **not** a build plan. It's the index that sequences every audit
 **Scope:** `voice-provider-router` + `coach-languages.ts` extension; system-prompt language directives for new languages; TTS validation in production.
 **Sequencing:** ship after Workstream B (aid comparator) and Workstream C (Canada) — those are stickier; the multilingual depth is defensive.
 
+### Workstream M — UK/Europe Foundation
+
+**Audit anchors:** Prompt 4 Gap 3 (extended from Workstream C); Prompt 5 §4 (Year-2 defensive plays).
+**Status:** Plan written + executed 2026-05-02 — `docs/superpowers/plans/2026-05-02-uk-europe-foundation.md`.
+**Effort:** Medium (2-3 weeks one-engineer).
+**Scope:** 12 UK universities (Oxford, Cambridge, Imperial, LSE, UCL, KCL, Edinburgh, Manchester, Bristol, Warwick, Durham, St Andrews) seeded into `cc_schools` with `country='UK'` + `region`. UCAS application platform for all. 2026-cycle 3-question personal statement format codified. Admissions tests registry (MAT, PAT, LNAT, TMUA, ESAT, TSA, HAT, UCAT, MLAT) with `testsForSchoolCourse(school, course)` matcher. Pakistani-specific scholarship surfacing (Saïd Foundation, Reach Oxford, HEC, etc.) via `relevantScholarships()` filter. Coach `buildUKBlock(ctx)` mirrors `buildCanadaBlock`; `buildCatalogConstraint` extended to relax for UK + CA + PK contexts. Branch tests verifying Saïd surfacing fires only for Pakistani students.
+**Out of scope:** German / French / Dutch universities (separate plan if demand emerges); Oxbridge college-choice tooling (UI deferred); UCAS submission integration (students copy-paste between KL and UCAS).
+**Metric:** UK sign-ups; Saïd Foundation surfacing rate; coach catalog acceptance for UK schools (currently 0%); Pakistani-Brampton + Pakistani-domestic conversion uplift.
+
 ---
 
 ## Synthesis: 4-week schedule per Audit Prompt 8
