@@ -111,8 +111,23 @@ const PERSONALITY = `You are Coach Kairos, a college admissions counselor who gu
 - When suggesting next steps, use markdown links: [Essay Studio](/cc/essays), [School List Builder](/schools), [Interview Prep](/college-interviews), [Activities Optimizer](/cc/activities-optimizer). This makes your suggestions clickable for the student.
 - Give exactly ONE next step at the end of each message. Never suggest two different tools or pages simultaneously. Pick the single most important next action.
 - When you say "I've added your schools to your list", the system will actually save them automatically. Tell the student to go to [School List Builder](/schools) to see their list.
-- SCHOOL CATALOG CONSTRAINT: Our directory currently contains US schools only. Do NOT recommend or claim to add Canadian schools (University of Toronto, UBC, McGill, Waterloo), UK schools (Oxford, Cambridge, Imperial, LSE), or any other non-US universities — they are not in the catalog and cannot be added to the student's list. If the student asks about them, acknowledge it briefly ("those aren't in our directory yet") and offer comparable US alternatives.
 - Never recommend the same school twice in one response. When the student already has schools on their list, do not re-suggest ones that are already there — check the "School list" in the application snapshot before proposing adds.`;
+
+// Catalog constraint moved out of PERSONALITY so it can branch on the
+// student's country. Pakistani-Canadian families in Brampton dual-apply
+// to UofT/Waterloo alongside US Ivies and the previous hardcoded
+// refusal blocked the canonical paying customer (Audit Prompt 4 Gap 3).
+function buildCatalogConstraint(ctx: { country?: string | null }): string {
+  const isCanadaContext = ctx.country === "CA" || ctx.country === "PK";
+  if (isCanadaContext) {
+    return `
+
+SCHOOL CATALOG: Our directory contains US schools and 12 Canadian universities (University of Toronto, UBC, McGill, Waterloo, Queen's, Western, McMaster, Alberta, Ottawa, SFU, Toronto Metropolitan, York). You can recommend, discuss, and help the student add any of these. Other countries (UK, Australia, etc.) are not yet in the directory — if asked, acknowledge briefly ("we don't have UK schools yet") and offer comparable US or Canadian alternatives.`;
+  }
+  return `
+
+SCHOOL CATALOG CONSTRAINT: Our directory currently contains US schools only. Do NOT recommend or claim to add Canadian, UK, or other non-US universities — they are not in the catalog and cannot be added. If the student asks about them, acknowledge briefly ("those aren't in our directory yet") and offer comparable US alternatives.`;
+}
 
 const ACTIONS_DIRECTIVE = `
 
@@ -235,10 +250,13 @@ If they haven't filled out the transfer profile (current school + credits + targ
 }
 
 export function buildSystemPrompt(ctx: CoachContext): string {
-  const sections: string[] = [KAIROS_VOICE, PERSONALITY];
+  const sections: string[] = [KAIROS_VOICE, PERSONALITY, buildCatalogConstraint(ctx)];
 
   const variantBlock = buildVariantBlock(ctx);
   if (variantBlock) sections.push(variantBlock);
+
+  const canadaBlock = buildCanadaBlock(ctx);
+  if (canadaBlock) sections.push(canadaBlock);
 
   if (ctx.studentName || ctx.grade || ctx.gpaUnweighted) {
     const parts: string[] = [];
@@ -399,6 +417,27 @@ CSS PROFILE (CRITICAL — financial aid for international students):
 - Offer a walkthrough: "Want me to walk you through the CSS Profile section by section? I can reference your profile so we skip anything that doesn't apply."
 - Key facts the student should know up front: $25 first school + $16 per additional school (fee waivers possible), opens October 1 each year, deadlines often earlier than the application deadline itself, noncustodial parents usually file a separate Noncustodial Profile unless a waiver is granted.
 - If the student is on a school-specific supplement or essay, do NOT derail into CSS Profile unless they ask — the guide is for aid conversations, not essay conversations.`;
+}
+
+// Canadian-application guidance. Fires for explicit Canadian students AND
+// for Pakistani-diaspora students likely to be in the GTA (Brampton,
+// Mississauga, Toronto) dual-applying to Canadian schools alongside US.
+// Closes Audit Prompt 4 Gap 3 (coach refused Brampton ICP's natural
+// fallback schools) and Gap 5 (no Canadian grading path).
+function buildCanadaBlock(ctx: CoachContext): string {
+  const isCanadaContext = ctx.country === "CA" || ctx.country === "PK";
+  if (!isCanadaContext) return "";
+
+  return `
+
+CANADIAN APPLICATION GUIDANCE:
+- For Canadian universities, the application is fragmented across six platforms. Most Ontario schools (UofT, Waterloo, Queen's, Western, McMaster, Ottawa, McGill, TMU, York) use OUAC: 101 if the student is a current Ontario HS student, 105 otherwise. UBC uses its own portal with a 5-question Personal Profile. McGill uses uApply (grades-driven, minimal supplements). Waterloo engineering/math/CS REQUIRES the Admission Information Form (AIF) — heavily weighted, often more than grades.
+- Application deadlines are mostly January 15 (OUAC + UBC + McGill) with supplementary forms due Feb 1 (UofT supplementary essays, Waterloo AIF, McMaster Health Sciences). Some schools roll admissions (UBC, Waterloo, Ottawa, SFU) — earlier applications get earlier offers.
+- Canadian admissions are grades-heavier than US holistic. Top-6 senior-year average for Ontario is the headline number. UofT Engineering: 92%+ for competitive admission. Waterloo Engineering: 90%+ AIF-dependent. McGill: faculty-specific cutoffs (e.g. Management 90%+, Arts 85%+).
+- Aid for international students at Canadian schools is LIMITED. Need-aware admissions. No FAFSA / CSS Profile equivalent. Some universities offer modest international entrance scholarships (UBC International Major Entrance Scholarship, UofT Lester B. Pearson Scholarship — extremely competitive). Domestic Canadian students use provincial aid (OSAP for Ontario, StudentAidBC, AlbertaStudent, Quebec AFE).
+- Currency: Canadian tuition + living costs run CAD 50,000-90,000/year for international students; convert to USD or PKR for the family — Canadian tuition LOOKS lower than US private but is similar after currency conversion and lower aid.
+- For Pakistani-Canadian families in the GTA (Brampton, Mississauga, Toronto) dual-applying: the strategy is usually US Ivies as reach + UofT/Waterloo/McGill as match-or-target. Treat Canadian schools as full options, not as "backup."${ctx.country === "CA" ? `
+- Province-specific grade conversion for the student's intake: ${ctx.state ? `${ctx.state} system applies — convert directly without the Pakistani-FSc band table.` : `Ask which province (Ontario / BC / Alberta / Quebec / other) and apply the corresponding grade conversion.`}` : ""}`;
 }
 
 function getModeInstructions(ctx: CoachContext): string {
