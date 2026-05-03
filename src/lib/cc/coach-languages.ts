@@ -29,8 +29,18 @@ export const COACH_LANGUAGES: CoachLanguage[] = [
   { code: "mr", name: "Marathi",   nativeName: "मराठी",        flag: "\u{1F1EE}\u{1F1F3}", mode: "voice" },
   { code: "pa", name: "Punjabi",   nativeName: "ਪੰਜਾਬੀ",       flag: "\u{1F1EE}\u{1F1F3}", mode: "voice" },
   { code: "od", name: "Odia",      nativeName: "ଓଡ଼ିଆ",        flag: "\u{1F1EE}\u{1F1F3}", mode: "voice" },
-  // Text-only (no TTS provider supports Urdu yet — third-party deferred post-Feature 17)
-  { code: "ur", name: "Urdu",      nativeName: "اردو",         flag: "\u{1F1F5}\u{1F1F0}", mode: "text-only", isRTL: true },
+  // Voice via hybrid pipeline: Deepgram nova-3 STT + Google Cloud TTS.
+  // Picked to match the largest international student source markets
+  // for US/UK/Canadian universities. Requires GOOGLE_CLOUD_CREDENTIALS.
+  // See src/lib/voice/google-tts.ts and voice-provider-router.ts.
+  { code: "ur", name: "Urdu",       nativeName: "اردو",        flag: "\u{1F1F5}\u{1F1F0}", mode: "voice", isRTL: true },
+  { code: "zh", name: "Mandarin",   nativeName: "中文",         flag: "\u{1F1E8}\u{1F1F3}", mode: "voice" },
+  { code: "ko", name: "Korean",     nativeName: "한국어",       flag: "\u{1F1F0}\u{1F1F7}", mode: "voice" },
+  { code: "ar", name: "Arabic",     nativeName: "العربية",     flag: "\u{1F1F8}\u{1F1E6}", mode: "voice", isRTL: true },
+  { code: "vi", name: "Vietnamese", nativeName: "Tiếng Việt",  flag: "\u{1F1FB}\u{1F1F3}", mode: "voice" },
+  { code: "pt", name: "Portuguese", nativeName: "Português",   flag: "\u{1F1E7}\u{1F1F7}", mode: "voice" },
+  { code: "ru", name: "Russian",    nativeName: "Русский",     flag: "\u{1F1F7}\u{1F1FA}", mode: "voice" },
+  { code: "tr", name: "Turkish",    nativeName: "Türkçe",      flag: "\u{1F1F9}\u{1F1F7}", mode: "voice" },
 ];
 
 export const DEFAULT_COACH_LANGUAGE = "en";

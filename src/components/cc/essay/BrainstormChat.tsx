@@ -37,15 +37,28 @@ type Lang = {
 };
 
 // Source of truth for the voice-greeting copy is the design mockup at
-// public/media/brainstorm-redesign-standalone (1).html.
+// public/media/brainstorm-redesign-standalone (1).html. Language list
+// matches the platform-wide COACH_LANGUAGES (src/lib/cc/coach-languages),
+// covering the largest international student source markets for
+// US/UK/Canadian universities. Voice (mic) flows through the browser
+// Web Speech API; server-side coach voice replies (when added) route
+// through voice-provider-router → Google Cloud TTS for the non-Latin
+// scripts that Deepgram Aura-2 doesn't cover.
 const LANGUAGES: Lang[] = [
-  { code: "en", name: "English",  flag: "\u{1F1FA}\u{1F1F8}", greeting: "I'm here to listen to your story. Tell me something about yourself that your classmates wouldn't know." },
-  { code: "es", name: "Español",  flag: "\u{1F1EA}\u{1F1F8}", greeting: "Estoy aquí para escuchar tu historia. Cuéntame algo sobre ti que tus compañeros no sepan." },
-  { code: "hi", name: "हिन्दी",    flag: "\u{1F1EE}\u{1F1F3}", greeting: "मैं तुम्हारी कहानी सुनने के लिए यहाँ हूँ। तुम्हारे बारे में कोई ऐसी बात बताओ जो तुम्हारे classmates नहीं जानते।" },
-  { code: "ur", name: "اردو",     flag: "\u{1F1F5}\u{1F1F0}", greeting: "میں تمہاری کہانی سننے کے لیے یہاں ہوں۔ اپنے بارے میں کچھ ایسا بتاؤ جو تمہارے classmates نہیں جانتے۔", isRTL: true },
-  { code: "pa", name: "ਪੰਜਾਬੀ",    flag: "\u{1F1EE}\u{1F1F3}", greeting: "ਮੈਂ ਤੁਹਾਡੀ ਕਹਾਣੀ ਸੁਣਨ ਲਈ ਇੱਥੇ ਹਾਂ। ਆਪਣੇ ਬਾਰੇ ਕੁਝ ਅਜਿਹਾ ਦੱਸੋ ਜੋ ਤੁਹਾਡੇ classmates ਨਹੀਂ ਜਾਣਦੇ।" },
-  { code: "fr", name: "Français", flag: "\u{1F1EB}\u{1F1F7}", greeting: "Je suis ici pour écouter ton histoire. Raconte-moi quelque chose sur toi que tes camarades ne sauraient pas." },
-  { code: "ja", name: "日本語",    flag: "\u{1F1EF}\u{1F1F5}", greeting: "あなたの物語を聞くためにここにいます。クラスメイトが知らないあなたのことを教えてください。" },
+  { code: "en", name: "English",    flag: "\u{1F1FA}\u{1F1F8}", greeting: "I'm here to listen to your story. Tell me something about yourself that your classmates wouldn't know." },
+  { code: "es", name: "Español",    flag: "\u{1F1EA}\u{1F1F8}", greeting: "Estoy aquí para escuchar tu historia. Cuéntame algo sobre ti que tus compañeros no sepan." },
+  { code: "hi", name: "हिन्दी",      flag: "\u{1F1EE}\u{1F1F3}", greeting: "मैं तुम्हारी कहानी सुनने के लिए यहाँ हूँ। तुम्हारे बारे में कोई ऐसी बात बताओ जो तुम्हारे classmates नहीं जानते।" },
+  { code: "ur", name: "اردو",       flag: "\u{1F1F5}\u{1F1F0}", greeting: "میں تمہاری کہانی سننے کے لیے یہاں ہوں۔ اپنے بارے میں کچھ ایسا بتاؤ جو تمہارے classmates نہیں جانتے۔", isRTL: true },
+  { code: "pa", name: "ਪੰਜਾਬੀ",      flag: "\u{1F1EE}\u{1F1F3}", greeting: "ਮੈਂ ਤੁਹਾਡੀ ਕਹਾਣੀ ਸੁਣਨ ਲਈ ਇੱਥੇ ਹਾਂ। ਆਪਣੇ ਬਾਰੇ ਕੁਝ ਅਜਿਹਾ ਦੱਸੋ ਜੋ ਤੁਹਾਡੇ classmates ਨਹੀਂ ਜਾਣਦੇ।" },
+  { code: "zh", name: "中文",        flag: "\u{1F1E8}\u{1F1F3}", greeting: "我在这里聆听你的故事。告诉我一些关于你自己、连同学都不知道的事情。" },
+  { code: "ko", name: "한국어",      flag: "\u{1F1F0}\u{1F1F7}", greeting: "당신의 이야기를 듣고 있어요. 같은 반 친구들도 모르는 당신만의 이야기를 들려주세요." },
+  { code: "ar", name: "العربية",    flag: "\u{1F1F8}\u{1F1E6}", greeting: "أنا هنا لأصغي إلى قصتك. أخبرني بشيء عنك لا يعرفه زملاؤك في الصف.", isRTL: true },
+  { code: "vi", name: "Tiếng Việt", flag: "\u{1F1FB}\u{1F1F3}", greeting: "Tôi ở đây để lắng nghe câu chuyện của bạn. Hãy kể cho tôi điều gì đó về bản thân mà các bạn cùng lớp không biết." },
+  { code: "pt", name: "Português",  flag: "\u{1F1E7}\u{1F1F7}", greeting: "Estou aqui para ouvir sua história. Me conte algo sobre você que seus colegas não saibam." },
+  { code: "ru", name: "Русский",    flag: "\u{1F1F7}\u{1F1FA}", greeting: "Я здесь, чтобы выслушать твою историю. Расскажи мне что-то о себе, чего не знают твои одноклассники." },
+  { code: "tr", name: "Türkçe",     flag: "\u{1F1F9}\u{1F1F7}", greeting: "Hikayeni dinlemek için buradayım. Sınıf arkadaşlarının bilmediği bir şeyi anlat bana." },
+  { code: "fr", name: "Français",   flag: "\u{1F1EB}\u{1F1F7}", greeting: "Je suis ici pour écouter ton histoire. Raconte-moi quelque chose sur toi que tes camarades ne sauraient pas." },
+  { code: "ja", name: "日本語",      flag: "\u{1F1EF}\u{1F1F5}", greeting: "あなたの物語を聞くためにここにいます。クラスメイトが知らないあなたのことを教えてください。" },
 ];
 
 const STORAGE_KEY = "coach-language";
@@ -449,10 +462,16 @@ export default function BrainstormChat({
   // Enter after each utterance. No backend change needed — transcripts go
   // through the normal /api/cc/essays/<id>/brainstorm streaming endpoint.
   //
-  // BCP-47 locale map — keeps the recognizer in the student's chosen language.
+  // BCP-47 locale map — keeps the browser's SpeechRecognition in the
+  // student's chosen language. ur-PK is used here (not ur-IN) because
+  // Chrome's Web Speech API picks up Pakistani-accent speech better with
+  // ur-PK; Google Cloud TTS still uses ur-IN since it's the only Urdu
+  // locale Google publishes a voice for.
   const LOCALE: Record<string, string> = {
     en: "en-US", es: "es-ES", hi: "hi-IN", ur: "ur-PK",
     pa: "pa-IN", fr: "fr-FR", ja: "ja-JP",
+    zh: "zh-CN", ko: "ko-KR", ar: "ar-SA",
+    vi: "vi-VN", pt: "pt-BR", ru: "ru-RU", tr: "tr-TR",
   };
 
   const startRecognition = () => {
@@ -644,32 +663,18 @@ export default function BrainstormChat({
             </div>
           )}
 
-          {langCode === "ur" ? (
-            <button
-              type="button"
-              disabled
-              className="kl-voice-toggle is-disabled"
-              title="Voice for Urdu coming soon — switch to Hindi for voice"
-            >
-              <span className="kl-voice-dot">
-                <MicOff className="w-3.5 h-3.5" />
-              </span>
-              <span>Voice off</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleVoiceToggle}
-              aria-pressed={voiceOn}
-              className={`kl-voice-toggle ${voiceOn ? "is-on" : ""}`}
-            >
-              <span className="kl-voice-dot">
-                {voiceOn ? <Mic className="w-3.5 h-3.5" /> : <MicOff className="w-3.5 h-3.5" />}
-              </span>
-              <span>{voiceOn ? "Voice on" : "Voice off"}</span>
-              {voiceOn && <VoiceWaveform active />}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleVoiceToggle}
+            aria-pressed={voiceOn}
+            className={`kl-voice-toggle ${voiceOn ? "is-on" : ""}`}
+          >
+            <span className="kl-voice-dot">
+              {voiceOn ? <Mic className="w-3.5 h-3.5" /> : <MicOff className="w-3.5 h-3.5" />}
+            </span>
+            <span>{voiceOn ? "Voice on" : "Voice off"}</span>
+            {voiceOn && <VoiceWaveform active />}
+          </button>
         </div>
       </div>
 
@@ -824,30 +829,17 @@ export default function BrainstormChat({
               <button type="button" className="kl-tool-btn" title="Attach" aria-label="Attach">
                 <Paperclip className="w-4 h-4" />
               </button>
-              {langCode === "ur" ? (
-                <button
-                  type="button"
-                  disabled
-                  className="kl-tool-btn"
-                  aria-label="Voice not available for Urdu"
-                  title="Voice for Urdu coming soon — switch to Hindi for voice"
-                  style={{ opacity: 0.4, cursor: "not-allowed" }}
-                >
-                  <MicOff className="w-4 h-4" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleVoiceToggle}
-                  className="kl-tool-btn"
-                  aria-pressed={voiceOn}
-                  aria-label="Toggle voice"
-                  title="Voice"
-                  style={{ color: voiceOn ? "var(--kl-gold-app,#D4AF37)" : undefined }}
-                >
-                  {voiceOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={handleVoiceToggle}
+                className="kl-tool-btn"
+                aria-pressed={voiceOn}
+                aria-label="Toggle voice"
+                title="Voice"
+                style={{ color: voiceOn ? "var(--kl-gold-app,#D4AF37)" : undefined }}
+              >
+                {voiceOn ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
+              </button>
               <button
                 type="submit"
                 className="kl-tool-btn is-primary"

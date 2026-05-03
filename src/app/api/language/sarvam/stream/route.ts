@@ -389,35 +389,53 @@ IMPORTANT: Focus conversation on the lesson topic above. Create scenarios where 
         send({ type: 'response', text: responseText });
 
         // ── Step 3: TTS ──
-        const speaker = SARVAM_SPEAKERS[language];
-        const targetLang = SARVAM_TTS_LANG_MAP[language];
-
-        if (speaker && targetLang && SARVAM_API_KEY && responseText) {
-          const ttsResp = await fetch('https://api.sarvam.ai/text-to-speech', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'api-subscription-key': SARVAM_API_KEY,
-            },
-            body: JSON.stringify({
-              text: responseText,
-              target_language_code: targetLang,
-              speaker,
-              model: 'bulbul:v3',
-              pace: 1.0,
-              speech_sample_rate: 22050,
-              output_audio_codec: 'mp3',
-            }),
-          });
-
-          if (ttsResp.ok) {
-            const data = await ttsResp.json();
-            const audioBase64 = data.audios?.[0] || '';
+        // Urdu (and any future languages routed via Google Cloud TTS)
+        // bypass Sarvam Bulbul. Sarvam covers Hindi/Punjabi/Indic only.
+        if (language === 'ur' && responseText) {
+          try {
+            const { synthesizeWithGoogle } = await import('@/lib/voice/google-tts');
+            const audioBuffer = await synthesizeWithGoogle(responseText, {
+              languageCode: 'ur-IN',
+            });
+            const audioBase64 = Buffer.from(audioBuffer).toString('base64');
             if (audioBase64) {
               send({ type: 'audio', base64: audioBase64 });
             }
-          } else {
-            console.error('[Stream TTS] Sarvam error:', await ttsResp.text());
+          } catch (err) {
+            console.error('[Stream TTS] Google Urdu TTS failed:', err);
+            send({ type: 'error', code: 'GOOGLE_TTS_FAILED' });
+          }
+        } else {
+          const speaker = SARVAM_SPEAKERS[language];
+          const targetLang = SARVAM_TTS_LANG_MAP[language];
+
+          if (speaker && targetLang && SARVAM_API_KEY && responseText) {
+            const ttsResp = await fetch('https://api.sarvam.ai/text-to-speech', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'api-subscription-key': SARVAM_API_KEY,
+              },
+              body: JSON.stringify({
+                text: responseText,
+                target_language_code: targetLang,
+                speaker,
+                model: 'bulbul:v3',
+                pace: 1.0,
+                speech_sample_rate: 22050,
+                output_audio_codec: 'mp3',
+              }),
+            });
+
+            if (ttsResp.ok) {
+              const data = await ttsResp.json();
+              const audioBase64 = data.audios?.[0] || '';
+              if (audioBase64) {
+                send({ type: 'audio', base64: audioBase64 });
+              }
+            } else {
+              console.error('[Stream TTS] Sarvam error:', await ttsResp.text());
+            }
           }
         }
 

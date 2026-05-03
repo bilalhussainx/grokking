@@ -1,17 +1,15 @@
 export const FAMILY_MODE_LANGUAGES = [
   "en", "es", "fr", "de", "it", "nl", "ja",
   "hi", "bn", "ta", "te", "gu", "kn", "ml", "mr", "pa", "od",
-  // Urdu is text-only — no browser SpeechRecognition support and Sarvam
-  // Urdu STT isn't wired into FamilyModeView. Listed here so the parent
-  // hand-off button stays enabled for Urdu families. AUD-P4-001 (OpenClaw
-  // 2026-05-02). FamilyModeView checks NO_VOICE_FAMILY_MODE_LANGUAGES
-  // below and renders a text input instead of the mic.
-  "ur",
+  "ur", "zh", "ko", "ar", "vi", "pt", "ru", "tr",
 ] as const;
 export type FamilyModeLang = typeof FAMILY_MODE_LANGUAGES[number];
 
-// Languages where the parent types instead of speaking.
-export const NO_VOICE_FAMILY_MODE_LANGUAGES = new Set<string>(["ur"]);
+// Languages where the parent types instead of speaking. Empty now that
+// Urdu is wired through Deepgram nova-3 STT + Google Cloud TTS
+// (see voice-provider-router GOOGLE_TTS_LANGUAGES branch). Kept as an
+// extension point so future text-only languages can opt out.
+export const NO_VOICE_FAMILY_MODE_LANGUAGES = new Set<string>([]);
 
 export type FamilyModeStrings = {
   tapToSpeak: string;
@@ -44,4 +42,11 @@ export const FAMILY_MODE_STRINGS: Record<FamilyModeLang, FamilyModeStrings> = {
   pa: { tapToSpeak: "ਬੋਲਣ ਲਈ ਟੈਪ ਕਰੋ", listening: "ਸੁਣ ਰਿਹਾ ਹਾਂ…", handBack: "ਵਿਦਿਆਰਥੀ ਨੂੰ ਵਾਪਸ ਦਿਓ", thinking: "Coach Kairos ਸੋਚ ਰਿਹਾ ਹੈ…", paused: "ਜਾਰੀ ਰੱਖਣ ਲਈ ਮਾਇਕ ਟੈਪ ਕਰੋ", goodbye: "ਫੈਮਿਲੀ ਮੋਡ ਖਤਮ" },
   od: { tapToSpeak: "କଥା କହିବାକୁ ଟାପ୍ କରନ୍ତୁ", listening: "ଶୁଣୁଛି…", handBack: "ଛାତ୍ରଙ୍କୁ ଫେରାଇଦିଅନ୍ତୁ", thinking: "Coach Kairos ଚିନ୍ତା କରୁଛି…", paused: "ଜାରି ରଖିବାକୁ ମାଇକ୍ ଟାପ୍ କରନ୍ତୁ", goodbye: "ପରିବାର ମୋଡ୍ ସମାପ୍ତ" },
   ur: { tapToSpeak: "ٹیپ کر کے بولیں", listening: "سن رہا ہوں…", handBack: "طالبعلم کو واپس دیں", thinking: "Coach Kairos سوچ رہا ہے…", paused: "جاری رکھنے کے لیے مائیک پر ٹیپ کریں", goodbye: "فیملی موڈ ختم", typeHere: "یہاں لکھیں…", send: "بھیجیں" },
+  zh: { tapToSpeak: "点击说话", listening: "正在听…", handBack: "交还给学生", thinking: "Coach Kairos 正在思考…", paused: "点击麦克风继续", goodbye: "家庭模式已结束" },
+  ko: { tapToSpeak: "탭하여 말하기", listening: "듣는 중…", handBack: "학생에게 돌려주기", thinking: "Coach Kairos가 생각 중…", paused: "계속하려면 마이크를 누르세요", goodbye: "가족 모드 종료" },
+  ar: { tapToSpeak: "اضغط للتحدث", listening: "أستمع…", handBack: "العودة إلى الطالب", thinking: "المدرب كايروس يفكر…", paused: "اضغط على المايك للمتابعة", goodbye: "انتهى وضع العائلة" },
+  vi: { tapToSpeak: "Chạm để nói", listening: "Đang nghe…", handBack: "Trả lại học sinh", thinking: "Coach Kairos đang suy nghĩ…", paused: "Chạm mic để tiếp tục", goodbye: "Đã kết thúc Chế độ gia đình" },
+  pt: { tapToSpeak: "Toque para falar", listening: "Ouvindo…", handBack: "Devolver ao estudante", thinking: "Coach Kairos está pensando…", paused: "Toque o microfone para continuar", goodbye: "Modo família encerrado" },
+  ru: { tapToSpeak: "Нажмите, чтобы говорить", listening: "Слушаю…", handBack: "Вернуть студенту", thinking: "Coach Kairos думает…", paused: "Нажмите микрофон, чтобы продолжить", goodbye: "Семейный режим завершён" },
+  tr: { tapToSpeak: "Konuşmak için dokunun", listening: "Dinliyorum…", handBack: "Öğrenciye geri ver", thinking: "Coach Kairos düşünüyor…", paused: "Devam için mikrofona dokunun", goodbye: "Aile Modu sona erdi" },
 };

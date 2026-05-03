@@ -7,8 +7,8 @@ import {
 } from "../family-mode-strings";
 
 describe("family-mode-strings", () => {
-  it("covers 17 voice languages + 1 text-only (Urdu) = 18 total", () => {
-    expect(FAMILY_MODE_LANGUAGES).toHaveLength(18);
+  it("covers 25 voice languages (added zh/ko/ar/vi/pt/ru/tr 2026-05-02 via Google TTS)", () => {
+    expect(FAMILY_MODE_LANGUAGES).toHaveLength(25);
   });
   it("each language has all 6 required string keys", () => {
     const required = ["tapToSpeak", "listening", "handBack", "thinking", "paused", "goodbye"] as const;
@@ -20,11 +20,14 @@ describe("family-mode-strings", () => {
       }
     }
   });
-  it("Urdu is included as text-only (AUD-P4-001)", () => {
-    expect(FAMILY_MODE_LANGUAGES as readonly string[]).toContain("ur");
-    expect(NO_VOICE_FAMILY_MODE_LANGUAGES.has("ur")).toBe(true);
+  it("no languages are text-only — Urdu now uses Deepgram nova-3 STT + Google ur-IN TTS", () => {
+    expect(NO_VOICE_FAMILY_MODE_LANGUAGES.size).toBe(0);
+    expect(NO_VOICE_FAMILY_MODE_LANGUAGES.has("ur")).toBe(false);
   });
-  it("Urdu has typeHere + send strings for the text-input UI", () => {
+  it("Urdu is included in the language list", () => {
+    expect(FAMILY_MODE_LANGUAGES as readonly string[]).toContain("ur");
+  });
+  it("Urdu still ships typeHere + send strings (kept for keyboard fallback)", () => {
     expect(FAMILY_MODE_STRINGS.ur.typeHere).toBeTruthy();
     expect(FAMILY_MODE_STRINGS.ur.send).toBeTruthy();
   });

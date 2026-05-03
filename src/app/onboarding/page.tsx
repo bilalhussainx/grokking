@@ -21,10 +21,14 @@ import {
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────
-// Languages — superset matching the design mockup. Voice == TTS+STT in-language;
-// Text-only == typing only. Voice marking aligns with our existing Deepgram
-// (en/es/fr/de/it/nl/ja) + Sarvam (hi/bn/ta/te/gu/kn/ml/mr/pa/od) coverage.
-// Urdu remains text-only (no TTS provider yet).
+// Languages — superset matching the design mockup. Voice == TTS+STT in-language.
+// Coverage:
+//   Deepgram Aura-2 TTS (7) — en, es, fr, de, it, nl, ja
+//   Sarvam Bulbul v3 TTS (10) — hi, bn, ta, te, gu, kn, ml, mr, pa, od
+//   Google Cloud TTS (8) — ur, zh, ko, ar, vi, pt, ru, tr (top international
+//     student source markets for US/UK/Canadian universities, wired May 2026)
+// All STT runs through Deepgram nova-3 except Punjabi (Sarvam saaras) and
+// Urdu (added to nova-3 in January 2026).
 // ─────────────────────────────────────────────────────────────────────────
 type Lang = {
   code: string;
@@ -39,7 +43,7 @@ const LANGS: Lang[] = [
   { code: "en", name: "English", flag: "🇺🇸", greeting: "I'm here to listen to your story.", voice: true },
   { code: "es", name: "Español", flag: "🇪🇸", greeting: "Estoy aquí para escuchar tu historia.", voice: true },
   { code: "hi", name: "हिन्दी", flag: "🇮🇳", greeting: "मैं तुम्हारी कहानी सुनने के लिए यहाँ हूँ।", voice: true, script: "devanagari" },
-  { code: "ur", name: "اردو", flag: "🇵🇰", greeting: "میں تمہاری کہانی سننے کے لیے یہاں ہوں۔", voice: false, script: "urdu" },
+  { code: "ur", name: "اردو", flag: "🇵🇰", greeting: "میں تمہاری کہانی سننے کے لیے یہاں ہوں۔", voice: true, script: "urdu" },
   { code: "pa", name: "ਪੰਜਾਬੀ", flag: "🇮🇳", greeting: "ਮੈਂ ਤੁਹਾਡੀ ਕਹਾਣੀ ਸੁਣਨ ਲਈ ਇੱਥੇ ਹਾਂ।", voice: true, script: "gurmukhi" },
   { code: "bn", name: "বাংলা", flag: "🇧🇩", greeting: "তোমার গল্প শুনতে আমি এখানে আছি।", voice: true, script: "bengali" },
   { code: "ta", name: "தமிழ்", flag: "🇮🇳", greeting: "உன் கதை கேட்க இங்கே இருக்கிறேன்.", voice: true, script: "tamil" },
@@ -49,6 +53,13 @@ const LANGS: Lang[] = [
   { code: "kn", name: "ಕನ್ನಡ", flag: "🇮🇳", greeting: "ನಿಮ್ಮ ಕಥೆಯನ್ನು ಕೇಳಲು ನಾನು ಇಲ್ಲಿದ್ದೇನೆ.", voice: true },
   { code: "ml", name: "മലയാളം", flag: "🇮🇳", greeting: "നിങ്ങളുടെ കഥ കേൾക്കാൻ ഞാൻ ഇവിടെയുണ്ട്.", voice: true },
   { code: "od", name: "ଓଡ଼ିଆ", flag: "🇮🇳", greeting: "ତୁମ କଥା ଶୁଣିବାକୁ ମୁଁ ଏଠାରେ ଅଛି.", voice: true },
+  { code: "zh", name: "中文", flag: "🇨🇳", greeting: "我在这里聆听你的故事。", voice: true },
+  { code: "ko", name: "한국어", flag: "🇰🇷", greeting: "당신의 이야기를 듣고 있어요.", voice: true },
+  { code: "ar", name: "العربية", flag: "🇸🇦", greeting: "أنا هنا لأصغي إلى قصتك.", voice: true, script: "arabic" },
+  { code: "vi", name: "Tiếng Việt", flag: "🇻🇳", greeting: "Tôi ở đây để lắng nghe câu chuyện của bạn.", voice: true },
+  { code: "pt", name: "Português", flag: "🇧🇷", greeting: "Estou aqui para ouvir sua história.", voice: true },
+  { code: "ru", name: "Русский", flag: "🇷🇺", greeting: "Я здесь, чтобы выслушать твою историю.", voice: true },
+  { code: "tr", name: "Türkçe", flag: "🇹🇷", greeting: "Hikayeni dinlemek için buradayım.", voice: true },
   { code: "fr", name: "Français", flag: "🇫🇷", greeting: "Je suis ici pour écouter ton histoire.", voice: true },
   { code: "de", name: "Deutsch", flag: "🇩🇪", greeting: "Ich bin hier, um deine Geschichte zu hören.", voice: true },
   { code: "it", name: "Italiano", flag: "🇮🇹", greeting: "Sono qui per ascoltare la tua storia.", voice: true },
@@ -324,7 +335,7 @@ function StepLanguage({ value, onPick }: { value: string | null; onPick: (code: 
       <div className="lang-foot">
         <div className="pill-info">
           <span className="dot-i" />
-          18 languages today &nbsp;·&nbsp; more rolling out through 2026
+          25 languages today &nbsp;·&nbsp; more rolling out through 2026
         </div>
         <div className="pill-info" style={{ color: "rgba(242,237,227,.40)" }}>
           <Headphones size={12} /> Voice mode uses your device mic. We never store raw audio.

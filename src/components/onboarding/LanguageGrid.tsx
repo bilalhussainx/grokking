@@ -24,6 +24,13 @@ const GREETINGS: Record<string, string> = {
   pa: "ਤੁਹਾਡੀ ਕਹਾਣੀ ਸੁਣਨ ਲਈ ਇੱਥੇ ਹਾਂ",
   od: "ମୁଁ ତୁମ କଥା ଶୁଣିବାକୁ ଏଠାରେ ଅଛି",
   ur: "میں تمہاری کہانی سننے کے لیے یہاں ہوں",
+  zh: "我在这里聆听你的故事",
+  ko: "당신의 이야기를 듣고 있어요",
+  ar: "أنا هنا لأصغي إلى قصتك",
+  vi: "Tôi ở đây để lắng nghe câu chuyện của bạn",
+  pt: "Estou aqui para ouvir sua história",
+  ru: "Я здесь, чтобы выслушать твою историю",
+  tr: "Hikayeni dinlemek için buradayım",
 };
 
 export default function LanguageGrid({ initialLanguage }: { initialLanguage: string }) {
@@ -102,7 +109,7 @@ export default function LanguageGrid({ initialLanguage }: { initialLanguage: str
       </div>
       {error && <p className="text-rose-400 text-sm mt-6">{error}</p>}
       <p className="text-[11px] text-white/35 mt-10 text-center max-w-md">
-        The platform interface stays in English. Coach Kairos will speak your chosen language. Urdu is text-only — voice support coming soon.
+        The platform interface stays in English. Coach Kairos will speak with you in your chosen language — voice supported across all 25 languages.
       </p>
     </div>
   );

@@ -10,7 +10,7 @@ import type { ProficiencyLevel } from './language-personas';
 // ============================================
 
 export type STTProvider = 'deepgram' | 'sarvam';
-export type TTSProvider = 'deepgram' | 'sarvam';
+export type TTSProvider = 'deepgram' | 'sarvam' | 'google';
 export type LLMProvider = 'moonshot-api' | 'gemini';
 
 export interface VoiceProviderConfig {
@@ -48,9 +48,50 @@ const DEEPGRAM_TTS_LANGUAGES = ['en', 'es', 'fr', 'de', 'nl', 'it', 'ja'];
 // Sarvam Bulbul v3 TTS: 11 Indic languages
 const SARVAM_LANGUAGES = ['hi', 'bn', 'ta', 'te', 'gu', 'kn', 'ml', 'mr', 'pa', 'od', 'en-IN'];
 
+// Languages where STT routes to Deepgram nova-3 (50+ languages including
+// Urdu/Hebrew/Persian added January 2026) and TTS routes to Google Cloud
+// because neither Sarvam Bulbul v3 nor Deepgram Aura-2 covers them.
+// Picked to match the top international student source countries
+// sending applicants to US/UK/Canadian universities:
+//   ur — Pakistan
+//   zh — China (#1 source globally)
+//   ko — South Korea
+//   ar — Gulf states (Saudi Arabia, UAE, Egypt, Jordan)
+//   vi — Vietnam
+//   pt — Brazil
+//   ru — Russia / CIS
+//   tr — Turkey
+// Requires GOOGLE_CLOUD_CREDENTIALS env var (service-account JSON).
+const GOOGLE_TTS_LANGUAGES = ['ur', 'zh', 'ko', 'ar', 'vi', 'pt', 'ru', 'tr'];
+
 export function isSarvamLanguage(lang: string): boolean {
   return SARVAM_LANGUAGES.includes(lang);
 }
+
+export function isGoogleTtsLanguage(lang: string): boolean {
+  return GOOGLE_TTS_LANGUAGES.includes(lang);
+}
+
+// BCP-47 mapping for Google Cloud TTS. Each entry is the language code
+// app-side → BCP-47 locale that Google publishes a voice for. Verified
+// via scripts/list-urdu-voices.mjs against the live listVoices() API.
+//
+// Notes:
+//  - ur: Google only ships ur-IN (no ur-PK); identical script reads
+//    natural for Pakistani users.
+//  - zh: Mandarin is published as cmn-CN, not zh-CN.
+//  - ar: ar-XA is Google's pan-Arabic locale (covers Gulf states +
+//    North Africa with a neutral MSA accent).
+const GOOGLE_TTS_LANG_CODES: Record<string, string> = {
+  ur: 'ur-IN',
+  zh: 'cmn-CN',
+  ko: 'ko-KR',
+  ar: 'ar-XA',
+  vi: 'vi-VN',
+  pt: 'pt-BR',
+  ru: 'ru-RU',
+  tr: 'tr-TR',
+};
 
 // All supported languages with metadata
 export const ALL_SUPPORTED_LANGUAGES = [
@@ -73,6 +114,15 @@ export const ALL_SUPPORTED_LANGUAGES = [
   { code: 'mr', name: 'Marathi', native: '\u092E\u0930\u093E\u0920\u0940', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
   { code: 'pa', name: 'Punjabi', native: '\u0A2A\u0A70\u0A1C\u0A3E\u0A2C\u0A40', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
   { code: 'od', name: 'Odia', native: '\u0B13\u0B21\u0B3C\u0B3F\u0B06', flag: '\u{1F1EE}\u{1F1F3}', provider: 'sarvam' as const },
+  // Google Cloud TTS — top international student source markets (added 2026-05-02)
+  { code: 'ur', name: 'Urdu',       native: '\u0627\u0631\u062F\u0648', flag: '\u{1F1F5}\u{1F1F0}', provider: 'google' as const },
+  { code: 'zh', name: 'Mandarin',   native: '\u4E2D\u6587', flag: '\u{1F1E8}\u{1F1F3}', provider: 'google' as const },
+  { code: 'ko', name: 'Korean',     native: '\uD55C\uAD6D\uC5B4', flag: '\u{1F1F0}\u{1F1F7}', provider: 'google' as const },
+  { code: 'ar', name: 'Arabic',     native: '\u0627\u0644\u0639\u0631\u0628\u064A\u0629', flag: '\u{1F1F8}\u{1F1E6}', provider: 'google' as const },
+  { code: 'vi', name: 'Vietnamese', native: 'Ti\u1EBFng Vi\u1EC7t', flag: '\u{1F1FB}\u{1F1F3}', provider: 'google' as const },
+  { code: 'pt', name: 'Portuguese', native: 'Portugu\u00EAs', flag: '\u{1F1E7}\u{1F1F7}', provider: 'google' as const },
+  { code: 'ru', name: 'Russian',    native: '\u0420\u0443\u0441\u0441\u043A\u0438\u0439', flag: '\u{1F1F7}\u{1F1FA}', provider: 'google' as const },
+  { code: 'tr', name: 'Turkish',    native: 'T\u00FCrk\u00E7e', flag: '\u{1F1F9}\u{1F1F7}', provider: 'google' as const },
 ] as const;
 
 // Deepgram voice catalog — multiple voices per language with accents
@@ -157,11 +207,37 @@ export interface RouterOptions {
 export function getVoiceProviderConfig(options: RouterOptions): VoiceProviderConfig {
   const { language, voiceId } = options;
 
-  // Hard-block voice for languages declared text-only in coach-languages.ts
-  // (e.g. Urdu — no working TTS provider). Previously this fell through to
-  // the English Deepgram default, which played accented English audio of a
-  // translated Urdu response — confusing UX. Throw with a known code so
-  // useCoachVoice can surface a "voice not yet supported for <lang>" banner.
+  // Tier 3: Hybrid pipeline — Deepgram STT + Google Cloud TTS for
+  // languages neither Deepgram Aura-2 nor Sarvam Bulbul v3 covers
+  // (Urdu, Mandarin, Korean, Arabic, Vietnamese, Portuguese, Russian,
+  // Turkish — top international student source markets). Deepgram
+  // nova-3 covers all of these for STT.
+  if (GOOGLE_TTS_LANGUAGES.includes(language)) {
+    const googleLocale = GOOGLE_TTS_LANG_CODES[language];
+    if (!googleLocale) {
+      throw new Error(`VOICE_UNSUPPORTED:${language}`);
+    }
+    return {
+      stt: { provider: 'deepgram', model: 'nova-3' },
+      tts: {
+        provider: 'google',
+        voiceId: voiceId || googleLocale,
+        model: 'google-tts-standard',
+      },
+      llm: {
+        provider: 'moonshot-api',
+        model: 'kimi-k2-turbo-preview',
+        apiKey: MOONSHOT_API_KEY,
+      },
+      tier: 2,
+      estimatedCostPerMinute: 0.05,
+    };
+  }
+
+  // Hard-block voice for any other language not in the known providers.
+  // Previously this fell through to the English Deepgram default, which
+  // played accented English audio of a translated reply — confusing UX.
+  // Throw with a known code so useCoachVoice can surface a clear banner.
   if (!DEEPGRAM_TTS_LANGUAGES.includes(language) && !SARVAM_LANGUAGES.includes(language)) {
     if (language && language !== "en" && language !== "unknown") {
       throw new Error(`VOICE_UNSUPPORTED:${language}`);
@@ -359,10 +435,26 @@ export async function synthesizeSpeech(
   switch (providerConfig.tts.provider) {
     case 'sarvam':
       return synthesizeWithSarvam(text, providerConfig.tts);
+    case 'google':
+      return synthesizeWithGoogleTts(text, providerConfig.tts);
     case 'deepgram':
     default:
       return synthesizeWithDeepgram(text, providerConfig.tts);
   }
+}
+
+// Google Cloud TTS dispatcher — used for languages outside Deepgram +
+// Sarvam coverage (currently Urdu only). The voiceId on providerConfig
+// is the BCP-47 language code (e.g. "ur-IN"), set in
+// getVoiceProviderConfig's GOOGLE_TTS_LANGUAGES branch.
+async function synthesizeWithGoogleTts(
+  text: string,
+  config: VoiceProviderConfig['tts'],
+): Promise<ArrayBuffer> {
+  // Lazy import so dev environments without GOOGLE_CLOUD_CREDENTIALS
+  // don't crash on module evaluation when Google TTS is never used.
+  const { synthesizeWithGoogle } = await import('./voice/google-tts');
+  return synthesizeWithGoogle(text, { languageCode: config.voiceId });
 }
 
 async function synthesizeWithDeepgram(
