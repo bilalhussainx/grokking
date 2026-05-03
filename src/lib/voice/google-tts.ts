@@ -1,4 +1,9 @@
 // src/lib/voice/google-tts.ts
+// SERVER-ONLY. The @google-cloud/text-to-speech SDK pulls in Node-only
+// modules (tls, net via node-fetch + https-proxy-agent), so importing
+// this from a client component will crash Turbopack at build time.
+// The `import 'server-only'` line below makes the failure loud + early.
+import "server-only";
 // Google Cloud Text-to-Speech wrapper for languages not covered by
 // Sarvam Bulbul v3 or Deepgram Aura-2. Currently used for Urdu (ur-IN)
 // only — Google only ships Urdu under the Indian locale; the script is

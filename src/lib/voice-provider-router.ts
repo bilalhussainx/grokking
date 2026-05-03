@@ -428,6 +428,14 @@ export async function translateWithKimiAPI(config: TranslationConfig): Promise<s
 // TTS (Text-to-Speech)
 // ============================================
 
+// Server-only TTS dispatcher. Note: the 'google' branch is intentionally
+// NOT handled here. Google's @google-cloud/text-to-speech SDK pulls in
+// node-fetch + https-proxy-agent which depend on Node's `tls` and `net`
+// modules — Turbopack chokes when this module is imported by client code
+// (AICoach.tsx, useVoiceAgent.ts). Callers that need 'google' provider
+// must import `src/lib/voice/google-tts` directly from a server route.
+// See src/app/api/language/tts/route.ts and src/app/api/language/sarvam/
+// stream/route.ts for the pattern.
 export async function synthesizeSpeech(
   text: string,
   providerConfig: VoiceProviderConfig
@@ -436,25 +444,16 @@ export async function synthesizeSpeech(
     case 'sarvam':
       return synthesizeWithSarvam(text, providerConfig.tts);
     case 'google':
-      return synthesizeWithGoogleTts(text, providerConfig.tts);
+      throw new Error(
+        "synthesizeSpeech: 'google' provider must be handled by the caller — " +
+        "import synthesizeWithGoogle from src/lib/voice/google-tts directly. " +
+        "Routing this through voice-provider-router pulls Google's SDK into " +
+        "client bundles and breaks Turbopack."
+      );
     case 'deepgram':
     default:
       return synthesizeWithDeepgram(text, providerConfig.tts);
   }
-}
-
-// Google Cloud TTS dispatcher — used for languages outside Deepgram +
-// Sarvam coverage (currently Urdu only). The voiceId on providerConfig
-// is the BCP-47 language code (e.g. "ur-IN"), set in
-// getVoiceProviderConfig's GOOGLE_TTS_LANGUAGES branch.
-async function synthesizeWithGoogleTts(
-  text: string,
-  config: VoiceProviderConfig['tts'],
-): Promise<ArrayBuffer> {
-  // Lazy import so dev environments without GOOGLE_CLOUD_CREDENTIALS
-  // don't crash on module evaluation when Google TTS is never used.
-  const { synthesizeWithGoogle } = await import('./voice/google-tts');
-  return synthesizeWithGoogle(text, { languageCode: config.voiceId });
 }
 
 async function synthesizeWithDeepgram(

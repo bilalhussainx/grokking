@@ -36,12 +36,25 @@ export async function POST(req: NextRequest) {
 
   try {
     const providerConfig = getVoiceProviderConfig({ language });
-    const audioBuffer = await synthesizeSpeech(text, providerConfig);
+    let audioBuffer: ArrayBuffer;
+    let contentType = "audio/wav";
+
+    if (providerConfig.tts.provider === "google") {
+      // Google's SDK is server-only (Node tls/net deps); import here so
+      // it never ends up in client bundles via voice-provider-router.
+      const { synthesizeWithGoogle } = await import("@/lib/voice/google-tts");
+      audioBuffer = await synthesizeWithGoogle(text, {
+        languageCode: providerConfig.tts.voiceId,
+      });
+      contentType = "audio/mpeg"; // google-tts.ts returns MP3
+    } else {
+      audioBuffer = await synthesizeSpeech(text, providerConfig);
+    }
 
     return new NextResponse(audioBuffer, {
       status: 200,
       headers: {
-        "Content-Type": "audio/wav",
+        "Content-Type": contentType,
         "Cache-Control": "public, max-age=3600",
       },
     });
