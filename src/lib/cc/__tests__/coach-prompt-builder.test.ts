@@ -310,4 +310,38 @@ describe("buildSystemPrompt", () => {
     const prompt = buildSystemPrompt(ctx);
     expect(prompt).not.toContain("DASHBOARD VARIANT:");
   });
+
+  describe("catalog constraint (Workstream C — Canada)", () => {
+    it("US student gets the strict refusal of Canadian schools", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "US" });
+      expect(prompt).toContain("US schools only");
+      expect(prompt).toContain("Canadian, UK, or other non-US");
+    });
+    it("Canadian student gets the relaxed catalog block", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "CA" });
+      expect(prompt).toContain("12 Canadian universities");
+      expect(prompt).toContain("University of Toronto");
+      expect(prompt).not.toContain("US schools only");
+    });
+    it("Pakistani student gets the relaxed catalog block (Brampton ICP)", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "PK" });
+      expect(prompt).toContain("12 Canadian universities");
+    });
+  });
+
+  describe("Canada guidance block (Workstream C)", () => {
+    it("appears for Canadian students", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "CA" });
+      expect(prompt).toContain("CANADIAN APPLICATION GUIDANCE");
+      expect(prompt).toContain("OUAC");
+    });
+    it("appears for Pakistani students (diaspora dual-apply)", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "PK" });
+      expect(prompt).toContain("CANADIAN APPLICATION GUIDANCE");
+    });
+    it("does not appear for US students", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "US" });
+      expect(prompt).not.toContain("CANADIAN APPLICATION GUIDANCE");
+    });
+  });
 });
