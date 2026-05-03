@@ -20,9 +20,14 @@ UPDATE cc_schools SET country = 'US' WHERE country IS NULL OR country = '';
 --   - https://you.ubc.ca/applying-ubc/dates-deadlines/
 --   - https://mcgill.ca/undergraduate-admissions/apply
 --   - https://uwaterloo.ca/future-students/admissions/dates-deadlines
+--
+-- Idempotency: the cc_schools table doesn't ship with a UNIQUE
+-- constraint on `name` (other migrations may key on id), so we use
+-- a NOT EXISTS guard per-school instead of ON CONFLICT.
 
 INSERT INTO cc_schools (name, country, province, application_platform, website, school_type, acceptance_rate, osap_eligible)
-VALUES
+SELECT v.name, v.country, v.province, v.application_platform, v.website, v.school_type, v.acceptance_rate, v.osap_eligible
+FROM (VALUES
   ('University of Toronto',     'CA', 'ON', 'OUAC',         'https://future.utoronto.ca',                              'public', 0.43, TRUE),
   ('University of British Columbia', 'CA', 'BC', 'UBC_direct', 'https://you.ubc.ca',                                    'public', 0.52, FALSE),
   ('McGill University',         'CA', 'QC', 'McGill_direct','https://www.mcgill.ca/undergraduate-admissions/',         'public', 0.46, FALSE),
@@ -35,4 +40,7 @@ VALUES
   ('Simon Fraser University',   'CA', 'BC', 'SFU_direct',   'https://www.sfu.ca',                                       'public', 0.66, FALSE),
   ('Toronto Metropolitan University', 'CA', 'ON', 'OUAC',   'https://www.torontomu.ca',                                 'public', 0.67, TRUE),
   ('York University',           'CA', 'ON', 'OUAC',         'https://www.yorku.ca',                                     'public', 0.71, TRUE)
-ON CONFLICT (name) DO NOTHING;
+) AS v(name, country, province, application_platform, website, school_type, acceptance_rate, osap_eligible)
+WHERE NOT EXISTS (
+  SELECT 1 FROM cc_schools cs WHERE cs.name = v.name
+);
