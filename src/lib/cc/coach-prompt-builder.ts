@@ -119,10 +119,12 @@ const PERSONALITY = `You are Coach Kairos, a college admissions counselor who gu
 // refusal blocked the canonical paying customer (Audit Prompt 4 Gap 3).
 function buildCatalogConstraint(ctx: { country?: string | null }): string {
   const isCanadaContext = ctx.country === "CA" || ctx.country === "PK";
-  if (isCanadaContext) {
+  const isUKContext = ctx.country === "UK" || ctx.country === "PK";
+  // Pakistani students apply to all three regions; relax for any of them.
+  if (isCanadaContext || isUKContext) {
     return `
 
-SCHOOL CATALOG: Our directory contains US schools and 12 Canadian universities (University of Toronto, UBC, McGill, Waterloo, Queen's, Western, McMaster, Alberta, Ottawa, SFU, Toronto Metropolitan, York). You can recommend, discuss, and help the student add any of these. Other countries (UK, Australia, etc.) are not yet in the directory — if asked, acknowledge briefly ("we don't have UK schools yet") and offer comparable US or Canadian alternatives.`;
+SCHOOL CATALOG: Our directory contains US schools, 12 Canadian universities (University of Toronto, UBC, McGill, Waterloo, Queen's, Western, McMaster, Alberta, Ottawa, SFU, Toronto Metropolitan, York), and 12 UK universities (Oxford, Cambridge, Imperial College London, LSE, UCL, King's College London, Edinburgh, Manchester, Bristol, Warwick, Durham, St Andrews). You can recommend, discuss, and help the student add any of these. Other countries (Australia, Germany, etc.) are not yet in the directory — if asked, acknowledge briefly and offer comparable alternatives from the supported regions.`;
   }
   return `
 
@@ -257,6 +259,9 @@ export function buildSystemPrompt(ctx: CoachContext): string {
 
   const canadaBlock = buildCanadaBlock(ctx);
   if (canadaBlock) sections.push(canadaBlock);
+
+  const ukBlock = buildUKBlock(ctx);
+  if (ukBlock) sections.push(ukBlock);
 
   if (ctx.studentName || ctx.grade || ctx.gpaUnweighted) {
     const parts: string[] = [];
@@ -438,6 +443,29 @@ CANADIAN APPLICATION GUIDANCE:
 - Currency: Canadian tuition + living costs run CAD 50,000-90,000/year for international students; convert to USD or PKR for the family — Canadian tuition LOOKS lower than US private but is similar after currency conversion and lower aid.
 - For Pakistani-Canadian families in the GTA (Brampton, Mississauga, Toronto) dual-applying: the strategy is usually US Ivies as reach + UofT/Waterloo/McGill as match-or-target. Treat Canadian schools as full options, not as "backup."${ctx.country === "CA" ? `
 - Province-specific grade conversion for the student's intake: ${ctx.state ? `${ctx.state} system applies — convert directly without the Pakistani-FSc band table.` : `Ask which province (Ontario / BC / Alberta / Quebec / other) and apply the corresponding grade conversion.`}` : ""}`;
+}
+
+// UK-application guidance. Fires for explicit UK students AND for Pakistani
+// diaspora students (Saïd Foundation Scholarships specifically target
+// Pakistani students at top UK universities — almost no other platform
+// surfaces this). Mirrors the Canada pattern.
+function buildUKBlock(ctx: CoachContext): string {
+  const isUKContext = ctx.country === "UK" || ctx.country === "PK";
+  if (!isUKContext) return "";
+
+  return `
+
+UK APPLICATION GUIDANCE:
+- All UK universities apply through UCAS (apply.ucas.com). Single platform, up to 5 university choices, £28.50 fee. Personal statement is UCAS-wide — one set of three answers goes to all 5 choices.
+- Application deadlines: October 15, 2026 (18:00 UK time) for Oxford, Cambridge, and all UK medicine / dentistry / veterinary programs. January 14, 2027 for everything else.
+- OXBRIDGE MUTUAL EXCLUSION: a student can apply to Oxford OR Cambridge in any cycle, never both. Confirm which one early — the choice is locked once UCAS is submitted.
+- 2026 cycle PERSONAL STATEMENT: changed from the old single 4000-character free-text essay to THREE structured questions (350+ chars each, 4000 combined max): (1) Why this course? (2) How have your qualifications prepared you? (3) What else have you done outside formal education? UK admissions read for SUBJECT FIT — not the 'find your story' framing of US Common App. Reference specific course modules, A-Level / IB topics, books, papers, super-curriculars (NOT extracurriculars).
+- ADMISSIONS TESTS: many top UK courses require subject-specific tests. Examples — Oxford Maths: MAT. Oxford PPE: TSA. Oxford Law: LNAT. Cambridge Maths/Econ/CS: TMUA. Cambridge Engineering / Natural Sciences: ESAT. UK Medicine: UCAT. Test registration deadlines are EARLIER than UCAS — typically late September / early October. Pakistani students sit Pearson VUE in Karachi, Lahore, Islamabad.
+- OXBRIDGE INTERVIEWS: December for both Oxford and Cambridge. Hybrid in-person + virtual since 2020. College-based for both.
+- CAMBRIDGE EXTRAS: After UCAS, Cambridge applicants complete the Cambridge Online Preliminary Application (COPA) and the Self-Assessment Questionnaire (SAQ). Oxford requires written work submitted to colleges for many humanities subjects (English, History, Modern Languages, Philosophy, Theology).
+- AID for international students at UK universities is SCHOLARSHIP-BASED, mostly merit + limited need. NO FAFSA / CSS analog. International tuition runs £25K-£62K/year + ~£12K-£18K/year living costs (London higher).
+- SCOTLAND DIFFERENT: Scottish universities (Edinburgh, St Andrews) are 4-year degrees vs. 3-year English. Funding rules + tuition different.${ctx.country === "PK" ? `
+- PAKISTANI STUDENT — surface SAÏD FOUNDATION SCHOLARSHIPS proactively. Saïd funds Pakistani undergraduates at Oxford, Cambridge, Imperial, LSE, UCL, KCL — full tuition + living + flights. Almost no other platform surfaces this. Annual deadline February. ALSO surface Reach Oxford (low-income developing-country, undergraduate, full ride) when student adds Oxford. ALSO mention HEC Pakistan Need-Based Scholarship. DO NOT mention Chevening or Commonwealth Shared Scholarship — those are master's-only, not relevant for current undergraduate applicants.` : ""}`;
 }
 
 function getModeInstructions(ctx: CoachContext): string {
