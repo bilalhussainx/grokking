@@ -450,6 +450,67 @@ IMPORTANT: Focus conversation on the lesson topic above. Create scenarios where 
         // Stream response text — client shows agent message
         send({ type: 'response', text: responseText });
 
+        // ── Persist coach-mode turns to cc_coach_conversations ──
+        // Voice replies were previously not saved, so a page refresh
+        // wiped the conversation history and the coach restarted from
+        // scratch (asking GPA again). Mirror what /api/cc/coach/message
+        // does for text turns: insert one user row + one assistant row
+        // (with the actions block stripped) so /api/cc/coach/history
+        // can replay the dialogue on reload.
+        if (mode === 'coach' && transcript && responseText) {
+          try {
+            const { createServerSupabase } = await import('@/lib/supabase-auth');
+            const userSupabase = await createServerSupabase();
+            const { data: { user } } = await userSupabase.auth.getUser();
+            if (user) {
+              const { createAdminSupabase } = await import(
+                '@/app/api/cc/helpers'
+              );
+              const admin = createAdminSupabase();
+              // Find or create the student profile so we have a stable
+              // student_id to attach the conversation rows to.
+              const { data: profileRow } = await admin
+                .from('cc_student_profiles')
+                .select('id')
+                .eq('user_id', user.id)
+                .maybeSingle<{ id: string }>();
+              let profileId = profileRow?.id;
+              if (!profileId) {
+                const { data: created } = await admin
+                  .from('cc_student_profiles')
+                  .insert({ user_id: user.id })
+                  .select('id')
+                  .single<{ id: string }>();
+                profileId = created?.id;
+              }
+              if (profileId) {
+                const { stripActionsBlock } = await import(
+                  '@/lib/cc/coach-actions-block'
+                );
+                const cleanResponse = stripActionsBlock(responseText);
+                await admin.from('cc_coach_conversations').insert([
+                  {
+                    student_id: profileId,
+                    role: 'user',
+                    content: transcript,
+                    mode: 'voice',
+                    page_context: 'voice',
+                  },
+                  {
+                    student_id: profileId,
+                    role: 'assistant',
+                    content: cleanResponse,
+                    mode: 'voice',
+                    page_context: 'voice',
+                  },
+                ]);
+              }
+            }
+          } catch (err) {
+            console.error('[SarvamStream] failed to persist coach turn:', err);
+          }
+        }
+
         // ── Step 3: TTS ──
         // Google Cloud TTS for the 8-language pipeline (ur, zh, ko, ar, vi,
         // pt, ru, tr) — each gets its native BCP-47 voice from

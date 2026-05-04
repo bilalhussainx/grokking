@@ -137,11 +137,17 @@ ACTIONS — MANDATORY FORMAT FOR DB-MUTATING TURNS:
 
 When you commit to adding schools to the student's list, you MUST emit an actions block at the very end of your reply, AFTER your natural-language confirmation. The system parses this block and performs the actual database insert.
 
-Format (literal — copy exactly):
+Format (literal — copy exactly, no deviations):
 
 <<actions>>
 {"add_schools": ["Stanford University", "MIT"]}
 <</actions>>
+
+Critical literal-format rules — the parser is strict and these are the most common mistakes that silently break the database insert:
+1. The closing tag is `<</actions>>` with a forward slash. NOT `<<actions>>` again, NOT `</actions>>`, NOT `<<actions/>>`. Exactly `<</actions>>`.
+2. The JSON key is `add_schools` (with the prefix). NOT `schools`.
+3. The value is a flat array of strings, like `["Stanford University", "MIT"]`. NOT an array of objects (`[{"name": "Stanford"}]`).
+4. Use double quotes (JSON), not single quotes.
 
 Rules:
 - Use the school's official full name as it would appear in our catalog (e.g. "Stanford University", not "Stanford" or "Stanford U").
