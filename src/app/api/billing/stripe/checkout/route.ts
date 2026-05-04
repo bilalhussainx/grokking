@@ -41,7 +41,10 @@ export async function POST(req: NextRequest) {
     req.headers.get("origin") ||
     `${req.nextUrl.protocol}//${req.nextUrl.host}`;
 
-  const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2026-04-22.dahlia" });
+  // Omit apiVersion — let the Stripe SDK pick its own default. Pinning a
+   // dahlia release (or any specific version) forces the SDK and the
+   // server to disagree if either drifts.
+  const stripe = new Stripe(STRIPE_SECRET_KEY);
 
   // Look up an existing Stripe customer for this user from the user_subscriptions
   // table (same table the existing Paddle flow writes to). If none, Stripe creates
@@ -68,8 +71,10 @@ export async function POST(req: NextRequest) {
       client_reference_id: user.id,
       subscription_data: {
         metadata: { user_id: user.id, plan: "pro" },
-        // First month free per the marketing page promise.
-        trial_period_days: 30,
+        // No trial here. The free 7-day Pro trial is granted at signup
+        // by the Supabase trigger (create_signup_pro_trial in migration
+        // 013_align_pro_trial_to_7_days). Stripe Checkout is hit AFTER
+        // the trial expires, so we charge $12 immediately on subscribe.
       },
       allow_promotion_codes: true,
     });

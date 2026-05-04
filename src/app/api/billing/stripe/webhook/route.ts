@@ -118,6 +118,21 @@ async function upsertSubscription(
     const { error } = await db.from("user_subscriptions").insert({ user_id: userId, ...patch });
     if (error) throw error;
   }
+
+  // Mirror the access state onto user_profiles.role so the rest of the
+  // app — trial banner, AIStateContext.isProUser, PricingCards.isPro —
+  // sees a consistent view. isPro() (credentials-pro-gate) reads
+  // user_subscriptions, but a lot of UI still gates on profile.role,
+  // and without this sync the UI shows Pro after cancel until the next
+  // page reload picks up the trial trigger expiring.
+  if (patch.plan === "pro" && (patch.status === "active" || patch.status === "trialing")) {
+    await db.from("user_profiles").update({ role: "pro" }).eq("id", userId);
+  } else if (patch.plan === "free" || patch.status === "canceled") {
+    await db.from("user_profiles").update({ role: "student" }).eq("id", userId);
+  }
+  // Note: past_due / paused intentionally don't flip role — we want to
+  // keep showing Pro UI while Stripe retries failed payments, otherwise
+  // a single declined invoice yanks access mid-cycle.
 }
 
 function tsToISO(unixSeconds: number | null | undefined): string | null {
@@ -139,7 +154,8 @@ export async function POST(req: NextRequest) {
   }
 
   const rawBody = await req.text();
-  const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2026-04-22.dahlia" });
+  // Let the SDK pick its default API version (see checkout route note).
+  const stripe = new Stripe(STRIPE_SECRET_KEY);
 
   let event: Stripe.Event;
   try {
