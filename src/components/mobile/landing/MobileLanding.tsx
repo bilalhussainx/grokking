@@ -103,7 +103,7 @@ export default function MobileLanding() {
               color: "#d4a84b",
             }}
           >
-            For first-gen and international families
+            For first-gen and international students
           </p>
           <h1
             className="mb-5 leading-[1.05]"
@@ -115,9 +115,9 @@ export default function MobileLanding() {
               letterSpacing: "-0.01em",
             }}
           >
-            The only college counselor that talks to your mother in{" "}
-            <em style={{ color: "#d4a84b", fontStyle: "italic" }}>Urdu</em> at
-            11pm — for $12 a month.
+            The{" "}
+            <em style={{ color: "#d4a84b", fontStyle: "italic" }}>$5,000</em>{" "}
+            college counselor, for $12 a month.
           </h1>
           <p
             className="mb-8 leading-relaxed"
@@ -141,7 +141,7 @@ export default function MobileLanding() {
                 boxShadow: "0 8px 22px -8px rgba(212,175,55,.5)",
               }}
             >
-              Get started — free for first-gen
+              Get started — free with a trial
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link

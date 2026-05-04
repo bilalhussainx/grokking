@@ -192,7 +192,7 @@ After the 4 weeks, the next sprint sequence (per Prompt 8 deferred items):
 
 ## What I deliberately did NOT plan
 
-- **Prompts 5 + 8 stand-alone plans.** Prompt 5 is competitive positioning; Prompt 8 is the synthesis. Neither is a build plan; both inform the sequencing above. The marketing positioning sentence ("the only college counselor that talks to your mother in Urdu at 11pm the night before the deadline — for $12 a month") goes on the landing page (Mobile plan) rather than into a separate workstream.
+- **Prompts 5 + 8 stand-alone plans.** Prompt 5 is competitive positioning; Prompt 8 is the synthesis. Neither is a build plan; both inform the sequencing above. The marketing positioning sentence ("the $5,000 college counselor, for $12 a month") goes on the landing page (Mobile plan) rather than into a separate workstream.
 - **Hong Kong, Mainland China, Singapore.** Per Prompt 2 — wait, wait, partner-or-wait. No build plan for these in 2026 or 2027.
 - **Adaptive SAT/ACT practice (Prompt 3 #9).** Khan Academy + Bluebook are free and best-in-class; wrong shape for one engineer.
 - **ASSIST.org / CA articulation (Prompt 3 #13).** Niche; bundle into transfer essay module if/when transfer leaves demo-ware.
