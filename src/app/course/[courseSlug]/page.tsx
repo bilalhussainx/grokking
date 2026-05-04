@@ -140,7 +140,7 @@ export default function CourseOverviewPage() {
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
           {!isFree && (
-            <p className="text-white/20 text-xs mt-2">1-month free Pro trial included</p>
+            <p className="text-white/20 text-xs mt-2">7-day free Pro trial included</p>
           )}
         </motion.div>
 

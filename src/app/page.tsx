@@ -489,7 +489,7 @@ export default function HomePage() {
             <div className="rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/5 to-orange-500/5 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-white">
-                  You&#39;re on a free 1-month Pro trial
+                  You&#39;re on a free 7-day Pro trial
                 </p>
                 <p className="text-xs text-white/50 mt-0.5">
                   Pro access and {credits} credits expire on{" "}

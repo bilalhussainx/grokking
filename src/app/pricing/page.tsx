@@ -327,7 +327,7 @@ export default function PricingPage() {
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              First month free. Cancel anytime.
+              Free 7-day trial. No card required.
             </p>
           </div>
         </div>
@@ -458,7 +458,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Is there really a free trial?",
-    a: "Yes. New users get the first month of Pro free on signup. You'll see a single charge of $12 thirty days later only if you don't cancel.",
+    a: "Yes. New users get a free 7-day Pro trial — no card required. After day 7, you'll be asked to subscribe at $12/month to keep Pro access. If you don't subscribe, your account stays usable on the free tier.",
   },
   {
     q: "Why $12 instead of free?",

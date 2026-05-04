@@ -29,9 +29,9 @@ export async function POST() {
     .single();
 
   if (!existingProfile) {
-    // Create profile with pro trial (30 days)
+    // Create profile with pro trial (7 days)
     const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + 30);
+    trialEnd.setDate(trialEnd.getDate() + 7);
 
     await admin.from("user_profiles").upsert({
       id: user.id,
@@ -41,9 +41,9 @@ export async function POST() {
       trial_ends_at: trialEnd.toISOString(),
     }, { onConflict: "id" });
   } else if (!existingProfile.trial_ends_at) {
-    // Existing user without trial_ends_at — set it now (30 days from today)
+    // Existing user without trial_ends_at — set it now (7 days from today)
     const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + 30);
+    trialEnd.setDate(trialEnd.getDate() + 7);
     await admin.from("user_profiles")
       .update({ role: "pro", trial_ends_at: trialEnd.toISOString() })
       .eq("id", user.id);
