@@ -456,17 +456,31 @@ IMPORTANT: Focus conversation on the lesson topic above. Create scenarios where 
         // GOOGLE_TTS_LANG_CODES so the audio is in the language's native
         // accent (not English mispronouncing the script). Sarvam Bulbul
         // continues to handle hi/pa.
+        //
+        // Uses streamingSynthesizeWithGoogle (Google's bidirectional
+        // streamingSynthesize RPC) so the TTS engine begins emitting MP3
+        // frames as soon as the first audio is rendered — running TTS
+        // generation in parallel with the network transit instead of
+        // buffering the full reply server-side. The client today still
+        // expects a single MP3 (one `audio` event), so we accumulate
+        // chunks here. A future client refactor that consumes
+        // `audio_chunk` + `audio_done` events would unlock true
+        // time-to-first-audio reduction.
         if (isGoogle && responseText) {
           try {
-            const { synthesizeWithGoogle } = await import('@/lib/voice/google-tts');
+            const { streamingSynthesizeWithGoogle } = await import('@/lib/voice/google-tts');
             const locale = GOOGLE_TTS_LANG_CODES[language];
             if (!locale) {
               throw new Error(`No Google TTS locale for language ${language}`);
             }
-            const audioBuffer = await synthesizeWithGoogle(responseText, {
+            const chunks: Buffer[] = [];
+            for await (const chunk of streamingSynthesizeWithGoogle(responseText, {
               languageCode: locale,
-            });
-            const audioBase64 = Buffer.from(audioBuffer).toString('base64');
+            })) {
+              chunks.push(chunk);
+            }
+            const combined = Buffer.concat(chunks);
+            const audioBase64 = combined.toString('base64');
             if (audioBase64) {
               send({ type: 'audio', base64: audioBase64 });
             }
