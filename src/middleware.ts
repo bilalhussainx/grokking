@@ -184,6 +184,22 @@ export async function middleware(request: NextRequest) {
       url.searchParams.set("blocked", "grade9");
       return NextResponse.redirect(url);
     }
+    // Onboarded real users on the legacy "/" land on /cc/dashboard
+    // server-side. This used to happen client-side via a useEffect in
+    // src/app/page.tsx, which produced a 3-frame flicker on sign-in:
+    //   (1) legacy CounselorDashboard renders briefly
+    //   (2) preferences fetch decides to redirect — adaptive dashboard
+    //       renders without sidebar while route transitions
+    //   (3) settles on /cc/dashboard
+    // Doing it here at the edge means the browser never sees "/" — first
+    // paint is /cc/dashboard, no flicker. Query params (e.g. coach=open,
+    // focus=intake from the onboarding language-picker handoff) are
+    // preserved so the new dashboard can read them.
+    if (pathname === "/") {
+      const url = new URL("/cc/dashboard", request.url);
+      request.nextUrl.searchParams.forEach((v, k) => url.searchParams.set(k, v));
+      return NextResponse.redirect(url);
+    }
   }
 
   // Skip remaining public-route checks (fastest path)
