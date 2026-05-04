@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getLanguagePersona, getDefaultPersona, type ProficiencyLevel } from "@/lib/language-personas";
 import { createServerSupabase } from "@/lib/supabase-auth";
+import { GOOGLE_TTS_LANG_CODES, isGoogleTtsLanguage } from "@/lib/voice-provider-router";
 
 const SARVAM_API_KEY = process.env.SARVAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
@@ -11,8 +12,14 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 // Spec: 2026-04-07 OpenRouter parity with Coach Kairos
 const VOICE_LLM_MODEL = process.env.OPENROUTER_VOICE_MODEL || "anthropic/claude-sonnet-4.5";
 
+// Languages this endpoint currently terminates TTS for via Sarvam Bulbul.
 const SARVAM_LANGUAGES = ['hi', 'pa'];
 const SARVAM_STT_LANGUAGES = ['pa'];
+
+// Languages this endpoint terminates TTS for via Google Cloud TTS. STT for
+// these still goes through Deepgram nova-3 (which covers all 8 natively).
+// Voices are auto-selected from DEFAULT_VOICES in src/lib/voice/google-tts.ts.
+const GOOGLE_TTS_LANGUAGES = Object.keys(GOOGLE_TTS_LANG_CODES);
 
 const SARVAM_SPEAKERS: Record<string, string> = {
   hi: 'priya',
@@ -60,17 +67,27 @@ export async function POST(req: NextRequest) {
         const historyJson = formData.get('conversationHistory') as string | null;
         const lessonContextJson = formData.get('lessonContext') as string | null;
         const lessonTitle = formData.get('lessonTitle') as string | null;
-        // Interview mode (spec: 2026-04-07-multilingual-interviews-design.md)
+        // mode discriminator: 'language' (default), 'interviewer', 'coach'.
+        // Interview spec: 2026-04-07-multilingual-interviews-design.md.
+        // Coach mode (added 2026-05-04): when set, the caller passes a fully
+        // formed Coach Kairos system prompt; the language-tutor persona logic
+        // is bypassed entirely.
         const mode = (formData.get('mode') as string | null) || 'language';
         const companyPersonaId = formData.get('companyPersonaId') as string | null;
         const questionPlanJson = formData.get('questionPlan') as string | null;
         const interviewType = formData.get('interviewType') as string | null;
+        // Coach Kairos system prompt passed in by useVoiceAgent when
+        // mode === 'coach'. Already includes the language directive; we
+        // append voice rules below.
+        const passedSystemPrompt = formData.get('systemPrompt') as string | null;
 
         const lessonContext = lessonContextJson ? JSON.parse(lessonContextJson) : null;
 
         const isGreeting = formData.get('greeting') === 'true';
 
-        if (!language || !SARVAM_LANGUAGES.includes(language)) {
+        const isSarvam = SARVAM_LANGUAGES.includes(language);
+        const isGoogle = isGoogleTtsLanguage(language);
+        if (!language || (!isSarvam && !isGoogle)) {
           send({ type: 'error', message: `Unsupported language: ${language}` });
           controller.close();
           return;
@@ -87,7 +104,15 @@ export async function POST(req: NextRequest) {
             // Generate greeting without requiring audio input
             let greetingText: string;
 
-            if (mode === 'interviewer') {
+            if (mode === 'coach') {
+              // Coach Kairos mode: a single short opening that asks for GPA.
+              // Kept English here intentionally — the LLM-driven follow-ups
+              // run through the language directive in passedSystemPrompt and
+              // come back in the user's chosen language. If you need to seed
+              // a localized greeting, the caller should pass it via the
+              // 'greetingText' formData field (TODO if needed).
+              greetingText = "Hi — let's start with your GPA. What's your unweighted GPA on the 4.0 scale?";
+            } else if (mode === 'interviewer') {
               // Interview mode: use the company persona's openingLine, code-mixed if needed
               try {
                 const { getCompanyPersona } = await import('@/data/interview-personas');
@@ -115,44 +140,63 @@ export async function POST(req: NextRequest) {
 
             send({ type: 'response', text: greetingText });
 
-            // TTS for greeting
-            const speaker = SARVAM_SPEAKERS[language];
-            const targetLang = SARVAM_TTS_LANG_MAP[language];
-            if (speaker && targetLang && SARVAM_API_KEY && greetingText) {
+            // TTS for greeting — Google for the 8-language pipeline,
+            // Sarvam Bulbul for Hindi/Punjabi.
+            if (greetingText && isGoogle) {
               try {
-                const ttsResp = await fetch('https://api.sarvam.ai/text-to-speech', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'api-subscription-key': SARVAM_API_KEY,
-                  },
-                  body: JSON.stringify({
-                    inputs: [greetingText],
-                    target_language_code: targetLang,
-                    speaker: speaker,
-                    model: 'bulbul:v2',
-                  }),
-                });
-
-                if (ttsResp.ok) {
-                  const ttsData = await ttsResp.json();
-                  if (ttsData.audios?.[0]) {
-                    send({ type: 'audio', base64: ttsData.audios[0] });
-                  } else {
-                    // Sarvam Bulbul-v3 sometimes returns 200 with an empty
-                    // audios array on certain inputs (very short, very long,
-                    // special chars). Used to skip silently — log it now so
-                    // we have a signal when greetings audibly fail.
-                    console.warn('[SarvamStream] Sarvam returned 200 but empty audios', {
-                      targetLang, textLength: greetingText.length, response: ttsData,
-                    });
+                const { synthesizeWithGoogle } = await import('@/lib/voice/google-tts');
+                const locale = GOOGLE_TTS_LANG_CODES[language];
+                if (locale) {
+                  const audioBuffer = await synthesizeWithGoogle(greetingText, {
+                    languageCode: locale,
+                  });
+                  const audioBase64 = Buffer.from(audioBuffer).toString('base64');
+                  if (audioBase64) {
+                    send({ type: 'audio', base64: audioBase64 });
                   }
-                } else {
-                  const errText = await ttsResp.text().catch(() => '');
-                  console.error('[SarvamStream] Sarvam TTS non-OK:', ttsResp.status, errText);
                 }
               } catch (err) {
-                console.error('[SarvamStream] Greeting TTS error:', err);
+                console.error('[SarvamStream] Google greeting TTS error:', err);
+              }
+            } else if (greetingText && isSarvam) {
+              const speaker = SARVAM_SPEAKERS[language];
+              const targetLang = SARVAM_TTS_LANG_MAP[language];
+              if (speaker && targetLang && SARVAM_API_KEY) {
+                try {
+                  const ttsResp = await fetch('https://api.sarvam.ai/text-to-speech', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'api-subscription-key': SARVAM_API_KEY,
+                    },
+                    body: JSON.stringify({
+                      inputs: [greetingText],
+                      target_language_code: targetLang,
+                      speaker: speaker,
+                      model: 'bulbul:v2',
+                    }),
+                  });
+
+                  if (ttsResp.ok) {
+                    const ttsData = await ttsResp.json();
+                    if (ttsData.audios?.[0]) {
+                      send({ type: 'audio', base64: ttsData.audios[0] });
+                    } else {
+                      // Sarvam Bulbul-v3 sometimes returns 200 with an empty
+                      // audios array on certain inputs (very short, very long,
+                      // special chars). Used to skip silently — log it now so
+                      // we have a signal when greetings audibly fail.
+                      console.warn('[SarvamStream] Sarvam returned 200 but empty audios', {
+                        targetLang, textLength: greetingText.length, response: ttsData,
+                      });
+                    }
+                  } else {
+                    const errText = await ttsResp.text().catch(() => '');
+                    console.error('[SarvamStream] Sarvam TTS non-OK:', ttsResp.status, errText);
+                  }
+                } catch (err) {
+                  console.error('[SarvamStream] Greeting TTS error:', err);
+                }
               }
             }
 
@@ -225,22 +269,24 @@ export async function POST(req: NextRequest) {
         send({ type: 'transcript', text: transcript });
 
         // ── Step 2: LLM (streaming) ──
-        const persona = personaId
-          ? getLanguagePersona(personaId) || getDefaultPersona(language)
-          : getDefaultPersona(language);
-
-        const level = (proficiencyLevel || 'A1') as ProficiencyLevel;
-        const rule = persona.adaptiveRules.find(r => {
-          const levels: ProficiencyLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-          const idx = levels.indexOf(level);
-          const lo = levels.indexOf(r.levelRange[0]);
-          const hi = levels.indexOf(r.levelRange[1]);
-          return idx >= lo && idx <= hi;
-        }) || persona.adaptiveRules[0];
-
         let systemPrompt: string;
 
-        if (mode === 'interviewer') {
+        if (mode === 'coach') {
+          // Coach Kairos mode: caller passes a fully-formed system prompt that
+          // already includes the language directive + student context. We just
+          // append voice-specific rules so the LLM keeps replies short and
+          // free of markdown.
+          const coachBase = passedSystemPrompt && passedSystemPrompt.length > 50
+            ? passedSystemPrompt
+            : "You are Coach Kairos, a college counselor. Guide the student step by step through intake → school list → essays → interviews → financial aid. Ask one question at a time.";
+          systemPrompt = `${coachBase}
+
+VOICE CONVERSATION RULES:
+- Keep responses to 1 short sentence. Maximum 2 sentences.
+- This goes through TTS. Write exactly how it should be spoken aloud.
+- No markdown, no asterisks, no emojis, no parenthetical notes.
+- Ask one question at a time. Wait for the student's answer before moving on.`;
+        } else if (mode === 'interviewer') {
           // ── Interview mode: build company persona + code-mix prompt ──
           // (Spec: 2026-04-07-multilingual-interviews-design.md)
           try {
@@ -266,6 +312,22 @@ VOICE CONVERSATION RULES:
           }
         } else {
           // ── Language learning mode (existing behavior) ──
+          // Persona + adaptive-rule lookup live here (instead of being hoisted
+          // above the mode branches) because coach + interviewer modes don't
+          // touch them and the language-tutor persona lookup can throw on
+          // unknown languages — keeping it scoped avoids that.
+          const persona = personaId
+            ? getLanguagePersona(personaId) || getDefaultPersona(language)
+            : getDefaultPersona(language);
+          const level = (proficiencyLevel || 'A1') as ProficiencyLevel;
+          const rule = persona.adaptiveRules.find(r => {
+            const levels: ProficiencyLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+            const idx = levels.indexOf(level);
+            const lo = levels.indexOf(r.levelRange[0]);
+            const hi = levels.indexOf(r.levelRange[1]);
+            return idx >= lo && idx <= hi;
+          }) || persona.adaptiveRules[0];
+
           // Sub-project 4: inject persistent language profile (vocab due, errors, level)
           let languageProfileBlock = "";
           try {
@@ -389,20 +451,27 @@ IMPORTANT: Focus conversation on the lesson topic above. Create scenarios where 
         send({ type: 'response', text: responseText });
 
         // ── Step 3: TTS ──
-        // Urdu (and any future languages routed via Google Cloud TTS)
-        // bypass Sarvam Bulbul. Sarvam covers Hindi/Punjabi/Indic only.
-        if (language === 'ur' && responseText) {
+        // Google Cloud TTS for the 8-language pipeline (ur, zh, ko, ar, vi,
+        // pt, ru, tr) — each gets its native BCP-47 voice from
+        // GOOGLE_TTS_LANG_CODES so the audio is in the language's native
+        // accent (not English mispronouncing the script). Sarvam Bulbul
+        // continues to handle hi/pa.
+        if (isGoogle && responseText) {
           try {
             const { synthesizeWithGoogle } = await import('@/lib/voice/google-tts');
+            const locale = GOOGLE_TTS_LANG_CODES[language];
+            if (!locale) {
+              throw new Error(`No Google TTS locale for language ${language}`);
+            }
             const audioBuffer = await synthesizeWithGoogle(responseText, {
-              languageCode: 'ur-IN',
+              languageCode: locale,
             });
             const audioBase64 = Buffer.from(audioBuffer).toString('base64');
             if (audioBase64) {
               send({ type: 'audio', base64: audioBase64 });
             }
           } catch (err) {
-            console.error('[Stream TTS] Google Urdu TTS failed:', err);
+            console.error(`[Stream TTS] Google ${language} TTS failed:`, err);
             send({ type: 'error', code: 'GOOGLE_TTS_FAILED' });
           }
         } else {

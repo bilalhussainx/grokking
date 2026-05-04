@@ -82,7 +82,7 @@ export function isGoogleTtsLanguage(lang: string): boolean {
 //  - zh: Mandarin is published as cmn-CN, not zh-CN.
 //  - ar: ar-XA is Google's pan-Arabic locale (covers Gulf states +
 //    North Africa with a neutral MSA accent).
-const GOOGLE_TTS_LANG_CODES: Record<string, string> = {
+export const GOOGLE_TTS_LANG_CODES: Record<string, string> = {
   ur: 'ur-IN',
   zh: 'cmn-CN',
   ko: 'ko-KR',

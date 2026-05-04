@@ -4,7 +4,15 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { useDeepgramAgent } from "./useDeepgramAgent";
 import { useOrchestratedVoiceAgent } from "./useOrchestratedVoiceAgent";
 import type { VoiceAgentConfig } from "@/lib/language-personas";
-import { isSarvamLanguage } from "@/lib/voice-provider-router";
+import { isSarvamLanguage, isGoogleTtsLanguage } from "@/lib/voice-provider-router";
+
+// Languages that go through the orchestrated streaming pipeline (the Sarvam
+// stream endpoint, which also handles Google TTS for the 8 international-
+// student languages). Anything else falls through to the bundled Deepgram
+// Agent which has built-in Aura voices for en/es/fr/de/it/nl/ja.
+function isOrchestratedLanguage(lang: string): boolean {
+  return isSarvamLanguage(lang) || isGoogleTtsLanguage(lang);
+}
 
 // Re-export types for convenience
 export type { VoiceAgentConfig } from "@/lib/language-personas";
@@ -83,7 +91,7 @@ export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
   });
 
   // Get active agent based on current language
-  const activeAgent = currentConfig && isSarvamLanguage(currentConfig.language)
+  const activeAgent = currentConfig && isOrchestratedLanguage(currentConfig.language)
     ? orchestratedAgent
     : deepgramAgent;
 
@@ -99,19 +107,28 @@ export function useVoiceAgent(callbacks?: VoiceAgentCallbacks): VoiceAgentHook {
     // 'interviewer' triggers interview prompt builders in the API routes.
     const isInterviewer = config.mode === 'interviewer';
 
-    if (isSarvamLanguage(config.language)) {
-      // Use orchestrated pipeline for Hindi/Punjabi (Sarvam TTS)
+    if (isOrchestratedLanguage(config.language)) {
+      // Use orchestrated pipeline for Sarvam Indic + Google TTS languages.
+      // Mode comes from the caller: 'coach' for Coach Kairos voice mode,
+      // 'interviewer' for mock interviews, 'language' for the language tutor.
+      const orchestratedMode: 'language' | 'interviewer' | 'coach' = isInterviewer
+        ? 'interviewer'
+        : (config.mode === 'coach' ? 'coach' : 'language');
       await orchestratedAgent.start({
         language: config.language,
         personaId: config.personaId,
         proficiencyLevel: config.proficiencyLevel,
         lessonTitle: config.lessonTitle,
         lessonContext: config.lessonContext,
-        // Interview mode passthrough
-        mode: isInterviewer ? 'interviewer' : 'language',
+        mode: orchestratedMode,
         companyPersonaId: config.companyPersonaId,
         questionPlan: config.questionPlan,
         interviewType: config.interviewType,
+        // Coach Kairos voice prompt — passed through to the streaming
+        // endpoint so the LLM uses the college-counselor system prompt
+        // (with the language directive already baked in) instead of the
+        // language-tutor persona.
+        systemPrompt: config.systemPrompt,
       });
     } else {
       // Use Deepgram Agent for Latin/CJK languages

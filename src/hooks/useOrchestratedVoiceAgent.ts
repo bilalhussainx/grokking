@@ -11,7 +11,7 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { isSarvamLanguage } from "@/lib/voice-provider-router";
+import { isSarvamLanguage, isGoogleTtsLanguage } from "@/lib/voice-provider-router";
 
 interface SarvamAgentConfig {
   language: string;
@@ -25,11 +25,16 @@ interface SarvamAgentConfig {
     vocabulary: string[];
     grammarFocus: string[];
   };
-  // Interview mode (spec: 2026-04-07-multilingual-interviews-design.md)
-  mode?: 'language' | 'interviewer';
+  // mode discriminator. 'language' is the legacy language-tutor flow,
+  // 'interviewer' the mock-interview flow, 'coach' is Coach Kairos voice
+  // mode (added 2026-05-04 to wire Google TTS languages through this
+  // streaming pipeline). 'coach' callers must also pass `systemPrompt`.
+  mode?: 'language' | 'interviewer' | 'coach';
   companyPersonaId?: string;
   questionPlan?: unknown;     // Will be JSON.stringified
   interviewType?: string;
+  // Pre-built Coach Kairos system prompt (only used when mode === 'coach').
+  systemPrompt?: string;
 }
 
 interface SarvamAgentCallbacks {
@@ -145,11 +150,14 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
       if (config.lessonTitle) form.append('lessonTitle', config.lessonTitle);
       if (config.lessonContext) form.append('lessonContext', JSON.stringify(config.lessonContext));
       form.append('conversationHistory', JSON.stringify(conversationRef.current.slice(-10)));
-      // Interview mode
+      // Interview / coach mode discriminator.
       if (config.mode) form.append('mode', config.mode);
       if (config.companyPersonaId) form.append('companyPersonaId', config.companyPersonaId);
       if (config.questionPlan) form.append('questionPlan', typeof config.questionPlan === 'string' ? config.questionPlan : JSON.stringify(config.questionPlan));
       if (config.interviewType) form.append('interviewType', config.interviewType);
+      // Coach Kairos system prompt (mode === 'coach'). The endpoint uses
+      // this verbatim instead of the language-tutor persona templates.
+      if (config.systemPrompt) form.append('systemPrompt', config.systemPrompt);
 
       const resp = await fetch('/api/language/sarvam/stream', {
         method: 'POST',
@@ -274,7 +282,10 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
   const start = useCallback(async (config: SarvamAgentConfig) => {
     if (isConnecting || isConnected) return;
 
-    if (!isSarvamLanguage(config.language)) {
+    if (!isSarvamLanguage(config.language) && !isGoogleTtsLanguage(config.language)) {
+      // Sarvam (hi/pa/Indic) and Google TTS (ur/zh/ko/ar/vi/pt/ru/tr) both
+      // route through this orchestrated pipeline. Anything else belongs in
+      // the bundled Deepgram Agent.
       setError(`Language ${config.language} should use Deepgram Agent`);
       return;
     }
