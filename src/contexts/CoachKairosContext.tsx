@@ -68,7 +68,7 @@ const LS_LANG_KEY = "coach_kairos_language";
 const LS_VOICE_KEY = "coach_kairos_voice_enabled";
 
 export function CoachKairosProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<CoachMessage[]>([]);
@@ -412,19 +412,46 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
     // Don't reseed an ongoing conversation — just open the drawer.
     if (messages.length > 0) return;
     proactiveSent.current = true;
-    const { getWalkthroughSeed } = await import("@/lib/cc/variant-walkthroughs");
+    const { getWalkthroughSeed, fillGreeting } = await import("@/lib/cc/variant-walkthroughs");
     const seed = getWalkthroughSeed(variantKey as Parameters<typeof getWalkthroughSeed>[0]);
     setCurrentMode(seed.mode);
+
+    // Substitute the student's first name into the {name} slot.
+    const firstName = profile?.full_name?.trim().split(/\s+/)[0] ?? null;
+    let opening = fillGreeting(seed.greeting, firstName);
+
+    // Translate to the user's chosen coach language. Keep English as a
+    // free no-op; for any other language, hit /api/language/translate.
+    // If translation fails (network, credit balance, anything), fall
+    // back to the English string — degrading gracefully beats blocking
+    // the open. Costs 1 credit per translated open; cheap UX win for
+    // non-English speakers.
+    if (language && language !== "en") {
+      try {
+        const res = await fetch("/api/language/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: opening, fromLang: "en", toLang: language }),
+        });
+        if (res.ok) {
+          const data = (await res.json()) as { translatedText?: string };
+          if (data.translatedText) opening = data.translatedText;
+        }
+      } catch {
+        // non-fatal — keep English fallback
+      }
+    }
+
     setMessages([
       {
         id: crypto.randomUUID(),
         role: "assistant",
-        content: seed.greeting,
+        content: opening,
         mode: seed.mode,
         createdAt: new Date().toISOString(),
       },
     ]);
-  }, [messages.length, isLoading]);
+  }, [messages.length, isLoading, profile?.full_name, language]);
 
   const toggleFamilyMode = useCallback((on?: boolean) => {
     setFamilyMode((prev) => (on === undefined ? !prev : on));
