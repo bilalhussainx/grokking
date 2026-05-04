@@ -72,7 +72,7 @@ export default async function OpenGraphImage() {
               fontWeight: 500,
             }}
           >
-            <span style={{ width: 36, height: 1, background: "#d4a84b", display: "inline-block" }} />
+            <span style={{ width: 36, height: 1, background: "#d4a84b", display: "block" }} />
             <span>AI-Powered College Admissions Counseling</span>
           </div>
 
