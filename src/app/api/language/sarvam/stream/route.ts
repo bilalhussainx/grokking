@@ -467,7 +467,23 @@ IMPORTANT: Focus conversation on the lesson topic above. Create scenarios where 
         // `audio_chunk` + `audio_done` events would unlock true
         // time-to-first-audio reduction.
         if (isGoogle && responseText) {
+          // Verbose logging gated on the env so Vercel logs show every
+          // step of the Google TTS pipeline. Once Urdu voice is verified
+          // working in production, drop these logs (or move behind a
+          // DEBUG_VOICE flag).
+          const ttsStartedAt = Date.now();
+          console.log(`[Stream TTS] starting Google path lang=${language} responseLen=${responseText.length}`);
           try {
+            // Pre-flight credential check — surfaces the most common
+            // production failure (env var missing) with a clear message
+            // before we attempt the SDK call.
+            if (!process.env.GOOGLE_CLOUD_CREDENTIALS) {
+              throw new Error(
+                "GOOGLE_CLOUD_CREDENTIALS env var is not set on the server. " +
+                "Add it to Vercel project settings — minified service-account " +
+                "JSON on a single line. Without it, Google TTS cannot run.",
+              );
+            }
             const { streamingSynthesizeWithGoogle } = await import('@/lib/voice/google-tts');
             const locale = GOOGLE_TTS_LANG_CODES[language];
             if (!locale) {
@@ -484,9 +500,12 @@ IMPORTANT: Focus conversation on the lesson topic above. Create scenarios where 
               const { transliterateUrduToDevanagari, containsNastaliq } =
                 await import('@/lib/voice/urdu-to-devanagari');
               if (containsNastaliq(ttsText)) {
+                const before = ttsText.length;
                 ttsText = transliterateUrduToDevanagari(ttsText);
+                console.log(`[Stream TTS] transliterated ur→hi-IN ${before}→${ttsText.length} chars`);
               }
             }
+            console.log(`[Stream TTS] calling streamingSynthesizeWithGoogle locale=${locale} ttsLen=${ttsText.length}`);
             const chunks: Buffer[] = [];
             for await (const chunk of streamingSynthesizeWithGoogle(ttsText, {
               languageCode: locale,
@@ -494,9 +513,21 @@ IMPORTANT: Focus conversation on the lesson topic above. Create scenarios where 
               chunks.push(chunk);
             }
             const combined = Buffer.concat(chunks);
+            console.log(`[Stream TTS] got ${chunks.length} chunks, ${combined.length} bytes total in ${Date.now() - ttsStartedAt}ms`);
             const audioBase64 = combined.toString('base64');
             if (audioBase64) {
               send({ type: 'audio', base64: audioBase64 });
+              console.log(`[Stream TTS] emitted audio event (${audioBase64.length} base64 chars)`);
+            } else {
+              // No bytes — server didn't error but produced silence.
+              // Tell the client so it can surface "voice failed, try
+              // again" instead of waiting forever.
+              console.warn(`[Stream TTS] empty audio output for lang=${language}`);
+              send({
+                type: 'error',
+                code: 'GOOGLE_TTS_EMPTY',
+                message: `Google TTS returned no audio for ${locale} — voice may not be enabled in this GCP project.`,
+              });
             }
           } catch (err) {
             console.error(`[Stream TTS] Google ${language} TTS failed:`, err);

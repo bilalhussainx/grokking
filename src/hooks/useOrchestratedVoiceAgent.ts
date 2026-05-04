@@ -211,8 +211,16 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
                 break;
 
               case 'error':
-                console.error('[SarvamStream]', event.message);
-                callbacksRef.current?.onError?.(event.message);
+                // Log code + message explicitly so the user sees what
+                // actually failed instead of "undefined". The server
+                // emits {type:'error', code, message} for known failure
+                // modes (GOOGLE_TTS_FAILED, GOOGLE_TTS_EMPTY, etc.).
+                {
+                  const code = (event as { code?: string }).code ?? 'no-code';
+                  const message = (event as { message?: string }).message ?? '(no message)';
+                  console.error(`[SarvamStream] ${code}: ${message}`);
+                  callbacksRef.current?.onError?.(`${code}: ${message}`);
+                }
                 break;
             }
           } catch {}
