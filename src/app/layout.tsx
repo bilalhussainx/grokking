@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     default: 'KairosLearn — Your AI college counselor, for every student',
     template: '%s | KairosLearn',
   },
-  description: 'Coach Kairos guides first-gen, international, and underprivileged applicants through intake, school list, essays, interviews, and financial aid. $12/mo or free for verified applicants.',
+  description: 'KairosLearn is an AI admissions counselor that knows your essays, understands your finances, and will take your call at 11pm the night before a deadline. The college counselor that wealthy families pay $8,000 for — now free for everyone else.',
   keywords: [
     'AI college counselor', 'college admissions', 'college application help',
     'personal statement coach', 'common app essay coach', 'supplemental essay help',
@@ -55,15 +55,18 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://kairoslearn.com',
     siteName: 'KairosLearn',
-    title: 'KairosLearn — Your AI college counselor, for every student',
-    description: 'Coach Kairos guides applicants through intake, school list, essays, interviews, and financial aid. $12/mo or free for verified applicants.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'KairosLearn — Your AI college counselor, for every student' }],
+    title: 'KairosLearn — The AI college counselor wealthy families pay $8,000 for. Now free for everyone else.',
+    description: 'AI admissions counseling that knows your essays, understands your finances, and takes your call at 11pm the night before a deadline.',
+    // og:image is auto-generated from src/app/opengraph-image.tsx (1200x630).
+    // Don't add an explicit `images` here — Next.js will inject the file-based
+    // route into <meta property="og:image"> automatically.
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KairosLearn — Your AI college counselor, for every student',
-    description: 'Coach Kairos guides applicants through intake, school list, essays, interviews, and financial aid. $12/mo or free for verified applicants.',
-    images: ['/og-image.png'],
+    title: 'KairosLearn — The AI college counselor wealthy families pay $8,000 for.',
+    description: 'AI admissions counseling that knows your essays, understands your finances, and takes your call at 11pm the night before a deadline.',
+    // twitter:image is auto-generated from src/app/twitter-image.tsx (or
+    // falls back to opengraph-image when only the OG variant exists).
   },
   robots: {
     index: true,

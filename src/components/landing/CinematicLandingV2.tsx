@@ -561,38 +561,37 @@ function Hero() {
             }}
           >
             <span style={{ display: "inline-block", width: 26, height: 1, background: "#d4a84b" }} />
-            <span>
-              Your AI counselor. For{" "}
-              <em
-                style={{
-                  fontStyle: "italic",
-                  textTransform: "none",
-                  letterSpacing: 0,
-                  fontSize: 14,
-                  color: "#f2ede3",
-                }}
-              >
-                every
-              </em>{" "}
-              student.
-            </span>
+            <span>AI-Powered College Admissions Counseling</span>
           </div>
+          <p
+            style={{
+              fontFamily: "var(--font-cormorant), 'Cormorant Garamond', serif",
+              fontWeight: 400,
+              fontStyle: "italic",
+              fontSize: 28,
+              lineHeight: 1.25,
+              color: "#d4a84b",
+              margin: "0 0 22px 0",
+              letterSpacing: "-0.005em",
+              maxWidth: 640,
+            }}
+          >
+            Your shot at college shouldn&apos;t depend on your zip code.
+          </p>
           <h1
             style={{
               fontFamily: "var(--font-cormorant), 'Cormorant Garamond', serif",
               fontWeight: 300,
-              fontSize: 88,
-              lineHeight: 0.98,
+              fontSize: 72,
+              lineHeight: 1.04,
               letterSpacing: "-.015em",
               margin: 0,
               color: "#f2ede3",
             }}
           >
-            Every student
-            <br />
-            deserves a counselor
-            <br />
-            who <em style={{ color: "#d4a84b", fontStyle: "italic" }}>actually knows</em> them.
+            The college counselor that wealthy families pay{" "}
+            <em style={{ color: "#d4a84b", fontStyle: "italic" }}>$8,000</em>{" "}
+            for. Now free for everyone else.
           </h1>
           <p
             style={{
@@ -602,25 +601,12 @@ function Hero() {
               color: "rgba(242,237,227,.65)",
               fontWeight: 300,
               marginTop: 36,
-              maxWidth: 520,
+              maxWidth: 560,
             }}
           >
-            The average U.S. public-school counselor serves{" "}
-            <span
-              style={{
-                color: "#f2ede3",
-                fontFamily: "var(--font-geist-mono), 'JetBrains Mono', monospace",
-                fontSize: 14,
-              }}
-            >
-              415 students
-            </span>
-            . For first-gen, international, and underprivileged applicants, that means almost no
-            time, no translation, no institutional memory.
-            <br />
-            <br />
-            Coach Kairos is one counselor per student — in your language, trained on your profile,
-            available at 3 a.m. on a Saturday.
+            KairosLearn is an AI admissions counselor that knows your essays,
+            understands your finances, and will take your call at 11pm the
+            night before a deadline.
           </p>
           <div style={{ marginTop: 42, display: "flex", gap: 14, alignItems: "center" }}>
             <Link
@@ -698,7 +684,7 @@ function Hero() {
             <span>·</span>
             <span>40+ languages</span>
             <span>·</span>
-            <span>Used by students across the 2025–26 cycle</span>
+            <span>120+ students in private beta</span>
           </div>
         </div>
         {/* Right Coach demo */}
@@ -983,8 +969,23 @@ function DemoVideo() {
               marginRight: "auto",
             }}
           >
-            Intake, school list, essays, interview — <em style={{ color: "#d4a84b", fontStyle: "italic" }}>in one walk.</em>
+            Everything you need. <em style={{ color: "#d4a84b", fontStyle: "italic" }}>From first search to final submission.</em>
           </h2>
+          <p
+            style={{
+              fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
+              fontSize: 16,
+              lineHeight: 1.6,
+              color: "rgba(242,237,227,.60)",
+              fontWeight: 300,
+              marginTop: 18,
+              maxWidth: 640,
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            One counselor. Every step of the application.
+          </p>
         </div>
 
         <div
@@ -1224,30 +1225,14 @@ function Pipeline() {
 }
 
 // ───────── Testimonials ─────────
+// Quotes intentionally empty until verified beta-user feedback lands. The
+// previous placeholder quotes named specific admissions (Stanford, UMich,
+// Grinnell) that we cannot back with screenshots — see audit 2026-05-03.
+// To re-enable: collect real one-sentence reactions from beta users, drop
+// them into `quotes`, and the section will render again.
 function Testimonials() {
-  const quotes = [
-    {
-      q:
-        "I applied to 11 U.S. schools from Karachi. My school had no counselor who'd even heard of the Common App. Kairos walked me through Matric → 4.0 conversion in an hour — and my Stanford supplement twice over.",
-      name: "Ayesha R.",
-      role: "Accepted — Stanford '29",
-      loc: "Karachi, Pakistan",
-    },
-    {
-      q:
-        "My parents speak Punjabi. They wanted to help but couldn't. I turned on voice mode and Kairos walked them through the CSS Profile in Punjabi while I translated the numbers. They cried. So did I.",
-      name: "Jaskaran S.",
-      role: "First-gen · Accepted UMich, UIUC",
-      loc: "Brampton, Canada",
-    },
-    {
-      q:
-        "I had a list of 15 reaches and zero safety schools. Kairos didn't lecture me — it showed me three schools I'd never heard of that meet 100% of need and were match-tier. I'm graduating debt-free.",
-      name: "Maya A.",
-      role: "Accepted — Grinnell, full aid",
-      loc: "Brooklyn, NY",
-    },
-  ];
+  const quotes: { q: string; name: string; role: string; loc: string }[] = [];
+  if (quotes.length === 0) return null;
   return (
     <section
       id="stories"

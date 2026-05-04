@@ -19,19 +19,12 @@ const PIPELINE = [
   { n: "05", title: "Compare offers in May", body: "Side-by-side aid letters in PKR or USD. Negotiation drafts for full-need families." },
 ];
 
-const TESTIMONIALS = [
-  {
-    quote:
-      "My mother could finally ask Coach Kairos questions in Urdu. She knew which form was FAFSA and which was CSS Profile by the second week.",
-    author: "Hassan",
-    location: "Lahore → admitted to MIT",
-  },
-  {
-    quote: "QuestBridge, Posse, fee waivers — Coach Kairos brought them up before I knew to ask. It made first-gen feel less alone.",
-    author: "Maya",
-    location: "Cleveland → admitted to UMich",
-  },
-];
+// Testimonials intentionally empty until verified beta-user quotes are
+// collected — previous placeholder entries claimed specific admissions
+// (MIT, UMich) we cannot back with screenshots. See audit 2026-05-03.
+// The Testimonials section below is gated so it only renders when this
+// array has entries; once real quotes are added, the section comes back.
+const TESTIMONIALS: { quote: string; author: string; location: string }[] = [];
 
 export default function MobileLanding() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -52,16 +45,15 @@ export default function MobileLanding() {
         <div className="flex items-center justify-between mb-12">
           <span className="text-[15px] tracking-tight font-semibold">
             <span style={{ color: "#f2ede3" }}>Kairos</span>
-            <em
+            <span
               style={{
                 color: "#d4a84b",
                 fontFamily: "'Cormorant Garamond', serif",
                 fontWeight: 400,
-                fontStyle: "italic",
               }}
             >
-              .ai
-            </em>
+              Learn
+            </span>
           </span>
           <button
             type="button"
@@ -103,33 +95,46 @@ export default function MobileLanding() {
               color: "#d4a84b",
             }}
           >
-            For first-gen and international students
+            AI-Powered College Admissions Counseling
+          </p>
+          <p
+            className="mb-3 leading-snug"
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontWeight: 400,
+              fontStyle: "italic",
+              fontSize: 22,
+              color: "#d4a84b",
+              letterSpacing: "-0.005em",
+            }}
+          >
+            Your shot at college shouldn&apos;t depend on your zip code.
           </p>
           <h1
-            className="mb-5 leading-[1.05]"
+            className="mb-5 leading-[1.08]"
             style={{
               fontFamily: "'Cormorant Garamond', serif",
               fontWeight: 300,
-              fontSize: 44,
+              fontSize: 38,
               color: "#f2ede3",
               letterSpacing: "-0.01em",
             }}
           >
-            The{" "}
-            <em style={{ color: "#d4a84b", fontStyle: "italic" }}>$5,000</em>{" "}
-            college counselor, for $12 a month.
+            The college counselor that wealthy families pay{" "}
+            <em style={{ color: "#d4a84b", fontStyle: "italic" }}>$8,000</em>{" "}
+            for. Now free for everyone else.
           </h1>
           <p
             className="mb-8 leading-relaxed"
             style={{
               fontSize: 14,
               color: "rgba(242,237,227,.65)",
-              maxWidth: 320,
+              maxWidth: 340,
             }}
           >
-            Coach Kairos works in Hindi, Punjabi, Urdu, and English. Need-blind
-            and meets-need school filters built in. Your parents stay in the
-            loop in their language.
+            KairosLearn is an AI admissions counselor that knows your essays,
+            understands your finances, and will take your call at 11pm the
+            night before a deadline.
           </p>
           <div className="flex flex-col gap-3">
             <Link
@@ -141,7 +146,7 @@ export default function MobileLanding() {
                 boxShadow: "0 8px 22px -8px rgba(212,175,55,.5)",
               }}
             >
-              Get started — free with a trial
+              Start for free — no credit card
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
@@ -241,7 +246,7 @@ export default function MobileLanding() {
           From day one to deposit
         </p>
         <h2
-          className="mb-10 leading-[1.15]"
+          className="mb-3 leading-[1.15]"
           style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 400,
@@ -249,8 +254,17 @@ export default function MobileLanding() {
             color: "#f2ede3",
           }}
         >
-          What the next 9 months look like.
+          Everything you need. From first search to final submission.
         </h2>
+        <p
+          className="mb-10 leading-relaxed"
+          style={{
+            fontSize: 14,
+            color: "rgba(242,237,227,.65)",
+          }}
+        >
+          One counselor. Every step of the application.
+        </p>
         <div className="relative">
           {/* Vertical connector */}
           <div
@@ -301,6 +315,9 @@ export default function MobileLanding() {
       </section>
 
       {/* ============== Testimonials ============== */}
+      {/* Gated on TESTIMONIALS having entries — empty until verified beta
+          quotes are added. See array declaration above for context. */}
+      {TESTIMONIALS.length > 0 && (
       <section className="py-12 px-5" style={{ background: "#0c1120" }}>
         <p
           className="uppercase mb-4"
@@ -355,6 +372,7 @@ export default function MobileLanding() {
           ))}
         </div>
       </section>
+      )}
 
       {/* ============== Pricing ============== */}
       <section className="px-5 py-12">
