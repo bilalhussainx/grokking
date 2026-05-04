@@ -500,7 +500,13 @@ IMPORTANT: Focus conversation on the lesson topic above. Create scenarios where 
             }
           } catch (err) {
             console.error(`[Stream TTS] Google ${language} TTS failed:`, err);
-            send({ type: 'error', code: 'GOOGLE_TTS_FAILED' });
+            // Include the error message so the client can show something
+            // useful instead of the cryptic "undefined" we logged before.
+            // Common failures land here: GOOGLE_CLOUD_CREDENTIALS missing,
+            // hi-IN-Wavenet-A not enabled in the GCP project, network
+            // timeout, voice quota exhausted.
+            const message = err instanceof Error ? err.message : String(err);
+            send({ type: 'error', code: 'GOOGLE_TTS_FAILED', message });
           }
         } else {
           const speaker = SARVAM_SPEAKERS[language];

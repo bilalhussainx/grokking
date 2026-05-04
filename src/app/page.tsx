@@ -271,13 +271,19 @@ export default function HomePage() {
           // Onboarding not completed — open the coach in intake mode.
           // The legacy /onboarding wizard now just redirects back here, so
           // we skip the middleman. Guard against pushing when the browser
-          // is already at the intake URL, otherwise we'd hit a loop when
-          // the user lands on /?coach=open&focus=intake directly.
+          // is already at the intake URL, otherwise we'd hit a loop.
+          //
+          // Target /cc/dashboard so returning-but-not-fully-onboarded users
+          // land on the same adaptive dashboard as everyone else (the new
+          // surface), not the legacy "/" CounselorDashboard. The dashboard
+          // reads ?focus=intake and shows the OnboardingChecklist when
+          // onboarding is incomplete; it shows the full counselor view
+          // otherwise. Single landing page, single mental model.
           const sp = new URLSearchParams(window.location.search);
           const alreadyAtIntake =
             sp.get('coach') === 'open' && sp.get('focus') === 'intake';
           if (!alreadyAtIntake) {
-            router.replace('/?coach=open&focus=intake');
+            router.replace('/cc/dashboard?coach=open&focus=intake');
           }
         }
       })

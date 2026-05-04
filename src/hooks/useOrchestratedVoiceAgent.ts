@@ -242,7 +242,15 @@ export function useOrchestratedVoiceAgent(callbacks?: SarvamAgentCallbacks) {
     const dataArray = new Uint8Array(analyser.frequencyBinCount);
     let speaking = false;
     const THRESHOLD = 20;
-    const SILENCE_DURATION = 150; // Aggressive — 150ms silence = end of utterance
+    // 150ms silence threshold was too aggressive — it chopped natural
+    // speech mid-word for languages with longer intra-utterance pauses
+    // (Urdu, Hindi, Arabic, conversational anything). The Sarvam STT
+    // endpoint then returned "Speech not recognized" on the resulting
+    // 200-500ms fragments, which the user saw as repeating errors. 600ms
+    // is the conversational-speech standard (matches Whisper's default
+    // VAD and is comfortable for second-language speakers thinking
+    // mid-sentence). Bumped 2026-05-04.
+    const SILENCE_DURATION = 600;
 
     const check = () => {
       if (!connectedRef.current) return;
