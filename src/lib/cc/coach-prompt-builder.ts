@@ -144,9 +144,9 @@ Format (literal — copy exactly, no deviations):
 <</actions>>
 
 Critical literal-format rules — the parser is strict and these are the most common mistakes that silently break the database insert:
-1. The closing tag is `<</actions>>` with a forward slash. NOT `<<actions>>` again, NOT `</actions>>`, NOT `<<actions/>>`. Exactly `<</actions>>`.
-2. The JSON key is `add_schools` (with the prefix). NOT `schools`.
-3. The value is a flat array of strings, like `["Stanford University", "MIT"]`. NOT an array of objects (`[{"name": "Stanford"}]`).
+1. The closing tag is "<</actions>>" with a forward slash. NOT "<<actions>>" again, NOT "</actions>>", NOT "<<actions/>>". Exactly "<</actions>>".
+2. The JSON key is "add_schools" (with the prefix). NOT "schools".
+3. The value is a flat array of strings, like ["Stanford University", "MIT"]. NOT an array of objects ([{"name": "Stanford"}]).
 4. Use double quotes (JSON), not single quotes.
 
 Rules:
