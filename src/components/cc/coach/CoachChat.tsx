@@ -5,13 +5,21 @@ import Link from "next/link";
 import { Send, Mic, MicOff, CheckCircle2 } from "lucide-react";
 import { useCoachKairos } from "@/contexts/CoachKairosContext";
 import { useVoiceAgent, type VoiceAgentCallbacks } from "@/hooks/useVoiceAgent";
+import { COACH_LANGUAGES } from "@/lib/cc/coach-languages";
 import CoachMessage from "./CoachMessage";
 
-// Languages that have full Deepgram WebSocket Voice Agent support (bundled
-// STT + LLM + TTS, sub-second). Sarvam languages (hi, pa, etc.) use the
-// orchestrated streaming pipeline via the same useVoiceAgent hook — that
-// path also works but keep this list for messaging purposes.
-const VOICE_SUPPORTED_LANGUAGES = ["en", "es", "fr", "de", "nl", "it", "ja", "hi", "pa", "bn", "ta", "te", "gu", "kn", "ml", "mr", "od"];
+// Voice-supported languages, derived from the canonical COACH_LANGUAGES
+// registry. Any entry tagged mode === "voice" is reachable through the
+// existing voice provider router (Deepgram WebSocket Voice Agent for the
+// 7 bundled languages, Sarvam orchestrated streaming for Indic, Google
+// Cloud TTS for the 8 international-student additions). Previously this
+// list was a hardcoded array that fell out of sync every time a new
+// provider shipped — most recently the 8 Google TTS languages (ur, zh,
+// ko, ar, vi, pt, ru, tr) shipped in commit 8c13179 (2026-05-02) but the
+// mic button gate here still rejected them.
+const VOICE_SUPPORTED_LANGUAGES: string[] = COACH_LANGUAGES
+  .filter((l) => l.mode === "voice")
+  .map((l) => l.code);
 
 // Fallback prompt used only if /api/cc/coach/voice-prompt is unreachable.
 // The real prompt is fetched at start time so voice mode honors the user's
