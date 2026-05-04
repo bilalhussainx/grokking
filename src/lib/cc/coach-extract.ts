@@ -315,10 +315,15 @@ async function extractAndSaveSchools(
 ): Promise<{ added: number }> {
   // Fast path: the LLM emitted a canonical <<actions>> block (parsed by
   // route.ts via parseActionsBlock and passed in). Trust the structured
-  // names and skip the LLM-based extraction pass entirely.
+  // names + bands and skip the LLM-based extraction pass entirely.
   if (actions?.add_schools && actions.add_schools.length > 0) {
-    console.log(`[extract schools] fast path — actions block has ${actions.add_schools.length} schools:`, actions.add_schools.join(", "));
-    const items = actions.add_schools.map((name) => ({ name, band: "unknown" }));
+    console.log(
+      `[extract schools] fast path — actions block has ${actions.add_schools.length} schools:`,
+      actions.add_schools.map((s) => `${s.name}${s.band ? ` (${s.band})` : ""}`).join(", "),
+    );
+    // Default to "unknown" only when the LLM didn't tag a band — this keeps
+    // backward compatibility with older string-only emissions.
+    const items = actions.add_schools.map((s) => ({ name: s.name, band: s.band ?? "unknown" }));
     return matchAndInsertSchools(supabase, studentId, items);
   }
 

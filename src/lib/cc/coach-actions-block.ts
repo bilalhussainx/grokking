@@ -24,8 +24,17 @@
 // breaks streaming UX. A fenced block survives the existing streaming +
 // extraction pipeline with a one-line prompt change.
 
+export interface CoachSchoolAdd {
+  name: string;
+  // Optional admit-likelihood tier the LLM tags each add with so the school
+  // lands in the right group on /schools (Reach / Match / Safety) instead of
+  // collapsing everything into "unknown" — which renders as "—" via
+  // tierFromBand("unknown") in ChanceBadge.
+  band?: "reach" | "match" | "safety";
+}
+
 export interface CoachActions {
-  add_schools?: string[];
+  add_schools?: CoachSchoolAdd[];
 }
 
 // Match the opening tag, then non-greedy any content, then either the
@@ -35,23 +44,27 @@ export interface CoachActions {
 const BLOCK_RE = /<<actions>>([\s\S]*?)(?:<<\/actions>>|<<actions>>)/g;
 
 // Permissive normalizer that accepts the deviations observed in
-// production. Returns string[] of school names regardless of input shape:
-//   ["Stanford"]                       → ["Stanford"]
-//   [{name: "Stanford"}]               → ["Stanford"]
-//   [{name: "Stanford"}, "MIT"]        → ["Stanford", "MIT"]
-function normalizeSchoolList(value: unknown): string[] | null {
+// production. Returns CoachSchoolAdd[] regardless of input shape:
+//   ["Stanford"]                              → [{name: "Stanford"}]
+//   [{name: "Stanford"}]                      → [{name: "Stanford"}]
+//   [{name: "Stanford", band: "reach"}]       → [{name: "Stanford", band: "reach"}]
+//   [{name: "Stanford"}, "MIT"]               → [{name: "Stanford"}, {name: "MIT"}]
+function normalizeSchoolList(value: unknown): CoachSchoolAdd[] | null {
   if (!Array.isArray(value)) return null;
-  const out: string[] = [];
+  const out: CoachSchoolAdd[] = [];
   for (const item of value) {
     if (typeof item === "string" && item.trim()) {
-      out.push(item.trim());
-    } else if (
-      item &&
-      typeof item === "object" &&
-      typeof (item as { name?: unknown }).name === "string"
-    ) {
-      const n = (item as { name: string }).name.trim();
-      if (n) out.push(n);
+      out.push({ name: item.trim() });
+    } else if (item && typeof item === "object") {
+      const obj = item as { name?: unknown; band?: unknown };
+      if (typeof obj.name === "string" && obj.name.trim()) {
+        const entry: CoachSchoolAdd = { name: obj.name.trim() };
+        if (typeof obj.band === "string") {
+          const b = obj.band.toLowerCase();
+          if (b === "reach" || b === "match" || b === "safety") entry.band = b;
+        }
+        out.push(entry);
+      }
     }
   }
   return out.length > 0 ? out : null;

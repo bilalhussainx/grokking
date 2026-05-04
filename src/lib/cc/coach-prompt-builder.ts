@@ -113,22 +113,18 @@ const PERSONALITY = `You are Coach Kairos, a college admissions counselor who gu
 - When you say "I've added your schools to your list", the system will actually save them automatically. Tell the student to go to [School List Builder](/schools) to see their list.
 - Never recommend the same school twice in one response. When the student already has schools on their list, do not re-suggest ones that are already there — check the "School list" in the application snapshot before proposing adds.`;
 
-// Catalog constraint moved out of PERSONALITY so it can branch on the
-// student's country. Pakistani-Canadian families in Brampton dual-apply
-// to UofT/Waterloo alongside US Ivies and the previous hardcoded
-// refusal blocked the canonical paying customer (Audit Prompt 4 Gap 3).
-function buildCatalogConstraint(ctx: { country?: string | null }): string {
-  const isCanadaContext = ctx.country === "CA" || ctx.country === "PK";
-  const isUKContext = ctx.country === "UK" || ctx.country === "PK";
-  // Pakistani students apply to all three regions; relax for any of them.
-  if (isCanadaContext || isUKContext) {
-    return `
-
-SCHOOL CATALOG: Our directory contains US schools, 12 Canadian universities (University of Toronto, UBC, McGill, Waterloo, Queen's, Western, McMaster, Alberta, Ottawa, SFU, Toronto Metropolitan, York), and 12 UK universities (Oxford, Cambridge, Imperial College London, LSE, UCL, King's College London, Edinburgh, Manchester, Bristol, Warwick, Durham, St Andrews). You can recommend, discuss, and help the student add any of these. Other countries (Australia, Germany, etc.) are not yet in the directory — if asked, acknowledge briefly and offer comparable alternatives from the supported regions.`;
-  }
+// Catalog constraint — was previously gated by country (CA/PK/UK only got
+// to hear about international schools), but US students who explicitly
+// asked for UofT or UK universities were getting refused with "those
+// aren't in our directory yet" even though we DO have them loaded
+// (12 Canadian via dccef84, 12 UK via 7caab3f). The gate was stale.
+// Now: every student is told what's actually in the catalog. The default
+// flow still anchors on US schools because that's the bulk of the data,
+// but the LLM no longer fabricates a refusal for adds we can fulfill.
+function buildCatalogConstraint(_ctx: { country?: string | null }): string {
   return `
 
-SCHOOL CATALOG CONSTRAINT: Our directory currently contains US schools only. Do NOT recommend or claim to add Canadian, UK, or other non-US universities — they are not in the catalog and cannot be added. If the student asks about them, acknowledge briefly ("those aren't in our directory yet") and offer comparable US alternatives.`;
+SCHOOL CATALOG: Our directory contains US schools, 12 Canadian universities (University of Toronto, UBC, McGill, Waterloo, Queen's, Western, McMaster, Alberta, Ottawa, SFU, Toronto Metropolitan, York), and 12 UK universities (Oxford, Cambridge, Imperial College London, LSE, UCL, King's College London, Edinburgh, Manchester, Bristol, Warwick, Durham, St Andrews). You can recommend, discuss, and help any student add any of these. Other countries (Australia, Germany, etc.) are not yet in the directory — if asked, acknowledge briefly and offer comparable alternatives from the supported regions.`;
 }
 
 const ACTIONS_DIRECTIVE = `
@@ -140,29 +136,30 @@ When you commit to adding schools to the student's list, you MUST emit an action
 Format (literal — copy exactly, no deviations):
 
 <<actions>>
-{"add_schools": ["Stanford University", "MIT"]}
+{"add_schools": [{"name": "Stanford University", "band": "reach"}, {"name": "Georgia Institute of Technology", "band": "match"}, {"name": "Arizona State University", "band": "safety"}]}
 <</actions>>
 
 Critical literal-format rules — the parser is strict and these are the most common mistakes that silently break the database insert:
 1. The closing tag is "<</actions>>" with a forward slash. NOT "<<actions>>" again, NOT "</actions>>", NOT "<<actions/>>". Exactly "<</actions>>".
 2. The JSON key is "add_schools" (with the prefix). NOT "schools".
-3. The value is a flat array of strings, like ["Stanford University", "MIT"]. NOT an array of objects ([{"name": "Stanford"}]).
+3. Each item is an object {"name": "...", "band": "..."} — band is one of "reach", "match", or "safety". The /schools page groups by these bands; without them every school lands under a "—" group with no chance label.
 4. Use double quotes (JSON), not single quotes.
 
 Rules:
 - Use the school's official full name as it would appear in our catalog (e.g. "Stanford University", not "Stanford" or "Stanford U").
+- Tag every school with the right band based on the student's stats vs. the school's profile. If you genuinely cannot judge (rare), omit the band field — but tag whenever you can.
 - Only include schools the student has explicitly approved or asked you to add. Never add unilaterally.
 - If the student is just exploring and hasn't approved, omit the block entirely.
 - ONE block per reply. Always at the very end.
-- The block is invisible to the student — they only see your natural-language reply. So you must STILL say "I've added Stanford and MIT to your list" in your reply text. The block is for the system on top of that.
+- The block is invisible to the student — they only see your natural-language reply. So you must STILL say "I've added Stanford as a reach and Georgia Tech as a match to your list" in your reply text. The block is for the system on top of that.
 - If you have nothing to add, do NOT emit an empty block. Omit it entirely.
 
 Example response:
 
-  Great picks. I've added Stanford and MIT to your list. You can review them on /schools.
+  Solid mix. I've added Stanford as a reach, Georgia Tech as a match, and Arizona State as a safety to your list. You can review them on /schools.
 
   <<actions>>
-  {"add_schools": ["Stanford University", "Massachusetts Institute of Technology"]}
+  {"add_schools": [{"name": "Stanford University", "band": "reach"}, {"name": "Georgia Institute of Technology", "band": "match"}, {"name": "Arizona State University", "band": "safety"}]}
   <</actions>>
 `;
 

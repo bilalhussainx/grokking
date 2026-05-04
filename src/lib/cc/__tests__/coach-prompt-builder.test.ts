@@ -312,18 +312,23 @@ describe("buildSystemPrompt", () => {
   });
 
   describe("catalog constraint (Workstream C — Canada)", () => {
-    it("US student gets the strict refusal of Canadian schools", () => {
+    // The previous behavior gated international schools by country (only
+    // CA/PK/UK heard about UofT etc). US students who explicitly asked for
+    // Toronto were refused even though we have 12 Canadian + 12 UK schools
+    // loaded. The gate was removed — every student sees the full catalog.
+    it("US student now sees the full international catalog (no stale refusal)", () => {
       const prompt = buildSystemPrompt({ ...baseContext, country: "US" });
-      expect(prompt).toContain("US schools only");
-      expect(prompt).toContain("Canadian, UK, or other non-US");
+      expect(prompt).not.toContain("US schools only");
+      expect(prompt).not.toContain("Canadian, UK, or other non-US");
+      expect(prompt).toContain("12 Canadian universities");
+      expect(prompt).toContain("12 UK universities");
     });
-    it("Canadian student gets the relaxed catalog block", () => {
+    it("Canadian student sees the catalog block", () => {
       const prompt = buildSystemPrompt({ ...baseContext, country: "CA" });
       expect(prompt).toContain("12 Canadian universities");
       expect(prompt).toContain("University of Toronto");
-      expect(prompt).not.toContain("US schools only");
     });
-    it("Pakistani student gets the relaxed catalog block (Brampton ICP)", () => {
+    it("Pakistani student sees the catalog block (Brampton ICP)", () => {
       const prompt = buildSystemPrompt({ ...baseContext, country: "PK" });
       expect(prompt).toContain("12 Canadian universities");
     });
@@ -342,6 +347,40 @@ describe("buildSystemPrompt", () => {
     it("does not appear for US students", () => {
       const prompt = buildSystemPrompt({ ...baseContext, country: "US" });
       expect(prompt).not.toContain("CANADIAN APPLICATION GUIDANCE");
+    });
+  });
+
+  describe("UK catalog constraint + guidance (Workstream M)", () => {
+    it("UK student gets the relaxed catalog block naming UK + CA schools", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "UK" });
+      expect(prompt).toContain("12 UK universities");
+      expect(prompt).toContain("Oxford");
+      expect(prompt).toContain("12 Canadian universities");
+      expect(prompt).not.toContain("US schools only");
+    });
+    it("Pakistani student gets a catalog block naming all three regions (US, CA, UK)", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "PK" });
+      expect(prompt).toContain("12 UK universities");
+      expect(prompt).toContain("12 Canadian universities");
+    });
+    it("UK guidance block appears for UK students", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "UK" });
+      expect(prompt).toContain("UK APPLICATION GUIDANCE");
+      expect(prompt).toContain("UCAS");
+      expect(prompt).toContain("October 15");
+    });
+    it("UK guidance block appears for Pakistani students (Saïd Foundation surfacing)", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "PK" });
+      expect(prompt).toContain("UK APPLICATION GUIDANCE");
+      expect(prompt).toContain("SAÏD FOUNDATION");
+    });
+    it("UK guidance block does NOT appear for US students", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "US" });
+      expect(prompt).not.toContain("UK APPLICATION GUIDANCE");
+    });
+    it("UK guidance block does NOT mention Saïd for Indian students", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "IN" });
+      expect(prompt).not.toContain("SAÏD FOUNDATION");
     });
   });
 });
