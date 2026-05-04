@@ -12,11 +12,14 @@ describe("parseActionsBlock", () => {
 <</actions>>`);
     expect(result).toEqual({ add_schools: ["Stanford University", "MIT"] });
   });
-  it("ignores empty arrays", () => {
+  it("returns null for empty arrays (no-op action)", () => {
+    // Empty add_schools is functionally a no-op — surfacing { add_schools: [] }
+    // would just trigger an extraction call that does nothing. Returning null
+    // lets the route short-circuit cleanly.
     const result = parseActionsBlock(`<<actions>>
 {"add_schools": []}
 <</actions>>`);
-    expect(result).toEqual({ add_schools: [] });
+    expect(result).toBeNull();
   });
   it("returns null for malformed JSON", () => {
     expect(parseActionsBlock("<<actions>>{not json}<</actions>>")).toBeNull();

@@ -473,18 +473,45 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
     ]);
     // Server persistence + extraction. The Deepgram Voice Agent runs its
     // LLM inside Deepgram's WebSocket, so our /api/cc/coach/message route
-    // never sees the conversation. Without this fire-and-forget POST,
-    // voice turns vanish on reload AND the LLM-emitted <<actions>> block
-    // never reaches the school-extraction pipeline (so "I added Stanford
-    // and MIT to your list" never actually adds them). Fail silently —
-    // the live chat continues even if persistence breaks.
+    // never sees the conversation. Without this POST, voice turns vanish
+    // on reload AND the LLM-emitted <<actions>> block never reaches the
+    // school-extraction pipeline.
+    //
+    // For assistant turns we also broadcast kairos:message-complete with
+    // the schoolsAddedCount returned by the route — this is the same event
+    // the text flow fires, so the existing /schools refetch listener and
+    // the CoachChat toast both light up exactly as they do for typed turns.
+    // Without this broadcast the voice flow had no parity with text:
+    // schools would land in the DB but the open /schools page wouldn't
+    // refetch until the user navigated away and back.
     fetch("/api/cc/coach/voice-turn", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ role, content: trimmed }),
-    }).catch((err) => {
-      console.warn("[CoachKairos] voice-turn persist failed (non-fatal):", err);
-    });
+    })
+      .then(async (res) => {
+        if (!res.ok || role !== "assistant") return;
+        const data = (await res.json().catch(() => null)) as
+          | { schoolsAddedCount?: number }
+          | null;
+        const extracted = data?.schoolsAddedCount ?? 0;
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(
+            new CustomEvent("kairos:message-complete", {
+              detail: {
+                mode: "voice",
+                content: trimmed,
+                source: null,
+                extracted,
+                actionKinds: extracted > 0 ? ["add_schools"] : [],
+              },
+            }),
+          );
+        }
+      })
+      .catch((err) => {
+        console.warn("[CoachKairos] voice-turn persist failed (non-fatal):", err);
+      });
   }, []);
 
   return (

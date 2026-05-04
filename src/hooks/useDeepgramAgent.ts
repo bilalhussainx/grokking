@@ -302,7 +302,17 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
                 break;
 
               case "AgentStartedSpeaking":
-                // New agent turn — reset text accumulator
+                // Flush any leftover text from the previous turn before
+                // resetting. Deepgram occasionally emits trailing silent
+                // ConversationText (e.g. the <<actions>> confirmation block)
+                // AFTER AgentAudioDone has already fired and flushed the
+                // verbal portion. Without this defensive flush that trailing
+                // text would get clobbered by the new turn and the actions
+                // block would never reach our voice-turn route — schools
+                // wouldn't get added.
+                if (agentTextRef.current.trim()) {
+                  callbacksRef.current?.onAgentMessage?.(agentTextRef.current.trim());
+                }
                 agentTextRef.current = "";
                 setIsSpeaking(true);
                 agentSpeakCountRef.current += 1;
