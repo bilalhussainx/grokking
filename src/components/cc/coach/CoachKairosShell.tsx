@@ -149,31 +149,25 @@ export default function CoachKairosShell() {
                     </AnimatePresence>
                   </div>
 
-                  {language === "ur" ? (
-                    <button
-                      type="button"
-                      disabled
-                      className="p-1.5 rounded-lg text-white/30 cursor-not-allowed"
-                      title="Voice for Urdu coming soon — try Hindi for voice"
-                    >
-                      <VolumeX className="w-4 h-4" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        if (isSpeaking) stopSpeaking();
-                        setVoiceEnabled(!voiceEnabled);
-                      }}
-                      className={`p-1.5 rounded-lg transition-colors ${
-                        voiceEnabled
-                          ? "bg-[#D4AF37]/15 text-[#D4AF37] hover:bg-[#D4AF37]/20"
-                          : "hover:bg-white/5 text-white/40 hover:text-white/60"
-                      }`}
-                      title={voiceEnabled ? "Voice on — click to disable" : "Voice off — click to enable"}
-                    >
-                      {voiceEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                    </button>
-                  )}
+                  {/* Urdu used to be text-only; it's now wired through Deepgram
+                      nova-3 STT + Google Cloud TTS via voice-provider-router.ts
+                      (GOOGLE_TTS_LANGUAGES). The dedicated Urdu-disabled branch
+                      that lived here was stale. Every coach language now uses
+                      the same toggle. */}
+                  <button
+                    onClick={() => {
+                      if (isSpeaking) stopSpeaking();
+                      setVoiceEnabled(!voiceEnabled);
+                    }}
+                    className={`p-1.5 rounded-lg transition-colors ${
+                      voiceEnabled
+                        ? "bg-[#D4AF37]/15 text-[#D4AF37] hover:bg-[#D4AF37]/20"
+                        : "hover:bg-white/5 text-white/40 hover:text-white/60"
+                    }`}
+                    title={voiceEnabled ? "Voice on — click to disable" : "Voice off — click to enable"}
+                  >
+                    {voiceEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                  </button>
 
                   <button
                     onClick={close}
