@@ -5,6 +5,7 @@ import { GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { useCoachKairos } from "@/contexts/CoachKairosContext";
 import { isGrade9BlockedPath } from "@/lib/cc/grade-route-policy";
+import { stripActionsBlock } from "@/lib/cc/coach-actions-block";
 
 interface Props {
   role: "assistant" | "user";
@@ -76,8 +77,15 @@ export default function CoachMessage({ role, content, isStreaming }: Props) {
   }
 
   const { currentVariantKey } = useCoachKairos();
+  // Last-line defense: even if the streaming-tag detection in
+  // /api/cc/coach/message lets an actions block leak into a chunk,
+  // strip it client-side before rendering. The block is for the
+  // server-side extraction pipeline, never for human eyes.
+  // stripActionsBlock matches both <</actions>> and <<actions>> as
+  // closers (lenient regex) — same behavior as the saved DB version.
+  const displayContent = stripActionsBlock(content);
   const quickActions = !isStreaming
-    ? filterChipsForVariant(getQuickActions(content), currentVariantKey)
+    ? filterChipsForVariant(getQuickActions(displayContent), currentVariantKey)
     : [];
 
   return (
@@ -91,7 +99,7 @@ export default function CoachMessage({ role, content, isStreaming }: Props) {
       </div>
       <div className="max-w-[85%]">
         <div dir="auto" className="text-sm text-white/80 leading-relaxed">
-          {renderContent(content)}
+          {renderContent(displayContent)}
           {isStreaming && <span className="inline-block w-1.5 h-4 bg-[#D4AF37] ml-0.5 animate-pulse" />}
         </div>
         {quickActions.length > 0 && (

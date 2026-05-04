@@ -401,14 +401,30 @@ export async function POST(req: NextRequest) {
     { role: "user", content: message },
   ];
 
-  // Save user message
-  await supabase.from("cc_coach_conversations").insert({
-    student_id: profile.id,
-    role: "user",
-    content: message,
-    mode,
-    page_context: page_context || "/",
-  });
+  // Save user message — log the result so we can see in Vercel logs
+  // whether saves are reaching the DB. Reports of "history gone after
+  // refresh" point at silent insert failures here.
+  {
+    const { error: userInsertErr } = await supabase
+      .from("cc_coach_conversations")
+      .insert({
+        student_id: profile.id,
+        role: "user",
+        content: message,
+        mode,
+        page_context: page_context || "/",
+      });
+    if (userInsertErr) {
+      console.error(
+        `[coach/message] USER insert failed for student ${profile.id}:`,
+        userInsertErr,
+      );
+    } else {
+      console.log(
+        `[coach/message] saved USER turn (student=${profile.id}, mode=${mode}, len=${message.length})`,
+      );
+    }
+  }
 
   // Stream response
   const encoder = new TextEncoder();
@@ -478,7 +494,11 @@ export async function POST(req: NextRequest) {
         // while the extraction (which inserts cc_student_schools, etc.) was
         // still running — any client that refetched on `done` would miss the
         // writes. Now `done` comes after extraction so a refetch reads fresh rows.
-        console.log(`[coach/message] stream done, mode=${mode}, actionsBlockSeen=${actionsTagSeen}`);
+        console.log(
+          `[coach/message] stream done — mode=${mode}, actionsTagSeen=${actionsTagSeen}, ` +
+          `fullResponseLen=${fullResponse.length}, cleanResponseLen=${cleanResponse.length}, ` +
+          `parsedActions=${actions ? JSON.stringify(actions) : "null"}`,
+        );
         let schoolsAddedCount = 0;
         try {
           const { error: insertErr } = await supabase.from("cc_coach_conversations").insert({
@@ -488,15 +508,29 @@ export async function POST(req: NextRequest) {
             mode,
             page_context: page_context || "/",
           });
-          if (insertErr) console.error("[coach/message] assistant insert failed:", insertErr);
+          if (insertErr) {
+            console.error(
+              `[coach/message] ASSISTANT insert FAILED for student ${profileId}:`,
+              insertErr,
+            );
+          } else {
+            console.log(
+              `[coach/message] saved ASSISTANT turn (student=${profileId}, len=${cleanResponse.length})`,
+            );
+          }
 
           // Always run extraction — the coach may mention schools/activities in
           // any mode (including school-browse while the user is on /schools).
           // runCoachExtraction short-circuits internally when there's nothing to save.
-          console.log(`[coach/message] dispatching runCoachExtraction(${profileId}, ${mode}, actions=${actions ? "block" : "null"})`);
+          console.log(
+            `[coach/message] dispatching runCoachExtraction(${profileId}, ${mode}, actions=${actions ? `block(${actions.add_schools?.length ?? 0} schools)` : "null"})`,
+          );
           const result = await runCoachExtraction(profileId, mode, actions);
           const r = result as { extracted: boolean; schoolsAddedCount?: number };
           schoolsAddedCount = r.schoolsAddedCount ?? 0;
+          console.log(
+            `[coach/message] extraction result — schoolsAddedCount=${schoolsAddedCount}`,
+          );
         } catch (err) {
           console.error("[coach/message] post-stream task failed:", err);
         }
