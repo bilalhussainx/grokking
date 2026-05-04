@@ -45,7 +45,22 @@ function getClient(): TextToSpeechClient {
       "GOOGLE_CLOUD_CREDENTIALS missing client_email or private_key — re-download the service account JSON.",
     );
   }
-  cachedClient = new textToSpeech.TextToSpeechClient({ credentials });
+  // CRITICAL: `fallback: true` forces the SDK to use HTTP/JSON instead of
+  // gRPC. Vercel serverless functions cannot maintain the long-lived gRPC
+  // streams the SDK expects — the call surfaces as
+  //   Error: undefined undefined: undefined
+  //   { code: undefined, details: undefined,
+  //     note: 'Exception occurred in retry method that was not classified
+  //            as transient' }
+  // because the underlying transport fails before a status frame arrives.
+  // HTTP/JSON works in serverless because every request is a fresh fetch
+  // — no connection pooling involved. Side effect: streamingSynthesize
+  // (bidirectional RPC) is unavailable in fallback mode, so the streaming
+  // helper auto-degrades to unary; net latency is the same as before.
+  cachedClient = new textToSpeech.TextToSpeechClient({
+    credentials,
+    fallback: true,
+  });
   return cachedClient;
 }
 
@@ -169,55 +184,16 @@ export async function* streamingSynthesizeWithGoogle(
   if (!text.trim()) {
     throw new Error("streamingSynthesizeWithGoogle: text is empty");
   }
-  const client = getClient();
-  const voiceName =
-    opts.voiceName ?? DEFAULT_VOICES[opts.languageCode] ?? undefined;
-
-  // streamingSynthesize is a bidirectional RPC. Some SDK builds expose it
-  // on the v1 client; older builds keep it under v1beta1. Detect at runtime.
-  const clientWithStreaming = client as unknown as {
-    streamingSynthesize?: () => NodeJS.ReadWriteStream;
-  };
-  if (typeof clientWithStreaming.streamingSynthesize !== "function") {
-    // SDK doesn't have streaming — fall back to unary and yield once.
-    const buf = await synthesizeWithGoogle(text, opts);
-    yield Buffer.from(buf);
-    return;
-  }
-
-  const stream = clientWithStreaming.streamingSynthesize();
-
-  // Send the streaming config as the first message, then the input text,
-  // then half-close. The server will respond with audioContent chunks.
-  const writable = stream as unknown as {
-    write: (msg: unknown) => void;
-    end: () => void;
-  };
-  writable.write({
-    streamingConfig: {
-      voice: {
-        languageCode: opts.languageCode,
-        ...(voiceName ? { name: voiceName } : {}),
-        ...(opts.gender && !voiceName ? { ssmlGender: opts.gender } : {}),
-      },
-      streamingAudioConfig: {
-        audioEncoding: "MP3",
-        speakingRate: opts.speakingRate ?? 0.95,
-      },
-    },
-  });
-  writable.write({ input: { text } });
-  writable.end();
-
-  for await (const response of stream as AsyncIterable<{
-    audioContent?: Uint8Array | string | null;
-  }>) {
-    const audio = response.audioContent;
-    if (!audio) continue;
-    if (audio instanceof Uint8Array) {
-      yield Buffer.from(audio);
-    } else if (typeof audio === "string") {
-      yield Buffer.from(audio, "base64");
-    }
-  }
+  // Always route through unary synthesizeWithGoogle. The bidirectional
+  // streamingSynthesize RPC requires gRPC, but we run with `fallback: true`
+  // (HTTP/JSON) on Vercel serverless — bidirectional streaming isn't
+  // available over fetch, so the streaming method either errors or hangs.
+  //
+  // Yielding a single chunk preserves the for-await consumer pattern in
+  // /api/language/sarvam/stream/route.ts; if/when we move off Vercel to a
+  // platform that holds gRPC reliably (Fly, Cloud Run), restore the
+  // bidirectional path here. The user-facing latency win from streaming
+  // was modest anyway; the production-blocker was getting any audio out.
+  const buf = await synthesizeWithGoogle(text, opts);
+  yield Buffer.from(buf);
 }
