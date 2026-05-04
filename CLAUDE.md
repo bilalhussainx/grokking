@@ -20,6 +20,36 @@ for creating content using the MCP server and skill files without Claude.
 
 ---
 
+## gstack
+
+This project uses [gstack](https://github.com/garrytan/gstack) — a bundle of
+review, ship, design, and browser-automation skills installed at
+`~/.claude/skills/gstack/`.
+
+**Web browsing rule:**
+- For **all** web browsing — opening pages, interacting with elements,
+  taking screenshots, dogfooding flows, verifying deploys — use the
+  `/browse` skill from gstack.
+- **Never** use `mcp__claude-in-chrome__*` tools. They are deprecated in
+  favor of gstack's headless browser, which is faster, deterministic, and
+  produces AI-readable snapshots.
+
+**Available gstack skills** (invoke with `/<name>`):
+
+`/office-hours` · `/plan-ceo-review` · `/plan-eng-review` ·
+`/plan-design-review` · `/design-consultation` · `/design-shotgun` ·
+`/design-html` · `/review` · `/ship` · `/land-and-deploy` · `/canary` ·
+`/benchmark` · `/browse` · `/connect-chrome` · `/qa` · `/qa-only` ·
+`/design-review` · `/setup-browser-cookies` · `/setup-deploy` ·
+`/setup-gbrain` · `/retro` · `/investigate` · `/document-release` ·
+`/codex` · `/cso` · `/autoplan` · `/plan-devex-review` · `/devex-review` ·
+`/careful` · `/freeze` · `/guard` · `/unfreeze` · `/gstack-upgrade` ·
+`/learn`
+
+Run `/gstack-upgrade` periodically to pull updates.
+
+---
+
 ## What Samsara.ai Is
 
 A Next.js 14 learning platform with:

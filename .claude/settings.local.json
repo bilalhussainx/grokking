@@ -77,7 +77,22 @@
       "Bash(git diff-tree:*)",
       "Bash(npx playwright:*)",
       "Bash(npx vitest:*)",
-      "Bash(cat /c/Users/bilal/Downloads/grokking/vitest.config*)"
+      "Bash(cat /c/Users/bilal/Downloads/grokking/vitest.config*)",
+      "WebFetch(domain:api.anthropic.com)",
+      "Bash(mkdir -p /tmp/design-h-bIgg0If)",
+      "Read(//tmp/**)",
+      "Bash(cp \"C:\\\\Users\\\\bilal\\\\.claude\\\\projects\\\\C--Users-bilal-Downloads-grokking\\\\86c02768-8430-4184-a6a6-27935cca8548\\\\tool-results\\\\webfetch-1776909088832-ixoapu.bin\" payload.gz)",
+      "Bash(gunzip -k payload.gz)",
+      "Bash(mkdir -p extracted)",
+      "Bash(tar -xf payload -C extracted)",
+      "Bash(pnpm tsc *)",
+      "Bash(pnpm test *)",
+      "Bash(xargs -I {} git show --stat {})",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm test:unit -- --run EssayStepper)",
+      "Bash(pnpm test:unit)",
+      "Bash(python -c ' *)",
+      "Bash(python)"
     ]
   }
 }
