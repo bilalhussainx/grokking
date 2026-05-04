@@ -1,20 +1,10 @@
 // src/components/pricing/PricingCards.tsx
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { initializePaddle, type Paddle } from "@paddle/paddle-js";
 import { Check, Crown, Sparkles, Zap, X } from "lucide-react";
-
-const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || "";
-const PADDLE_ENV = (process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT || "sandbox") as
-  | "sandbox"
-  | "production";
-const PRO_MONTHLY_PRICE =
-  process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_MONTHLY || "";
-const PRO_ANNUAL_PRICE =
-  process.env.NEXT_PUBLIC_PADDLE_PRICE_ID_PRO_ANNUAL || "";
+import ProCheckoutButton from "@/components/marketing/ProCheckoutButton";
 
 interface Feature {
   text: string;
@@ -55,40 +45,6 @@ const TEAM_FEATURES: Feature[] = [
 export default function PricingCards() {
   const { user, profile } = useAuth();
   const router = useRouter();
-  const [annual, setAnnual] = useState(false);
-  const [paddleInstance, setPaddleInstance] = useState<Paddle | null>(null);
-  const [checkoutSuccess, setCheckoutSuccess] = useState(false);
-
-  // Initialize Paddle once
-  useEffect(() => {
-    if (!PADDLE_CLIENT_TOKEN) return;
-    initializePaddle({
-      token: PADDLE_CLIENT_TOKEN,
-      environment: PADDLE_ENV,
-      eventCallback: (event) => {
-        if (event.name === "checkout.completed") {
-          setCheckoutSuccess(true);
-          // Redirect to success after a moment
-          setTimeout(() => router.push("/"), 2000);
-        }
-      },
-    }).then((instance) => {
-      if (instance) setPaddleInstance(instance);
-    });
-  }, [router]);
-
-  const openCheckout = useCallback(
-    (priceId: string) => {
-      if (!paddleInstance || !priceId) return;
-
-      paddleInstance.Checkout.open({
-        items: [{ priceId, quantity: 1 }],
-        customData: { userId: user?.id || "", plan: "pro" },
-        customer: user?.email ? { email: user.email } : undefined,
-      });
-    },
-    [paddleInstance, user]
-  );
 
   const isPro =
     profile?.role === "pro" ||
@@ -96,61 +52,9 @@ export default function PricingCards() {
     profile?.role === "admin";
 
   const monthlyPrice = 12;
-  const annualMonthlyPrice = 10;
-  const annualTotalPrice = annualMonthlyPrice * 12;
-
-  if (checkoutSuccess) {
-    return (
-      <div className="max-w-md mx-auto text-center py-12">
-        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 flex items-center justify-center">
-          <Check className="w-10 h-10 text-[#D4AF37]" />
-        </div>
-        <h2 className="text-2xl font-bold text-white mb-2">
-          Welcome to Pro
-        </h2>
-        <p className="text-white/50">
-          Your subscription is active. Redirecting to your dashboard...
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div>
-      {/* Annual/Monthly Toggle */}
-      <div className="flex items-center justify-center gap-3 mb-12">
-        <span
-          className={`text-sm font-medium transition-colors ${
-            !annual ? "text-white" : "text-white/40"
-          }`}
-        >
-          Monthly
-        </span>
-        <button
-          onClick={() => setAnnual(!annual)}
-          className={`relative w-12 h-6 rounded-full transition-colors ${
-            annual ? "bg-[#D4AF37]" : "bg-white/20"
-          }`}
-          aria-label="Toggle annual billing"
-        >
-          <div
-            className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform ${
-              annual ? "translate-x-6" : "translate-x-0.5"
-            }`}
-          />
-        </button>
-        <span
-          className={`text-sm font-medium transition-colors ${
-            annual ? "text-white" : "text-white/40"
-          }`}
-        >
-          Annual{" "}
-          <span className="text-[#D4AF37] text-xs font-semibold">
-            (save 20%)
-          </span>
-        </span>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
         {/* ---------------------------------------------------------------- */}
         {/* Free Plan */}
@@ -213,19 +117,9 @@ export default function PricingCards() {
           </div>
 
           <div className="mb-6">
-            <span className="text-5xl font-bold text-white">
-              ${annual ? annualMonthlyPrice : monthlyPrice}
-            </span>
+            <span className="text-5xl font-bold text-white">${monthlyPrice}</span>
             <span className="text-sm text-white/40 ml-1">/mo</span>
-            {annual && (
-              <div className="text-sm text-white/40 mt-1">
-                ${annualTotalPrice}/year &mdash;{" "}
-                <span className="text-[#D4AF37]">save 20%</span>
-              </div>
-            )}
-            {!annual && (
-              <div className="text-sm text-white/40 mt-1">billed monthly</div>
-            )}
+            <div className="text-sm text-white/40 mt-1">billed monthly</div>
           </div>
 
           <ul className="space-y-3 mb-8 flex-1">
@@ -240,20 +134,21 @@ export default function PricingCards() {
             ))}
           </ul>
 
-          <button
-            onClick={() => {
-              if (!user) {
-                router.push("/login?redirect=/pricing");
-                return;
-              }
-              openCheckout(annual ? PRO_ANNUAL_PRICE : PRO_MONTHLY_PRICE);
-            }}
-            disabled={isPro}
-            className="w-full py-3 rounded-xl text-sm font-semibold transition-all bg-[#D4AF37] text-black hover:bg-[#C4A030] shadow-lg shadow-[#D4AF37]/25 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            <Crown className="w-4 h-4" />
-            {isPro ? "Current Plan" : "Upgrade to Pro"}
-          </button>
+          {isPro ? (
+            <button
+              type="button"
+              disabled
+              className="w-full py-3 rounded-xl text-sm font-semibold bg-[#D4AF37] text-black opacity-40 cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              <Crown className="w-4 h-4" />
+              Current Plan
+            </button>
+          ) : (
+            <ProCheckoutButton className="w-full py-3 rounded-xl text-sm font-semibold transition-all bg-[#D4AF37] text-black hover:bg-[#C4A030] shadow-lg shadow-[#D4AF37]/25 flex items-center justify-center gap-2">
+              <Crown className="w-4 h-4" />
+              Upgrade to Pro
+            </ProCheckoutButton>
+          )}
         </div>
 
         {/* ---------------------------------------------------------------- */}
@@ -304,7 +199,7 @@ export default function PricingCards() {
         </span>
         <span className="flex items-center gap-1.5">
           <Check className="w-3.5 h-3.5" />
-          Secure payments via Paddle
+          Secure payments via Stripe
         </span>
       </div>
     </div>

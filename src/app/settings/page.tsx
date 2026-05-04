@@ -159,7 +159,7 @@ export default function SettingsPage() {
           <CardContent>
             {p.role === "pro" || p.role === "teacher" ? (
               <p className="text-sm text-white/60">
-                Manage your subscription, update payment method, or view invoices through the Paddle customer portal.
+                Manage your subscription, update payment method, or view invoices through the Stripe customer portal.
               </p>
             ) : (
               <p className="text-sm text-white/40">No active subscription. Upgrade to Pro to unlock all features.</p>

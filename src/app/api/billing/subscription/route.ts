@@ -1,122 +1,50 @@
-// src/app/api/billing/subscription/route.ts
-// GET  — Returns current user's subscription status
-// POST — Cancel, pause, or resume subscription via Paddle API
-// Env: PADDLE_API_KEY
-import { NextRequest, NextResponse } from "next/server";
-import { getAuthUser } from "@/lib/supabase-auth";
-import { createAdminSupabase } from "@/lib/supabase-auth";
-import {
-  cancelSubscription,
-  pauseSubscription,
-  resumeSubscription,
-} from "@/lib/paddle";
-import { rowToSubscription } from "@/types/billing";
-import type { SubscriptionRow, SubscriptionAction } from "@/types/billing";
+// GET /api/billing/subscription — returns the current user's subscription
+// row in the client-facing Subscription shape. Read-only and vendor-agnostic;
+// cancel / pause / resume / update-card are handled by the Stripe Billing
+// Portal at /api/billing/stripe/portal, not by this route.
+//
+// Replaces the Paddle-era POST handler which called Paddle's API directly.
 
-// ---------------------------------------------------------------------------
-// GET /api/billing/subscription — current user's subscription
-// ---------------------------------------------------------------------------
+import { NextResponse } from "next/server";
+import { createServerSupabase } from "@/lib/supabase-auth";
+import { rowToSubscription, type SubscriptionRow } from "@/types/billing";
+
 export async function GET() {
-  const user = await getAuthUser();
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const db = createAdminSupabase();
-  const { data, error } = await db
+  const { data: row } = await supabase
     .from("user_subscriptions")
-    .select("*")
+    .select(
+      "id, user_id, stripe_subscription_id, stripe_customer_id, plan, status, current_period_start, current_period_end, cancel_at_period_end, created_at, updated_at",
+    )
     .eq("user_id", user.id)
-    .maybeSingle();
+    .maybeSingle<SubscriptionRow>();
 
-  if (error) {
-    console.error("[Billing] Subscription fetch error:", error);
-    return NextResponse.json({ error: "Database error" }, { status: 500 });
-  }
-
-  // No subscription row means the user is on the free plan
-  if (!data) {
+  if (!row) {
+    // No row yet — caller treats this as the free tier. Return a synthetic
+    // subscription rather than 404 so the UI can render a free-plan card.
     return NextResponse.json({
       subscription: {
         id: "",
         userId: user.id,
-        paddleSubscriptionId: null,
-        paddleCustomerId: null,
+        stripeSubscriptionId: null,
+        stripeCustomerId: null,
         plan: "free",
         status: "active",
         currentPeriodStart: null,
         currentPeriodEnd: null,
         cancelAtPeriodEnd: false,
-        createdAt: "",
-        updatedAt: "",
+        createdAt: new Date(0).toISOString(),
+        updatedAt: new Date(0).toISOString(),
       },
     });
   }
 
-  return NextResponse.json({
-    subscription: rowToSubscription(data as SubscriptionRow),
-  });
-}
-
-// ---------------------------------------------------------------------------
-// POST /api/billing/subscription — cancel, pause, or resume
-// ---------------------------------------------------------------------------
-export async function POST(req: NextRequest) {
-  const user = await getAuthUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  let body: SubscriptionAction;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
-  }
-
-  const { action } = body;
-  if (!["cancel", "pause", "resume"].includes(action)) {
-    return NextResponse.json(
-      { error: "Invalid action. Use 'cancel', 'pause', or 'resume'." },
-      { status: 400 }
-    );
-  }
-
-  // Look up user's Paddle subscription ID
-  const db = createAdminSupabase();
-  const { data: sub } = await db
-    .from("user_subscriptions")
-    .select("paddle_subscription_id, status")
-    .eq("user_id", user.id)
-    .single();
-
-  if (!sub?.paddle_subscription_id) {
-    return NextResponse.json(
-      { error: "No active subscription found" },
-      { status: 404 }
-    );
-  }
-
-  const paddleSubId = sub.paddle_subscription_id;
-  let result: { data: unknown; error: string | null };
-
-  switch (action) {
-    case "cancel":
-      result = await cancelSubscription(paddleSubId);
-      break;
-    case "pause":
-      result = await pauseSubscription(paddleSubId);
-      break;
-    case "resume":
-      result = await resumeSubscription(paddleSubId);
-      break;
-    default:
-      return NextResponse.json({ error: "Unknown action" }, { status: 400 });
-  }
-
-  if (result.error) {
-    return NextResponse.json({ error: result.error }, { status: 502 });
-  }
-
-  return NextResponse.json({ success: true, action });
+  return NextResponse.json({ subscription: rowToSubscription(row) });
 }

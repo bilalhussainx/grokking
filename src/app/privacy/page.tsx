@@ -26,7 +26,7 @@ export default function PrivacyPolicyPage() {
           <ul>
             <li><strong>Account information:</strong> Name, email address, and password when you create an account</li>
             <li><strong>Profile information:</strong> Learning preferences, language settings, and course progress</li>
-            <li><strong>Payment information:</strong> Billing details processed securely through our payment provider (Paddle). We do not store your credit card information directly.</li>
+            <li><strong>Payment information:</strong> Billing details processed securely through our payment provider (Stripe). We do not store your credit card information directly.</li>
             <li><strong>Voice data:</strong> Audio from voice tutoring sessions, processed in real-time for AI coaching. We do not permanently store raw audio recordings.</li>
           </ul>
 
@@ -53,7 +53,7 @@ export default function PrivacyPolicyPage() {
             <li><strong>Supabase:</strong> Authentication and database hosting</li>
             <li><strong>Deepgram:</strong> Speech-to-text and text-to-speech for voice tutoring</li>
             <li><strong>Sarvam AI:</strong> Voice processing for Indic languages</li>
-            <li><strong>Paddle:</strong> Payment processing and subscription management</li>
+            <li><strong>Stripe:</strong> Payment processing and subscription management</li>
             <li><strong>Vercel:</strong> Website hosting</li>
           </ul>
           <p>Each service has its own privacy policy governing how they handle your data.</p>

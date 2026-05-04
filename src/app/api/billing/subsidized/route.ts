@@ -23,7 +23,7 @@ export async function POST() {
 
   const { data: existing } = await db
     .from("user_subscriptions")
-    .select("plan, status, paddle_subscription_id")
+    .select("plan, status, stripe_subscription_id")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -31,12 +31,19 @@ export async function POST() {
     return NextResponse.json({ already: true, message: "You already have Pro access." });
   }
 
+  // Subsidized grant — no Stripe subscription exists. We mark the row with
+  // the literal string "subsidized-grant" in stripe_subscription_id so the
+  // status route + UI can distinguish a comped account from a paid one
+  // (and so the Stripe webhook will never collide with this row, since real
+  // Stripe sub IDs are prefixed `sub_`). When/if the user later subscribes,
+  // the webhook resolves them by user_id from metadata and overwrites this
+  // marker with the real subscription id.
   const { error } = await db
     .from("user_subscriptions")
     .upsert({
       user_id: user.id,
-      paddle_subscription_id: "subsidized-grant",
-      paddle_customer_id: null,
+      stripe_subscription_id: "subsidized-grant",
+      stripe_customer_id: null,
       plan: "pro",
       status: "active",
       current_period_start: new Date().toISOString(),

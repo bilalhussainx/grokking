@@ -1,5 +1,9 @@
 // src/components/billing/SubscriptionStatus.tsx
-// Shows current plan, next billing date, and manage/cancel buttons.
+// Shows current plan, status, next billing date, and a "Manage subscription"
+// button that opens the Stripe Billing Portal. Cancel / pause / resume /
+// update-card all live in the portal — we deliberately don't reimplement
+// them so Stripe stays the source of truth and the webhook stays the only
+// path that mutates user_subscriptions.
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -7,14 +11,10 @@ import {
   Crown,
   Calendar,
   AlertTriangle,
-  Pause,
-  Play,
-  XCircle,
   Loader2,
   ExternalLink,
-  CheckCircle2,
 } from "lucide-react";
-import type { Subscription, SubscriptionAction } from "@/types/billing";
+import type { Subscription } from "@/types/billing";
 
 const STATUS_LABELS: Record<string, { text: string; color: string }> = {
   active: { text: "Active", color: "text-emerald-400" },
@@ -27,9 +27,8 @@ const STATUS_LABELS: Record<string, { text: string; color: string }> = {
 export default function SubscriptionStatus() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [confirmAction, setConfirmAction] = useState<"cancel" | "pause" | null>(null);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [portalOpening, setPortalOpening] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchSubscription = useCallback(async () => {
     try {
@@ -49,35 +48,19 @@ export default function SubscriptionStatus() {
     fetchSubscription();
   }, [fetchSubscription]);
 
-  const performAction = async (action: SubscriptionAction["action"]) => {
-    setActionLoading(action);
-    setMessage(null);
-    setConfirmAction(null);
-
+  const openPortal = async () => {
+    setError(null);
+    setPortalOpening(true);
     try {
-      const res = await fetch("/api/billing/subscription", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
-      });
-
+      const res = await fetch("/api/billing/stripe/portal", { method: "POST" });
       const data = await res.json();
-      if (!res.ok) {
-        setMessage({ type: "error", text: data.error || "Action failed" });
-      } else {
-        const actionLabels: Record<string, string> = {
-          cancel: "Subscription will cancel at end of billing period.",
-          pause: "Subscription will pause at end of billing period.",
-          resume: "Subscription resumed successfully.",
-        };
-        setMessage({ type: "success", text: actionLabels[action] || "Done." });
-        // Refresh subscription data
-        await fetchSubscription();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Couldn't open the billing portal.");
       }
-    } catch {
-      setMessage({ type: "error", text: "Network error. Please try again." });
-    } finally {
-      setActionLoading(null);
+      window.location.href = data.url;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't open the billing portal.");
+      setPortalOpening(false);
     }
   };
 
@@ -100,9 +83,13 @@ export default function SubscriptionStatus() {
   const periodEnd = subscription.currentPeriodEnd
     ? new Date(subscription.currentPeriodEnd)
     : null;
-  const isActive = subscription.status === "active" || subscription.status === "trialing";
-  const isPaused = subscription.status === "paused";
   const isCanceled = subscription.status === "canceled";
+
+  // Subsidized grants don't have a real Stripe customer, so the portal
+  // can't open for them — hide the manage button in that case.
+  const hasStripeCustomer =
+    !!subscription.stripeCustomerId &&
+    subscription.stripeSubscriptionId !== "subsidized-grant";
 
   return (
     <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-6 space-y-5">
@@ -154,111 +141,29 @@ export default function SubscriptionStatus() {
         </div>
       )}
 
-      {/* Messages */}
-      {message && (
-        <div
-          className={`flex items-start gap-2 text-sm rounded-lg px-4 py-3 border ${
-            message.type === "success"
-              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-              : "bg-red-500/10 border-red-500/20 text-red-400"
-          }`}
+      {/* Error */}
+      {error && (
+        <div className="flex items-start gap-2 text-sm rounded-lg px-4 py-3 border bg-red-500/10 border-red-500/20 text-red-400">
+          <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Manage via Stripe portal */}
+      {isPro && hasStripeCustomer && (
+        <button
+          type="button"
+          onClick={openPortal}
+          disabled={portalOpening}
+          className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-white/[0.05] text-white/70 hover:bg-white/10 hover:text-white transition-colors border border-white/[0.08] disabled:opacity-50"
         >
-          {message.type === "success" ? (
-            <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+          {portalOpening ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
           ) : (
-            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+            <ExternalLink className="w-3.5 h-3.5" />
           )}
-          <span>{message.text}</span>
-        </div>
-      )}
-
-      {/* Confirmation dialog */}
-      {confirmAction && (
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 space-y-3">
-          <p className="text-sm text-amber-300">
-            {confirmAction === "cancel"
-              ? "Are you sure you want to cancel? You'll retain access until the end of your billing period."
-              : "Are you sure you want to pause your subscription?"}
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => performAction(confirmAction)}
-              disabled={!!actionLoading}
-              className="px-4 py-2 text-sm rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors disabled:opacity-50 flex items-center gap-2"
-            >
-              {actionLoading === confirmAction && (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              )}
-              Yes, {confirmAction}
-            </button>
-            <button
-              onClick={() => setConfirmAction(null)}
-              className="px-4 py-2 text-sm rounded-lg bg-white/[0.05] text-white/60 hover:bg-white/10 transition-colors"
-            >
-              Keep my plan
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Actions */}
-      {isPro && !confirmAction && (
-        <div className="flex flex-wrap gap-2">
-          {/* Manage in Paddle */}
-          {subscription.paddleSubscriptionId && (
-            <a
-              href={`https://${
-                process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT === "production"
-                  ? "customer"
-                  : "sandbox-customer"
-              }.paddle.com/subscriptions/${subscription.paddleSubscriptionId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-white/[0.05] text-white/60 hover:bg-white/10 hover:text-white/80 transition-colors border border-white/[0.08]"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              Manage Subscription
-            </a>
-          )}
-
-          {/* Cancel */}
-          {isActive && !subscription.cancelAtPeriodEnd && (
-            <button
-              onClick={() => setConfirmAction("cancel")}
-              className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-white/[0.05] text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-colors border border-white/[0.08]"
-            >
-              <XCircle className="w-3.5 h-3.5" />
-              Cancel
-            </button>
-          )}
-
-          {/* Pause (only active subs) */}
-          {isActive && !subscription.cancelAtPeriodEnd && (
-            <button
-              onClick={() => setConfirmAction("pause")}
-              className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-white/[0.05] text-white/40 hover:bg-yellow-500/10 hover:text-yellow-400 transition-colors border border-white/[0.08]"
-            >
-              <Pause className="w-3.5 h-3.5" />
-              Pause
-            </button>
-          )}
-
-          {/* Resume (only paused subs) */}
-          {isPaused && (
-            <button
-              onClick={() => performAction("resume")}
-              disabled={!!actionLoading}
-              className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-violet-500/20 text-violet-300 hover:bg-violet-500/30 transition-colors border border-violet-500/30 disabled:opacity-50"
-            >
-              {actionLoading === "resume" ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Play className="w-3.5 h-3.5" />
-              )}
-              Resume
-            </button>
-          )}
-        </div>
+          Manage subscription
+        </button>
       )}
 
       {/* Free plan CTA */}

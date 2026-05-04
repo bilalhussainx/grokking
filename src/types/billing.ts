@@ -1,9 +1,7 @@
 // src/types/billing.ts
-// Environment variables required:
-//   PADDLE_API_KEY              — Paddle API key (server-side)
-//   PADDLE_WEBHOOK_SECRET       — Webhook signature verification
-//   NEXT_PUBLIC_PADDLE_CLIENT_TOKEN  — Client-side token
-//   NEXT_PUBLIC_PADDLE_ENVIRONMENT   — 'sandbox' or 'production'
+// Billing types — Stripe-only. The Paddle SDK + types were ripped out
+// as part of the 2026-05-03 billing migration; if you need Stripe API
+// shapes, import them directly from `stripe`.
 
 export type PlanId = "free" | "pro";
 
@@ -17,8 +15,8 @@ export type SubscriptionStatus =
 export interface Subscription {
   id: string;
   userId: string;
-  paddleSubscriptionId: string | null;
-  paddleCustomerId: string | null;
+  stripeSubscriptionId: string | null;
+  stripeCustomerId: string | null;
   plan: PlanId;
   status: SubscriptionStatus;
   currentPeriodStart: string | null;
@@ -28,61 +26,12 @@ export interface Subscription {
   updatedAt: string;
 }
 
-export interface PaddleWebhookEvent {
-  event_type: string;
-  event_id: string;
-  occurred_at: string;
-  notification_id: string;
-  data: Record<string, unknown>;
-}
-
-export interface CheckoutRequest {
-  planId: PlanId;
-  userId: string;
-}
-
-export interface CheckoutResponse {
-  transactionId?: string;
-  checkoutUrl?: string;
-  error?: string;
-}
-
-export interface SubscriptionAction {
-  action: "cancel" | "pause" | "resume";
-}
-
-// Paddle API v2 response types (subset)
-export interface PaddleSubscription {
-  id: string;
-  status: string;
-  customer_id: string;
-  current_billing_period: {
-    starts_at: string;
-    ends_at: string;
-  } | null;
-  scheduled_change: {
-    action: string;
-    effective_at: string;
-  } | null;
-  custom_data: Record<string, string> | null;
-}
-
-export interface PaddleTransaction {
-  id: string;
-  subscription_id: string | null;
-  customer_id: string;
-  status: string;
-  checkout: {
-    url: string;
-  } | null;
-}
-
 // Database row shape (snake_case from Supabase)
 export interface SubscriptionRow {
   id: string;
   user_id: string;
-  paddle_subscription_id: string | null;
-  paddle_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  stripe_customer_id: string | null;
   plan: PlanId;
   status: SubscriptionStatus;
   current_period_start: string | null;
@@ -97,8 +46,8 @@ export function rowToSubscription(row: SubscriptionRow): Subscription {
   return {
     id: row.id,
     userId: row.user_id,
-    paddleSubscriptionId: row.paddle_subscription_id,
-    paddleCustomerId: row.paddle_customer_id,
+    stripeSubscriptionId: row.stripe_subscription_id,
+    stripeCustomerId: row.stripe_customer_id,
     plan: row.plan,
     status: row.status,
     currentPeriodStart: row.current_period_start,

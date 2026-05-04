@@ -23,7 +23,7 @@ interface Props {
   request: UpgradeRequest | null;
   onClose: () => void;
   onSignup: () => void;   // opens signup modal for guest → free
-  onCheckout: () => void; // fires Paddle checkout for Pro
+  onCheckout: () => void; // routes to /pricing → Stripe checkout for Pro
 }
 
 interface Copy {

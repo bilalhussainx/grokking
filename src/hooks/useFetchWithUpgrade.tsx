@@ -63,7 +63,9 @@ export function UpgradeGateProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const goCheckout = useCallback(() => {
-    // Paddle checkout — same route the /pricing page hits.
+    // Stripe checkout lives on /pricing — clicking the Pro button there
+    // calls /api/billing/stripe/checkout and redirects into Stripe. The
+    // ?upgrade=pro flag is read by the pricing page to highlight Pro.
     if (typeof window !== "undefined") {
       window.location.href = "/pricing?upgrade=pro";
     }

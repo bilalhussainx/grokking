@@ -15,7 +15,6 @@ const PUBLIC_ROUTES = [
   "/onboarding",
   "/auth/callback",
   "/auth/confirm",
-  "/api/webhooks/paddle",
   "/api/billing/stripe/webhook",
   "/api/survey",
   "/survey.html",

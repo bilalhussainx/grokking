@@ -48,7 +48,7 @@ export default function TermsOfServicePage() {
 
           <h2>5. Payments and Refunds</h2>
           <ul>
-            <li>Pro subscriptions are billed monthly or annually through Paddle</li>
+            <li>Pro subscriptions are billed monthly through Stripe</li>
             <li>You may cancel your subscription at any time — access continues until the end of your billing period</li>
             <li>Refund requests within 7 days of initial purchase will be honored on a case-by-case basis</li>
             <li>We reserve the right to change pricing with 30 days&apos; notice to existing subscribers</li>

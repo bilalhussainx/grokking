@@ -470,7 +470,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "What payment methods?",
-    a: "All major credit + debit cards, PayPal, Apple Pay, Google Pay through Paddle. Paddle handles VAT/sales tax automatically.",
+    a: "All major credit + debit cards, Apple Pay, Google Pay, and Link through Stripe. Stripe handles VAT/sales tax automatically.",
   },
   {
     q: "Refund policy?",
