@@ -458,17 +458,33 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const appendVoiceTurn = useCallback((role: "user" | "assistant", content: string) => {
-    if (!content.trim()) return;
+    const trimmed = content.trim();
+    if (!trimmed) return;
+    // Local state — show the turn in the chat immediately.
     setMessages((prev) => [
       ...prev,
       {
         id: crypto.randomUUID(),
         role,
-        content: content.trim(),
+        content: trimmed,
         mode: "voice",
         createdAt: new Date().toISOString(),
       },
     ]);
+    // Server persistence + extraction. The Deepgram Voice Agent runs its
+    // LLM inside Deepgram's WebSocket, so our /api/cc/coach/message route
+    // never sees the conversation. Without this fire-and-forget POST,
+    // voice turns vanish on reload AND the LLM-emitted <<actions>> block
+    // never reaches the school-extraction pipeline (so "I added Stanford
+    // and MIT to your list" never actually adds them). Fail silently —
+    // the live chat continues even if persistence breaks.
+    fetch("/api/cc/coach/voice-turn", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role, content: trimmed }),
+    }).catch((err) => {
+      console.warn("[CoachKairos] voice-turn persist failed (non-fatal):", err);
+    });
   }, []);
 
   return (
