@@ -473,8 +473,22 @@ IMPORTANT: Focus conversation on the lesson topic above. Create scenarios where 
             if (!locale) {
               throw new Error(`No Google TTS locale for language ${language}`);
             }
+            // Urdu pipeline routes through hi-IN-Wavenet-A. The reply from
+            // the LLM comes back in Nastaliq script; the Hindi voice can't
+            // read Nastaliq, so transliterate Nastaliq → Devanagari first.
+            // Hindi/Urdu phonetics are mutually intelligible, so the
+            // resulting audio sounds natural to Pakistani Urdu speakers.
+            // Other Google TTS languages pass their reply through verbatim.
+            let ttsText = responseText;
+            if (language === 'ur') {
+              const { transliterateUrduToDevanagari, containsNastaliq } =
+                await import('@/lib/voice/urdu-to-devanagari');
+              if (containsNastaliq(ttsText)) {
+                ttsText = transliterateUrduToDevanagari(ttsText);
+              }
+            }
             const chunks: Buffer[] = [];
-            for await (const chunk of streamingSynthesizeWithGoogle(responseText, {
+            for await (const chunk of streamingSynthesizeWithGoogle(ttsText, {
               languageCode: locale,
             })) {
               chunks.push(chunk);

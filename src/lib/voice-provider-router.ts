@@ -77,13 +77,20 @@ export function isGoogleTtsLanguage(lang: string): boolean {
 // via scripts/list-urdu-voices.mjs against the live listVoices() API.
 //
 // Notes:
-//  - ur: Google only ships ur-IN (no ur-PK); identical script reads
-//    natural for Pakistani users.
+//  - ur: Routes through hi-IN (Hindi Wavenet) instead of ur-IN (Standard).
+//    Google has not published Wavenet/Neural2/Chirp3-HD for ur-IN as of
+//    2026-05; ur-IN-Standard-A is concatenative + robotic, and an English
+//    voice mispronounces Nastaliq. Spoken Hindi/Urdu (Hindustani) are
+//    mutually intelligible — feeding the Urdu reply into the hi-IN voice
+//    after a Nastaliq → Devanagari transliteration (see
+//    src/lib/voice/urdu-to-devanagari.ts) gives Pakistani Urdu speakers
+//    a natural-sounding native voice. Switch back to 'ur-IN' if/when
+//    Google ships a Chirp3-HD Urdu voice.
 //  - zh: Mandarin is published as cmn-CN, not zh-CN.
 //  - ar: ar-XA is Google's pan-Arabic locale (covers Gulf states +
 //    North Africa with a neutral MSA accent).
 export const GOOGLE_TTS_LANG_CODES: Record<string, string> = {
-  ur: 'ur-IN',
+  ur: 'hi-IN',
   zh: 'cmn-CN',
   ko: 'ko-KR',
   ar: 'ar-XA',

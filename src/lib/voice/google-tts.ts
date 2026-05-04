@@ -76,7 +76,13 @@ export interface GoogleTtsOptions {
 // Voice resolution follows opts.voiceName → DEFAULT_VOICES[locale] → none
 // (Google picks one). To override per-call, pass `voiceName` directly.
 const DEFAULT_VOICES: Record<string, string> = {
-  "ur-IN": "ur-IN-Standard-A",   // Standard only — Wavenet/Neural2 not published.
+  // hi-IN: Hindi Wavenet, used for the Urdu pipeline (ur is mapped to
+  // hi-IN in voice-provider-router so callers feed transliterated
+  // Devanagari → Hindi-Urdu phonetics out the speaker).
+  "hi-IN": "hi-IN-Wavenet-A",
+  // ur-IN kept as a fallback in case a caller passes the locale directly.
+  // Standard tier is the only thing published for ur-IN as of 2026-05.
+  "ur-IN": "ur-IN-Standard-A",
   "cmn-CN": "cmn-CN-Wavenet-A",  // Mandarin (Mainland China) — Wavenet
   "ko-KR": "ko-KR-Neural2-A",    // Korean — Neural2 (newest tier available)
   "ar-XA": "ar-XA-Wavenet-A",    // Pan-Arabic — Wavenet
