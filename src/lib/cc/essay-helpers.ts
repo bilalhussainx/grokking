@@ -1,6 +1,7 @@
 import { createAdminSupabase } from "@/lib/supabase-server";
 import { ESSAY_REVIEW_PRINCIPLES, ESSAY_EXPERT_TIPS, ESSAY_STRUCTURAL_PATTERNS } from "./activity-exemplars";
 import { KAIROS_VOICE } from "@/lib/brand-voice";
+import { getEssayProfile, type EssayProfile } from "./essay-profile";
 
 export interface EssayContext {
   studentName: string;
@@ -13,6 +14,11 @@ export interface EssayContext {
   brainstormTranscript: { role: string; content: string }[] | null;
   outlineJson: Record<string, unknown> | null;
   currentDraft: string | null;
+  // Country code of the target school ("US" / "CA" / "UK") when the essay is
+  // tied to a school via school_id. NULL for school-agnostic essays (Common
+  // App PS, UCAS PS — those don't have a school_id). Drives region-aware
+  // brainstorm / outline guidance via getEssayProfile().
+  schoolCountry: string | null;
   // When the current essay is a supplement, this carries the student's approved
   // Common App personal statement so the supplement coaching can reference it
   // ("you already covered music in your main essay — this supplement should go
@@ -141,6 +147,19 @@ export async function buildEssayContext(
     }
   }
 
+  // Look up the school's country when the essay has school_id. Cheap join —
+  // single row by primary key. School-agnostic essays (Common App PS, UCAS PS)
+  // have school_id = null and skip the lookup entirely.
+  let schoolCountry: string | null = null;
+  if (essay.school_id) {
+    const { data: school } = await db
+      .from("cc_schools")
+      .select("country")
+      .eq("id", essay.school_id)
+      .maybeSingle();
+    schoolCountry = (school?.country as string | undefined) ?? null;
+  }
+
   return {
     studentName: profile.preferred_name || profile.legal_first_name || "Student",
     activities: activityList,
@@ -152,11 +171,19 @@ export async function buildEssayContext(
     brainstormTranscript: parseJsonField<{ role: string; content: string }[]>(essay.brainstorm_transcript),
     outlineJson: parseJsonField<Record<string, unknown>>(essay.outline_json),
     currentDraft: essay.current_draft,
+    schoolCountry,
     parentPersonalStatement,
   };
 }
 
 export function getBrainstormSystemPrompt(ctx: EssayContext): string {
+  // Region-aware essay profile — null for the US default. When non-null,
+  // we inject the brainstormFraming block AFTER the prompt context and
+  // (for UCAS PS) suppress the US-Common-App-centric ESSAY_EXPERT_TIPS
+  // and ESSAY_STRUCTURAL_PATTERNS blocks since those would actively
+  // mislead a UK PS brainstorm.
+  const profile: EssayProfile | null = getEssayProfile(ctx.essayType, ctx.schoolCountry);
+
   const activityBlock = ctx.activities.length > 0
     ? `\nStudent's activities (ordered by position, with hours/impact metadata — use these as raw material for topic discovery):\n${ctx.activities.map((a, i) => `${i + 1}. ${a}`).join("\n")}`
     : "";
@@ -167,7 +194,7 @@ export function getBrainstormSystemPrompt(ctx: EssayContext): string {
   const transcript = ctx.brainstormTranscript || [];
   const userTurns = transcript.filter((t) => t.role === "user");
   const userTurnCount = userTurns.length;
-  const isSupplement = ctx.essayType !== "personal_statement";
+  const isSupplement = ctx.essayType !== "personal_statement" && !ctx.essayType.startsWith("ucas_ps_");
   const isFirstTurn = userTurnCount === 0;
 
   const supplementKickoff = isSupplement && isFirstTurn && ctx.activities.length > 0
@@ -215,18 +242,31 @@ When the student proposes a topic that's clearly a rehash of the PS, gently push
     ? `\n\n[SYSTEM NUDGE] The student has shared enough — this turn, surface 2-3 concrete themes using the <<THEMES_READY>> block and ask which one resonates. Do not ask another open-ended discovery question.`
     : "";
 
+  // Default label for "what the student is writing". When a region profile
+  // applies (UCAS / Canadian supplement), use its `what` for a more honest
+  // description than "supplemental essay".
+  const whatLabel = profile?.what
+    ?? (ctx.essayType === "personal_statement"
+      ? "Common App personal statement"
+      : "supplemental essay");
+
+  // The US-centric tip blocks are skipped for UCAS (suppressUSExpertTips=true)
+  // because UCAS Q1/Q2/Q3 are structurally different from Common App essays
+  // and those tips would push the LLM toward the wrong genre. Canadian
+  // supplements still benefit from the US tips (the genre is similar enough)
+  // but get the academic-leaning framing on top.
+  const tipsBlock = profile?.suppressUSExpertTips
+    ? ""
+    : `\n${ESSAY_EXPERT_TIPS}\n\n${ESSAY_STRUCTURAL_PATTERNS}\n`;
+
   return `${KAIROS_VOICE}
 
-You are a college essay brainstorm coach helping ${ctx.studentName} write a ${ctx.essayType === "personal_statement" ? "Common App personal statement" : "supplemental essay"}.
+You are a college essay brainstorm coach helping ${ctx.studentName} write a ${whatLabel}.${profile ? `\n\nAudience: ${profile.audience}.` : ""}
 
 Prompt: "${ctx.promptText}"
 Word limit: ${ctx.wordLimit}
-
-${ESSAY_EXPERT_TIPS}
-
-${ESSAY_STRUCTURAL_PATTERNS}
-
-${ESSAY_REVIEW_PRINCIPLES}
+${tipsBlock}
+${ESSAY_REVIEW_PRINCIPLES}${profile?.brainstormFraming ?? ""}
 
 Rules:
 1. Ask ONE question per message to help the student discover their story.
@@ -247,11 +287,17 @@ ${activityBlock}${honorBlock}${ctx.academicHighlights ? `\nAcademics: ${ctx.acad
 }
 
 export function getOutlineSystemPrompt(ctx: EssayContext): string {
+  const profile: EssayProfile | null = getEssayProfile(ctx.essayType, ctx.schoolCountry);
+  const whatLabel = profile?.what
+    ?? (ctx.essayType === "personal_statement"
+      ? "Common App personal statement"
+      : "supplemental");
+
   return `You are a college essay outline coach. Generate EXACTLY 3 structurally DIFFERENT outline options for ${ctx.studentName}'s chosen theme.
 
-Essay type: ${ctx.essayType === "personal_statement" ? "Common App personal statement" : "supplemental"}
+Essay type: ${whatLabel}${profile ? `\nAudience: ${profile.audience}` : ""}
 Prompt: "${ctx.promptText}"
-Word limit: ${ctx.wordLimit}
+Word limit: ${ctx.wordLimit}${profile?.outlineFraming ?? ""}
 
 HARD REQUIREMENT: return an "outlines" array with length === 3. Do not return 1, 2, or 4.
 
