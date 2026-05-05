@@ -643,12 +643,14 @@ function buildTiles(key: VariantKey): Tile[] {
         { href: "/cc/courses", icon: "book", label: "Track your courses" },
         { href: "/cc/test-strategy", icon: "chart", label: "Test strategy", cap: "PSAT 10 first." },
         { href: "/cc/majors", icon: "compass", label: "Major exploration" },
+        { href: "/schools", icon: "grad", label: "School list", cap: "Preview — explore freely, lock at junior year." },
         { href: "/cc/summer", icon: "sun", label: "Plan your summer" },
         { href: "/cc/visits", icon: "mapPin", label: "Virtual tours" },
         { href: "/?coach=open", icon: "sparkles", label: "Coach Kairos" },
       ];
     case "junior":
       return [
+        { href: "/schools", icon: "grad", label: "School list" },
         { href: "/cc/essays", icon: "fileText", label: "Brainstorm only", cap: "Draft + revise unlock at grade 12." },
         { href: "/cc/courses", icon: "book", label: "Course rigor" },
         { href: "/cc/majors", icon: "compass", label: "Major exploration" },
@@ -658,6 +660,11 @@ function buildTiles(key: VariantKey): Tile[] {
       ];
     case "senior_writing":
       return [
+        // School list intentionally first in the explore grid for senior
+        // writing — once supplements start, the writer constantly needs to
+        // reference WHICH schools are on the list to plan supplement order.
+        // Was missing entirely from this variant before.
+        { href: "/schools", icon: "grad", label: "School list" },
         { href: "/cc/activities-optimizer", icon: "activity", label: "Activities" },
         { href: "/cc/recommenders", icon: "mail", label: "Recommenders" },
         { href: "/cc/test-strategy", icon: "chart", label: "Test scores (final)" },
@@ -667,6 +674,7 @@ function buildTiles(key: VariantKey): Tile[] {
       ];
     case "senior_post_submit":
       return [
+        { href: "/schools", icon: "grad", label: "School list" },
         { href: "/cc/interview-prep/reflect", icon: "message", label: "Interview reflection" },
         { href: "/applications", icon: "calendar", label: "Application history" },
         { href: "/cc/visits", icon: "mapPin", label: "Visit log" },
@@ -674,12 +682,14 @@ function buildTiles(key: VariantKey): Tile[] {
       ];
     case "senior_decisions":
       return [
+        { href: "/schools", icon: "grad", label: "School list" },
         { href: "/applications", icon: "calendar", label: "Application history" },
         { href: "/cc/interview-prep/reflect", icon: "message", label: "Interview reflection" },
         { href: "/?coach=open", icon: "sparkles", label: "Coach Kairos" },
       ];
     case "transfer":
       return [
+        { href: "/schools", icon: "grad", label: "School list" },
         { href: "/cc/courses", icon: "book", label: "Course evaluations" },
         { href: "/?coach=open", icon: "sparkles", label: "Coach Kairos" },
         { href: "/cc/recommenders", icon: "mail", label: "Translate-for-parent docs" },

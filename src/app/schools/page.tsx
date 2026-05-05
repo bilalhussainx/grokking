@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Building2, List, GitCompare, MessageSquare, Globe, Unlock, BadgePercent, ClipboardList, type LucideIcon } from "lucide-react";
+import { Search, Building2, List, GitCompare, MessageSquare, Globe, Unlock, BadgePercent, ClipboardList, AlertTriangle, type LucideIcon } from "lucide-react";
 import SchoolCard from "@/components/cc/SchoolCard";
 import SchoolCompareModal from "@/components/cc/SchoolCompareModal";
 import { ChanceBadge, tierFromBand } from "@/components/cc/ChanceBadge";
@@ -32,7 +32,17 @@ interface MySchoolEntry {
 
 const STATES = ["CA", "NY", "MA", "TX", "FL", "PA", "IL", "GA", "NC", "VA", "MI", "OH", "NJ", "IN", "WI", "WA", "CO", "MN", "AZ", "MD", "TN", "CT", "DC"];
 const TYPES = ["public", "private"];
-const BAND_ORDER = ["reach", "match", "safety", "unknown"];
+const BAND_ORDER = ["reach", "match", "safety", "unknown"] as const;
+// Bold group-header label restored from the pre-April-26 design
+// (commit 2ca0725 "school list generator"). The earlier compact
+// "<ChanceBadge> (count)" layout buried the band so much that students
+// couldn't tell at a glance whether their list was reach-heavy.
+const BAND_LABELS: Record<string, string> = {
+  reach: "Reach Schools",
+  match: "Match Schools",
+  safety: "Safety Schools",
+  unknown: "Uncategorized",
+};
 
 export default function SchoolsPage() {
   const coach = useCoachKairos();
@@ -183,6 +193,25 @@ export default function SchoolsPage() {
     return acc;
   }, {});
 
+  // Imbalance warning restored from the pre-April-26 design. Triggers when
+  // the student has 3+ schools and either:
+  //   (a) zero safeties — most common pitfall for ambitious applicants
+  //   (b) reach-heavy — more reaches than (matches + safeties) combined,
+  //       which usually signals an unrealistic list
+  // The April-26 redesign dropped this entirely and lost the at-a-glance
+  // "your list is unbalanced" signal; counselors specifically asked for it
+  // back because it's the single most useful prompt for students.
+  const safetyCount = grouped.safety?.length ?? 0;
+  const matchCount = grouped.match?.length ?? 0;
+  const reachCount = grouped.reach?.length ?? 0;
+  const imbalanced =
+    mySchools.length >= 3 &&
+    (safetyCount === 0 || reachCount > matchCount + safetyCount);
+  const imbalanceMessage =
+    safetyCount === 0
+      ? "Your list has no safety schools. Add at least 2 safety schools so you have a guaranteed admit to fall back on."
+      : "Your list is reach-heavy. Consider adding more match and safety schools to balance it out.";
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <div className="flex items-center gap-3 mb-6">
@@ -289,15 +318,23 @@ export default function SchoolsPage() {
             </div>
           ) : (
             <div className="space-y-8">
+              {imbalanced && (
+                <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-200/90 leading-relaxed">{imbalanceMessage}</p>
+                </div>
+              )}
               {BAND_ORDER.map((band) => {
                 const list = grouped[band];
                 if (!list || list.length === 0) return null;
                 const tier = tierFromBand(band);
                 return (
                   <div key={band}>
-                    <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <h2 className="text-sm font-semibold text-white">
+                        {BAND_LABELS[band]} ({list.length})
+                      </h2>
                       <ChanceBadge tier={tier} />
-                      <span className="text-xs text-white/20">({list.length})</span>
                     </div>
                     <div className="grid gap-3">
                       {list.map((entry) => (

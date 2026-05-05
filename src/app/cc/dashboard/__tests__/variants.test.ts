@@ -135,10 +135,25 @@ describe("buildVariant — tiles", () => {
     const locked = v.tiles.find((t) => t.label === "Application tracker");
     expect(locked?.locked).toBe(true);
   });
-  it("g10 has 6 tiles, none locked", () => {
+  it("g10 has 7 tiles (incl. School list preview), none locked", () => {
+    // Bumped from 6 → 7 when "School list" was added as a preview tile so
+    // g10 students can browse the catalog ahead of junior year. Capped with
+    // a "Preview — explore freely, lock at junior year" hint to keep the
+    // variant guidance ("school-list building unlocks at junior year")
+    // honest while still surfacing the entry point.
     const v = buildVariant("g10", baseData);
-    expect(v.tiles).toHaveLength(6);
+    expect(v.tiles).toHaveLength(7);
     expect(v.tiles.every((t) => !t.locked)).toBe(true);
+    expect(v.tiles.some((t) => t.label === "School list")).toBe(true);
+  });
+  it("senior_writing surfaces School list in the explore grid", () => {
+    // Regression guard for the screenshot the user reported — the
+    // senior_writing tiles array used to have no /schools entry, so a
+    // student knee-deep in supplements couldn't navigate back to their
+    // school list from the dashboard at all (sidebar didn't have it
+    // either before sidebar-data.ts was updated).
+    const v = buildVariant("senior_writing", baseData);
+    expect(v.tiles.some((t) => t.href === "/schools")).toBe(true);
   });
   it("transfer hides SAT/ACT and includes professor recs note", () => {
     const v = buildVariant("transfer", baseData);

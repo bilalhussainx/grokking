@@ -6,7 +6,7 @@
 import {
   Home, Calendar, FileText, Mail, BarChart3, MessageSquare, Hourglass,
   Activity, BookOpen, Compass, MapPin, Sun, GraduationCap, Settings,
-  Edit3, Users,
+  Edit3, Users, Building2,
 } from "lucide-react";
 
 export type SidebarGrade =
@@ -17,13 +17,14 @@ export type SidebarGrade =
 export type IconName =
   | "home" | "calendar" | "fileText" | "mail" | "chartBar" | "msgSquare"
   | "hourglass" | "activity" | "bookOpen" | "compass" | "mapPin" | "sun"
-  | "cap" | "settings" | "edit3" | "users";
+  | "cap" | "settings" | "edit3" | "users" | "building";
 
 export const ICONS: Record<IconName, typeof Home> = {
   home: Home, calendar: Calendar, fileText: FileText, mail: Mail,
   chartBar: BarChart3, msgSquare: MessageSquare, hourglass: Hourglass,
   activity: Activity, bookOpen: BookOpen, compass: Compass, mapPin: MapPin,
   sun: Sun, cap: GraduationCap, settings: Settings, edit3: Edit3, users: Users,
+  building: Building2,
 };
 
 export type NavItem = {
@@ -56,6 +57,14 @@ export const SECTIONS: NavSection[] = [
     id: "apply", name: "Apply", abbr: "A",
     lockedFor: ["g9"], lockedCaption: "Unlocks junior year",
     items: [
+      // School list shows up for g10 and above. g10 is on the early side,
+      // but the variant guidance lets g10 students "preview" the list view
+      // without locking them into a final list — the dashboard widgets and
+      // coach still tell them not to commit yet. Kept ABOVE the application
+      // tracker so it reads as the natural starting point of the apply flow:
+      // build the list -> track applications against it.
+      { id: "schools", label: "School list", icon: "building", href: "/schools",
+        grades: ["g10", "junior", ...SENIOR_GRADES, "transfer"] },
       { id: "tracker", label: "Application tracker", icon: "calendar", href: "/applications",
         grades: ["junior", ...SENIOR_GRADES, "transfer"] },
       { id: "whyTransfer", label: "Why-transfer essay", icon: "edit3", href: "/cc/essays?type=transfer",
