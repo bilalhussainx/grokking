@@ -3,14 +3,7 @@
 // prompts, supplements the student has started/completed.
 import { NextResponse } from "next/server";
 import { requireAuth, unauthorized, createAdminSupabase } from "../../helpers";
-import promptsSeed from "@/data/supplement-prompts-2026.json";
-
-type SeedEntry = {
-  school_name: string;
-  prompts: { type: string; text: string; word_limit: number; required: boolean }[];
-};
-
-const SEED = promptsSeed as SeedEntry[];
+import { findSupplementSeed } from "@/lib/cc/supplements-loader";
 
 export async function GET() {
   const auth = await requireAuth();
@@ -54,7 +47,7 @@ export async function GET() {
   const essays = (studentEssays ?? []) as EssayRow[];
 
   const result = schoolList.map((s) => {
-    const seed = SEED.find((e) => e.school_name.toLowerCase() === s.name.toLowerCase());
+    const seed = findSupplementSeed(s.name);
     const totalPrompts = seed?.prompts.length ?? 0;
     const requiredCount = seed?.prompts.filter((p) => p.required).length ?? 0;
     const studentEssaysForSchool = essays.filter((e) => e.school_id === s.schoolId);

@@ -40,9 +40,14 @@ export default function SupplementsDashboardPage() {
     <div className="px-6 py-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-2">
         <h1 className="text-xl font-semibold text-white">Supplements</h1>
-        <Link href="/cc/essays" className="text-[12px] text-[#D4AF37] hover:underline">
-          Personal Statement →
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/cc/essays/supplements/uk" className="text-[12px] text-[#D4AF37] hover:underline">
+            UCAS Personal Statement →
+          </Link>
+          <Link href="/cc/essays" className="text-[12px] text-[#D4AF37] hover:underline">
+            Personal Statement →
+          </Link>
+        </div>
       </div>
       <p className="text-[13px] text-white/60 mb-6">
         You have <strong className="text-white/85">{data.totalRequired}</strong> required supplements

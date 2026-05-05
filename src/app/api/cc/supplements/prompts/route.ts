@@ -2,13 +2,7 @@
 // a school + which prompts the student has already started.
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, unauthorized, createAdminSupabase } from "../../helpers";
-import promptsSeed from "@/data/supplement-prompts-2026.json";
-
-type SeedEntry = {
-  school_name: string;
-  prompts: { type: string; text: string; word_limit: number; required: boolean }[];
-};
-const SEED = promptsSeed as SeedEntry[];
+import { findSupplementSeed } from "@/lib/cc/supplements-loader";
 
 export async function GET(req: NextRequest) {
   const auth = await requireAuth();
@@ -20,7 +14,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Missing ?school=" }, { status: 400 });
   }
 
-  const seed = SEED.find((e) => e.school_name.toLowerCase() === school.toLowerCase());
+  const seed = findSupplementSeed(school);
   if (!seed) {
     return NextResponse.json({ schoolName: school, prompts: [], hasSeed: false });
   }
@@ -68,5 +62,10 @@ export async function GET(req: NextRequest) {
     };
   });
 
-  return NextResponse.json({ schoolName: seed.school_name, prompts, hasSeed: true });
+  return NextResponse.json({
+    schoolName: seed.school_name,
+    region: seed.region,
+    prompts,
+    hasSeed: true,
+  });
 }
