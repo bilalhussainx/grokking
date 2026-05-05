@@ -71,6 +71,38 @@ html {
   color-scheme: light;
 }
 
+/*
+ * Native <select> dropdown styling.
+ *
+ * The user reported the application-tracker plan/status dropdowns showed up
+ * as blank white boxes — options invisible until hovered. Cause: most of the
+ * app's <select> elements use `text-white/80` (or similar light text) so
+ * they look right against the dark page background. When the browser opens
+ * the native popup, on Edge / Chromium under Windows the popup background
+ * defaults to white, but the option text inherits the white-ish color from
+ * the trigger, so options render white-on-white.
+ *
+ * `color-scheme: dark` on html SHOULD make native popups use the dark
+ * variant — but Chromium-on-Windows is inconsistent about that for the
+ * <select> popup specifically. Forcing the option colors at the CSS level
+ * is the only thing that holds across Chrome / Edge / Firefox / Safari.
+ *
+ * Applies platform-wide, so we don't have to patch every individual <select>
+ * in the app (15+ instances at last count: ApplicationBoard, schools page,
+ * activities-optimizer, profile forms, etc.).
+ */
+select {
+  color-scheme: dark;
+}
+select option {
+  background-color: #141414;
+  color: #ffffff;
+}
+select option:checked {
+  background-color: rgba(212, 175, 55, 0.18); /* gold tint to mark selected */
+  color: #ffffff;
+}
+
 /* ── Custom Scrollbar ── */
 ::-webkit-scrollbar {
   width: 6px;
