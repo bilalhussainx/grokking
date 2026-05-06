@@ -10,7 +10,10 @@ import { getCounselorForUser } from "@/lib/cc/counselor-helpers";
 interface PatchBody {
   title?: string;
   description?: string | null;
+  pricing_model?: "fixed" | "quote";
   price_usd?: number;
+  price_usd_min?: number | null;
+  price_usd_max?: number | null;
   turnaround_hours?: number | null;
   scope?: Record<string, unknown>;
   active?: boolean;
@@ -51,9 +54,27 @@ export async function PATCH(
     update.title = body.title.trim();
   }
   if (body.description !== undefined) update.description = body.description?.trim() || null;
+  if (body.pricing_model !== undefined) {
+    if (body.pricing_model !== "fixed" && body.pricing_model !== "quote") {
+      return NextResponse.json({ error: "Invalid pricing_model" }, { status: 400 });
+    }
+    update.pricing_model = body.pricing_model;
+  }
   if (body.price_usd !== undefined) {
     if (body.price_usd < 1) return NextResponse.json({ error: "Price must be ≥ $1" }, { status: 400 });
     update.price_usd = body.price_usd;
+  }
+  if (body.price_usd_min !== undefined) {
+    if (body.price_usd_min !== null && body.price_usd_min < 1) {
+      return NextResponse.json({ error: "Minimum price must be ≥ $1" }, { status: 400 });
+    }
+    update.price_usd_min = body.price_usd_min;
+  }
+  if (body.price_usd_max !== undefined) {
+    if (body.price_usd_max !== null && body.price_usd_max < 1) {
+      return NextResponse.json({ error: "Maximum price must be ≥ $1" }, { status: 400 });
+    }
+    update.price_usd_max = body.price_usd_max;
   }
   if (body.turnaround_hours !== undefined) update.turnaround_hours = body.turnaround_hours;
   if (body.scope !== undefined) update.scope_jsonb = body.scope;

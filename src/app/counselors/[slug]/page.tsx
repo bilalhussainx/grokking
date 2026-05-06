@@ -14,13 +14,17 @@ import {
 } from "lucide-react";
 import { createAdminSupabase } from "@/lib/supabase-server";
 import { getCounselorBySlug } from "@/lib/cc/counselor-helpers";
+import BookOrRequestButton from "@/components/counselor/BookOrRequestButton";
 
 interface ServiceRow {
   id: string;
   service_type: string;
   title: string;
   description: string | null;
+  pricing_model: "fixed" | "quote";
   price_usd: number;
+  price_usd_min: number | null;
+  price_usd_max: number | null;
   turnaround_hours: number | null;
 }
 
@@ -65,7 +69,9 @@ export default async function CounselorProfilePage({
     await Promise.all([
       db
         .from("cc_counselor_services")
-        .select("id, service_type, title, description, price_usd, turnaround_hours")
+        .select(
+          "id, service_type, title, description, pricing_model, price_usd, price_usd_min, price_usd_max, turnaround_hours",
+        )
         .eq("counselor_id", counselor.id)
         .eq("active", true)
         .order("sort_order", { ascending: true }),
@@ -173,24 +179,27 @@ export default async function CounselorProfilePage({
                   </p>
                 )}
                 <div className="flex items-center justify-between mt-auto pt-2 border-t border-white/5">
-                  <span className="text-base font-semibold text-[#D4AF37]">
-                    ${Number(s.price_usd).toLocaleString()}
-                  </span>
+                  {s.pricing_model === "quote" && s.price_usd_min != null && s.price_usd_max != null ? (
+                    <div>
+                      <span className="text-base font-semibold text-[#D4AF37]">
+                        ${Number(s.price_usd_min).toLocaleString()}–${Number(s.price_usd_max).toLocaleString()}
+                      </span>
+                      <span className="ml-2 text-[10px] uppercase tracking-wider text-white/45">
+                        Per request
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-base font-semibold text-[#D4AF37]">
+                      ${Number(s.price_usd).toLocaleString()}
+                    </span>
+                  )}
                   {s.turnaround_hours && (
                     <span className="text-[11px] text-white/45">
                       {s.turnaround_hours}h turnaround
                     </span>
                   )}
                 </div>
-                {/* Phase 2: <BookButton serviceId={s.id} /> goes here. */}
-                <button
-                  type="button"
-                  disabled
-                  className="mt-3 w-full px-3 py-2 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] text-[12px] font-medium opacity-60 cursor-not-allowed"
-                  title="Booking unlocks in Phase 2 — Stripe Connect onboarding required"
-                >
-                  Book — coming soon
-                </button>
+                <BookOrRequestButton service={s} counselorSlug={counselor.slug} />
               </div>
             ))}
           </div>

@@ -35,7 +35,9 @@ export async function GET() {
   const db = createAdminSupabase();
   const { data, error } = await db
     .from("cc_counselor_services")
-    .select("id, service_type, title, description, price_usd, turnaround_hours, scope_jsonb, active, sort_order, created_at")
+    .select(
+      "id, service_type, title, description, pricing_model, price_usd, price_usd_min, price_usd_max, turnaround_hours, scope_jsonb, active, sort_order, created_at",
+    )
     .eq("counselor_id", counselor.id)
     .order("sort_order", { ascending: true });
 
@@ -57,7 +59,10 @@ export async function POST(req: NextRequest) {
     service_type?: string;
     title?: string;
     description?: string | null;
+    pricing_model?: "fixed" | "quote";
     price_usd?: number;
+    price_usd_min?: number;
+    price_usd_max?: number;
     turnaround_hours?: number | null;
     scope?: Record<string, unknown>;
   };
@@ -69,8 +74,30 @@ export async function POST(req: NextRequest) {
   if (!body.title || body.title.trim().length < 3) {
     return NextResponse.json({ error: "Title must be at least 3 characters" }, { status: 400 });
   }
-  if (typeof body.price_usd !== "number" || body.price_usd < 1) {
-    return NextResponse.json({ error: "Price must be at least $1" }, { status: 400 });
+
+  const pricingModel = body.pricing_model === "quote" ? "quote" : "fixed";
+  let priceUsd = body.price_usd;
+  let priceUsdMin: number | null = null;
+  let priceUsdMax: number | null = null;
+
+  if (pricingModel === "fixed") {
+    if (typeof priceUsd !== "number" || priceUsd < 1) {
+      return NextResponse.json({ error: "Fixed price must be at least $1" }, { status: 400 });
+    }
+  } else {
+    // quote mode — require min + max range; price_usd becomes the "typical"
+    // anchor (defaulted to the midpoint when the form omits it).
+    if (typeof body.price_usd_min !== "number" || body.price_usd_min < 1) {
+      return NextResponse.json({ error: "Minimum price must be at least $1" }, { status: 400 });
+    }
+    if (typeof body.price_usd_max !== "number" || body.price_usd_max < body.price_usd_min) {
+      return NextResponse.json({ error: "Maximum price must be ≥ minimum" }, { status: 400 });
+    }
+    priceUsdMin = body.price_usd_min;
+    priceUsdMax = body.price_usd_max;
+    if (typeof priceUsd !== "number") {
+      priceUsd = Math.round((priceUsdMin + priceUsdMax) / 2);
+    }
   }
 
   const db = createAdminSupabase();
@@ -81,7 +108,10 @@ export async function POST(req: NextRequest) {
       service_type: body.service_type,
       title: body.title.trim(),
       description: body.description?.trim() || null,
-      price_usd: body.price_usd,
+      pricing_model: pricingModel,
+      price_usd: priceUsd,
+      price_usd_min: priceUsdMin,
+      price_usd_max: priceUsdMax,
       turnaround_hours: body.turnaround_hours ?? null,
       scope_jsonb: body.scope ?? {},
       active: true,

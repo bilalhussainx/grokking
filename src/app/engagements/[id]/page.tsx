@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { createServerSupabase } from "@/lib/supabase-auth";
 import { createAdminSupabase } from "@/lib/supabase-server";
+import QuoteActions from "@/components/counselor/QuoteActions";
 
 interface EngagementFull {
   id: string;
@@ -30,8 +31,31 @@ interface EngagementFull {
   paid_at: string | null;
   started_at: string | null;
   completed_at: string | null;
-  service: { title: string | null; service_type: string | null; description: string | null }
-    | { title: string | null; service_type: string | null; description: string | null }[]
+  // Quote-thread fields (added 2026-05-06)
+  request_message: string | null;
+  quoted_price_usd: number | null;
+  quote_message: string | null;
+  quoted_at: string | null;
+  quote_declined_at: string | null;
+  service:
+    | {
+        title: string | null;
+        service_type: string | null;
+        description: string | null;
+        pricing_model: "fixed" | "quote" | null;
+        price_usd: number | null;
+        price_usd_min: number | null;
+        price_usd_max: number | null;
+      }
+    | {
+        title: string | null;
+        service_type: string | null;
+        description: string | null;
+        pricing_model: "fixed" | "quote" | null;
+        price_usd: number | null;
+        price_usd_min: number | null;
+        price_usd_max: number | null;
+      }[]
     | null;
   counselor: { id: string; user_id: string; display_name: string; slug: string }
     | { id: string; user_id: string; display_name: string; slug: string }[]
@@ -64,7 +88,11 @@ export default async function EngagementDetail({
     .select(`
       id, status, scope_jsonb, price_usd_paid,
       proposed_at, paid_at, started_at, completed_at,
-      service:cc_counselor_services!service_id (title, service_type, description),
+      request_message, quoted_price_usd, quote_message, quoted_at, quote_declined_at,
+      service:cc_counselor_services!service_id (
+        title, service_type, description,
+        pricing_model, price_usd, price_usd_min, price_usd_max
+      ),
       counselor:cc_counselors!counselor_id (id, user_id, display_name, slug),
       student:cc_student_profiles!student_id (id, user_id, preferred_name)
     `)
@@ -92,6 +120,9 @@ export default async function EngagementDetail({
     const i = STATUS_TIMELINE.findIndex((s) => s.key === e.status);
     if (i >= 0) return i;
     if (["cancelled", "refunded"].includes(e.status)) return 1; // paid then refunded
+    // Quote-mode pre-payment states all stack at "Proposed" on the timeline;
+    // the dedicated Quote thread above shows the within-step detail.
+    if (["quote_requested", "quoted", "quote_declined"].includes(e.status)) return 0;
     return 0;
   })();
 
@@ -127,6 +158,69 @@ export default async function EngagementDetail({
           </p>
         )}
       </div>
+
+      {/* Quote thread — only for quote-mode engagements */}
+      {(e.request_message || e.quoted_price_usd !== null || e.quote_declined_at) && (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 mb-5">
+          <p className="text-[11px] uppercase tracking-wider text-white/55 mb-4">Quote thread</p>
+          <ul className="space-y-4">
+            {e.request_message && (
+              <li>
+                <p className="text-[10.5px] uppercase tracking-wider text-white/45 mb-1">
+                  Request {e.proposed_at && `· ${new Date(e.proposed_at).toLocaleString()}`}
+                </p>
+                <p className="text-[13px] text-white/80 leading-relaxed whitespace-pre-wrap">
+                  {e.request_message}
+                </p>
+              </li>
+            )}
+            {e.quoted_price_usd !== null && e.quoted_price_usd !== undefined && (
+              <li className="border-t border-white/5 pt-4">
+                <p className="text-[10.5px] uppercase tracking-wider text-white/45 mb-1">
+                  Counselor quoted{" "}
+                  <span className="text-[#D4AF37]">
+                    ${Number(e.quoted_price_usd).toLocaleString()}
+                  </span>
+                  {e.quoted_at && ` · ${new Date(e.quoted_at).toLocaleString()}`}
+                </p>
+                {e.quote_message && (
+                  <p className="text-[13px] text-white/80 leading-relaxed whitespace-pre-wrap">
+                    {e.quote_message}
+                  </p>
+                )}
+              </li>
+            )}
+            {e.quote_declined_at && (
+              <li className="border-t border-white/5 pt-4">
+                <p className="text-[10.5px] uppercase tracking-wider text-rose-300/70 mb-1">
+                  Quote declined · {new Date(e.quote_declined_at).toLocaleString()}
+                </p>
+                <p className="text-[12.5px] text-white/55 italic">
+                  The counselor can send a revised quote any time.
+                </p>
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
+
+      {/* Action panel — counselor "Send quote" / student "Accept & pay" or "Decline" */}
+      {(() => {
+        const svc = Array.isArray(e.service) ? e.service[0] : e.service;
+        return (
+          <div className="mb-5">
+            <QuoteActions
+              engagementId={e.id}
+              viewerRole={viewerRole}
+              status={e.status}
+              quotedPriceUsd={e.quoted_price_usd}
+              rangeMin={svc?.price_usd_min ?? null}
+              rangeMax={svc?.price_usd_max ?? null}
+              typicalPriceUsd={svc?.price_usd ?? null}
+            />
+          </div>
+        );
+      })()}
 
       {/* Status timeline */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 mb-5">

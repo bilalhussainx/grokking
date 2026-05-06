@@ -20,7 +20,10 @@ interface Service {
   service_type: string;
   title: string;
   description: string | null;
+  pricing_model: "fixed" | "quote";
   price_usd: number;
+  price_usd_min: number | null;
+  price_usd_max: number | null;
   turnaround_hours: number | null;
   active: boolean;
   sort_order: number;
@@ -46,7 +49,10 @@ export default function ServicesPage() {
     service_type: "essay_review_single",
     title: "",
     description: "",
+    pricing_model: "fixed" as "fixed" | "quote",
     price_usd: 150,
+    price_usd_min: 100,
+    price_usd_max: 500,
     turnaround_hours: 72,
   });
   const [error, setError] = useState<string | null>(null);
@@ -157,6 +163,25 @@ export default function ServicesPage() {
               </select>
             </label>
             <label className="block">
+              <span className="text-[11px] uppercase tracking-wider text-white/55 block mb-1">Pricing</span>
+              <select
+                value={draft.pricing_model}
+                onChange={(e) =>
+                  setDraft({ ...draft, pricing_model: e.target.value as "fixed" | "quote" })
+                }
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm"
+              >
+                <option value="fixed">Fixed price — student books at the listed amount</option>
+                <option value="quote">Quote per request — student requests, you reply with a price</option>
+              </select>
+            </label>
+          </div>
+
+          {/* Pricing fields branch on the model. Fixed services need one
+              number; quote services need a min/max range AND a "typical"
+              anchor that pre-fills the amount field on the quote form. */}
+          {draft.pricing_model === "fixed" ? (
+            <label className="block">
               <span className="text-[11px] uppercase tracking-wider text-white/55 block mb-1">Price (USD)</span>
               <input
                 type="number"
@@ -167,7 +192,43 @@ export default function ServicesPage() {
                 className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm"
               />
             </label>
-          </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-3">
+              <label className="block">
+                <span className="text-[11px] uppercase tracking-wider text-white/55 block mb-1">Min (USD)</span>
+                <input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={draft.price_usd_min}
+                  onChange={(e) => setDraft({ ...draft, price_usd_min: Number(e.target.value) })}
+                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm"
+                />
+              </label>
+              <label className="block">
+                <span className="text-[11px] uppercase tracking-wider text-white/55 block mb-1">Max (USD)</span>
+                <input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={draft.price_usd_max}
+                  onChange={(e) => setDraft({ ...draft, price_usd_max: Number(e.target.value) })}
+                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm"
+                />
+              </label>
+              <label className="block">
+                <span className="text-[11px] uppercase tracking-wider text-white/55 block mb-1">Typical (USD)</span>
+                <input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={draft.price_usd}
+                  onChange={(e) => setDraft({ ...draft, price_usd: Number(e.target.value) })}
+                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm"
+                />
+              </label>
+            </div>
+          )}
           <label className="block">
             <span className="text-[11px] uppercase tracking-wider text-white/55 block mb-1">Title</span>
             <input
@@ -234,11 +295,20 @@ export default function ServicesPage() {
                   )}
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-base font-semibold text-[#D4AF37]">
-                    ${Number(s.price_usd).toLocaleString()}
-                  </p>
+                  {s.pricing_model === "quote" && s.price_usd_min != null && s.price_usd_max != null ? (
+                    <>
+                      <p className="text-base font-semibold text-[#D4AF37]">
+                        ${Number(s.price_usd_min).toLocaleString()}–${Number(s.price_usd_max).toLocaleString()}
+                      </p>
+                      <p className="text-[10px] uppercase tracking-wider text-white/45">Quote per request</p>
+                    </>
+                  ) : (
+                    <p className="text-base font-semibold text-[#D4AF37]">
+                      ${Number(s.price_usd).toLocaleString()}
+                    </p>
+                  )}
                   {s.turnaround_hours && (
-                    <p className="text-[10.5px] text-white/45">{s.turnaround_hours}h turnaround</p>
+                    <p className="text-[10.5px] text-white/45 mt-0.5">{s.turnaround_hours}h turnaround</p>
                   )}
                 </div>
               </div>

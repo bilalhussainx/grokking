@@ -30,13 +30,19 @@ interface EngagementRow {
   student: { preferred_name: string | null } | { preferred_name: string | null }[] | null;
 }
 
+// Quote-mode statuses (quote_requested, quoted, quote_declined) added
+// 2026-05-06. Quote-requested goes to inbox first — that's the "you have
+// a new request waiting on your response" surface counselors will check.
 const STATUS_GROUPS = {
-  inbox: ["proposed", "paid_pending_start"],
+  inbox: ["quote_requested", "quoted", "proposed", "paid_pending_start"],
   active: ["in_progress", "awaiting_student"],
-  done: ["completed", "cancelled", "refunded"],
+  done: ["completed", "cancelled", "refunded", "quote_declined"],
 } as const;
 
 const STATUS_LABELS: Record<string, string> = {
+  quote_requested: "New request · respond",
+  quoted: "Quoted · awaiting student",
+  quote_declined: "Quote declined",
   proposed: "Proposed",
   paid_pending_start: "Paid · awaiting start",
   in_progress: "In progress",
