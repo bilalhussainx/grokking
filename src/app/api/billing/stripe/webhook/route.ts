@@ -172,6 +172,41 @@ export async function POST(req: NextRequest) {
       // ──────────────────────────────────────────────────────────────────
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
+
+        // Marketplace branch — counselor engagement bookings.
+        // The booking endpoint sets metadata.marketplace="engagement" so we
+        // can dispatch without inspecting line items. Flip the engagement
+        // from "proposed" → "paid_pending_start" and stamp paid_at +
+        // payment-intent ids for the payouts dashboard.
+        if (session.metadata?.marketplace === "engagement") {
+          const engagementId = session.metadata.engagement_id as string | undefined;
+          if (!engagementId) {
+            console.warn("[stripe/webhook] engagement checkout missing engagement_id", session.id);
+            break;
+          }
+          const paymentIntentId =
+            typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : session.payment_intent?.id ?? null;
+          const amountTotal = (session.amount_total ?? 0) / 100;
+          const { error: engErr } = await db
+            .from("cc_counselor_engagements")
+            .update({
+              status: "paid_pending_start",
+              paid_at: new Date().toISOString(),
+              price_usd_paid: amountTotal,
+              stripe_payment_intent_id: paymentIntentId,
+            })
+            .eq("id", engagementId)
+            .eq("status", "proposed"); // idempotency — only first webhook flips
+          if (engErr) {
+            console.error("[stripe/webhook] engagement update failed", engagementId, engErr);
+          } else {
+            console.log("[stripe/webhook] engagement paid", engagementId, `$${amountTotal}`);
+          }
+          break;
+        }
+
         if (session.mode !== "subscription") break;
 
         const customerId =

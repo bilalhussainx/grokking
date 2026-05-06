@@ -120,3 +120,50 @@ export function visibleFor(grade: SidebarGrade): NavSection[] {
     ),
   }));
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// Counselor sidebar — entirely separate IA from the student/grade-routed
+// sidebar above. The Sidebar component picks one or the other based on
+// useCounselorRole(). We keep the same NavSection shape (with all grades
+// populated) so the existing rendering code doesn't need to branch on
+// "counselor mode" — it just renders whatever sections it's given.
+// ─────────────────────────────────────────────────────────────────────────
+export const COUNSELOR_SECTIONS: NavSection[] = [
+  {
+    id: "apply",
+    name: "Practice",
+    abbr: "P",
+    items: [
+      { id: "engagements", label: "Engagements", icon: "calendar", href: "/counselor/dashboard",
+        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer", "unknown"] },
+      { id: "services", label: "Services", icon: "fileText", href: "/counselor/services",
+        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer", "unknown"] },
+      { id: "payouts", label: "Payouts", icon: "chartBar", href: "/counselor/payouts",
+        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer", "unknown"] },
+    ],
+  },
+  {
+    id: "profile",
+    name: "Brand",
+    abbr: "B",
+    items: [
+      { id: "profile-public", label: "Public profile", icon: "users", href: "/counselor/profile",
+        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer", "unknown"] },
+      { id: "admit-history", label: "Admit history", icon: "building", href: "/counselor/admit-history",
+        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer", "unknown"] },
+    ],
+  },
+  {
+    id: "tools",
+    name: "Tools",
+    abbr: "T",
+    items: [
+      { id: "settings", label: "Settings", icon: "settings", href: "/account/settings",
+        grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer", "unknown"] },
+    ],
+  },
+];
+
+export function counselorSections(): NavSection[] {
+  return COUNSELOR_SECTIONS;
+}

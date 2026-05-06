@@ -22,12 +22,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCoachKairos } from "@/contexts/CoachKairosContext";
+import { useCounselorRole } from "@/hooks/useCounselorRole";
 import {
   type SidebarGrade,
   type IconName,
   type NavSection,
   ICONS,
   visibleFor,
+  counselorSections,
 } from "./sidebar-data";
 
 // Re-export the variant key so existing imports of `SidebarGrade` from this
@@ -61,7 +63,13 @@ export default function Sidebar({
     });
   };
 
-  const sections = visibleFor(grade);
+  // Counselor sidebar swap. When the signed-in user has a cc_counselors row
+  // we render the counselor IA (Engagements / Services / Payouts / Brand /
+  // Settings) instead of the grade-routed student IA. The grade prop is
+  // still accepted but ignored in counselor mode — counselors aren't routed
+  // by HS grade.
+  const { isCounselor } = useCounselorRole();
+  const sections: NavSection[] = isCounselor ? counselorSections() : visibleFor(grade);
   const W = mode === "expanded" ? 240 : 64;
 
   // Active row = whichever item's href matches the current pathname best.
