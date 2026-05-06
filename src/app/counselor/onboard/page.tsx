@@ -35,7 +35,10 @@ export default function CounselorOnboardPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Failed (${res.status})`);
-      router.push(`/counselors/${data.counselor.slug}`);
+      // Land on the private counselor dashboard, not the public profile.
+      // Public profile is for students browsing the marketplace; the new
+      // counselor wants their workspace + setup checklist first.
+      router.push("/counselor/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Onboarding failed");
       setSubmitting(false);

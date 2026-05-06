@@ -11,8 +11,11 @@ import {
   Star,
   Globe,
   Building2,
+  Settings,
+  ListChecks,
 } from "lucide-react";
 import { createAdminSupabase } from "@/lib/supabase-server";
+import { createServerSupabase } from "@/lib/supabase-auth";
 import { getCounselorBySlug } from "@/lib/cc/counselor-helpers";
 import BookOrRequestButton from "@/components/counselor/BookOrRequestButton";
 
@@ -64,6 +67,15 @@ export default async function CounselorProfilePage({
   const counselor = await getCounselorBySlug(slug);
   if (!counselor) notFound();
 
+  // Detect "you are looking at your own profile" — when so, render an
+  // admin bar at the top of the public page with shortcuts back into
+  // the private workspace. Without this, a counselor who lands here
+  // (post-onboard, share-link, etc.) sees the same read-only view a
+  // stranger does and has no breadcrumb home.
+  const userSupabase = await createServerSupabase();
+  const { data: { user: viewer } } = await userSupabase.auth.getUser();
+  const isOwner = Boolean(viewer && viewer.id === counselor.user_id);
+
   const db = createAdminSupabase();
   const [{ data: services }, { data: proof }, { data: reviews }, { data: agency }] =
     await Promise.all([
@@ -105,6 +117,30 @@ export default async function CounselorProfilePage({
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
+      {isOwner && (
+        <div className="mb-6 rounded-xl border border-[#D4AF37]/30 bg-gradient-to-r from-[#1a1610] to-[#141414] p-3 flex items-center gap-3 flex-wrap">
+          <span className="text-[10.5px] uppercase tracking-wider text-[#D4AF37] font-semibold">
+            You're viewing your public profile
+          </span>
+          <span className="text-[11px] text-white/45 hidden sm:inline">
+            This is what students see when they find you on the marketplace.
+          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <Link
+              href="/counselor/dashboard"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[11px] text-white/85 hover:bg-white/10"
+            >
+              <Settings className="w-3 h-3" /> Dashboard
+            </Link>
+            <Link
+              href="/counselor/services"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[11px] text-[#D4AF37] hover:bg-[#D4AF37]/25"
+            >
+              <ListChecks className="w-3 h-3" /> Edit services
+            </Link>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-start gap-4 mb-6">
         <div className="shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/30">
