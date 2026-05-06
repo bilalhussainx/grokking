@@ -47,10 +47,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signingOutRef = useRef(false);
   const ensureProfilePromiseRef = useRef<Promise<void> | null>(null);
 
-  // Stable Supabase client — never re-created on re-renders
+  // Stable Supabase client — never re-created on re-renders.
+  // Can be null if NEXT_PUBLIC_SUPABASE_URL / ANON_KEY are missing (e.g.
+  // during a Vercel preview build before env vars propagate). Every call
+  // site below null-checks; when supabase is null the provider behaves as
+  // if no user is logged in — the rest of the app renders without crashing.
   const supabase = useMemo(() => createBrowserSupabase(), []);
 
   const fetchProfile = useCallback(async (userId: string) => {
+    if (!supabase) return;
     const { data } = await supabase
       .from("user_profiles")
       .select("id, email, full_name, role, referral_code, login_streak, avatar_url, trial_ends_at")
@@ -89,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Fallback: client-side (may fail due to RLS but better than nothing)
       await fetchProfile(_authUser.id);
+      if (!supabase) return;
       const { data: bal } = await supabase.rpc("get_credit_balance", { p_user_id: _authUser.id });
       setCredits((bal as number) || 0);
       setCreditsLoaded(true);
@@ -116,6 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch {}
     // Fallback to browser RPC
+    if (!supabase) return;
     const { data } = await supabase.rpc("get_credit_balance", { p_user_id: user.id });
     setCredits((data as number) || 0);
     setCreditsLoaded(true);
@@ -123,6 +130,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Initialize auth state
   useEffect(() => {
+    // Supabase env missing — finish loading immediately as logged-out.
+    // The provider still mounts and renders children; just nobody is signed in.
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
     const initAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
@@ -202,7 +215,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, [supabase, fetchProfile, ensureProfile]);
 
+  // Helper used by every auth-mutating method below: when supabase is null
+  // (env vars missing), surface a clear error instead of a stack trace.
+  const noAuthError = { error: "Auth is not configured (Supabase env missing)." };
+
   const signInWithGoogle = async () => {
+    if (!supabase) {
+      console.warn(noAuthError.error);
+      return;
+    }
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
@@ -210,12 +231,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithEmail = async (email: string, password: string) => {
+    if (!supabase) return noAuthError;
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { error: error.message };
     return {};
   };
 
   const signUpWithEmail = async (email: string, password: string, name: string) => {
+    if (!supabase) return noAuthError;
     // Read referral cookie if present (set by /ref/[code] page)
     const refCode = document.cookie.match(/referral_code=([^;]+)/)?.[1] || undefined;
     const { data, error } = await supabase.auth.signUp({
@@ -266,6 +289,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string;
     name: string;
   }) => {
+    if (!supabase) return noAuthError;
     // Anonymous user → real user. Supabase keeps the same auth.users.id, so
     // every cc_* row owned by the anon stays intact. RLS continues to match
     // on auth.uid(). No data migration required.
@@ -309,8 +333,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
     setCredits(0);
     setCreditsLoaded(false);
-    // Sign out from Supabase (global = revoke all sessions server-side)
-    await supabase.auth.signOut({ scope: "global" });
+    // Sign out from Supabase (global = revoke all sessions server-side).
+    // No-op when env missing — there's nothing to sign out from.
+    if (supabase) {
+      await supabase.auth.signOut({ scope: "global" });
+    }
     // Manually clear all Supabase auth cookies and localStorage
     document.cookie.split(";").forEach((c) => {
       const name = c.trim().split("=")[0];

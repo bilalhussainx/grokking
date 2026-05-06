@@ -39,6 +39,15 @@ export function useGuestSession(): GuestSessionState {
 
     const run = async () => {
       const client = supabase.current;
+      // Supabase env missing — skip the anonymous-session bootstrap and
+      // mark the hook ready in a no-guest state. Lets pages downstream
+      // render their logged-out shells without crashing.
+      if (!client) {
+        if (!cancelled) {
+          setState({ userId: null, isAnonymous: false, isReady: true });
+        }
+        return;
+      }
 
       // Probe the existing session. If Supabase's refresh path fires and the
       // refresh token is stale ("Invalid Refresh Token: Refresh Token Not

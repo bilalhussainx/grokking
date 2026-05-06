@@ -20,6 +20,11 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setError("");
 
+    if (!supabase) {
+      setError("Auth is not configured (Supabase env missing).");
+      setLoading(false);
+      return;
+    }
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });

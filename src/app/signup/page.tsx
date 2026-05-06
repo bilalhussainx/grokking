@@ -93,6 +93,11 @@ export default function SignupPage() {
   const handleResend = async () => {
     setLoading(true);
     const supabase = (await import("@/lib/supabase-browser")).createBrowserSupabase();
+    if (!supabase) {
+      setLoading(false);
+      alert("Auth is not configured (Supabase env missing).");
+      return;
+    }
     await supabase.auth.resend({ type: "signup", email });
     setLoading(false);
     alert("Confirmation email resent. Check your inbox.");

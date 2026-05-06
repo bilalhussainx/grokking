@@ -33,6 +33,11 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
 
+    if (!supabase) {
+      setError("Auth is not configured (Supabase env missing).");
+      setLoading(false);
+      return;
+    }
     const { error: updateError } = await supabase.auth.updateUser({
       password,
     });

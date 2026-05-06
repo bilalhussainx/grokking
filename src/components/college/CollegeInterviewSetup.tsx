@@ -95,6 +95,7 @@ export default function CollegeInterviewSetup() {
     (async () => {
       try {
         const supabase = createBrowserSupabase();
+        if (!supabase) return;
         const { data } = await supabase
           .from("college_applicant_profile")
           .select("intended_major")
@@ -156,6 +157,7 @@ export default function CollegeInterviewSetup() {
     (async () => {
       try {
         const supabase = createBrowserSupabase();
+        if (!supabase) return;
         const { data: profile } = await supabase
           .from("cc_student_profiles")
           .select("id")
@@ -196,6 +198,7 @@ export default function CollegeInterviewSetup() {
     if (!user) return;
     try {
       const supabase = createBrowserSupabase();
+      if (!supabase) return;
       await supabase.from("college_applicant_profile").upsert({
         user_id: user.id,
         intended_major: intendedMajor.trim() || null,
