@@ -161,7 +161,27 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/_next/") ||
     pathname === "/login" ||
     pathname === "/signup" ||
-    pathname === "/landing";
+    pathname === "/landing" ||
+    // Counselor marketplace surfaces. The student-onboarding gate
+    // (language picker → grade picker → concerns) is irrelevant to:
+    //   /counselor/*       — counselor own onboarding + dashboard +
+    //                         services + payouts + session room
+    //   /counselors/*      — public counselor profile pages (anyone
+    //                         can browse)
+    //   /agencies/*        — public agency landing pages
+    //   /find-counselor    — public counselor discovery + search
+    //   /engagements/*     — booking detail page for both counselor and
+    //                         student parties; access is gated by
+    //                         engagement participation (see page-level
+    //                         check), not by student onboarding state
+    // Without these exemptions, hitting /counselor/onboard for the
+    // first time bounces a brand-new account through /onboarding which
+    // is the wrong flow for someone signing up to become a counselor.
+    pathname.startsWith("/counselor") ||
+    pathname.startsWith("/counselors") ||
+    pathname.startsWith("/agencies") ||
+    pathname === "/find-counselor" ||
+    pathname.startsWith("/engagements");
 
   if (user && isRealUser && !isOnboardingExempt) {
     const { data: profile } = await supabase
