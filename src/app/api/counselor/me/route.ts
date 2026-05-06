@@ -15,12 +15,24 @@ export async function GET() {
     return NextResponse.json({ counselor: null });
   }
   const counselor = await getCounselorForUser(user.id);
+  // Return the full editable shape so the /counselor/profile editor can
+  // read directly from this endpoint (avoids duplicating the Supabase
+  // lookup). useCounselorRole only consumes id + slug; extra fields are
+  // additive.
   return NextResponse.json({
     counselor: counselor
       ? {
           id: counselor.id,
           slug: counselor.slug,
           display_name: counselor.display_name,
+          headline: counselor.headline,
+          bio: counselor.bio,
+          photo_url: counselor.photo_url,
+          years_experience: counselor.years_experience,
+          specialties: counselor.specialties ?? [],
+          languages: counselor.languages ?? ["en"],
+          hourly_rate_usd: counselor.hourly_rate_usd,
+          accepts_new_students: counselor.accepts_new_students,
           agency_id: counselor.agency_id,
           verified: counselor.verified,
         }

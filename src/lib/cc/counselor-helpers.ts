@@ -24,6 +24,10 @@ export interface CounselorRow {
   total_sessions: number;
   average_rating: number | null;
   total_reviews: number;
+  // Stripe Connect Express account id — null until counselor completes
+  // payouts onboarding. Read on /counselor/payouts and gated by the
+  // booking endpoint (refuses bookings until this is set).
+  stripe_account_id: string | null;
 }
 
 export interface AgencyRow {
