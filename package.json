@@ -13,7 +13,10 @@
     "test:desktop": "playwright test --project='Desktop Chrome'",
     "test:ui": "playwright test --ui",
     "test:unit": "vitest run",
-    "test:unit:watch": "vitest"
+    "test:unit:watch": "vitest",
+    "test:counselor": "playwright test --project=counselor",
+    "test:counselor:ui": "playwright test --project=counselor --ui",
+    "e2e:counselor:watch": "node scripts/e2e-watch.mjs"
   },
   "dependencies": {
     "@11labs/react": "^0.2.0",

@@ -15,6 +15,12 @@ export default defineConfig({
     {
       name: 'Desktop Chrome',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: '**/counselor/**',
+    },
+    {
+      name: 'counselor',
+      testMatch: '**/counselor/**',
+      use: { ...devices['Desktop Chrome'] },
     },
   ],
   webServer: {
