@@ -46,12 +46,27 @@ export async function ensureAgencyMember(
 export async function resetCounselorE2eState(): Promise<void> {
   // Idempotent: wipe e2e-scoped agency rows by slug prefix so reruns start clean.
   const db = admin();
+
+  // 1. Wipe everything scoped to e2e-prefixed agencies (FK-respecting order).
   const { data: agencies } = await db.from('cc_agencies').select('id').like('slug', 'e2e-%');
-  if (!agencies?.length) return;
-  const ids = agencies.map(a => a.id as string);
-  await db.from('cc_agency_invite_codes').delete().in('agency_id', ids);
-  await db.from('cc_student_counselor_links').delete().in('agency_id', ids);
-  await db.from('cc_agency_members').delete().in('agency_id', ids);
-  await db.from('cc_agencies').delete().in('id', ids);
-  await db.from('cc_counselor_requests').delete().like('message', 'e2e:%');
+  const agencyIds = (agencies ?? []).map(a => a.id as string);
+  if (agencyIds.length) {
+    await db.from('cc_agency_invite_codes').delete().in('agency_id', agencyIds);
+    await db.from('cc_student_counselor_links').delete().in('agency_id', agencyIds);
+    await db.from('cc_agency_members').delete().in('agency_id', agencyIds);
+    await db.from('cc_agencies').delete().in('id', agencyIds);
+  }
+
+  // 2. Sweep orphan requests by persona email — robust against missing message prefixes.
+  // auth.users isn't reachable via the PostgREST client even with service role,
+  // so we page through the admin listUsers API to find persona userIds. One page
+  // at perPage=1000 comfortably covers any e2e persona count.
+  const { data: list } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
+  const personaIds = (list?.users ?? [])
+    .filter(u => u.email?.startsWith('e2e-') && u.email.endsWith('@test.local'))
+    .map(u => u.id);
+  if (personaIds.length) {
+    await db.from('cc_counselor_requests').delete().in('student_user_id', personaIds);
+    await db.from('cc_counselor_requests').delete().in('counselor_user_id', personaIds);
+  }
 }

@@ -1,6 +1,6 @@
-import { request, BrowserContext, Page } from '@playwright/test';
+import { BrowserContext, Page } from '@playwright/test';
 import { createClient } from '@supabase/supabase-js';
-import { mkdirSync, writeFileSync } from 'fs';
+import { mkdirSync } from 'fs';
 import { join } from 'path';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -30,16 +30,44 @@ export async function ensurePersonaUser(persona: Persona): Promise<PersonaUser> 
   const { email, password } = PERSONAS[persona];
   const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
 
+  // Try to create. If the user already exists, find them and reset the password.
+  // (We don't use listUsers() because GoTrue paginates at 50/page and the find
+  // would silently miss the persona in a project with more users.)
   let userId: string;
-  const { data: existing } = await admin.auth.admin.listUsers();
-  const found = existing.users.find(u => u.email === email);
-  if (found) {
-    userId = found.id;
-    await admin.auth.admin.updateUserById(userId, { password, email_confirm: true });
+  const { data: created, error: createError } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+  });
+
+  if (created?.user) {
+    userId = created.user.id;
   } else {
-    const { data, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
-    if (error || !data.user) throw new Error(`createUser failed: ${error?.message}`);
-    userId = data.user.id;
+    // Already-exists is the only error we expect to recover from. Anything
+    // else (network, auth, permission) is a real failure.
+    const message = createError?.message ?? '';
+    const isAlreadyExists = /already (been )?(registered|exists)|email.*exists/i.test(message);
+    if (!isAlreadyExists) {
+      throw new Error(`createUser failed for ${email}: ${message}`);
+    }
+    // Look up by email via the admin API. getUserByEmail is not exposed in
+    // supabase-js, so we page through listUsers with a wide per_page until
+    // found. This is a one-time per-persona-per-process cost.
+    const pageSize = 1000;
+    let page = 1;
+    let foundId: string | null = null;
+    for (;;) {
+      const { data: list, error: listErr } = await admin.auth.admin.listUsers({ page, perPage: pageSize });
+      if (listErr) throw new Error(`listUsers failed for ${email}: ${listErr.message}`);
+      const match = list?.users.find(u => u.email === email);
+      if (match) { foundId = match.id; break; }
+      if (!list?.users.length || list.users.length < pageSize) break;
+      page++;
+    }
+    if (!foundId) throw new Error(`createUser said "already exists" for ${email} but listUsers found nothing`);
+    userId = foundId;
+    const { error: updateErr } = await admin.auth.admin.updateUserById(userId, { password, email_confirm: true });
+    if (updateErr) throw new Error(`password reset failed for ${email}: ${updateErr.message}`);
   }
 
   return {
