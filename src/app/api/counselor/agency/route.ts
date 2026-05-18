@@ -10,6 +10,7 @@
 //   400 — invalid body / malformed slug
 //   401 — not authenticated
 //   409 — slug taken by another agency or caller is non-head member
+//   500 — DB/infrastructure failure (insert/cleanup error)
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/supabase-auth";
 import { createAgencyAndMakeHead } from "@/lib/cc/agency-creation";
@@ -59,6 +60,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result, { status: 201 });
   } catch (e) {
     const message = e instanceof Error ? e.message : "unknown error";
-    return NextResponse.json({ error: message }, { status: 409 });
+    // Classify before mapping: only true slug conflicts are 409.
+    // Insert/cleanup failures are infrastructure problems → 500, and the
+    // raw DB error text is logged but not surfaced to the client.
+    const isConflict = /slug.*(already taken|taken)/i.test(message);
+    if (isConflict) {
+      return NextResponse.json({ error: message }, { status: 409 });
+    }
+    console.error("[POST /api/counselor/agency] creation failed:", e);
+    return NextResponse.json(
+      { error: "agency creation failed; please retry" },
+      { status: 500 },
+    );
   }
 }

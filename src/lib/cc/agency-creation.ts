@@ -84,6 +84,33 @@ export async function createAgencyAndMakeHead(
   }
   const agencyId = created.id as string;
 
-  await addAgencyMember(agencyId, userId, "head", false);
+  // Best-effort cleanup: if the head-membership insert fails, delete the
+  // agency we just created so the slug doesn't get permanently burned.
+  // Without this, the caller would be locked out of their own slug forever:
+  // retry would see an existing agency with no membership and throw "taken
+  // by another agency".
+  try {
+    await addAgencyMember(agencyId, userId, "head", false);
+  } catch (memberErr) {
+    const { error: cleanupErr } = await db
+      .from("cc_agencies")
+      .delete()
+      .eq("id", agencyId);
+    if (cleanupErr) {
+      console.error(
+        `[agency-creation] orphan cleanup failed for agency ${agencyId} ` +
+          `(slug=${input.slug}): ${cleanupErr.message}`,
+      );
+      throw new Error(
+        `agency creation failed (head insert: ${
+          memberErr instanceof Error ? memberErr.message : "unknown"
+        }) AND orphan cleanup failed — agency ${agencyId} needs manual delete`,
+      );
+    }
+    throw memberErr instanceof Error
+      ? memberErr
+      : new Error("addAgencyMember failed");
+  }
+
   return { agencyId, agencySlug: input.slug };
 }
