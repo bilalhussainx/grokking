@@ -32,8 +32,15 @@ describe('invite-codes helpers', () => {
   });
 
   it('listInviteCodes returns minted codes ordered newest first', async () => {
+    const first = await mintInviteCode(agencyId, headUserId, { label: 'order-A', maxUses: 1 });
+    const second = await mintInviteCode(agencyId, headUserId, { label: 'order-B', maxUses: 1 });
     const list = await listInviteCodes(agencyId);
-    expect(list.length).toBeGreaterThanOrEqual(1);
+    expect(list.length).toBeGreaterThanOrEqual(2);
+    // Newest first: the second (later) mint must precede the first.
+    expect(list[0].id).toBe(second.id);
+    const firstIdx = list.findIndex((c) => c.id === first.id);
+    const secondIdx = list.findIndex((c) => c.id === second.id);
+    expect(secondIdx).toBeLessThan(firstIdx);
   });
 
   it('redeemInviteCode increments used_count and creates link', async () => {

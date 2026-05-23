@@ -9,11 +9,14 @@
 // phone. Collisions are extremely unlikely but we retry on the unique-violation
 // SQLSTATE just in case.
 //
-// Redemption is structured as: validate → resolve assigned counselor → upsert
-// link → optimistically increment used_count. The used_count UPDATE is gated
-// on the previously-observed value so a race between two concurrent redeems
-// of the same single-use code can only succeed once (the loser will fail the
-// CAS, the link upsert is idempotent on (agency_id, student_user_id)).
+// Redemption is structured as: validate → resolve assigned counselor →
+// CLAIM a use of the code (optimistic-concurrency UPDATE with affected-row
+// detection) → upsert link (rolling the claim back if the link fails). The
+// claim-first ordering means a race between two concurrent redeems of the same
+// single-use code can only succeed once: the loser's UPDATE matches zero rows
+// (it must verify a row came back, since a no-match Supabase UPDATE returns
+// error:null), so it never creates a link. The link upsert is idempotent on
+// (agency_id, student_user_id).
 
 import { createAdminSupabase } from "@/lib/supabase-server";
 import { randomBytes } from "crypto";
@@ -164,7 +167,7 @@ export async function redeemInviteCode(
   }
 
   // Pick assigned counselor: preassigned, or fall back to first head of agency.
-  let counselorUserId = row.preassigned_counselor_user_id;
+  let counselorUserId: string | null = row.preassigned_counselor_user_id;
   if (!counselorUserId) {
     const { data: head } = await db
       .from("cc_agency_members")
@@ -179,36 +182,58 @@ export async function redeemInviteCode(
     }
     counselorUserId = head.user_id as string;
   }
+  // Narrowed: both branches above guarantee a non-null counselor here.
+  const resolvedCounselorUserId: string = counselorUserId;
 
-  const { data: link, error: linkError } = await db
-    .from("cc_student_counselor_links")
-    .upsert(
-      {
-        agency_id: row.agency_id,
-        student_user_id: studentUserId,
-        primary_counselor_user_id: counselorUserId,
-        linked_via_code_id: row.id,
-        status: "active",
-      },
-      { onConflict: "agency_id,student_user_id" },
-    )
-    .select("id")
-    .single();
-  if (linkError || !link) {
-    throw new Error(`link upsert failed: ${linkError?.message ?? "unknown"}`);
-  }
-
-  // Optimistic concurrency on used_count to prevent double-increment under race.
-  const { error: incError } = await db
+  // Claim a use of the code FIRST, with optimistic concurrency. The WHERE
+  // clause guards against both a stale read (used_count changed under us) and
+  // exhaustion (used_count already at max). We .select() so we can detect the
+  // zero-rows case: a Supabase UPDATE that matches no rows returns error:null,
+  // so checking `error` alone is NOT enough — we must verify a row came back.
+  const { data: claimed, error: claimError } = await db
     .from("cc_agency_invite_codes")
     .update({ used_count: row.used_count + 1 })
     .eq("id", row.id)
-    .eq("used_count", row.used_count);
-  if (incError) throw new Error(`used_count increment failed: ${incError.message}`);
+    .eq("used_count", row.used_count)        // CAS: only if unchanged since our read
+    .lt("used_count", row.max_uses)          // belt-and-suspenders exhaustion guard
+    .select("id")
+    .maybeSingle();
+  if (claimError) {
+    throw new Error(`code claim failed: ${claimError.message}`);
+  }
+  if (!claimed) {
+    // Zero rows updated: someone else claimed the last use between our read
+    // and our write (or it's now exhausted). This is the race-loser path.
+    throw new Error("code exhausted (already at max_uses)");
+  }
 
-  return {
-    linkId: link.id as string,
-    agencyId: row.agency_id,
-    counselorUserId,
-  };
+  // Slot is ours. Now create the link. If THIS fails, roll the counter back
+  // so the use isn't consumed without a link.
+  const { data: link, error: linkError } = await db
+    .from("cc_student_counselor_links")
+    .upsert({
+      agency_id: row.agency_id,
+      student_user_id: studentUserId,
+      primary_counselor_user_id: resolvedCounselorUserId,
+      linked_via_code_id: row.id,
+      status: "active",
+    }, { onConflict: "agency_id,student_user_id" })
+    .select("id")
+    .single();
+  if (linkError || !link) {
+    // Best-effort rollback of the claim so the code isn't silently burned.
+    const { error: rollbackError } = await db
+      .from("cc_agency_invite_codes")
+      .update({ used_count: row.used_count })
+      .eq("id", row.id)
+      .eq("used_count", row.used_count + 1);   // only roll back OUR increment
+    if (rollbackError) {
+      console.error(
+        `[invite-codes] link upsert failed AND counter rollback failed for code ${row.id}: ${rollbackError.message}`,
+      );
+    }
+    throw new Error(`link upsert failed: ${linkError?.message ?? "unknown"}`);
+  }
+
+  return { linkId: link.id as string, agencyId: row.agency_id, counselorUserId: resolvedCounselorUserId };
 }

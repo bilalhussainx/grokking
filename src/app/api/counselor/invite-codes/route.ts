@@ -4,6 +4,7 @@
 // Status codes:
 //   201 — mint success
 //   200 — list success
+//   400 — invalid maxUses (mint path only)
 //   401 — unauthenticated
 //   403 — caller is not a head of any agency
 //   500 — DB/infrastructure failure (mint path only)
@@ -45,10 +46,18 @@ export async function POST(req: NextRequest) {
     body = {};
   }
 
+  const maxUses = body.maxUses ?? 1;
+  if (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > 1000) {
+    return NextResponse.json(
+      { error: "maxUses must be an integer between 1 and 1000" },
+      { status: 400 },
+    );
+  }
+
   try {
     const code = await mintInviteCode(m.agencyId, user.id, {
       label: body.label,
-      maxUses: body.maxUses ?? 1,
+      maxUses,
       expiresAt: body.expiresAt,
       preassignedCounselorUserId: body.preassignedCounselorUserId,
     });
