@@ -257,6 +257,22 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // --- Head-only counselor surfaces ---------------------------------------
+  // /counselor/team (member management + invite-code minting) is head-only.
+  // The page already client-redirects non-heads and every underlying API is
+  // server-side head-gated (403), so this is defense-in-depth — it just stops
+  // a non-head from seeing the page shell flash before the client redirect.
+  if (pathname.startsWith("/counselor/team")) {
+    const { data: membership } = await supabase
+      .from("cc_agency_members")
+      .select("role")
+      .eq("user_id", user.id)
+      .maybeSingle<{ role: string }>();
+    if (!membership || membership.role !== "head") {
+      return NextResponse.redirect(new URL("/counselor/dashboard", request.url));
+    }
+  }
+
   // --- Root / landing routing (only for users with a session) -------------
   if (pathname === "/") {
     if (isAnonymous) {
