@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-auth";
 import { getCounselorForUser } from "@/lib/cc/counselor-helpers";
+import { getAnyAgencyMembership } from "@/lib/cc/agency-membership";
 
 export async function GET() {
   const supabase = await createServerSupabase();
@@ -12,9 +13,10 @@ export async function GET() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.json({ counselor: null });
+    return NextResponse.json({ counselor: null, membership: null });
   }
   const counselor = await getCounselorForUser(user.id);
+  const membership = await getAnyAgencyMembership(user.id);
   // Return the full editable shape so the /counselor/profile editor can
   // read directly from this endpoint (avoids duplicating the Supabase
   // lookup). useCounselorRole only consumes id + slug; extra fields are
@@ -35,6 +37,16 @@ export async function GET() {
           accepts_new_students: counselor.accepts_new_students,
           agency_id: counselor.agency_id,
           verified: counselor.verified,
+        }
+      : null,
+    // Agency-workspace membership (additive — SP1). null when the user
+    // isn't a member of any agency. Consumed by useCounselorRole to drive
+    // role-aware workspace UI.
+    membership: membership
+      ? {
+          agencyId: membership.agencyId,
+          role: membership.role,
+          requiresReview: membership.requiresReview,
         }
       : null,
   });
