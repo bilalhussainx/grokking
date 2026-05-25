@@ -181,7 +181,15 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/counselors") ||
     pathname.startsWith("/agencies") ||
     pathname === "/find-counselor" ||
-    pathname.startsWith("/engagements");
+    pathname.startsWith("/engagements") ||
+    // /join/<code> — student invite-code redemption. A brand-new student
+    // following a counselor's invite link must be able to redeem the code
+    // BEFORE the student-onboarding gate fires; otherwise the gate bounces
+    // them to /onboarding and the code is lost. The page itself is still
+    // auth-gated (it falls through to the !user → /login?next= redirect
+    // below for logged-out visitors), so this only exempts the onboarding
+    // step, not authentication.
+    pathname.startsWith("/join/");
 
   if (user && isRealUser && !isOnboardingExempt) {
     const { data: profile } = await supabase
