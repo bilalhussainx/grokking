@@ -760,3 +760,15 @@ Testnet acceptance achieved 2026-04-11.
 - **SP2a shipped (2026-04-12):** Public `/verify/<tokenId>` page (server-rendered, no-auth, crawlable with OG tags + `next/og` image generation), LinkedIn share button on `/credentials`, revocation check, `robots.txt` updated. Sepolia testnet only. Zero new deps/env vars/migrations. Middleware updated to make `/verify/` public.
 - **Deferred to SP2b:** Base mainnet deploy, cold wallet rotation, `external_url` wiring.
 - **Deferred to Sub-project 3:** batch Merkle publishing, multi-credential types, catalog beyond coding/tech-interview.
+
+---
+
+## Design System
+
+Always read `DESIGN.md` (repo root) before making any visual or UI decisions. Font
+choices, colors, spacing, radii, and aesthetic direction are defined there, grounded
+in `src/styles/kairos-tokens.css`. Two surfaces: `.kl-surface-landing` (Cormorant /
+navy / square) and `.kl-surface-app` (Inter / true-black / gold / rounded). The
+counselor surface is the **app** surface. Do not deviate without explicit user
+approval. In QA/review, flag code that drifts from DESIGN.md (e.g. `bg-white/5` cards
+instead of `#141414`).
