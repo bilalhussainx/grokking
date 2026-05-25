@@ -68,8 +68,8 @@ export default function Sidebar({
   // Settings) instead of the grade-routed student IA. The grade prop is
   // still accepted but ignored in counselor mode — counselors aren't routed
   // by HS grade.
-  const { isCounselor } = useCounselorRole();
-  const sections: NavSection[] = isCounselor ? counselorSections() : visibleFor(grade);
+  const { isCounselor, isHead } = useCounselorRole();
+  const sections: NavSection[] = isCounselor ? counselorSections({ isHead }) : visibleFor(grade);
   const W = mode === "expanded" ? 240 : 64;
 
   // Active row = whichever item's href matches the current pathname best.

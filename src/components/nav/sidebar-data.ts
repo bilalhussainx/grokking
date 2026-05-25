@@ -40,7 +40,7 @@ export type NavItem = {
 };
 
 export type NavSection = {
-  id: "apply" | "profile" | "tools";
+  id: "apply" | "profile" | "tools" | "workspace";
   name: string;
   abbr: string;
   items: NavItem[];
@@ -128,7 +128,21 @@ export function visibleFor(grade: SidebarGrade): NavSection[] {
 // populated) so the existing rendering code doesn't need to branch on
 // "counselor mode" — it just renders whatever sections it's given.
 // ─────────────────────────────────────────────────────────────────────────
+const ALL_GRADES: SidebarGrade[] = ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer", "unknown"];
+
 export const COUNSELOR_SECTIONS: NavSection[] = [
+  {
+    id: "workspace",
+    name: "Workspace",
+    abbr: "W",
+    items: [
+      { id: "students", label: "Students", icon: "users", href: "/counselor/students",
+        grades: ALL_GRADES },
+      // "Team" is head-only — counselorSections() filters it out for non-heads.
+      { id: "team", label: "Team & invites", icon: "mail", href: "/counselor/team",
+        grades: ALL_GRADES },
+    ],
+  },
   {
     id: "apply",
     name: "Practice",
@@ -164,6 +178,15 @@ export const COUNSELOR_SECTIONS: NavSection[] = [
   },
 ];
 
-export function counselorSections(): NavSection[] {
-  return COUNSELOR_SECTIONS;
+export function counselorSections(opts?: { isHead?: boolean }): NavSection[] {
+  const isHead = opts?.isHead ?? false;
+  if (isHead) return COUNSELOR_SECTIONS;
+  // Non-head counselors don't manage the team or mint codes — drop the "Team
+  // & invites" item. If that leaves the Workspace section with only the
+  // roster, keep the section (Students is still relevant to every member).
+  return COUNSELOR_SECTIONS.map((section) =>
+    section.id === "workspace"
+      ? { ...section, items: section.items.filter((item) => item.id !== "team") }
+      : section,
+  );
 }
