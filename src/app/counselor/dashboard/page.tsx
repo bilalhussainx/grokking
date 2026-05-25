@@ -107,10 +107,10 @@ export default async function CounselorDashboard() {
           </Link>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Link href="/counselor/services" className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[12px] text-white/75 hover:bg-white/10 inline-flex items-center gap-1.5">
+          <Link href="/counselor/services" className="px-3 py-2 rounded-md bg-[#141414] border border-white/[0.08] text-[12px] text-white/75 hover:bg-[#1a1a1a] inline-flex items-center gap-1.5">
             <ListChecks className="w-3.5 h-3.5" /> Services
           </Link>
-          <Link href="/counselor/payouts" className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[12px] text-white/75 hover:bg-white/10 inline-flex items-center gap-1.5">
+          <Link href="/counselor/payouts" className="px-3 py-2 rounded-md bg-[#141414] border border-white/[0.08] text-[12px] text-white/75 hover:bg-[#1a1a1a] inline-flex items-center gap-1.5">
             <CreditCard className="w-3.5 h-3.5" /> Payouts
           </Link>
         </div>
@@ -131,7 +131,7 @@ export default async function CounselorDashboard() {
 
       {/* Setup checklist — surfaces missing pieces */}
       {(serviceCount ?? 0) === 0 || !counselor.bio ? (
-        <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+        <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
           <p className="text-sm font-semibold text-amber-200 mb-2 inline-flex items-center gap-1.5">
             <Settings2 className="w-4 h-4" /> Finish setting up your profile
           </p>
@@ -185,11 +185,11 @@ function Stat({
   extra?: string;
 }) {
   return (
-    <div className={`rounded-xl border p-4 ${accent ? "border-[#D4AF37]/30 bg-[#D4AF37]/5" : "border-white/10 bg-white/[0.02]"}`}>
-      <div className="flex items-center gap-2 text-[10.5px] uppercase tracking-wider text-white/55 mb-1.5">
+    <div className={`rounded-2xl border p-4 ${accent ? "border-[#D4AF37]/30 bg-[#D4AF37]/10" : "border-white/[0.08] bg-[#141414]"}`}>
+      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.10em] text-white/40 font-medium mb-1.5">
         <Icon className="w-3.5 h-3.5" /> {label}
       </div>
-      <p className={`text-xl font-bold ${accent ? "text-[#D4AF37]" : "text-white"}`}>
+      <p className={`text-xl font-bold tabular-nums ${accent ? "text-[#D4AF37]" : "text-white"}`}>
         {value}{extra && <span className="text-[12px] text-white/55 font-normal ml-2">{extra}</span>}
       </p>
     </div>
@@ -209,7 +209,7 @@ function Column({
 }) {
   void role; // reserved for student-side reuse later
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 min-h-[200px]">
+    <div className="rounded-2xl border border-white/[0.08] bg-[#141414] p-4 min-h-[200px]">
       <div className="mb-3">
         <p className="text-sm font-semibold text-white">{title}</p>
         <p className="text-[11px] text-white/45">{hint}</p>
@@ -225,7 +225,7 @@ function Column({
               <li key={e.id}>
                 <Link
                   href={`/engagements/${e.id}`}
-                  className="block rounded-lg border border-white/10 bg-black/20 p-3 hover:border-[#D4AF37]/30 hover:bg-white/[0.04]"
+                  className="block rounded-xl border border-white/[0.08] bg-black/20 p-3 hover:border-[#D4AF37]/30 hover:bg-[#1a1a1a]"
                 >
                   <p className="text-[12.5px] font-medium text-white truncate">
                     {svc?.title ?? "Untitled service"}
