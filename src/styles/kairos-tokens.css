@@ -12,9 +12,13 @@
  */
 
 /* =========================================================================
- * FONTS — Google Fonts (already what the codebase pulls via next/font)
+ * FONTS — loaded via next/font (see src/app/layout.tsx: Inter, JetBrains_Mono,
+ * Cormorant_Garamond, DM_Sans). No @import here on purpose: this file is
+ * inlined into globals.css *after* the tailwindcss/tokens imports, so a
+ * Google-Fonts @import lands mid-file, which CSS forbids — Turbopack 500s the
+ * dev server on it. next/font already supplies all four families, so the
+ * @import was redundant. Do NOT re-add it here.
  * ========================================================================= */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* =========================================================================
  * ROOT: BRAND COLORS (shared across surfaces)

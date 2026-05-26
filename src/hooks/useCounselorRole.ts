@@ -64,35 +64,59 @@ export function useCounselorRole(): CounselorRoleState {
       }
     }
 
-    fetch("/api/counselor/me")
-      .then((r) => (r.ok ? r.json() : { counselor: null, membership: null }))
-      .then(
-        (data: {
-          counselor: { id: string; slug: string } | null;
-          membership: { agencyId: string; role: "head" | "counselor"; requiresReview: boolean } | null;
-        }) => {
-          const next: CounselorRoleState = {
-            isCounselor: Boolean(data.counselor),
-            counselorId: data.counselor?.id ?? null,
-            counselorSlug: data.counselor?.slug ?? null,
-            agencyId: data.membership?.agencyId ?? null,
-            role: data.membership?.role ?? null,
-            requiresReview: data.membership?.requiresReview ?? false,
-            isMember: Boolean(data.membership),
-            isHead: data.membership?.role === "head",
-            loading: false,
-          };
-          setState(next);
-          if (typeof window !== "undefined") {
-            const { loading: _loading, ...persist } = next;
-            void _loading;
-            window.localStorage.setItem(`${CACHE_KEY}:${user.id}`, JSON.stringify(persist));
-          }
-        },
-      )
-      .catch(() => {
+    let cancelled = false;
+
+    // Fetch /me with one retry. Right after sign-in there's an auth-settle
+    // window where /api/counselor/me can transiently 401/500 (cookies not yet
+    // propagated). Treating that as "not a counselor/member" makes gated pages
+    // (roster, team) wrongly redirect to the dashboard. So on a non-ok or
+    // thrown response we retry once after a short delay before resolving.
+    async function loadMe(): Promise<{
+      counselor: { id: string; slug: string } | null;
+      membership: { agencyId: string; role: "head" | "counselor"; requiresReview: boolean } | null;
+    } | null> {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const r = await fetch("/api/counselor/me");
+          if (r.ok) return await r.json();
+        } catch {
+          /* network blip — fall through to retry */
+        }
+        if (attempt === 0) await new Promise((res) => setTimeout(res, 800));
+      }
+      return null; // both attempts failed
+    }
+
+    loadMe().then((data) => {
+      if (cancelled) return;
+      if (!data) {
+        // Lookup failed after retry. Don't downgrade a cached membership to
+        // "not a member" — just stop loading so cached state (if any) stands.
         setState((prev) => ({ ...prev, loading: false }));
-      });
+        return;
+      }
+      const next: CounselorRoleState = {
+        isCounselor: Boolean(data.counselor),
+        counselorId: data.counselor?.id ?? null,
+        counselorSlug: data.counselor?.slug ?? null,
+        agencyId: data.membership?.agencyId ?? null,
+        role: data.membership?.role ?? null,
+        requiresReview: data.membership?.requiresReview ?? false,
+        isMember: Boolean(data.membership),
+        isHead: data.membership?.role === "head",
+        loading: false,
+      };
+      setState(next);
+      if (typeof window !== "undefined") {
+        const { loading: _loading, ...persist } = next;
+        void _loading;
+        window.localStorage.setItem(`${CACHE_KEY}:${user.id}`, JSON.stringify(persist));
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   return state;

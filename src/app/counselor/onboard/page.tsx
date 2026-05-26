@@ -7,17 +7,28 @@
 // Stripe Connect, language picker, etc. Today: claim a counselor row so
 // the role-aware nav swaps and downstream routes can gate on counselor-id.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, GraduationCap, ArrowRight } from "lucide-react";
+import { useCounselorRole } from "@/hooks/useCounselorRole";
 
 export default function CounselorOnboardPage() {
   const router = useRouter();
+  const role = useCounselorRole();
   const [displayName, setDisplayName] = useState("");
   const [agencySlug, setAgencySlug] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Already a counselor? Skip the setup form — go straight to the workspace.
+  // This makes the "Counselor sign in → /counselor/onboard" login entry a
+  // clean no-op for existing counselors (form only shows for first-timers).
+  useEffect(() => {
+    if (!role.loading && role.isCounselor) {
+      router.replace("/counselor/dashboard");
+    }
+  }, [role.loading, role.isCounselor, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

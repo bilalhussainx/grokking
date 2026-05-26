@@ -1,8 +1,9 @@
 // src/app/signup/page.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,8 +12,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import KairosLogo from "@/components/ui/SamsaraLogo";
 
-export default function SignupPage() {
+function SignupForm() {
   const { signInWithGoogle, signUpWithEmail, user, loading: authLoading } = useAuth();
+  const searchParams = useSearchParams();
+  // Honor an internal ?next= so counselor sign-ups (and /join invite links)
+  // route to the right place after account creation. Only same-origin paths
+  // ("/foo", not "//evil.com" or "https://…") are allowed — open-redirect guard.
+  const rawNext = searchParams.get("next");
+  const next =
+    rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : null;
   const nameRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -82,7 +90,7 @@ export default function SignupPage() {
         // preferred router.push to keep the client-side error boundary, but
         // that caused /onboarding and downstream redirects to hit middleware
         // without cookies, creating the /landing redirect loop.)
-        window.location.assign("/onboarding?new=1");
+        window.location.assign(next ?? "/onboarding?new=1");
       } else {
         setSuccess(true);
       }
@@ -248,5 +256,13 @@ export default function SignupPage() {
         </p>
       </motion.div>
     </section>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <SignupForm />
+    </Suspense>
   );
 }

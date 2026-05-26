@@ -173,6 +173,27 @@ function LoginForm() {
           >
             Get Started Free — 300 Credits
           </Link>
+
+          <div className="pt-3 mt-1 border-t border-white/10">
+            <p className="text-xs text-white/40">
+              Counselor or agency?{" "}
+              <Link
+                href="/login?next=%2Fcounselor%2Fonboard"
+                className="text-[#D4AF37] hover:underline font-medium"
+              >
+                Sign in to your workspace →
+              </Link>
+            </p>
+            <p className="text-[11px] text-white/30 mt-1">
+              New here?{" "}
+              <Link
+                href="/signup?next=%2Fcounselor%2Fonboard"
+                className="text-white/50 hover:text-[#D4AF37] hover:underline"
+              >
+                Set up a counselor account
+              </Link>
+            </p>
+          </div>
         </div>
       </motion.form>
     </section>
