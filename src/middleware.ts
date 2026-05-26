@@ -202,6 +202,19 @@ export async function middleware(request: NextRequest) {
     // coach API) OR (b) the onboarding sentinel is still null. Either way
     // the first thing the user should see is the multi-step onboarding.
     if (!profile || profile.language_picker_seen_at == null) {
+      // Counselors who haven't completed student onboarding shouldn't be forced
+      // through the student flow (language → grade → concerns) — that's not
+      // their workflow. If the user has a counselor profile, send them straight
+      // to their workspace. Scoped to the no-student-profile branch so it only
+      // costs a query for accounts that haven't onboarded as students.
+      const { data: counselor } = await supabase
+        .from("cc_counselors")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle<{ id: string }>();
+      if (counselor) {
+        return NextResponse.redirect(new URL("/counselor/dashboard", request.url));
+      }
       return NextResponse.redirect(new URL("/onboarding", request.url));
     }
     // Grade-9 route guard (Feature 16). Page-level checks already exist on
@@ -263,12 +276,15 @@ export async function middleware(request: NextRequest) {
   // server-side head-gated (403), so this is defense-in-depth — it just stops
   // a non-head from seeing the page shell flash before the client redirect.
   if (pathname.startsWith("/counselor/team")) {
-    const { data: membership } = await supabase
+    // NB: select all membership rows — a user can belong to more than one
+    // agency, so .maybeSingle() would error on multiple rows and wrongly
+    // bounce a legitimate head. Pass if ANY membership is head.
+    const { data: memberships } = await supabase
       .from("cc_agency_members")
       .select("role")
-      .eq("user_id", user.id)
-      .maybeSingle<{ role: string }>();
-    if (!membership || membership.role !== "head") {
+      .eq("user_id", user.id);
+    const isHead = (memberships ?? []).some((m) => m.role === "head");
+    if (!isHead) {
       return NextResponse.redirect(new URL("/counselor/dashboard", request.url));
     }
   }

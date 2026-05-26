@@ -19,8 +19,10 @@ import {
   MoreHorizontal,
   Settings,
   Target,
+  GraduationCap,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCounselorRole } from "@/hooks/useCounselorRole";
 import { useTopNav } from "@/contexts/TopNavContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import CreditBadge from "@/components/auth/CreditBadge";
@@ -52,6 +54,7 @@ export default function TopNav({
   onToggleSidebar: propOnToggleSidebar,
 }: TopNavProps) {
   const { user, profile, signOut } = useAuth();
+  const { isCounselor } = useCounselorRole();
   const { overrides } = useTopNav();
   const { isDark, toggle: toggleDarkMode } = useTheme();
   const pathname = usePathname();
@@ -283,6 +286,17 @@ export default function TopNav({
                     );
                   })()}
                 </div>
+
+                {isCounselor && (
+                  <Link
+                    href="/counselor/dashboard"
+                    role="menuitem"
+                    className="flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] font-medium text-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/15 border-b border-white/5 transition-colors"
+                  >
+                    <GraduationCap className="w-4 h-4" />
+                    Counselor workspace
+                  </Link>
+                )}
 
                 <Link
                   href="/settings"
