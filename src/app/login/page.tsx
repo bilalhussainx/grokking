@@ -84,7 +84,7 @@ function LoginForm() {
         >
           <KairosLogo size="lg" showText={false} className="mb-4" />
           <h1 className="text-2xl font-bold text-white">
-            Kairos<span className="text-amber-400">.ai</span>
+            Kairos<span className="text-amber-400">Learn</span>
           </h1>
           <p className="text-sm text-white/50 mt-2">Sign in to continue learning</p>
         </motion.div>

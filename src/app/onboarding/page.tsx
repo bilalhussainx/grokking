@@ -125,6 +125,11 @@ export default function OnboardingPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Only true once /api/cc/onboarding/complete has confirmed the write that
+  // sets language_picker_seen_at. The landed step must NOT navigate to the
+  // dashboard before this — otherwise middleware sees a null sentinel and
+  // bounces the user straight back to /onboarding (BUG-001).
+  const [persistedOk, setPersistedOk] = useState(false);
   const completedRef = useRef(false);
 
   // Cross-fade between steps. The current step fades out, then we swap and
@@ -209,6 +214,7 @@ export default function OnboardingPage() {
       } catch {
         /* ignore quota */
       }
+      setPersistedOk(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       completedRef.current = false; // allow retry
@@ -218,7 +224,10 @@ export default function OnboardingPage() {
   };
 
   const goToDashboard = () => {
-    router.push("/cc/dashboard");
+    // Hard navigation (not router.push) so the freshly-written onboarding
+    // sentinel cookie/session reaches middleware on the /cc/dashboard request.
+    // Soft client nav was dropping cookies and looping back to /onboarding.
+    window.location.assign("/cc/dashboard");
   };
 
   const onSkip = async () => {
@@ -277,6 +286,7 @@ export default function OnboardingPage() {
               profile={profile}
               submitting={submitting}
               error={error}
+              persistedOk={persistedOk}
               onContinue={goToDashboard}
               onRetry={() => persist(profile)}
             />
@@ -629,24 +639,29 @@ function StepLanded({
   profile,
   submitting,
   error,
+  persistedOk,
   onContinue,
   onRetry,
 }: {
   profile: Profile;
   submitting: boolean;
   error: string | null;
+  persistedOk: boolean;
   onContinue: () => void;
   onRetry: () => void;
 }) {
   const langName = LANGS.find((l) => l.code === profile.lang)?.name || "English";
 
-  // Auto-advance to dashboard 1.5s after persistence completes successfully.
+  // Auto-advance to the dashboard 1.5s AFTER the completion write is confirmed
+  // (persistedOk). Gating on persistedOk — not just !submitting — prevents the
+  // timer firing before the language_picker_seen_at sentinel is committed,
+  // which would bounce the user back to /onboarding (BUG-001).
   useEffect(() => {
-    if (!submitting && !error) {
+    if (persistedOk && !error) {
       const t = window.setTimeout(onContinue, 1500);
       return () => window.clearTimeout(t);
     }
-  }, [submitting, error, onContinue]);
+  }, [persistedOk, error, onContinue]);
 
   return (
     <div style={{ textAlign: "center", maxWidth: 720, margin: "0 auto" }}>
@@ -696,8 +711,13 @@ function StepLanded({
       </p>
 
       <div style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 12 }}>
-        <button type="button" className="btn-gold" onClick={onContinue} disabled={submitting}>
-          {submitting ? "Saving…" : "Open my dashboard"} <ArrowRight size={16} />
+        <button
+          type="button"
+          className="btn-gold"
+          onClick={onContinue}
+          disabled={!persistedOk || !!error}
+        >
+          {persistedOk ? "Open my dashboard" : "Saving your profile…"} <ArrowRight size={16} />
         </button>
       </div>
 

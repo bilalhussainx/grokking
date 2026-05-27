@@ -48,13 +48,23 @@ await db.from('cc_student_counselor_links').upsert([
   { agency_id: agencyId, student_user_id: stu2, primary_counselor_user_id: headId, status: 'active' },
 ], { onConflict: 'agency_id,student_user_id' });
 
-// profiles (delete-then-insert: cc_student_profiles has no UNIQUE(user_id))
+// profiles (delete-then-insert: cc_student_profiles has no UNIQUE(user_id)).
+// language_picker_seen_at + intake_completed_at MUST be set, or the middleware
+// onboarding gate bounces these students to /onboarding and blocks every
+// /cc/* route (was BUG-001 in the 2026-05-25 Hermes report).
+const seenAt = new Date().toISOString();
 for (const [uid, prof] of [
   [stu1, { preferred_name: 'Maya Chen', grade_level: 11, graduation_year: 2027, high_school_name: 'Lincoln High', state_province: 'CA', profile_completion_pct: 64, is_transfer_student: false }],
   [stu2, { preferred_name: 'Devon Park', grade_level: 12, graduation_year: 2026, high_school_name: 'Riverside Prep', state_province: 'TX', profile_completion_pct: 88, is_transfer_student: false }],
 ]) {
   await db.from('cc_student_profiles').delete().eq('user_id', uid);
-  await db.from('cc_student_profiles').insert({ user_id: uid, ...prof });
+  await db.from('cc_student_profiles').insert({
+    user_id: uid,
+    home_language: 'en',
+    language_picker_seen_at: seenAt,
+    intake_completed_at: seenAt,
+    ...prof,
+  });
 }
 
 console.log('SEEDED head=' + headId.slice(0, 8) + ' agency=' + agencyId.slice(0, 8) + ' (2 codes, 2 students)');

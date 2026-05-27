@@ -118,7 +118,7 @@ export default function TopNav({
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <KairosLogoIcon size={28} />
           <span className="text-lg font-bold tracking-tight hidden sm:inline text-white">
-            Kairos<span className="text-amber-400">.ai</span>
+            Kairos<span className="text-amber-400">Learn</span>
           </span>
           <span className="text-lg font-bold tracking-tight sm:hidden text-amber-400">K.</span>
         </Link>

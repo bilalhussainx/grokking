@@ -159,7 +159,7 @@ function SignupForm() {
         >
           <KairosLogo size="lg" showText={false} className="mb-4" />
           <h1 className="text-2xl font-bold text-white">
-            Join Kairos<span className="text-amber-400">.ai</span>
+            Join Kairos<span className="text-amber-400">Learn</span>
           </h1>
           <p className="text-sm text-white/50 mt-2">Free 7-day Pro trial for students — 300 AI credits included</p>
         </motion.div>
