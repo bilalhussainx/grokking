@@ -146,18 +146,28 @@ export default function OnboardingPage() {
   const stepDotIdx = STEP_DOT_IDX[step];
 
   // ── Per-step handlers ────────────────────────────────────────────────
-  const onPickLang = (code: string) => advance("role", { lang: code });
-  const onPickRole = (role: "hs" | "tx") => {
-    if (role === "tx") advance("transfer", { role });
-    else advance("grade", { role });
+  // Single-select steps use select → Continue (not click-to-auto-advance).
+  // Selecting only highlights the choice; the explicit Continue button
+  // advances. This gives the user control + obvious feedback that their click
+  // registered, instead of a card silently jumping to the next step (BUG-005).
+  const selectLang = (code: string) => setProfile((p) => ({ ...p, lang: code }));
+  const continueFromLang = () => {
+    if (profile.lang) advance("role");
   };
-  const onPickGrade = (g: number) => {
+  const selectRole = (role: "hs" | "tx") => setProfile((p) => ({ ...p, role }));
+  const continueFromRole = () => {
+    if (profile.role === "tx") advance("transfer");
+    else if (profile.role === "hs") advance("grade");
+  };
+  const selectGrade = (g: number) => setProfile((p) => ({ ...p, grade: g }));
+  const continueFromGrade = () => {
+    const g = profile.grade;
+    if (!g) return;
     if (g === 9 || g === 10) {
-      const next = { ...profile, grade: g };
-      advance("landed", { grade: g });
-      void persist(next);
+      advance("landed");
+      void persist({ ...profile, grade: g });
     } else {
-      advance("concerns", { grade: g });
+      advance("concerns");
     }
   };
   const onSubmitTransfer = () => {
@@ -264,9 +274,15 @@ export default function OnboardingPage() {
 
       <div className="canvas">
         <div className={"step " + (stepIn ? "in" : "")}>
-          {step === "lang" && <StepLanguage value={profile.lang} onPick={onPickLang} />}
-          {step === "role" && <StepRole onPick={onPickRole} />}
-          {step === "grade" && <StepGrade value={profile.grade} onPick={onPickGrade} />}
+          {step === "lang" && (
+            <StepLanguage value={profile.lang} onSelect={selectLang} onContinue={continueFromLang} />
+          )}
+          {step === "role" && (
+            <StepRole value={profile.role} onSelect={selectRole} onContinue={continueFromRole} />
+          )}
+          {step === "grade" && (
+            <StepGrade value={profile.grade} onSelect={selectGrade} onContinue={continueFromGrade} />
+          )}
           {step === "transfer" && (
             <StepTransfer
               form={profile.transfer}
@@ -298,7 +314,15 @@ export default function OnboardingPage() {
 }
 
 // ── Step 1: Language ─────────────────────────────────────────────────────
-function StepLanguage({ value, onPick }: { value: string | null; onPick: (code: string) => void }) {
+function StepLanguage({
+  value,
+  onSelect,
+  onContinue,
+}: {
+  value: string | null;
+  onSelect: (code: string) => void;
+  onContinue: () => void;
+}) {
   return (
     <>
       <div className="eyebrow">
@@ -319,7 +343,7 @@ function StepLanguage({ value, onPick }: { value: string | null; onPick: (code: 
             type="button"
             className={"lang-tile " + (value === l.code ? "active" : "")}
             data-script={l.script ?? undefined}
-            onClick={() => onPick(l.code)}
+            onClick={() => onSelect(l.code)}
           >
             <div className="row1">
               <span className="lang-flag" aria-hidden>
@@ -342,6 +366,12 @@ function StepLanguage({ value, onPick }: { value: string | null; onPick: (code: 
         ))}
       </div>
 
+      <div style={{ marginTop: 28, display: "flex", justifyContent: "center" }}>
+        <button type="button" className="btn-gold" onClick={onContinue} disabled={!value}>
+          {value ? "Continue" : "Pick a language to continue"} <ArrowRight size={16} />
+        </button>
+      </div>
+
       <div className="lang-foot">
         <div className="pill-info">
           <span className="dot-i" />
@@ -356,7 +386,15 @@ function StepLanguage({ value, onPick }: { value: string | null; onPick: (code: 
 }
 
 // ── Step 2: Role ─────────────────────────────────────────────────────────
-function StepRole({ onPick }: { onPick: (role: "hs" | "tx") => void }) {
+function StepRole({
+  value,
+  onSelect,
+  onContinue,
+}: {
+  value: "hs" | "tx" | null;
+  onSelect: (role: "hs" | "tx") => void;
+  onContinue: () => void;
+}) {
   return (
     <>
       <div className="eyebrow">
@@ -371,7 +409,11 @@ function StepRole({ onPick }: { onPick: (role: "hs" | "tx") => void }) {
       </p>
 
       <div className="choice-grid">
-        <button type="button" className="choice" onClick={() => onPick("hs")}>
+        <button
+          type="button"
+          className={"choice " + (value === "hs" ? "active" : "")}
+          onClick={() => onSelect("hs")}
+        >
           <div className="side-rune" aria-hidden>
             <Book size={26} strokeWidth={1.4} />
           </div>
@@ -393,7 +435,11 @@ function StepRole({ onPick }: { onPick: (role: "hs" | "tx") => void }) {
           </div>
         </button>
 
-        <button type="button" className="choice" onClick={() => onPick("tx")}>
+        <button
+          type="button"
+          className={"choice " + (value === "tx" ? "active" : "")}
+          onClick={() => onSelect("tx")}
+        >
           <div className="side-rune" aria-hidden>
             <Move size={26} strokeWidth={1.4} />
           </div>
@@ -415,12 +461,26 @@ function StepRole({ onPick }: { onPick: (role: "hs" | "tx") => void }) {
           </div>
         </button>
       </div>
+
+      <div style={{ marginTop: 28, display: "flex", justifyContent: "center" }}>
+        <button type="button" className="btn-gold" onClick={onContinue} disabled={!value}>
+          {value ? "Continue" : "Pick your path to continue"} <ArrowRight size={16} />
+        </button>
+      </div>
     </>
   );
 }
 
 // ── Step 3a: Grade ───────────────────────────────────────────────────────
-function StepGrade({ value, onPick }: { value: number | null; onPick: (g: number) => void }) {
+function StepGrade({
+  value,
+  onSelect,
+  onContinue,
+}: {
+  value: number | null;
+  onSelect: (g: number) => void;
+  onContinue: () => void;
+}) {
   return (
     <>
       <div className="eyebrow">
@@ -440,7 +500,7 @@ function StepGrade({ value, onPick }: { value: number | null; onPick: (g: number
             key={g.g}
             type="button"
             className={"grade " + (value === g.g ? "active" : "")}
-            onClick={() => onPick(g.g)}
+            onClick={() => onSelect(g.g)}
           >
             <div className="num">{g.g}</div>
             <div className="label">{g.label}</div>
@@ -450,6 +510,12 @@ function StepGrade({ value, onPick }: { value: number | null; onPick: (g: number
             </div>
           </button>
         ))}
+      </div>
+
+      <div style={{ marginTop: 28, display: "flex", justifyContent: "center" }}>
+        <button type="button" className="btn-gold" onClick={onContinue} disabled={!value}>
+          {value ? "Continue" : "Pick your grade to continue"} <ArrowRight size={16} />
+        </button>
       </div>
     </>
   );

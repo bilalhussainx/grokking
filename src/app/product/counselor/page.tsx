@@ -75,8 +75,12 @@ export default function CounselorPage() {
       </section>
 
       <FinalCTA
-        headline="Talk to <em>Coach Kairos</em> in 90 seconds."
-        body="Sign up, pick your language, and have the first real conversation about your college list."
+        headline="Run your whole book with <em>Coach Kairos</em>."
+        body="Set up your counselor workspace, invite students with a code, and review essays, school lists, and aid in one place."
+        primaryHref="/signup?next=%2Fcounselor%2Fonboard"
+        primaryLabel="Set up your counselor workspace"
+        secondaryHref="/login?next=%2Fcounselor%2Fonboard"
+        secondaryLabel="Sign in as a counselor"
       />
     </MarketingShell>
   );
