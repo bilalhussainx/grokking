@@ -8,6 +8,7 @@ import BrainstormChat from "@/components/cc/essay/BrainstormChat";
 import OutlinePicker from "@/components/cc/essay/OutlinePicker";
 import DraftEditor from "@/components/cc/essay/DraftEditor";
 import RevisionPanel from "@/components/cc/essay/RevisionPanel";
+import CounselorFeedbackPanel from "@/components/cc/essay/CounselorFeedbackPanel";
 import { useCoachKairos } from "@/contexts/CoachKairosContext";
 
 type Phase = "brainstorm" | "outline" | "draft" | "revise";
@@ -388,8 +389,9 @@ function ReviseView({
           </div>
         </div>
 
-        {/* Scorecard + comments + jump-back rail */}
-        <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 260px)" }}>
+        {/* Scorecard + comments + jump-back rail + counselor review */}
+        <div className="overflow-y-auto space-y-4" style={{ maxHeight: "calc(100vh - 260px)" }}>
+          <CounselorFeedbackPanel essayId={essay.id} />
           <RevisionPanel
             review={review}
             loading={reviewLoading}

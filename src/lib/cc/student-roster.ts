@@ -91,3 +91,43 @@ export async function listRosterForViewer(viewerUserId: string): Promise<RosterS
     };
   });
 }
+
+export interface StudentVisibility {
+  agencyId: string;
+  primaryCounselorUserId: string;
+  viewerRole: "head" | "counselor";
+}
+
+// Mirrors the cc_visible_student RLS rule at the application layer: a head sees
+// any active-linked student in their agency; a counselor sees only students
+// where they are the primary counselor. Returns the link context when visible,
+// or null when the viewer may not see this student. Used by the per-student
+// review surface (SP2/SP3) and the pilot Pro-grant endpoint.
+export async function getStudentVisibility(
+  viewerUserId: string,
+  studentUserId: string,
+): Promise<StudentVisibility | null> {
+  const membership = await getAnyAgencyMembership(viewerUserId);
+  if (!membership) return null;
+
+  const db = createAdminSupabase();
+  const { data: link } = await db
+    .from("cc_student_counselor_links")
+    .select("agency_id, primary_counselor_user_id")
+    .eq("agency_id", membership.agencyId)
+    .eq("student_user_id", studentUserId)
+    .eq("status", "active")
+    .maybeSingle<{ agency_id: string; primary_counselor_user_id: string }>();
+  if (!link) return null;
+
+  // Counselors (non-heads) only see their own assigned students.
+  if (membership.role !== "head" && link.primary_counselor_user_id !== viewerUserId) {
+    return null;
+  }
+
+  return {
+    agencyId: link.agency_id,
+    primaryCounselorUserId: link.primary_counselor_user_id,
+    viewerRole: membership.role,
+  };
+}

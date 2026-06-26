@@ -118,9 +118,10 @@ export default function StudentsPage() {
           {students.map((s) => {
             const pct = s.profileCompletionPct ?? 0;
             return (
-              <div
+              <Link
                 key={s.linkId}
-                className="rounded-2xl border border-white/[0.08] bg-[#141414] p-4 space-y-3 transition-colors hover:bg-[#1a1a1a]"
+                href={`/counselor/students/${s.studentUserId}`}
+                className="block rounded-2xl border border-white/[0.08] bg-[#141414] p-4 space-y-3 transition-colors hover:bg-[#1a1a1a] hover:border-[#D4AF37]/30"
               >
                 {/* Name row + grade chip */}
                 <div className="flex items-start justify-between gap-2">
@@ -172,7 +173,7 @@ export default function StudentsPage() {
                     </span>
                   )}
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
