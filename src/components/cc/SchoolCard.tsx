@@ -9,12 +9,43 @@ interface School {
   name: string;
   city: string;
   state: string;
+  country?: string | null;
+  province?: string | null;
   school_type: string;
   acceptance_rate: number;
   avg_net_price: number;
   test_policy: string;
   regular_deadline: string;
   early_deadline: string | null;
+}
+
+const COUNTRY_NAMES: Record<string, string> = {
+  US: "United States",
+  GB: "United Kingdom",
+  UK: "United Kingdom",
+  CA: "Canada",
+  AU: "Australia",
+  NL: "Netherlands",
+  DE: "Germany",
+  IE: "Ireland",
+  SG: "Singapore",
+  HK: "Hong Kong",
+  JP: "Japan",
+  AE: "UAE",
+};
+
+// "City, ST" for US schools, "City, Country" internationally. Never renders
+// a dangling comma when parts are missing (the old template produced "📍 , "
+// for schools with no city/state).
+function formatLocation(s: School): string {
+  const isUS = !s.country || s.country === "US";
+  const region = isUS ? s.state : s.province || COUNTRY_NAMES[s.country ?? ""] || s.country;
+  const parts = [s.city, region].filter(Boolean);
+  if (!isUS && s.province) {
+    const countryName = COUNTRY_NAMES[s.country ?? ""] || s.country;
+    if (countryName) parts.push(countryName);
+  }
+  return parts.join(", ") || (COUNTRY_NAMES[s.country ?? ""] ?? "Location unlisted");
 }
 
 interface Props {
@@ -69,17 +100,22 @@ export default function SchoolCard({ school, onAdd, onRemove, onPlanChange, list
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[11px] text-white/50">
             <span className="flex items-center gap-1">
               <MapPin className="w-3 h-3" aria-hidden />
-              {school.city}, {school.state}
+              {formatLocation(school)}
             </span>
             <span className="capitalize">{school.school_type}</span>
             <span className="flex items-center gap-1">
               <GraduationCap className="w-3 h-3" aria-hidden />
               {acceptPct}% accept
             </span>
-            <span className="flex items-center gap-1">
-              <DollarSign className="w-3 h-3" aria-hidden />
-              ${(school.avg_net_price || 0).toLocaleString()} net
-            </span>
+            {/* avg_net_price is a US IPEDS statistic — showing "$0 net" for
+                international schools (or any school missing the datum) reads
+                as "free", which is wrong. Only render when we have a value. */}
+            {school.avg_net_price > 0 && (
+              <span className="flex items-center gap-1">
+                <DollarSign className="w-3 h-3" aria-hidden />
+                ${school.avg_net_price.toLocaleString()} net
+              </span>
+            )}
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" aria-hidden />
               {school.regular_deadline}

@@ -1,16 +1,29 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createAdminSupabase } from "../helpers";
 
-export async function GET(req: NextRequest) {
+// Column names must match cc_glossary's real schema (term_display /
+// short_def — see 20260417_coach_kairos_schema.sql). The previous select
+// asked for non-existent `term, definition` columns, so this route 500'd on
+// every page mount (GlossaryProvider fetches it globally) and littered the
+// console. Mapped back to the GlossaryTerm client shape here.
+export async function GET() {
   const supabase = createAdminSupabase();
   const { data, error } = await supabase
     .from("cc_glossary")
-    .select("term_slug, term, definition, category, translations")
-    .order("term");
+    .select("term_slug, term_display, short_def, category, translations")
+    .order("term_display");
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ terms: data });
+  return NextResponse.json({
+    terms: (data ?? []).map((t) => ({
+      term_slug: t.term_slug,
+      term: t.term_display,
+      definition: t.short_def,
+      category: t.category,
+      translations: t.translations,
+    })),
+  });
 }

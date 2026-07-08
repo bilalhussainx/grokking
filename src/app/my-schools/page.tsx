@@ -46,6 +46,7 @@ export default function MySchoolsPage() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[] | null>(null);
+  const [suggestError, setSuggestError] = useState<string | null>(null);
   const [addingIds, setAddingIds] = useState<Set<string>>(new Set());
 
   const fetchList = useCallback(async () => {
@@ -70,10 +71,19 @@ export default function MySchoolsPage() {
   const handleGenerate = async () => {
     setGenerating(true);
     setSuggestions(null);
-    const res = await fetch("/api/cc/school-list/generate", { method: "POST" });
-    if (res.ok) {
-      const data = await res.json();
-      setSuggestions(data.suggestions || []);
+    setSuggestError(null);
+    try {
+      const res = await fetch("/api/cc/school-list/generate", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && Array.isArray(data.suggestions) && data.suggestions.length > 0) {
+        setSuggestions(data.suggestions);
+      } else {
+        setSuggestError(
+          data.error || "Couldn't generate suggestions right now. Try again in a moment.",
+        );
+      }
+    } catch {
+      setSuggestError("Couldn't reach the server. Check your connection and try again.");
     }
     setGenerating(false);
   };
@@ -142,6 +152,19 @@ export default function MySchoolsPage() {
               ? "Your list has no safety schools. Add at least 2 safety schools for a balanced list."
               : "Your list is reach-heavy. Consider adding more match and safety schools."}
           </p>
+        </div>
+      )}
+
+      {suggestError && (
+        <div className="mb-8 p-4 rounded-xl border border-red-500/25 bg-red-500/5 flex items-center justify-between gap-3">
+          <p className="text-sm text-red-300">{suggestError}</p>
+          <button
+            onClick={handleGenerate}
+            disabled={generating}
+            className="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-red-400/30 text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+          >
+            Retry
+          </button>
         </div>
       )}
 

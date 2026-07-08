@@ -107,15 +107,51 @@ function extractBoldLabelThemes(text: string): string[] {
   return out;
 }
 
+// Major Narrative Card — emitted by the Storyboard Coach prompt alongside
+// <<THEMES_READY>>. Shape: thesis (one sentence), 2-3 anchors (specific
+// moments / activities), audience_fit (why this lands for THIS prompt/reader).
+// Added 2026-05-17 per the Cookiy user-research finding that "blank page
+// paralysis" is the #1 essay pain across all 6 personas — they want a coach
+// that extracts a major narrative from bullets before drafting.
+export type NarrativeCard = {
+  thesis: string;
+  anchors: string[];
+  audienceFit: string;
+};
+
+function parseNarrativeCard(text: string): NarrativeCard | null {
+  const m = text.match(/<<NARRATIVE_CARD>>([\s\S]*?)<<END_NARRATIVE>>/);
+  if (!m) return null;
+  const body = m[1];
+  const thesisMatch = body.match(/thesis:\s*([^\n]+)/i);
+  const audienceMatch = body.match(/audience_fit:\s*([^\n]+)/i);
+  const anchors: string[] = [];
+  const anchorsBlock = body.match(/anchors:\s*\n([\s\S]*?)(?=\n[a-z_]+:|$)/i);
+  if (anchorsBlock) {
+    for (const line of anchorsBlock[1].split("\n")) {
+      const v = line.replace(/^\s*[-*]\s*/, "").trim();
+      if (v) anchors.push(v);
+    }
+  }
+  const thesis = thesisMatch ? thesisMatch[1].trim() : "";
+  const audienceFit = audienceMatch ? audienceMatch[1].trim() : "";
+  if (!thesis && anchors.length === 0) return null;
+  return { thesis, anchors, audienceFit };
+}
+
 function parseThemesBlock(text: string): {
   displayText: string;
   themes: string[];
   awaitingThemes: boolean;
 } {
   const tagged = text.match(/<<THEMES_READY>>([\s\S]*?)<<END_THEMES>>/);
-  const displayText = tagged
+  // Strip BOTH the narrative card and the themes block from the visible
+  // chat bubble so the raw "<<THESIS_READY>>" / "<<NARRATIVE_CARD>>" lines
+  // never leak into the message UI.
+  let displayText = tagged
     ? text.replace(/<<THEMES_READY>>[\s\S]*?<<END_THEMES>>\s*/, "").trim()
     : text;
+  displayText = displayText.replace(/<<NARRATIVE_CARD>>[\s\S]*?<<END_NARRATIVE>>\s*/, "").trim();
 
   // Collect theme candidates from THREE sources and union them:
   //   1. the tagged <<THEMES_READY>> block (if present)
@@ -253,6 +289,7 @@ export default function BrainstormChat({
   const [themes, setThemes] = useState<string[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
   const [awaitingThemes, setAwaitingThemes] = useState(false);
+  const [narrativeCard, setNarrativeCard] = useState<NarrativeCard | null>(null);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
 
   // Bilingual canvas extraction (Feature 1A) — feature-flagged + silent fallback.
@@ -328,9 +365,15 @@ export default function BrainstormChat({
     const collected: string[] = [];
     let sawAwaitingLatest = false;
     let latestListIndex = -1;
+    let latestCard: NarrativeCard | null = null;
     for (let i = messages.length - 1; i >= 0; i--) {
       if (messages[i].role !== "assistant") continue;
       const parsed = parseThemesBlock(messages[i].content);
+      // Hold the most-recent narrative card we see while walking back.
+      if (latestCard === null) {
+        const card = parseNarrativeCard(messages[i].content);
+        if (card) latestCard = card;
+      }
       if (parsed.themes.length > 0) {
         if (latestListIndex === -1) latestListIndex = i;
         collected.push(...parsed.themes);
@@ -345,8 +388,9 @@ export default function BrainstormChat({
     }
     const deduped = dedupeThemes(collected);
     setThemes(deduped);
+    setNarrativeCard(latestCard);
     setAwaitingThemes(sawAwaitingLatest && deduped.length === 0);
-    if (deduped.length > 0 && rightTab !== "canvas") setRightTab("canvas");
+    if ((deduped.length > 0 || latestCard) && rightTab !== "canvas") setRightTab("canvas");
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
@@ -421,8 +465,10 @@ export default function BrainstormChat({
         });
       }
 
-      // Bilingual canvas extraction (R1, R8) — feature-flagged, fails silently.
-      if (process.env.NEXT_PUBLIC_BILINGUAL_CANVAS_ENABLED === "true") {
+      // Bilingual canvas extraction (R1, R8) — on by default, opt out with
+      // NEXT_PUBLIC_BILINGUAL_CANVAS_ENABLED="false". The old opt-in gate
+      // meant prod (flag unset) never populated the Story canvas at all.
+      if (process.env.NEXT_PUBLIC_BILINGUAL_CANVAS_ENABLED !== "false") {
         try {
           const xRes = await fetch(`/api/cc/essays/${essayId}/canvas-extract`, {
             method: "POST",
@@ -735,6 +781,46 @@ export default function BrainstormChat({
                           maxWidth: 620,
                         }}
                       >
+                        {narrativeCard && (
+                          <div
+                            className="mb-4 p-3 rounded-lg"
+                            style={{
+                              background: "rgba(212,175,55,0.10)",
+                              border: "1px solid var(--kl-app-gold-edge, rgba(212, 175, 55, 0.30))",
+                            }}
+                          >
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[var(--kl-gold-app,#D4AF37)] font-mono">
+                                Major narrative card
+                              </span>
+                            </div>
+                            {narrativeCard.thesis && (
+                              <p className="text-[13px] leading-snug text-white mb-2.5" style={{ fontStyle: "italic" }}>
+                                &ldquo;{narrativeCard.thesis}&rdquo;
+                              </p>
+                            )}
+                            {narrativeCard.anchors.length > 0 && (
+                              <div className="mb-2.5">
+                                <div className="text-[10px] uppercase tracking-wider text-white/55 mb-1 font-mono">
+                                  Anchors
+                                </div>
+                                <ul className="text-[12px] text-white/85 space-y-1 pl-3 list-disc marker:text-[var(--kl-gold-app,#D4AF37)]">
+                                  {narrativeCard.anchors.map((a, idx) => (
+                                    <li key={idx}>{a}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {narrativeCard.audienceFit && (
+                              <div>
+                                <div className="text-[10px] uppercase tracking-wider text-white/55 mb-0.5 font-mono">
+                                  Why it lands
+                                </div>
+                                <p className="text-[12px] text-white/75 leading-snug">{narrativeCard.audienceFit}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
                         <div className="flex items-center gap-2 mb-2.5">
                           <Sparkles className="w-3.5 h-3.5 text-[var(--kl-gold-app,#D4AF37)]" />
                           <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[var(--kl-gold-app,#D4AF37)] font-mono">

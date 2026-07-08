@@ -72,6 +72,27 @@ export async function listRosterForViewer(viewerUserId: string): Promise<RosterS
     ((profiles ?? []) as ProfileRow[]).map((p) => [p.user_id, p]),
   );
 
+  // Fallback for profiles with no name (created before signup-name seeding):
+  // pull the auth user's full_name so the roster never shows "Unnamed
+  // student" for an account that signed up with a name. Bounded to the
+  // handful of nameless rows on the roster.
+  const authNameById = new Map<string, string>();
+  const nameless = linkRows.filter((l) => {
+    const p = profileById.get(l.student_user_id);
+    return !p?.preferred_name && !p?.legal_first_name;
+  });
+  for (const l of nameless.slice(0, 25)) {
+    try {
+      const { data } = await db.auth.admin.getUserById(l.student_user_id);
+      const name =
+        (data?.user?.user_metadata?.full_name as string | undefined)?.trim() ||
+        (data?.user?.user_metadata?.name as string | undefined)?.trim();
+      if (name) authNameById.set(l.student_user_id, name);
+    } catch {
+      /* auth lookup is best-effort */
+    }
+  }
+
   return linkRows.map((l) => {
     const p = profileById.get(l.student_user_id);
     return {
@@ -80,7 +101,7 @@ export async function listRosterForViewer(viewerUserId: string): Promise<RosterS
       primaryCounselorUserId: l.primary_counselor_user_id,
       linkedViaCode: l.linked_via_code_id !== null,
       linkedAt: l.linked_at,
-      preferredName: p?.preferred_name ?? null,
+      preferredName: p?.preferred_name ?? authNameById.get(l.student_user_id) ?? null,
       legalFirstName: p?.legal_first_name ?? null,
       gradeLevel: p?.grade_level ?? null,
       graduationYear: p?.graduation_year ?? null,

@@ -63,6 +63,21 @@ export async function POST(req: NextRequest) {
     concerns: cleanedConcerns,
   };
 
+  // Backfill the signup name for profiles created before ensureStudentProfile
+  // seeded it. Only fills a NULL preferred_name — never overwrites a name the
+  // student set themselves.
+  const signupName =
+    (auth.user.user_metadata?.full_name as string | undefined)?.trim() ||
+    (auth.user.user_metadata?.name as string | undefined)?.trim();
+  if (signupName) {
+    const { data: existingName } = await auth.supabase
+      .from("cc_student_profiles")
+      .select("preferred_name")
+      .eq("user_id", auth.user.id)
+      .maybeSingle<{ preferred_name: string | null }>();
+    if (!existingName?.preferred_name) update.preferred_name = signupName;
+  }
+
   if (body.role === "hs") {
     update.is_transfer_student = false;
     update.grade_level = body.grade ?? null;

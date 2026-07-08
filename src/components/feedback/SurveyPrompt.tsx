@@ -52,10 +52,10 @@ export default function SurveyPrompt() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 40, scale: 0.95 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="fixed bottom-6 right-6 z-50 w-[340px] rounded-2xl border border-violet-500/20 bg-[var(--background)] shadow-2xl shadow-violet-500/10 overflow-hidden"
+          className="fixed bottom-6 right-6 z-50 w-[340px] rounded-2xl border border-[#D4AF37]/25 bg-[#141414] shadow-2xl shadow-black/50 overflow-hidden"
         >
           {/* Gradient top accent */}
-          <div className="h-1 bg-gradient-to-r from-violet-500 via-cyan-500 to-emerald-500" />
+          <div className="h-1 bg-[#D4AF37]" />
 
           <div className="p-5">
             {/* Close */}
@@ -68,8 +68,8 @@ export default function SurveyPrompt() {
 
             {/* Icon + Message */}
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
-                <MessageSquare className="w-5 h-5 text-violet-400" />
+              <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/25 flex items-center justify-center shrink-0">
+                <MessageSquare className="w-5 h-5 text-[#D4AF37]" />
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-white mb-1">How's your experience?</h3>
@@ -91,7 +91,7 @@ export default function SurveyPrompt() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={goToSurvey}
-                className="flex-1 py-2 rounded-lg bg-gradient-to-r from-violet-500 to-cyan-500 text-white text-xs font-semibold text-center hover:opacity-90 transition-opacity"
+                className="flex-1 py-2 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold text-center hover:opacity-90 transition-opacity"
               >
                 Take Survey
               </a>

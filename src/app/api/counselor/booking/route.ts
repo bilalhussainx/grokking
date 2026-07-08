@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error:
-          "This counselor hasn't completed Stripe Connect onboarding yet, so payouts can't flow. Please try again later.",
+          "This counselor isn't set up to accept bookings yet. Check back soon — they need to finish their payout setup first.",
       },
       { status: 409 },
     );

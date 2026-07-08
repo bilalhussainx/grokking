@@ -117,6 +117,12 @@ export default async function CounselorProfilePage({
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
+      <Link
+        href="/find-counselor"
+        className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 mb-4"
+      >
+        ← All counselors
+      </Link>
       {isOwner && (
         <div className="mb-6 rounded-xl border border-[#D4AF37]/30 bg-gradient-to-r from-[#1a1610] to-[#141414] p-3 flex items-center gap-3 flex-wrap">
           <span className="text-[10.5px] uppercase tracking-wider text-[#D4AF37] font-semibold">
@@ -195,9 +201,17 @@ export default async function CounselorProfilePage({
           Services
         </h2>
         {serviceList.length === 0 ? (
-          <p className="text-[13px] text-white/40 italic">
-            This counselor hasn&apos;t published a service catalog yet.
-          </p>
+          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <p className="text-[13px] text-white/50 mb-3">
+              This counselor hasn&apos;t published bookable services yet.
+            </p>
+            <Link
+              href="/find-counselor"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/25 text-[12px] text-[#D4AF37] hover:bg-[#D4AF37]/20 transition-colors"
+            >
+              Browse other counselors →
+            </Link>
+          </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">
             {serviceList.map((s) => (

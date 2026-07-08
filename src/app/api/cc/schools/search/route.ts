@@ -7,6 +7,7 @@ export async function POST(req: NextRequest) {
   const {
     query,
     state,
+    country,
     type,
     test_policy,
     need_blind_international,
@@ -25,6 +26,10 @@ export async function POST(req: NextRequest) {
 
   if (query) q = q.ilike("name", `%${query}%`);
   if (state) q = q.eq("state", state);
+  if (country) {
+    // "US" rows may predate the country column (NULL default) — treat NULL as US.
+    q = country === "US" ? q.or("country.eq.US,country.is.null") : q.eq("country", country);
+  }
   if (type) q = q.eq("school_type", type);
   if (test_policy) q = q.eq("test_policy", test_policy);
   if (need_blind_international === true) q = q.eq("need_blind_international", true);

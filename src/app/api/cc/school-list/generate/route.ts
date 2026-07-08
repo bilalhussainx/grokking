@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, unauthorized, createAdminSupabase } from "../../helpers";
+import { chatOnce } from "@/lib/cc/openrouter";
 
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
@@ -120,47 +121,36 @@ Respond in JSON format:
   ]
 }`;
 
-  const apiKey = process.env.MOONSHOT_API_KEY || process.env.GEMINI_API_KEY;
-  const isMoonshot = !!process.env.MOONSHOT_API_KEY;
-
-  const url = isMoonshot
-    ? "https://api.moonshot.ai/v1/chat/completions"
-    : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
+  // chatOnce routes through OpenRouter (Sonnet) with Moonshot/Gemini
+  // fallback baked into the helper — the same path Coach Kairos uses. The
+  // previous direct Moonshot call failed silently (no choices → "{}" →
+  // empty suggestions returned as a 200), which the UI rendered as a blank
+  // panel. Any empty/unparseable result is now a real error the client can
+  // show.
   let suggestions: Array<{ name: string; band: string; reason: string; school_id?: string }> = [];
 
   try {
-    if (isMoonshot) {
-      const resp = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-        body: JSON.stringify({
-          model: "kimi-k2-0711-preview",
-          messages: [{ role: "user", content: prompt }],
-          max_tokens: 1500,
-          response_format: { type: "json_object" },
-        }),
-      });
-      const data = await resp.json();
-      const content = data.choices?.[0]?.message?.content || "{}";
-      const parsed = JSON.parse(content);
-      suggestions = parsed.suggestions || [];
-    } else {
-      const resp = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: "application/json", maxOutputTokens: 1500 },
-        }),
-      });
-      const data = await resp.json();
-      const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-      const parsed = JSON.parse(content);
-      suggestions = parsed.suggestions || [];
-    }
-  } catch {
-    return NextResponse.json({ error: "AI generation failed" }, { status: 500 });
+    const raw = await chatOnce([{ role: "user", content: prompt }]);
+    // Models sometimes wrap JSON in ``` fences — strip before parsing.
+    const jsonText = raw.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "").trim();
+    const start = jsonText.indexOf("{");
+    const end = jsonText.lastIndexOf("}");
+    const parsed = JSON.parse(start >= 0 && end > start ? jsonText.slice(start, end + 1) : jsonText);
+    suggestions = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
+  } catch (e) {
+    console.error("[school-list/generate] AI generation failed:", e);
+    return NextResponse.json(
+      { error: "Suggestion generation failed. Try again in a moment." },
+      { status: 502 },
+    );
+  }
+
+  if (suggestions.length === 0) {
+    console.error("[school-list/generate] model returned zero suggestions");
+    return NextResponse.json(
+      { error: "The counselor couldn't build a list from your profile yet. Add grade, GPA, or preferences and try again." },
+      { status: 502 },
+    );
   }
 
   const schoolNameMap = new Map(typedSchools.map((s) => [s.name.toLowerCase(), s]));

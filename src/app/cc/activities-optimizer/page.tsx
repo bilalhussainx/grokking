@@ -63,6 +63,11 @@ export default function ActivitiesOptimizerPage() {
   const [honors, setHonors] = useState<HonorRow[]>([]);
   const [error, setError] = useState("");
   const [showUpload, setShowUpload] = useState(false);
+  const [showManualAdd, setShowManualAdd] = useState(false);
+  const [manualRole, setManualRole] = useState("");
+  const [manualOrg, setManualOrg] = useState("");
+  const [manualDesc, setManualDesc] = useState("");
+  const [manualSaving, setManualSaving] = useState(false);
 
   const loadProfile = useCallback(async () => {
     try {
@@ -95,6 +100,42 @@ export default function ActivitiesOptimizerPage() {
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
+
+  // Manual entry — a 9th grader without a resume shouldn't dead-end on the
+  // import-only empty state. Appends one activity via the same endpoint the
+  // resume parser uses.
+  const handleManualAdd = async () => {
+    if (!manualRole.trim() && !manualOrg.trim()) return;
+    setManualSaving(true);
+    try {
+      await fetch("/api/cc/activities/save-parsed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          activities: [
+            {
+              position: activities.length + 1,
+              activity_type: null,
+              organization: manualOrg.trim() || null,
+              role: manualRole.trim() || null,
+              description_150: manualDesc.trim().slice(0, 150) || null,
+              grades_participated: [],
+              hours_per_week: null,
+              weeks_per_year: null,
+              is_continuing: true,
+            },
+          ],
+        }),
+      });
+      setManualRole("");
+      setManualOrg("");
+      setManualDesc("");
+      setShowManualAdd(false);
+      await loadProfile();
+    } finally {
+      setManualSaving(false);
+    }
+  };
 
   const handleSaveActivity = async (position: number, description: string) => {
     await fetch("/api/cc/profile/activities", {
@@ -193,13 +234,68 @@ export default function ActivitiesOptimizerPage() {
             <div className="text-center py-12 rounded-xl border border-white/10 bg-white/5">
               <Sparkles className="w-8 h-8 text-[#D4AF37]/40 mx-auto mb-3" />
               <p className="text-sm text-white/50 mb-2">No activities or honors yet</p>
-              <p className="text-xs text-white/30 mb-4">Import a resume or add entries from your profile</p>
-              <button
-                onClick={() => setShowUpload(true)}
-                className="px-4 py-2 rounded-lg bg-[#D4AF37]/10 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition-colors"
-              >
-                Import from resume
-              </button>
+              <p className="text-xs text-white/30 mb-4">Import a resume — or add your first activity by hand</p>
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setShowUpload(true)}
+                  className="px-4 py-2 rounded-lg bg-[#D4AF37]/10 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition-colors"
+                >
+                  Import from resume
+                </button>
+                <button
+                  onClick={() => setShowManualAdd(true)}
+                  className="px-4 py-2 rounded-lg border border-white/15 text-white/70 text-xs font-medium hover:bg-white/5 transition-colors"
+                >
+                  Add manually
+                </button>
+              </div>
+            </div>
+          )}
+
+          {showManualAdd && (
+            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
+              <h3 className="text-xs uppercase tracking-wide text-white/50 font-semibold">Add an activity</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <input
+                  value={manualRole}
+                  onChange={(e) => setManualRole(e.target.value)}
+                  placeholder="Your role (e.g. Captain, Volunteer)"
+                  aria-label="Role"
+                  className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/85 placeholder-white/30"
+                />
+                <input
+                  value={manualOrg}
+                  onChange={(e) => setManualOrg(e.target.value)}
+                  placeholder="Organization (e.g. Varsity Debate)"
+                  aria-label="Organization"
+                  className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/85 placeholder-white/30"
+                />
+              </div>
+              <textarea
+                value={manualDesc}
+                onChange={(e) => setManualDesc(e.target.value)}
+                maxLength={150}
+                rows={2}
+                placeholder="What did you do? (150 characters — Common App limit)"
+                aria-label="Activity description"
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/85 placeholder-white/30"
+              />
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleManualAdd}
+                  disabled={manualSaving || (!manualRole.trim() && !manualOrg.trim())}
+                  className="px-4 py-2 rounded-lg bg-[#D4AF37] text-black text-xs font-semibold hover:bg-[#c9a532] disabled:opacity-40"
+                >
+                  {manualSaving ? "Saving…" : "Save activity"}
+                </button>
+                <button
+                  onClick={() => setShowManualAdd(false)}
+                  className="px-3 py-2 text-xs text-white/50 hover:text-white/80"
+                >
+                  Cancel
+                </button>
+                <span className="ml-auto text-[10px] text-white/30 tabular-nums">{manualDesc.length}/150</span>
+              </div>
             </div>
           )}
 

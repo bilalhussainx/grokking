@@ -340,6 +340,7 @@ export default function ResumeUpload({ onImported }: Props) {
           <textarea
             value={pasteText}
             onChange={(e) => setPasteText(e.target.value)}
+            aria-label="Paste activities and honors"
             rows={8}
             placeholder="Paste activities and honors here. Example:&#10;• Varsity Soccer — captain senior year, led team to state semis, 20 hrs/wk&#10;• Founded coding club, 30 members, taught weekly workshops&#10;• National Merit Finalist, grade 11"
             className="w-full px-3 py-2 rounded-lg text-xs text-white bg-white/5 border border-white/10 placeholder:text-white/25 focus:outline-none focus:border-[#D4AF37]/50 resize-y"

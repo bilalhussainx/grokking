@@ -35,14 +35,21 @@ function SignupForm() {
     nameRef.current?.focus();
   }, []);
 
-  // Redirect already-logged-in users to the dashboard. Use hard navigation so
-  // cookies are guaranteed to be sent to middleware (avoids the blank-page trap
-  // when client/server auth state is out of sync).
+  // Redirect already-logged-in users. Use hard navigation so cookies are
+  // guaranteed to be sent to middleware (avoids the blank-page trap when
+  // client/server auth state is out of sync). Honors ?next= (e.g. a /join
+  // invite link opened while already signed in). navigatedRef prevents this
+  // effect from racing the post-signup navigation below: auth state flips
+  // to "user" the moment signup succeeds, and without the guard this effect
+  // fired assign("/") over the assign(next) — which is how invite links
+  // lost their redemption redirect.
+  const navigatedRef = useRef(false);
   useEffect(() => {
-    if (!authLoading && user) {
-      window.location.assign("/");
+    if (!authLoading && user && !navigatedRef.current) {
+      navigatedRef.current = true;
+      window.location.assign(next ?? "/");
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, next]);
 
   const validateFields = (): boolean => {
     const errors: typeof fieldErrors = {};
@@ -90,6 +97,7 @@ function SignupForm() {
         // preferred router.push to keep the client-side error boundary, but
         // that caused /onboarding and downstream redirects to hit middleware
         // without cookies, creating the /landing redirect loop.)
+        navigatedRef.current = true;
         window.location.assign(next ?? "/onboarding?new=1");
       } else {
         setSuccess(true);

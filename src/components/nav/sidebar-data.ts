@@ -102,7 +102,7 @@ export const SECTIONS: NavSection[] = [
     items: [
       { id: "coach", label: "Coach Kairos", icon: "cap", href: "#coach",
         grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer"], drawer: true },
-      { id: "settings", label: "Settings", icon: "settings", href: "/account/settings",
+      { id: "settings", label: "Settings", icon: "settings", href: "/settings",
         grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer"] },
     ],
   },
@@ -172,7 +172,7 @@ export const COUNSELOR_SECTIONS: NavSection[] = [
     name: "Tools",
     abbr: "T",
     items: [
-      { id: "settings", label: "Settings", icon: "settings", href: "/account/settings",
+      { id: "settings", label: "Settings", icon: "settings", href: "/settings",
         grades: ["g9", "g10", "junior", ...SENIOR_GRADES, "transfer", "unknown"] },
     ],
   },

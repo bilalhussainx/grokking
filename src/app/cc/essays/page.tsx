@@ -13,6 +13,8 @@ interface EssayRow {
   word_count: number | null;
   word_limit: number;
   updated_at: string;
+  counselor_review_state?: string | null;
+  counselor_comment_count?: number;
 }
 
 interface MySchoolRow {
@@ -438,6 +440,8 @@ export default function EssayListPage() {
               wordCount={e.word_count}
               wordLimit={e.word_limit}
               updatedAt={e.updated_at}
+              commentCount={e.counselor_comment_count ?? 0}
+              reviewState={e.counselor_review_state}
             />
           ))}
         </div>

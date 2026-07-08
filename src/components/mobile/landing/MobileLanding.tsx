@@ -12,11 +12,11 @@ import { Menu, ArrowRight, Sparkles, MessageSquare, Globe2, Heart, Compass } fro
 import MobileLandingMenu from "./MobileLandingMenu";
 
 const PIPELINE = [
-  { n: "01", title: "Intake in your language", body: "Answer in Urdu, Hindi, Punjabi, or English. Coach Kairos remembers." },
+  { n: "01", title: "Intake in your language", body: "Answer in any of 18 languages — Urdu, Hindi, Spanish, English, and more. Coach Kairos remembers." },
   { n: "02", title: "Build your school list", body: "Need-blind for internationals, need-aware that meets full need — surfaced by name." },
   { n: "03", title: "Draft essays with the coach", body: "Common App PS + supplements with prompt-aware feedback your counselor would give." },
   { n: "04", title: "Track every deadline", body: "EA, ED, REA, RD, FAFSA, CSS — one surface, multilingual reminders." },
-  { n: "05", title: "Compare offers in May", body: "Side-by-side aid letters in PKR or USD. Negotiation drafts for full-need families." },
+  { n: "05", title: "Compare offers in May", body: "Side-by-side aid letters in USD or your home currency. Negotiation drafts for full-need families." },
 ];
 
 // Testimonials intentionally empty until verified beta-user quotes are
@@ -192,7 +192,7 @@ export default function MobileLanding() {
             {
               icon: <Globe2 className="w-5 h-5" style={{ color: "#d4a84b" }} />,
               title: "International students",
-              body: "FSc 87% → US 3.48 GPA conversion. Pakistani CSS Profile asset reporting (property, gold, agricultural income). Need-blind canonical 8 surfaced by name.",
+              body: "Home transcripts converted to US GPA (e.g. FSc 87% → 3.48). CSS Profile asset reporting for international families (property, gold, agricultural income). Need-blind canonical 8 surfaced by name.",
             },
             {
               icon: <Heart className="w-5 h-5" style={{ color: "#d4a84b" }} />,
@@ -453,7 +453,7 @@ export default function MobileLanding() {
                 className="text-[13px] leading-relaxed mb-5 space-y-1.5"
                 style={{ color: "rgba(242,237,227,.75)" }}
               >
-                <li>· Coach Kairos in Urdu / Hindi / Punjabi / English</li>
+                <li>· Coach Kairos in 18 languages — Urdu, Hindi, Spanish, English…</li>
                 <li>· Family Mode for non-English-speaking parents</li>
                 <li>· Need-blind and meets-need school filters</li>
                 <li>· Common App essay studio with prompt-aware feedback</li>

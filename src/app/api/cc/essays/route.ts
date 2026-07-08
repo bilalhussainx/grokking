@@ -19,11 +19,37 @@ export async function GET() {
 
   const { data: essays } = await db
     .from("cc_essays")
-    .select("id, essay_type, prompt_text, word_limit, phase, word_count, updated_at, school_id")
+    .select(
+      "id, essay_type, prompt_text, word_limit, phase, word_count, updated_at, school_id, counselor_review_state",
+    )
     .eq("student_id", profile.id)
     .order("updated_at", { ascending: false });
 
-  return NextResponse.json({ essays: essays || [] });
+  // Shipped counselor comment counts so the list can badge reviewed essays.
+  const rows = essays || [];
+  const counselorComments = new Map<string, number>();
+  if (rows.length > 0) {
+    const { data: comments } = await db
+      .from("cc_counselor_comments")
+      .select("artifact_id")
+      .eq("artifact_type", "essay")
+      .eq("status", "shipped")
+      .in(
+        "artifact_id",
+        rows.map((e) => e.id as string),
+      );
+    for (const c of comments ?? []) {
+      const aid = c.artifact_id as string;
+      counselorComments.set(aid, (counselorComments.get(aid) ?? 0) + 1);
+    }
+  }
+
+  return NextResponse.json({
+    essays: rows.map((e) => ({
+      ...e,
+      counselor_comment_count: counselorComments.get(e.id as string) ?? 0,
+    })),
+  });
 }
 
 export async function POST(req: NextRequest) {

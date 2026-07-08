@@ -16,7 +16,38 @@ export async function GET() {
   const m = await getAnyAgencyMembership(user.id);
   if (!m) return NextResponse.json({ error: "not in an agency" }, { status: 403 });
   const members = await listAgencyMembers(m.agencyId);
-  return NextResponse.json({ members, viewerRole: m.role });
+
+  // Attach human names — the raw membership rows only carry user ids, and
+  // the team table was showing truncated UUIDs to the head. Counselor
+  // display names first, auth email as fallback.
+  const db = createAdminSupabase();
+  const userIds = members.map((mm) => mm.userId);
+  const nameById = new Map<string, string>();
+  if (userIds.length > 0) {
+    const { data: counselors } = await db
+      .from("cc_counselors")
+      .select("user_id, display_name")
+      .in("user_id", userIds);
+    for (const c of counselors ?? []) {
+      if (c.display_name) nameById.set(c.user_id as string, c.display_name as string);
+    }
+    for (const id of userIds) {
+      if (nameById.has(id)) continue;
+      try {
+        const { data } = await db.auth.admin.getUserById(id);
+        const label =
+          (data?.user?.user_metadata?.full_name as string | undefined) || data?.user?.email;
+        if (label) nameById.set(id, label);
+      } catch {
+        /* best-effort */
+      }
+    }
+  }
+
+  return NextResponse.json({
+    members: members.map((mm) => ({ ...mm, displayName: nameById.get(mm.userId) ?? null })),
+    viewerRole: m.role,
+  });
 }
 
 export async function POST(req: NextRequest) {

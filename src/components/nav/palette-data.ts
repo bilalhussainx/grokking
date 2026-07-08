@@ -50,7 +50,7 @@ export const PAGES: PaletteItem[] = [
   { id: "visits", icon: "mapPin", label: "Visits", caption: "Demonstrated interest log", href: "/cc/visits" },
   { id: "summer", icon: "sun", label: "Summer experiences", caption: "Plan summers", href: "/cc/summer" },
   { id: "schools", icon: "building", label: "Schools", caption: "School list builder", href: "/schools" },
-  { id: "settings", icon: "settings", label: "Settings", caption: "Account, notifications, parent access", href: "/account/settings" },
+  { id: "settings", icon: "settings", label: "Settings", caption: "Account, notifications, parent access", href: "/settings" },
 ];
 
 export const ACTIONS: PaletteItem[] = [

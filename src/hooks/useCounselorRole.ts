@@ -43,10 +43,18 @@ const EMPTY: Omit<CounselorRoleState, "loading"> = {
 };
 
 export function useCounselorRole(): CounselorRoleState {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [state, setState] = useState<CounselorRoleState>({ ...EMPTY, loading: true });
 
   useEffect(() => {
+    // Auth itself is still resolving (hard navigation / first paint). This
+    // is NOT "signed out" — resolving to loading:false here made gated
+    // pages (roster, team) read {isMember:false, loading:false} for a frame
+    // and redirect to the dashboard before the session settled. Stay loading.
+    if (authLoading) {
+      setState((prev) => ({ ...prev, loading: true }));
+      return;
+    }
     if (!user) {
       setState({ ...EMPTY, loading: false });
       return;
@@ -117,7 +125,7 @@ export function useCounselorRole(): CounselorRoleState {
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [user, authLoading]);
 
   return state;
 }

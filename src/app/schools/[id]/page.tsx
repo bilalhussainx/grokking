@@ -161,6 +161,16 @@ export default function SchoolDetailPage({
   const gradPct = school.graduation_rate_6y ? Math.round(school.graduation_rate_6y * 100) : null;
   const pellPct = school.pell_pct ? Math.round(school.pell_pct * 100) : null;
   const firstGenPct = school.first_gen_pct ? Math.round(school.first_gen_pct * 100) : null;
+  // Pell grants + CSS Profile are US instruments; framing a UK/CA/AU school
+  // with them is factually wrong (Oxford was showing "CSS Profile required
+  // for intl aid"). Everything US-specific below is gated on this.
+  const isUS = !school.country || school.country === "US";
+  const COUNTRY_NAMES: Record<string, string> = {
+    GB: "United Kingdom", UK: "United Kingdom", CA: "Canada", AU: "Australia",
+    NL: "Netherlands", DE: "Germany", IE: "Ireland", SG: "Singapore",
+    HK: "Hong Kong", JP: "Japan", AE: "UAE",
+  };
+  const countryLabel = !isUS ? COUNTRY_NAMES[school.country ?? ""] ?? school.country : null;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
@@ -175,11 +185,10 @@ export default function SchoolDetailPage({
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white">{school.name}</h1>
         <div className="flex items-center gap-3 mt-2 text-xs text-white/50">
-          {(school.city || school.state) && (
+          {(school.city || school.state || countryLabel) && (
             <span className="flex items-center gap-1">
               <MapPin className="w-3 h-3" />
-              {[school.city, school.state].filter(Boolean).join(", ")}
-              {school.country && school.country !== "US" ? ` · ${school.country}` : ""}
+              {[school.city, isUS ? school.state : countryLabel].filter(Boolean).join(", ")}
             </span>
           )}
           {school.institution_type && (
@@ -217,7 +226,7 @@ export default function SchoolDetailPage({
               <AlertTriangle className="w-3 h-3" /> Need-aware · full need
             </span>
           )}
-          {school.css_profile_required && (
+          {school.css_profile_required && isUS && (
             <Link
               href="/profile/css-guide"
               title="CSS Profile required for international aid — click to open our step-by-step guide"
@@ -263,15 +272,17 @@ export default function SchoolDetailPage({
             />
             <StatCard icon={GraduationCap} label="Avg HS GPA" value={school.avg_hs_gpa?.toFixed(2) || "—"} />
             <StatCard icon={GraduationCap} label="6-yr grad rate" value={gradPct != null ? `${gradPct}%` : "—"} />
-            <StatCard
-              icon={Users}
-              label="Pell / first-gen"
-              value={
-                pellPct != null || firstGenPct != null
-                  ? `${pellPct ?? "—"}% / ${firstGenPct ?? "—"}%`
-                  : "—"
-              }
-            />
+            {isUS && (
+              <StatCard
+                icon={Users}
+                label="Pell / first-gen"
+                value={
+                  pellPct != null || firstGenPct != null
+                    ? `${pellPct ?? "—"}% / ${firstGenPct ?? "—"}%`
+                    : "—"
+                }
+              />
+            )}
           </div>
 
           {school.mission_statement && (
@@ -364,7 +375,15 @@ export default function SchoolDetailPage({
             </div>
           )}
 
-          {(school.css_profile_required || school.fafsa_required_international) && (
+          {!isUS && (
+            <div className="p-3 rounded-lg bg-white/[0.03] border border-white/10 text-xs text-white/70 leading-relaxed">
+              {countryLabel === "United Kingdom"
+                ? "UK universities don't use the CSS Profile or FAFSA. Aid for international students is limited — look into university scholarships (e.g. Reach Oxford, Clarendon), external awards, and check UCAS for course fees. Applications go through UCAS with the personal statement."
+                : `Aid at universities in ${countryLabel ?? "this country"} doesn't run on US instruments (CSS Profile / FAFSA). Check the university's international scholarships page and national aid schemes.`}
+            </div>
+          )}
+
+          {isUS && (school.css_profile_required || school.fafsa_required_international) && (
             <div className="flex flex-wrap gap-1.5">
               {school.css_profile_required && (
                 <Link

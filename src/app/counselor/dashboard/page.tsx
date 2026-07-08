@@ -137,7 +137,13 @@ export default async function CounselorDashboard() {
           </p>
           <ul className="text-[12.5px] text-white/65 space-y-1">
             {!counselor.bio && (
-              <li>· Add a bio + headline so students know who they&apos;re hiring (Phase 2 profile editor)</li>
+              <li>
+                ·{" "}
+                <Link href="/counselor/profile" className="text-[#D4AF37] underline">
+                  Add a bio + headline
+                </Link>{" "}
+                so students know who they&apos;re hiring
+              </li>
             )}
             {(serviceCount ?? 0) === 0 && (
               <li>
@@ -149,7 +155,13 @@ export default async function CounselorDashboard() {
               </li>
             )}
             {!counselor.verified && (
-              <li>· Get verified — submit two admit-history rows for review (Phase 4 admin tool)</li>
+              <li>
+                ·{" "}
+                <Link href="/counselor/admit-history" className="text-[#D4AF37] underline">
+                  Get verified
+                </Link>{" "}
+                — add two admit-history entries and we&apos;ll review them
+              </li>
             )}
           </ul>
         </div>

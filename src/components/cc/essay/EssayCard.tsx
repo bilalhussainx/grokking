@@ -19,6 +19,14 @@ const RAIL_COLOR: Record<string, string> = {
   scholarship: "#4ade80",
 };
 
+// Student-facing labels for cc_essays.counselor_review_state.
+const REVIEW_BADGES: Record<string, { label: string; cls: string }> = {
+  in_review: { label: "Counselor reviewing", cls: "text-sky-300 border-sky-500/30 bg-sky-500/10" },
+  changes_requested: { label: "Changes requested", cls: "text-amber-300 border-amber-500/30 bg-amber-500/10" },
+  resubmitted: { label: "Resubmitted", cls: "text-violet-300 border-violet-500/30 bg-violet-500/10" },
+  approved: { label: "Approved", cls: "text-emerald-300 border-emerald-500/30 bg-emerald-500/10" },
+};
+
 interface EssayCardProps {
   id: string;
   essayType: string;
@@ -28,6 +36,7 @@ interface EssayCardProps {
   wordLimit: number;
   updatedAt: string;
   commentCount?: number;
+  reviewState?: string | null;
 }
 
 export default function EssayCard({
@@ -39,6 +48,7 @@ export default function EssayCard({
   wordLimit,
   updatedAt,
   commentCount = 0,
+  reviewState = null,
 }: EssayCardProps) {
   const phaseKey = (PHASE_KEYS as readonly string[]).includes(phase)
     ? (phase as PhaseKey)
@@ -62,6 +72,13 @@ export default function EssayCard({
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {reviewState && REVIEW_BADGES[reviewState] && (
+            <span
+              className={`text-[10px] px-2 py-0.5 rounded-xl border ${REVIEW_BADGES[reviewState].cls}`}
+            >
+              {REVIEW_BADGES[reviewState].label}
+            </span>
+          )}
           <span className={`kl-phase-chip ${phaseKey}`}>{phaseKey}</span>
           <span className="inline-flex items-center gap-1 text-[11px] text-white/50 group-hover:text-white/80 transition-colors">
             <Pencil className="w-3 h-3" /> Open

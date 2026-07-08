@@ -335,8 +335,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCreditsLoaded(false);
     // Sign out from Supabase (global = revoke all sessions server-side).
     // No-op when env missing — there's nothing to sign out from.
+    // Bounded: if the revoke call stalls (observed hanging the whole
+    // sign-out, leaving the session active after click), proceed with local
+    // cookie/storage cleanup after 3.5s — local cleanup is what actually
+    // logs the browser out; the server revoke is best-effort.
     if (supabase) {
-      await supabase.auth.signOut({ scope: "global" });
+      try {
+        await Promise.race([
+          supabase.auth.signOut({ scope: "global" }),
+          new Promise((resolve) => setTimeout(resolve, 3500)),
+        ]);
+      } catch {
+        /* revoke failed — still clear local state below */
+      }
     }
     // Manually clear all Supabase auth cookies and localStorage
     document.cookie.split(";").forEach((c) => {

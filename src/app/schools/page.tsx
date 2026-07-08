@@ -13,6 +13,8 @@ interface School {
   name: string;
   city: string;
   state: string;
+  country?: string | null;
+  province?: string | null;
   school_type: string;
   acceptance_rate: number;
   avg_net_price: number;
@@ -31,6 +33,18 @@ interface MySchoolEntry {
 }
 
 const STATES = ["CA", "NY", "MA", "TX", "FL", "PA", "IL", "GA", "NC", "VA", "MI", "OH", "NJ", "IN", "WI", "WA", "CO", "MN", "AZ", "MD", "TN", "CT", "DC"];
+const COUNTRIES: { code: string; label: string }[] = [
+  { code: "US", label: "United States" },
+  { code: "GB", label: "United Kingdom" },
+  { code: "CA", label: "Canada" },
+  { code: "AU", label: "Australia" },
+  { code: "NL", label: "Netherlands" },
+  { code: "DE", label: "Germany" },
+  { code: "IE", label: "Ireland" },
+  { code: "SG", label: "Singapore" },
+  { code: "HK", label: "Hong Kong" },
+  { code: "AE", label: "UAE" },
+];
 const TYPES = ["public", "private"];
 const BAND_ORDER = ["reach", "match", "safety", "unknown"] as const;
 // Bold group-header label restored from the pre-April-26 design
@@ -57,6 +71,7 @@ export default function SchoolsPage() {
   const [browseLoading, setBrowseLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [stateFilter, setStateFilter] = useState("");
+  const [countryFilter, setCountryFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const [needBlindIntl, setNeedBlindIntl] = useState(false);
@@ -126,11 +141,12 @@ export default function SchoolsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const search = useCallback(async (q: string, state: string, type: string, nbi: boolean, mfni: boolean, css: boolean) => {
+  const search = useCallback(async (q: string, state: string, country: string, type: string, nbi: boolean, mfni: boolean, css: boolean) => {
     setBrowseLoading(true);
     const body: Record<string, unknown> = { limit: 50 };
     if (q) body.query = q;
     if (state) body.state = state;
+    if (country) body.country = country;
     if (type) body.type = type;
     if (nbi) body.need_blind_international = true;
     if (mfni) body.meets_full_need_international = true;
@@ -149,8 +165,8 @@ export default function SchoolsPage() {
   }, []);
 
   useEffect(() => {
-    if (tab === "browse") search(query, stateFilter, typeFilter, needBlindIntl, meetsFullNeedIntl, cssProfileRequired);
-  }, [query, stateFilter, typeFilter, needBlindIntl, meetsFullNeedIntl, cssProfileRequired, search, tab]);
+    if (tab === "browse") search(query, stateFilter, countryFilter, typeFilter, needBlindIntl, meetsFullNeedIntl, cssProfileRequired);
+  }, [query, stateFilter, countryFilter, typeFilter, needBlindIntl, meetsFullNeedIntl, cssProfileRequired, search, tab]);
 
   const handleAdd = async (schoolId: string) => {
     const res = await fetch("/api/cc/school-list/add", {
@@ -246,7 +262,7 @@ export default function SchoolsPage() {
         onChange={(next) => {
           setTab(next);
           if (next === "browse") {
-            search(query, stateFilter, typeFilter, needBlindIntl, meetsFullNeedIntl, cssProfileRequired);
+            search(query, stateFilter, countryFilter, typeFilter, needBlindIntl, meetsFullNeedIntl, cssProfileRequired);
           }
         }}
         options={[
@@ -301,7 +317,7 @@ export default function SchoolsPage() {
                     </p>
                   </button>
                   <button
-                    onClick={() => { setTab("browse"); search("", "", "", false, false, false); }}
+                    onClick={() => { setTab("browse"); search("", "", "", "", false, false, false); }}
                     className="group text-left p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:border-white/20 transition-all"
                   >
                     <div className="flex items-center gap-2 mb-1.5">
@@ -310,7 +326,7 @@ export default function SchoolsPage() {
                     </div>
                     <h4 className="text-sm font-semibold text-white mb-1">Browse schools</h4>
                     <p className="text-xs text-white/50 leading-relaxed">
-                      Search by name, state, or type and add schools to your list one by one.
+                      Search by name, country, state, or type and add schools to your list one by one.
                     </p>
                   </button>
                 </div>
@@ -372,13 +388,30 @@ export default function SchoolsPage() {
 
           <div className="flex flex-wrap gap-2 mb-6">
             <select
-              value={stateFilter}
-              onChange={(e) => setStateFilter(e.target.value)}
+              value={countryFilter}
+              onChange={(e) => {
+                setCountryFilter(e.target.value);
+                // State filter only applies to US schools.
+                if (e.target.value && e.target.value !== "US") setStateFilter("");
+              }}
+              aria-label="Filter by country"
               className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 focus:outline-none focus:border-[#D4AF37]/50"
             >
-              <option value="">All states</option>
-              {STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+              <option value="">All countries</option>
+              {COUNTRIES.map((c) => <option key={c.code} value={c.code}>{c.label}</option>)}
             </select>
+
+            {(!countryFilter || countryFilter === "US") && (
+              <select
+                value={stateFilter}
+                onChange={(e) => setStateFilter(e.target.value)}
+                aria-label="Filter by US state"
+                className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/60 focus:outline-none focus:border-[#D4AF37]/50"
+              >
+                <option value="">All states</option>
+                {STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+            )}
 
             <select
               value={typeFilter}

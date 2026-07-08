@@ -14,15 +14,46 @@ type Experience = {
 
 const CATEGORIES = ["Research", "Internship", "Job", "Volunteer", "Camp/Program", "Online course", "Self-directed project", "Family obligation"];
 
-const SOUTH_ASIAN_ALTERNATIVES = [
-  { name: "Aga Khan University Health Camp (Karachi)", category: "Volunteer" },
-  { name: "LUMS Summer Coding Bootcamp (Lahore)", category: "Camp/Program" },
-  { name: "Edhi Foundation hospital volunteer", category: "Volunteer" },
-  { name: "TCS Foundation literacy mentor (Pakistan)", category: "Volunteer" },
-  { name: "Local masjid Quran-teaching assistant", category: "Volunteer" },
-  { name: "Family business shift work — log honestly as 'job'", category: "Job" },
-  { name: "MIT OCW / Khan Academy + project (US-recognized)", category: "Online course" },
-];
+// Region-keyed suggestion lists — picked by the student's profile country
+// (returned by GET /api/cc/summer). Admissions readers value local and
+// family commitments; the point of each list is "what counts where you are".
+const ALTERNATIVES: Record<string, { title: string; items: { name: string; category: string }[] }> = {
+  SA: {
+    title: "South Asia alternatives",
+    items: [
+      { name: "Aga Khan University Health Camp (Karachi)", category: "Volunteer" },
+      { name: "LUMS Summer Coding Bootcamp (Lahore)", category: "Camp/Program" },
+      { name: "Edhi Foundation hospital volunteer", category: "Volunteer" },
+      { name: "TCS Foundation literacy mentor (Pakistan)", category: "Volunteer" },
+      { name: "Local masjid Quran-teaching assistant", category: "Volunteer" },
+      { name: "Family business shift work — log honestly as 'job'", category: "Job" },
+      { name: "MIT OCW / Khan Academy + project (US-recognized)", category: "Online course" },
+    ],
+  },
+  US: {
+    title: "Ideas that count",
+    items: [
+      { name: "Local library / hospital volunteering", category: "Volunteer" },
+      { name: "Community-college dual-enrollment course", category: "Online course" },
+      { name: "Part-time job — retail, food service, lifeguarding all count", category: "Job" },
+      { name: "State governor's school / summer academy", category: "Camp/Program" },
+      { name: "Self-directed project (build, publish, organize something)", category: "Self-directed project" },
+      { name: "Caring for siblings or family members — log it honestly", category: "Family obligation" },
+      { name: "Cold-email a local lab or professor for research shadowing", category: "Research" },
+    ],
+  },
+  INTL: {
+    title: "Local alternatives that count",
+    items: [
+      { name: "Volunteering with a local NGO or hospital", category: "Volunteer" },
+      { name: "National olympiad / competition training", category: "Self-directed project" },
+      { name: "Family business shift work — log honestly as 'job'", category: "Job" },
+      { name: "University-run summer school in your country", category: "Camp/Program" },
+      { name: "MIT OCW / Khan Academy + project (US-recognized)", category: "Online course" },
+      { name: "Community teaching or tutoring younger students", category: "Volunteer" },
+    ],
+  },
+};
 
 export default function SummerPage() {
   const [exps, setExps] = useState<Experience[]>([]);
@@ -32,10 +63,13 @@ export default function SummerPage() {
   const [end, setEnd] = useState("");
   const [desc, setDesc] = useState("");
   const [loading, setLoading] = useState(true);
+  const [region, setRegion] = useState<string>("US");
 
   const refresh = async () => {
     const r = await fetch("/api/cc/summer");
-    setExps((await r.json()).experiences ?? []);
+    const d = await r.json();
+    setExps(d.experiences ?? []);
+    if (d.region) setRegion(d.region as string);
   };
   useEffect(() => { refresh().finally(() => setLoading(false)); }, []);
 
@@ -62,7 +96,7 @@ export default function SummerPage() {
     <div className="px-6 py-6 max-w-3xl mx-auto space-y-5">
       <div>
         <h1 className="text-xl font-semibold text-white mb-1">Summer experiences</h1>
-        <p className="text-[13px] text-white/60">Log every summer activity. South Asian / Pakistani alternatives count — admissions readers know.</p>
+        <p className="text-[13px] text-white/60">Log every summer activity. Local jobs and family commitments count — admissions readers know.</p>
       </div>
 
       <section className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
@@ -74,8 +108,8 @@ export default function SummerPage() {
           </select>
         </div>
         <div className="grid grid-cols-2 gap-2 mb-2">
-          <input type="date" placeholder="Start" value={start} onChange={(e) => setStart(e.target.value)} className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/85" />
-          <input type="date" placeholder="End" value={end} onChange={(e) => setEnd(e.target.value)} className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/85" />
+          <input type="date" aria-label="Start date" placeholder="Start" value={start} onChange={(e) => setStart(e.target.value)} className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/85" />
+          <input type="date" aria-label="End date" placeholder="End" value={end} onChange={(e) => setEnd(e.target.value)} className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/85" />
         </div>
         <textarea placeholder="Description" value={desc} onChange={(e) => setDesc(e.target.value)} rows={2} className="w-full mb-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/85 placeholder-white/30" />
         <button type="button" onClick={add} disabled={!name.trim()} className="px-3 py-2 rounded-lg bg-[#D4AF37] text-black text-[13px] font-medium hover:bg-[#C4A030] disabled:opacity-40 inline-flex items-center gap-1.5">
@@ -85,10 +119,10 @@ export default function SummerPage() {
 
       <section className="rounded-xl border border-[#D4AF37]/40 bg-[#D4AF37]/5 p-4">
         <h2 className="text-[12px] uppercase tracking-wider text-[#D4AF37] font-semibold mb-3 inline-flex items-center gap-1.5">
-          <Sun className="w-3 h-3" /> South Asian / Pakistan alternatives
+          <Sun className="w-3 h-3" /> {(ALTERNATIVES[region] ?? ALTERNATIVES.US).title}
         </h2>
         <ul className="space-y-1.5 text-[12.5px] text-white/80">
-          {SOUTH_ASIAN_ALTERNATIVES.map((a, i) => (
+          {(ALTERNATIVES[region] ?? ALTERNATIVES.US).items.map((a, i) => (
             <li key={i}>
               <strong>{a.name}</strong> <span className="text-white/55">— {a.category}</span>
             </li>
@@ -105,7 +139,12 @@ export default function SummerPage() {
                 <p>
                   <strong className="text-white">{e.experience_name}</strong>
                   {e.category && <span className="text-white/55 ml-2">{e.category}</span>}
-                  {e.start_date && <span className="text-white/45 ml-2">{e.start_date} → {e.end_date ?? "?"}</span>}
+                  {e.start_date && (
+                    <span className="text-white/45 ml-2">
+                      {e.start_date}
+                      {e.end_date ? ` → ${e.end_date}` : " → ongoing"}
+                    </span>
+                  )}
                 </p>
                 {e.description && <p className="text-white/65 mt-1">{e.description}</p>}
               </li>

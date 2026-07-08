@@ -18,6 +18,7 @@ import { useCounselorRole } from "@/hooks/useCounselorRole";
 
 interface Member {
   userId: string;
+  displayName?: string | null;
   role: "head" | "counselor";
   requiresReview: boolean;
   joinedAt: string;
@@ -195,7 +196,9 @@ export default function TeamPage() {
             <tbody>
               {members.map((m) => (
                 <tr key={m.userId} className="border-t border-white/[0.08]">
-                  <td className="px-4 py-2.5 kl-mono kl-sm !text-white/80 tabular-nums">{m.userId.slice(0, 8)}…</td>
+                  <td className="px-4 py-2.5 kl-sm !text-white/80">
+                    {m.displayName || <span className="kl-mono tabular-nums">{m.userId.slice(0, 8)}…</span>}
+                  </td>
                   <td className="px-4 py-2.5 kl-sm !text-white/80 capitalize">{m.role}</td>
                   <td className="px-4 py-2.5 kl-sm">
                     {m.role === "head" ? (

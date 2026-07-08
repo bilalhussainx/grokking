@@ -203,10 +203,17 @@ function CoachFAB() {
 function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isCinematicPage = pathname === "/landing";
+  // MarketingShell pages carry their own sticky marketing nav — mounting the
+  // global TopNav above it produced a stacked double header with duplicate
+  // sign-in CTAs on /product/* (and /pricing, /stories).
+  const hasOwnMarketingNav =
+    (pathname?.startsWith("/product/") ?? false) ||
+    pathname === "/pricing" ||
+    pathname === "/stories";
 
   // Cinematic landing page needs full document scroll (GSAP ScrollTrigger)
   // — no TopNav, no Coach sidebar, no overflow-hidden wrapper
-  if (isCinematicPage) {
+  if (isCinematicPage || hasOwnMarketingNav) {
     return <>{children}</>;
   }
 

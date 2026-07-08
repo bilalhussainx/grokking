@@ -204,6 +204,15 @@ export default function EssayWorkspace({
       {/* On brainstorm/outline, allow the page to scroll so all cards reach.
           On draft/revise, keep the old overflow-hidden + child scrolling. */}
       <div className={phaseOwnsBanner ? "flex-1 overflow-y-auto" : "flex-1 overflow-hidden"}>
+        {/* Counselor review surfaces on every phase, not just revise — the
+            panel renders nothing when there's no review activity. Without
+            this, feedback left while the student is still brainstorming or
+            drafting is invisible to them. */}
+        {activePhase !== "revise" && (
+          <div className="px-4 pt-3 max-w-3xl mx-auto w-full">
+            <CounselorFeedbackPanel essayId={id} />
+          </div>
+        )}
         {activePhase === "brainstorm" && (
           <BrainstormChat
             essayId={id}

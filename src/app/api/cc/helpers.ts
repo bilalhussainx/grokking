@@ -33,9 +33,16 @@ export async function ensureStudentProfile(
   if (existing) return existing as { id: string };
 
   const admin = createAdminSupabase();
+  // Seed preferred_name from the signup name (auth user_metadata.full_name)
+  // so surfaces like the counselor roster don't show "Unnamed student" for
+  // accounts that never fill out the profile form.
+  const signupName =
+    (user.user_metadata?.full_name as string | undefined)?.trim() ||
+    (user.user_metadata?.name as string | undefined)?.trim() ||
+    null;
   const { data, error } = await admin
     .from("cc_student_profiles")
-    .insert({ user_id: user.id, country: "US" })
+    .insert({ user_id: user.id, country: "US", preferred_name: signupName })
     .select("id")
     .single();
 
