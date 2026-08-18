@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { ArrowRight, GraduationCap, Code, Users, Sparkles, Briefcase, Rocket } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'About KairosLearn - AI-Powered Learning Platform',
-  description: 'Meet the team behind KairosLearn. Harvard CS grad turned educator building the future of AI-powered education with voice tutoring in 17 languages.',
+  title: 'About KairosLearn - AI College Counseling for Every Student',
+  description: 'Meet the team behind KairosLearn. Harvard CS grad turned educator building an AI college counselor that speaks 18 languages — for the students the 415:1 counselor ratio leaves behind.',
 };
 
 export default function AboutPage() {
@@ -14,11 +14,12 @@ export default function AboutPage() {
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-            Teaching the world, one voice conversation at a time
+            Every student deserves a counselor who actually knows them
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            KairosLearn is an AI-powered learning platform that makes education accessible,
-            personalized, and engaging through voice conversations in 17 languages.
+            KairosLearn is an AI-powered college counseling platform. Coach Kairos guides
+            students through school lists, essays, interviews, and financial aid — in 18
+            languages — and gives human counselors a workspace to support their whole caseload.
           </p>
         </div>
       </section>
@@ -27,46 +28,46 @@ export default function AboutPage() {
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-[#141414] rounded-2xl p-8 border border-white/10">
           <h2 className="text-3xl font-bold text-white mb-6">
-            From Harvard Classroom to AI-Powered Learning
+            From Harvard Classroom to AI College Counseling
           </h2>
 
           <div className="prose prose-lg prose-invert max-w-none">
             <p className="text-gray-300 leading-relaxed mb-4">
-              Hi, I'm Bilal Hussain, founder of KairosLearn. I graduated from Harvard with a degree in Computer Science in May 2022,
+              Hi, I&apos;m Bilal Hussain, founder of KairosLearn. I graduated from Harvard with a degree in Computer Science in May 2022,
               then spent two years teaching at Milton Academy (August 2022 – May 2024). Those two years changed everything.
             </p>
 
             <p className="text-gray-300 leading-relaxed mb-4">
-              As a CS instructor, I saw firsthand how traditional education fails so many students. Not because they're
-              not smart enough — but because they learn differently, speak different languages, or need concepts explained
-              in ways textbooks don't offer.
+              At an elite school, every student had a college counselor who knew their story. But the average U.S.
+              public-school counselor serves 415 students. For first-gen, international, and underprivileged
+              applicants — the students whose families can&apos;t pay $5,000 for a private consultant, or don&apos;t speak
+              English at home — that ratio means almost no time, no translation, and no one who knows them.
             </p>
 
             <p className="text-gray-300 leading-relaxed mb-4">
-              I watched students light up when I explained algorithms in Spanish, when I broke down React in simpler terms,
-              when I gave them voice explanations they could replay. That's when it clicked: <strong>What if every student
-              had an AI tutor that could speak their language, adapt to their level, and explain things 100 different ways
-              until it made sense?</strong>
+              That&apos;s when it clicked: <strong>What if every student had a counselor who spoke their family&apos;s language,
+              knew their full profile, and was available at 3 a.m. the night before a deadline?</strong>
             </p>
 
             <p className="text-gray-300 leading-relaxed mb-4">
-              So I built it. Using Claude Code (Anthropic's AI coding assistant), I shipped KairosLearn — an AI platform with:
+              So I built it. KairosLearn is an AI college counseling platform with:
             </p>
 
             <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
-              <li><strong>Voice tutoring in 17 languages</strong> — not just English</li>
-              <li><strong>69+ interactive courses</strong> — coding, languages, finance, philosophy, religion</li>
-              <li><strong>2,284+ structured lessons</strong> — from beginner to professional</li>
-              <li><strong>Real-time AI coaching</strong> — Coach Kairos adapts to your level and explains in your language</li>
+              <li><strong>Coach Kairos in 18 languages</strong> — talk through your school list in Hindi, your essays in Punjabi, your aid forms in Spanish</li>
+              <li><strong>Essay Studio</strong> — brainstorm, outline, draft, and revise with coaching that never writes a word for you</li>
+              <li><strong>School list + aid tools</strong> — reach/match/safety chancing, activities optimizer, mock interviews, financial-aid comparison</li>
+              <li><strong>A counselor workspace</strong> — human counselors and agencies run their whole student book on the same platform</li>
             </ul>
 
             <p className="text-gray-300 leading-relaxed mb-4">
-              This isn't just another LeetCode clone or Duolingo competitor. It's a platform that believes education should
-              be <strong>multilingual, conversational, and AI-native</strong>.
+              This isn&apos;t a chatbot wearing a counselor hat. It&apos;s a platform that believes college guidance should be
+              <strong> multilingual, personal, and honest about AI</strong> — the student does the work; the AI makes
+              sure no one does it alone.
             </p>
 
             <p className="text-gray-300 leading-relaxed">
-              We're raising our pre-seed round now to bring this to 1 million students worldwide. If you're an investor,
+              We&apos;re raising our pre-seed round now to bring this to 1 million students worldwide. If you&apos;re an investor,
               partner, or just believe in this vision — <Link href="/pricing" className="text-[#D4AF37] underline">try the platform</Link> or <a href="mailto:bilalhussain.v1@gmail.com" className="text-[#D4AF37] underline">reach out</a>.
             </p>
           </div>
@@ -85,11 +86,11 @@ export default function AboutPage() {
               <Users className="w-6 h-6 text-[#D4AF37]" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">
-              Education for Everyone
+              Counseling for Everyone
             </h3>
             <p className="text-gray-300">
-              Learning shouldn't be limited by language, location, or learning style. Our AI tutors speak 17 languages
-              and adapt to every student.
+              A great application shouldn&apos;t require a $5,000 consultant or an English-speaking household.
+              Coach Kairos speaks 18 languages and knows every student&apos;s full story.
             </p>
           </div>
 
@@ -101,8 +102,8 @@ export default function AboutPage() {
               AI-Native from Day One
             </h3>
             <p className="text-gray-300">
-              Built with Claude Code, optimized for AI interactions. We're not retrofitting AI onto old systems —
-              we're AI-first.
+              Built with Claude Code, optimized for AI interactions. We&apos;re not retrofitting AI onto old systems —
+              we&apos;re AI-first.
             </p>
           </div>
 
@@ -111,10 +112,11 @@ export default function AboutPage() {
               <GraduationCap className="w-6 h-6 text-white/70" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-3">
-              Evidence-Based Learning
+              Your Words, Your Work
             </h3>
             <p className="text-gray-300">
-              Every course is structured with checkpoints, exercises, and projects. We don't just teach — we help you master.
+              Our AI coaches essays by asking questions — it never writes a sentence for you. Read our{' '}
+              <Link href="/integrity" className="text-[#D4AF37] underline">AI Integrity Policy</Link>.
             </p>
           </div>
         </div>
@@ -167,31 +169,31 @@ export default function AboutPage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-[#D4AF37] rounded-2xl p-8 text-black">
           <h2 className="text-3xl font-bold mb-6 text-center">
-            Building the Future of AI Education
+            Building the Future of College Counseling
           </h2>
 
           <div className="grid md:grid-cols-4 gap-6 text-center mb-8">
             <div>
-              <div className="text-4xl font-bold mb-2">69+</div>
-              <div className="text-black/70">Interactive Courses</div>
+              <div className="text-4xl font-bold mb-2">18</div>
+              <div className="text-black/70">Coach Languages</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">2,284+</div>
-              <div className="text-black/70">Structured Lessons</div>
+              <div className="text-4xl font-bold mb-2">415:1</div>
+              <div className="text-black/70">The Ratio We&apos;re Fixing</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">17</div>
-              <div className="text-black/70">Voice Languages</div>
+              <div className="text-4xl font-bold mb-2">6</div>
+              <div className="text-black/70">Application Tools</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">28</div>
-              <div className="text-black/70">Free Courses</div>
+              <div className="text-4xl font-bold mb-2">$0</div>
+              <div className="text-black/70">First Three Schools</div>
             </div>
           </div>
 
           <div className="text-center">
             <p className="text-lg mb-6 text-black/80">
-              <strong>We're raising $500K–$1.5M in pre-seed funding</strong> to scale to 1M users and expand our course library.
+              <strong>We&apos;re raising $500K–$1.5M in pre-seed funding</strong> to bring one-on-one college counseling to 1M students.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -218,14 +220,14 @@ export default function AboutPage() {
           Join Us on This Journey
         </h2>
         <p className="text-xl text-gray-300 mb-8">
-          Whether you're a student, investor, partner, or fellow builder — we'd love to hear from you.
+          Whether you&apos;re a student, investor, partner, or fellow builder — we&apos;d love to hear from you.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/courses"
+            href="/signup"
             className="inline-flex items-center justify-center px-6 py-3 bg-[#D4AF37] text-black rounded-lg font-semibold hover:bg-[#D4AF37]/90 transition"
           >
-            Explore Courses
+            Start Your Application
             <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
           <a

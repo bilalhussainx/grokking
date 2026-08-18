@@ -7,21 +7,21 @@ import { JsonLd } from '@/lib/schema';
 export const metadata: Metadata = {
   title: 'Frequently Asked Questions',
   description:
-    'Common questions about KairosLearn — what courses are available, how AI coaching works, pricing, supported languages, and more.',
+    'Common questions about KairosLearn — how AI college counseling works, essay coaching and AI integrity, pricing, supported languages, and tools for counselors and families.',
   keywords: [
     'KairosLearn FAQ',
-    'online learning FAQ',
-    'AI tutor questions',
-    'free online courses',
-    'how does AI coaching work',
+    'AI college counselor',
+    'college essay coaching',
+    'does AI write my essay',
+    'college application help',
     'KairosLearn pricing',
-    'meditation course online',
-    'coding interview preparation',
-    'religious studies online',
+    'college counseling in Spanish',
+    'college counseling in Hindi',
+    'independent counselor software',
   ],
   openGraph: {
     title: 'FAQ — KairosLearn',
-    description: 'Common questions about KairosLearn courses and AI coaching.',
+    description: 'Common questions about KairosLearn AI college counseling, essays, and pricing.',
     url: 'https://kairoslearn.com/faq',
   },
   alternates: { canonical: 'https://kairoslearn.com/faq' },
@@ -31,42 +31,42 @@ const FAQ_ITEMS = [
   {
     question: 'What is KairosLearn?',
     answer:
-      'KairosLearn is an AI-powered online learning platform that offers interactive courses across Computer Science, Religious Studies, Philosophy, Finance, Health & Wellness, and Political Strategy. Each course includes an AI voice coach that provides real-time explanations, hints, and personalized feedback to help learners master complex subjects at their own pace.',
+      'KairosLearn is an AI-powered college counseling platform. Coach Kairos — an AI counselor available in 18 languages — guides you through the whole application: building a school list with reach/match/safety chancing, brainstorming and revising essays, optimizing your Common App activities, practicing interviews with alumni AI personas, and comparing financial aid. Human counselors and agencies use the same platform to run their student caseload, review essays, and track progress.',
   },
   {
-    question: 'What courses are available on KairosLearn?',
+    question: 'Does the AI write my college essay?',
     answer:
-      'KairosLearn offers 60+ courses organized into 7 domains. In Computer Science, you can study Python, JavaScript, React, system design, data structures, and coding interview preparation. Religious Studies includes courses on Islam, Christianity, and Buddhism. Philosophy covers Stoic philosophy. Finance courses include personal finance, investing, accounting, and macroeconomics. Health & Wellness features meditation, mental health, and leadership courses. Political Strategy covers geopolitics and international relations.',
+      'No — and this is by design. Essay Studio coaches you through brainstorming, outlining, and revision by asking questions, suggesting angles, and pointing out what is or isn’t working. It never writes essay sentences or rewrites your prose. The Common App treats submitting AI-generated writing as your own work as a violation, and many colleges have their own AI policies. Our approach keeps every word yours. Read the full policy at kairoslearn.com/integrity.',
   },
   {
-    question: 'Is KairosLearn free?',
+    question: 'How does Essay Studio work?',
     answer:
-      'Many courses on KairosLearn are completely free, including Python Fundamentals, Web Development, Islam: Foundations & Practice, Stoic Philosophy, Meditation & Mindfulness, Mental Health & Resilience, and Personal Finance Mastery. Premium (Pro) courses covering advanced topics like system design, machine learning, investing, and cybersecurity require a Pro subscription.',
+      'Essay Studio walks you through four phases. Brainstorm: a Storyboard Coach interviews you to surface the story only you can tell, before you write a sentence. Outline: you get three structurally different outline options built from your own experiences, and pick one. Draft: you write; the coach responds with questions and observations, never rewrites. Review: your counselor (or Coach Kairos) gives anchored feedback for revision. Supplemental essays get the same treatment, with checks that you aren’t rehashing your personal statement.',
   },
   {
-    question: 'How does AI coaching work on KairosLearn?',
+    question: 'Is KairosLearn free? What does Pro cost?',
     answer:
-      'Every course on KairosLearn includes an AI voice coach that accompanies you through lessons. The coach can explain concepts in plain language, provide progressive hints when you are stuck on coding exercises, celebrate your progress, and answer questions about the material. The AI coach is available in 9 languages including English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, and Punjabi.',
+      'Free forever for your first three schools — school list, essays, and core tools included. Pro is $12/month and unlocks unlimited schools, essays, voice sessions, languages, mock interviews, and the full financial-aid comparator. New users get a free 7-day Pro trial with no card required, and you can cancel within 14 days of any charge for a full refund.',
   },
   {
     question: 'What languages does KairosLearn support?',
     answer:
-      'The AI voice coaching feature supports 9 languages: English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, and Punjabi. Course content is primarily in English, but the AI coach can explain concepts and provide feedback in any of the supported languages.',
+      'Coach Kairos supports 18 languages for voice and chat, including English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, Punjabi, and Urdu. You can talk through your school list in one language and get essay feedback in another. Family Mode lets you hand the phone to a parent and the coach switches to their language and answers their questions — financial aid included — without exposing your essay drafts.',
   },
   {
-    question: 'What is the Meditation & Mindfulness course like?',
+    question: 'I’m a counselor or run an agency. How does KairosLearn work for me?',
     answer:
-      'The Meditation & Mindfulness Practice course is a free, beginner-level course with 7 modules covering breath awareness, body scans, loving-kindness meditation, mindful living, and emotional regulation. It is grounded in neuroscience research from JAMA, The Lancet, and leading universities. An AI voice coach guides you through each practice and helps you build a sustainable daily meditation habit.',
+      'You get a counselor workspace: invite students with a code, see your whole roster, review essays with inline feedback, track each student’s school list and application progress, and manage a team of counselors under one agency with per-counselor review settings. Students do the work in the same tools you review in, so nothing gets emailed back and forth as attachments. Start at kairoslearn.com/product/counselor.',
   },
   {
-    question: 'How do coding exercises work on KairosLearn?',
+    question: 'Can my parents follow my application?',
     answer:
-      'Computer Science courses include interactive coding exercises with an in-browser code editor. You write code directly in the browser, and the AI coach provides progressive hints if you get stuck. Each exercise includes starter code and a solution you can reveal after attempting the problem. Exercises cover Python, JavaScript, TypeScript, C++, and C# depending on the course.',
+      'Yes, if you choose to share. You control a share link that gives counselors or family read access to your essays, activities, school list, and scores. Family Mode in the coach is built for parents who don’t speak English — it answers their questions about deadlines, costs, and financial aid in their language.',
   },
   {
-    question: 'What religious studies courses are available?',
+    question: 'Does KairosLearn still offer courses?',
     answer:
-      'KairosLearn offers three religious studies courses: Islam: Foundations & Practice covers the Quran, Hadith, Five Pillars, and Islamic ethics. Christianity: Ethics & Theology explores scripture, the life of Jesus, denominational differences, and Christian ethics. Buddhism: Path to Inner Peace covers the Four Noble Truths, the Eightfold Path, meditation traditions, and Buddhist ethics. All three courses are free and beginner-friendly.',
+      'Yes. Alongside the counseling tools there is a library of interactive courses — computer science and coding interview prep, personal finance, philosophy, religious studies, meditation, and more — each with an AI voice coach. Free accounts include a set of free courses; Pro unlocks the full library.',
   },
 ];
 
@@ -96,8 +96,8 @@ export default function FAQPage() {
             Frequently Asked Questions
           </h1>
           <p className="text-slate-400 text-lg">
-            Everything you need to know about KairosLearn, our courses, AI
-            coaching, and pricing.
+            Everything you need to know about KairosLearn — AI college
+            counseling, essays, pricing, and tools for counselors and families.
           </p>
         </header>
 
@@ -117,13 +117,13 @@ export default function FAQPage() {
 
         <div className="mt-12 text-center">
           <p className="text-slate-400 mb-4">
-            Ready to start learning?
+            Ready to start your application?
           </p>
           <Link
-            href="/courses"
-            className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl transition-colors"
+            href="/signup"
+            className="inline-block px-6 py-3 bg-[#D4AF37] hover:bg-[#C4A030] text-black font-medium rounded-xl transition-colors"
           >
-            Browse All Courses
+            Start for Free
           </Link>
         </div>
       </div>

@@ -127,8 +127,9 @@ export default function MarketingShell({ children }: { children: ReactNode }) {
             </Link>
           </div>
           <div className="kl-mkt-foot-fine">
-            © {new Date().getFullYear()} KairosLearn. <Link href="/privacy">Privacy</Link> ·{" "}
-            <Link href="/terms">Terms</Link>
+            © {new Date().getFullYear()} KairosLearn · Built by{" "}
+            <Link href="/about">Bilal Hussain</Link>. <Link href="/privacy">Privacy</Link> ·{" "}
+            <Link href="/terms">Terms</Link> · <Link href="/integrity">AI Integrity</Link>
           </div>
         </div>
       </footer>

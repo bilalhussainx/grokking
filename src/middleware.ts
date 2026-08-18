@@ -52,6 +52,7 @@ const PUBLIC_PREFIXES = [
   "/tools",
   "/privacy",
   "/terms",
+  "/integrity",
   "/interviews",
   "/college-interviews",
   "/history",
@@ -203,16 +204,25 @@ export async function middleware(request: NextRequest) {
       .select("language_picker_seen_at, grade_level")
       .eq("user_id", user.id)
       .maybeSingle<{ language_picker_seen_at: string | null; grade_level: number | null }>();
-    // Redirect if (a) the user has no profile row yet (brand-new account —
-    // the row is created lazily by ensureStudentProfile when they hit a
-    // coach API) OR (b) the onboarding sentinel is still null. Either way
-    // the first thing the user should see is the multi-step onboarding.
-    if (!profile || profile.language_picker_seen_at == null) {
-      // Counselors who haven't completed student onboarding shouldn't be forced
-      // through the student flow (language → grade → concerns) — that's not
-      // their workflow. If the user has a counselor profile, send them straight
-      // to their workspace. Scoped to the no-student-profile branch so it only
-      // costs a query for accounts that haven't onboarded as students.
+    const profileIncomplete = !profile || profile.language_picker_seen_at == null;
+
+    // Counselor routing. A user with a cc_counselors row lives in the
+    // /counselor/* workspace, never the student dashboard. This check runs when:
+    //   (a) they have no completed student profile — the original
+    //       onboarding-skip case (don't force a counselor through the student
+    //       language → grade → concerns flow), OR
+    //   (b) they hit the post-login landing ("/") or the student dashboard
+    //       root ("/cc/dashboard").
+    // Case (b) is the fix for a real misroute: a counselor who ALSO has a
+    // completed student profile (they tried the product as a student first,
+    // THEN set up a counselor account — a common path) used to fall past the
+    // old counselor check, which was nested only inside the incomplete-profile
+    // branch, and land silently on /cc/dashboard. Bounded to the landing paths
+    // so it never adds a DB query to ordinary /cc/* feature requests, and it
+    // doesn't touch a counselor's ability to open a specific student's view
+    // under /counselor/students/[id].
+    const isDashboardLanding = pathname === "/" || pathname === "/cc/dashboard";
+    if (profileIncomplete || isDashboardLanding) {
       const { data: counselor } = await supabase
         .from("cc_counselors")
         .select("id")
@@ -221,12 +231,16 @@ export async function middleware(request: NextRequest) {
       if (counselor) {
         return NextResponse.redirect(new URL("/counselor/dashboard", request.url));
       }
+    }
+
+    // Non-counselor with no completed student profile → student onboarding.
+    if (profileIncomplete) {
       return NextResponse.redirect(new URL("/onboarding", request.url));
     }
     // Grade-9 route guard (Feature 16). Page-level checks already exist on
     // the standalone dashboards but not on the per-feature surfaces. Block at
     // the edge so a 14-year-old following a deep link can't open senior tools.
-    if (profile.grade_level === 9 && isGrade9BlockedPath(pathname)) {
+    if (profile?.grade_level === 9 && isGrade9BlockedPath(pathname)) {
       const url = new URL("/cc/dashboard", request.url);
       url.searchParams.set("blocked", "grade9");
       return NextResponse.redirect(url);
@@ -295,9 +309,12 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // --- Root / landing routing (only for users with a session) -------------
+  // --- Root / landing routing ----------------------------------------------
+  // Anyone without a real account — guest sessions AND cookie-less visitors
+  // (crawlers included) — gets a server-side redirect to /landing, so search
+  // engines index the marketing page instead of the client "Loading…" shell.
   if (pathname === "/") {
-    if (isAnonymous) {
+    if (!isRealUser) {
       return NextResponse.redirect(new URL("/landing", request.url));
     }
     return response;

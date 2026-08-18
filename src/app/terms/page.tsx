@@ -11,7 +11,7 @@ export default function TermsOfServicePage() {
     <div className="min-h-screen bg-black">
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <h1 className="text-4xl font-bold text-white mb-4">Terms of Service</h1>
-        <p className="text-gray-400 mb-12">Last updated: March 26, 2026</p>
+        <p className="text-gray-400 mb-12">Last updated: August 17, 2026</p>
 
         <div className="prose prose-lg prose-invert max-w-none">
           <h2>1. Acceptance of Terms</h2>
@@ -22,8 +22,11 @@ export default function TermsOfServicePage() {
 
           <h2>2. Description of Service</h2>
           <p>
-            KairosLearn is an AI-powered learning platform that provides interactive courses, AI voice tutoring,
-            and educational content across multiple domains including computer science, finance, philosophy, and more.
+            KairosLearn is an AI-powered college counseling platform. It helps students plan and manage
+            college applications — school lists, essays, activities, interviews, and financial aid — with
+            an AI counselor (Coach Kairos) available in 18 languages, and gives human counselors and
+            agencies a workspace to support their students on the same data. The platform also includes
+            a library of interactive courses and AI voice tutoring.
           </p>
 
           <h2>3. Accounts</h2>
@@ -37,20 +40,21 @@ export default function TermsOfServicePage() {
           <h2>4. Free and Pro Plans</h2>
           <h3>Free Plan</h3>
           <p>
-            Access to 28 free courses, limited AI coaching credits, and basic voice tutoring.
-            Free accounts may have usage limits that reset monthly.
+            Free forever for your first three schools, with limited AI coaching credits, free courses,
+            and basic voice tutoring. Free accounts may have usage limits that reset monthly.
           </p>
           <h3>Pro Plan ($12/month)</h3>
           <p>
-            Access to all 69+ courses, unlimited AI coaching, full voice tutoring in 17 languages,
-            and priority support. Billed monthly through Stripe. You may cancel at any time.
+            Unlimited schools, essays, voice sessions, languages, mock interviews, the full financial-aid
+            comparator, and access to all courses. New users get a free 7-day Pro trial with no card
+            required. Billed monthly through Stripe. You may cancel at any time.
           </p>
 
           <h2>5. Payments and Refunds</h2>
           <ul>
             <li>Pro subscriptions are billed monthly through Stripe</li>
             <li>You may cancel your subscription at any time — access continues until the end of your billing period</li>
-            <li>Refund requests within 7 days of initial purchase will be honored on a case-by-case basis</li>
+            <li>Cancel within 14 days of a charge for a full refund. After that, we don&apos;t offer mid-cycle refunds as standard, but if something is wrong, contact us and we&apos;ll work it out</li>
             <li>We reserve the right to change pricing with 30 days&apos; notice to existing subscribers</li>
           </ul>
 
@@ -72,15 +76,18 @@ export default function TermsOfServicePage() {
             or republish it without written permission.
           </p>
 
-          <h2>8. AI Tutoring Disclaimer</h2>
+          <h2>8. AI Counseling and Tutoring Disclaimer</h2>
           <p>
-            Our AI tutor (Coach Kairos) provides educational assistance based on AI models. While we strive for accuracy:
+            Our AI counselor (Coach Kairos) provides educational assistance based on AI models. While we strive for accuracy:
           </p>
           <ul>
-            <li>AI responses may occasionally contain errors</li>
-            <li>AI tutoring is not a substitute for professional instruction where required</li>
+            <li>AI responses may occasionally contain errors — always verify deadlines, requirements, and school-specific facts against official sources</li>
+            <li>AI counseling is not a substitute for professional instruction or licensed advice where required</li>
+            <li>Our AI does not write application essays for you — see our{' '}
+              <Link href="/integrity" className="text-[#D4AF37]">AI Integrity Policy</Link> for how essay
+              coaching works and your responsibilities under each college&apos;s AI-use rules</li>
             <li>Health and wellness course content is educational only — not medical advice</li>
-            <li>Financial course content is educational only — not financial advice</li>
+            <li>Financial and financial-aid content is educational only — not financial advice</li>
           </ul>
 
           <h2>9. Limitation of Liability</h2>

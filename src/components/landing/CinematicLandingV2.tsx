@@ -1925,7 +1925,10 @@ function Footer() {
             letterSpacing: ".10em",
           }}
         >
-          © 2026 KairosLearn · kairoslearn.com
+          © 2026 KairosLearn · kairoslearn.com · Built by{" "}
+          <Link href="/about" style={{ color: "inherit", textDecoration: "underline" }}>
+            Bilal Hussain
+          </Link>
         </span>
         <div
           style={{
@@ -1937,10 +1940,10 @@ function Footer() {
             letterSpacing: ".06em",
           }}
         >
-          <span>Privacy</span>
-          <span>Terms</span>
-          <span>Accessibility</span>
-          <span>kairos@kairoslearn.com</span>
+          <Link href="/privacy" style={{ color: "inherit" }}>Privacy</Link>
+          <Link href="/terms" style={{ color: "inherit" }}>Terms</Link>
+          <Link href="/integrity" style={{ color: "inherit" }}>AI Integrity</Link>
+          <a href="mailto:kairos@kairoslearn.com" style={{ color: "inherit" }}>kairos@kairoslearn.com</a>
         </div>
       </div>
     </footer>
