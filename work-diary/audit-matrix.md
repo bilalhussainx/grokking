@@ -1,0 +1,24 @@
+# Ten-student audit matrix
+
+All personas are synthetic. Emails use bilalhussain.v1+astra-testN@gmail.com (N = 1–10), owned by the founder. Passwords are not stored here. Do not claim a flow tested until it has DOM, network and screenshot evidence.
+
+| Persona | Stage | Scenario | Live state |
+|---|---|---|---|
+| test1 | Grade 9 | Toronto; explore robotics; early courses/activities | Signup/onboarding passed; invite manual revisit201; every sidebar landing captured; course persistence + major generation + coach response pass. Courses/majors survive new login. Synthetic PDF activity+honor import/edit/reload/new-login passes121; Coach sees activity count but cannot read details122. |
+| test2 | Grade 10 | Compare interests; sustained activities | Signup/onboarding + invite201; all sidebar landings captured; SAT quiz200 and school/summer/visit saves persisted. New-login SAT/summer/visit/school GETs200; Coach cannot read three saved logs120. Settings404; coach-auto-open issue. |
+| test3 | Grade 11 | US school list and testing plan | Signup/onboarding200 + code201; concerns ignored; recommender write/read failure diagnosed; blank essay + initial brainstorm200; shared landings043–054 captured. School list/settings not revisited for this persona. |
+| test4 | Grade 12 writing | Essays and counselor review request | Signup/onboarding200 + code201; blank essay created; Attach no-op; Toronto school saved; application in-progress persisted. Sidebar landings055–069 shown (067desktop loading shell; mobile settled). Coach cannot explain counselor access. Brainstorm notes persist across logout/login106-109; first recall denial followed by correct neutral recall. General Coach cannot access notes. Human feedback tested separately with qa-s1 and test9. |
+| test5 | Grade 12 submitted | Application status and follow-ups | Signup/onboarding200 + code201; Harvard school saved, RD/submitted persisted; submitted dashboard verified.070–073shown. Synthetic interview reflection/feedback persist across new login GET200; waitlist correctly empty. |
+| test6 | Grade 12 decisions | Aid offers and decision support | Signup/onboarding200 + code201; Yale accepted/MIT waitlisted saved; decisions dashboard and waitlist correct.074–077shown. Net-price live404; no offer-comparison UI verified. LOCI generation with blank fields enabled; not invoked. |
+| test7 | Transfer | Credits and transfer-specific next steps | UI signup/transfer onboarding2001728ms; code201705ms; school/32credits/Fall2027 saved,GPA3.50 lost. Sidebar078–090 shown (081loading replaced085). CommonApp essay/high-school courses mismatch; Coach incorrectly reports three saved fields missing; Settings404. |
+| test8 | Ontario grade 11 | Prerequisites and Canadian pathway | Created/onboarded; Canada/Ontario persists091; invite2011047ms. Coach recognizes region but assumes eligibility/undated claims095; dashboard/coursesUS-centric. Waterloo saved096 and tracker097; Settings404098. Coach reads new school099; corrected synthetic planning context100 recalled after logout/login103-104. Profile and own history persisted; no test9 context. |
+| test9 | Grade 12 | Assigned graduate counselor with head approval required | Signup/onboarding complete; code linked to supervised graduate201. Clean initial history101-102. Graduate roster only test9; other test file403. Draft comment hidden, head API publication delivered shipped comment, but live Brainstorm UI lacks review panel110-115. No head publish UI; review-state changes bypass requiresReview. |
+| test10 | Grade 12 | Separate/unassigned student; verify access boundaries | Created/onboarded; intentionally unlinked. Own history200count0. Foreign synthetic test4 essayGET404, feedbackGET404, qa-s1 counselor-fileGET403. Evidence test10-read-boundaries.json;105dashboard. These read denials do not prove counselor write/assignment boundaries. |
+
+## Agency flow acceptance
+- Discover counselor → express interest to a synthetic counselor → counselor issues code → student redeems → clear identity/relationship confirmation.
+- Head sees agency roster; graduate counselor only sees assigned students; head can assign student/task; approval-required feedback stays private until approved.
+- Student submits application/essay/document; counselor can find current version, leave anchored feedback, request changes; student resubmits; history and saved artifacts persist.
+- Document organization scales with filters/search/status/ownership. File access is private, tied to student and authorized agency membership, and tested against an unassigned user.
+- Chat is per relationship with unread state; notifications group changes, support quiet/digest settings and distinguish urgent deadline/review events from routine messages.
+- Existing code and proposed capabilities are separate. Never message Sir Jamal, Zuha or a real student during tests.
