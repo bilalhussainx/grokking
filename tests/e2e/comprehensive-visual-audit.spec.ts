@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 const BASE = 'https://grokking-delta.vercel.app';
 const DIR = 'tests/screenshots/comprehensive-audit';
@@ -6,7 +6,7 @@ const TEST_EMAIL = 'testuser789@test.com';
 const TEST_PASSWORD = 'AuditPro2026!';
 
 // Helper: login and return authenticated page
-async function login(page: any) {
+async function login(page: Page) {
   await page.goto(`${BASE}/login`);
   await page.waitForLoadState('networkidle');
   await page.fill('input[type="email"]', TEST_EMAIL);

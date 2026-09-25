@@ -26,9 +26,9 @@ interface AuthContextType {
   creditsLoaded: boolean;
   loading: boolean;
   isAnonymous: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: (nextPath?: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<{ error?: string }>;
-  signUpWithEmail: (email: string, password: string, name: string) => Promise<{ error?: string; confirmed?: boolean }>;
+  signUpWithEmail: (email: string, password: string, name: string, nextPath?: string) => Promise<{ error?: string; confirmed?: boolean }>;
   // Convert an existing anonymous user to a real account without losing data.
   // Flips is_anonymous=false on the same user_id so every cc_* row stays put.
   upgradeToRealUser: (params: { email: string; password: string; name: string }) => Promise<{ error?: string }>;
@@ -43,7 +43,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [credits, setCredits] = useState(0);
   const [creditsLoaded, setCreditsLoaded] = useState(false);
-  const [loading, setLoading] = useState(true);
   const signingOutRef = useRef(false);
   const ensureProfilePromiseRef = useRef<Promise<void> | null>(null);
 
@@ -53,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // site below null-checks; when supabase is null the provider behaves as
   // if no user is logged in — the rest of the app renders without crashing.
   const supabase = useMemo(() => createBrowserSupabase(), []);
+  const [loading, setLoading] = useState(() => supabase !== null);
 
   const fetchProfile = useCallback(async (userId: string) => {
     if (!supabase) return;
@@ -132,10 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Supabase env missing — finish loading immediately as logged-out.
     // The provider still mounts and renders children; just nobody is signed in.
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
+    if (!supabase) return;
     const initAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
@@ -219,14 +216,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // (env vars missing), surface a clear error instead of a stack trace.
   const noAuthError = { error: "Auth is not configured (Supabase env missing)." };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (nextPath?: string) => {
     if (!supabase) {
       console.warn(noAuthError.error);
       return;
     }
+    // Same as signUpWithEmail: carry an internal ?next= (e.g. counselor
+    // sign-up's /counselor/onboard) through to the OAuth callback.
+    const safeNext =
+      nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//") ? nextPath : null;
+    const redirectTo = `${window.location.origin}/auth/callback${
+      safeNext ? `?next=${encodeURIComponent(safeNext)}` : ""
+    }`;
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo },
     });
   };
 
@@ -237,14 +241,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {};
   };
 
-  const signUpWithEmail = async (email: string, password: string, name: string) => {
+  const signUpWithEmail = async (email: string, password: string, name: string, nextPath?: string) => {
     if (!supabase) return noAuthError;
     // Read referral cookie if present (set by /ref/[code] page)
     const refCode = document.cookie.match(/referral_code=([^;]+)/)?.[1] || undefined;
+    // Carry an internal ?next= through the email-confirmation link so counselor
+    // sign-ups (next=/counselor/onboard) don't get funneled into student
+    // onboarding after they confirm. Same-origin guard mirrors the signup page.
+    const safeNext =
+      nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//") ? nextPath : null;
+    const emailRedirectTo = `${window.location.origin}/auth/callback${
+      safeNext ? `?next=${encodeURIComponent(safeNext)}` : ""
+    }`;
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: name, referral_code: refCode } },
+      options: { data: { full_name: name, referral_code: refCode }, emailRedirectTo },
     });
 
     if (error) {

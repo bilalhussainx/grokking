@@ -18,7 +18,13 @@ const NAV_LINKS: { label: string; href: string }[] = [
 export default function MarketingShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [menu, setMenu] = useState({ pathname, open: false });
+  const open = menu.pathname === pathname && menu.open;
+
+  // Reset during render so navigation closes the menu before it is painted.
+  if (menu.pathname !== pathname) {
+    setMenu({ pathname, open: false });
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -26,9 +32,6 @@ export default function MarketingShell({ children }: { children: ReactNode }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  // Close mobile menu on route change.
-  useEffect(() => setOpen(false), [pathname]);
 
   return (
     <div className="kl-mkt">
@@ -68,7 +71,8 @@ export default function MarketingShell({ children }: { children: ReactNode }) {
           <button
             type="button"
             className="kl-mkt-burger"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => setMenu({ pathname, open: !open })}
+            aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}
           >
             {open ? <X size={20} /> : <Menu size={20} />}

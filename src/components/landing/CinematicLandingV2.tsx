@@ -891,9 +891,10 @@ function DemoVideo() {
     const node = containerRef.current;
     if (!node || hasEnteredView) return;
     if (typeof IntersectionObserver === "undefined") {
-      // Browsers without IO support: fall through to immediate mount.
-      setHasEnteredView(true);
-      return;
+      // Keep the no-IntersectionObserver fallback, but defer it so React does not
+      // synchronously schedule a second render from inside this effect.
+      const mountTimer = window.setTimeout(() => setHasEnteredView(true), 0);
+      return () => window.clearTimeout(mountTimer);
     }
     const obs = new IntersectionObserver(
       (entries) => {
