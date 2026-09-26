@@ -10,8 +10,55 @@ doesn't re-test what's recorded here. Newest work goes at the top.
 | 1 | Security holes (ownership and counselor review integrity) | **Done**: built, tested, live-verified, final review "ready to merge" (plans 1A and 1B). **Not deployed.** |
 | 2 | Broken saves and dead pages: recommenders don't show after saving, transfer GPA dropped, Settings and net-price 404, Outline generation 500 (from Astra's D1) | **Done**: built, tested, live-verified, final review fixes applied (`b21b5a1`). **Not deployed.** Settings and `/cc/net-price` were already fixed on this branch (`1da0d10`); production 404s until it deploys. |
 | 3 | Bug fixes from `docs/superpowers/plans/2026-08-17-essay-studio-roadmap.md` (Tasks 2-6; 7-11 go to Astra's D2/D4) | **Done**: `docs/superpowers/plans/2026-09-25-fix-3-august-bug-fixes.md`; built, tested, live-verified, final-review fix applied. **Not deployed.** |
-| 4 | Stripe and credits for the new prices (Free 200 credits; $15/month; $99/year) | Queued |
+| 4 | Stripe and credits for the new prices (Free 200 credits; $15/month; $99/year) | **Done in code**: `docs/superpowers/plans/2026-09-25-fix-4-stripe-credits-new-prices.md`; final-review fixes applied. **Not deployed; 3 migrations not applied; no Stripe prices created (no test key).** |
 | 5 | Competitor research, phone app (PWA), Ad Astra readiness, full testing of every student type | Queued |
+
+## Fix 4 — Stripe and credits for the new prices (2026-09-25)
+
+Founder decisions: Free 200 credits once at signup; Pro $15/month or $99/year,
+unlimited under fair use; 7-day trial; existing $12 subscribers move to $15 at
+their next renewal after notice; Claude creates only test-mode prices.
+
+- **One pricing module** (`src/lib/pricing.ts`). All copy reads from it, and a
+  tripwire fails on $12, 300 credits, "500 credits/month", "Renews monthly",
+  "no daily cap" and similar.
+- **Checkout** takes `interval: month | year`, never falls back to monthly,
+  and returns 409 (opening the billing portal) for anyone already
+  subscribed. The yearly plan shows only when
+  `NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_YEARLY` is set.
+- **Pro doesn't spend credits.** Fair use is the limit: 300 coach messages
+  and 120 voice minutes a day, env-tunable, returning a 429 with a clear
+  message. Before this, 29 routes charged Pro and nothing refilled credits.
+- **Signup:** 200 credits (the migration, plus ensure-profile, which had been
+  topping new users back up to 300) and a 7-day trial that actually ends
+  (`v_user_tier` treated `trialing` as Pro forever).
+- **Credit reservations** (`reserve/capture/release`) for the agent, with
+  idempotent keys, per-user lock ordering, and release-before-reserve
+  tombstones.
+- **Security:** a read-only production probe showed the public anon key can
+  execute the credit functions. `add_credits`/`deduct_credits` take any user
+  id, so anyone could mint up to 5000 credits for, or drain, any account.
+  The migration `20260925_lock_down_credit_rpcs.sql` revokes that; the
+  language refund routes now use the service role.
+- **Webhook:** billing-period dates now come from subscription items (Stripe's
+  current API); they were being stored as null.
+- **Scripts:**
+  - `scripts/stripe/create-test-prices.ts` refuses live keys.
+  - `scripts/stripe/migrate-pro-price.ts` is dry-run by default and needs
+    `--apply --expect=N --live`. It refuses price pairs whose interval,
+    product or currency differ, and skips scheduled subscriptions.
+  - Draft notice: `docs/handoff/pro-price-change-notice.md`.
+- Suite **587/587**, tsc 0, build 0. `/pricing` checked at 375px and 1440px.
+- **Founder actions before launch:**
+  1. Add `STRIPE_TEST_SECRET_KEY` so the test prices and a test checkout can run.
+  2. Create the live $15 and $99 prices and set both `NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_*` in Vercel.
+  3. Approve applying the three migrations. The credit-RPC lockdown is urgent.
+  4. Start Docker so the reservation SQL test can run.
+  5. Review the terms wording.
+  6. Send the notice, wait 30 days, then dry-run and apply the migration script.
+- Found, not fixed: the `/pricing` footer overflows 53px on phones; the
+  activities optimizer blocks Pro users with exactly 10 activities (off by
+  one); `/api/cron/*` uses a fragile `CRON_SECRET` comparison.
 
 ## Fix 3 — August bug fixes (2026-09-25)
 
