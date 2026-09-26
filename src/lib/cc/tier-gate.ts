@@ -46,6 +46,13 @@ export interface TierCaps {
 
 const UNLIMITED = Number.POSITIVE_INFINITY;
 
+// Pro is "unlimited" under fair use (founder, 2026-09-25): generous daily
+// caps that stop runaway or automated use, tunable without a deploy.
+function proFairUse(envName: string, fallback: number): number {
+  const n = Number(process.env[envName]);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
 export const TIER_CAPS: Record<Tier, TierCaps> = {
   guest: {
     schoolsMax: 3,
@@ -81,8 +88,8 @@ export const TIER_CAPS: Record<Tier, TierCaps> = {
   },
   pro: {
     schoolsMax: UNLIMITED,
-    coachMessagesPerDay: UNLIMITED,
-    coachVoiceMinutesPerDay: UNLIMITED,
+    coachMessagesPerDay: proFairUse("PRO_FAIR_USE_COACH_MESSAGES_PER_DAY", 300),
+    coachVoiceMinutesPerDay: proFairUse("PRO_FAIR_USE_VOICE_MINUTES_PER_DAY", 120),
     activityBulletsMax: 10, // Common App only has 10 slots — this is a hard cap regardless
     resumeParsesMax: UNLIMITED,
     essaysMax: UNLIMITED,
@@ -209,6 +216,9 @@ export async function assertCapacity(
 }
 
 function reasonFor(capability: Capability, tier: Tier): string {
+  if (tier === "pro") {
+    return "You've reached today's fair-use limit for this feature. It resets at midnight UTC.";
+  }
   const caps = TIER_CAPS[tier];
   const v = caps[capability];
   switch (capability) {
@@ -260,6 +270,19 @@ function reasonFor(capability: Capability, tier: Tier): string {
 // Lightweight helper for route handlers: run an assert and, on block, return
 // a Response with 402 + JSON payload the client can pass to UpgradeModal.
 export function blockedResponse(blocked: AssertBlocked): Response {
+  // A Pro user can't upgrade further: a fair-use limit is a 429, not a paywall.
+  if (blocked.tier === "pro") {
+    return new Response(
+      JSON.stringify({
+        error: blocked.reason,
+        fairUse: true,
+        capability: blocked.capability,
+        tier: blocked.tier,
+        limit: blocked.limit,
+      }),
+      { status: 429, headers: { "Content-Type": "application/json" } },
+    );
+  }
   return new Response(
     JSON.stringify({
       error: blocked.reason,
