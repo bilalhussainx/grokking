@@ -10,7 +10,7 @@
 //   500 — DB/infrastructure failure (mint path only)
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/supabase-auth";
-import { getAnyAgencyMembership } from "@/lib/cc/agency-membership";
+import { getAnyAgencyMembership, getAgencyMembership } from "@/lib/cc/agency-membership";
 import { mintInviteCode, listInviteCodes } from "@/lib/cc/invite-codes";
 
 export const runtime = "nodejs";
@@ -52,6 +52,18 @@ export async function POST(req: NextRequest) {
       { error: "maxUses must be an integer between 1 and 1000" },
       { status: 400 },
     );
+  }
+
+  // A code preassigned to someone outside this agency would link students to
+  // a counselor who can't see them. Only the agency's own members qualify.
+  if (body.preassignedCounselorUserId) {
+    const assignee = await getAgencyMembership(body.preassignedCounselorUserId, m.agencyId);
+    if (!assignee) {
+      return NextResponse.json(
+        { error: "preassigned counselor is not a member of your agency" },
+        { status: 400 },
+      );
+    }
   }
 
   try {
