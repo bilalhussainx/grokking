@@ -32,22 +32,11 @@ export async function POST(req: NextRequest) {
     .update({ user_id: user.id })
     .eq("id", session.id);
 
-  // Link the orphan profile created during intake completion
-  // Find profiles with no user_id that were created around the same session
-  const { data: orphanProfile } = await admin
-    .from("cc_student_profiles")
-    .select("id")
-    .is("user_id", null)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .single();
-
-  if (orphanProfile) {
-    await admin
-      .from("cc_student_profiles")
-      .update({ user_id: user.id })
-      .eq("id", orphanProfile.id);
-  }
+  // Deliberately no profile adoption here. The previous code linked "the
+  // newest profile with no user", which belongs to whichever anonymous
+  // student finished intake last: another student's data. Sessions don't
+  // record the profile they created, so a correct link needs a
+  // session→profile column first (tracked in docs/handoff).
 
   return NextResponse.json({ linked: true });
 }
