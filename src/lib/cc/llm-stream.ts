@@ -139,40 +139,73 @@ export async function streamLLM(
   return null;
 }
 
+// Extract one JSON object from model output: tolerates ```json fences and
+// leading/trailing prose; returns null for truncated or invalid JSON.
+export function extractJsonObject<T>(text: string): T | null {
+  const unfenced = text.replace(/^\s*```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "");
+  const start = unfenced.indexOf("{");
+  const end = unfenced.lastIndexOf("}");
+  if (start < 0 || end <= start) return null;
+  try {
+    return JSON.parse(unfenced.slice(start, end + 1)) as T;
+  } catch {
+    return null;
+  }
+}
+
+// One JSON-object completion. Retries once on transient failures (429/5xx,
+// network errors, unparseable output) and logs every failure reason; before
+// this, every failure became a silent null and a blank 500 upstream.
+// jsonMode asks the provider for a guaranteed JSON object; it's opt-in
+// because OpenAI rejects json_object mode when no message mentions JSON.
 export async function callLLMJSON<T>(
   messages: ChatMessage[],
-  opts?: { temperature?: number; maxTokens?: number }
+  opts?: { temperature?: number; maxTokens?: number; label?: string; jsonMode?: boolean }
 ): Promise<T | null> {
   const temp = opts?.temperature ?? 0.3;
   const maxTokens = opts?.maxTokens ?? 1500;
   const apiKey = OPENROUTER_API_KEY || MOONSHOT_API_KEY;
   const apiUrl = OPENROUTER_API_KEY ? OPENROUTER_URL : MOONSHOT_URL;
   const model = OPENROUTER_API_KEY ? "openai/gpt-4o-mini" : MOONSHOT_MODEL;
+  const tag = `[callLLMJSON${opts?.label ? `:${opts.label}` : ""}]`;
 
-  if (!apiKey) return null;
-
-  try {
-    const resp = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-        ...(OPENROUTER_API_KEY ? { "HTTP-Referer": "https://kairoslearn.com" } : {}),
-      },
-      body: JSON.stringify({
-        model,
-        messages,
-        temperature: temp,
-        max_tokens: maxTokens,
-      }),
-    });
-    if (!resp.ok) return null;
-    const data = await resp.json();
-    const text = data.choices?.[0]?.message?.content || "";
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
-    return JSON.parse(jsonMatch[0]) as T;
-  } catch {
+  if (!apiKey) {
+    console.error(`${tag} no LLM API key configured`);
     return null;
   }
+
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const resp = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+          ...(OPENROUTER_API_KEY ? { "HTTP-Referer": "https://kairoslearn.com" } : {}),
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          temperature: temp,
+          max_tokens: maxTokens,
+          ...(opts?.jsonMode && OPENROUTER_API_KEY ? { response_format: { type: "json_object" } } : {}),
+        }),
+      });
+      if (!resp.ok) {
+        console.error(`${tag} attempt ${attempt}: HTTP ${resp.status}`);
+        if (resp.status === 429 || resp.status >= 500) continue;
+        return null;
+      }
+      const data = await resp.json();
+      const text: string = data.choices?.[0]?.message?.content || "";
+      const parsed = extractJsonObject<T>(text);
+      if (parsed !== null) return parsed;
+      console.error(
+        `${tag} attempt ${attempt}: unparseable output (finish=${data.choices?.[0]?.finish_reason}, chars=${text.length})`,
+      );
+    } catch (err) {
+      console.error(`${tag} attempt ${attempt}: ${String(err).slice(0, 200)}`);
+    }
+  }
+  return null;
 }

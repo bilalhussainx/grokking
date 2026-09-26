@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, unauthorized, createAdminSupabase } from "../../../helpers";
 import { buildEssayContext, getOutlineSystemPrompt } from "@/lib/cc/essay-helpers";
 import { callLLMJSON, type ChatMessage } from "@/lib/cc/llm-stream";
-import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
+import { deductCredits, addCredits, CREDIT_COSTS } from "@/lib/credits";
 import { getOwnedEssay } from "@/lib/cc/ownership";
 
 export async function POST(
@@ -85,10 +85,19 @@ export async function POST(
   // varying budgets, which is chunkier than the old Hook/Development/
   // Reflection template. 4500 gives enough headroom so the third option
   // never truncates regardless of form mix.
-  const result = await callLLMJSON<{ outlines: unknown[] }>(messages, { maxTokens: 4500 });
+  const result = await callLLMJSON<{ outlines: unknown[] }>(messages, { maxTokens: 4500, label: "outline", jsonMode: true });
 
   if (!result?.outlines || !Array.isArray(result.outlines) || result.outlines.length === 0) {
-    return NextResponse.json({ error: "Failed to generate outlines" }, { status: 500 });
+    // The student was charged before the model call; don't keep the credit
+    // for a failed generation. callLLMJSON has already logged why it failed.
+    await addCredits(auth.user.id, CREDIT_COSTS.coach_text, "essay_outline_refund");
+    return NextResponse.json(
+      {
+        error: "Outline generation is temporarily unavailable. Your credit was refunded; please try again in a moment.",
+        retryable: true,
+      },
+      { status: 503 },
+    );
   }
 
   // If the model still returned fewer than 3 options, log so we can catch the
