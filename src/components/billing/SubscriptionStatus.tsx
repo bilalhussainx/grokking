@@ -1,4 +1,3 @@
-import { PRICING, proMonthlyLabel } from "@/lib/pricing";
 // src/components/billing/SubscriptionStatus.tsx
 // Shows current plan, status, next billing date, and a "Manage subscription"
 // button that opens the Stripe Billing Portal. Cancel / pause / resume /
@@ -6,6 +5,7 @@ import { PRICING, proMonthlyLabel } from "@/lib/pricing";
 // them so Stripe stays the source of truth and the webhook stays the only
 // path that mutates user_subscriptions.
 "use client";
+import { PRICING, proMonthlyLabel } from "@/lib/pricing";
 
 import { useState, useEffect, useCallback } from "react";
 import {

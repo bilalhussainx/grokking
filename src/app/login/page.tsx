@@ -1,6 +1,6 @@
-import { PRICING } from "@/lib/pricing";
 // src/app/login/page.tsx
 "use client";
+import { PRICING } from "@/lib/pricing";
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
