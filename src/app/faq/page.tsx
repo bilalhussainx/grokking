@@ -1,3 +1,4 @@
+import { proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { courses } from '@/data';
@@ -46,7 +47,7 @@ const FAQ_ITEMS = [
   {
     question: 'Is KairosLearn free? What does Pro cost?',
     answer:
-      'Free forever for your first three schools — school list, essays, and core tools included. Pro is $12/month and unlocks unlimited schools, essays, voice sessions, languages, mock interviews, and the full financial-aid comparator. New users get a free 7-day Pro trial with no card required, and you can cancel within 14 days of any charge for a full refund.',
+      `Free forever for your first three schools — school list, essays, and core tools included. Pro is ${proMonthlyLabel()} (or ${proYearlyLabel()}) and unlocks unlimited schools, essays, voice sessions, languages, mock interviews, and the full financial-aid comparator. New users get a free 7-day Pro trial with no card required, and you can cancel within 14 days of any charge for a full refund.`,
   },
   {
     question: 'What languages does KairosLearn support?',

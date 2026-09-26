@@ -1,3 +1,4 @@
+import { PRICING, proMonthlyLabel } from "@/lib/pricing";
 // src/components/billing/SubscriptionStatus.tsx
 // Shows current plan, status, next billing date, and a "Manage subscription"
 // button that opens the Stripe Billing Portal. Cancel / pause / resume /
@@ -124,7 +125,7 @@ export default function SubscriptionStatus() {
 
         {isPro && (
           <span className="text-2xl font-bold text-white">
-            $12<span className="text-sm text-white/40 font-normal">/mo</span>
+            ${PRICING.pro.monthlyUsd}<span className="text-sm text-white/40 font-normal">/mo</span>
           </span>
         )}
       </div>
@@ -173,7 +174,7 @@ export default function SubscriptionStatus() {
           className="block text-center py-3 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 text-white font-semibold text-sm hover:from-violet-400 hover:to-cyan-400 transition-all shadow-lg shadow-violet-500/25"
         >
           <Crown className="w-4 h-4 inline mr-2" />
-          Upgrade to Pro -- $12/mo
+          Upgrade to Pro -- {proMonthlyLabel()}
         </a>
       )}
     </div>

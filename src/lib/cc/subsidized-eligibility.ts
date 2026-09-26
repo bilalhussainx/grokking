@@ -1,3 +1,4 @@
+import { proMonthlyLabel } from "@/lib/pricing";
 import { createServerSupabase } from "@/lib/supabase-server";
 
 export interface EligibilityResult {
@@ -63,14 +64,14 @@ export async function checkSubsidizedEligibility(
   if (profile.is_first_gen) {
     return {
       eligible: false,
-      reason: "You're first-gen, but your income bracket doesn't qualify. Pro is $12/month with full access.",
+      reason: `You're first-gen, but your income bracket doesn't qualify. Pro is ${proMonthlyLabel()} with full access.`,
       missingFields: [],
     };
   }
 
   return {
     eligible: false,
-    reason: "Based on your profile, you don't currently qualify for subsidized Pro. Pro is $12/month.",
+    reason: `Based on your profile, you don't currently qualify for subsidized Pro. Pro is ${proMonthlyLabel()}.`,
     missingFields: [],
   };
 }

@@ -6,7 +6,7 @@
 //
 // Requires env:
 //   STRIPE_SECRET_KEY                          — server, never NEXT_PUBLIC
-//   NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY    — stripe price ID for Pro $12/mo
+//   NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY    — stripe price ID for Pro monthly (src/lib/pricing.ts)
 //   NEXT_PUBLIC_APP_ORIGIN (optional)          — if missing, derived from request
 
 import { NextRequest, NextResponse } from "next/server";
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         // No trial here. The free 7-day Pro trial is granted at signup
         // by the Supabase trigger (create_signup_pro_trial in migration
         // 013_align_pro_trial_to_7_days). Stripe Checkout is hit AFTER
-        // the trial expires, so we charge $12 immediately on subscribe.
+        // the trial expires, so we charge the Pro price immediately on subscribe.
       },
       allow_promotion_codes: true,
     });

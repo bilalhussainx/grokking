@@ -1,3 +1,4 @@
+import { PRICING } from "@/lib/pricing";
 // src/app/login/page.tsx
 "use client";
 
@@ -176,7 +177,7 @@ function LoginForm() {
             href={signupHref}
             className="block w-full py-2.5 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37] text-sm font-semibold hover:bg-[#D4AF37]/20 transition-all text-center"
           >
-            Get Started Free — 300 Credits
+            Get Started Free — {PRICING.free.signupCredits} Credits
           </Link>
 
           <div className="pt-3 mt-1 border-t border-white/10">

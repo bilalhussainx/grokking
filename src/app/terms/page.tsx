@@ -1,3 +1,4 @@
+import { proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
 import { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -43,7 +44,7 @@ export default function TermsOfServicePage() {
             Free forever for your first three schools, with limited AI coaching credits, free courses,
             and basic voice tutoring. Free accounts may have usage limits that reset monthly.
           </p>
-          <h3>Pro Plan ($12/month)</h3>
+          <h3>Pro Plan ({proMonthlyLabel()} or {proYearlyLabel()})</h3>
           <p>
             Unlimited schools, essays, voice sessions, languages, mock interviews, the full financial-aid
             comparator, and access to all courses. New users get a free 7-day Pro trial with no card

@@ -36,7 +36,7 @@ export async function deductCredits(
   }
 
   // If deduction returned false, the user_credits row may not exist yet
-  // (signup trigger failed). Create it with 300 credits and retry once.
+  // (signup trigger failed). Create it with the signup credits and retry once.
   if (data === false) {
     const { data: existingRow } = await db
       .from("user_credits")

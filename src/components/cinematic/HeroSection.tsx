@@ -1,4 +1,5 @@
 'use client'
+import { proMonthlyLabel } from "@/lib/pricing";
 
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
@@ -78,7 +79,7 @@ export default function HeroSection() {
         </h1>
 
         <p className={styles.sub} id="hs">
-          Essay brainstorming and drafting. Activities optimization. Mock interviews with Harvard, Yale, Stanford, and MIT alumni personas. School list building. Recommendation coaching. One platform, every piece of your application. $12/mo.
+          Essay brainstorming and drafting. Activities optimization. Mock interviews with Harvard, Yale, Stanford, and MIT alumni personas. School list building. Recommendation coaching. One platform, every piece of your application. {proMonthlyLabel()}.
         </p>
 
         <div className={styles.ctas} id="hc">

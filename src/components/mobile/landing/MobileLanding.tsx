@@ -1,4 +1,5 @@
 "use client";
+import { PRICING, proMonthlyLabel } from "@/lib/pricing";
 // Mobile-native landing page (single-column, 393×852 reference). Source:
 // docs/superpowers/designs/mobile/landing/landing.html. Per Plan T8, the
 // 8 handoff sections are kept as internal components in a single file —
@@ -10,9 +11,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Menu, ArrowRight, Sparkles, MessageSquare, Globe2, Heart, Compass } from "lucide-react";
 import MobileLandingMenu from "./MobileLandingMenu";
+import { COACH_LANGUAGES } from "@/lib/cc/coach-languages";
 
 const PIPELINE = [
-  { n: "01", title: "Intake in your language", body: "Answer in any of 18 languages — Urdu, Hindi, Spanish, English, and more. Coach Kairos remembers." },
+  { n: "01", title: "Intake in your language", body: `Choose from ${COACH_LANGUAGES.length} configured language options, including Urdu, Hindi, Spanish, and English. Coach Kairos carries your profile forward.` },
   { n: "02", title: "Build your school list", body: "Need-blind for internationals, need-aware that meets full need — surfaced by name." },
   { n: "03", title: "Draft essays with the coach", body: "Common App PS + supplements with prompt-aware feedback your counselor would give." },
   { n: "04", title: "Track every deadline", body: "EA, ED, REA, RD, FAFSA, CSS — one surface, multilingual reminders." },
@@ -120,9 +122,9 @@ export default function MobileLanding() {
               letterSpacing: "-0.01em",
             }}
           >
-            The college counselor that wealthy families pay{" "}
-            <em style={{ color: "#d4a84b", fontStyle: "italic" }}>$8,000</em>{" "}
-            for. Now free for everyone else.
+            College guidance that starts{" "}
+            <em style={{ color: "#d4a84b", fontStyle: "italic" }}>free</em>{" "}
+            and stays with you through every deadline.
           </h1>
           <p
             className="mb-8 leading-relaxed"
@@ -132,9 +134,8 @@ export default function MobileLanding() {
               maxWidth: 340,
             }}
           >
-            KairosLearn is an AI admissions counselor that knows your essays,
-            understands your finances, and will take your call at 11pm the
-            night before a deadline.
+            KairosLearn keeps your essays, school list, and financial-aid context
+            in one place, with guidance available beyond counselor office hours.
           </p>
           <div className="flex flex-col gap-3">
             <Link
@@ -395,7 +396,7 @@ export default function MobileLanding() {
             color: "#f2ede3",
           }}
         >
-          $12/month, or zero if you qualify.
+          {proMonthlyLabel()}, or zero if you qualify.
         </h2>
         <div className="space-y-4">
           {/* KairosLearn — recommended */}
@@ -440,7 +441,7 @@ export default function MobileLanding() {
                     fontFamily: "'JetBrains Mono', monospace",
                   }}
                 >
-                  $12
+                  ${PRICING.pro.monthlyUsd}
                 </span>
                 <span
                   className="text-[13px] ml-1"
@@ -453,7 +454,7 @@ export default function MobileLanding() {
                 className="text-[13px] leading-relaxed mb-5 space-y-1.5"
                 style={{ color: "rgba(242,237,227,.75)" }}
               >
-                <li>· Coach Kairos in 18 languages — Urdu, Hindi, Spanish, English…</li>
+                <li>· {COACH_LANGUAGES.length} configured language options — Urdu, Hindi, Spanish, English…</li>
                 <li>· Family Mode for non-English-speaking parents</li>
                 <li>· Need-blind and meets-need school filters</li>
                 <li>· Common App essay studio with prompt-aware feedback</li>

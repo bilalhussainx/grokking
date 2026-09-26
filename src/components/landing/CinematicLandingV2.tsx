@@ -1,4 +1,5 @@
 "use client";
+import { PRICING } from "@/lib/pricing";
 
 /**
  * 1:1 React port of docs/superpowers/designs/kairoslearn-design-system/project/landing/landing.jsx.
@@ -15,6 +16,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { Maximize2 } from "lucide-react";
+import { COACH_LANGUAGES } from "@/lib/cc/coach-languages";
 
 import "./cinematic-landing-mobile.css";
 
@@ -589,9 +591,9 @@ function Hero() {
               color: "#f2ede3",
             }}
           >
-            The college counselor that wealthy families pay{" "}
-            <em style={{ color: "#d4a84b", fontStyle: "italic" }}>$8,000</em>{" "}
-            for. Now free for everyone else.
+            College guidance that starts{" "}
+            <em style={{ color: "#d4a84b", fontStyle: "italic" }}>free</em>{" "}
+            and stays with you through every deadline.
           </h1>
           <p
             style={{
@@ -604,9 +606,8 @@ function Hero() {
               maxWidth: 560,
             }}
           >
-            KairosLearn is an AI admissions counselor that knows your essays,
-            understands your finances, and will take your call at 11pm the
-            night before a deadline.
+            KairosLearn keeps your essays, school list, and financial-aid context
+            in one place, with guidance available beyond counselor office hours.
           </p>
           <div style={{ marginTop: 42, display: "flex", gap: 14, alignItems: "center" }}>
             <Link
@@ -682,9 +683,9 @@ function Hero() {
               No credit card
             </span>
             <span>·</span>
-            <span>40+ languages</span>
+            <span>{COACH_LANGUAGES.length} configured language options</span>
             <span>·</span>
-            <span>120+ students in private beta</span>
+            <span>Student-written essays</span>
           </div>
         </div>
         {/* Right Coach demo */}
@@ -710,9 +711,9 @@ function ForgottenStudent() {
     },
     {
       tag: "First-gen",
-      title: "Hindi, Punjabi, <em>Español</em>.",
+      title: "Urdu, Hindi, <em>Español</em>.",
       copy:
-        "Voice coaching and essay feedback in the language you think in. Switch mid-sentence — your coach follows. 40+ languages, native-level.",
+        "Choose a configured language for coaching and feedback. Essay Studio interviews, structures, and critiques while you write every sentence.",
       chip: "हिंदी · ਪੰਜਾਬੀ · Español",
       glyph: "⟡",
     },
@@ -1100,7 +1101,7 @@ function Pipeline() {
     { n: "01", t: "Intake", sub: "5-minute profile", copy: "Grades, context, goals, need. Coach Kairos builds your profile once — every tool uses it forever." },
     { n: "02", t: "School List", sub: "Reach · Match · Safety", copy: "Chance any school in seconds. Balanced by the numbers, not the marketing." },
     { n: "03", t: "Essays", sub: "Personal + supplements", copy: "Brainstorm → outline → draft → revise. Real feedback at the paragraph level." },
-    { n: "04", t: "Interview", sub: "10 alumni AI personas", copy: "Harvard, Yale, Stanford, MIT, and more. In your language. Real-time pronunciation." },
+    { n: "04", t: "Interview", sub: "10 school-specific simulations", copy: "Harvard, Yale, Stanford, MIT, and more. Practice by voice or text, then review structured feedback." },
     { n: "05", t: "Financial Aid", sub: "$0 is the goal", copy: "Net price calculators, CSS Profile prep, scholarship matching. We fight for the number." },
   ];
   return (
@@ -1400,7 +1401,7 @@ function Testimonials() {
 function Pricing() {
   const kairosFeatures = [
     "Unlimited Coach Kairos — essays, schools, interviews",
-    "40+ languages, voice mode included",
+    `${COACH_LANGUAGES.length} configured language options`,
     "Full pipeline: intake → aid",
     "Chancing, net-price, scholarship match",
     "Always-on, 3 a.m. on a Saturday",
@@ -1450,7 +1451,7 @@ function Pricing() {
               letterSpacing: "-.01em",
             }}
           >
-            $12, or <em style={{ color: "#d4a84b", fontStyle: "italic" }}>$8,000.</em>
+            ${PRICING.pro.monthlyUsd}, or <em style={{ color: "#d4a84b", fontStyle: "italic" }}>$8,000.</em>
           </h2>
           <p
             style={{
@@ -1513,7 +1514,7 @@ function Pricing() {
                   letterSpacing: "-.02em",
                 }}
               >
-                $12
+                ${PRICING.pro.monthlyUsd}
               </div>
               <div
                 style={{

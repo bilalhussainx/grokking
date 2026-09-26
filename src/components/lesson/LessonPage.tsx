@@ -1,4 +1,5 @@
 "use client";
+import { proMonthlyLabel } from "@/lib/pricing";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
@@ -310,7 +311,7 @@ export default function LessonPage({
               href="/pricing"
               className="shrink-0 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold hover:from-amber-400 hover:to-orange-400 transition-all"
             >
-              Unlock all {previewBanner.totalLessons} lessons — $12/mo
+              Unlock all {previewBanner.totalLessons} lessons — {proMonthlyLabel()}
             </Link>
           </div>
         )}

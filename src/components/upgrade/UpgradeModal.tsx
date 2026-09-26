@@ -1,4 +1,5 @@
 "use client";
+import { proMonthlyLabel } from "@/lib/pricing";
 
 // Context-aware upgrade modal. Triggered by useFetchWithUpgrade when a gated
 // API route returns HTTP 402. Copy + CTA adapt per capability so the student
@@ -58,7 +59,7 @@ function copyFor(req: UpgradeRequest): Copy {
         ? {
             headline: "Unlock an unlimited school list",
             body: "Pro lets you track every reach, match, and safety you're considering — no cap.",
-            ctaLabel: "Upgrade to Pro — $12/mo",
+            ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
             bullets: proBullets,
           }
         : {
@@ -73,7 +74,7 @@ function copyFor(req: UpgradeRequest): Copy {
         ? {
             headline: "Unlimited chat with Coach Kairos",
             body: "Upgrade to Pro and keep the conversation going — no daily cap.",
-            ctaLabel: "Upgrade to Pro — $12/mo",
+            ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
             bullets: proBullets,
           }
         : {
@@ -88,7 +89,7 @@ function copyFor(req: UpgradeRequest): Copy {
         ? {
             headline: "Unlimited voice coaching",
             body: "Pro removes the 10-minute daily limit — useful for mock-interview prep or long essay debriefs.",
-            ctaLabel: "Upgrade to Pro — $12/mo",
+            ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
             bullets: proBullets,
           }
         : {
@@ -102,8 +103,8 @@ function copyFor(req: UpgradeRequest): Copy {
       return toPro
         ? {
             headline: "Unlock unlimited essay reviews",
-            body: "You just used your free review. Pro gives you unlimited reviews + all supplements for $12/mo — most students draft 20–30 essays across their list.",
-            ctaLabel: "Upgrade to Pro — $12/mo",
+            body: `You just used your free review. Pro gives you unlimited reviews + all supplements for ${proMonthlyLabel()} — most students draft 20–30 essays across their list.`,
+            ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
             bullets: proBullets,
           }
         : {
@@ -117,7 +118,7 @@ function copyFor(req: UpgradeRequest): Copy {
       return {
         headline: "Supplemental essays are a Pro feature",
         body: "Why-This-School, Why-This-Major, and other supplements live behind Pro. They're the essays that compound — 20–30 across a typical list.",
-        ctaLabel: "Upgrade to Pro — $12/mo",
+        ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
         bullets: proBullets,
       };
 
@@ -126,7 +127,7 @@ function copyFor(req: UpgradeRequest): Copy {
         ? {
             headline: "Draft every essay you need",
             body: "Pro gives you unlimited drafts — personal statement plus every supplement.",
-            ctaLabel: "Upgrade to Pro — $12/mo",
+            ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
             bullets: proBullets,
           }
         : {
@@ -141,7 +142,7 @@ function copyFor(req: UpgradeRequest): Copy {
         ? {
             headline: "Optimize all 10 activity slots",
             body: "Pro lets you polish every Common App bullet.",
-            ctaLabel: "Upgrade to Pro — $12/mo",
+            ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
             bullets: proBullets,
           }
         : {
@@ -156,7 +157,7 @@ function copyFor(req: UpgradeRequest): Copy {
         ? {
             headline: "Parse your resume again",
             body: "Pro lets you re-parse your resume whenever you update it.",
-            ctaLabel: "Upgrade to Pro — $12/mo",
+            ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
             bullets: proBullets,
           }
         : {
@@ -171,7 +172,7 @@ function copyFor(req: UpgradeRequest): Copy {
         ? {
             headline: "Unlimited mock interviews",
             body: "You used your free session. Pro gives you unlimited reps with per-school interviewer personas.",
-            ctaLabel: "Upgrade to Pro — $12/mo",
+            ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
             bullets: proBullets,
           }
         : {
@@ -185,7 +186,7 @@ function copyFor(req: UpgradeRequest): Copy {
       return {
         headline: "Share your progress with a counselor",
         body: "Counselor share links are a Pro feature — they show your full app package in one read-only page.",
-        ctaLabel: "Upgrade to Pro — $12/mo",
+        ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
         bullets: proBullets,
       };
 
@@ -193,7 +194,7 @@ function copyFor(req: UpgradeRequest): Copy {
       return {
         headline: "Appeal your financial aid package",
         body: "Pro generates a counselor-grade appeal letter for your admitted schools.",
-        ctaLabel: "Upgrade to Pro — $12/mo",
+        ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
         bullets: proBullets,
       };
 
@@ -201,7 +202,7 @@ function copyFor(req: UpgradeRequest): Copy {
       return {
         headline: "FAFSA walkthrough — Pro",
         body: "Line-by-line walkthrough of every FAFSA question, tailored to your situation.",
-        ctaLabel: "Upgrade to Pro — $12/mo",
+        ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
         bullets: proBullets,
       };
 
@@ -209,7 +210,7 @@ function copyFor(req: UpgradeRequest): Copy {
       return {
         headline: "Scholarship matching + alerts",
         body: "Pro matches you against 500+ scholarships and pings you when deadlines approach.",
-        ctaLabel: "Upgrade to Pro — $12/mo",
+        ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
         bullets: proBullets,
       };
 
@@ -217,7 +218,7 @@ function copyFor(req: UpgradeRequest): Copy {
       return {
         headline: "Upgrade to continue",
         body: req.reason ?? "Upgrade your account to unlock this feature.",
-        ctaLabel: toPro ? "Upgrade to Pro — $12/mo" : "Sign up free",
+        ctaLabel: toPro ? `Upgrade to Pro — ${proMonthlyLabel()}` : "Sign up free",
         bullets: toPro ? proBullets : freeBullets,
       };
   }

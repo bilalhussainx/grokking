@@ -1,3 +1,4 @@
+import { PRICING, proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, Minus } from "lucide-react";
@@ -8,7 +9,7 @@ import ProCheckoutButton from "@/components/marketing/ProCheckoutButton";
 export const metadata: Metadata = {
   title: "Pricing — KairosLearn",
   description:
-    "Free forever for the first three schools. Upgrade to Pro at $12 / month for unlimited everything — schools, essays, voice sessions, languages, mock interviews, and the full FAFSA + aid comparator.",
+    `Free forever for the first three schools. Upgrade to Pro at ${proMonthlyLabel()} (or ${proYearlyLabel()}) for unlimited everything — schools, essays, voice sessions, languages, mock interviews, and the full FAFSA + aid comparator.`,
 };
 
 type Row = {
@@ -264,7 +265,7 @@ export default function PricingPage() {
                   letterSpacing: "-.02em",
                 }}
               >
-                $12{" "}
+                ${PRICING.pro.monthlyUsd}{" "}
                 <span style={{ fontSize: 14, color: "rgba(242,237,227,.55)" }}>/ month</span>
               </div>
               <p
@@ -443,7 +444,7 @@ export default function PricingPage() {
       </section>
 
       <FinalCTA
-        headline="Try Pro for <em>one month</em>, free."
+        headline={`Try Pro for <em>${PRICING.pro.trialDays} days</em>, free.`}
         body="If it's not pulling its weight, cancel from settings. We don't email-trap you to keep the subscription."
         primaryLabel="Start Pro free"
       />
@@ -458,11 +459,11 @@ const FAQ_ITEMS = [
   },
   {
     q: "Is there really a free trial?",
-    a: "Yes. New users get a free 7-day Pro trial — no card required. After day 7, you'll be asked to subscribe at $12/month to keep Pro access. If you don't subscribe, your account stays usable on the free tier.",
+    a: `Yes. New users get a free 7-day Pro trial — no card required. After day 7, you'll be asked to subscribe at ${proMonthlyLabel()} (or ${proYearlyLabel()}) to keep Pro access. If you don't subscribe, your account stays usable on the free tier.`,
   },
   {
-    q: "Why $12 instead of free?",
-    a: "Voice sessions cost real money to run (Deepgram + Sarvam STT/TTS, OpenRouter LLM tokens). $12/mo covers infrastructure plus the team building this. We keep a meaningful free tier so cost isn't the barrier — but the model is built around the Pro flow.",
+    q: `Why $${PRICING.pro.monthlyUsd} instead of free?`,
+    a: `Voice sessions cost real money to run (Deepgram + Sarvam STT/TTS, OpenRouter LLM tokens). ${proMonthlyLabel()} covers infrastructure plus the team building this. We keep a meaningful free tier so cost isn't the barrier — but the model is built around the Pro flow.`,
   },
   {
     q: "Do you offer free Pro for low-income or first-gen students?",

@@ -4,7 +4,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Coins } from "lucide-react";
 
-// Per audit 2026-04-07: "Credits unclear: 300 credits shown but no
+// Per audit 2026-04-07: "Credits unclear: the signup credits shown but no
 // indication of burn rate." Native title attribute gives users an
 // instant tooltip on hover without adding any new dependency.
 const CREDIT_TOOLTIP =

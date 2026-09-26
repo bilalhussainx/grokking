@@ -1,4 +1,5 @@
 "use client";
+import { proMonthlyLabel } from "@/lib/pricing";
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -509,7 +510,7 @@ export default function HomePage() {
                 href="/pricing"
                 className="shrink-0 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold hover:from-amber-400 hover:to-orange-400 transition-all"
               >
-                Subscribe — $12/mo
+                Subscribe — {proMonthlyLabel()}
               </Link>
             </div>
           </motion.div>

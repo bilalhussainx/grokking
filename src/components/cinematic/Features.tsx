@@ -1,4 +1,5 @@
 'use client'
+import { PRICING, proMonthlyLabel } from "@/lib/pricing";
 
 import { motion, type Variants } from 'framer-motion'
 import Link from 'next/link'
@@ -251,7 +252,7 @@ function PipelineFlow() {
 
 function PricingTable() {
   const rows = [
-    { label: 'Monthly cost', school: '$0 (taxpayer funded)', private: '$8,000+', kairos: '$12' },
+    { label: 'Monthly cost', school: '$0 (taxpayer funded)', private: '$8,000+', kairos: `$${PRICING.pro.monthlyUsd}` },
     { label: 'Students served', school: '400 per counselor', private: '1 to 1', kairos: 'Unlimited access' },
     { label: 'Available at 11pm', school: 'No', private: 'No', kairos: 'Yes' },
     { label: 'Reads every essay draft', school: 'No', private: 'Sometimes', kairos: 'Always' },
@@ -468,11 +469,11 @@ And it speaks Hindi, Punjabi, and Urdu.`,
         </div>
       </Section>
 
-      {/* SECTION 4 — $12/month */}
+      {/* SECTION 4 — Pro price */}
       <Section>
         <EyebrowHeadline
           eyebrow="PRICING"
-          headline="What $12 a month"
+          headline={`What $${PRICING.pro.monthlyUsd} a month`}
           highlight="buys you."
         />
         <div style={{ maxWidth: 760, margin: '0 auto 40px', textAlign: 'center' }}>
@@ -508,7 +509,7 @@ And it speaks Hindi, Punjabi, and Urdu.`,
               fontStyle: 'italic',
             }}
           >
-            KairosLearn Pro: $12/month. All the tools a $50,000 counselor would use.
+            KairosLearn Pro: {proMonthlyLabel()}. All the tools a $50,000 counselor would use.
           </p>
         </div>
         <PricingTable />
