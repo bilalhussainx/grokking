@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, unauthorized, ensureStudentProfile } from "../../helpers";
 import { COACH_LANGUAGES } from "@/lib/cc/coach-languages";
+import { parseGpa } from "@/lib/cc/parse-gpa";
 
 const ALLOWED_LANGS = new Set(COACH_LANGUAGES.map((l) => l.code));
 const ALLOWED_CONCERNS = new Set(["deadlines", "aid", "essays", "activities", "interviews", "unsure"]);
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
 
   // Ensure profile row exists (lazy creation — same path /api/cc/profile/voice
   // uses).
-  await ensureStudentProfile(auth.supabase, auth.user);
+  const profile = await ensureStudentProfile(auth.supabase, auth.user);
 
   const cleanedConcerns = (body.concerns ?? [])
     .filter((c): c is string => typeof c === "string" && ALLOWED_CONCERNS.has(c))
@@ -93,9 +94,6 @@ export async function POST(req: NextRequest) {
       body.transfer?.creditsCompleted == null ? null : Number(body.transfer.creditsCompleted);
     update.transfer_target_term = body.transfer?.targetTerm?.trim() ?? null;
     update.transfer_reason = body.transfer?.reason?.trim() ?? null;
-    // GPA is stored on cc_academic_profiles separately; we skip persisting
-    // it from onboarding to avoid an extra round-trip. The student can fill
-    // it in on the /cc/courses page later.
   }
 
   const { error } = await auth.supabase
@@ -107,8 +105,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // A transfer applicant's college GPA is what transfer admissions weighs;
+  // onboarding asks for it, so keep it (previously it was discarded).
+  let gpaSaved = false;
+  const gpa = body.role === "tx" ? parseGpa(body.transfer?.gpa) : null;
+  if (gpa !== null) {
+    const { data: existing } = await auth.supabase
+      .from("cc_academic_profiles")
+      .select("id")
+      .eq("student_id", profile.id)
+      .limit(1)
+      .maybeSingle<{ id: string }>();
+    const { error: gpaError } = existing
+      ? await auth.supabase.from("cc_academic_profiles").update({ gpa_unweighted: gpa }).eq("id", existing.id)
+      : await auth.supabase.from("cc_academic_profiles").insert({ student_id: profile.id, gpa_unweighted: gpa, gpa_scale: "4.0" });
+    if (gpaError) console.error("[onboarding] transfer GPA save failed:", gpaError.message);
+    gpaSaved = !gpaError;
+  }
+
   return NextResponse.json({
     ok: true,
+    gpaSaved,
     profile: {
       language: body.language,
       grade: update.grade_level ?? null,
