@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabase } from "@/lib/supabase-auth";
 import { earnGems } from "@/lib/gems";
 import { LEAGUE_ORDER, type League } from "@/lib/leaderboard";
+import { hasAdminSecret } from "@/lib/admin-secret";
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET || "grokking-admin-2026";
 
 const PROMOTE_COUNT = 10;
 const DEMOTE_COUNT = 5;
@@ -23,7 +23,7 @@ const DEMOTE_COUNT = 5;
  *   - Create new league groups for the next week
  */
 export async function POST(req: NextRequest) {
-  if (req.headers.get("x-admin-secret") !== ADMIN_SECRET) {
+  if (!hasAdminSecret(req.headers.get("x-admin-secret"), "ADMIN_SECRET")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

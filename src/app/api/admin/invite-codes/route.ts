@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabase } from "@/lib/supabase-auth";
+import { hasAdminSecret } from "@/lib/admin-secret";
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET || "grokking-admin-2026";
 
 /**
  * POST /api/admin/invite-codes — Create invite codes (admin only)
@@ -10,7 +10,7 @@ const ADMIN_SECRET = process.env.ADMIN_SECRET || "grokking-admin-2026";
  * Requires: x-admin-secret header matching ADMIN_SECRET env var
  */
 export async function POST(req: NextRequest) {
-  if (req.headers.get("x-admin-secret") !== ADMIN_SECRET) {
+  if (!hasAdminSecret(req.headers.get("x-admin-secret"), "ADMIN_SECRET")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  if (req.headers.get("x-admin-secret") !== ADMIN_SECRET) {
+  if (!hasAdminSecret(req.headers.get("x-admin-secret"), "ADMIN_SECRET")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

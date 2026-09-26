@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateCourse } from "@/lib/course-generator";
+import { hasAdminSecret } from "@/lib/admin-secret";
 
 // Pre-defined institution courses to seed
 const SEED_COURSES = [
@@ -25,12 +26,9 @@ const SEED_COURSES = [
 ];
 
 export async function POST(req: Request) {
-  // Simple admin key check — in production use proper auth
   const url = new URL(req.url);
-  const adminKey = url.searchParams.get("key") || "";
-  const expectedKey = process.env.TEACHER_SECRET_KEY || "GROK-TEACH-2026";
-  if (adminKey !== expectedKey) {
-    return NextResponse.json({ error: "Unauthorized", hint: "Pass ?key=YOUR_TEACHER_SECRET_KEY" }, { status: 401 });
+  if (!hasAdminSecret(url.searchParams.get("key"), "TEACHER_SECRET_KEY")) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const results: { query: string; courseId?: string; error?: string }[] = [];
