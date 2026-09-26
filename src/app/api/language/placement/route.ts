@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-auth";
-import { deductCredits } from "@/lib/credits";
+import { deductCredits, addCredits } from "@/lib/credits";
 import { generateWithMoonshot } from "@/lib/voice-provider-router";
 import type { ProficiencyLevel } from "@/lib/language-personas";
 
@@ -84,11 +84,7 @@ export async function POST(req: NextRequest) {
 
   if (insertError) {
     // Refund credits on error
-    await supabase.rpc('add_credits', {
-      p_user_id: user.id,
-      p_amount: CREDIT_COST_PLACEMENT,
-      p_action: 'placement_test_refund',
-    });
+    await addCredits(user.id, CREDIT_COST_PLACEMENT, "placement_test_refund");
     
     return NextResponse.json(
       { error: "Failed to start placement test" },

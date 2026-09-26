@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-auth";
-import { deductCredits } from "@/lib/credits";
+import { deductCredits, addCredits } from "@/lib/credits";
 import { translate, generateWithMoonshot } from "@/lib/voice-provider-router";
 
 const CREDIT_COST_TRANSLATION = 1;
@@ -99,11 +99,7 @@ export async function POST(req: NextRequest) {
     console.error("[Translation] Error:", error);
     
     // Refund credits on error
-    await supabase.rpc('add_credits', {
-      p_user_id: user.id,
-      p_amount: CREDIT_COST_TRANSLATION,
-      p_action: 'translation_refund',
-    });
+    await addCredits(user.id, CREDIT_COST_TRANSLATION, "translation_refund");
     
     return NextResponse.json(
       { error: "Translation failed", details: String(error) },

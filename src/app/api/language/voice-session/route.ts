@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-auth";
-import { deductCredits } from "@/lib/credits";
+import { deductCredits, addCredits } from "@/lib/credits";
 import { getLanguagePersona, getDefaultPersona, type ProficiencyLevel } from "@/lib/language-personas";
 import { buildAgentContext, getConversationCheckpoint, buildResumeContext, updateConversationCheckpoint } from "@/lib/language-agent";
 import type { ConversationCheckpoint } from "@/data/language-types";
@@ -354,11 +354,7 @@ APPROACH:
 
     // Refund credits on error (authenticated users only)
     if (user) {
-      await supabase.rpc("add_credits", {
-        p_user_id: user.id,
-        p_amount: CREDIT_COST_VOICE_MINUTE,
-        p_action: "voice_session_refund",
-      });
+      await addCredits(user.id, CREDIT_COST_VOICE_MINUTE, "voice_session_refund");
     }
 
     return NextResponse.json(
