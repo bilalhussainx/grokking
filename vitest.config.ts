@@ -17,6 +17,11 @@ export default defineConfig({
     include: ["src/**/*.test.{ts,tsx}", "tests/unit/**/*.test.{ts,tsx}"],
     exclude: ["node_modules", ".next", "tests/e2e/**"],
     globals: false,
+    // Route tests import Next route modules (and their deps) on first use; with
+    // ~48 files transforming in parallel that first import alone can exceed the
+    // 5s default. Tests here are in-memory, so a longer ceiling only matters for
+    // a genuinely hung test.
+    testTimeout: 30_000,
     setupFiles: ["./vitest.setup.ts"],
   },
   resolve: {

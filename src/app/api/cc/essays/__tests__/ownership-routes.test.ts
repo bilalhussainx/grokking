@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { ALICE, ALICE_ESSAY, BOB, BOB_ESSAY, studentWorld } from "@/lib/cc/__tests__/helpers/fixtures";
 import type { FakeSupabase } from "@/lib/cc/__tests__/helpers/fake-supabase";
+import { PATCH as draftPATCH } from "../[id]/draft/route";
+import { POST as sharePOST } from "../[id]/share/route";
+import { POST as outlinePOST } from "../[id]/outline/route";
 
 const h = vi.hoisted(() => ({ world: null as unknown, user: null as string | null }));
 
@@ -32,24 +35,21 @@ beforeEach(() => {
 describe("PATCH /api/cc/essays/[id]/draft", () => {
   it("rejects another student's essay and leaves it unchanged", async () => {
     h.user = BOB;
-    const { PATCH } = await import("../[id]/draft/route");
-    const res = await PATCH(request("PATCH", ALICE_ESSAY, { content: "hijacked" }), ctx(ALICE_ESSAY));
+    const res = await draftPATCH(request("PATCH", ALICE_ESSAY, { content: "hijacked" }), ctx(ALICE_ESSAY));
     expect(res.status).toBe(404);
     expect(essay(ALICE_ESSAY).current_draft).toBe("Alice wrote this.");
   });
 
   it("saves the caller's own draft", async () => {
     h.user = ALICE;
-    const { PATCH } = await import("../[id]/draft/route");
-    const res = await PATCH(request("PATCH", ALICE_ESSAY, { content: "A better opening line" }), ctx(ALICE_ESSAY));
+    const res = await draftPATCH(request("PATCH", ALICE_ESSAY, { content: "A better opening line" }), ctx(ALICE_ESSAY));
     expect(res.status).toBe(200);
     expect(essay(ALICE_ESSAY).current_draft).toBe("A better opening line");
     expect(essay(ALICE_ESSAY).word_count).toBe(4);
   });
 
   it("returns 401 when signed out", async () => {
-    const { PATCH } = await import("../[id]/draft/route");
-    const res = await PATCH(request("PATCH", ALICE_ESSAY, { content: "x" }), ctx(ALICE_ESSAY));
+    const res = await draftPATCH(request("PATCH", ALICE_ESSAY, { content: "x" }), ctx(ALICE_ESSAY));
     expect(res.status).toBe(401);
   });
 });
@@ -57,24 +57,21 @@ describe("PATCH /api/cc/essays/[id]/draft", () => {
 describe("POST /api/cc/essays/[id]/share", () => {
   it("never reveals another student's existing share token", async () => {
     h.user = ALICE;
-    const { POST } = await import("../[id]/share/route");
-    const res = await POST(request("POST", BOB_ESSAY), ctx(BOB_ESSAY));
+    const res = await sharePOST(request("POST", BOB_ESSAY), ctx(BOB_ESSAY));
     expect(res.status).toBe(404);
     expect(await res.text()).not.toContain("bob-secret-token");
   });
 
   it("does not mint a token on another student's essay", async () => {
     h.user = BOB;
-    const { POST } = await import("../[id]/share/route");
-    const res = await POST(request("POST", ALICE_ESSAY), ctx(ALICE_ESSAY));
+    const res = await sharePOST(request("POST", ALICE_ESSAY), ctx(ALICE_ESSAY));
     expect(res.status).toBe(404);
     expect(essay(ALICE_ESSAY).share_token).toBeNull();
   });
 
   it("mints and stores a token for the owner", async () => {
     h.user = ALICE;
-    const { POST } = await import("../[id]/share/route");
-    const res = await POST(request("POST", ALICE_ESSAY), ctx(ALICE_ESSAY));
+    const res = await sharePOST(request("POST", ALICE_ESSAY), ctx(ALICE_ESSAY));
     const json = (await res.json()) as { share_token: string };
     expect(res.status).toBe(200);
     expect(json.share_token).toMatch(/^[0-9a-f]{32}$/);
@@ -87,8 +84,7 @@ describe("POST /api/cc/essays/[id]/outline (save)", () => {
 
   it("rejects saving onto another student's essay", async () => {
     h.user = BOB;
-    const { POST } = await import("../[id]/outline/route");
-    const res = await POST(request("POST", ALICE_ESSAY, { action: "save", outline }), ctx(ALICE_ESSAY));
+    const res = await outlinePOST(request("POST", ALICE_ESSAY, { action: "save", outline }), ctx(ALICE_ESSAY));
     expect(res.status).toBe(404);
     expect(essay(ALICE_ESSAY).outline_json).toBeNull();
     expect(world().tables.cc_essay_interactions).toHaveLength(0);
@@ -96,8 +92,7 @@ describe("POST /api/cc/essays/[id]/outline (save)", () => {
 
   it("saves the owner's outline and moves the essay to draft", async () => {
     h.user = ALICE;
-    const { POST } = await import("../[id]/outline/route");
-    const res = await POST(request("POST", ALICE_ESSAY, { action: "save", outline }), ctx(ALICE_ESSAY));
+    const res = await outlinePOST(request("POST", ALICE_ESSAY, { action: "save", outline }), ctx(ALICE_ESSAY));
     expect(res.status).toBe(200);
     expect(essay(ALICE_ESSAY).outline_json).toEqual(outline);
     expect(essay(ALICE_ESSAY).phase).toBe("draft");

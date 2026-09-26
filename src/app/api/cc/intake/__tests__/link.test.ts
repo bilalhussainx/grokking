@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { createFakeSupabase, type FakeSupabase } from "@/lib/cc/__tests__/helpers/fake-supabase";
+import { POST } from "../link/route";
 
 const h = vi.hoisted(() => ({ world: null as unknown, user: null as string | null }));
 
@@ -33,14 +34,12 @@ function post(body: unknown) {
 
 describe("POST /api/cc/intake/link", () => {
   it("links the session to the caller", async () => {
-    const { POST } = await import("../link/route");
     const res = await POST(post({ session_token: "tok-123" }));
     expect(res.status).toBe(200);
     expect((h.world as FakeSupabase).tables.cc_intake_sessions[0].user_id).toBe(CALLER);
   });
 
   it("never assigns another student's orphan profile to the caller", async () => {
-    const { POST } = await import("../link/route");
     await POST(post({ session_token: "tok-123" }));
     const stranger = (h.world as FakeSupabase).tables.cc_student_profiles.find((p) => p.id === STRANGER_PROFILE)!;
     expect(stranger.user_id).toBeNull();
