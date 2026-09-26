@@ -103,3 +103,15 @@ describe("POST /api/cc/recommenders/ask-email-text", () => {
     expect(row("cc_recommenders", ALICE_REC)!.ask_email_text).toBe("Dear teacher, would you write me a letter?");
   });
 });
+
+describe("duplicate profile rows", () => {
+  it("lets the caller delete a course that hangs off their second profile", async () => {
+    const DUP_PROFILE = "a11ce000-1111-4000-8000-0000000000d2";
+    const DUP_COURSE = "a11ce000-3333-4000-8000-0000000000d2";
+    world().tables.cc_student_profiles.push({ id: DUP_PROFILE, user_id: ALICE });
+    world().tables.cc_courses.push({ id: DUP_COURSE, student_id: DUP_PROFILE, course_name: "AP Physics" });
+    const res = await coursesDELETE(req("DELETE", `http://localhost/api/cc/courses?id=${DUP_COURSE}`));
+    expect(res.status).toBe(200);
+    expect(row("cc_courses", DUP_COURSE)).toBeUndefined();
+  });
+});

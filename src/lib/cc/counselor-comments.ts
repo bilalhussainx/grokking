@@ -46,16 +46,16 @@ export interface EssaySummary {
   openCommentCount: number;
 }
 
-// Resolve the profile-row id for an auth user. Returns null if no profile.
-async function profileIdForUser(studentUserId: string): Promise<string | null> {
+// Every profile-row id for an auth user. cc_student_profiles has no unique
+// user_id and some students have duplicate rows; their essays can hang off
+// any of them, so ownership checks accept all.
+async function profileIdsForUser(studentUserId: string): Promise<string[]> {
   const db = createAdminSupabase();
   const { data } = await db
     .from("cc_student_profiles")
     .select("id")
-    .eq("user_id", studentUserId)
-    .limit(1)
-    .maybeSingle<{ id: string }>();
-  return data?.id ?? null;
+    .eq("user_id", studentUserId);
+  return ((data ?? []) as { id: string }[]).map((r) => r.id);
 }
 
 // List a student's essays with review state + comment counts, for the
@@ -64,8 +64,8 @@ export async function listStudentEssays(
   studentUserId: string,
   opts: { agencyId?: string } = {},
 ): Promise<EssaySummary[]> {
-  const profileId = await profileIdForUser(studentUserId);
-  if (!profileId) return [];
+  const profileIds = await profileIdsForUser(studentUserId);
+  if (profileIds.length === 0) return [];
 
   const db = createAdminSupabase();
   const { data: essays } = await db
@@ -73,7 +73,7 @@ export async function listStudentEssays(
     .select(
       "id, essay_type, prompt_text, phase, word_count, updated_at, counselor_review_state, counselor_review_updated_at",
     )
-    .eq("student_id", profileId)
+    .in("student_id", profileIds)
     .order("updated_at", { ascending: false });
   const rows = essays ?? [];
   if (rows.length === 0) return [];
@@ -129,8 +129,8 @@ export async function getEssayForReview(
   essayId: string,
   opts: { onlyShipped?: boolean; agencyId?: string } = {},
 ): Promise<EssayDetail | null> {
-  const profileId = await profileIdForUser(studentUserId);
-  if (!profileId) return null;
+  const profileIds = await profileIdsForUser(studentUserId);
+  if (profileIds.length === 0) return null;
 
   const db = createAdminSupabase();
   const { data: essay } = await db
@@ -138,7 +138,7 @@ export async function getEssayForReview(
     .select("id, student_id, essay_type, prompt_text, word_limit, current_draft, word_count, counselor_review_state")
     .eq("id", essayId)
     .maybeSingle();
-  if (!essay || essay.student_id !== profileId) return null; // not this student's essay
+  if (!essay || !profileIds.includes(essay.student_id as string)) return null; // not this student's essay
 
   let q = db
     .from("cc_counselor_comments")
@@ -191,14 +191,14 @@ export async function essayBelongsToStudent(
   essayId: string,
 ): Promise<boolean> {
   if (!isUuid(essayId)) return false;
-  const profileId = await profileIdForUser(studentUserId);
-  if (!profileId) return false;
+  const profileIds = await profileIdsForUser(studentUserId);
+  if (profileIds.length === 0) return false;
   const db = createAdminSupabase();
   const { data } = await db
     .from("cc_essays")
     .select("id")
     .eq("id", essayId)
-    .eq("student_id", profileId)
+    .in("student_id", profileIds)
     .maybeSingle<{ id: string }>();
   return Boolean(data);
 }
@@ -246,15 +246,15 @@ export async function setEssayReviewState(
   essayId: string,
   state: "in_review" | "changes_requested" | "resubmitted" | "approved",
 ): Promise<boolean> {
-  const profileId = await profileIdForUser(studentUserId);
-  if (!profileId) return false;
+  const profileIds = await profileIdsForUser(studentUserId);
+  if (profileIds.length === 0) return false;
   const db = createAdminSupabase();
   const { data: essay } = await db
     .from("cc_essays")
     .select("id, student_id")
     .eq("id", essayId)
     .maybeSingle();
-  if (!essay || essay.student_id !== profileId) return false;
+  if (!essay || !profileIds.includes(essay.student_id as string)) return false;
   const { error } = await db
     .from("cc_essays")
     .update({ counselor_review_state: state, counselor_review_updated_at: new Date().toISOString() })

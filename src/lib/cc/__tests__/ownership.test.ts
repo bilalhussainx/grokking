@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getOwnedEssay, getStudentProfileId, isUuid } from "../ownership";
+import { getOwnedEssay, getStudentProfileId, getStudentProfileIds, isUuid } from "../ownership";
 import { ALICE, ALICE_ESSAY, ALICE_PROFILE, BOB, asDb, studentWorld } from "./helpers/fixtures";
 
 describe("isUuid", () => {
@@ -43,5 +43,23 @@ describe("getOwnedEssay", () => {
 
   it("returns null when the caller has no profile", async () => {
     expect(await getOwnedEssay(asDb(studentWorld()), "c0000000-0000-4000-8000-000000000003", ALICE_ESSAY)).toBeNull();
+  });
+});
+
+describe("duplicate profile rows (no unique user_id)", () => {
+  const DUP_PROFILE = "a11ce000-1111-4000-8000-0000000000d2";
+  const DUP_ESSAY = "a11ce000-2222-4000-8000-0000000000d2";
+
+  it("finds an essay that hangs off the caller's second profile", async () => {
+    const world = studentWorld();
+    world.tables.cc_student_profiles.push({ id: DUP_PROFILE, user_id: ALICE });
+    world.tables.cc_essays.push({ id: DUP_ESSAY, student_id: DUP_PROFILE, share_token: null });
+    expect(await getOwnedEssay(asDb(world), ALICE, DUP_ESSAY)).toEqual({ id: DUP_ESSAY, student_id: DUP_PROFILE, share_token: null });
+  });
+
+  it("returns every profile id the user owns", async () => {
+    const world = studentWorld();
+    world.tables.cc_student_profiles.push({ id: DUP_PROFILE, user_id: ALICE });
+    expect((await getStudentProfileIds(asDb(world), ALICE)).sort()).toEqual([ALICE_PROFILE, DUP_PROFILE].sort());
   });
 });

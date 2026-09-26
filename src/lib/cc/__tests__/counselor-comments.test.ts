@@ -88,3 +88,14 @@ describe("listStudentEssays", () => {
     expect(essay.openCommentCount).toBe(1);
   });
 });
+
+describe("duplicate profile rows", () => {
+  it("accepts a comment on an essay under the student's second profile", async () => {
+    const DUP_PROFILE = "a11ce000-1111-4000-8000-0000000000d2";
+    const DUP_ESSAY = "a11ce000-2222-4000-8000-0000000000d2";
+    world().tables.cc_student_profiles.push({ id: DUP_PROFILE, user_id: ALICE });
+    world().tables.cc_essays.push({ id: DUP_ESSAY, student_id: DUP_PROFILE, current_draft: "d" });
+    const id = await addEssayComment({ agencyId: AGENCY_A, studentUserId: ALICE, authorUserId: COUNSELOR, body: "ok", essayId: DUP_ESSAY });
+    expect(typeof id).toBe("string");
+  });
+});

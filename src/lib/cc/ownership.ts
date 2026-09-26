@@ -11,19 +11,23 @@ export function isUuid(value: unknown): value is string {
   return typeof value === "string" && UUID_RE.test(value);
 }
 
-// cc_student_profiles has no unique constraint on user_id, so take the
-// first row instead of letting maybeSingle() error on duplicates.
+// cc_student_profiles has no unique constraint on user_id, and some users
+// have duplicate rows. A student's data can hang off any of them, so
+// ownership checks must accept every profile the user owns.
+export async function getStudentProfileIds(
+  db: SupabaseClient,
+  userId: string,
+): Promise<string[]> {
+  const { data } = await db.from("cc_student_profiles").select("id").eq("user_id", userId);
+  return ((data ?? []) as { id: string }[]).map((r) => r.id);
+}
+
 export async function getStudentProfileId(
   db: SupabaseClient,
   userId: string,
 ): Promise<string | null> {
-  const { data } = await db
-    .from("cc_student_profiles")
-    .select("id")
-    .eq("user_id", userId)
-    .limit(1)
-    .maybeSingle<{ id: string }>();
-  return data?.id ?? null;
+  const ids = await getStudentProfileIds(db, userId);
+  return ids[0] ?? null;
 }
 
 export interface OwnedEssay {
@@ -39,13 +43,13 @@ export async function getOwnedEssay(
   essayId: string,
 ): Promise<OwnedEssay | null> {
   if (!isUuid(essayId)) return null;
-  const profileId = await getStudentProfileId(db, userId);
-  if (!profileId) return null;
+  const profileIds = await getStudentProfileIds(db, userId);
+  if (profileIds.length === 0) return null;
   const { data, error } = await db
     .from("cc_essays")
     .select("id, student_id, share_token")
     .eq("id", essayId)
-    .eq("student_id", profileId)
+    .in("student_id", profileIds)
     .maybeSingle<OwnedEssay>();
   if (error || !data) return null;
   return data;

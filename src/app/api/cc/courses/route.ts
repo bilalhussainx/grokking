@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, unauthorized, createAdminSupabase, ensureStudentProfile } from "../helpers";
-import { getStudentProfileId, isUuid } from "@/lib/cc/ownership";
+import { getStudentProfileIds, isUuid } from "@/lib/cc/ownership";
 
 export async function GET() {
   const auth = await requireAuth();
@@ -54,14 +54,14 @@ export async function DELETE(req: NextRequest) {
   if (!isUuid(id)) return notFound;
 
   const db = createAdminSupabase();
-  const profileId = await getStudentProfileId(db, auth.user.id);
-  if (!profileId) return notFound;
+  const profileIds = await getStudentProfileIds(db, auth.user.id);
+  if (profileIds.length === 0) return notFound;
 
   const { data: deleted, error } = await db
     .from("cc_courses")
     .delete()
     .eq("id", id)
-    .eq("student_id", profileId)
+    .in("student_id", profileIds)
     .select("id");
   if (error) return NextResponse.json({ error: "Delete failed" }, { status: 500 });
   if (!deleted || deleted.length === 0) return notFound;

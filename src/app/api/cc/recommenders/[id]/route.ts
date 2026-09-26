@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, unauthorized, createAdminSupabase } from "../../helpers";
-import { getStudentProfileId, isUuid } from "@/lib/cc/ownership";
+import { getStudentProfileIds, isUuid } from "@/lib/cc/ownership";
 
 const notFound = () => NextResponse.json({ error: "Recommender not found" }, { status: 404 });
 
@@ -35,14 +35,14 @@ export async function PATCH(
   if (!isUuid(id)) return notFound();
 
   const db = createAdminSupabase();
-  const profileId = await getStudentProfileId(db, auth.user.id);
-  if (!profileId) return notFound();
+  const profileIds = await getStudentProfileIds(db, auth.user.id);
+  if (profileIds.length === 0) return notFound();
 
   const { data: updated, error } = await db
     .from("cc_recommenders")
     .update(updates)
     .eq("id", id)
-    .eq("student_id", profileId)
+    .in("student_id", profileIds)
     .select("id");
 
   if (error) {
@@ -63,14 +63,14 @@ export async function DELETE(
   if (!isUuid(id)) return notFound();
 
   const db = createAdminSupabase();
-  const profileId = await getStudentProfileId(db, auth.user.id);
-  if (!profileId) return notFound();
+  const profileIds = await getStudentProfileIds(db, auth.user.id);
+  if (profileIds.length === 0) return notFound();
 
   const { data: deleted, error } = await db
     .from("cc_recommenders")
     .delete()
     .eq("id", id)
-    .eq("student_id", profileId)
+    .in("student_id", profileIds)
     .select("id");
 
   if (error) {
