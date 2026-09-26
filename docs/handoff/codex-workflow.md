@@ -2,6 +2,8 @@
 
 _Last updated 2026-09-26 by Claude Code. The founder runs this file; Astra doesn't need to read it._
 
+> **Updated 2026-09-26 (founder):** Codex does **only design and frontend implementation**: session B (the Daybreak + Table design system and surfaces, built on branch `design/daybreak`) and session D (brand craft). **Everything else is Claude's.** Session A is retired: Claude folds the D2-PLANS-2 fixes (`docs/handoff/astra-gate-d2-plans-2-response.md`) into the agent plans itself and executes them. Dashboard ops (Stripe, Vercel, Supabase SQL) run in the founder's Claude browser-extension session, using the `session-c-*` prompts.
+
 ## The split
 
 | Astra (Codex, GPT-6) | Claude Code |
