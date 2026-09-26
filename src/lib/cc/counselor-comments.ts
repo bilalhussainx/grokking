@@ -10,6 +10,16 @@
 // of the auth user id (student_user_id, from the roster), so every lookup
 // bridges auth-uid → cc_student_profiles.id → cc_essays.student_id.
 import { createAdminSupabase } from "@/lib/supabase-server";
+import { isUuid } from "./ownership";
+
+// Thrown when a comment targets an essay that isn't the named student's.
+// Callers map it to 404 so essay ids from other students can't be probed.
+export class EssayNotOwnedError extends Error {
+  constructor() {
+    super("essay does not belong to this student");
+    this.name = "EssayNotOwnedError";
+  }
+}
 
 export interface CounselorComment {
   id: string;
@@ -43,13 +53,17 @@ async function profileIdForUser(studentUserId: string): Promise<string | null> {
     .from("cc_student_profiles")
     .select("id")
     .eq("user_id", studentUserId)
+    .limit(1)
     .maybeSingle<{ id: string }>();
   return data?.id ?? null;
 }
 
 // List a student's essays with review state + comment counts, for the
 // counselor per-student view. studentUserId is the auth user id.
-export async function listStudentEssays(studentUserId: string): Promise<EssaySummary[]> {
+export async function listStudentEssays(
+  studentUserId: string,
+  opts: { agencyId?: string } = {},
+): Promise<EssaySummary[]> {
   const profileId = await profileIdForUser(studentUserId);
   if (!profileId) return [];
 
@@ -64,13 +78,16 @@ export async function listStudentEssays(studentUserId: string): Promise<EssaySum
   const rows = essays ?? [];
   if (rows.length === 0) return [];
 
-  // Comment counts per essay (one query, grouped client-side).
+  // Comment counts per essay (one query, grouped client-side). Counselor
+  // callers pass their agency so another agency's feedback never counts.
   const essayIds = rows.map((e) => e.id as string);
-  const { data: comments } = await db
+  let commentQuery = db
     .from("cc_counselor_comments")
     .select("artifact_id, status")
     .eq("artifact_type", "essay")
     .in("artifact_id", essayIds);
+  if (opts.agencyId) commentQuery = commentQuery.eq("agency_id", opts.agencyId);
+  const { data: comments } = await commentQuery;
   const shipped = new Map<string, number>();
   const open = new Map<string, number>();
   for (const c of comments ?? []) {
@@ -110,7 +127,7 @@ export interface EssayDetail {
 export async function getEssayForReview(
   studentUserId: string,
   essayId: string,
-  opts: { onlyShipped?: boolean } = {},
+  opts: { onlyShipped?: boolean; agencyId?: string } = {},
 ): Promise<EssayDetail | null> {
   const profileId = await profileIdForUser(studentUserId);
   if (!profileId) return null;
@@ -131,6 +148,7 @@ export async function getEssayForReview(
     .order("range_start", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: true });
   if (opts.onlyShipped) q = q.eq("status", "shipped");
+  if (opts.agencyId) q = q.eq("agency_id", opts.agencyId);
 
   const { data: comments } = await q;
   return {
@@ -167,7 +185,28 @@ export interface AddCommentInput {
   status?: "draft" | "shipped"; // counselors with requires_review default draft
 }
 
+// True only when essayId is one of this student's essays.
+export async function essayBelongsToStudent(
+  studentUserId: string,
+  essayId: string,
+): Promise<boolean> {
+  if (!isUuid(essayId)) return false;
+  const profileId = await profileIdForUser(studentUserId);
+  if (!profileId) return false;
+  const db = createAdminSupabase();
+  const { data } = await db
+    .from("cc_essays")
+    .select("id")
+    .eq("id", essayId)
+    .eq("student_id", profileId)
+    .maybeSingle<{ id: string }>();
+  return Boolean(data);
+}
+
 export async function addEssayComment(input: AddCommentInput): Promise<string> {
+  if (!(await essayBelongsToStudent(input.studentUserId, input.essayId))) {
+    throw new EssayNotOwnedError();
+  }
   const db = createAdminSupabase();
   const { data, error } = await db
     .from("cc_counselor_comments")
