@@ -45,3 +45,37 @@ describe("planPriceMigration", () => {
     ]);
   });
 });
+
+import { assertCompatiblePrices, type PriceLite } from "../../../scripts/stripe/price-migration";
+
+describe("assertCompatiblePrices", () => {
+  const monthly12: PriceLite = { id: "price_12", product: "prod_pro", currency: "usd", interval: "month", interval_count: 1 };
+  it("accepts a same-product, same-interval swap", () =>
+    expect(() => assertCompatiblePrices(monthly12, { ...monthly12, id: "price_15" })).not.toThrow());
+  it.each([
+    ["a yearly price (Stripe would reset the anchor and invoice now)", { interval: "year" as const }],
+    ["a different interval count", { interval_count: 3 }],
+    ["another currency", { currency: "eur" }],
+    ["another product", { product: "prod_other" }],
+  ])("refuses %s", (_label, over) =>
+    expect(() => assertCompatiblePrices(monthly12, { ...monthly12, id: "price_x", ...over })).toThrow());
+});
+
+describe("planPriceMigration skips scheduled changes", () => {
+  it("leaves subscriptions with a schedule or a scheduled cancellation alone", () => {
+    const plan = planPriceMigration(
+      [
+        { ...sub("s"), schedule: "sub_sched_1" },
+        { ...sub("c"), cancel_at: 1893456000 },
+        sub("ok"),
+      ],
+      ["price_12"],
+      "price_15",
+    );
+    expect(plan.updates.map((u) => u.subscriptionId)).toEqual(["ok"]);
+    expect(plan.skipped.map((s) => [s.subscriptionId, s.reason])).toEqual([
+      ["s", "has a subscription schedule"],
+      ["c", "cancellation scheduled"],
+    ]);
+  });
+});

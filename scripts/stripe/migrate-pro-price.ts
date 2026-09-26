@@ -11,7 +11,7 @@
 // (docs/handoff/pro-price-change-notice.md).
 import { config } from "dotenv";
 import Stripe from "stripe";
-import { assertKeyMode, planPriceMigration, type SubLite } from "./price-migration";
+import { assertCompatiblePrices, assertKeyMode, planPriceMigration, type PriceLite, type SubLite } from "./price-migration";
 
 config({ path: ".env.local", quiet: true });
 
@@ -28,6 +28,19 @@ async function main() {
   const mode = assertKeyMode(process.env.STRIPE_SECRET_KEY, process.argv.includes("--live"));
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+  const toLite = (p: Stripe.Price): PriceLite => {
+    if (!p.recurring) throw new Error(`${p.id} is not a recurring price`);
+    return {
+      id: p.id,
+      product: typeof p.product === "string" ? p.product : p.product.id,
+      currency: p.currency,
+      interval: p.recurring.interval,
+      interval_count: p.recurring.interval_count,
+    };
+  };
+  const newPrice = toLite(await stripe.prices.retrieve(newId));
+  for (const id of oldIds) assertCompatiblePrices(toLite(await stripe.prices.retrieve(id)), newPrice);
+
   const seen = new Map<string, SubLite>();
   for (const price of oldIds) {
     for await (const s of stripe.subscriptions.list({ status: "all", price, limit: 100 })) {
@@ -36,6 +49,8 @@ async function main() {
         status: s.status,
         cancel_at_period_end: s.cancel_at_period_end,
         items: s.items.data.map((i) => ({ id: i.id, price: i.price.id })),
+        schedule: typeof s.schedule === "string" ? s.schedule : (s.schedule?.id ?? null),
+        cancel_at: s.cancel_at ?? null,
       });
     }
   }
