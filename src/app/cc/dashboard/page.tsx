@@ -19,6 +19,7 @@ import {
 } from "./variants";
 import AdaptiveDashboardClientSwitch from "./AdaptiveDashboardClientSwitch";
 import AdaptiveDashboardLegacy from "./AdaptiveDashboardLegacy";
+import MyCounselorChip from "@/components/cc/MyCounselorChip";
 
 export const dynamic = "force-dynamic";
 
@@ -137,7 +138,7 @@ export default async function DashboardPage({
   // === v2 branch: client-side viewport switch picks Mobile vs Desktop;
   // both renderers self-fetch via /api/cc/dashboard/summary ===
   if (useV2) {
-    return <AdaptiveDashboardClientSwitch />;
+    return <><MyCounselorChip /><AdaptiveDashboardClientSwitch /></>;
   }
 
   // === Legacy branch: server-side data fetch + variant build, then prop-pass ===
@@ -344,5 +345,5 @@ export default async function DashboardPage({
   );
   const variant = buildVariant(variantKey, data);
 
-  return <AdaptiveDashboardLegacy data={data} variant={variant} variantKey={variantKey} />;
+  return <><MyCounselorChip /><AdaptiveDashboardLegacy data={data} variant={variant} variantKey={variantKey} /></>;
 }
