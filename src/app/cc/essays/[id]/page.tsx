@@ -309,7 +309,7 @@ function ReviseView({
 
   return (
     <div
-      className="kl-surface-app w-full"
+      className="kl-surface-app w-full kl-studio-shell"
       style={{ padding: "22px 28px", display: "flex", flexDirection: "column", gap: 18 }}
     >
       <div className="kl-phase-bar">
@@ -376,7 +376,7 @@ function ReviseView({
         </button>
       </div>
 
-      <div className="grid items-start gap-5" style={{ gridTemplateColumns: "1fr 400px" }}>
+      <div className="grid items-start gap-5 kl-studio-grid" style={{ gridTemplateColumns: "1fr 400px" }}>
         {/* Draft prose */}
         <div
           className="rounded-2xl overflow-y-auto"

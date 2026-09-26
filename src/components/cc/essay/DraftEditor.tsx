@@ -364,7 +364,7 @@ export default function DraftEditor({
   const reviewDisabled = wordCount < 100 || requestingReview;
 
   return (
-    <div className="kl-surface-app w-full" style={{ padding: "22px 28px", display: "flex", flexDirection: "column", gap: 18 }}>
+    <div className="kl-surface-app w-full kl-studio-shell" style={{ padding: "22px 28px", display: "flex", flexDirection: "column", gap: 18 }}>
       <PhaseBar nodes={phaseNodes} />
 
       <div className="kl-bs-subhead">
@@ -411,7 +411,7 @@ export default function DraftEditor({
 
       {/* 3-column grid: outline · editor · rail */}
       <div
-        className="grid items-start gap-5"
+        className="grid items-start gap-5 kl-studio-grid"
         style={{ gridTemplateColumns: outline ? "240px 1fr 380px" : "1fr 380px" }}
       >
         {outline && (

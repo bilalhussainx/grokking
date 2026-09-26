@@ -246,7 +246,7 @@ export default function OutlinePicker({
   // Pre-generation view
   if (!generated) {
     return (
-      <div className="kl-surface-app w-full" style={{ padding: "22px 28px", display: "flex", flexDirection: "column", gap: 18 }}>
+      <div className="kl-surface-app w-full kl-studio-shell" style={{ padding: "22px 28px", display: "flex", flexDirection: "column", gap: 18 }}>
         <PhaseBar nodes={phaseNodes} />
         <Subhead
           badge="Outline"
@@ -300,7 +300,7 @@ export default function OutlinePicker({
 
   // Post-generation view
   return (
-    <div className="kl-surface-app w-full" style={{ padding: "22px 28px", display: "flex", flexDirection: "column", gap: 18 }}>
+    <div className="kl-surface-app w-full kl-studio-shell" style={{ padding: "22px 28px", display: "flex", flexDirection: "column", gap: 18 }}>
       <PhaseBar nodes={phaseNodes} />
       <Subhead
         badge="Outline"
@@ -308,7 +308,7 @@ export default function OutlinePicker({
         sub="Each option takes your story somewhere different. Tap one, skim the sections, then refine with the coach or jump to drafting."
       />
 
-      <div className="grid items-start gap-5" style={{ gridTemplateColumns: "1fr 380px" }}>
+      <div className="grid items-start gap-5 kl-studio-grid" style={{ gridTemplateColumns: "1fr 380px" }}>
         {/* Left: outline options */}
         <div className="flex flex-col gap-4 min-w-0">
           <div ref={outlinesTopRef} />

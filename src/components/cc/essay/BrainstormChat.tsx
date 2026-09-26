@@ -614,7 +614,7 @@ export default function BrainstormChat({
   const showAwaitingRecovery = awaitingThemes && themes.length === 0 && !streaming;
 
   return (
-    <div className="kl-surface-app w-full" style={{ padding: "22px 28px", display: "flex", flexDirection: "column", gap: 18 }}>
+    <div className="kl-surface-app w-full kl-studio-shell" style={{ padding: "22px 28px", display: "flex", flexDirection: "column", gap: 18 }}>
       {/* Breadcrumb + autosave */}
       <div className="flex items-center gap-2.5 text-[12.5px] text-white/45">
         <span className="text-white/70 inline-flex items-center gap-1.5">Essay Studio</span>
@@ -725,7 +725,7 @@ export default function BrainstormChat({
       </div>
 
       {/* Two column: chat + right rail */}
-      <div className="grid items-start gap-5" style={{ gridTemplateColumns: "1fr 380px" }}>
+      <div className="grid items-start gap-5 kl-studio-grid" style={{ gridTemplateColumns: "1fr 380px" }}>
         <div className="flex flex-col gap-4 min-w-0">
           {voiceOn && voiceCheckPassed === false && langCode !== "ur" && (
             <VoiceQualityCheck
