@@ -1,5 +1,6 @@
 // src/lib/credits.ts
 import { createAdminSupabase } from "@/lib/supabase-auth";
+import { PRICING } from "@/lib/pricing";
 
 export const CREDIT_COSTS = {
   coach_text: 1,
@@ -48,7 +49,7 @@ export async function deductCredits(
       // Row doesn't exist — create it with signup bonus, then retry deduction
       await db.rpc("add_credits", {
         p_user_id: userId,
-        p_amount: 300,
+        p_amount: PRICING.free.signupCredits,
         p_action: "signup_bonus",
       });
       // Retry the deduction
