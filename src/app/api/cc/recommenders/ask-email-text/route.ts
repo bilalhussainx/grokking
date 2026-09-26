@@ -52,12 +52,13 @@ Write the ask email body.`;
   }
   email = email.trim();
 
-  // Save the latest generated email to the recommender row if id provided.
-  if (body.recommenderId) {
+  // Save the latest generated email to the caller's own recommender row.
+  if (body.recommenderId && profile) {
     await db
       .from("cc_recommenders")
       .update({ ask_email_text: email })
-      .eq("id", body.recommenderId);
+      .eq("id", body.recommenderId)
+      .eq("student_id", profile.id);
   }
 
   return NextResponse.json({ email });
