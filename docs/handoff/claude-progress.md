@@ -8,10 +8,39 @@ doesn't re-test what's recorded here. Newest work goes at the top.
 | # | Item | Status |
 |---|---|---|
 | 1 | Security holes (ownership and counselor review integrity) | **Done**: built, tested, live-verified, final review "ready to merge" (plans 1A and 1B). **Not deployed.** |
-| 2 | Broken saves and dead pages: recommenders don't show after saving, transfer GPA dropped, Settings and net-price 404, Outline generation 500 (from Astra's D1) | **In progress**: `docs/superpowers/plans/2026-09-25-fix-2-broken-saves-dead-pages.md` |
-| 3 | Bug fixes from `docs/superpowers/plans/2026-08-17-essay-studio-roadmap.md` (Tasks 2-11) | Queued |
+| 2 | Broken saves and dead pages: recommenders don't show after saving, transfer GPA dropped, Settings and net-price 404, Outline generation 500 (from Astra's D1) | **Done**: built, tested, live-verified, final review fixes applied (`b21b5a1`). **Not deployed.** Settings and `/cc/net-price` were already fixed on this branch (`1da0d10`); production 404s until it deploys. |
+| 3 | Bug fixes from `docs/superpowers/plans/2026-08-17-essay-studio-roadmap.md` (Tasks 2-6; 7-11 go to Astra's D2/D4) | **In progress**: re-verifying each bug against today's code |
 | 4 | Stripe and credits for the new prices (Free 200 credits; $15/month; $99/year) | Queued |
 | 5 | Competitor research, phone app (PWA), Ad Astra readiness, full testing of every student type | Queued |
+
+## Fix 2 — broken saves and dead pages (2026-09-25)
+
+- **Recommenders:** production has no `cc_recommenders.created_at`, so every
+  `order("created_at")` failed (42703) and callers showed an empty list.
+  - The student list orders by `name` and returns 500 on error.
+  - The page now says "Couldn't load your recommenders" with Retry instead of
+    "No recommenders yet", and keeps the form when a save fails.
+  - The parent/counselor **share link** had the same bug (always zero
+    recommenders); fixed the same way.
+  - POST saves `context_notes`.
+  - Live: POST then GET listed the new recommender with notes.
+- **Transfer GPA:** onboarding now saves it to `cc_academic_profiles`.
+  `parseGpa` accepts "3.5", "3.5/4.0" and "3,65" (0 < n ≤ 5); anything else
+  is ignored, never stored as a wrong number.
+- **Settings / net-price 404:** fixed on the branch in `1da0d10`. A test now
+  checks that every sidebar and palette link resolves to a real page.
+- **Outline 500:** doesn't reproduce locally. `callLLMJSON` retries once on
+  429/5xx/unparseable output and logs `[callLLMJSON:<label>] attempt N: ...`;
+  after deploy, the real production cause shows in Vercel logs as
+  `[callLLMJSON:outline]`. Outline asks for JSON mode, refunds the credit on
+  failure, and returns a retryable 503. `callLLMJSON` has 11 call sites; only
+  Outline uses JSON mode.
+- **QA-02 (ensure-profile 500):** not reproducible. A fresh signup on this
+  branch got 200 three times.
+- Suite **482/482**, tsc 0. Fresh final review (opus): 3 Important found and
+  fixed test-first; 6 minors deferred (refund wording, retry on truncation,
+  stale raw-GPA columns, 5.0-scale label, fake payload checks, no
+  context-notes field in the UI).
 
 ## Security 1A — student-data ownership
 
