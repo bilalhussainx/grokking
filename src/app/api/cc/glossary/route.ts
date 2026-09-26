@@ -14,7 +14,10 @@ export async function GET() {
     .order("term_display");
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    // Decorative and fetched on every page mount: a schema or seed problem
+    // must not 500 for every visitor. Log it and serve nothing.
+    console.error("[glossary] fetch failed:", error.message);
+    return NextResponse.json({ terms: [] });
   }
 
   return NextResponse.json({

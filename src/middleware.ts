@@ -36,6 +36,7 @@ const PUBLIC_PREFIXES = [
   "/api/call/",
   "/api/cc/intake/",
   "/api/cc/shared/",
+  "/api/cc/glossary", // read-only term definitions; GlossaryProvider mounts for guests too
   "/api/cc/guest/", // guest session audit endpoints — caller identifies self via cookie
   "/api/leads/",    // exit-intent lead capture (email-only, no auth)
   "/resume/",       // email resume link landing page — public by design
@@ -99,7 +100,7 @@ const PRO_ONLY_PREFIXES = [
   "/cc/share",
 ];
 
-function isPublicRoute(pathname: string): boolean {
+export function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.includes(pathname)) return true;
   if (PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return true;
 
