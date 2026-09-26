@@ -485,3 +485,12 @@
     justify-content: center;
   }
 }
+
+/* 375px: the footer links row didn't wrap and grid children kept their
+   min-content width, pushing the page 53px wider than the screen. Bug fix
+   only; the footer's design belongs to Codex D3. */
+@media (max-width: 640px) {
+  .kl-mkt-foot-inner > * { min-width: 0; }
+  .kl-mkt-foot-links { flex-wrap: wrap; row-gap: 10px; }
+  .kl-mkt-foot-brand { flex-wrap: wrap; }
+}
