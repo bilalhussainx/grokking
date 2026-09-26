@@ -19,9 +19,11 @@ import { Loader2 } from "lucide-react";
 export default function ProCheckoutButton({
   className = "",
   children,
+  interval = "month",
 }: {
   className?: string;
   children: ReactNode;
+  interval?: "month" | "year";
 }) {
   const { user } = useAuth();
   const router = useRouter();
@@ -39,6 +41,7 @@ export default function ProCheckoutButton({
       const res = await fetch("/api/billing/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interval }),
       });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));

@@ -1,4 +1,4 @@
-import { PRICING, proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
+import { PRICING, proMonthlyLabel, proYearlyLabel, yearlySavingsPct } from "@/lib/pricing";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, Minus } from "lucide-react";
@@ -268,6 +268,9 @@ export default function PricingPage() {
                 ${PRICING.pro.monthlyUsd}{" "}
                 <span style={{ fontSize: 14, color: "rgba(242,237,227,.55)" }}>/ month</span>
               </div>
+              <div style={{ marginTop: 6, fontSize: 13, color: "rgba(242,237,227,.7)", fontFamily: "'DM Sans', sans-serif" }}>
+                or {proYearlyLabel()} — save {yearlySavingsPct()}%
+              </div>
               <p
                 style={{
                   marginTop: 12,
@@ -297,7 +300,7 @@ export default function PricingPage() {
               {[
                 "Unlimited schools",
                 "Unlimited essay drafts + supplements",
-                "Unlimited voice sessions",
+                "Unlimited voice sessions (fair use)",
                 "18 languages incl. Hindi, Punjabi, French, Spanish",
                 "Unlimited mock interviews",
                 "Full FAFSA + aid comparator",
@@ -317,7 +320,10 @@ export default function PricingPage() {
               className="kl-mkt-cta-gold"
               // Override layout to fill the card width.
             >
-              Start Pro <ArrowRight size={14} />
+              Start Pro — {proMonthlyLabel()} <ArrowRight size={14} />
+            </ProCheckoutButton>
+            <ProCheckoutButton interval="year" className="kl-mkt-cta-gold">
+              Start Pro yearly — {proYearlyLabel()} <ArrowRight size={14} />
             </ProCheckoutButton>
             <p
               style={{
