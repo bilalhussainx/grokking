@@ -4,7 +4,7 @@
 // filter fails even if it calls .eq() with plausible-looking values.
 export type FakeRow = Record<string, unknown>;
 export type FakeTables = Record<string, FakeRow[]>;
-export type FakeResult = { data: unknown; error: { message: string } | null };
+export type FakeResult = { data: unknown; error: { message: string; code?: string } | null };
 type Mode = "select" | "insert" | "update" | "delete";
 
 export interface FakeSupabase {
@@ -20,11 +20,13 @@ export class FakeQuery implements PromiseLike<FakeResult> {
   private limitN: number | null = null;
   private singleMode: "single" | "maybe" | null = null;
   private columns: string[] | null = null;
+  private referenced: string[] = [];
 
   constructor(
     private readonly tables: FakeTables,
     private readonly table: string,
     private readonly nextId: () => string,
+    private readonly schema: string[] | null = null,
   ) {}
 
   select(columns?: string): this {
@@ -51,22 +53,27 @@ export class FakeQuery implements PromiseLike<FakeResult> {
     return this;
   }
   eq(col: string, val: unknown): this {
+    this.referenced.push(col);
     this.filters.push((r) => r[col] === val);
     return this;
   }
   neq(col: string, val: unknown): this {
+    this.referenced.push(col);
     this.filters.push((r) => r[col] !== val);
     return this;
   }
   in(col: string, vals: unknown[]): this {
+    this.referenced.push(col);
     this.filters.push((r) => vals.includes(r[col]));
     return this;
   }
   is(col: string, val: unknown): this {
+    this.referenced.push(col);
     this.filters.push((r) => (r[col] ?? null) === val);
     return this;
   }
-  order(_col: string, _opts?: unknown): this {
+  order(col: string, _opts?: unknown): this {
+    this.referenced.push(col);
     return this;
   }
   limit(n: number): this {
@@ -83,6 +90,16 @@ export class FakeQuery implements PromiseLike<FakeResult> {
   }
 
   private run(): FakeResult {
+    // Like PostgREST: naming a column the table doesn't have is an error
+    // (42703), not a silently ignored filter. Only enforced when a schema
+    // was supplied for the table.
+    if (this.schema) {
+      const schema = this.schema;
+      const unknown = [...this.referenced, ...(this.columns ?? [])].find((c) => !schema.includes(c));
+      if (unknown) {
+        return { data: null, error: { message: `column ${this.table}.${unknown} does not exist`, code: "42703" } };
+      }
+    }
     if (!this.tables[this.table]) this.tables[this.table] = [];
     const rows = this.tables[this.table];
     const matches = (r: FakeRow) => this.filters.every((f) => f(r));
@@ -127,9 +144,15 @@ export class FakeQuery implements PromiseLike<FakeResult> {
   }
 }
 
-export function createFakeSupabase(seed: FakeTables = {}): FakeSupabase {
+export function createFakeSupabase(
+  seed: FakeTables = {},
+  opts: { columns?: Record<string, string[]> } = {},
+): FakeSupabase {
   const tables: FakeTables = JSON.parse(JSON.stringify(seed)) as FakeTables;
   let n = 0;
   const nextId = () => `00000000-0000-4000-8000-${String(++n).padStart(12, "0")}`;
-  return { tables, from: (table: string) => new FakeQuery(tables, table, nextId) };
+  return {
+    tables,
+    from: (table: string) => new FakeQuery(tables, table, nextId, opts.columns?.[table] ?? null),
+  };
 }

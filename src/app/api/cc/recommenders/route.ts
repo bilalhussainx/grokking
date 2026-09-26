@@ -14,13 +14,20 @@ export async function GET() {
 
   if (!profile) return NextResponse.json({ recommenders: [] });
 
-  const { data } = await db
+  // cc_recommenders has no created_at in production (probed 2026-09-25);
+  // ordering by it errored and the list came back empty. Order by name, and
+  // report failures instead of masking them as "no recommenders".
+  const { data, error } = await db
     .from("cc_recommenders")
     .select("*")
     .eq("student_id", profile.id)
-    .order("created_at", { ascending: true });
+    .order("name", { ascending: true });
 
-  return NextResponse.json({ recommenders: data || [] });
+  if (error) {
+    console.error("[recommenders GET] query failed:", error.message);
+    return NextResponse.json({ error: "Could not load recommenders" }, { status: 500 });
+  }
+  return NextResponse.json({ recommenders: data ?? [] });
 }
 
 export async function POST(req: NextRequest) {
@@ -59,6 +66,7 @@ export async function POST(req: NextRequest) {
       subject: subject || null,
       email: email || null,
       recommender_type,
+      context_notes: context_notes || null,
       status: "considering",
     })
     .select()
