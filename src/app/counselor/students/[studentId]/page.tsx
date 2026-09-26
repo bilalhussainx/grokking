@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useCounselorRole } from "@/hooks/useCounselorRole";
+import { essayTypeLabel } from "@/lib/cc/essay-type-label";
 
 interface EssaySummary {
   id: string;
@@ -232,7 +233,7 @@ export default function StudentFilePage() {
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm text-white/90 truncate">
-                  {e.essayType || "Essay"}
+                  {essayTypeLabel(e.essayType)}
                 </span>
                 {e.reviewState && (
                   <span className={"text-[10px] px-1.5 py-0.5 rounded border shrink-0 " + (STATE_CLASS[e.reviewState] ?? "")}>
@@ -259,7 +260,7 @@ export default function StudentFilePage() {
           ) : (
             <div className="space-y-5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="kl-h2">{detail.essayType || "Essay"}</h2>
+                <h2 className="kl-h2">{essayTypeLabel(detail.essayType)}</h2>
                 {detail.reviewState && (
                   <span className={"text-xs px-2.5 py-1 rounded-xl border " + (STATE_CLASS[detail.reviewState] ?? "")}>
                     {STATE_LABEL[detail.reviewState]}

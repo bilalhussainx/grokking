@@ -266,7 +266,7 @@ export default function TeamPage() {
           </button>
         </form>
         <p className="kl-xs">
-          The person must already have a Samsara account — add them by the email they signed up with.
+          The person must already have a KairosLearn account — add them by the email they signed up with.
         </p>
       </section>
 
