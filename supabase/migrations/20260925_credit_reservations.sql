@@ -13,16 +13,20 @@ CREATE TABLE IF NOT EXISTS public.credit_reservations (
 ALTER TABLE public.credit_reservations ENABLE ROW LEVEL SECURITY;
 
 CREATE OR REPLACE FUNCTION public.reserve_credits(p_user_id uuid, p_key text, p_max int)
-RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 DECLARE r credit_reservations; bal int;
 BEGIN
   IF p_max < 0 THEN RETURN 'over_reservation'; END IF;
+  -- Take the per-user lock first: a concurrent replay of the same key waits
+  -- here, then finds the committed reservation below and returns 'ok'.
+  SELECT balance INTO bal FROM user_credits WHERE user_id = p_user_id FOR UPDATE;
   SELECT * INTO r FROM credit_reservations WHERE user_id = p_user_id AND operation_key = p_key FOR UPDATE;
   IF FOUND THEN
+    IF r.state = 'released' THEN RETURN 'already_released'; END IF;
+    IF r.state = 'captured' THEN RETURN 'already_captured'; END IF;
     IF r.max_credits <> p_max THEN RETURN 'reservation_conflict'; END IF;
-    RETURN CASE r.state WHEN 'reserved' THEN 'ok' WHEN 'captured' THEN 'already_captured' ELSE 'already_released' END;
+    RETURN 'ok';
   END IF;
-  SELECT balance INTO bal FROM user_credits WHERE user_id = p_user_id FOR UPDATE;
   IF bal IS NULL OR bal < p_max THEN RETURN 'insufficient_credits'; END IF;
   UPDATE user_credits SET balance = balance - p_max, updated_at = now() WHERE user_id = p_user_id;
   INSERT INTO credit_reservations (user_id, operation_key, max_credits, state) VALUES (p_user_id, p_key, p_max, 'reserved');
@@ -33,7 +37,7 @@ EXCEPTION WHEN unique_violation THEN
 END; $$;
 
 CREATE OR REPLACE FUNCTION public.capture_credits(p_user_id uuid, p_key text, p_final int)
-RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 DECLARE r credit_reservations;
 BEGIN
   SELECT * INTO r FROM credit_reservations WHERE user_id = p_user_id AND operation_key = p_key FOR UPDATE;
@@ -52,11 +56,17 @@ BEGIN
 END; $$;
 
 CREATE OR REPLACE FUNCTION public.release_credits(p_user_id uuid, p_key text)
-RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 DECLARE r credit_reservations;
 BEGIN
   SELECT * INTO r FROM credit_reservations WHERE user_id = p_user_id AND operation_key = p_key FOR UPDATE;
-  IF NOT FOUND THEN RETURN 'not_reserved'; END IF;
+  IF NOT FOUND THEN
+    -- Nothing was held (e.g. the operation ended before reserve ran). Record a
+    -- released tombstone so a late reserve for this key can't hold credits.
+    INSERT INTO credit_reservations (user_id, operation_key, max_credits, state)
+      VALUES (p_user_id, p_key, 0, 'released') ON CONFLICT DO NOTHING;
+    RETURN 'ok';
+  END IF;
   IF r.state = 'released' THEN RETURN 'ok'; END IF;
   IF r.state = 'captured' THEN RETURN 'already_captured'; END IF;
   UPDATE credit_reservations SET state = 'released', updated_at = now() WHERE user_id = p_user_id AND operation_key = p_key;
@@ -68,3 +78,4 @@ BEGIN
 END; $$;
 
 REVOKE ALL ON FUNCTION public.reserve_credits(uuid, text, int), public.capture_credits(uuid, text, int), public.release_credits(uuid, text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.reserve_credits(uuid, text, int), public.capture_credits(uuid, text, int), public.release_credits(uuid, text) TO service_role;

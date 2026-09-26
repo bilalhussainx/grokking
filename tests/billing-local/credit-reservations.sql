@@ -54,6 +54,7 @@ BEGIN
   ASSERT capture_credits(u, 'op-1', 2) = 'already_captured';
   ASSERT release_credits(u, 'op-1') = 'already_captured';
   ASSERT reserve_credits(u, 'op-1', 3) = 'already_captured';
+  ASSERT reserve_credits(u, 'op-1', 9) = 'already_captured', 'state wins over amount mismatch';
 
   ASSERT reserve_credits(u, 'op-2', 2) = 'ok';
   ASSERT capture_credits(u, 'op-2', 3) = 'over_reservation';
@@ -65,9 +66,11 @@ BEGIN
 
   ASSERT reserve_credits(u, 'op-3', 99) = 'insufficient_credits';
   ASSERT capture_credits(u, 'missing', 0) = 'not_reserved';
-  ASSERT release_credits(u, 'missing') = 'not_reserved';
+  ASSERT release_credits(u, 'early') = 'ok', 'release before reserve settles as nothing held';
+  ASSERT reserve_credits(u, 'early', 1) = 'already_released', 'a late reserve cannot hold credits';
+  SELECT balance INTO bal FROM user_credits WHERE user_id = u; ASSERT bal = 4, 'tombstone held nothing';
 
-  SELECT count(*) INTO n FROM credit_reservations WHERE user_id = u; ASSERT n = 2, 'op-3 left no row';
+  SELECT count(*) INTO n FROM credit_reservations WHERE user_id = u; ASSERT n = 3, 'op-1, op-2 and the early tombstone; op-3 left no row';
   SELECT coalesce(sum(amount), 0) INTO n FROM credit_txns WHERE user_id = u; ASSERT n = -1, 'ledger nets to the 1 captured credit';
   RAISE NOTICE 'credit_reservations: all assertions passed';
 END $$;
