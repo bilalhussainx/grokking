@@ -32,10 +32,13 @@ describe("credit RPC lockdown", () => {
     expect(offenders).toEqual([]);
   });
 
-  it("a migration revokes EXECUTE on the write functions from anon and authenticated", () => {
+  it("the migration drops the ambiguous 3-arg add_credits and revokes every overload from anon/authenticated", () => {
     const sql = fs.readFileSync("supabase/migrations/20260925_lock_down_credit_rpcs.sql", "utf8");
-    expect(sql).toMatch(/REVOKE EXECUTE ON FUNCTION public\.add_credits\(uuid, int, text\) FROM PUBLIC, anon, authenticated/i);
-    expect(sql).toMatch(/REVOKE EXECUTE ON FUNCTION public\.deduct_credits\(uuid, int, text, text\) FROM PUBLIC, anon, authenticated/i);
-    expect(sql).toMatch(/GRANT EXECUTE ON FUNCTION public\.add_credits\(uuid, int, text\) TO service_role/i);
+    // Production had add_credits(uuid,int,text) AND add_credits(uuid,int,text,text DEFAULT NULL):
+    // every 3-arg call was ambiguous (PGRST203) and failed.
+    expect(sql).toMatch(/DROP FUNCTION IF EXISTS public\.add_credits\(uuid, integer, text\);/);
+    expect(sql).toMatch(/proname IN \('add_credits', 'deduct_credits'\)/);
+    expect(sql).toMatch(/REVOKE EXECUTE ON FUNCTION %s FROM PUBLIC, anon, authenticated/);
+    expect(sql).toMatch(/GRANT EXECUTE ON FUNCTION %s TO service_role/);
   });
 });
