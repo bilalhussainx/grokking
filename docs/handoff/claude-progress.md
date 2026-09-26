@@ -9,9 +9,47 @@ doesn't re-test what's recorded here. Newest work goes at the top.
 |---|---|---|
 | 1 | Security holes (ownership and counselor review integrity) | **Done**: built, tested, live-verified, final review "ready to merge" (plans 1A and 1B). **Not deployed.** |
 | 2 | Broken saves and dead pages: recommenders don't show after saving, transfer GPA dropped, Settings and net-price 404, Outline generation 500 (from Astra's D1) | **Done**: built, tested, live-verified, final review fixes applied (`b21b5a1`). **Not deployed.** Settings and `/cc/net-price` were already fixed on this branch (`1da0d10`); production 404s until it deploys. |
-| 3 | Bug fixes from `docs/superpowers/plans/2026-08-17-essay-studio-roadmap.md` (Tasks 2-6; 7-11 go to Astra's D2/D4) | **In progress**: re-verifying each bug against today's code |
+| 3 | Bug fixes from `docs/superpowers/plans/2026-08-17-essay-studio-roadmap.md` (Tasks 2-6; 7-11 go to Astra's D2/D4) | **Done**: `docs/superpowers/plans/2026-09-25-fix-3-august-bug-fixes.md`; built, tested, live-verified, final-review fix applied. **Not deployed.** |
 | 4 | Stripe and credits for the new prices (Free 200 credits; $15/month; $99/year) | Queued |
 | 5 | Competitor research, phone app (PWA), Ad Astra readiness, full testing of every student type | Queued |
+
+## Fix 3 — August bug fixes (2026-09-25)
+
+Re-verified each August QA item against this branch. QA-01, 03 and 08 were
+already fixed; QA-02 (ensure-profile 500) doesn't reproduce. Fixed:
+
+- **Invite links survive sign-up (QA-23).** `/login`'s "Sign up" links and
+  both Google buttons now carry `?next=`, so a new student from
+  `/join/<code>` comes back to redeem it.
+- **Open redirect on `/login?next=` (new).** `next` went straight to
+  `window.location.assign`. `safeNextPath` now allows same-origin paths only,
+  including the tab/LF/CR bypass the final review found (`/%09/evil.com`).
+- **Students see their counselor (QA-05).** New `GET /api/cc/my-counselor`;
+  the join page says "You're linked to <name>" with a Continue button; the
+  dashboard shows "Your counselor: …". Live: qa-s1 sees "QA Counselor One ·
+  QA Test Agency".
+- **Counselors without an agency can create one (QA-04):** a create-workspace
+  card on `/counselor/dashboard`.
+- **Copy (QA-09):** readable essay-type labels on counselor screens; "Samsara
+  account" → "KairosLearn account".
+- **Glossary (QA-06):** public for guests; an error returns `{terms: []}`
+  instead of 500. **Production `cc_glossary` has 0 rows. Seeding it needs the
+  founder.**
+- **Essay Studio on phones (QA-07).** At 375px the Revise text measured 0px
+  wide and 93 elements overflowed. Now: text 309px, 0 overflow, no
+  overlapping columns in Revise/Draft/Outline; desktop unchanged. New
+  `.kl-studio-grid` / `.kl-studio-shell` and mobile `.kl-bs-subhead` /
+  `.kl-phase-bar` rules in `tokens.css`.
+- **Admin routes (security, found during verification).**
+  `/api/admin/{invite-codes,league-reset,seed-courses}` are public in
+  middleware and fell back to secrets committed in the repo when the env var
+  was unset. They now fail closed. **Founder:** confirm `ADMIN_SECRET` and
+  `TEACHER_SECRET_KEY` are set in Vercel (else these return 403/401), and
+  consider auditing `invite_codes` for rows nobody on the team created.
+- Suite **530/530**, tsc 0, build 0. Fresh final review (opus): 1 Critical
+  (the redirect bypass above) fixed test-first; 9 minors deferred.
+- Follow-up: `/api/cron/*` compares `Bearer ${CRON_SECRET ?? ""}`, which is
+  fragile if `CRON_SECRET` is unset. Carried to the next security pass.
 
 ## Fix 2 — broken saves and dead pages (2026-09-25)
 
