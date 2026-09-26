@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import fs from "node:fs";
 
 const h = vi.hoisted(() => ({ rpc: vi.fn() }));
+vi.mock("@/lib/cc/tier-gate", () => ({ getTier: async () => "free" }));
 vi.mock("@/lib/supabase-auth", () => ({
   createAdminSupabase: () => ({
     rpc: h.rpc,

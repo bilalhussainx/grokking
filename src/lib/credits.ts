@@ -1,6 +1,7 @@
 // src/lib/credits.ts
 import { createAdminSupabase } from "@/lib/supabase-auth";
 import { PRICING } from "@/lib/pricing";
+import { getTier } from "@/lib/cc/tier-gate";
 
 export const CREDIT_COSTS = {
   coach_text: 1,
@@ -24,6 +25,10 @@ export async function deductCredits(
   action: string,
   refId?: string
 ): Promise<boolean> {
+  // Pro is unlimited under fair use (founder, 2026-09-25): tier-gate's daily
+  // caps are the limit, and nothing refills credits, so Pro isn't charged.
+  if ((await getTier(userId)) === "pro") return true;
+
   const db = createAdminSupabase();
   const { data, error } = await db.rpc("deduct_credits", {
     p_user_id: userId,
