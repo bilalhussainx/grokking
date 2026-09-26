@@ -3,6 +3,7 @@ import { requireAuth, unauthorized, createAdminSupabase } from "../../../helpers
 import { buildEssayContext, getQuickCheckSystemPrompt } from "@/lib/cc/essay-helpers";
 import { streamLLM, type ChatMessage } from "@/lib/cc/llm-stream";
 import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
+import { getOwnedEssay } from "@/lib/cc/ownership";
 
 export async function PATCH(
   req: NextRequest,
@@ -21,6 +22,10 @@ export async function PATCH(
 
   const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
   const db = createAdminSupabase();
+  const owned = await getOwnedEssay(db, auth.user.id, id);
+  if (!owned) {
+    return NextResponse.json({ error: "Essay not found" }, { status: 404 });
+  }
 
   const { error } = await db
     .from("cc_essays")
@@ -30,7 +35,8 @@ export async function PATCH(
       phase: "draft",
       updated_at: new Date().toISOString(),
     })
-    .eq("id", id);
+    .eq("id", owned.id)
+    .eq("student_id", owned.student_id);
 
   if (error) {
     return NextResponse.json({ error: "Failed to save draft" }, { status: 500 });

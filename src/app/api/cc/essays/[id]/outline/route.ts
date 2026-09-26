@@ -3,6 +3,7 @@ import { requireAuth, unauthorized, createAdminSupabase } from "../../../helpers
 import { buildEssayContext, getOutlineSystemPrompt } from "@/lib/cc/essay-helpers";
 import { callLLMJSON, type ChatMessage } from "@/lib/cc/llm-stream";
 import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
+import { getOwnedEssay } from "@/lib/cc/ownership";
 
 export async function POST(
   req: NextRequest,
@@ -22,6 +23,11 @@ export async function POST(
   const db = createAdminSupabase();
 
   if (action === "save" && outline) {
+    const owned = await getOwnedEssay(db, auth.user.id, id);
+    if (!owned) {
+      return NextResponse.json({ error: "Essay not found" }, { status: 404 });
+    }
+
     const { error } = await db
       .from("cc_essays")
       .update({
@@ -29,14 +35,15 @@ export async function POST(
         phase: "draft",
         updated_at: new Date().toISOString(),
       })
-      .eq("id", id);
+      .eq("id", owned.id)
+      .eq("student_id", owned.student_id);
 
     if (error) {
       return NextResponse.json({ error: "Failed to save outline" }, { status: 500 });
     }
 
     await db.from("cc_essay_interactions").insert({
-      essay_id: id,
+      essay_id: owned.id,
       turn_type: "outline_save",
       content: JSON.stringify(outline),
     });
