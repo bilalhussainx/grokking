@@ -24,11 +24,13 @@ const post = (body: unknown) =>
     headers: { "Content-Type": "application/json" },
   });
 
-let mint: ReturnType<typeof vi.fn>;
+const newMint = () =>
+  vi.fn(async (..._args: unknown[]): Promise<unknown> => ({ code: "ADASTRA-K7M9P2" }));
+let mint = newMint();
 
 beforeEach(() => {
   h.members = new Set(["zuha"]);
-  mint = vi.fn(async () => ({ code: "ADASTRA-K7M9P2" }));
+  mint = newMint();
   h.mint = mint;
 });
 
