@@ -102,11 +102,14 @@ export async function GET(
   }
 
   if (sections.recommendations) {
-    const { data: recs } = await db
+    // cc_recommenders has no created_at in production; ordering by it errored
+    // and the section silently came back empty.
+    const { data: recs, error: recsError } = await db
       .from("cc_recommenders")
       .select("name, recommender_type, subject, status")
       .eq("student_id", studentId)
-      .order("created_at");
+      .order("name");
+    if (recsError) console.error("[shared] recommenders query failed:", recsError.message);
     result.recommendations = (recs || []).map((r) => ({
       name: r.name,
       recommenderType: r.recommender_type,

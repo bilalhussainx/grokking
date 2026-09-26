@@ -47,6 +47,8 @@ export default function RecommendersPage() {
   const [addEmail, setAddEmail] = useState("");
   const [addType, setAddType] = useState("Teacher");
   const [adding, setAdding] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
 
   const [activeRecId, setActiveRecId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"brag" | "email" | null>(null);
@@ -59,8 +61,14 @@ export default function RecommendersPage() {
 
   const loadRecs = () => {
     fetch("/api/cc/recommenders")
-      .then((r) => r.json())
-      .then((d) => setRecs(d.recommenders || []))
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const d = await r.json();
+        setRecs(d.recommenders || []);
+        setLoadError(false);
+      })
+      // A failed load must not look like "no recommenders yet".
+      .catch(() => setLoadError(true))
       .finally(() => setLoading(false));
   };
 
@@ -69,7 +77,8 @@ export default function RecommendersPage() {
   const handleAdd = async () => {
     if (!addName.trim()) return;
     setAdding(true);
-    await fetch("/api/cc/recommenders", {
+    setAddError(null);
+    const res = await fetch("/api/cc/recommenders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -78,9 +87,14 @@ export default function RecommendersPage() {
         email: addEmail || null,
         recommender_type: addType,
       }),
-    });
-    setAddName(""); setAddSubject(""); setAddEmail(""); setShowAdd(false);
+    }).catch(() => null);
     setAdding(false);
+    if (!res?.ok) {
+      // Keep what they typed so they can retry.
+      setAddError("Couldn't save this recommender. Please try again.");
+      return;
+    }
+    setAddName(""); setAddSubject(""); setAddEmail(""); setShowAdd(false);
     loadRecs();
   };
 
@@ -180,11 +194,22 @@ export default function RecommendersPage() {
           <button onClick={handleAdd} disabled={adding || !addName.trim()} className="px-5 py-2 rounded-xl bg-[#D4AF37] text-black text-sm font-semibold hover:bg-[#C4A030] disabled:opacity-40">
             {adding ? "Adding..." : "Add Recommender"}
           </button>
+          {addError && <p role="alert" className="text-sm text-red-400">{addError}</p>}
         </div>
       )}
 
       {/* Recommender list */}
-      {recs.length === 0 ? (
+      {loadError ? (
+        <div role="alert" className="text-center py-16">
+          <p className="text-sm text-white/60 mb-3">Couldn&apos;t load your recommenders.</p>
+          <button
+            onClick={() => { setLoading(true); loadRecs(); }}
+            className="px-4 py-2 rounded-xl border border-white/10 text-sm text-white/80 hover:bg-white/5"
+          >
+            Retry
+          </button>
+        </div>
+      ) : recs.length === 0 ? (
         <div className="text-center py-16">
           <UserCheck className="w-12 h-12 text-white/10 mx-auto mb-3" />
           <p className="text-sm text-white/30">No recommenders yet. Most students need 2-3.</p>
