@@ -8,7 +8,7 @@ import { Coins } from "lucide-react";
 // indication of burn rate." Native title attribute gives users an
 // instant tooltip on hover without adding any new dependency.
 const CREDIT_TOOLTIP =
-  "Credits power voice features. ~10/interview · ~3/min voice tutoring · text coach is free. Renews monthly.";
+  "Credits power voice features. ~10/interview · ~3/min voice tutoring · text coach is free. Free credits are a one-time signup grant; Pro doesn't use credits.";
 
 export default function CreditBadge() {
   const { credits, creditsLoaded, user } = useAuth();

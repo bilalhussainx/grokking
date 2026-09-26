@@ -73,7 +73,7 @@ function copyFor(req: UpgradeRequest): Copy {
       return toPro
         ? {
             headline: "Unlimited chat with Coach Kairos",
-            body: "Upgrade to Pro and keep the conversation going — no daily cap.",
+            body: "Upgrade to Pro and keep the conversation going — with a generous fair-use daily limit.",
             ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
             bullets: proBullets,
           }
@@ -88,7 +88,7 @@ function copyFor(req: UpgradeRequest): Copy {
       return toPro
         ? {
             headline: "Unlimited voice coaching",
-            body: "Pro removes the 10-minute daily limit — useful for mock-interview prep or long essay debriefs.",
+            body: "Pro raises the 10-minute daily limit to a generous fair-use allowance — useful for mock-interview prep or long essay debriefs.",
             ctaLabel: `Upgrade to Pro — ${proMonthlyLabel()}`,
             bullets: proBullets,
           }

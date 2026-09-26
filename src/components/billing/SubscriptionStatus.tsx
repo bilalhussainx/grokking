@@ -5,7 +5,7 @@
 // them so Stripe stays the source of truth and the webhook stays the only
 // path that mutates user_subscriptions.
 "use client";
-import { PRICING, proMonthlyLabel } from "@/lib/pricing";
+import { proMonthlyLabel } from "@/lib/pricing";
 
 import { useState, useEffect, useCallback } from "react";
 import {
@@ -123,11 +123,6 @@ export default function SubscriptionStatus() {
           </div>
         </div>
 
-        {isPro && (
-          <span className="text-2xl font-bold text-white">
-            ${PRICING.pro.monthlyUsd}<span className="text-sm text-white/40 font-normal">/mo</span>
-          </span>
-        )}
       </div>
 
       {/* Billing period */}

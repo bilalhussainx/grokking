@@ -1,4 +1,4 @@
-import { PRICING, proMonthlyLabel, proYearlyLabel, yearlySavingsPct } from "@/lib/pricing";
+import { PRICING, proMonthlyLabel, proYearlyLabel, yearlySavingsPct, yearlyCheckoutConfigured } from "@/lib/pricing";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, Minus } from "lucide-react";
@@ -21,7 +21,7 @@ type Row = {
 const COMPARE: Row[] = [
   { feature: "School list", free: "3 schools", pro: "Unlimited" },
   { feature: "Essay drafts", free: "1", pro: "Unlimited" },
-  { feature: "Voice sessions", free: "3 / month", pro: "Unlimited" },
+  { feature: "Voice sessions", free: "3 / month", pro: "Unlimited (fair use)" },
   { feature: "Languages", free: "English only", pro: "Hindi, Punjabi, French, Spanish + 14 more" },
   { feature: "Interview prep", free: "1 mock", pro: "Unlimited" },
   { feature: "Financial aid", free: "Basic", pro: "Full FAFSA + aid comparator" },
@@ -268,9 +268,11 @@ export default function PricingPage() {
                 ${PRICING.pro.monthlyUsd}{" "}
                 <span style={{ fontSize: 14, color: "rgba(242,237,227,.55)" }}>/ month</span>
               </div>
-              <div style={{ marginTop: 6, fontSize: 13, color: "rgba(242,237,227,.7)", fontFamily: "'DM Sans', sans-serif" }}>
-                or {proYearlyLabel()} — save {yearlySavingsPct()}%
-              </div>
+              {yearlyCheckoutConfigured() && (
+                <div style={{ marginTop: 6, fontSize: 13, color: "rgba(242,237,227,.7)", fontFamily: "'DM Sans', sans-serif" }}>
+                  or {proYearlyLabel()} — save {yearlySavingsPct()}%
+                </div>
+              )}
               <p
                 style={{
                   marginTop: 12,
@@ -322,9 +324,11 @@ export default function PricingPage() {
             >
               Start Pro — {proMonthlyLabel()} <ArrowRight size={14} />
             </ProCheckoutButton>
-            <ProCheckoutButton interval="year" className="kl-mkt-cta-gold">
-              Start Pro yearly — {proYearlyLabel()} <ArrowRight size={14} />
-            </ProCheckoutButton>
+            {yearlyCheckoutConfigured() && (
+              <ProCheckoutButton interval="year" className="kl-mkt-cta-gold">
+                Start Pro yearly — {proYearlyLabel()} <ArrowRight size={14} />
+              </ProCheckoutButton>
+            )}
             <p
               style={{
                 fontSize: 11.5,

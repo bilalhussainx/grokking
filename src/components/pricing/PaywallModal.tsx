@@ -20,7 +20,7 @@ const TRIGGER_MESSAGES = {
   },
   credits_depleted: {
     title: "You're out of credits",
-    subtitle: "Upgrade to Pro for 500 AI credits per month — coaching, hints, and interviews.",
+    subtitle: "Upgrade to Pro — coaching, hints and interviews without spending credits (fair use).",
     icon: Zap,
   },
   interview_locked: {
@@ -73,7 +73,7 @@ export default function PaywallModal({ courseTitle, trigger, onClose }: PaywallM
           <div className="grid grid-cols-2 gap-3 mb-8 text-left">
             {[
               { icon: BookOpen, text: "All 13+ courses" },
-              { icon: Zap, text: "500 credits/month" },
+              { icon: Zap, text: "No credits needed (fair use)" },
               { icon: Mic, text: "Voice coaching" },
               { icon: Award, text: "Certificates" },
             ].map(({ icon: FIcon, text }) => (

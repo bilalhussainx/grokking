@@ -48,12 +48,12 @@ export default function TermsOfServicePage() {
           <p>
             Unlimited schools, essays, voice sessions, languages, mock interviews, the full financial-aid
             comparator, and access to all courses. New users get a free 7-day Pro trial with no card
-            required. Billed monthly through Stripe. You may cancel at any time.
+            required. Billed monthly or yearly through Stripe. You may cancel at any time.
           </p>
 
           <h2>5. Payments and Refunds</h2>
           <ul>
-            <li>Pro subscriptions are billed monthly through Stripe</li>
+            <li>Pro subscriptions are billed monthly or yearly through Stripe</li>
             <li>You may cancel your subscription at any time — access continues until the end of your billing period</li>
             <li>Cancel within 14 days of a charge for a full refund. After that, we don&apos;t offer mid-cycle refunds as standard, but if something is wrong, contact us and we&apos;ll work it out</li>
             <li>We reserve the right to change pricing with 30 days&apos; notice to existing subscribers</li>

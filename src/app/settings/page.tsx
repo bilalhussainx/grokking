@@ -138,8 +138,8 @@ export default function SettingsPage() {
               {p.role === "pro" && p.trial_ends_at
                 ? `Free trial credits — expires ${new Date(p.trial_ends_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.`
                 : p.role === "pro"
-                ? "500 credits refresh monthly with your Pro subscription."
-                : "Upgrade to Pro for 500 credits/month."}
+                ? "Pro covers AI features without spending credits (fair-use daily limits apply)."
+                : "Free credits are a one-time signup grant. Pro covers AI features without credits."}
             </p>
             {p.role === "student" && (
               <Button className="mt-4 bg-violet-500 hover:bg-violet-600" asChild>
