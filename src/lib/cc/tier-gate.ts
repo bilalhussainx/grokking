@@ -48,6 +48,9 @@ const UNLIMITED = Number.POSITIVE_INFINITY;
 
 // Pro is "unlimited" under fair use (founder, 2026-09-25): generous daily
 // caps that stop runaway or automated use, tunable without a deploy.
+const DAILY_CAPS: ReadonlySet<Capability> = new Set(["coachMessagesPerDay", "coachVoiceMinutesPerDay"]);
+const isFairUseBlock = (tier: Tier, capability: Capability) => tier === "pro" && DAILY_CAPS.has(capability);
+
 function proFairUse(envName: string, fallback: number): number {
   const n = Number(process.env[envName]);
   return Number.isFinite(n) && n > 0 ? n : fallback;
@@ -216,7 +219,7 @@ export async function assertCapacity(
 }
 
 function reasonFor(capability: Capability, tier: Tier): string {
-  if (tier === "pro") {
+  if (isFairUseBlock(tier, capability)) {
     return "You've reached today's fair-use limit for this feature. It resets at midnight UTC.";
   }
   const caps = TIER_CAPS[tier];
@@ -270,8 +273,8 @@ function reasonFor(capability: Capability, tier: Tier): string {
 // Lightweight helper for route handlers: run an assert and, on block, return
 // a Response with 402 + JSON payload the client can pass to UpgradeModal.
 export function blockedResponse(blocked: AssertBlocked): Response {
-  // A Pro user can't upgrade further: a fair-use limit is a 429, not a paywall.
-  if (blocked.tier === "pro") {
+  // A Pro user can't upgrade further: a daily fair-use limit is a 429, not a paywall.
+  if (isFairUseBlock(blocked.tier, blocked.capability)) {
     return new Response(
       JSON.stringify({
         error: blocked.reason,

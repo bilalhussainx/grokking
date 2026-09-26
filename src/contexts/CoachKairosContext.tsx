@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
 import { useCoachVoice } from "@/hooks/useCoachVoice";
 import { DEFAULT_COACH_LANGUAGE } from "@/lib/cc/coach-languages";
+import { coachErrorMessage } from "@/lib/cc/coach-error-message";
 
 export interface CoachMessage {
   id: string;
@@ -299,10 +300,12 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
       });
 
       if (!res.ok || !res.body) {
+        const errorBody = res.ok ? null : await res.json().catch(() => null);
+        const content = coachErrorMessage(res.status, errorBody);
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMsg.id
-              ? { ...m, content: "Sorry, I had trouble responding. Try again?" }
+              ? { ...m, content }
               : m
           )
         );

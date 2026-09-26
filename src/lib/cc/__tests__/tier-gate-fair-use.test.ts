@@ -24,3 +24,14 @@ describe("Pro fair use", () => {
     expect(body.error).toMatch(/fair[- ]use/i);
   });
 });
+
+describe("fair use applies only to daily caps", () => {
+  it("a Pro block on a non-daily cap keeps its real reason and is not called fair use", async () => {
+    const r = await assertCapacity("u1", "activityBulletsMax", 10);
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.reason).not.toMatch(/fair[- ]use|resets/i);
+    const body = await blockedResponse(r).json();
+    expect(body.fairUse).toBeUndefined();
+  });
+});
