@@ -1,0 +1,611 @@
+[
+  {
+    "variant": "g9",
+    "viewport": "desktop",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "g9",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "g9",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "g9",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "redirect",
+    "detail": "landed on /cc/dashboard"
+  },
+  {
+    "variant": "g9",
+    "viewport": "desktop",
+    "page": "/cc/essays",
+    "kind": "redirect",
+    "detail": "landed on /cc/dashboard"
+  },
+  {
+    "variant": "g9",
+    "viewport": "desktop",
+    "page": "/cc/recommenders",
+    "kind": "redirect",
+    "detail": "landed on /cc/dashboard"
+  },
+  {
+    "variant": "g9",
+    "viewport": "desktop",
+    "page": "/cc/interview-prep",
+    "kind": "redirect",
+    "detail": "landed on /cc/dashboard"
+  },
+  {
+    "variant": "g10",
+    "viewport": "desktop",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "g10",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "g10",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "g10",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "g10",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "junior",
+    "viewport": "desktop",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "junior",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "junior",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "junior",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "junior",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-writing",
+    "viewport": "desktop",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "senior-writing",
+    "viewport": "desktop",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "senior-writing",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-writing",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-writing",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-writing",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-post-submit",
+    "viewport": "desktop",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "senior-post-submit",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-post-submit",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-post-submit",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-post-submit",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-decisions",
+    "viewport": "desktop",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "senior-decisions",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-decisions",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-decisions",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-decisions",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "transfer",
+    "viewport": "desktop",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "transfer",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "transfer",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "transfer",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "transfer",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "unknown",
+    "viewport": "desktop",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "unknown",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "unknown",
+    "viewport": "desktop",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "unknown",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "unknown",
+    "viewport": "desktop",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "g9",
+    "viewport": "phone",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "g9",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "g9",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "g9",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "g9",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "redirect",
+    "detail": "landed on /cc/dashboard"
+  },
+  {
+    "variant": "g9",
+    "viewport": "phone",
+    "page": "/cc/essays",
+    "kind": "redirect",
+    "detail": "landed on /cc/dashboard"
+  },
+  {
+    "variant": "g9",
+    "viewport": "phone",
+    "page": "/cc/recommenders",
+    "kind": "redirect",
+    "detail": "landed on /cc/dashboard"
+  },
+  {
+    "variant": "g9",
+    "viewport": "phone",
+    "page": "/cc/interview-prep",
+    "kind": "redirect",
+    "detail": "landed on /cc/dashboard"
+  },
+  {
+    "variant": "g10",
+    "viewport": "phone",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "g10",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "g10",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "g10",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "g10",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "junior",
+    "viewport": "phone",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "junior",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "junior",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "junior",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "junior",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-writing",
+    "viewport": "phone",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "senior-writing",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-writing",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-writing",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-writing",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-post-submit",
+    "viewport": "phone",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "senior-post-submit",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-post-submit",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-post-submit",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-post-submit",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-decisions",
+    "viewport": "phone",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "senior-decisions",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-decisions",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "senior-decisions",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "senior-decisions",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "transfer",
+    "viewport": "phone",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "transfer",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "transfer",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "transfer",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "transfer",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "unknown",
+    "viewport": "phone",
+    "page": "/cc/dashboard",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  },
+  {
+    "variant": "unknown",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "unknown",
+    "viewport": "phone",
+    "page": "/schools",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "unknown",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "api",
+    "detail": "404 GET /api/cc/me"
+  },
+  {
+    "variant": "unknown",
+    "viewport": "phone",
+    "page": "/applications",
+    "kind": "console",
+    "detail": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "variant": "unknown",
+    "viewport": "phone",
+    "page": "/settings",
+    "kind": "console",
+    "detail": "Error checking Cross-Origin-Opener-Policy: Failed to fetch"
+  }
+]

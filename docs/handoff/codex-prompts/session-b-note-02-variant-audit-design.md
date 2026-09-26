@@ -1,6 +1,6 @@
 **NOTE FOR D4, from Claude's every-student-type audit (2026-09-26). Paste into session B. Fold it into the relevant D4 gates in the new warm design system; no separate gate.**
 
-Evidence: `docs/qa/2026-09-26-student-variant-audit.md`. Screenshots are in `tests/e2e/test-results/student-variants/` (`<viewport>-<variant>_<page>.png`, all 8 variants × 9 pages at 375 and 1440). Please look at them. It's the fastest way to see what each student type actually gets today.
+Evidence: `docs/qa/2026-09-26-student-variant-audit.md`. Screenshots are in `docs/qa/evidence/student-variants/` (`<viewport>-<variant>_<page>.png`, all 8 variants × 9 pages at 375 and 1440). Please look at them. It's the fastest way to see what each student type actually gets today.
 
 ## For D4.1–D4.2 (onboarding, dashboard, app shell)
 
