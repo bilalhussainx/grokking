@@ -3,7 +3,7 @@ import { requireAuth, unauthorized, createAdminSupabase } from "../../helpers";
 import { callLLMJSON, type ChatMessage } from "@/lib/cc/llm-stream";
 import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
 import { ACTIVITY_WRITING_RULES, ACTIVITY_EXEMPLARS, ACTIVITY_ACTION_VERBS } from "@/lib/cc/activity-exemplars";
-import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
+import { getCaps, getTier } from "@/lib/cc/tier-gate";
 
 interface ActivityRow {
   position: number;
@@ -66,21 +66,17 @@ export async function POST() {
     return NextResponse.json({ error: "Complete your profile first" }, { status: 400 });
   }
 
-  const { data: activities } = await db
+  const { data: allActivities } = await db
     .from("cc_activities")
     .select("position, activity_type, organization, role, description_150, star_situation, star_task, star_action, star_result, grades_participated, hours_per_week, weeks_per_year")
     .eq("student_id", profile.id)
     .order("position") as { data: ActivityRow[] | null };
 
-  // Tier gate: guests get 3 bullets optimized, free users + pro get up to 10.
-  // We enforce by capping the activities list sent to the LLM, not by blocking —
-  // this way guests still see real value, just not on all 10 slots.
-  const bulletCheck = await assertCapacity(
-    auth.user.id,
-    "activityBulletsMax",
-    activities?.length ?? 0
-  );
-  if (!bulletCheck.ok) return blockedResponse(bulletCheck);
+  // Tier allowance: guests get 3 rows optimized, free and pro up to 10 (the
+  // Common App maximum). Cap the list sent to the LLM rather than blocking —
+  // a full activities list is normal, not a reason for a paywall.
+  const caps = getCaps(await getTier(auth.user.id));
+  const activities = (allActivities ?? []).slice(0, caps.activityBulletsMax);
 
   const ok = await deductCredits(auth.user.id, CREDIT_COSTS.coach_text, "activities_optimize");
   if (!ok) {
