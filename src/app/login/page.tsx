@@ -4,6 +4,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { safeNextPath } from "@/lib/safe-next";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,7 +24,11 @@ export default function LoginPage() {
 function LoginForm() {
   const { signInWithGoogle, signInWithEmail, user, loading: authLoading } = useAuth();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/";
+  const explicitNext = safeNextPath(searchParams.get("next"));
+  const next = explicitNext ?? "/";
+  // Invite links (/join/<code>) send logged-out students here; a brand-new
+  // student then clicks "Sign up", which must keep the invite.
+  const signupHref = explicitNext ? `/signup?next=${encodeURIComponent(explicitNext)}` : "/signup";
   const authError = searchParams.get("error");
 
   const [email, setEmail] = useState("");
@@ -93,7 +98,7 @@ function LoginForm() {
           type="button"
           variant="outline"
           className="w-full flex items-center justify-center gap-3 mb-4 h-11 border-white/20 bg-transparent text-white hover:bg-white/5"
-          onClick={() => void signInWithGoogle()}
+          onClick={() => void signInWithGoogle(explicitNext ?? undefined)}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 262" className="w-5 h-5">
             <path fill="#4285f4" d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622l38.755 30.023l2.685.268c24.659-22.774 38.875-56.282 38.875-96.027" />
@@ -163,12 +168,12 @@ function LoginForm() {
         <div className="text-center mt-6 space-y-3">
           <p className="text-sm text-white/40">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-[#D4AF37] hover:underline font-medium">
+            <Link href={signupHref} className="text-[#D4AF37] hover:underline font-medium">
               Sign up
             </Link>
           </p>
           <Link
-            href="/signup"
+            href={signupHref}
             className="block w-full py-2.5 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37] text-sm font-semibold hover:bg-[#D4AF37]/20 transition-all text-center"
           >
             Get Started Free — 300 Credits
