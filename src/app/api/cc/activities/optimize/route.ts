@@ -134,11 +134,18 @@ Return valid JSON only matching this schema:
   "overallStrength": 0.72
 }`;
 
+  // When the list is capped, say so: gap analysis and ordering must not assume
+  // the rows we didn't send are missing.
+  const totalCount = allActivities?.length ?? 0;
+  const capNote = activities.length < totalCount
+    ? `NOTE: Only the first ${activities.length} of ${totalCount} activities are included. Do not report gaps, ordering or hours for the others.\n\n`
+    : "";
+
   const messages: ChatMessage[] = [
     { role: "system", content: systemPrompt },
     {
       role: "user",
-      content: `ACTIVITIES:\n${activitiesText || "None"}\n\nHONORS:\n${honorsText || "None"}\n\nAnalyze and return the optimization JSON.`,
+      content: `${capNote}ACTIVITIES:\n${activitiesText || "None"}\n\nHONORS:\n${honorsText || "None"}\n\nAnalyze and return the optimization JSON.`,
     },
   ];
 
@@ -149,9 +156,11 @@ Return valid JSON only matching this schema:
   }
 
   // Store impact scores back to DB
+  // Only write back scores for rows we actually sent; the model can misnumber.
+  const sent = new Set(activities.map((a) => a.position));
   if (result.activities?.length) {
     for (const a of result.activities) {
-      if (a.impactScore >= 1 && a.impactScore <= 5) {
+      if (sent.has(a.position) && a.impactScore >= 1 && a.impactScore <= 5) {
         await db
           .from("cc_activities")
           .update({ impact_score: a.impactScore })
@@ -161,5 +170,5 @@ Return valid JSON only matching this schema:
     }
   }
 
-  return NextResponse.json(result);
+  return NextResponse.json({ ...result, optimizedCount: activities.length, totalCount });
 }
