@@ -135,6 +135,19 @@ export default function StudentFilePage() {
     setBusy(false);
   }
 
+  async function publishComment(commentId: string) {
+    if (!selectedId) return;
+    setBusy(true);
+    await fetch(`/api/counselor/comments/${commentId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "shipped" }),
+    });
+    await openEssay(selectedId);
+    await loadStudent();
+    setBusy(false);
+  }
+
   async function grantPro() {
     setBusy(true);
     setError(null);
@@ -267,23 +280,29 @@ export default function StudentFilePage() {
                 </div>
               </div>
 
-              {/* Review actions */}
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setReview("changes_requested")}
-                  disabled={busy}
-                  className="text-sm px-4 py-2 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/15 disabled:opacity-50"
-                >
-                  Request changes
-                </button>
-                <button
-                  onClick={() => setReview("approved")}
-                  disabled={busy}
-                  className="text-sm px-4 py-2 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/15 disabled:opacity-50"
-                >
-                  Approve
-                </button>
-              </div>
+              {/* Review actions: supervised counselors comment; the head decides */}
+              {role.requiresReview ? (
+                <p className="text-xs text-white/45">
+                  Your head counselor sets the review status. Leave comments below; they go to them for approval.
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setReview("changes_requested")}
+                    disabled={busy}
+                    className="text-sm px-4 py-2 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/15 disabled:opacity-50"
+                  >
+                    Request changes
+                  </button>
+                  <button
+                    onClick={() => setReview("approved")}
+                    disabled={busy}
+                    className="text-sm px-4 py-2 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/15 disabled:opacity-50"
+                  >
+                    Approve
+                  </button>
+                </div>
+              )}
 
               {/* Comments */}
               <div className="rounded-2xl border border-white/[0.08] bg-[#141414] p-5 space-y-4">
@@ -301,6 +320,15 @@ export default function StudentFilePage() {
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/40 border border-white/10">
                           draft — awaiting head approval
                         </span>
+                      )}
+                      {c.status === "draft" && role.isHead && (
+                        <button
+                          onClick={() => publishComment(c.id)}
+                          disabled={busy}
+                          className="text-[10px] px-2 py-0.5 rounded bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/15 disabled:opacity-50"
+                        >
+                          Publish to student
+                        </button>
                       )}
                       {c.status === "resolved" && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300/70 border border-emerald-500/20">
