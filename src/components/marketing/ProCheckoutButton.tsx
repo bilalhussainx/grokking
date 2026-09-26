@@ -45,6 +45,15 @@ export default function ProCheckoutButton({
       });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
+        // Already subscribed: open the billing portal to manage or switch plans.
+        if (res.status === 409 && j.manage) {
+          const portal = await fetch("/api/billing/stripe/portal", { method: "POST" });
+          const p = await portal.json().catch(() => ({}));
+          if (portal.ok && p.url) {
+            window.location.href = p.url;
+            return;
+          }
+        }
         throw new Error(j.error || `Checkout failed (${res.status})`);
       }
       const { url } = (await res.json()) as { url: string };

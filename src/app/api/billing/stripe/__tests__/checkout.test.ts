@@ -2,14 +2,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
-const h = vi.hoisted(() => ({ create: vi.fn(), user: { id: "u1", email: "s@example.com" } as { id: string; email: string } | null }));
+const h = vi.hoisted(() => ({ create: vi.fn(), user: { id: "u1", email: "s@example.com" } as { id: string; email: string } | null, existing: null as Record<string, unknown> | null }));
 vi.mock("stripe", () => ({
   default: class { checkout = { sessions: { create: h.create } }; },
 }));
 vi.mock("@/lib/supabase-auth", () => ({
   createServerSupabase: async () => ({
     auth: { getUser: async () => ({ data: { user: h.user } }) },
-    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null }) }) }) }),
+    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: h.existing }) }) }) }),
   }),
 }));
 
@@ -23,6 +23,7 @@ const req = (body: unknown) =>
 beforeEach(() => {
   h.create.mockReset().mockResolvedValue({ url: "https://checkout.stripe.test/s" });
   h.user = { id: "u1", email: "s@example.com" };
+  h.existing = null;
   vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_x");
   vi.stubEnv("NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY", "price_month");
   vi.stubEnv("NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_YEARLY", "price_year");
@@ -54,5 +55,30 @@ describe("POST /api/billing/stripe/checkout", () => {
   it("401s when signed out", async () => {
     h.user = null;
     expect((await POST(req({}))).status).toBe(401);
+  });
+
+  it("refuses a second subscription and points to the billing portal", async () => {
+    h.existing = { stripe_customer_id: "cus_1", stripe_subscription_id: "sub_1", status: "active" };
+    const res = await POST(req({ interval: "year" }));
+    expect(res.status).toBe(409);
+    expect((await res.json()).manage).toBe(true);
+    expect(h.create).not.toHaveBeenCalled();
+  });
+
+  it("still lets a signup-trial user (no Stripe subscription) subscribe", async () => {
+    h.existing = { stripe_customer_id: null, stripe_subscription_id: null, status: "trialing" };
+    expect((await POST(req({}))).status).toBe(200);
+  });
+
+  it("lets a user whose subscription was canceled subscribe again", async () => {
+    h.existing = { stripe_customer_id: "cus_1", stripe_subscription_id: "sub_old", status: "canceled" };
+    expect((await POST(req({}))).status).toBe(200);
+  });
+
+  it("treats a JSON null body as the default interval", async () => {
+    const res = await POST(new NextRequest("http://localhost/api/billing/stripe/checkout", {
+      method: "POST", body: "null", headers: { "Content-Type": "application/json", origin: "http://localhost" },
+    }));
+    expect(res.status).toBe(200);
   });
 });

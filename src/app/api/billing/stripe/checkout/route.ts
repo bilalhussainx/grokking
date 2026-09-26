@@ -22,8 +22,8 @@ const PRICE_ENV = {
 type Interval = keyof typeof PRICE_ENV;
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json().catch(() => ({}))) as { interval?: unknown };
-  const interval = body.interval ?? "month";
+  const raw: unknown = await req.json().catch(() => null);
+  const interval = (raw && typeof raw === "object" ? (raw as { interval?: unknown }).interval : undefined) ?? "month";
   if (interval !== "month" && interval !== "year") {
     return NextResponse.json({ error: "interval must be 'month' or 'year'" }, { status: 400 });
   }
@@ -63,9 +63,18 @@ export async function POST(req: NextRequest) {
   let customerId: string | undefined;
   const { data: existing } = await supabase
     .from("user_subscriptions")
-    .select("stripe_customer_id")
+    .select("stripe_customer_id, stripe_subscription_id, status")
     .eq("user_id", user.id)
-    .maybeSingle<{ stripe_customer_id?: string | null }>();
+    .maybeSingle<{ stripe_customer_id?: string | null; stripe_subscription_id?: string | null; status?: string | null }>();
+  // Already paying through Stripe: a second checkout would create a second,
+  // separately billed subscription. Send them to the billing portal instead.
+  // (Signup-trial rows have no stripe_subscription_id and may subscribe.)
+  if (existing?.stripe_subscription_id && ["active", "trialing", "past_due"].includes(existing.status ?? "")) {
+    return NextResponse.json(
+      { error: "You already have Pro. Manage or switch your plan from the billing portal.", manage: true },
+      { status: 409 },
+    );
+  }
   if (existing?.stripe_customer_id) customerId = existing.stripe_customer_id;
 
   try {
