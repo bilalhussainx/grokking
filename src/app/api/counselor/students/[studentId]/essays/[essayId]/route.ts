@@ -14,6 +14,7 @@ import {
   getEssayForReview,
   addEssayComment,
   setEssayReviewState,
+  EssayNotOwnedError,
 } from "@/lib/cc/counselor-comments";
 
 export const runtime = "nodejs";
@@ -28,7 +29,7 @@ export async function GET(
   const vis = await getStudentVisibility(user.id, studentId);
   if (!vis) return NextResponse.json({ error: "student not on your roster" }, { status: 403 });
 
-  const essay = await getEssayForReview(studentId, essayId);
+  const essay = await getEssayForReview(studentId, essayId, { agencyId: vis.agencyId });
   if (!essay) return NextResponse.json({ error: "essay not found" }, { status: 404 });
   return NextResponse.json({ essay });
 }
@@ -78,6 +79,9 @@ export async function POST(
       });
       return NextResponse.json({ ok: true, id, status }, { status: 201 });
     } catch (e) {
+      if (e instanceof EssayNotOwnedError) {
+        return NextResponse.json({ error: "essay not found" }, { status: 404 });
+      }
       console.error("[counselor comment] failed:", e);
       return NextResponse.json({ error: "could not save comment" }, { status: 500 });
     }
@@ -87,6 +91,15 @@ export async function POST(
     const state = body.state;
     if (state !== "changes_requested" && state !== "approved" && state !== "in_review") {
       return NextResponse.json({ error: "invalid review state" }, { status: 400 });
+    }
+    // Supervised counselors' comments already wait for head approval; their
+    // review decisions must too, or the approval gate is a formality.
+    const membership = await getAnyAgencyMembership(user.id);
+    if (membership?.requiresReview) {
+      return NextResponse.json(
+        { error: "Review decisions need your head counselor. Leave a comment instead; it goes to them for approval." },
+        { status: 403 },
+      );
     }
     try {
       const ok = await setEssayReviewState(studentId, essayId, state);

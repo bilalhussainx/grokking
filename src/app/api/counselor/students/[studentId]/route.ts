@@ -32,7 +32,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ student
     .eq("user_id", studentId)
     .maybeSingle();
 
-  const essays = await listStudentEssays(studentId);
+  const essays = await listStudentEssays(studentId, { agencyId: vis.agencyId });
 
   return NextResponse.json({
     student: {
