@@ -45,7 +45,11 @@
 ## Decisions recorded
 
 - **The $20 English pilot is NOT approved yet.** The founder decides after a1 and a2 land and the probe results are in.
-- **Billing:** Claude has shipped the `BillingPort` implementation for item 4 (`src/lib/credit-reservations.ts`: `makeCreditBilling(userId)` with `reserve/capture/release`, typed `BillingError` codes, migration `20260925_credit_reservations.sql`, not applied). a2 keeps its no-charge implementation. Its signature matches.
+- **Billing:** Claude has shipped the `BillingPort` implementation for item 4 (`src/lib/credit-reservations.ts`: `makeCreditBilling(userId)` with `reserve/capture/release`, typed `BillingError` codes, migration `20260925_credit_reservations.sql`, not applied). a2 keeps its no-charge implementation. The method signatures match. Adjust a2 as follows:
+  - `release(key)` on a key that was never reserved returns ok and records a tombstone, so a later `reserve(key)` returns `already_released`. That makes a2's `finish()` safe when `authorize` hung before reserve.
+  - Callers must never answer a failed `reserve` with `release`.
+  - a2's `Billing` type adds a `mode` field (a2:543) that the real port doesn't have. Make `mode` a property of a2's no-charge wrapper, not a required part of the port.
+  - **Pro users don't spend credits** (fair use is the limit), so the agent quotes 0 credits for Pro and reserves only for Free users.
 - **Docker:** Docker Desktop is installed but its engine isn't running, and psql 16 is present. The founder starts Docker before a1/a2 execution.
 - **Planning package:** Claude commits the spec, plans, contract and prompts at the start of execution. Don't commit them yourself.
 
