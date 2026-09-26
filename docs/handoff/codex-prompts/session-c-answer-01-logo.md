@@ -10,7 +10,7 @@ Logo files, all square, all made from the founder's original `public/kairos-logo
 
 - **Test product (`prod_VKfOCdYMEuSHCY`):** upload the **icon** file, to match the live product's emblem.
 - **Settings → Branding:** icon = the icon file, logo = the logo file.
-- **Brand colors (CEO decision):** brand color `#0F1F3D` (the navy in the mark) and accent color `#D4AF37` (gold, per `DESIGN.md`). Check contrast in Stripe's preview; if Stripe warns about it, keep the navy and report the warning.
+- **Brand colors (CEO decision):** brand color `#10243F` (the navy sampled from the logo) and accent color `#D4AF37` (gold, per `DESIGN.md`). Check contrast in Stripe's preview; if Stripe warns about it, keep the navy and report the warning.
 - **Live product default price:** set it to `price_1UK0IQCvx3JX9BYYy6j6V7K6` ($15 USD monthly) as OPS-1 says. Don't archive anything.
 - **Support email:** leave it as it is and report it. It's a founder item, not yours.
 
