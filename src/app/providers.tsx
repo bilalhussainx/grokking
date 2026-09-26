@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { PrivyProvider } from "@/components/providers/PrivyProvider";
 import { AIProvider, useAI } from "@/contexts/AIContext";
 import { XPProvider, useXP } from "@/contexts/XPContext";
 import { TopNavProvider } from "@/contexts/TopNavContext";
@@ -258,7 +257,6 @@ function GamificationOverlays() {
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <PrivyProvider>
     <AuthProvider>
       <ThemeProvider>
       <TopNavProvider>
@@ -287,6 +285,5 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       </TopNavProvider>
       </ThemeProvider>
     </AuthProvider>
-    </PrivyProvider>
   );
 }
