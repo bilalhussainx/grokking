@@ -25,6 +25,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
+import { subscriptionPeriod } from "@/lib/stripe-period";
 
 export const runtime = "nodejs";
 // Disable caching — webhook calls are idempotent on Stripe's side but must
@@ -135,10 +136,6 @@ async function upsertSubscription(
   // a single declined invoice yanks access mid-cycle.
 }
 
-function tsToISO(unixSeconds: number | null | undefined): string | null {
-  if (unixSeconds == null) return null;
-  return new Date(unixSeconds * 1000).toISOString();
-}
 
 export async function POST(req: NextRequest) {
   if (!STRIPE_SECRET_KEY || !STRIPE_WEBHOOK_SECRET) {
@@ -240,12 +237,8 @@ export async function POST(req: NextRequest) {
           stripe_customer_id: customerId,
           stripe_subscription_id: subscriptionId,
           stripe_price_id: sub?.items?.data?.[0]?.price?.id ?? null,
-          current_period_start: tsToISO(
-            (sub as unknown as { current_period_start?: number } | null)?.current_period_start,
-          ),
-          current_period_end: tsToISO(
-            (sub as unknown as { current_period_end?: number } | null)?.current_period_end,
-          ),
+          current_period_start: subscriptionPeriod(sub).start,
+          current_period_end: subscriptionPeriod(sub).end,
           cancel_at_period_end: sub?.cancel_at_period_end ?? false,
         });
         break;
@@ -273,12 +266,8 @@ export async function POST(req: NextRequest) {
           stripe_customer_id: customerId,
           stripe_subscription_id: sub.id,
           stripe_price_id: sub.items.data[0]?.price.id ?? null,
-          current_period_start: tsToISO(
-            (sub as unknown as { current_period_start?: number }).current_period_start,
-          ),
-          current_period_end: tsToISO(
-            (sub as unknown as { current_period_end?: number }).current_period_end,
-          ),
+          current_period_start: subscriptionPeriod(sub).start,
+          current_period_end: subscriptionPeriod(sub).end,
           cancel_at_period_end: sub.cancel_at_period_end ?? false,
         });
         break;
@@ -336,12 +325,8 @@ export async function POST(req: NextRequest) {
           status: mapStatus(sub.status),
           stripe_customer_id: customerId,
           stripe_subscription_id: sub.id,
-          current_period_start: tsToISO(
-            (sub as unknown as { current_period_start?: number }).current_period_start,
-          ),
-          current_period_end: tsToISO(
-            (sub as unknown as { current_period_end?: number }).current_period_end,
-          ),
+          current_period_start: subscriptionPeriod(sub).start,
+          current_period_end: subscriptionPeriod(sub).end,
           cancel_at_period_end: sub.cancel_at_period_end ?? false,
         });
         break;
