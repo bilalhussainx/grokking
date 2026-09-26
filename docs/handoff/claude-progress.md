@@ -10,8 +10,38 @@ doesn't re-test what's recorded here. Newest work goes at the top.
 | 1 | Security holes (ownership and counselor review integrity) | **Done**: built, tested, live-verified, final review "ready to merge" (plans 1A and 1B). **Not deployed.** |
 | 2 | Broken saves and dead pages: recommenders don't show after saving, transfer GPA dropped, Settings and net-price 404, Outline generation 500 (from Astra's D1) | **Done**: built, tested, live-verified, final review fixes applied (`b21b5a1`). **Not deployed.** Settings and `/cc/net-price` were already fixed on this branch (`1da0d10`); production 404s until it deploys. |
 | 3 | Bug fixes from `docs/superpowers/plans/2026-08-17-essay-studio-roadmap.md` (Tasks 2-6; 7-11 go to Astra's D2/D4) | **Done**: `docs/superpowers/plans/2026-09-25-fix-3-august-bug-fixes.md`; built, tested, live-verified, final-review fix applied. **Not deployed.** |
-| 4 | Stripe and credits for the new prices (Free 200 credits; $15/month; $99/year) | **Done in code**: `docs/superpowers/plans/2026-09-25-fix-4-stripe-credits-new-prices.md`; final-review fixes applied. **Not deployed; 3 migrations not applied; no Stripe prices created (no test key).** |
+| 4 | Stripe and credits for the new prices (Free 200 credits; $15/month; $99/year) | **Done in code**: `docs/superpowers/plans/2026-09-25-fix-4-stripe-credits-new-prices.md`; final-review fixes applied. Stripe prices created by Astra (`docs/handoff/stripe-setup-report.md`). **Credit lock-down applied in production 2026-09-26.** Branch not deployed; 3 other migrations not applied. |
 | 5 | Competitor research, phone app (PWA), Ad Astra readiness, full testing of every student type | Queued |
+
+## 2026-09-26 — Production security fix applied; CEO/CTO decisions
+
+**Applied in production (the founder ran the SQL; Claude verified):**
+`supabase/migrations/20260925_lock_down_credit_rpcs.sql`.
+- Before: the public anon key could execute `add_credits`, `deduct_credits`
+  and `get_credit_balance` for any user id. The probe used a nonexistent user
+  id, so nothing was written.
+- Before: production also had two `add_credits` overloads, so every
+  3-argument call failed as ambiguous (PGRST203). That broke signup top-ups,
+  refunds, invite credits and referral credits.
+- After: the anon key gets permission denied on all three functions; the
+  service-role `add_credits` resolves again; the verification table showed
+  9 rows.
+
+**Credit reservations:** `tests/billing-local/credit-reservations.sql` passes
+against Docker Postgres 16, and so does the race test
+(`credit-reservations-race.sh`): a concurrent same-key reserve waits, returns
+ok, and holds credits once.
+
+**Decisions (Claude as CEO/CTO, per the founder):**
+- **Keep the founder's landing honesty edits** swept into `52a48d8`. They
+  remove unsupported claims ($8,000, 120+ beta students, 40+ languages,
+  alumni personas) and read the real language count, which matches the
+  grounding rule. The flat wording goes to D3 as a copy note:
+  `docs/handoff/codex-prompts/session-b-note-01-landing-copy.md`.
+- **No $12→$15 migration or notice email.** Stripe shows 0 subscribers on
+  the $12 prices.
+- **UI/UX changes go to Codex** (session B) as detailed prompts; Claude fixes
+  pure bugs (for example the 375px footer overflow and the optimizer off-by-one).
 
 ## Fix 4 — Stripe and credits for the new prices (2026-09-25)
 
