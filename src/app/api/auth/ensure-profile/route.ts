@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase, createAdminSupabase } from "@/lib/supabase-auth";
+import { PRICING } from "@/lib/pricing";
 
 /**
  * POST /api/auth/ensure-profile
@@ -49,7 +50,7 @@ export async function POST() {
       .eq("id", user.id);
   }
 
-  // 2. Ensure user has 300 signup credits
+  // 2. Ensure user has the signup credits (PRICING.free.signupCredits, once)
   //    Check total signup_bonus credits ever granted
   const { data: bonusTxns } = await admin
     .from("credit_txns")
@@ -60,15 +61,16 @@ export async function POST() {
   const totalBonusGranted = (bonusTxns || []).reduce((sum: number, t: { amount: number }) => sum + t.amount, 0);
   let credits = 0;
 
-  if (totalBonusGranted < 300) {
-    // Top up to 300 — grant the difference
-    const topUp = 300 - totalBonusGranted;
+  const signupCredits = PRICING.free.signupCredits;
+  if (totalBonusGranted < signupCredits) {
+    // Top up to the signup amount — grant the difference
+    const topUp = signupCredits - totalBonusGranted;
     const { data: newBalance } = await admin.rpc("add_credits", {
       p_user_id: user.id,
       p_amount: topUp,
       p_action: "signup_bonus",
     });
-    credits = (newBalance as number) || 300;
+    credits = (newBalance as number) || signupCredits;
   } else {
     // Already has full signup bonus — fetch current balance
     const { data: bal } = await admin.rpc("get_credit_balance", {
