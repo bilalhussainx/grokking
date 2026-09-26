@@ -18,6 +18,8 @@ import {
 import { createServerSupabase } from "@/lib/supabase-auth";
 import { createAdminSupabase } from "@/lib/supabase-server";
 import { getCounselorForUser } from "@/lib/cc/counselor-helpers";
+import { getAnyAgencyMembership } from "@/lib/cc/agency-membership";
+import CreateWorkspaceCard from "@/components/counselor/CreateWorkspaceCard";
 
 interface EngagementRow {
   id: string;
@@ -59,6 +61,8 @@ export default async function CounselorDashboard() {
 
   const counselor = await getCounselorForUser(user.id);
   if (!counselor) redirect("/counselor/onboard");
+  // Invite codes, the roster and essay review all need an agency (QA-04).
+  const membership = await getAnyAgencyMembership(user.id);
 
   const db = createAdminSupabase();
   const [{ data: engagementsRaw }, { count: serviceCount }] = await Promise.all([
@@ -115,6 +119,8 @@ export default async function CounselorDashboard() {
           </Link>
         </div>
       </div>
+
+      {!membership && <CreateWorkspaceCard displayName={counselor.display_name} />}
 
       {/* Top-line stats */}
       <div className="grid sm:grid-cols-4 gap-3 mb-8">
