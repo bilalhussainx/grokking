@@ -4,7 +4,7 @@
 
 1. `codex-astra-handover-prompt.md` §2 (operating model), §4 D3 and D4, and §5–7 (grounding, hard rules, gate format). That's your contract.
 2. `docs/design/2026-09-product-judgment.md` (your D1, greenlit) and `docs/design/2026-09-live-audit.md` (QA-11…59).
-3. `DESIGN.md` and `src/styles/kairos-tokens.css`: the two surfaces. `.kl-surface-landing` is Cormorant, navy and square; `.kl-surface-app` is Inter, true black, gold and rounded. `src/app/tokens.css` has the Essay Studio mobile rules Claude added (`.kl-studio-grid`, `.kl-studio-shell`, and mobile `.kl-bs-subhead`/`.kl-phase-bar`). Build on those.
+3. **Superseded 2026-09-26 by the founder:** `DESIGN.md` and `kairos-tokens.css` (navy/black/gold, Cormorant) are **no longer binding**. D3 is reimagining the visual identity to be warm and welcoming for students of every background; see `docs/handoff/astra-gate-d3-response.md`. D4 follows the design system approved at GATE D3-R2, not `DESIGN.md`. The Essay Studio mobile rules Claude added in `src/app/tokens.css` are layout fixes and remain useful.
 4. `docs/handoff/claude-progress.md`: what Claude has already fixed. Don't re-test it, and don't design around a bug that's already fixed.
    - Security: ownership and counselor review.
    - Broken saves: recommenders, transfer GPA, Settings and net-price routes.
