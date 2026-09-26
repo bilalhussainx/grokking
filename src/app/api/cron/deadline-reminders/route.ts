@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email/resend-client";
 import { renderDeadlineReminderEmail } from "@/lib/notifications/deadline-reminder-renderer";
+import { hasBearerSecret } from "@/lib/admin-secret";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -37,7 +38,7 @@ function daysFromTodayUTC(iso: string): number {
 
 export async function GET(req: NextRequest) {
   const auth = req.headers.get("authorization");
-  if (auth !== `Bearer ${process.env.CRON_SECRET ?? ""}`) {
+  if (!hasBearerSecret(auth, "CRON_SECRET")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
