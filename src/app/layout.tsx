@@ -38,6 +38,7 @@ export const metadata: Metadata = {
     template: '%s | KairosLearn',
   },
   description: 'College guidance, at your pace. Find one next step, explore costs and plan your applications. AI interviews, structures and critiques; you write every essay.',
+  icons: { apple: '/icons/apple-touch-icon.png' },
   keywords: [
     'AI college counselor', 'college admissions', 'college application help',
     'personal statement coach', 'common app essay coach', 'supplemental essay help',

@@ -6,6 +6,7 @@
 // allowed caps via /api/cc/me/tier and displays them, then relies on the server
 // returning 402 when a user actually crosses a line.
 import { createAdminSupabase } from "@/lib/supabase-server";
+import { PRO_FAIR_USE } from "@/lib/pricing";
 
 export type Tier = "guest" | "free" | "pro";
 
@@ -91,8 +92,8 @@ export const TIER_CAPS: Record<Tier, TierCaps> = {
   },
   pro: {
     schoolsMax: UNLIMITED,
-    coachMessagesPerDay: proFairUse("PRO_FAIR_USE_COACH_MESSAGES_PER_DAY", 300),
-    coachVoiceMinutesPerDay: proFairUse("PRO_FAIR_USE_VOICE_MINUTES_PER_DAY", 120),
+    coachMessagesPerDay: proFairUse("PRO_FAIR_USE_COACH_MESSAGES_PER_DAY", PRO_FAIR_USE.coachMessagesPerDay),
+    coachVoiceMinutesPerDay: proFairUse("PRO_FAIR_USE_VOICE_MINUTES_PER_DAY", PRO_FAIR_USE.voiceMinutesPerDay),
     activityBulletsMax: 10, // Common App only has 10 slots — this is a hard cap regardless
     resumeParsesMax: UNLIMITED,
     essaysMax: UNLIMITED,

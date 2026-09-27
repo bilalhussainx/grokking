@@ -5,6 +5,10 @@ export const PRICING = {
   pro: { monthlyUsd: 15, yearlyUsd: 99, trialDays: 7 },
 } as const;
 
+// Pro is unlimited under fair use. Browser-safe: homepage and pricing copy
+// read these; server limits (src/lib/cc/tier-gate.ts) default to them.
+export const PRO_FAIR_USE = { coachMessagesPerDay: 300, voiceMinutesPerDay: 120 } as const;
+
 export const proMonthlyLabel = () => `$${PRICING.pro.monthlyUsd}/month`;
 export const proYearlyLabel = () => `$${PRICING.pro.yearlyUsd}/year`;
 // 12 × $15 = $180 vs $99 → 45% saved.

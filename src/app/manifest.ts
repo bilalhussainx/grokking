@@ -8,10 +8,13 @@ export default function manifest(): MetadataRoute.Manifest {
     description: ADMISSIONS_SUMMARY,
     start_url: '/',
     display: 'standalone',
-    background_color: '#0a0a0a',
-    theme_color: '#3b82f6',
+    background_color: '#FFF7EE',
+    theme_color: '#FFF7EE',
     icons: [
       { src: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' },
+      { src: '/icons/kairos-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/icons/kairos-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: '/icons/kairos-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
     ],
   };
 }

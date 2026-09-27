@@ -4,7 +4,7 @@ import fs from "node:fs";
 import { findRetiredReferences } from "./retired-links.helpers";
 
 const SHELL = [
-  "src/app/providers.tsx", "src/components/layout/TopNav.tsx", "src/components/layout/Footer.tsx",
+  "src/app/providers.tsx", "src/components/layout/TopNav.tsx", "src/components/marketing/daybreak/DaybreakFooter.tsx",
   "src/app/settings/page.tsx", "src/components/nav/sidebar-data.ts", "src/components/nav/palette-data.ts",
 ];
 

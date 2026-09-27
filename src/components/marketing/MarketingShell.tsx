@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
+import DaybreakFooter from "@/components/marketing/daybreak/DaybreakFooter";
 
 const NAV_LINKS: { label: string; href: string }[] = [
   { label: "Counselor", href: "/product/counselor" },
@@ -106,37 +107,7 @@ export default function MarketingShell({ children }: { children: ReactNode }) {
 
       <main className="kl-mkt-main">{children}</main>
 
-      {/* Footer */}
-      <footer className="kl-mkt-foot">
-        <div className="kl-mkt-foot-inner">
-          <div className="kl-mkt-foot-brand">
-            <div className="kl-mkt-seal" aria-hidden>
-              k
-            </div>
-            <span>
-              <em>Kairos</em>Learn
-            </span>
-          </div>
-          <nav className="kl-mkt-foot-links" aria-label="Footer">
-            {NAV_LINKS.map((l) => (
-              <Link key={l.href} href={l.href}>
-                {l.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="kl-mkt-foot-cta">
-            <Link href="/login">Sign in</Link>
-            <Link href="/intake" className="kl-mkt-cta-gold">
-              Start for free <ArrowRight size={14} />
-            </Link>
-          </div>
-          <div className="kl-mkt-foot-fine">
-            © {new Date().getFullYear()} KairosLearn · Built by{" "}
-            <Link href="/about">Bilal Hussain</Link>. <Link href="/privacy">Privacy</Link> ·{" "}
-            <Link href="/terms">Terms</Link> · <Link href="/integrity">AI Integrity</Link>
-          </div>
-        </div>
-      </footer>
+      <DaybreakFooter />
     </div>
   );
 }
