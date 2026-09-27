@@ -138,7 +138,19 @@ function parseNarrativeCard(text: string): NarrativeCard | null {
   return { thesis, anchors, audienceFit };
 }
 
-function parseThemesBlock(text: string): {
+// What the chat bubble shows for an assistant message: the prose without the
+// machine-readable blocks, including a block that is still streaming in.
+// Messages themselves keep the raw text so the theme and narrative-card
+// detectors can read it.
+export function visibleText(text: string): string {
+  return text
+    .replace(/<<THEMES_READY>>[\s\S]*?<<END_THEMES>>\s*/g, "")
+    .replace(/<<NARRATIVE_CARD>>[\s\S]*?<<END_NARRATIVE>>\s*/g, "")
+    .replace(/<<(THEMES_READY|NARRATIVE_CARD)>>[\s\S]*$/, "")
+    .trim();
+}
+
+export function parseThemesBlock(text: string): {
   displayText: string;
   themes: string[];
   awaitingThemes: boolean;
@@ -456,10 +468,11 @@ export default function BrainstormChat({
         const { done, value } = await reader.read();
         if (done) break;
         aiText += decoder.decode(value, { stream: true });
-        const parsed = parseThemesBlock(aiText);
+        // Keep the raw text (themes/narrative blocks included) so the theme
+        // detector sees them; the bubble renders visibleText().
         setMessages((prev) => {
           const updated = [...prev];
-          updated[updated.length - 1] = { role: "assistant", content: parsed.displayText };
+          updated[updated.length - 1] = { role: "assistant", content: aiText };
           return updated;
         });
       }
@@ -767,7 +780,7 @@ export default function BrainstormChat({
                         className={`kl-msg-bubble ${msg.role === "user" ? "is-user" : "is-coach"}`}
                       >
                         {msg.content
-                          ? renderRich(msg.content)
+                          ? renderRich(msg.role === "assistant" ? visibleText(msg.content) : msg.content)
                           : <span className="inline-block w-4 h-4 border-2 border-white/20 border-t-[var(--kl-gold-app,#D4AF37)] rounded-full animate-spin" />}
                       </div>
                     </div>
