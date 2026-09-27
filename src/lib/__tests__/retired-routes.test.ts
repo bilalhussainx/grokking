@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import fs from "node:fs";
 import { RETIRED_ROUTE_REDIRECTS, retiredDestination } from "../retired-routes";
 
 describe("retired learning routes", () => {
@@ -31,5 +32,11 @@ describe("retired learning routes", () => {
 
   it("all redirects are temporary for the first release", () => {
     expect(RETIRED_ROUTE_REDIRECTS.every((r) => r.permanent === false)).toBe(true);
+  });
+
+  it("no page directory remains for a retired route", () => {
+    const bases = [...new Set(RETIRED_ROUTE_REDIRECTS.map((r) => r.source.replace("/:path*", "")))].filter((b) => b !== "/admin");
+    expect(bases.filter((b) => fs.existsSync(`src/app${b}`))).toEqual([]);
+    expect(fs.existsSync("src/app/admin/page.tsx")).toBe(false);
   });
 });
