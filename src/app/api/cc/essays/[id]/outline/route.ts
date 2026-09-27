@@ -15,12 +15,29 @@ export async function POST(
 
   const body = await req.json();
   const { action, outline, selectedThemes } = body as {
-    action: "generate" | "save";
+    action: "generate" | "save" | "themes";
     outline?: Record<string, unknown>;
     selectedThemes?: string[];
   };
 
   const db = createAdminSupabase();
+
+  // The student picked themes in Brainstorm: move to Outline and remember the
+  // pick, so a reload doesn't send them back to Brainstorm.
+  if (action === "themes") {
+    const owned = await getOwnedEssay(db, auth.user.id, id);
+    if (!owned) {
+      return NextResponse.json({ error: "Essay not found" }, { status: 404 });
+    }
+    const themes = (selectedThemes ?? []).filter((t) => typeof t === "string" && t.trim()).slice(0, 10);
+    await db.from("cc_essays").update({ phase: "outline", updated_at: new Date().toISOString() }).eq("id", owned.id);
+    await db.from("cc_essay_interactions").insert({
+      essay_id: owned.id,
+      turn_type: "themes_selected",
+      content: JSON.stringify(themes),
+    });
+    return NextResponse.json({ saved: true });
+  }
 
   if (action === "save" && outline) {
     const owned = await getOwnedEssay(db, auth.user.id, id);
@@ -114,5 +131,47 @@ export async function POST(
     .update({ phase: "outline", updated_at: new Date().toISOString() })
     .eq("id", id);
 
+  // Keep the options the student paid a credit for; GET serves them back.
+  await db.from("cc_essay_interactions").insert({
+    essay_id: id,
+    turn_type: "outline_options",
+    content: JSON.stringify({ themes: selectedThemes ?? [], outlines: result.outlines }),
+  });
+
   return NextResponse.json({ outlines: result.outlines });
+}
+
+// The latest chosen themes and generated outline options for this essay, so
+// the Outline phase can be restored after a reload.
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const auth = await requireAuth();
+  if (!auth) return unauthorized();
+  const { id } = await params;
+  const db = createAdminSupabase();
+  const owned = await getOwnedEssay(db, auth.user.id, id);
+  if (!owned) {
+    return NextResponse.json({ error: "Essay not found" }, { status: 404 });
+  }
+
+  const latest = async (turnType: string) => {
+    const { data } = await db
+      .from("cc_essay_interactions")
+      .select("content, timestamp")
+      .eq("essay_id", owned.id)
+      .eq("turn_type", turnType)
+      .order("timestamp", { ascending: false })
+      .limit(1);
+    const raw = (data as { content: string | null }[] | null)?.[0]?.content;
+    if (!raw) return null;
+    try { return JSON.parse(raw) as unknown; } catch { return null; }
+  };
+
+  const [themesRaw, optionsRaw] = await Promise.all([latest("themes_selected"), latest("outline_options")]);
+  const options = (optionsRaw ?? null) as { themes?: unknown; outlines?: unknown } | null;
+  const themes = Array.isArray(themesRaw) ? themesRaw : Array.isArray(options?.themes) ? options.themes : [];
+  const outlines = Array.isArray(options?.outlines) ? options.outlines : [];
+  return NextResponse.json({ themes, outlines });
 }

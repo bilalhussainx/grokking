@@ -25,6 +25,9 @@ interface OutlinePickerProps {
   essayId: string;
   selectedThemes: string[];
   existingOutline?: OutlineOption | null;
+  // Options generated earlier for this essay, restored after a reload so the
+  // student doesn't pay to generate them again.
+  savedOptions?: OutlineOption[];
   onOutlineSaved: (outline: OutlineOption) => void;
 }
 
@@ -44,15 +47,16 @@ export default function OutlinePicker({
   essayId,
   selectedThemes,
   existingOutline,
+  savedOptions,
   onOutlineSaved,
 }: OutlinePickerProps) {
   const [outlines, setOutlines] = useState<OutlineOption[]>(
-    existingOutline ? [existingOutline] : []
+    existingOutline ? [existingOutline] : savedOptions ?? []
   );
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<number | null>(existingOutline ? 0 : null);
   const [saving, setSaving] = useState(false);
-  const [generated, setGenerated] = useState(Boolean(existingOutline));
+  const [generated, setGenerated] = useState(Boolean(existingOutline) || (savedOptions?.length ?? 0) > 0);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [generateError, setGenerateError] = useState<string | null>(null);
 

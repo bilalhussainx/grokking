@@ -42,6 +42,8 @@ interface EssayData {
   } | null;
 }
 
+type OutlineOptionData = { title: string; sections: { label: string; bullets: string[]; wordBudget: number }[] };
+
 export default function EssayWorkspace({
   params,
 }: {
@@ -53,17 +55,26 @@ export default function EssayWorkspace({
   const [loading, setLoading] = useState(true);
   const [activePhase, setActivePhase] = useState<Phase>("brainstorm");
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
+  const [savedOutlineOptions, setSavedOutlineOptions] = useState<OutlineOptionData[]>([]);
   const [reviewLoading, setReviewLoading] = useState(false);
   const [promptExpanded, setPromptExpanded] = useState(true);
 
   const loadEssay = () => {
     fetch(`/api/cc/essays/${id}`)
       .then((r) => r.json())
-      .then((d) => {
-        if (d.essay) {
-          setEssay(d.essay);
-          setActivePhase(d.essay.phase as Phase);
+      .then(async (d) => {
+        if (!d.essay) return;
+        // In Outline without a saved outline: restore the chosen themes and
+        // any options already generated, before the picker mounts.
+        if (d.essay.phase === "outline" && !d.essay.outline_json) {
+          const o = await fetch(`/api/cc/essays/${id}/outline`)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null) as { themes?: string[]; outlines?: OutlineOptionData[] } | null;
+          if (o?.themes?.length) setSelectedThemes(o.themes);
+          if (o?.outlines?.length) setSavedOutlineOptions(o.outlines);
         }
+        setEssay(d.essay);
+        setActivePhase(d.essay.phase as Phase);
       })
       .finally(() => setLoading(false));
   };
@@ -75,7 +86,14 @@ export default function EssayWorkspace({
 
   const handleAdvanceToOutline = (themes: string[]) => {
     setSelectedThemes(themes);
+    setSavedOutlineOptions([]);
     setActivePhase("outline");
+    // Remember the pick so a reload lands back in Outline with these themes.
+    fetch(`/api/cc/essays/${id}/outline`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "themes", selectedThemes: themes }),
+    }).catch(() => {});
   };
 
   const handleOutlineSaved = () => {
@@ -227,6 +245,7 @@ export default function EssayWorkspace({
           <OutlinePicker
             essayId={id}
             selectedThemes={selectedThemes}
+            savedOptions={savedOutlineOptions}
             existingOutline={
               essay.outline_json
                 ? {

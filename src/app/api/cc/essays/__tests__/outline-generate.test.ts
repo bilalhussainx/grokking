@@ -11,7 +11,7 @@ const h = vi.hoisted(() => ({
 vi.mock("../../helpers", () => ({
   requireAuth: async () => ({ user: { id: "a11ce000-0000-4000-8000-000000000001" }, supabase: {} }),
   unauthorized: () => new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 }),
-  createAdminSupabase: () => ({ from: () => ({ update: () => ({ eq: async () => ({ error: null }) }) }) }),
+  createAdminSupabase: () => ({ from: () => ({ update: () => ({ eq: async () => ({ error: null }) }), insert: async () => ({ error: null }) }) }),
 }));
 vi.mock("@/lib/credits", () => ({
   CREDIT_COSTS: { coach_text: 1 },
