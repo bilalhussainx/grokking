@@ -14,21 +14,8 @@ const FLOWS = [
   { name: 'login', url: '/login' },
   { name: 'signup', url: '/signup' },
   { name: 'onboarding', url: '/onboarding' },
-  { name: 'courses', url: '/courses' },
-  { name: 'talk', url: '/talk' },
   { name: 'pricing', url: '/pricing' },
   { name: 'settings', url: '/settings' },
-  { name: 'course-coding', url: '/course/coding-interview' },
-  { name: 'course-python', url: '/course/python-fundamentals' },
-  { name: 'course-islam', url: '/course/islam-foundations' },
-  { name: 'course-finance', url: '/course/personal-finance' },
-  { name: 'course-french', url: '/course/french-beginner' },
-  { name: 'course-stoic', url: '/course/stoic-philosophy' },
-  { name: 'course-aiml', url: '/course/ai-ml-fundamentals' },
-  { name: 'course-sysdesign', url: '/course/system-design' },
-  { name: 'course-dsa', url: '/course/data-structures-algorithms' },
-  { name: 'course-mentalhealth', url: '/course/mental-health-resilience' },
-  { name: 'course-apbio', url: '/course/ap-biology' },
   { name: 'admin-survey', url: '/admin/survey' },
 ];
 
@@ -97,37 +84,4 @@ test.describe('Visual Audit — User Flows', () => {
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'flow-6-onboarding-summary.png') });
   });
 
-  test('flow: browse courses → open lesson', async ({ page }) => {
-    await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'flow-courses-list.png'), fullPage: true });
-
-    // Click first course
-    const firstCourse = page.locator('a[href^="/course/"]').first();
-    if (await firstCourse.isVisible()) {
-      await firstCourse.click();
-      await page.waitForLoadState('networkidle');
-      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'flow-course-detail.png'), fullPage: true });
-
-      // Click first lesson
-      const firstLesson = page.locator('a[href*="/course/"]').nth(1);
-      if (await firstLesson.isVisible()) {
-        await firstLesson.click();
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(1000);
-        await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'flow-lesson-with-coach.png'), fullPage: true });
-      }
-    }
-  });
-
-  test('flow: talk page language selection', async ({ page }) => {
-    await page.goto('/talk');
-    await page.waitForLoadState('networkidle');
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'flow-talk-languages.png') });
-
-    // Select Spanish
-    await page.getByText('Spanish').click();
-    await page.waitForTimeout(1000);
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'flow-talk-spanish.png') });
-  });
 });

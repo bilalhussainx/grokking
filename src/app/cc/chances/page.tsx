@@ -129,7 +129,7 @@ export default function ChancesPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-white/60 mb-6">
+        <Link href="/cc/dashboard" className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-white/60 mb-6">
           <ArrowLeft className="w-3.5 h-3.5" />
           Back
         </Link>

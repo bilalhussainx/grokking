@@ -88,13 +88,6 @@ export default function HistoryPage() {
                 <GraduationCap className="w-4 h-4" />
                 Start a college interview
               </Link>
-              <Link
-                href="/interviews"
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-white/15 text-white/80 text-sm font-medium hover:bg-white/5 transition-colors"
-              >
-                <Target className="w-4 h-4" />
-                Start a tech interview
-              </Link>
             </div>
           </div>
         )}

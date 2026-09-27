@@ -7,8 +7,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import AnimatedBlobs from "@/components/ui/AnimatedBlobs";
 
 const NAV_ITEMS = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/create", label: "New Course", icon: Plus },
+  { href: "/admin/survey", label: "Survey", icon: LayoutDashboard },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

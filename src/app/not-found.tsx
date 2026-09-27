@@ -15,7 +15,7 @@ export default function NotFound() {
         <p className="text-sm text-white/50 mb-8">
           The page you're looking for doesn't exist or has moved. Try one of these instead:
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
           <Link
             href="/"
             className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-white/10 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all"
@@ -29,13 +29,6 @@ export default function NotFound() {
           >
             <GraduationCap className="w-5 h-5 text-[#D4AF37]" />
             <span className="text-xs text-white/70">College</span>
-          </Link>
-          <Link
-            href="/interviews"
-            className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-white/10 hover:border-[#D4AF37]/40 hover:bg-white/5 transition-all"
-          >
-            <Target className="w-5 h-5 text-[#D4AF37]" />
-            <span className="text-xs text-white/70">Tech</span>
           </Link>
         </div>
       </div>

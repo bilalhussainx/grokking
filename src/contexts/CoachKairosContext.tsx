@@ -167,7 +167,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
       proactiveSent.current = true;
       return;
     }
-    if (pathname === "/" || pathname === "/dashboard") {
+    if (pathname === "/") {
       const timer = setTimeout(() => {
         if (!proactiveSent.current) {
           proactiveSent.current = true;

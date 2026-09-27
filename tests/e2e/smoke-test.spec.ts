@@ -92,16 +92,6 @@ test.describe('Public Pages - No Auth', () => {
     expect(r.networkErrors).toHaveLength(0);
   });
 
-  test('Courses page loads', async ({ page }) => {
-    const r = await auditPage(page, '/courses', 'courses');
-    expect(r.networkErrors).toHaveLength(0);
-  });
-
-  test('Talk page loads', async ({ page }) => {
-    const r = await auditPage(page, '/talk', 'talk');
-    expect(r.networkErrors).toHaveLength(0);
-  });
-
   test('Survey page loads', async ({ page }) => {
     const r = await auditPage(page, '/survey.html', 'survey');
     expect(r.networkErrors).toHaveLength(0);
@@ -110,61 +100,7 @@ test.describe('Public Pages - No Auth', () => {
 
 // ─── COURSE OVERVIEW PAGES (public) ───
 
-test.describe('Course Overview Pages', () => {
-  const courseSlugs = [
-    'coding-interview',
-    'coding-interview-premium',
-    'system-design',
-    'python-fundamentals',
-    'data-structures-algorithms',
-    'personal-finance',
-    'islam-foundations',
-    'buddhism-foundations',
-    'stoic-philosophy',
-    'ai-ml-fundamentals',
-    'mental-health-resilience',
-    'ap-biology',
-  ];
-
-  for (const slug of courseSlugs) {
-    test(`Course overview: ${slug}`, async ({ page }) => {
-      const r = await auditPage(page, `/course/${slug}`, `course-${slug}`);
-      expect(r.networkErrors).toHaveLength(0);
-    });
-  }
-});
-
 // ─── LESSON PAGES WITH MERMAID DIAGRAMS ───
-
-test.describe('Lesson Pages - Mermaid Diagrams Render', () => {
-  // Test a sample lesson from each Phase to verify Mermaid renders
-  const lessonPages = [
-    // Phase 1: CS
-    { path: '/course/coding-interview/two-pointers-intro', name: 'mermaid-two-pointers' },
-    { path: '/course/data-structures-algorithms/bst-operations', name: 'mermaid-bst' },
-    // Phase 2: System Design
-    { path: '/course/system-design/introduction-to-system-design', name: 'mermaid-sysdesign' },
-    // Phase 3: Python
-    { path: '/course/python-fundamentals/if-statements', name: 'mermaid-python-control' },
-    // Phase 4: Religion
-    { path: '/course/islam-foundations/what-is-islam', name: 'mermaid-islam' },
-    { path: '/course/buddhism-foundations/the-four-noble-truths', name: 'mermaid-buddhism' },
-    // Phase 5: Finance/Health
-    { path: '/course/personal-finance/income-expenses-net-worth', name: 'mermaid-finance' },
-    { path: '/course/mental-health-resilience/what-is-mental-health', name: 'mermaid-mental' },
-    // Phase 6: Philosophy
-    { path: '/course/stoic-philosophy/what-is-stoicism', name: 'mermaid-stoic' },
-  ];
-
-  for (const { path, name } of lessonPages) {
-    test(`Lesson renders: ${name}`, async ({ page }) => {
-      const r = await auditPage(page, path, name);
-      // Lesson pages require auth — may redirect to login
-      // That's OK, we just check no crashes or network errors
-      expect(r.consoleErrors.filter(e => e.includes('APPLICATION CRASH'))).toHaveLength(0);
-    });
-  }
-});
 
 // ─── API HEALTH CHECKS ───
 
@@ -182,13 +118,6 @@ test.describe('API Endpoints', () => {
     expect(res.status()).toBe(401);
   });
 
-  test('Coach API requires auth', async ({ request }) => {
-    const res = await request.post('/api/ai/coach', {
-      data: { event: 'test' },
-    });
-    expect(res.status()).toBe(401);
-  });
-
   test('Submissions API requires password', async ({ request }) => {
     const res = await request.get('/api/submissions?password=wrong');
     expect(res.status()).toBe(401);
@@ -196,19 +125,3 @@ test.describe('API Endpoints', () => {
 });
 
 // ─── LANGUAGE COURSE PAGES ───
-
-test.describe('Language Course Pages', () => {
-  const langCourses = [
-    'french-beginner',
-    'spanish-beginner',
-    'hindi-beginner',
-    'english-beginner',
-  ];
-
-  for (const slug of langCourses) {
-    test(`Language course overview: ${slug}`, async ({ page }) => {
-      const r = await auditPage(page, `/course/${slug}`, `lang-${slug}`);
-      expect(r.networkErrors).toHaveLength(0);
-    });
-  }
-});

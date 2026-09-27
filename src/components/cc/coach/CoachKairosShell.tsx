@@ -19,7 +19,7 @@ import WorkingLatePrompt from "@/components/cc/WorkingLatePrompt";
 // actually open, so essays are allowed again. On brainstorm/outline/draft the
 // floating drawer is a secondary entry point — students typically use the
 // in-page chats instead, and having both open is harmless.
-const HIDDEN_PATHS = ["/login", "/signup", "/onboarding", "/landing", "/talk"];
+const HIDDEN_PATHS = ["/login", "/signup", "/onboarding", "/landing"];
 
 export default function CoachKairosShell() {
   const { user } = useAuth();

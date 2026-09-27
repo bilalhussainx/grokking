@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Code2, Mic, ArrowLeft } from "lucide-react";
 import { useInterview } from "@/contexts/InterviewContext";
 import InterviewEditor from "./InterviewEditor";
-import LiveCodingPanel from "./LiveCodingPanel";
 import InterviewVoicePanel from "./InterviewVoicePanel";
 import InterviewTextPanel from "./InterviewTextPanel";
 import Link from "next/link";
@@ -26,7 +25,7 @@ export default function InterviewRoom() {
   }, []);
 
   const handleInterviewEnd = useCallback(() => {
-    router.push(`/interviews/${sessionId}/results`);
+    router.push(`/college-interviews/${sessionId}/results`);
   }, [router, sessionId]);
 
   if (!questionPlan || !sessionId) {
@@ -47,7 +46,7 @@ export default function InterviewRoom() {
           </div>
           <p className="text-white/50 mb-4">No interview session found.</p>
           <Link
-            href="/interviews"
+            href="/college-interviews"
             className="text-[var(--kl-gold-app,#D4AF37)] underline text-sm hover:text-[var(--kl-gold-hover-app,#C4A030)]"
           >
             Start a new interview
@@ -75,7 +74,7 @@ export default function InterviewRoom() {
       >
         <div className="flex items-center gap-3">
           <Link
-            href="/interviews"
+            href="/college-interviews"
             className="p-1.5 rounded-lg hover:bg-white/5 transition-colors text-white/40 hover:text-white/70"
             aria-label="Back to interviews"
           >
@@ -136,36 +135,20 @@ export default function InterviewRoom() {
       <div className="flex-1 flex min-h-0">
         {showEditor && (
           <div className="hidden md:block w-[55%] border-r border-white/[0.06] p-2">
-            {currentProblem ? (
-              <LiveCodingPanel
-                problem={currentProblem}
-                sessionId={dbSessionId || undefined}
-                onCodeChange={handleCodeChange}
-              />
-            ) : (
-              <InterviewEditor
-                onCodeChange={handleCodeChange}
-                onOutputChange={handleOutputChange}
-              />
-            )}
+            <InterviewEditor
+              onCodeChange={handleCodeChange}
+              onOutputChange={handleOutputChange}
+            />
           </div>
         )}
 
         {/* Mobile: show editor when tab is "code" */}
         {showEditor && mobileTab === "code" && (
           <div className="md:hidden w-full h-full p-2">
-            {currentProblem ? (
-              <LiveCodingPanel
-                problem={currentProblem}
-                sessionId={dbSessionId || undefined}
-                onCodeChange={handleCodeChange}
-              />
-            ) : (
-              <InterviewEditor
-                onCodeChange={handleCodeChange}
-                onOutputChange={handleOutputChange}
-              />
-            )}
+            <InterviewEditor
+              onCodeChange={handleCodeChange}
+              onOutputChange={handleOutputChange}
+            />
           </div>
         )}
 

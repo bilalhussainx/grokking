@@ -36,33 +36,6 @@ test.describe('Mobile UI', () => {
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 5);
   });
 
-  test('course page is readable on mobile', async ({ page }) => {
-    await page.goto('/course/islam-foundations/what-is-islam');
-    await page.waitForLoadState('networkidle');
-    // Content should be visible and not clipped
-    const content = page.locator('article, .prose, main').first();
-    await expect(content).toBeVisible({ timeout: 10000 });
-  });
-
-  test('talk page language grid works on mobile', async ({ page }) => {
-    await page.goto('/talk');
-    await expect(page.getByText('Spanish')).toBeVisible();
-    // Tap a language
-    await page.getByText('Spanish').click();
-    await expect(page.locator('body')).toBeVisible();
-  });
-
-  test('translate bar does not block content', async ({ page }) => {
-    await page.goto('/');
-    // Translate bar should be visible but small
-    const translateBtn = page.getByText('Translate');
-    if (await translateBtn.isVisible()) {
-      const rect = await translateBtn.evaluate(el => el.getBoundingClientRect());
-      // Should be at the bottom, not covering main content
-      expect(rect.top).toBeGreaterThan(700);
-    }
-  });
-
   test('onboarding is usable on mobile', async ({ page }) => {
     await page.goto('/onboarding');
     await expect(page.getByText('What language do you speak?')).toBeVisible();
@@ -71,14 +44,5 @@ test.describe('Mobile UI', () => {
     // Continue button should be visible without scrolling past viewport
     const continueBtn = page.getByText('Continue');
     await expect(continueBtn).toBeVisible();
-  });
-});
-
-test.describe('Mobile Coach Panel', () => {
-  test.use({ viewport: { width: 390, height: 844 } });
-
-  test('placement page works on mobile', async ({ page }) => {
-    await page.goto('/placement/es');
-    await expect(page.getByText('Placement Test')).toBeVisible();
   });
 });
