@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @import "./tokens.css";
 @import "../styles/kairos-tokens.css";
+@import "../styles/daybreak-tokens.css";
 @import "@fontsource/noto-nastaliq-urdu/400.css";
 @source "../**/*.{ts,tsx,js,jsx,mdx}";
 

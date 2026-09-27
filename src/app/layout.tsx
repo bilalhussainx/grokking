@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     default: 'KairosLearn — Your AI college counselor, for every student',
     template: '%s | KairosLearn',
   },
-  description: 'KairosLearn is an AI admissions counselor that knows your essays, understands your finances, and will take your call at 11pm the night before a deadline. The college counselor that wealthy families pay $8,000 for — now free for everyone else.',
+  description: 'College guidance, at your pace. Find one next step, explore costs and plan your applications. AI interviews, structures and critiques; you write every essay.',
   keywords: [
     'AI college counselor', 'college admissions', 'college application help',
     'personal statement coach', 'common app essay coach', 'supplemental essay help',
@@ -55,16 +55,16 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://kairoslearn.com',
     siteName: 'KairosLearn',
-    title: 'KairosLearn — The AI college counselor wealthy families pay $8,000 for. Now free for everyone else.',
-    description: 'AI admissions counseling that knows your essays, understands your finances, and takes your call at 11pm the night before a deadline.',
+    title: 'KairosLearn — Your future. One good next step.',
+    description: 'College guidance, at your pace. Start with the question you have today.',
     // og:image is auto-generated from src/app/opengraph-image.tsx (1200x630).
     // Don't add an explicit `images` here — Next.js will inject the file-based
     // route into <meta property="og:image"> automatically.
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KairosLearn — The AI college counselor wealthy families pay $8,000 for.',
-    description: 'AI admissions counseling that knows your essays, understands your finances, and takes your call at 11pm the night before a deadline.',
+    title: 'KairosLearn — Your future. One good next step.',
+    description: 'College guidance, at your pace. Start with the question you have today.',
     // twitter:image is auto-generated from src/app/twitter-image.tsx (or
     // falls back to opengraph-image when only the OG variant exists).
   },

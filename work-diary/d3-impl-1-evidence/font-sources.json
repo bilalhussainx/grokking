@@ -1,0 +1,52 @@
+[
+  {
+    "family": "Atkinson Hyperlegible",
+    "name": "atkinson-hyperlegible-400.woff2",
+    "url": "https://fonts.gstatic.com/s/atkinsonhyperlegible/v12/9Bt23C1KxNDXMspQ1lPyU89-1h6ONRlW45G04pIo.woff2"
+  },
+  {
+    "family": "Atkinson Hyperlegible",
+    "name": "atkinson-hyperlegible-700.woff2",
+    "url": "https://fonts.gstatic.com/s/atkinsonhyperlegible/v12/9Bt73C1KxNDXMspQ1lPyU89-1h6ONRlW45G8Wbc9dCWP.woff2"
+  },
+  {
+    "family": "Bricolage Grotesque",
+    "name": "bricolage-grotesque-400.woff2",
+    "url": "https://fonts.gstatic.com/s/bricolagegrotesque/v9/3y9H6as8bTXq_nANBjzKo3IeZx8z6up5BeSl5jBNz_19PpbpMXuECpwUxJBOm_OJWiawA1Xp.woff2"
+  },
+  {
+    "family": "Bricolage Grotesque",
+    "name": "bricolage-grotesque-700.woff2",
+    "url": "https://fonts.gstatic.com/s/bricolagegrotesque/v9/3y9H6as8bTXq_nANBjzKo3IeZx8z6up5BeSl5jBNz_19PpbpMXuECpwUxJBOm_OJWiawA1Xp.woff2"
+  },
+  {
+    "family": "Noto Sans Devanagari",
+    "name": "noto-sans-devanagari-400.woff2",
+    "url": "https://fonts.gstatic.com/s/notosansdevanagari/v30/TuG7UUFzXI5FBtUq5a8bjKYTZjtRU6Sgv3NaV_SNmI0b8QQCQmHN5TV_9qo.woff2"
+  },
+  {
+    "family": "Noto Sans Devanagari",
+    "name": "noto-sans-devanagari-700.woff2",
+    "url": "https://fonts.gstatic.com/s/notosansdevanagari/v30/TuG7UUFzXI5FBtUq5a8bjKYTZjtRU6Sgv3NaV_SNmI0b8QQCQmHN5TV_9qo.woff2"
+  },
+  {
+    "family": "Noto Sans Gurmukhi",
+    "name": "noto-sans-gurmukhi-400.woff2",
+    "url": "https://fonts.gstatic.com/s/notosansgurmukhi/v29/w8gyH3EvQP81sInb43inmyN9zZ7hb7ATbSWo4q8dJ74a3cVrSnsXn2CP.woff2"
+  },
+  {
+    "family": "Noto Sans Gurmukhi",
+    "name": "noto-sans-gurmukhi-700.woff2",
+    "url": "https://fonts.gstatic.com/s/notosansgurmukhi/v29/w8gyH3EvQP81sInb43inmyN9zZ7hb7ATbSWo4q8dJ74a3cVrSnsXn2CP.woff2"
+  },
+  {
+    "family": "Nunito Sans",
+    "name": "nunito-sans-400.woff2",
+    "url": "https://fonts.gstatic.com/s/nunitosans/v19/pe0TMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfGWVpNn64CL7U8upHZIbMV51Q42ptCp7t1R-s.woff2"
+  },
+  {
+    "family": "Nunito Sans",
+    "name": "nunito-sans-700.woff2",
+    "url": "https://fonts.gstatic.com/s/nunitosans/v19/pe0TMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfGWVpNn64CL7U8upHZIbMV51Q42ptCp7t1R-s.woff2"
+  }
+]

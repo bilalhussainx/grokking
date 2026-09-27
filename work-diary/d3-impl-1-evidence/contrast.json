@@ -1,0 +1,254 @@
+[
+  {
+    "foreground": "ink",
+    "background": "page",
+    "hexForeground": "#342A24",
+    "hexBackground": "#FFF7EE",
+    "ratio": 13.17,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "ink",
+    "background": "card",
+    "hexForeground": "#342A24",
+    "hexBackground": "#FFFFFF",
+    "ratio": 13.975,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "ink",
+    "background": "apricot",
+    "hexForeground": "#342A24",
+    "hexBackground": "#FCE4CD",
+    "ratio": 11.392,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "ink",
+    "background": "sage",
+    "hexForeground": "#342A24",
+    "hexBackground": "#E6EDDF",
+    "ratio": 11.675,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "muted",
+    "background": "page",
+    "hexForeground": "#69584B",
+    "hexBackground": "#FFF7EE",
+    "ratio": 6.388,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "muted",
+    "background": "card",
+    "hexForeground": "#69584B",
+    "hexBackground": "#FFFFFF",
+    "ratio": 6.778,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "muted",
+    "background": "apricot",
+    "hexForeground": "#69584B",
+    "hexBackground": "#FCE4CD",
+    "ratio": 5.525,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "muted",
+    "background": "sage",
+    "hexForeground": "#69584B",
+    "hexBackground": "#E6EDDF",
+    "ratio": 5.663,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "clay",
+    "background": "page",
+    "hexForeground": "#A13E24",
+    "hexBackground": "#FFF7EE",
+    "ratio": 6.127,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "clay",
+    "background": "card",
+    "hexForeground": "#A13E24",
+    "hexBackground": "#FFFFFF",
+    "ratio": 6.502,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "clay",
+    "background": "apricot",
+    "hexForeground": "#A13E24",
+    "hexBackground": "#FCE4CD",
+    "ratio": 5.3,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "clay",
+    "background": "sage",
+    "hexForeground": "#A13E24",
+    "hexBackground": "#E6EDDF",
+    "ratio": 5.432,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "green",
+    "background": "page",
+    "hexForeground": "#315B4C",
+    "hexBackground": "#FFF7EE",
+    "ratio": 7.246,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "green",
+    "background": "card",
+    "hexForeground": "#315B4C",
+    "hexBackground": "#FFFFFF",
+    "ratio": 7.688,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "green",
+    "background": "apricot",
+    "hexForeground": "#315B4C",
+    "hexBackground": "#FCE4CD",
+    "ratio": 6.267,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "green",
+    "background": "sage",
+    "hexForeground": "#315B4C",
+    "hexBackground": "#E6EDDF",
+    "ratio": 6.423,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "border",
+    "background": "page",
+    "hexForeground": "#967D6A",
+    "hexBackground": "#FFF7EE",
+    "ratio": 3.639,
+    "normalTextPass": false,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "border",
+    "background": "card",
+    "hexForeground": "#967D6A",
+    "hexBackground": "#FFFFFF",
+    "ratio": 3.861,
+    "normalTextPass": false,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "border",
+    "background": "apricot",
+    "hexForeground": "#967D6A",
+    "hexBackground": "#FCE4CD",
+    "ratio": 3.148,
+    "normalTextPass": false,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "border",
+    "background": "sage",
+    "hexForeground": "#967D6A",
+    "hexBackground": "#E6EDDF",
+    "ratio": 3.226,
+    "normalTextPass": false,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "focus",
+    "background": "page",
+    "hexForeground": "#245C52",
+    "hexBackground": "#FFF7EE",
+    "ratio": 7.256,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "focus",
+    "background": "card",
+    "hexForeground": "#245C52",
+    "hexBackground": "#FFFFFF",
+    "ratio": 7.699,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "focus",
+    "background": "apricot",
+    "hexForeground": "#245C52",
+    "hexBackground": "#FCE4CD",
+    "ratio": 6.276,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "focus",
+    "background": "sage",
+    "hexForeground": "#245C52",
+    "hexBackground": "#E6EDDF",
+    "ratio": 6.432,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "error",
+    "background": "page",
+    "hexForeground": "#A12720",
+    "hexBackground": "#FFF7EE",
+    "ratio": 7.002,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "error",
+    "background": "card",
+    "hexForeground": "#A12720",
+    "hexBackground": "#FFFFFF",
+    "ratio": 7.43,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "error",
+    "background": "apricot",
+    "hexForeground": "#A12720",
+    "hexBackground": "#FCE4CD",
+    "ratio": 6.056,
+    "normalTextPass": true,
+    "nonTextPass": true
+  },
+  {
+    "foreground": "error",
+    "background": "sage",
+    "hexForeground": "#A12720",
+    "hexBackground": "#E6EDDF",
+    "ratio": 6.207,
+    "normalTextPass": true,
+    "nonTextPass": true
+  }
+]

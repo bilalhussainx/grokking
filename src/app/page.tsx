@@ -22,6 +22,7 @@ import OnboardingChecklist from "@/components/cc/dashboard/OnboardingChecklist";
 import CounselorDashboard from "@/components/cc/dashboard/CounselorDashboard";
 import AppShell from "@/components/nav/AppShell";
 import type { SidebarGrade } from "@/components/nav/Sidebar";
+import DaybreakHomepage from "@/components/marketing/daybreak/DaybreakHomepage";
 
 
 const container = {
@@ -201,13 +202,8 @@ export default function HomePage() {
     })
     .sort((a, b) => (courseProgress[b.slug] ?? 0) - (courseProgress[a.slug] ?? 0));
 
-  // Anonymous visitors → cinematic /landing. The pre-auth marketing surface
-  // lives at /landing; / is reserved for the logged-in counselor dashboard.
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace("/landing");
-    }
-  }, [loading, user, router]);
+  // Signed-out visitors get the Daybreak homepage after auth resolves.
+  // Signed-in dashboard/intake effects below retain their existing behavior.
 
   // Logged-in + onboarded users → /cc/dashboard (the canonical adaptive
   // dashboard). The legacy CounselorDashboard at / is kept around for
@@ -336,6 +332,8 @@ export default function HomePage() {
     typeof window !== "undefined" &&
     new URLSearchParams(window.location.search).get("focus") === "intake";
   const showAppShell = Boolean(user && !loading) && !isIntakeCoachMode;
+
+  if (!loading && !user) return <DaybreakHomepage />;
 
   const homeContent = (
     <div className="min-h-screen bg-[var(--background)]">

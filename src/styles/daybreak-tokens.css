@@ -1,0 +1,26 @@
+/* Opt-in Daybreak v2. Legacy --kl-* and global Tailwind tokens remain intact. */
+@font-face{font-family:"Daybreak Atkinson";src:url('/fonts/daybreak/atkinson-hyperlegible-400.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:"Daybreak Atkinson";src:url('/fonts/daybreak/atkinson-hyperlegible-700.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
+@font-face{font-family:"Daybreak Nunito";src:url('/fonts/daybreak/nunito-sans-400.woff2') format('woff2');font-style:normal;font-weight:400 700;font-display:swap}
+@font-face{font-family:"Daybreak Devanagari";src:url('/fonts/daybreak/noto-sans-devanagari-400.woff2') format('woff2');font-style:normal;font-weight:400 700;font-display:swap}
+@font-face{font-family:"Daybreak Gurmukhi";src:url('/fonts/daybreak/noto-sans-gurmukhi-400.woff2') format('woff2');font-style:normal;font-weight:400 700;font-display:swap}
+@font-face{font-family:"Daybreak Urdu";src:url('/fonts/daybreak/noto-nastaliq-urdu.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+
+:root{
+ --db-page:#FFF7EE;--db-card:#FFFFFF;--db-ink:#342A24;--db-muted:#69584B;
+ --db-clay:#A13E24;--db-clay-hover:#85321D;--db-on-clay:#FFFFFF;
+ --db-apricot:#FCE4CD;--db-sage:#E6EDDF;--db-green:#315B4C;
+ --db-border:#967D6A;--db-focus:#245C52;--db-error:#A12720;
+ --db-font-body:"Daybreak Atkinson",Arial,sans-serif;--db-font-display:"Daybreak Nunito","Daybreak Atkinson",Arial,sans-serif;
+ --db-radius-control:12px;--db-radius-card:12px;--db-radius-feature:22px;
+ --db-space-1:4px;--db-space-2:8px;--db-space-3:12px;--db-space-4:16px;--db-space-6:24px;--db-space-8:32px;--db-space-12:48px;--db-space-16:64px;
+ --db-shadow:0 3px 0 #342a240b;--db-shadow-raised:0 8px 24px #342a2412;
+ --db-type-xs:12px;--db-type-sm:14px;--db-type-body:16px;--db-type-lead:20px;--db-type-title:32px;--db-type-display:68px;
+}
+@theme inline{
+ --color-daybreak-page:var(--db-page);--color-daybreak-card:var(--db-card);--color-daybreak-ink:var(--db-ink);--color-daybreak-muted:var(--db-muted);
+ --color-daybreak-clay:var(--db-clay);--color-daybreak-apricot:var(--db-apricot);--color-daybreak-sage:var(--db-sage);--color-daybreak-green:var(--db-green);--color-daybreak-border:var(--db-border);--color-daybreak-focus:var(--db-focus);
+ --font-daybreak:var(--db-font-body);--font-daybreak-display:var(--db-font-display);
+ --radius-daybreak-control:var(--db-radius-control);--radius-daybreak-card:var(--db-radius-card);--radius-daybreak-feature:var(--db-radius-feature);
+ --shadow-daybreak:var(--db-shadow);--shadow-daybreak-raised:var(--db-shadow-raised);
+}

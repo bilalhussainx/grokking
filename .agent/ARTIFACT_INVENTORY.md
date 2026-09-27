@@ -16,3 +16,21 @@
 | work-diary/qa-synthetic-resume.pdf / make-resume-fixture.cjs |1095B clearly labeled upload fixture and generator; no real student data |
 
 Do not stage the entire directory: historical/private logs, unrelated files and large screenshots are not automatically part of a commit. All evidence remains in the requested local work-diary for portable continuation.
+
+## Daybreak artifact inventory
+
+| Artifact | Location |
+|---|---|
+| Design system v2 and archived v1 | `DESIGN.md`, `docs/design/archive/DESIGN-v1-navy-gold.md` |
+| Scoped tokens | `src/styles/daybreak-tokens.css` |
+| Licensed fonts and source manifest | `public/fonts/`, `work-diary/d3-impl-1-evidence/font-sources.json` |
+| Original illustration | `public/illustrations/daybreak/next-step.svg` |
+| Accessible primitives/tests | `src/components/ui/daybreak/` |
+| Homepage, shell and interaction tests | `src/components/marketing/daybreak/` |
+| Pure logic/tests | `src/lib/daybreak/` |
+| Root and middleware regressions | `src/app/page.daybreak.test.tsx`, `src/middleware.daybreak.test.ts` |
+| Validation report, plan and raw logs | `work-diary/d3-impl-1-validation.md`, `work-diary/d3-impl-1-PLAN.md`, `work-diary/d3-impl-1-*.log` |
+| Six viewport captures, extra states, DOM/performance/contrast/assets evidence | `work-diary/d3-impl-1-evidence/` |
+| Local-only Next preview helper | `work-diary/daybreak-local-preview.cjs` |
+
+Ignored runtime artifacts are not release artifacts: `.next/`, node_modules junction and the incomplete dependency mirror. There is no deployment or production validation artifact in this slice.

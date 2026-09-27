@@ -32,3 +32,25 @@ Alltenstudentaccounts created. test8CA/Ontario persists afterlogout/login, saved
 - Independent report accuracy PASS including119-123 addendum; full product acceptance unpassed. work-diary/gate1-independent-verification.md.
 - Screens001-123 shown; sampled graduate read isolation, draft privacy, API publication, student/head resubmission/approval, new-login feature persistence and second-essay isolation verified with bounded scope.
 - No production deployment/migration/real-user messages/paid listing. Exact next gate and fixtures: work-diary/checkpoint-123.md.
+
+## Daybreak validation ledger
+
+2026-09-26. Full evidence and limitations: `work-diary/d3-impl-1-validation.md`.
+
+| Evidence | Result |
+|---|---|
+| Full src Vitest, one threads worker | 92 files / 626 passed; exit 0 |
+| Final affected Vitest including middleware, routing, controls and logic | 5 files / 48 passed; exit 0 |
+| `npx tsc --noEmit -p .` | Exit 2, inherited aid-explainer props mismatch |
+| Fresh TypeScript with `--incremental false` | Same single inherited error |
+| `npm run build` | Exit 1, external dependency junction rejected by Turbopack |
+| Scoped ESLint | Exit 0, one native-SVG img advisory |
+| gstack actual Next browser | Six required viewport captures plus multilingual, results and share card |
+| DOM checks | No homepage horizontal overflow; all interactive targets >=44px; font faces loaded; correct selected-option colors |
+| Keyboard/form checks | Skip target, result/error focus, reset, exact cents, currency invalidation and unknown path verified |
+| Contrast | Normal text >=4.5:1, functional borders/focus >=3:1 across the documented surfaces |
+| Performance | Dev measurements recorded; production budget and Lighthouse acceptance not established |
+| Independent review | Separate reviewer examined source, test evidence and final report; no new source blocker identified in its first two passes |
+| Cleanup | Owned server/browser stopped; temporary mirror removal blocked by automatic approval review |
+
+The 48 affected tests overlap the 626 full-suite tests except the two new matcher cases. No `test:unit`, production migration, push, deployment or environment-file access was performed. The absent local service-role key causes the existing glossary endpoint's documented 500 response in local preview.

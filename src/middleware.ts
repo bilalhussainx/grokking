@@ -371,7 +371,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all routes except static files, images, manifests, and HTML files in public/
-    "/((?!_next/static|_next/image|favicon.ico|manifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html|ico|txt|xml|json|webmanifest)$).*)",
+    // Daybreak's public WOFF2 assets and homepage share card need no session.
+    // Keep the font exception scoped; application/auth route matching is unchanged.
+    "/((?!_next/static|_next/image|favicon.ico|manifest|opengraph-image$|fonts/daybreak/[^/]+\\.woff2$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html|ico|txt|xml|json|webmanifest)$).*)",
   ],
 };

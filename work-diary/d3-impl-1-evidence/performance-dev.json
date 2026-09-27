@@ -1,0 +1,38 @@
+{
+  "environment": "Local Next development preview, unthrottled, warm navigation; not a Lighthouse score or production benchmark",
+  "url": "/",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  },
+  "ttfbMs": 2294.800000011921,
+  "domContentLoadedMs": 2565.199999988079,
+  "loadMs": 3155.0999999940395,
+  "paint": [
+    {
+      "name": "first-paint",
+      "ms": 2576
+    },
+    {
+      "name": "first-contentful-paint",
+      "ms": 4060
+    }
+  ],
+  "lcpCandidates": [
+    {
+      "startTime": 4060,
+      "renderTime": 4060,
+      "loadTime": 0,
+      "size": 23712,
+      "tag": "H1"
+    }
+  ],
+  "layoutShifts": [
+    {
+      "startTime": 4148.699999988079,
+      "value": 0.0009820624742167972
+    }
+  ],
+  "observedLayoutShiftSum": 0.0009820624742167972,
+  "note": "Observed shift sum is diagnostic; it is not the web-vitals session-window CLS algorithm. INP not measured."
+}
