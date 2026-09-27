@@ -3,7 +3,7 @@ import { createServerSupabase } from "@/lib/supabase-auth";
 import { deductCredits, addCredits } from "@/lib/credits";
 import { getLanguagePersona, getDefaultPersona, type ProficiencyLevel } from "@/lib/language-personas";
 import { buildAgentContext, getConversationCheckpoint, buildResumeContext, updateConversationCheckpoint } from "@/lib/language-agent";
-import type { ConversationCheckpoint } from "@/data/language-types";
+import type { ConversationCheckpoint } from "@/lib/voice/language-types";
 
 // Force Node.js runtime and disable caching for guest reliability
 export const runtime = "nodejs";

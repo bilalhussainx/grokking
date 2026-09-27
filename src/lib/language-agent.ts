@@ -13,7 +13,7 @@ import type {
   AgentTurnMetadata,
   TranscriptEntry,
   ConversationCheckpoint,
-} from '@/data/language-types';
+} from '@/lib/voice/language-types';
 import type { ProficiencyLevel, LanguagePersona } from '@/lib/language-personas';
 import { getLanguagePersona } from '@/lib/language-personas';
 

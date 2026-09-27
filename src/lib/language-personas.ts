@@ -1,7 +1,7 @@
 // Language Persona Definitions for Language Learning Voice Agent
 // Separate from existing voice-personas.ts (Coach Kairos, Interviewer, etc.)
 
-import type { ConversationCheckpoint } from '@/data/language-types';
+import type { ConversationCheckpoint } from '@/lib/voice/language-types';
 
 export type ProficiencyLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 export type PersonaStyle = 'strict' | 'conversational' | 'patient';
