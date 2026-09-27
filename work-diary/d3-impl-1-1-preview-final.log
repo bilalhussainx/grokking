@@ -1,0 +1,15 @@
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+Daybreak local preview: http://127.0.0.1:4180
+○ Compiling / ...
+ GET / 200 in 12.4s (compile: 9.3s, proxy.ts: 316ms, render: 2.8s)
+⨯ Error: SUPABASE_SERVICE_ROLE_KEY is not set
+    at createAdminSupabase (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\lib\supabase-server.ts:33:11)
+    at GET (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\app\api\cc\glossary\route.ts:10:39)
+  31 |   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  32 |   if (!serviceKey) {
+> 33 |     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+     |           ^
+  34 |   }
+  35 |   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+  36 | }
+ GET /api/cc/glossary 500 in 1955ms (compile: 1250ms, proxy.ts: 330ms, render: 375ms)

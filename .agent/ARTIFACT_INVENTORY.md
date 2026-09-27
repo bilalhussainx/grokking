@@ -34,3 +34,10 @@ Do not stage the entire directory: historical/private logs, unrelated files and 
 | Local-only Next preview helper | `work-diary/daybreak-local-preview.cjs` |
 
 Ignored runtime artifacts are not release artifacts: `.next/`, node_modules junction and the incomplete dependency mirror. There is no deployment or production validation artifact in this slice.
+
+## D3-IMPL-1.1 artifacts
+- work-diary/d3-impl-1-1-validation.md and d3-impl-1-1-evidence/: gate report, screenshots, font/network/DOM/icon evidence.
+- work-diary/subset-daybreak-fonts.py and build-daybreak-icons.cjs: reproducible asset processing.
+- public/icons/: four BRAND-1 installable-app PNGs.
+- src/components/marketing/daybreak/DaybreakFooter.tsx: standalone admissions footer for Claude integration.
+- work-diary/daybreak-src-vitest.config.mts: source-only verification with no dotenv or production fixtures.

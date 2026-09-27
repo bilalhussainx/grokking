@@ -1,0 +1,1 @@
+BUILD_INCONCLUSIVE: Direct Next build was stopped after several minutes without emitted build diagnostics or a completion result. No production build pass claimed. The earlier slice also recorded a Turbopack root restriction for this external dependency junction.

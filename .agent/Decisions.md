@@ -36,3 +36,6 @@ Turbopack rejects a dependency junction outside its configured filesystem root. 
 ## Acceptance integrity
 
 Do not hide the pre-existing aid-explainer feature gap with unused props or compiler suppression. Do not label development timing as Lighthouse results or claim the 550KiB production budget passed. Native-script rendering is not native-speaker copy approval. Existing pricing claims remain a separate review item.
+
+## 2026-09-27 — admissions-only review fixes
+The D3-IMPL-1.1 prompt protects Claude's refocus files; integration requests belong in the gate report. Missing pricing exports must not be invented. Welcome-only script subsets keep initial font cost low; selected-language copy loads a larger subset. Preserve full legacy Urdu for arbitrary app messages. Rebuild subsets after copy edits with shaping closure intact. BRAND-1 emblem is resized, never redrawn; manifest theme/background both #FFF7EE. Default non-TTY Vitest output may remain quiet until completion; use verbose reporter for ongoing progress, not repeat concurrent runs. CLI shims can be absent in shared junctions; invoke installed package entry points and do not install through the junction.

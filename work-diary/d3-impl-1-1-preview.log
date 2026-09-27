@@ -1,0 +1,84 @@
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+Daybreak local preview: http://127.0.0.1:4180
+○ Compiling / ...
+ GET / 200 in 10.6s (compile: 9.4s, proxy.ts: 128ms, render: 994ms)
+⨯ Error: SUPABASE_SERVICE_ROLE_KEY is not set
+    at createAdminSupabase (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\lib\supabase-server.ts:33:11)
+    at GET (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\app\api\cc\glossary\route.ts:10:39)
+  31 |   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  32 |   if (!serviceKey) {
+> 33 |     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+     |           ^
+  34 |   }
+  35 |   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+  36 | }
+ GET /api/cc/glossary 500 in 245ms (compile: 154ms, proxy.ts: 12ms, render: 78ms)
+✓ Compiled in 1157ms
+✓ Compiled in 928ms
+○ Compiling /_not-found/page ...
+ GET /icons/kairos-192.png 404 in 4.9s (compile: 4.7s, render: 205ms)
+✓ Compiled in 370ms
+✓ Compiled in 3.3s
+ GET / 200 in 1690ms (compile: 792ms, proxy.ts: 52ms, render: 846ms)
+ GET / 200 in 2.1s (compile: 708ms, proxy.ts: 279ms, render: 1162ms)
+ GET / 200 in 877ms (compile: 17ms, proxy.ts: 697ms, render: 163ms)
+ GET / 200 in 179ms (compile: 48ms, proxy.ts: 10ms, render: 121ms)
+⨯ Error: SUPABASE_SERVICE_ROLE_KEY is not set
+    at createAdminSupabase (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\lib\supabase-server.ts:33:11)
+    at GET (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\app\api\cc\glossary\route.ts:10:39)
+  31 |   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  32 |   if (!serviceKey) {
+> 33 |     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+     |           ^
+  34 |   }
+  35 |   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+  36 | }
+ GET /api/cc/glossary 500 in 26ms (compile: 5ms, proxy.ts: 4ms, render: 17ms)
+ GET /fonts/daybreak/noto-sans-gurmukhi-400-subset.woff2 404 in 742ms (compile: 491ms, render: 250ms)
+ GET /fonts/daybreak/noto-sans-devanagari-400-subset.woff2 404 in 754ms (compile: 255ms, render: 498ms)
+ GET /fonts/daybreak/noto-nastaliq-urdu-subset.woff2 404 in 739ms (compile: 532ms, render: 207ms)
+✓ Compiled in 2.2s
+ GET /fonts/daybreak/noto-nastaliq-urdu-welcome.woff2 404 in 440ms (compile: 101ms, render: 339ms)
+ GET /fonts/daybreak/noto-sans-gurmukhi-400-welcome.woff2 404 in 445ms (compile: 48ms, render: 397ms)
+ GET /fonts/daybreak/noto-sans-devanagari-400-welcome.woff2 404 in 456ms (compile: 260ms, render: 195ms)
+ GET / 200 in 175ms (compile: 11ms, proxy.ts: 13ms, render: 151ms)
+⨯ Error: SUPABASE_SERVICE_ROLE_KEY is not set
+    at createAdminSupabase (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\lib\supabase-server.ts:33:11)
+    at GET (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\app\api\cc\glossary\route.ts:10:39)
+  31 |   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  32 |   if (!serviceKey) {
+> 33 |     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+     |           ^
+  34 |   }
+  35 |   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+  36 | }
+ GET /api/cc/glossary 500 in 30ms (compile: 5ms, proxy.ts: 6ms, render: 19ms)
+ GET / 200 in 148ms (compile: 11ms, proxy.ts: 8ms, render: 130ms)
+⨯ Error: SUPABASE_SERVICE_ROLE_KEY is not set
+    at createAdminSupabase (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\lib\supabase-server.ts:33:11)
+    at GET (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\app\api\cc\glossary\route.ts:10:39)
+  31 |   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  32 |   if (!serviceKey) {
+> 33 |     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+     |           ^
+  34 |   }
+  35 |   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+  36 | }
+ GET /api/cc/glossary 500 in 19ms (compile: 4ms, proxy.ts: 6ms, render: 9ms)
+✓ Compiled in 596ms
+✓ Finished filesystem cache database compaction in 11.8s
+ GET / 200 in 2.2s (compile: 773ms, proxy.ts: 262ms, render: 1123ms)
+ GET /api/cc/glossary 500 in 55ms (compile: 20ms, proxy.ts: 12ms, render: 23ms)
+⨯ Error: SUPABASE_SERVICE_ROLE_KEY is not set
+    at createAdminSupabase (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\lib\supabase-server.ts:33:11)
+    at GET (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\app\api\cc\glossary\route.ts:10:39)
+  31 |   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  32 |   if (!serviceKey) {
+> 33 |     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+     |           ^
+  34 |   }
+  35 |   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+  36 | }
+✓ Compiled in 549ms
+✓ Compiled in 77ms
+✓ Compiled in 651ms
