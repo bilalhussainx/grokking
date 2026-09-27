@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AIProvider, useAI } from "@/contexts/AIContext";
 import { XPProvider, useXP } from "@/contexts/XPContext";
 import { TopNavProvider } from "@/contexts/TopNavContext";
@@ -201,6 +201,8 @@ function CoachFAB() {
  */
 function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const isDaybreakHome = pathname === "/" && !user;
   const isCinematicPage = pathname === "/landing";
   // MarketingShell pages carry their own sticky marketing nav — mounting the
   // global TopNav above it produced a stacked double header with duplicate
@@ -212,7 +214,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
   // Cinematic landing page needs full document scroll (GSAP ScrollTrigger)
   // — no TopNav, no Coach sidebar, no overflow-hidden wrapper
-  if (isCinematicPage || hasOwnMarketingNav) {
+  if (isCinematicPage || hasOwnMarketingNav || isDaybreakHome) {
     return <>{children}</>;
   }
 
@@ -269,13 +271,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
               <AppLayout>
                 {children}
               </AppLayout>
-              <CoachKairosShell />
-              <CoachFAB />
-              <GamificationOverlays />
-              <GlobalSearch />
-              <ShortcutsHelp />
-              <TranslationBarWrapper />
-              <SurveyPrompt />
+              <AppOverlays />
             </UpgradeGateProvider>
           </CoachKairosProvider>
           </GlossaryProvider>
@@ -286,4 +282,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       </ThemeProvider>
     </AuthProvider>
   );
+}
+
+/** Anonymous homepage owns its full-page marketing surface; signed-in overlays stay intact. */
+function AppOverlays() {
+  const pathname = usePathname();
+  const { user } = useAuth();
+  if (pathname === "/" && !user) return null;
+  return <><CoachKairosShell /><CoachFAB /><GamificationOverlays /><GlobalSearch /><ShortcutsHelp /><TranslationBarWrapper /><SurveyPrompt /></>;
 }
