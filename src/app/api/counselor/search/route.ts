@@ -8,6 +8,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { searchCounselors } from "@/lib/cc/counselor-helpers";
 
+// Signed-out visitors can call this (it backs /find-counselor), so it returns
+// marketplace-profile fields only — never the counselor's auth user id or
+// Stripe payout details that searchCounselors' select(*) carries.
+const PUBLIC_FIELDS = [
+  "id", "slug", "display_name", "headline", "bio", "photo_url", "years_experience",
+  "specialties", "languages", "hourly_rate_usd", "accepts_new_students", "verified",
+  "total_sessions", "average_rating", "total_reviews",
+  "agency_name", "agency_slug", "agency_verified", "matched_school_admits",
+] as const;
+
+function publicProfile(row: Record<string, unknown>) {
+  return Object.fromEntries(PUBLIC_FIELDS.filter((k) => k in row).map((k) => [k, row[k]]));
+}
+
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const q = url.searchParams.get("q");
@@ -28,7 +42,7 @@ export async function GET(req: NextRequest) {
   });
 
   return NextResponse.json({
-    counselors: results,
+    counselors: results.map((r) => publicProfile(r as Record<string, unknown>)),
     count: results.length,
   });
 }

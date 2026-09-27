@@ -57,6 +57,7 @@ const PUBLIC_PREFIXES = [
   // counselors and their services before creating an account. Booking is
   // still auth-gated at the API (/api/counselor/booking requires a session).
   "/find-counselor",
+  "/api/counselor/search", // read-only, public-fields-only search behind /find-counselor
   "/counselors/",
   "/agencies/",
 ];
