@@ -13,6 +13,16 @@ doesn't re-test what's recorded here. Newest work goes at the top.
 | 4 | Stripe and credits for the new prices (Free 200 credits; $15/month; $99/year) | **Done in code**: `docs/superpowers/plans/2026-09-25-fix-4-stripe-credits-new-prices.md`; final-review fixes applied. Stripe prices created by Astra (`docs/handoff/stripe-setup-report.md`). **Credit lock-down applied in production 2026-09-26.** Branch not deployed; 3 other migrations not applied. |
 | 5 | Competitor research, phone app (PWA), Ad Astra readiness, full testing of every student type | Queued |
 
+## 2026-09-27 — D3-IMPL-1.1 integrated (`04a87f2`)
+
+- Codex's font subsetting, BRAND-1 emblem and admissions footer are merged.
+- `PRO_FAIR_USE` is exported from `pricing.ts`; the tier-gate defaults and the homepage copy read it.
+- `MarketingShell` uses `DaybreakFooter`, and the dead `layout/Footer.tsx` is deleted.
+- The manifest has the PWA icons, and the Apple touch icon is set.
+- Build 0, tsc 0, and 707/707 unit tests pass.
+- First load: `/` 478 KiB (fonts 82), `/login` 455 KiB, `/pricing` 636 KiB.
+- Known transition: the navy `MarketingShell` header and the warm footer carry two different logos. This is fixed by D4.8.
+
 ## 2026-09-27 — Pre-deploy verification (release candidate `refocus/admissions-only`)
 
 The founder asked for every user workflow, feature, progression, continuity, design and font-legibility check, plus the live-audit items, to be tested before deploy.
