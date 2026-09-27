@@ -1,6 +1,6 @@
 # KairosLearn design system v2 — Daybreak + Table
 
-Approved direction; slice 1 awaiting GATE D3-IMPL-1. Authority: `docs/handoff/astra-gate-d3r2-response.md`, 2026-09-26. Previous system archived at `docs/design/archive/DESIGN-v1-navy-gold.md`. This system governs migrated surfaces only.
+Approved direction; review fixes awaiting GATE D3-IMPL-1.1. Authority: `docs/handoff/codex-prompts/session-b-d3-impl-1-1.md`, 2026-09-27. Previous system archived at `docs/design/archive/DESIGN-v1-navy-gold.md`. This system governs migrated surfaces only. KairosLearn is exclusively an AI college-admissions counselor; high-school coursework and college interviews remain in scope, study courses and tutoring do not.
 
 ## Intent
 
@@ -67,6 +67,10 @@ Paragraphs stay near 60–75 characters per line. Labels remain visible outside 
 Language codes come from `src/lib/cc/coach-languages.ts`. The picker explicitly controls the quick check and hero, not the whole site. Native-speaker editorial acceptance is required before deployment; browser testing proves rendering/direction only. WOFF2 uses `font-display: swap`; licenses and provenance are in `public/fonts/LICENSES.md`. Daybreak adds no remote font calls; legacy root fonts remain on unmigrated surfaces.
 
 ## Layout, shape and elevation
+
+BRAND-1 uses the approved compass/star emblem from `docs/brand/kairos-icon-512.png` with the KairosLearn text name. Header/footer use `public/icons/kairos-192.png`. Installable-app assets: 192, 512, maskable 512 and apple-touch 180 PNGs. Manifest theme and background are both `#FFF7EE`; icon canvases are opaque white to retain the approved artwork. Footer groups: Platform, Resources, Legal; links and behavior live in the reusable `DaybreakFooter` component.
+
+Homepage font policy: preload only Nunito; retain swap. Permanent welcome words use small script subsets; selected quick-check languages load their corresponding copy subsets on demand. Regenerate after copy changes and verify shaping visually. Keep full legacy Urdu for arbitrary app messages. Font-byte evidence and reproduction instructions are in `public/fonts/LICENSES.md`.
 
 - Content max-width 1200px, mobile gutters 18px, desktop at least 24px.
 - Desktop check has three fields in a row and the action beside them when space permits. Stack on mobile in the same order. The English check and action should fit the first 812px screen.

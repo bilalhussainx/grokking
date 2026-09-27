@@ -1,0 +1,150 @@
+{
+  "url": "http://127.0.0.1:4180/",
+  "width": 375,
+  "documentWidth": 375,
+  "overflowing": [],
+  "smallTargets": [],
+  "language": "es",
+  "direction": "ltr",
+  "fontFaces": [
+    {
+      "family": "Daybreak Welcome Devanagari",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Welcome Gurmukhi",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Welcome Urdu",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Atkinson",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Atkinson",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Nunito",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Devanagari",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Gurmukhi",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Urdu",
+      "status": "loaded"
+    }
+  ],
+  "fonts": [
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400-subset.woff2",
+      "encodedBytes": 17924,
+      "transferBytes": 300
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/atkinson-hyperlegible-400.woff2",
+      "encodedBytes": 0,
+      "transferBytes": 300
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400-subset.woff2",
+      "encodedBytes": 17924,
+      "transferBytes": 300
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/atkinson-hyperlegible-700.woff2",
+      "encodedBytes": 0,
+      "transferBytes": 300
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-sans-devanagari-400-welcome.woff2",
+      "encodedBytes": 0,
+      "transferBytes": 300
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-sans-gurmukhi-400-welcome.woff2",
+      "encodedBytes": 0,
+      "transferBytes": 300
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-nastaliq-urdu-welcome.woff2",
+      "encodedBytes": 0,
+      "transferBytes": 300
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-nastaliq-urdu-subset.woff2",
+      "encodedBytes": 95280,
+      "transferBytes": 95580
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-sans-devanagari-400-subset.woff2",
+      "encodedBytes": 49488,
+      "transferBytes": 49788
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-sans-gurmukhi-400-subset.woff2",
+      "encodedBytes": 12988,
+      "transferBytes": 13288
+    }
+  ],
+  "preloads": [
+    "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400-subset.woff2"
+  ],
+  "footerLinks": [
+    {
+      "name": "Coach Kairos",
+      "href": "/cc"
+    },
+    {
+      "name": "School list",
+      "href": "/schools"
+    },
+    {
+      "name": "Pricing",
+      "href": "/pricing"
+    },
+    {
+      "name": "Interview prep",
+      "href": "/cc/interview-prep"
+    },
+    {
+      "name": "About",
+      "href": "/about"
+    },
+    {
+      "name": "FAQ",
+      "href": "/faq"
+    },
+    {
+      "name": "Academic integrity",
+      "href": "/integrity"
+    },
+    {
+      "name": "Privacy",
+      "href": "/privacy"
+    },
+    {
+      "name": "Terms",
+      "href": "/terms"
+    }
+  ],
+  "brandImages": [
+    {
+      "src": "/icons/kairos-192.png",
+      "loaded": true
+    },
+    {
+      "src": "/icons/kairos-192.png",
+      "loaded": true
+    }
+  ]
+}

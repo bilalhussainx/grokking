@@ -99,9 +99,19 @@ describe("calculateGap", () => {
       annualCostCents: 100,
       gapCents: 100,
     });
+    expect(calculateGap({ annualCost: "45,000", grants: "0", familyContribution: "0" })).toMatchObject({
+      ok: true,
+      annualCostCents: 4_500_000,
+      gapCents: 4_500_000,
+    });
+    expect(calculateGap({ annualCost: "45,000.50", grants: "0", familyContribution: "0" })).toMatchObject({
+      ok: true,
+      annualCostCents: 4_500_050,
+      gapCents: 4_500_050,
+    });
   });
 
-  it.each(["", "   ", ".", "1e2", "NaN", "-1", "1.234", "10000000.01"])(
+  it.each(["", "   ", ".", "1e2", "NaN", "-1", "1.234", "10000000.01", "45,00", "4,5000", "45,,000", "1,234,56.78"])(
     "rejects malformed or out-of-range annual cost %j",
     (annualCost) => {
       expect(calculateGap({ annualCost, grants: "0", familyContribution: "0" })).toMatchObject({

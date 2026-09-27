@@ -1,0 +1,72 @@
+{
+  "fonts": [
+    {
+      "url": "http://127.0.0.1:4180/_next/static/media/01e4147cff8141ee-s.p.7787e134.woff2",
+      "bytes": 37776,
+      "transfer": 38076
+    },
+    {
+      "url": "http://127.0.0.1:4180/_next/static/media/5c285b27cdda1fe8-s.p.a62025f2.woff2",
+      "bytes": 36980,
+      "transfer": 37280
+    },
+    {
+      "url": "http://127.0.0.1:4180/_next/static/media/70bc3e132a0a741e-s.p.15008bfb.woff2",
+      "bytes": 40480,
+      "transfer": 40780
+    },
+    {
+      "url": "http://127.0.0.1:4180/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2",
+      "bytes": 48432,
+      "transfer": 48732
+    },
+    {
+      "url": "http://127.0.0.1:4180/_next/static/media/8bd76523131fa0fc-s.p.eb17b6b9.woff2",
+      "bytes": 39304,
+      "transfer": 39604
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/atkinson-hyperlegible-400.woff2",
+      "bytes": 17208,
+      "transfer": 17508
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400.woff2",
+      "bytes": 31076,
+      "transfer": 31376
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/atkinson-hyperlegible-700.woff2",
+      "bytes": 17524,
+      "transfer": 17824
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-sans-devanagari-400.woff2",
+      "bytes": 121192,
+      "transfer": 121492
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-sans-gurmukhi-400.woff2",
+      "bytes": 33824,
+      "transfer": 34124
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-nastaliq-urdu.woff2",
+      "bytes": 159368,
+      "transfer": 159668
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400.woff2",
+      "bytes": 0,
+      "transfer": 300
+    }
+  ],
+  "preloads": [
+    "http://127.0.0.1:4180/_next/static/media/01e4147cff8141ee-s.p.7787e134.woff2",
+    "http://127.0.0.1:4180/_next/static/media/5c285b27cdda1fe8-s.p.a62025f2.woff2",
+    "http://127.0.0.1:4180/_next/static/media/70bc3e132a0a741e-s.p.15008bfb.woff2",
+    "http://127.0.0.1:4180/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2",
+    "http://127.0.0.1:4180/_next/static/media/8bd76523131fa0fc-s.p.eb17b6b9.woff2",
+    "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400.woff2"
+  ]
+}

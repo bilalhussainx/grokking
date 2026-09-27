@@ -1,0 +1,36 @@
+{
+  "source": "docs/brand/kairos-icon-512.png",
+  "theme_color": "#FFF7EE",
+  "background_color": "#FFF7EE",
+  "maskableSafeSquare": 288,
+  "icons": [
+    {
+      "file": "public/icons/kairos-192.png",
+      "width": 192,
+      "height": 192,
+      "bytes": 31240,
+      "sha256": "664571f2f1e1ebc4d5f60ad0ef8519b37ded59adc71a01ffaba5117e483930fc"
+    },
+    {
+      "file": "public/icons/kairos-512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 163247,
+      "sha256": "247d4cdad04408b8a3a7175f7da35417917981013b186bf39fec4a68f6e01dcf"
+    },
+    {
+      "file": "public/icons/apple-touch-icon.png",
+      "width": 180,
+      "height": 180,
+      "bytes": 27533,
+      "sha256": "70a6838c1b6747bb6837937c52f99ce77ad168763dfb5f407af6c1309a32f306"
+    },
+    {
+      "file": "public/icons/kairos-maskable-512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 73530,
+      "sha256": "828dc3dc564054ad65c26615750edb3c4b8c81a2e7047c27d7d58ead6c79d579"
+    }
+  ]
+}

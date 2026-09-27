@@ -1,0 +1,123 @@
+{
+  "url": "http://127.0.0.1:4180/",
+  "width": 1440,
+  "documentWidth": 1440,
+  "overflowing": [],
+  "smallTargets": [],
+  "language": "en",
+  "direction": "ltr",
+  "fontFaces": [
+    {
+      "family": "Daybreak Welcome Devanagari",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Welcome Gurmukhi",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Welcome Urdu",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Atkinson",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Atkinson",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Nunito",
+      "status": "loaded"
+    }
+  ],
+  "fonts": [
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400-subset.woff2",
+      "encodedBytes": 17924,
+      "transferBytes": 18224
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/atkinson-hyperlegible-400.woff2",
+      "encodedBytes": 17208,
+      "transferBytes": 17508
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400-subset.woff2",
+      "encodedBytes": 17924,
+      "transferBytes": 300
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/atkinson-hyperlegible-700.woff2",
+      "encodedBytes": 17524,
+      "transferBytes": 17824
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-sans-gurmukhi-400-welcome.woff2",
+      "encodedBytes": 1752,
+      "transferBytes": 2052
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-sans-devanagari-400-welcome.woff2",
+      "encodedBytes": 4708,
+      "transferBytes": 5008
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-nastaliq-urdu-welcome.woff2",
+      "encodedBytes": 24448,
+      "transferBytes": 24748
+    }
+  ],
+  "preloads": [
+    "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400-subset.woff2"
+  ],
+  "footerLinks": [
+    {
+      "name": "Coach Kairos",
+      "href": "/cc"
+    },
+    {
+      "name": "School list",
+      "href": "/schools"
+    },
+    {
+      "name": "Pricing",
+      "href": "/pricing"
+    },
+    {
+      "name": "Interview prep",
+      "href": "/cc/interview-prep"
+    },
+    {
+      "name": "About",
+      "href": "/about"
+    },
+    {
+      "name": "FAQ",
+      "href": "/faq"
+    },
+    {
+      "name": "Academic integrity",
+      "href": "/integrity"
+    },
+    {
+      "name": "Privacy",
+      "href": "/privacy"
+    },
+    {
+      "name": "Terms",
+      "href": "/terms"
+    }
+  ],
+  "brandImages": [
+    {
+      "src": "/icons/kairos-192.png",
+      "loaded": true
+    },
+    {
+      "src": "/icons/kairos-192.png",
+      "loaded": true
+    }
+  ]
+}

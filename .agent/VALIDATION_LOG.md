@@ -54,3 +54,8 @@ Alltenstudentaccounts created. test8CA/Ontario persists afterlogout/login, saved
 | Cleanup | Owned server/browser stopped; temporary mirror removal blocked by automatic approval review |
 
 The 48 affected tests overlap the 626 full-suite tests except the two new matcher cases. No `test:unit`, production migration, push, deployment or environment-file access was performed. The absent local service-role key causes the existing glossary endpoint's documented 500 response in local preview.
+
+## 2026-09-27 — D3-IMPL-1.1
+Source suite 93 files / 632 tests passed (exit 0); focused 38 overlap. TypeScript still fails on inherited aid props only. Targeted lint 0 errors / 3 image advisories. Actual browser font payload 583,164 to 83,564 unique bytes; six layout records pass overflow/touch checks. Five languages rendered; grouped money and single focus announcement path verified by DOM. See work-diary/d3-impl-1-1-validation.md for exact commands, limitations and gate requests. No deploy.
+
+Final artifact review confirmed test totals, font/icon hashes and DOM evidence. Its minor footer whitespace finding was repaired and recaptured. Implementation baea252. Production build attempt stopped without diagnostics/completion: inconclusive, not a pass.

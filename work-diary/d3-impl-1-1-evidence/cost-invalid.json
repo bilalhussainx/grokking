@@ -1,0 +1,6 @@
+{
+  "focus": "cost-error",
+  "text": "Check the highlighted amount. Enter annual cost as a nonnegative amount up to 10,000,000, with optional comma groups of three digits and at most two decimal places.",
+  "liveAncestor": false,
+  "invalid": "true"
+}

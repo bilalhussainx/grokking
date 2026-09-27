@@ -8,17 +8,17 @@ import { JsonLd, organizationSchema, websiteSchema } from "@/lib/schema";
 
 const inter = Inter({
   variable: "--font-inter",
-  subsets: ["latin"],
+  subsets: ["latin"], preload: false,
 });
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains",
-  subsets: ["latin"],
+  subsets: ["latin"], preload: false,
 });
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
-  subsets: ["latin"],
+  subsets: ["latin"], preload: false,
   weight: ["300", "400", "500"],
   style: ["normal", "italic"],
   display: "swap",
@@ -26,7 +26,7 @@ const cormorant = Cormorant_Garamond({
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
-  subsets: ["latin"],
+  subsets: ["latin"], preload: false,
   weight: ["300", "400", "500"],
   display: "swap",
 });

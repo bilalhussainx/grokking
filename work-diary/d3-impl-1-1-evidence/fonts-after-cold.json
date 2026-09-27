@@ -1,0 +1,42 @@
+{
+  "fonts": [
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400-subset.woff2",
+      "bytes": 17924,
+      "transfer": 18224
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/atkinson-hyperlegible-400.woff2",
+      "bytes": 17208,
+      "transfer": 17508
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400-subset.woff2",
+      "bytes": 17924,
+      "transfer": 300
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/atkinson-hyperlegible-700.woff2",
+      "bytes": 17524,
+      "transfer": 17824
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-sans-gurmukhi-400-welcome.woff2",
+      "bytes": 1752,
+      "transfer": 2052
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-sans-devanagari-400-welcome.woff2",
+      "bytes": 4708,
+      "transfer": 5008
+    },
+    {
+      "url": "http://127.0.0.1:4180/fonts/daybreak/noto-nastaliq-urdu-welcome.woff2",
+      "bytes": 24448,
+      "transfer": 24748
+    }
+  ],
+  "preloads": [
+    "http://127.0.0.1:4180/fonts/daybreak/nunito-sans-400-subset.woff2"
+  ]
+}

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import DaybreakHomepage from "./DaybreakHomepage";
@@ -50,6 +50,13 @@ function setCostAmounts(annualCost: string, grants: string, contribution: string
 
 function submitCostCheck() {
   fireEvent.click(screen.getByRole("button", { name: /calculate the gap/i }));
+}
+
+function expectNoLiveAnnouncement(node: HTMLElement) {
+  for (let current: HTMLElement | null = node; current; current = current.parentElement) {
+    expect(current).not.toHaveAttribute("aria-live");
+    expect(current).not.toHaveAttribute("role", "alert");
+  }
 }
 
 beforeEach(() => {
@@ -123,13 +130,18 @@ describe("Daybreak homepage cost check", () => {
     setCostAmounts("10", "10.01", "0");
     submitCostCheck();
 
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "Confirmed grants cannot exceed the total annual cost",
-    );
+    const error = screen.getByText(/Check the highlighted amount/);
+    expect(error).toHaveTextContent("Check the highlighted amount.");
+    expect(error).not.toHaveAttribute("role", "alert");
     expect(screen.getByLabelText("Confirmed grants & scholarships")).toHaveAttribute(
       "aria-invalid",
       "true",
     );
+    expect(screen.getByLabelText("Confirmed grants & scholarships")).toHaveAccessibleDescription(
+      /Confirmed grants cannot exceed the total annual cost/,
+    );
+    expectNoLiveAnnouncement(error);
+    return waitFor(() => expect(error).toHaveFocus());
   });
 
   it("treats explicit zeroes as entered amounts", () => {
@@ -137,17 +149,21 @@ describe("Daybreak homepage cost check", () => {
     setCostAmounts("0", "0", "0");
     submitCostCheck();
 
-    expect(screen.getByRole("heading", { name: "Your entered amounts cover this cost." })).toBeInTheDocument();
-    expect(screen.getByText(/USD\s*0\.00/, { selector: ".db-cost-amount" })).toBeInTheDocument();
+    const heading = screen.getByRole("heading", { name: "Your entered amounts cover this cost." });
+    expect(heading).toHaveAccessibleDescription(/USD\s*0\.00/);
+    expect(heading.getAttribute("aria-describedby")).toContain("cost-result-amount");
+    expectNoLiveAnnouncement(heading);
+    return waitFor(() => expect(heading).toHaveFocus());
   });
 
   it("calculates decimal amounts in cents", () => {
     render(<DaybreakHomepage />);
-    setCostAmounts("123.45", "23.40", "50.05");
+    setCostAmounts("45,000.50", "23,000.40", "1,000.05");
     submitCostCheck();
 
-    expect(screen.getByRole("heading", { name: "Your remaining annual gap." })).toBeInTheDocument();
-    expect(screen.getByText(/USD\s*50\.00/)).toBeInTheDocument();
+    const heading = screen.getByRole("heading", { name: "Your remaining annual gap." });
+    expect(heading).toHaveAccessibleDescription(/USD\s*21,000\.05/);
+    expect(screen.getByLabelText("Total annual cost")).toHaveAttribute("inputmode", "decimal");
   });
 
   it("clears entered values and results when currency changes", () => {
@@ -160,18 +176,21 @@ describe("Daybreak homepage cost check", () => {
       target: { value: "CAD" },
     });
 
-    expect(screen.getByLabelText("Total annual cost")).toHaveValue(null);
-    expect(screen.getByLabelText("Confirmed grants & scholarships")).toHaveValue(null);
+    expect(screen.getByLabelText("Total annual cost")).toHaveValue("");
+    expect(screen.getByLabelText("Confirmed grants & scholarships")).toHaveValue("");
     expect(screen.getByText("Amounts cleared. Changing currency does not convert your entries.")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Your remaining annual gap." })).not.toBeInTheDocument();
   });
 
-  it("shows the unknown-amount collection path and returns to the inputs", () => {
+  it("shows the unknown-amount collection path and returns to the inputs", async () => {
     render(<DaybreakHomepage />);
     fireEvent.click(screen.getByRole("button", { name: /i don’t know the amounts yet/i }));
 
-    expect(screen.getByRole("heading", { name: "Collect these three things." })).toBeInTheDocument();
+    const unknownHeading = screen.getByRole("heading", { name: "Collect these three things." });
+    expect(unknownHeading).toBeInTheDocument();
     expect(screen.getByText("The school’s current annual cost, including living costs.")).toBeInTheDocument();
+    expectNoLiveAnnouncement(unknownHeading);
+    await waitFor(() => expect(unknownHeading).toHaveFocus());
 
     fireEvent.click(screen.getByRole("button", { name: "Back to my numbers" }));
     expect(screen.queryByRole("heading", { name: "Collect these three things." })).not.toBeInTheDocument();
@@ -182,12 +201,12 @@ describe("Daybreak homepage cost check", () => {
 describe("Daybreak homepage yearly price gate", () => {
   it("shows the annual price only when yearly checkout is configured", () => {
     const { unmount } = render(<DaybreakHomepage />);
-    expect(screen.queryByTestId("yearly-price")).not.toBeInTheDocument();
+    expect(screen.queryByText(/\$99\/year USD/)).not.toBeInTheDocument();
 
     unmount();
     pricingState.yearlyEnabled = true;
     render(<DaybreakHomepage />);
 
-    expect(screen.getByTestId("yearly-price")).toHaveTextContent("$99/year USD");
+    expect(screen.getAllByText(/\$99\/year USD/).length).toBeGreaterThan(0);
   });
 });

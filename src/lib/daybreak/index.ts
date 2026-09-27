@@ -152,10 +152,12 @@ const amountLabels: Record<CostField, string> = {
 
 function parseAmountCents(value: string): number | null {
   const trimmed = value.trim();
-  const match = /^(\d*)(?:\.(\d{0,2}))?$/.exec(trimmed);
+  const match = trimmed.includes(",")
+    ? /^(\d{1,3}(?:,\d{3})+)(?:\.(\d{0,2}))?$/.exec(trimmed)
+    : /^(\d*)(?:\.(\d{0,2}))?$/.exec(trimmed);
   if (!match || !/\d/.test(trimmed)) return null;
 
-  const whole = Number(match[1]);
+  const whole = Number(match[1].replaceAll(",", ""));
   const fraction = Number((match[2] ?? "").padEnd(2, "0"));
   const cents = whole * 100 + fraction;
   return Number.isSafeInteger(cents) && cents <= MAX_AMOUNT_CENTS
@@ -167,7 +169,7 @@ function invalidAmount(field: CostField): CostCalculation {
   return {
     ok: false,
     field,
-    error: `Enter ${amountLabels[field]} as a nonnegative amount up to 10,000,000, with at most two decimal places.`,
+    error: `Enter ${amountLabels[field]} as a nonnegative amount up to 10,000,000, with optional comma groups of three digits and at most two decimal places.`,
   };
 }
 

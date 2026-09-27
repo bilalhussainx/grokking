@@ -1,0 +1,10 @@
+
+ RUN  v4.1.5 C:/Users/bilal/Downloads/grokking-daybreak
+
+
+ Test Files  93 passed (93)
+      Tests  632 passed (632)
+   Start at  14:24:54
+   Duration  260.18s (transform 2.14s, setup 47.12s, import 12.53s, tests 10.80s, environment 167.23s)
+
+EXIT_CODE=0

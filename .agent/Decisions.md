@@ -45,3 +45,5 @@ KairosLearn is only an AI college-admissions counselor. The study-courses produc
 
 **Guardrails:** the word "courses" in `/cc/courses` means high-school coursework and stays. The voice and college-interview stacks are shared and stay. Make the redirects permanent only after 30 days with no reversal.
 
+## 2026-09-27 — admissions-only review fixes
+The D3-IMPL-1.1 prompt protects Claude's refocus files; integration requests belong in the gate report. Missing pricing exports must not be invented. Welcome-only script subsets keep initial font cost low; selected-language copy loads a larger subset. Preserve full legacy Urdu for arbitrary app messages. Rebuild subsets after copy edits with shaping closure intact. BRAND-1 emblem is resized, never redrawn; manifest theme/background both #FFF7EE. Default non-TTY Vitest output may remain quiet until completion; use verbose reporter for ongoing progress, not repeat concurrent runs. CLI shims can be absent in shared junctions; invoke installed package entry points and do not install through the junction.

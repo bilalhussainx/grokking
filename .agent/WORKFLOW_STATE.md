@@ -1,4 +1,16 @@
-# Daybreak slice 1 checkpoint
+# Daybreak review-fix checkpoint — 2026-09-27
+
+Current phase: **GATE D3-IMPL-1.1, awaiting Claude review/integration** on `design/daybreak`. Scope: admissions-only review fixes, BRAND-1 assets/footer, font budget and cost accessibility/input handling. No D4.2 work started. No push/merge/deploy. §1 protected files untouched; root layout only disables four legacy font preloads.
+
+Implementation commit `baea252`. Final build attempt is inconclusive (stopped without diagnostics/completion); no production build pass. Separate evidence commit follows; review artifact is the authoritative handoff.
+
+Resume from `work-diary/d3-impl-1-1-validation.md`. Source tests: 93 files / 632 passed; fresh TS still has the inherited AidExplainerLauncher prop error. Initial homepage fonts: 583,164 → 83,564 unique encoded bytes. Manifest colors both #FFF7EE. Claude must supply the shared fair-use pricing export and wire footer/icons/manifest; numerical limits are absent pending that export.
+
+Owned browser/preview server stopped. Do not install through the shared node_modules junction. CLI shims are absent; source-only Vitest config avoids dotenv and production fixtures. Preserve the historical checkpoints below; earlier counts and blockers belong to their recorded dates.
+
+---
+
+# Daybreak slice 1 checkpoint (historical)
 
 2026-09-26, branch `design/daybreak`, isolated checkout `C:/Users/bilal/Downloads/grokking-daybreak`. Authority: `docs/handoff/astra-gate-d3r2-response.md`. The original shared checkout is protected and was not edited.
 
