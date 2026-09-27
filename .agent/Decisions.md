@@ -36,3 +36,12 @@ Turbopack rejects a dependency junction outside its configured filesystem root. 
 ## Acceptance integrity
 
 Do not hide the pre-existing aid-explainer feature gap with unused props or compiler suppression. Do not label development timing as Lighthouse results or claim the 550KiB production budget passed. Native-script rendering is not native-speaker copy approval. Existing pricing claims remain a separate review item.
+
+## 2026-09-26 — Admissions-only product
+
+KairosLearn is only an AI college-admissions counselor. The study-courses product is retired in code: 307 redirects from `src/lib/retired-routes.ts`, and learning tables kept for at least 30 days.
+
+**Why:** the founder: "it should just focus on An AI Admissions Counselor Agent Platform… for students to get into college mainly." The course catalogue was also 4.8 MB gzip reaching every page.
+
+**Guardrails:** the word "courses" in `/cc/courses` means high-school coursework and stays. The voice and college-interview stacks are shared and stay. Make the redirects permanent only after 30 days with no reversal.
+

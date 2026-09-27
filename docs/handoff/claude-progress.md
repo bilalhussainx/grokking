@@ -13,6 +13,64 @@ doesn't re-test what's recorded here. Newest work goes at the top.
 | 4 | Stripe and credits for the new prices (Free 200 credits; $15/month; $99/year) | **Done in code**: `docs/superpowers/plans/2026-09-25-fix-4-stripe-credits-new-prices.md`; final-review fixes applied. Stripe prices created by Astra (`docs/handoff/stripe-setup-report.md`). **Credit lock-down applied in production 2026-09-26.** Branch not deployed; 3 other migrations not applied. |
 | 5 | Competitor research, phone app (PWA), Ad Astra readiness, full testing of every student type | Queued |
 
+## 2026-09-27 — Admissions-only refocus (branch `refocus/admissions-only`, NOT deployed)
+
+The founder asked (2026-09-26) that KairosLearn stop offering study courses and be only an AI college-admissions counselor.
+- Spec: `docs/superpowers/specs/2026-09-26-admissions-only-refocus-design.md`.
+- Plan: `docs/superpowers/plans/2026-09-26-admissions-only-refocus.md`.
+- The branch is built on `integrate/daybreak`, which is feat plus Daybreak plus the page-weight work, so deploying it deploys all of that.
+
+**Gone:**
+- the course catalogue (about 90 courses, 32 MB of `src/data`) and lessons and exercises;
+- language courses, `/talk` and placement;
+- tech/coding interviews and career pathways;
+- classrooms and live sessions;
+- XP, gems, leaderboard and achievements;
+- course-completion credentials (`/credentials`, `/verify`);
+- the blog, `vs-leetcode` and `tools/interview-roadmap`;
+- the lesson coach sidebar and course search (Ctrl+K).
+
+In total: about 1,560 files and about 616k lines.
+
+**Kept:**
+- all of `/cc/*` (including `/cc/courses`, high-school coursework) and `/counselor/*`;
+- college interviews;
+- the Coach Kairos voice stack;
+- the survey and the admin survey.
+- The **database is untouched.** Learning tables keep their rows.
+
+**Redirects (307, temporary):** every retired URL goes to `/`, except:
+- `/interviews` and `/career` go to `/cc/interview-prep`;
+- `/dashboard` goes to `/cc/dashboard`;
+- `/onboarding/language` goes to `/onboarding`;
+- `/admin` and `/admin/courses` go to `/admin/survey`.
+
+The single source is `src/lib/retired-routes.ts`. A guard test fails if any shipped file links to a retired page or API.
+
+**Evidence (2026-09-27):**
+- tsc 0; `npx vitest run src` 95 files / 653 tests pass; `npm run build` 0, with no retired routes in the route list.
+- `student-variants` e2e: 16/16 pass (8 variants × desktop and phone) against `next start`.
+- First-load weight on `next start`: `/` 931 KiB (fonts 569; Codex D3-IMPL-1.1 subsets them), `/pricing` 590, `/login` 562. At `ae82a5a` these were 6119 / 5763 / 5767.
+- `/` for signed-out visitors is the Daybreak homepage. Any session on `/`, guest or real, goes to `/cc/dashboard` with its query kept.
+
+**Follow-ups:**
+- F1: make the interview routes college-only and delete the tech personas.
+- F2: `/call`, `/writing` and `/history` need a founder decision.
+- F3: drop the learning tables (a migration, founder go, 30 days or more after release).
+- F4: trim the learning actions in `lib/credits.ts`.
+- F5: the repo `CLAUDE.md` "Samsara.ai" section is stale.
+- F6: the FAQ pricing answer says "Free forever for your first three schools"; check it against "200 credits once".
+- F7: remove the `@privy-io/*` dependencies.
+- F8: 25 unreferenced non-learning files, left in place: `credit-reservations.ts` (not wired yet), `guest-session.ts`, `cc/uk`, `cc/canada` loaders, landing, and more.
+- **Coach auto-open:** the coach's proactive greeting only fires on `/`, where sessions no longer land, so it's effectively off. D4.2 decides where it lives.
+
+**OPS-2b (2026-09-27, founder's ops session):** the three 20260925 migrations were applied to production. Read-only checks:
+- `credit_reservations` exists, has RLS and 0 rows;
+- `v_user_tier` responds;
+- the anon key is refused `reserve_credits` (42501).
+
+The Stripe live product description was updated. The live webhook smoke test waits on a Stripe test-mode key.
+
 ## 2026-09-27 — DEPLOYED to production (kairoslearn.com)
 
 - `master` = `ae82a5a` (fast-forward from `b3e8b1f`; 80+ commits: security 1A/1B, fixes 2–5b, pricing/Stripe/credits, etc.). Both Vercel builds report success.
