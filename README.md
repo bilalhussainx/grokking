@@ -1,29 +1,23 @@
-# Samsara Pitch Deck - Deployment Package
+# KairosLearn
 
-## Quick Deploy to Vercel
+**AI admissions counselor + learning platform for students.** The college counselor wealthy families pay $8,000 for — free for everyone else. Students get 1-on-1 admissions guidance from an AI counselor that knows their essays, understands their finances, and answers at 11pm the night before a deadline — and then keep learning through built-in course libraries.
 
-1. Install Vercel CLI (if not already):
-   ```bash
-   npm install -g vercel
-   ```
+Live: https://kairoslearn.com · 120+ students in beta · 40+ languages
 
-2. Deploy:
-   ```bash
-   cd /home/bilalhussain/pitch-deck-deploy
-   vercel --prod
-   ```
+## What students get
 
-3. Or deploy via Vercel website:
-   - Go to https://vercel.com/new
-   - Drag this entire folder to the upload area
-   - Click Deploy
+**Admissions counseling** — essay coaching (personal statement, Common App, supplementals) with a multi-stage AI review pipeline, school-list building with reach/match/safety assessment, a chancing calculator, interview prep with voice-based mock interviews, activities optimization, recommendation-letter coaching, and financial-aid guidance. Built for first-generation and international students.
 
-## What's Inside
-- `index.html` - The pitch deck
-- `vercel.json` - Vercel configuration
+**Courses** — 12+ course libraries (Python, Node.js, Next.js, AI agents, prompt engineering, Claude Code mastery and more) with an AI voice coach, per-student review loops, and progress tracking.
 
-## After Deployment
-You'll get a URL like: `https://samsara-pitch.vercel.app`
+## How it works
 
-Access your deck at that URL.
-# Force redeploy Mon, Mar 23, 2026  8:52:40 PM
+A counselor agent pipeline (5 stages) processes each student's profile, essays and constraints; specialized agents handle review, scoring and follow-ups, with human-in-loop checkpoints. Real-time flows run over WebSocket; voice sessions use speech-to-speech with Deepgram.
+
+## Stack
+
+TypeScript · Next.js · FastAPI (Python) · LangGraph · PostgreSQL (Prisma) · Redis · Socket.IO · Playwright test infrastructure · Vercel
+
+## Author
+
+Bilal Hussain — full-stack + AI engineer, Toronto (Harvard CS '22) · https://www.bilalhussain.dev
