@@ -13,6 +13,71 @@ doesn't re-test what's recorded here. Newest work goes at the top.
 | 4 | Stripe and credits for the new prices (Free 200 credits; $15/month; $99/year) | **Done in code**: `docs/superpowers/plans/2026-09-25-fix-4-stripe-credits-new-prices.md`; final-review fixes applied. Stripe prices created by Astra (`docs/handoff/stripe-setup-report.md`). **Credit lock-down applied in production 2026-09-26.** Branch not deployed; 3 other migrations not applied. |
 | 5 | Competitor research, phone app (PWA), Ad Astra readiness, full testing of every student type | Queued |
 
+## 2026-09-27 — Pre-deploy verification (release candidate `refocus/admissions-only`)
+
+The founder asked for every user workflow, feature, progression, continuity, design and font-legibility check, plus the live-audit items, to be tested before deploy.
+
+**Audit matrix:** `docs/qa/2026-09-27-audit-resolution-matrix.md` maps every QA-01…64 item to a status with evidence. Open items stay open with named owners:
+- **Claude:** agent slices a1/a2/b/d (coach memory).
+- **Codex:** D4 design items; see `codex-prompts/session-b-note-03-predeploy-findings.md`.
+- **Founder:** decisions listed below.
+
+**Workflows:** `docs/qa/2026-09-27-predeploy-workflow-report.md`.
+- First run: W1–W10 on the older build, 5 blockers.
+- Re-test on `804c998`: 7/7 PASS.
+- 14 AI calls in total, all on QA accounts. No payments, no emails.
+
+**Fixed in this pass**, each change test-first:
+- `/landing` retired to the homepage.
+- The TopNav search opens the command palette.
+- Signup copy reads its credits from `PRICING`.
+- Counselor search:
+  - It is public, with profile fields only. It had leaked `user_id`, `stripe_account_id` and `payout_status` to any caller.
+  - It lists verified counselors only. All six listed counselors in production were test profiles.
+- The phone drawer's sign-out works.
+- The empty-deadline and transfer dashboard links are now honest.
+- **Eleven selects** named columns that production doesn't have, and each route read the resulting error as "no data":
+  - Coach activities, the activity narrative, the waitlist letter and nightly observations lost activities.
+  - The Coach essay focus was lost.
+  - The share-link essay text was missing.
+  - The dashboard lost SAT scores and course grades.
+  - Net price lost the school list.
+  - Interview questions lost the intended major.
+  - Guard tests now scan every select on those tables. The columns were confirmed by a head-only production probe that read no rows.
+- The waitlist letter no longer invents programs or professors.
+- Interview rate: 0.43% now shows as 43%.
+- Transfer onboarding no longer promises "Coach will draft your essay".
+- The dead Attach button is removed.
+- The school list no longer forces the coach open.
+- Invite codes that are used up now show as "used up".
+- The course form gains a "Regular" level and takes its grade default from the profile.
+- Brainstorm theme chips appear on the live turn, with no raw markers.
+- The chosen themes and generated outlines survive a reload; stored in `cc_essay_interactions`, no schema change.
+- `/ref/<code>` returns a redirect instead of a 500, and Settings hides the referral card when there's no code.
+- The header Sign Up and Sign In links keep `?next=`, so invites survive.
+- Subscribing during the free trial now bills at the trial's end (`trial_end`), not today.
+- Net price shows the affordability label instead of the raw value.
+
+**Signed-out and design checks:**
+- 19 public pages were checked at 1440 and 375: no overflow, no page errors.
+- The homepage renders real web fonts for Hindi, Punjabi and Urdu.
+- Small text and low contrast go to Codex (note-03).
+
+**Evidence:**
+- `npx vitest run src`: 108 files, 697 tests pass.
+- tsc 0, `npm run build` 0.
+- Signed-out re-check on the rebuilt RC.
+- Workflow re-test PASS.
+
+**Founder decisions still open:**
+1. `.env.local` still has the old $12 monthly price ID. This is local only; production uses $15.
+2. The production glossary is empty. Seed it (`scripts/seed-glossary.ts`, 128 terms)?
+3. Referral codes stopped being generated at signup (migration 006). Re-enable them with a migration?
+4. Should the waitlist letter be AI-written or coached?
+5. The Terms/Privacy redline in `docs/legal/`.
+6. `/call`, `/writing` and `/history`.
+7. Rotate the database password.
+
 ## 2026-09-27 — Admissions-only refocus (branch `refocus/admissions-only`, NOT deployed)
 
 The founder asked (2026-09-26) that KairosLearn stop offering study courses and be only an AI college-admissions counselor.
