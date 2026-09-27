@@ -81,10 +81,9 @@ export default function SubsidizedPage() {
           <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
             <h3 className="text-sm font-semibold text-white mb-3">What you get with Pro:</h3>
             <ul className="space-y-2 text-sm text-white/70">
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> All 69+ courses unlocked</li>
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Unlimited AI coaching credits</li>
+              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Every admissions tool: school list, essay feedback, aid and net price</li>
+              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Unlimited Coach Kairos, under fair use</li>
               <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Voice practice in 9 languages</li>
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Verifiable credentials (diplomas)</li>
               <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Priority support</li>
             </ul>
           </div>

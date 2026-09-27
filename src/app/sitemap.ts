@@ -1,60 +1,30 @@
 import { MetadataRoute } from 'next';
-import { courses } from '@/data';
-import { pathways } from '@/data/pathways';
-import { getAllLessons } from '@/data/types';
+
+const BASE_URL = 'https://kairoslearn.com';
+
+// Public pages of the admissions product. Each has a page under src/app.
+const PAGES: Array<[path: string, changeFrequency: 'weekly' | 'monthly' | 'yearly', priority: number]> = [
+  ['', 'weekly', 1.0],
+  ['/pricing', 'monthly', 0.8],
+  ['/product/counselor', 'monthly', 0.7],
+  ['/product/essays', 'monthly', 0.7],
+  ['/product/schools', 'monthly', 0.7],
+  ['/find-counselor', 'weekly', 0.7],
+  ['/stories', 'monthly', 0.6],
+  ['/about', 'monthly', 0.6],
+  ['/faq', 'monthly', 0.6],
+  ['/integrity', 'yearly', 0.4],
+  ['/signup', 'yearly', 0.4],
+  ['/privacy', 'yearly', 0.3],
+  ['/terms', 'yearly', 0.3],
+];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://kairoslearn.com';
-
-  // Static pages
-  const staticPages = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 1.0 },
-    { url: `${baseUrl}/courses`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
-    { url: `${baseUrl}/interviews`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
-    { url: `${baseUrl}/talk`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.9 },
-    { url: `${baseUrl}/pathways`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.8 },
-    { url: `${baseUrl}/pricing`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
-    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.7 },
-    { url: `${baseUrl}/comparison/vs-leetcode`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
-    { url: `${baseUrl}/tools/interview-roadmap`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
-    { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.3 },
-    { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.3 },
-    { url: `${baseUrl}/integrity`, lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.4 },
-    { url: `${baseUrl}/signup`, lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.4 },
-  ];
-
-  // Blog posts
-  const blogPages = [
-    { url: `${baseUrl}/blog/why-voice-based-ai-tutoring-works`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
-    { url: `${baseUrl}/blog/learning-algorithms-in-your-native-language`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
-  ];
-
-  // Career pathway pages
-  const pathwayPages = pathways.map(p => ({
-    url: `${baseUrl}/pathways/${p.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
+  const lastModified = new Date();
+  return PAGES.map(([path, changeFrequency, priority]) => ({
+    url: `${BASE_URL}${path}`,
+    lastModified,
+    changeFrequency,
+    priority,
   }));
-
-  // Course pages
-  const coursePages = courses.map(course => ({
-    url: `${baseUrl}/course/${course.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }));
-
-  // Lesson pages
-  const lessonPages = courses.flatMap(course =>
-    getAllLessons(course).map(lesson => ({
-      url: `${baseUrl}/course/${course.slug}/${lesson.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
-    }))
-  );
-
-  return [...staticPages, ...blogPages, ...pathwayPages, ...coursePages, ...lessonPages];
 }

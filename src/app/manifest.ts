@@ -1,10 +1,11 @@
 import { MetadataRoute } from 'next';
+import { ADMISSIONS_SUMMARY } from '@/lib/product-summary';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'KairosLearn — Learn Anything with AI',
+    name: 'KairosLearn — AI College Counselor',
     short_name: 'KairosLearn',
-    description: 'AI-powered learning platform with voice coaching. Master coding, philosophy, religion, finance, and more with personalized AI tutors.',
+    description: ADMISSIONS_SUMMARY,
     start_url: '/',
     display: 'standalone',
     background_color: '#0a0a0a',
