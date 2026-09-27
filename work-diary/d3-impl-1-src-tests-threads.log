@@ -1,0 +1,642 @@
+◇ injected env (0) from .env.local // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+
+ RUN  v4.1.5 C:/Users/bilal/Downloads/grokking-daybreak
+
+stderr | src/app/page.daybreak.test.tsx > root route Daybreak and signed-in routing > sends onboarded users to the dashboard and preserves query parameters
+React does not recognize the `whileHover` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `whilehover` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+
+ ✓ src/app/page.daybreak.test.tsx > root route Daybreak and signed-in routing > renders Daybreak once signed-out auth resolves, without redirecting to /landing 31ms
+ ✓ src/app/page.daybreak.test.tsx > root route Daybreak and signed-in routing > sends onboarded users to the dashboard and preserves query parameters 17ms
+ ✓ src/app/page.daybreak.test.tsx > root route Daybreak and signed-in routing > keeps focus=intake on the root route for an onboarded user 8ms
+ ✓ src/app/page.daybreak.test.tsx > root route Daybreak and signed-in routing > routes users whose preferences show incomplete onboarding to coach intake 15ms
+ ✓ src/lib/credential-issuer.test.ts > credential-issuer env validation > throws when ISSUER_PRIVATE_KEY is missing 8254ms
+ ✓ src/lib/credential-issuer.test.ts > credential-issuer env validation > exports the deployed SBT registry address by default 4ms
+ ✓ src/components/marketing/daybreak/daybreak-homepage.test.tsx > Daybreak homepage quick check > shows the stage-aware result and clears it when the visitor starts again 539ms
+ ✓ src/components/marketing/daybreak/daybreak-homepage.test.tsx > Daybreak homepage quick check > invalidates a shown result when any answer changes 240ms
+ ✓ src/components/marketing/daybreak/daybreak-homepage.test.tsx > Daybreak homepage quick check > sets Urdu language and right-to-left direction on the quick check 108ms
+ ✓ src/components/marketing/daybreak/daybreak-homepage.test.tsx > Daybreak homepage quick check > does not write answers to storage or fetch data while completing the check 220ms
+ ✓ src/components/marketing/daybreak/daybreak-homepage.test.tsx > Daybreak homepage cost check > shows the validation error when confirmed grants exceed annual cost 120ms
+ ✓ src/components/marketing/daybreak/daybreak-homepage.test.tsx > Daybreak homepage cost check > treats explicit zeroes as entered amounts 129ms
+ ✓ src/components/marketing/daybreak/daybreak-homepage.test.tsx > Daybreak homepage cost check > calculates decimal amounts in cents 124ms
+ ✓ src/components/marketing/daybreak/daybreak-homepage.test.tsx > Daybreak homepage cost check > clears entered values and results when currency changes 269ms
+ ✓ src/components/marketing/daybreak/daybreak-homepage.test.tsx > Daybreak homepage cost check > shows the unknown-amount collection path and returns to the inputs 169ms
+ ✓ src/components/marketing/daybreak/daybreak-homepage.test.tsx > Daybreak homepage yearly price gate > shows the annual price only when yearly checkout is configured 58ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileDashboard.test.tsx > MobileDashboard > shows loading state initially, then summary 349ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileDashboard.test.tsx > MobileDashboard > renders the bottom tab bar after summary loads 81ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileDashboard.test.tsx > MobileDashboard > renders the footer widgets when present 58ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileDashboard.test.tsx > MobileDashboard > opens the drawer when hamburger is tapped 287ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileDashboard.test.tsx > MobileDashboard > opens the search sheet when search icon is tapped 165ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileDashboard.test.tsx > MobileDashboard > refetches summary on kairos:message-complete with extracted > 0 119ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileDashboard.test.tsx > MobileDashboard > does NOT refetch on kairos:message-complete when extracted=0 and actionKinds=[] 111ms
+ ✓ src/lib/__tests__/credit-rpc-lockdown.test.ts > credit RPC lockdown > only service-role server modules call add_credits / deduct_credits 848ms
+ ✓ src/lib/__tests__/credit-rpc-lockdown.test.ts > credit RPC lockdown > the migration drops the ambiguous 3-arg add_credits and revokes every overload from anon/authenticated 2ms
+ ✓ src/lib/__tests__/pricing-copy.test.ts > pricing > has the 2026-09-25 numbers 6ms
+ ✓ src/lib/__tests__/pricing-copy.test.ts > pricing > no source file advertises the old pricing 278ms
+ ✓ src/components/mobile/MobileSearchSheet.test.tsx > MobileSearchSheet > renders nothing when open is false 49ms
+ ✓ src/components/mobile/MobileSearchSheet.test.tsx > MobileSearchSheet > renders and auto-focuses the input when open 493ms
+ ✓ src/components/mobile/MobileSearchSheet.test.tsx > MobileSearchSheet > renders default Pages + Actions groups when query is empty 55ms
+ ✓ src/components/mobile/MobileSearchSheet.test.tsx > MobileSearchSheet > filters palette when query is typed 71ms
+ ✓ src/components/mobile/MobileSearchSheet.test.tsx > MobileSearchSheet > flips into Coach mode when query starts with / 68ms
+ ✓ src/components/mobile/MobileSearchSheet.test.tsx > MobileSearchSheet > calls onSlashCommand when Enter is pressed in slash mode 180ms
+ ✓ src/components/mobile/MobileSearchSheet.test.tsx > MobileSearchSheet > calls onClose when Escape is pressed 51ms
+ ✓ src/components/mobile/MobileDrawer.test.tsx > MobileDrawer > renders nothing when open is false 51ms
+ ✓ src/components/mobile/MobileDrawer.test.tsx > MobileDrawer > renders aside + scrim when open is true 368ms
+ ✓ src/components/mobile/MobileDrawer.test.tsx > MobileDrawer > calls onClose when scrim is clicked 70ms
+ ✓ src/components/mobile/MobileDrawer.test.tsx > MobileDrawer > renders Apply / Profile / Tools section headers for senior_writing 74ms
+ ✓ src/components/mobile/MobileDrawer.test.tsx > MobileDrawer > shows 'Unlocks junior year' caption for g9 Apply section 41ms
+ ✓ src/components/mobile/MobileDrawer.test.tsx > MobileDrawer > shows transfer-specific 'Why-transfer essay' label 46ms
+ ✓ src/app/login/__tests__/next-propagation.test.tsx > /login carries ?next= onward > sends new users to sign-up with the invite path intact 457ms
+ ✓ src/app/login/__tests__/next-propagation.test.tsx > /login carries ?next= onward > passes next to Google sign-in 62ms
+ ✓ src/app/login/__tests__/next-propagation.test.tsx > /login carries ?next= onward > drops an off-site next 43ms
+ ✓ src/components/counselor/__tests__/CreateWorkspaceCard.test.tsx > CreateWorkspaceCard > posts name, slug and display name, then goes to the team page 349ms
+ ✓ src/components/counselor/__tests__/CreateWorkspaceCard.test.tsx > CreateWorkspaceCard > shows a message when the name is taken 56ms
+ ✓ src/components/ui/daybreak/daybreak.test.tsx > Daybreak primitives > associates field labels and descriptions, exposes errors, and forwards refs 266ms
+ ✓ src/components/ui/daybreak/daybreak.test.tsx > Daybreak primitives > uses a native select with its label and controlled value 29ms
+ ✓ src/components/ui/daybreak/daybreak.test.tsx > Daybreak primitives > defaults buttons to type button and provides the requested variants 17ms
+ ✓ src/components/ui/daybreak/daybreak.test.tsx > Daybreak primitives > renders card tone, redundant chip mark, and alert semantics for error callouts 17ms
+ ✓ src/components/ui/daybreak/daybreak.test.tsx > Daybreak primitives > supports named tablists, complete associations, disabled skipping, and Home/End 66ms
+ ✓ src/components/ui/daybreak/daybreak.test.tsx > Daybreak primitives > uses the nearest RTL direction for arrow navigation and reports controlled changes 32ms
+ ✓ src/components/ui/daybreak/daybreak.test.tsx > Daybreak primitives > creates unique tab and panel IDs for repeated instances 12ms
+ ✓ src/components/ui/daybreak/daybreak.test.tsx > Daybreak primitives > marks only the current bottom navigation destination 24ms
+ ✓ src/app/cc/recommenders/__tests__/page.test.tsx > RecommendersPage > says the list couldn't load, not that there are none, when the API fails 112ms
+ ✓ src/app/cc/recommenders/__tests__/page.test.tsx > RecommendersPage > keeps the form and shows an error when saving a recommender fails 308ms
+ ✓ src/app/join/__tests__/join-page.test.tsx > /join/[code] > names the counselor after joining and waits for Continue 332ms
+ ✓ src/components/marketing/MarketingShell.test.tsx > marketing mobile menu > closes on navigation and stays closed when returning to the original page 412ms
+ ✓ src/app/api/__tests__/ownership-contract.test.ts > ownership contract for service-role writes > flags a handler that writes by id alone 6ms
+ ✓ src/app/api/__tests__/ownership-contract.test.ts > ownership contract for service-role writes > accepts a handler that proves ownership first 1ms
+ ✓ src/app/api/__tests__/ownership-contract.test.ts > ownership contract for service-role writes > every service-role write in api/cc and api/counselor is ownership-scoped 74ms
+ ✓ src/app/api/__tests__/ownership-contract.test.ts > ownership contract for service-role writes > every allowlist entry still points at a real route 2ms
+ ✓ src/lib/__tests__/use-client-directive.test.ts > "use client" placement > is the first statement wherever it appears 225ms
+ ✓ src/components/mobile/BottomTabBar.test.tsx > BottomTabBar > shows Apply tab labeled 'Apply' for senior_writing 536ms
+ ✓ src/components/mobile/BottomTabBar.test.tsx > BottomTabBar > shows Apply tab as locked for g9 70ms
+ ✓ src/components/mobile/BottomTabBar.test.tsx > BottomTabBar > relabels Apply tab to 'Tests' for g10 14ms
+ ✓ src/components/mobile/BottomTabBar.test.tsx > BottomTabBar > relabels Apply tab to 'Why-Transfer' for transfer 120ms
+ ✓ src/components/mobile/BottomTabBar.test.tsx > BottomTabBar > calls onTab with the tab id when a tab is clicked 26ms
+ ✓ src/components/mobile/BottomTabBar.test.tsx > BottomTabBar > does NOT call onTab for the locked Apply tab in g9 15ms
+ ✓ src/components/mobile/MobileCoachSheet.test.tsx > MobileCoachSheet > renders nothing when open is false 40ms
+ ✓ src/components/mobile/MobileCoachSheet.test.tsx > MobileCoachSheet > renders the CoachChat content when open 122ms
+ ✓ src/components/mobile/MobileCoachSheet.test.tsx > MobileCoachSheet > calls onClose when the scrim is clicked 20ms
+ ✓ src/components/mobile/MobileCoachSheet.test.tsx > MobileCoachSheet > renders a drag handle for visual affordance 18ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileWidgets.test.tsx > MobileWidgets > returns null when no items 29ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileWidgets.test.tsx > MobileWidgets > renders a horizontal-scroll strip with one card per item 123ms
+ ✓ src/components/cc/dashboard/sections/__tests__/CourseRigorGrid.test.tsx > CourseRigorGrid > renders empty-state CTA when no courses 222ms
+ ✓ src/components/cc/dashboard/sections/__tests__/CourseRigorGrid.test.tsx > CourseRigorGrid > renders up to 4 course cards when courses are present 30ms
+ ✓ src/components/billing/__tests__/SubscriptionStatus.test.tsx > SubscriptionStatus > shows Pro without claiming a specific price 115ms
+ ✓ src/hooks/__tests__/useVoicePreference.test.tsx > useVoicePreference > starts false when nothing in storage 58ms
+ ✓ src/hooks/__tests__/useVoicePreference.test.tsx > useVoicePreference > rehydrates true when 'true' is in storage 11ms
+ ✓ src/hooks/__tests__/useVoicePreference.test.tsx > useVoicePreference > writes 'true' to storage when toggled on 13ms
+ ✓ src/hooks/__tests__/useVoicePreference.test.tsx > useVoicePreference > writes 'false' to storage when toggled off (after on) 6ms
+ ✓ src/hooks/__tests__/useVoicePreference.test.tsx > useVoicePreference > survives unmount + remount when storage value is 'true' 9ms
+ ✓ src/hooks/__tests__/useVoicePreference.test.tsx > useVoicePreference > treats any non-'true' string as false 3ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileGreeting.test.tsx > MobileGreeting > renders 'Hi, <name>.' when firstName is set 98ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileGreeting.test.tsx > MobileGreeting > renders 'Welcome.' when firstName is null 9ms
+ ✓ src/components/mobile/dashboard/__tests__/MobileGreeting.test.tsx > MobileGreeting > renders the statusLabel inside the tone pill 8ms
+ ✓ src/app/api/cc/__tests__/me.test.ts > GET /api/cc/me > returns the caller's own profile fields 14ms
+ ✓ src/app/api/cc/__tests__/me.test.ts > GET /api/cc/me > is deterministic when a user has duplicate profile rows 3ms
+ ✓ src/app/api/cc/__tests__/me.test.ts > GET /api/cc/me > returns profile null (200) when the user has no row yet 2ms
+ ✓ src/app/api/cc/__tests__/me.test.ts > GET /api/cc/me > 401s when signed out 1ms
+ ✓ src/app/api/cc/schools/__tests__/search-filters.test.ts > /api/cc/schools/search filter behavior > filters need-blind international when flag is true 30ms
+ ✓ src/app/api/cc/schools/__tests__/search-filters.test.ts > /api/cc/schools/search filter behavior > filters meets-full-need international when flag is true 2ms
+ ✓ src/app/api/cc/schools/__tests__/search-filters.test.ts > /api/cc/schools/search filter behavior > filters css-profile-required when flag is true 3ms
+ ✓ src/app/api/cc/schools/__tests__/search-filters.test.ts > /api/cc/schools/search filter behavior > does not filter when flag is absent or false 4ms
+ ✓ src/hooks/useMediaQuery.test.tsx > useMediaQuery > returns false initially when matchMedia.matches is false 55ms
+ ✓ src/hooks/useMediaQuery.test.tsx > useMediaQuery > returns true when the media query starts matched 5ms
+ ✓ src/hooks/useMediaQuery.test.tsx > useMediaQuery > updates on media-query change events 10ms
+ ✓ src/hooks/useMediaQuery.test.tsx > useMediaQuery > unsubscribes on unmount 5ms
+ ✓ src/app/api/counselor/__tests__/essay-review-route.test.ts > POST /api/counselor/students/[studentId]/essays/[essayId] > 404s a comment aimed at another student's essay and writes nothing 36ms
+ ✓ src/app/api/counselor/__tests__/essay-review-route.test.ts > POST /api/counselor/students/[studentId]/essays/[essayId] > saves a comment on the student's own essay 3ms
+ ✓ src/app/api/counselor/__tests__/essay-review-route.test.ts > POST /api/counselor/students/[studentId]/essays/[essayId] > forbids a supervised counselor from setting the review state 1ms
+ ✓ src/app/api/counselor/__tests__/essay-review-route.test.ts > POST /api/counselor/students/[studentId]/essays/[essayId] > lets an unsupervised counselor approve 1ms
+ ✓ src/app/api/counselor/__tests__/essay-review-route.test.ts > GET counselor views > essay view shows only the viewer's agency comments 5ms
+ ✓ src/app/api/counselor/__tests__/essay-review-route.test.ts > GET counselor views > student file counts only the viewer's agency comments 9ms
+ ✓ src/app/api/billing/stripe/__tests__/checkout.test.ts > POST /api/billing/stripe/checkout > uses the monthly price by default 17ms
+ ✓ src/app/api/billing/stripe/__tests__/checkout.test.ts > POST /api/billing/stripe/checkout > uses the yearly price for interval=year 2ms
+ ✓ src/app/api/billing/stripe/__tests__/checkout.test.ts > POST /api/billing/stripe/checkout > rejects an unknown interval 2ms
+ ✓ src/app/api/billing/stripe/__tests__/checkout.test.ts > POST /api/billing/stripe/checkout > never falls back to monthly when the yearly price is missing 2ms
+ ✓ src/app/api/billing/stripe/__tests__/checkout.test.ts > POST /api/billing/stripe/checkout > 401s when signed out 3ms
+ ✓ src/app/api/billing/stripe/__tests__/checkout.test.ts > POST /api/billing/stripe/checkout > refuses a second subscription and points to the billing portal 2ms
+ ✓ src/app/api/billing/stripe/__tests__/checkout.test.ts > POST /api/billing/stripe/checkout > still lets a signup-trial user (no Stripe subscription) subscribe 1ms
+ ✓ src/app/api/billing/stripe/__tests__/checkout.test.ts > POST /api/billing/stripe/checkout > lets a user whose subscription was canceled subscribe again 1ms
+ ✓ src/app/api/billing/stripe/__tests__/checkout.test.ts > POST /api/billing/stripe/checkout > treats a JSON null body as the default interval 1ms
+ ✓ src/lib/cc/__tests__/llm-json.test.ts > extractJsonObject > parses fenced JSON 7ms
+ ✓ src/lib/cc/__tests__/llm-json.test.ts > extractJsonObject > returns null for truncated JSON 1ms
+ ✓ src/lib/cc/__tests__/llm-json.test.ts > callLLMJSON > asks the provider for a JSON object when jsonMode is set 7ms
+ ✓ src/lib/cc/__tests__/llm-json.test.ts > callLLMJSON > does not force JSON mode by default (prompts may not mention JSON) 1ms
+ ✓ src/lib/cc/__tests__/llm-json.test.ts > callLLMJSON > retries once after a transient provider error 2ms
+ ✓ src/lib/cc/__tests__/llm-json.test.ts > callLLMJSON > retries once after unparseable output, then gives up and logs why 5ms
+ ✓ src/lib/cc/__tests__/llm-json.test.ts > callLLMJSON > does not retry a non-transient error 1ms
+ ✓ src/components/nav/__tests__/nav-links.test.ts > nav destinations > flags a destination with no page 4ms
+ ✓ src/components/nav/__tests__/nav-links.test.ts > nav destinations > every sidebar and palette href resolves to a page 9ms
+ ✓ src/app/api/cc/__tests__/shared-link-recommenders.test.ts > GET /api/cc/shared/[token] recommendations > lists the student's recommenders against production's real columns 18ms
+ ✓ src/lib/cc/__tests__/counselor-comments.test.ts > addEssayComment > refuses an essay that belongs to a different student 8ms
+ ✓ src/lib/cc/__tests__/counselor-comments.test.ts > addEssayComment > refuses a non-uuid essay id without touching the database 1ms
+ ✓ src/lib/cc/__tests__/counselor-comments.test.ts > addEssayComment > inserts a comment on the student's own essay 1ms
+ ✓ src/lib/cc/__tests__/counselor-comments.test.ts > getEssayForReview > shows a counselor only their own agency's comments 2ms
+ ✓ src/lib/cc/__tests__/counselor-comments.test.ts > getEssayForReview > shows the student shipped comments from every agency 1ms
+ ✓ src/lib/cc/__tests__/counselor-comments.test.ts > getEssayForReview > shows the student a supervised draft once a head publishes it 1ms
+ ✓ src/lib/cc/__tests__/counselor-comments.test.ts > listStudentEssays > counts only the viewing agency's comments 2ms
+ ✓ src/lib/cc/__tests__/counselor-comments.test.ts > duplicate profile rows > accepts a comment on an essay under the student's second profile 1ms
+stderr | src/app/api/cc/__tests__/recommenders-list.test.ts > GET /api/cc/recommenders > reports a query failure instead of pretending the list is empty
+[recommenders GET] query failed: column cc_recommenders.student_id does not exist
+
+ ✓ src/app/api/cc/__tests__/recommenders-list.test.ts > GET /api/cc/recommenders > lists the student's recommenders against production's real columns 13ms
+ ✓ src/app/api/cc/__tests__/recommenders-list.test.ts > GET /api/cc/recommenders > reports a query failure instead of pretending the list is empty 3ms
+ ✓ src/app/api/cc/__tests__/recommenders-list.test.ts > POST /api/cc/recommenders > saves context notes the student typed 8ms
+ ✓ src/app/api/cc/essays/__tests__/ownership-routes.test.ts > PATCH /api/cc/essays/[id]/draft > rejects another student's essay and leaves it unchanged 49ms
+ ✓ src/app/api/cc/essays/__tests__/ownership-routes.test.ts > PATCH /api/cc/essays/[id]/draft > saves the caller's own draft 4ms
+ ✓ src/app/api/cc/essays/__tests__/ownership-routes.test.ts > PATCH /api/cc/essays/[id]/draft > returns 401 when signed out 1ms
+ ✓ src/app/api/cc/essays/__tests__/ownership-routes.test.ts > POST /api/cc/essays/[id]/share > never reveals another student's existing share token 2ms
+ ✓ src/app/api/cc/essays/__tests__/ownership-routes.test.ts > POST /api/cc/essays/[id]/share > does not mint a token on another student's essay 2ms
+ ✓ src/app/api/cc/essays/__tests__/ownership-routes.test.ts > POST /api/cc/essays/[id]/share > mints and stores a token for the owner 2ms
+ ✓ src/app/api/cc/essays/__tests__/ownership-routes.test.ts > POST /api/cc/essays/[id]/outline (save) > rejects saving onto another student's essay 4ms
+ ✓ src/app/api/cc/essays/__tests__/ownership-routes.test.ts > POST /api/cc/essays/[id]/outline (save) > saves the owner's outline and moves the essay to draft 3ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > DELETE /api/cc/courses > cannot delete another student's course 16ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > DELETE /api/cc/courses > deletes the caller's own course 3ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > DELETE /api/cc/courses > returns 404 for a non-uuid id instead of a database error 2ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > DELETE /api/cc/courses > returns 404 when the caller has no student profile 2ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > /api/cc/recommenders/[id] > PATCH cannot change another student's recommender email 4ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > /api/cc/recommenders/[id] > PATCH updates the caller's own recommender 2ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > /api/cc/recommenders/[id] > PATCH with no recognized fields is a 400, not an empty update 1ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > /api/cc/recommenders/[id] > DELETE cannot remove another student's recommender 2ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > /api/cc/recommenders/[id] > DELETE removes the caller's own recommender 1ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > POST /api/cc/recommenders/ask-email-text > does not write the generated email onto another student's recommender 3ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > POST /api/cc/recommenders/ask-email-text > saves the generated email on the caller's own recommender 1ms
+ ✓ src/app/api/cc/__tests__/student-data-ownership.test.ts > duplicate profile rows > lets the caller delete a course that hangs off their second profile 1ms
+ ✓ src/components/cc/dashboard/sections/__tests__/variant-sections.test.ts > SECTION_ORDER > covers every variant 5ms
+ ✓ src/components/cc/dashboard/sections/__tests__/variant-sections.test.ts > SECTION_ORDER > every referenced SectionId resolves to a registered component 2ms
+ ✓ src/components/cc/dashboard/sections/__tests__/variant-sections.test.ts > SECTION_ORDER > PriorityWidgetRow comes after SchoolCardGrid for variants that have both 1ms
+ ✓ src/components/cc/dashboard/sections/__tests__/variant-sections.test.ts > SECTION_ORDER > g9 + g10 use CourseRigorGrid, not SchoolCardGrid 2ms
+ ✓ src/components/cc/dashboard/sections/__tests__/variant-sections.test.ts > SECTION_ORDER > transfer has WhyTransferFeatured and SchoolCardGrid (post-list) 1ms
+ ✓ src/app/api/cc/__tests__/onboarding-transfer-gpa.test.ts > POST /api/cc/onboarding/complete — transfer GPA > saves the transfer student's GPA to their academic profile 59ms
+ ✓ src/app/api/cc/__tests__/onboarding-transfer-gpa.test.ts > POST /api/cc/onboarding/complete — transfer GPA > updates an existing academic profile instead of duplicating it 8ms
+ ✓ src/app/api/cc/__tests__/onboarding-transfer-gpa.test.ts > POST /api/cc/onboarding/complete — transfer GPA > finishes onboarding but saves nothing for an unreadable GPA 2ms
+ ✓ src/app/api/cc/__tests__/onboarding-transfer-gpa.test.ts > POST /api/cc/onboarding/complete — transfer GPA > never writes a GPA for the high-school path 2ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > selectVariant > transfer overrides grade 4ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > selectVariant > g9 / g10 / junior map by grade 1ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > selectVariant > grade 12 default = senior_writing 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > selectVariant > grade 12 + any submitted school = post_submit 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > selectVariant > grade 12 + any decided school = decisions 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > selectVariant > missing grade = unknown 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — hero > urgent deadline override fires for any variant 2ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — hero > waitlist override fires for senior post-submit 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — hero > g11 with no school list -> 'start your school list' 3ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — hero > g11 with school list but no test -> diagnostic SAT (only Aug-Dec) 1ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — hero > transfer with no profile -> 'tell us where you are' 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — hero > transfer with profile -> why-transfer essay 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — tiles > g9 includes locked Application tracker tile 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — tiles > g10 has 7 tiles (incl. School list preview), none locked 2ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — tiles > senior_writing surfaces School list in the explore grid 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — tiles > transfer hides SAT/ACT and includes professor recs note 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — priority cards > junior priority shows reach/match/safety counts 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — priority cards > senior_writing applications card flips to urgent on close deadline 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — handoff Phase 2 fields > populates statusTone per variant 1ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — handoff Phase 2 fields > urgent deadline hero uses rose tone + urgency block 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — handoff Phase 2 fields > non-urgent hero leaves ctaTone undefined (defaults to gold) 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — handoff Phase 2 fields > populates 4 widgets per variant 1ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — handoff Phase 2 fields > first widget per variant is the gold-tinted primary metric 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.5 priority extras > senior_writing PS card has phaseBar with capitalized current phase 2ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.5 priority extras > senior_writing PS phaseBar.current is null when no PS exists 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.5 priority extras > senior_writing supplements has progressBar extra 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.5 priority extras > senior_post_submit decisions tracker has decisionCounts when schools exist 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.5 priority extras > senior_post_submit decisions tracker omits extra when no decisionCounts 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.5 priority extras > senior_decisions Decisions card has decisionCounts breakdown 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.5 priority extras > junior test strategy has satBars with target=1500 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.5 priority extras > junior satBars carries null reading/math when no test attempt 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.7 coach nudges > attaches nudge to matching priority card by label 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.7 coach nudges > does not attach nudge when observations map is empty 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.7 coach nudges > ignores observations whose label has no matching card 0ms
+ ✓ src/app/cc/dashboard/__tests__/variants.test.ts > buildVariant — Phase 2.7 coach nudges > attaches multiple nudges across cards in the same variant 0ms
+ ✓ src/lib/cc/__tests__/tier-gate-fair-use.test.ts > Pro fair use > caps Pro coach messages and voice minutes at fair-use defaults 4ms
+ ✓ src/lib/cc/__tests__/tier-gate-fair-use.test.ts > Pro fair use > a Pro user over the limit gets a 429 fair-use response, not a paywall 7ms
+ ✓ src/lib/cc/__tests__/tier-gate-fair-use.test.ts > fair use applies only to daily caps > a Pro block on a non-daily cap keeps its real reason and is not called fair use 2ms
+ ✓ src/app/api/counselor/__tests__/invite-codes-route.test.ts > POST /api/counselor/invite-codes preassignment > rejects a preassigned counselor outside the head's agency 84ms
+ ✓ src/app/api/counselor/__tests__/invite-codes-route.test.ts > POST /api/counselor/invite-codes preassignment > mints with a preassigned counselor from the same agency 44ms
+ ✓ src/app/api/counselor/__tests__/invite-codes-route.test.ts > POST /api/counselor/invite-codes preassignment > mints without preassignment as before 2ms
+ ✓ src/app/api/cc/__tests__/activities-optimize-cap.test.ts > POST /api/cc/activities/optimize caps instead of blocking > optimizes all 10 activities for a free student with a full list 149ms
+ ✓ src/app/api/cc/__tests__/activities-optimize-cap.test.ts > POST /api/cc/activities/optimize caps instead of blocking > sends only the first 10 when a student has 12 6ms
+ ✓ src/app/api/cc/__tests__/activities-optimize-cap.test.ts > POST /api/cc/activities/optimize caps instead of blocking > gives a guest their 3-row allowance 7ms
+ ✓ src/app/api/cc/__tests__/activities-optimize-cap.test.ts > POST /api/cc/activities/optimize caps instead of blocking > tells the model when the list was capped, and reports counts to the client 18ms
+ ✓ src/app/api/cc/__tests__/activities-optimize-cap.test.ts > POST /api/cc/activities/optimize caps instead of blocking > never writes a score to an activity that wasn't sent to the model 2ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > includes personality guidelines 5ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > includes student profile data 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > includes intake instructions when mode is intake 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > includes school-builder instructions when mode is school-builder 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > includes GPA conversion note for international students without GPA 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > suggests next step in general mode 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > surfaces full-aid guidance in school-builder when needsFullAid is true 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > excludes full-aid guidance in school-builder when needsFullAid is false 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > includes affordability context in the profile summary when needsFullAid is true 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > lists all 8 canonical need-blind schools for intl full-aid students in school-builder mode 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > mentions the need-aware-meets-full-need distinction for intl full-aid students 2ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > includes first-gen guidance block when isFirstGen is true 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > excludes first-gen guidance block when isFirstGen is false 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > includes unconditional international block when isInternational is true and needsFullAid is false 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > includes Pakistani-specific guidance when isInternational and country is PK 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > surfaces CSS Profile guide link for international students in general mode 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > describes CSS Profile walkthrough offer for international students 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > adds Pakistan-specific CSS Profile asset note when country is PK 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > does not surface CSS Profile guide for domestic students 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > g9 variant locks essays/SAT/applications away 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > g10 variant pushes PSAT 10 + summer + depth 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > junior variant blocks personal-statement drafting 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > senior_writing variant orders by deadline pressure 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > senior_post_submit variant guides demonstrated interest + interview prep 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > senior_decisions variant prioritizes aid math 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > transfer variant rejects first-year strategies 1ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > variantKey null produces no variant block 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > variantKey 'unknown' produces no variant block 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > catalog constraint (Workstream C — Canada) > US student now sees the full international catalog (no stale refusal) 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > catalog constraint (Workstream C — Canada) > Canadian student sees the catalog block 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > catalog constraint (Workstream C — Canada) > Pakistani student sees the catalog block (Brampton ICP) 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > Canada guidance block (Workstream C) > appears for Canadian students 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > Canada guidance block (Workstream C) > appears for Pakistani students (diaspora dual-apply) 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > Canada guidance block (Workstream C) > does not appear for US students 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > UK catalog constraint + guidance (Workstream M) > UK student gets the relaxed catalog block naming UK + CA schools 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > UK catalog constraint + guidance (Workstream M) > Pakistani student gets a catalog block naming all three regions (US, CA, UK) 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > UK catalog constraint + guidance (Workstream M) > UK guidance block appears for UK students 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > UK catalog constraint + guidance (Workstream M) > UK guidance block appears for Pakistani students (Saïd Foundation surfacing) 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > UK catalog constraint + guidance (Workstream M) > UK guidance block does NOT appear for US students 0ms
+ ✓ src/lib/cc/__tests__/coach-prompt-builder.test.ts > buildSystemPrompt > UK catalog constraint + guidance (Workstream M) > UK guidance block does NOT mention Saïd for Indian students 0ms
+ ✓ src/app/api/admin/__tests__/admin-secret.test.ts > hasAdminSecret > fails closed when the env var is unset 4ms
+ ✓ src/app/api/admin/__tests__/admin-secret.test.ts > hasAdminSecret > fails closed on an empty env var 1ms
+ ✓ src/app/api/admin/__tests__/admin-secret.test.ts > hasAdminSecret > accepts only the configured value 1ms
+ ✓ src/app/api/admin/__tests__/admin-secret.test.ts > admin routes reject the old in-repo secrets when env is unset > invite-codes 11ms
+ ✓ src/app/api/admin/__tests__/admin-secret.test.ts > admin routes reject the old in-repo secrets when env is unset > league-reset 2ms
+ ✓ src/app/api/admin/__tests__/admin-secret.test.ts > admin routes reject the old in-repo secrets when env is unset > seed-courses 2ms
+ ✓ src/app/api/auth/__tests__/ensure-profile-credits.test.ts > ensure-profile signup credits > does not top a 200-credit signup back up to 300 11ms
+ ✓ src/app/api/auth/__tests__/ensure-profile-credits.test.ts > ensure-profile signup credits > grants the missing signup credits up to 200 when none were granted 2ms
+ ✓ src/lib/cc/uk/admissions-tests.test.ts > getAdmissionsTest > returns MAT metadata 11ms
+ ✓ src/lib/cc/uk/admissions-tests.test.ts > getAdmissionsTest > returns null for unknown code 7ms
+ ✓ src/lib/cc/uk/admissions-tests.test.ts > testsForSchoolCourse > Oxford Maths requires MAT 17ms
+ ✓ src/lib/cc/uk/admissions-tests.test.ts > testsForSchoolCourse > Oxford Law requires LNAT 11ms
+ ✓ src/lib/cc/uk/admissions-tests.test.ts > testsForSchoolCourse > Cambridge Engineering requires ESAT 10ms
+ ✓ src/lib/cc/uk/admissions-tests.test.ts > testsForSchoolCourse > Cambridge Medicine requires UCAT 1ms
+ ✓ src/lib/cc/uk/admissions-tests.test.ts > testsForSchoolCourse > Edinburgh History requires no test 12ms
+ ✓ src/lib/cc/uk/admissions-tests.test.ts > ALL_TEST_CODES > includes the 9 known tests 7ms
+ ✓ src/app/api/cc/essays/__tests__/outline-generate.test.ts > POST outline (generate) failure handling > returns a retryable 503 and refunds the credit when generation fails 21ms
+ ✓ src/app/api/cc/essays/__tests__/outline-generate.test.ts > POST outline (generate) failure handling > returns the outlines when generation succeeds, in JSON mode, without a refund 4ms
+ ✓ src/lib/cc/__tests__/family-mode-prompts.test.ts > family-mode-strings > covers 25 voice languages (added zh/ko/ar/vi/pt/ru/tr 2026-05-02 via Google TTS) 5ms
+ ✓ src/lib/cc/__tests__/family-mode-prompts.test.ts > family-mode-strings > each language has all 6 required string keys 4ms
+ ✓ src/lib/cc/__tests__/family-mode-prompts.test.ts > family-mode-strings > no languages are text-only — Urdu now uses Deepgram nova-3 STT + Google ur-IN TTS 1ms
+ ✓ src/lib/cc/__tests__/family-mode-prompts.test.ts > family-mode-strings > Urdu is included in the language list 1ms
+ ✓ src/lib/cc/__tests__/family-mode-prompts.test.ts > family-mode-strings > Urdu still ships typeHere + send strings (kept for keyboard fallback) 1ms
+ ✓ src/lib/cc/__tests__/family-mode-prompts.test.ts > familyModeSystemPrompt > includes the language-specific opener for Hindi 0ms
+ ✓ src/lib/cc/__tests__/family-mode-prompts.test.ts > familyModeSystemPrompt > includes English fallback for unsupported language 0ms
+ ✓ src/lib/cc/__tests__/family-mode-prompts.test.ts > familyModeSystemPrompt > interpolates summary fields 0ms
+ ✓ src/lib/supplements/__tests__/reuse-detector.test.ts > detectReuse > flags school-leakage (Stanford essay mentions MIT) 14ms
+ ✓ src/lib/supplements/__tests__/reuse-detector.test.ts > detectReuse > does not flag own school name 7ms
+ ✓ src/lib/supplements/__tests__/reuse-detector.test.ts > detectReuse > does not match 'admit' as MIT 55ms
+ ✓ src/lib/supplements/__tests__/reuse-detector.test.ts > detectReuse > flags high token overlap with another essay 57ms
+ ✓ src/lib/supplements/__tests__/reuse-detector.test.ts > detectReuse > does not flag distinct content 6ms
+ ✓ src/lib/supplements/__tests__/reuse-detector.test.ts > wordCount > counts words 1ms
+ ✓ src/lib/supplements/__tests__/reuse-detector.test.ts > wordCountColor > green near limit 0ms
+ ✓ src/lib/supplements/__tests__/reuse-detector.test.ts > wordCountColor > red over limit 0ms
+ ✓ src/lib/supplements/__tests__/reuse-detector.test.ts > wordCountColor > amber under target 0ms
+ ✓ src/lib/supplements/__tests__/reuse-detector.test.ts > wordCountColor > green when no limit 0ms
+ ✓ src/lib/credential-eligibility.test.ts > computeEligibility > returns all 11 diplomas with eligible=false for an empty context 17ms
+ ✓ src/lib/credential-eligibility.test.ts > computeEligibility > marks coding-interview-foundations eligible when course complete + 5 qualifying mocks avg >= 75 2ms
+ ✓ src/lib/credential-eligibility.test.ts > computeEligibility > keeps coding-interview-foundations ineligible when course missing 1ms
+ ✓ src/lib/credential-eligibility.test.ts > computeEligibility > marks google-swe-mock-mastery eligible with 10 google mocks avg >= 80 2ms
+ ✓ src/lib/credential-eligibility.test.ts > computeEligibility > marks python-fundamentals eligible via course completion alone 2ms
+ ✓ src/lib/credential-eligibility.test.ts > computeEligibility > each result carries evidence and a non-empty reason 4ms
+ ✓ src/app/api/cc/__tests__/my-counselor.test.ts > GET /api/cc/my-counselor > names the student's counselor and agency 67ms
+ ✓ src/app/api/cc/__tests__/my-counselor.test.ts > GET /api/cc/my-counselor > falls back to the agency name when there is no primary counselor 42ms
+ ✓ src/app/api/cc/__tests__/my-counselor.test.ts > GET /api/cc/my-counselor > returns null for an unlinked or ended link 2ms
+ ✓ src/app/api/cc/__tests__/my-counselor.test.ts > GET /api/cc/my-counselor > 401s when signed out 1ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > componentProgress > returns 0/7 when nothing is done 11ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > componentProgress > returns 7/7 when all complete 0ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > urgencyClass > urgent under 14 days 2ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > urgencyClass > soon between 14 and 30 0ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > urgencyClass > ok beyond 30 1ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > urgencyClass > ok if past 0ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > daysUntil > returns positive count for future dates (tolerant to UTC/local DST drift) 2ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > lookupSchoolDeadlines > finds MIT exactly 1ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > lookupSchoolDeadlines > finds Harvard via case-insensitive match 0ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > lookupSchoolDeadlines > returns null for unknown school 0ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > kanbanColumnFor > maps status -> column 44ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > nextUpcomingDeadline > returns null when no future deadlines 20ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > nextUpcomingDeadline > returns earliest future deadline across keys 23ms
+ ✓ src/lib/applications/__tests__/deadlines.test.ts > buildICalendar > emits VCALENDAR + one VEVENT per deadline 3ms
+ ✓ src/app/api/cron/__tests__/cron-auth.test.ts > hasBearerSecret > fails closed when unset 20ms
+ ✓ src/app/api/cron/__tests__/cron-auth.test.ts > hasBearerSecret > accepts only the configured bearer 151ms
+ ✓ src/app/api/cron/__tests__/cron-auth.test.ts > cron routes with CRON_SECRET unset > deadline-reminders refuses an empty bearer 381ms
+ ✓ src/app/api/cron/__tests__/cron-auth.test.ts > cron routes with CRON_SECRET unset > generate-observations refuses an empty bearer 15ms
+ ✓ src/app/api/cc/intake/__tests__/link.test.ts > POST /api/cc/intake/link > links the session to the caller 17ms
+ ✓ src/app/api/cc/intake/__tests__/link.test.ts > POST /api/cc/intake/link > never assigns another student's orphan profile to the caller 3ms
+ ✓ src/app/api/cc/__tests__/glossary.test.ts > glossary > is reachable by guests (GlossaryProvider mounts on public pages) 4ms
+ ✓ src/app/api/cc/__tests__/glossary.test.ts > glossary > returns an empty list, not a 500, when the table errors 12ms
+ ✓ src/lib/daybreak/index.test.ts > quick check language metadata > follows the coach-language order and exposes native names 4ms
+ ✓ src/lib/daybreak/index.test.ts > quick check language metadata > types supported codes and safely falls back to English 1ms
+ ✓ src/lib/daybreak/index.test.ts > getNextStep > routes school concern at early to its stage action 0ms
+ ✓ src/lib/daybreak/index.test.ts > getNextStep > routes school concern at junior to its stage action 0ms
+ ✓ src/lib/daybreak/index.test.ts > getNextStep > routes school concern at applying to its stage action 0ms
+ ✓ src/lib/daybreak/index.test.ts > getNextStep > routes school concern at submitted to its stage action 0ms
+ ✓ src/lib/daybreak/index.test.ts > getNextStep > routes school concern at decisions to its stage action 0ms
+ ✓ src/lib/daybreak/index.test.ts > getNextStep > routes school concern at transfer to its stage action 0ms
+ ✓ src/lib/daybreak/index.test.ts > getNextStep > keeps late application and transfer essay guidance stage-aware 0ms
+ ✓ src/lib/daybreak/index.test.ts > getNextStep > returns localized copy and the chosen destination and concern prompts 0ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > converts decimal amounts to exact integer cents 1ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > accepts explicit zeroes, decimal forms, and the inclusive maximum 2ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > rejects malformed or out-of-range annual cost "" 0ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > rejects malformed or out-of-range annual cost "   " 0ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > rejects malformed or out-of-range annual cost "." 0ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > rejects malformed or out-of-range annual cost "1e2" 0ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > rejects malformed or out-of-range annual cost "NaN" 0ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > rejects malformed or out-of-range annual cost "-1" 0ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > rejects malformed or out-of-range annual cost "1.234" 0ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > rejects malformed or out-of-range annual cost "10000000.01" 0ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > rejects grants above cost and clamps a negative gap with an overcovered flag 0ms
+ ✓ src/lib/daybreak/index.test.ts > calculateGap > reports the first invalid field in the input order 0ms
+ ✓ src/lib/daybreak/index.test.ts > firstPlanningQuestion > returns the first item that is not answered yes 0ms
+ ✓ src/lib/daybreak/index.test.ts > firstPlanningQuestion > does not frame all-known answers as an admissions assessment 0ms
+ ✓ src/lib/__tests__/stripe-price-migration.test.ts > assertKeyMode > accepts test keys 3ms
+ ✓ src/lib/__tests__/stripe-price-migration.test.ts > assertKeyMode > refuses live keys unless allowed 2ms
+ ✓ src/lib/__tests__/stripe-price-migration.test.ts > assertKeyMode > refuses missing or unknown keys 1ms
+ ✓ src/lib/__tests__/stripe-price-migration.test.ts > planPriceMigration > moves only live subscriptions on an old price, one item each 2ms
+ ✓ src/lib/__tests__/stripe-price-migration.test.ts > assertCompatiblePrices > accepts a same-product, same-interval swap 0ms
+ ✓ src/lib/__tests__/stripe-price-migration.test.ts > assertCompatiblePrices > refuses a yearly price (Stripe would reset the anchor and invoice now) 0ms
+ ✓ src/lib/__tests__/stripe-price-migration.test.ts > assertCompatiblePrices > refuses a different interval count 0ms
+ ✓ src/lib/__tests__/stripe-price-migration.test.ts > assertCompatiblePrices > refuses another currency 0ms
+ ✓ src/lib/__tests__/stripe-price-migration.test.ts > assertCompatiblePrices > refuses another product 0ms
+ ✓ src/lib/__tests__/stripe-price-migration.test.ts > planPriceMigration skips scheduled changes > leaves subscriptions with a schedule or a scheduled cancellation alone 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > percentage system > converts 95% to 3.8-4.0 range 2ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > percentage system > converts 82% to 3.3-3.5 range 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > percentage system > converts 72% to 2.7-3.3 range 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > percentage system > converts 55% to below 2.0 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > percentage system > clamps at 4.0 for 100% 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > cgpa10 system > converts 8.5 CGPA to ~3.4 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > cgpa10 system > converts 10.0 CGPA to 4.0 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > cgpa10 system > converts 6.0 CGPA to ~2.4 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > a-levels system > converts A* (6) to 4.0 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > a-levels system > converts B (4) to ~3.3 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > ib system > converts 7 to 4.0 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertToUS4 > ib system > converts 5 to ~3.3 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertPercentageToGPA > converts 87% to 3.48 with Excellent band 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertPercentageToGPA > converts 95% to 3.8 with Outstanding band 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertPercentageToGPA > converts 55% to 2.2 with Satisfactory band 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertPercentageToGPA > converts 100% to 4.0 with Outstanding band 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertPercentageToGPA > 89% is still Excellent (upper boundary) 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertPercentageToGPA > 90% is Outstanding (lower boundary) 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertPercentageToGPA > throws for -1 1ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > convertPercentageToGPA > throws for 101 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > formatRawGPADisplay > renders percentage with country context for Pakistan 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > formatRawGPADisplay > renders percentage without country when unknown 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > formatRawGPADisplay > renders CGPA /10 display 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > formatRawGPADisplay > renders A-Levels display 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > formatRawGPADisplay > renders IB display 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > detectGradingSystem > returns percentage for Pakistan 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > detectGradingSystem > returns percentage for India 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > detectGradingSystem > returns a-levels for UK 0ms
+ ✓ src/lib/cc/__tests__/gpa-converter.test.ts > detectGradingSystem > returns null for US 0ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > containsNonLatin > returns true for Devanagari (Hindi/Marathi) 2ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > containsNonLatin > returns true for Gurmukhi (Punjabi) 0ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > containsNonLatin > returns true for Nastaliq (Urdu) 0ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > containsNonLatin > returns true for Bengali 0ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > containsNonLatin > returns true for Hiragana 0ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > containsNonLatin > returns false for plain English with punctuation and digits 0ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > containsNonLatin > returns false for English with European diacritics (Spanish/French) 0ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > CANVAS_EXTRACT_SYSTEM > contains the English-only directive 0ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > extractCanvasFragment > returns the parsed result on first try when English 1ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > extractCanvasFragment > retries once when first response is non-English 0ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > extractCanvasFragment > gives up silently when both attempts fail 0ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > extractCanvasFragment > handles malformed JSON by returning empty 0ms
+ ✓ src/lib/cc/__tests__/canvas-extract.test.ts > extractCanvasFragment > strips code fences before parsing 0ms
+ ✓ src/lib/__tests__/credit-reservations.test.ts > makeCreditBilling > passes the actor, key and amount to the RPCs 3ms
+ ✓ src/lib/__tests__/credit-reservations.test.ts > makeCreditBilling > maps insufficient_credits to a BillingError 1ms
+ ✓ src/lib/__tests__/credit-reservations.test.ts > makeCreditBilling > maps reservation_conflict to a BillingError 0ms
+ ✓ src/lib/__tests__/credit-reservations.test.ts > makeCreditBilling > maps already_captured to a BillingError 0ms
+ ✓ src/lib/__tests__/credit-reservations.test.ts > makeCreditBilling > maps already_released to a BillingError 0ms
+ ✓ src/lib/__tests__/credit-reservations.test.ts > makeCreditBilling > maps not_reserved to a BillingError 0ms
+ ✓ src/lib/__tests__/credit-reservations.test.ts > makeCreditBilling > maps over_reservation to a BillingError 0ms
+ ✓ src/lib/__tests__/credit-reservations.test.ts > makeCreditBilling > maps an RPC failure to billing_unavailable (never treated as success) 0ms
+ ✓ src/lib/__tests__/credit-reservations.test.ts > makeCreditBilling > rejects negative or non-integer amounts before calling the database 0ms
+ ✓ src/lib/tests/__tests__/sat-act-quiz.test.ts > recommendSATorACT > recommends SAT when most answers are SAT 2ms
+ ✓ src/lib/tests/__tests__/sat-act-quiz.test.ts > recommendSATorACT > recommends ACT when most answers are ACT 0ms
+ ✓ src/lib/tests/__tests__/sat-act-quiz.test.ts > recommendSATorACT > recommends BOTH when split evenly 0ms
+ ✓ src/lib/tests/__tests__/sat-act-quiz.test.ts > recommendSATorACT > warns when most answers are neutral 0ms
+ ✓ src/lib/tests/__tests__/sat-act-quiz.test.ts > feeWaiverEligibility > eligible with free lunch 0ms
+ ✓ src/lib/tests/__tests__/sat-act-quiz.test.ts > feeWaiverEligibility > not eligible if international 0ms
+ ✓ src/lib/tests/__tests__/sat-act-quiz.test.ts > feeWaiverEligibility > eligible (likely) for first-gen 0ms
+ ✓ src/lib/tests/__tests__/sat-act-quiz.test.ts > feeWaiverEligibility > not eligible by default 0ms
+ ✓ src/lib/tests/__tests__/sat-act-quiz.test.ts > SAT_ACT_QUIZ > has 6 questions 1ms
+ ✓ src/lib/tests/__tests__/sat-act-quiz.test.ts > SAT_ACT_QUIZ > each question has 3 options 1ms
+ ✓ src/lib/cc/uk/schools.test.ts > getUKSchools > returns 12 schools 2ms
+ ✓ src/lib/cc/uk/schools.test.ts > getUKSchools > includes Oxford, Cambridge, Imperial, LSE, UCL 1ms
+ ✓ src/lib/cc/uk/schools.test.ts > getUKDeadline > Oxford has Oct 15 deadline 0ms
+ ✓ src/lib/cc/uk/schools.test.ts > getUKDeadline > Imperial has Jan 14 deadline 0ms
+ ✓ src/lib/cc/uk/schools.test.ts > getUKDeadline > returns null for unknown school 0ms
+ ✓ src/lib/cc/uk/schools.test.ts > getUKApplicationPlan > every UK school uses UCAS 1ms
+ ✓ src/lib/cc/uk/schools.test.ts > getUKApplicationPlan > every UK school is need-aware-for-internationals 0ms
+ ✓ src/lib/cc/uk/schools.test.ts > isOxbridgeOrMedical > returns true for Oxford and Cambridge 0ms
+ ✓ src/lib/cc/uk/schools.test.ts > isOxbridgeOrMedical > returns false for Imperial, LSE, UCL 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > edWarningState > safe when not aid-dependent and not international 1ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > edWarningState > warning when aid-dependent (domestic) 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > edWarningState > block when international + need-aware school 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > edWarningState > safe-ish when international but school is need-blind for internationals 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > checkREAConflict > no conflict when no REA selected 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > checkREAConflict > conflict when REA + EA at private school 1ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > checkREAConflict > no conflict when REA + EA at public school (UMich) 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > checkREAConflict > no conflict when REA + RD elsewhere 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > schoolAcceptsPlan > MIT accepts EA 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > schoolAcceptsPlan > MIT does not accept ED (Stanford-style only) 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > schoolAcceptsPlan > Cornell accepts ED 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > schoolAcceptsPlan > unknown school does not block 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > getSchoolPlanInfo > returns info for known school 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy.test.ts > getSchoolPlanInfo > returns null for unknown school 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > INTAKE_QUESTIONS > has the expected question ids in order 2ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > INTAKE_QUESTIONS > parents_education is optional and has 5 options 1ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > INTAKE_QUESTIONS > citizenship_status uses the shared citizenship option set 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > nextAskableIndex > skips parents_education when first_gen is no 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > nextAskableIndex > asks parents_education when first_gen is yes 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > nextAskableIndex > asks parents_education when first_gen is not sure 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > nextAskableIndex > skips international_status + citizenship_status when country is US 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > nextAskableIndex > skips international_status + citizenship_status when country is CA 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > nextAskableIndex > asks international_status when country is not US/CA 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > nextAskableIndex > skips citizenship_status when international_status is no 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > nextAskableIndex > asks citizenship_status when international_status is yes 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > nextAskableIndex > returns -1 when there are no more askable questions 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > parseInternationalStatus > returns true for yes 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > parseInternationalStatus > returns false for no 0ms
+ ✓ src/lib/cc/__tests__/intake-questions.test.ts > parseInternationalStatus > returns null for unknown 0ms
+ ✓ src/lib/cc/__tests__/ownership.test.ts > isUuid > accepts a v4 uuid and rejects route placeholders 2ms
+ ✓ src/lib/cc/__tests__/ownership.test.ts > getStudentProfileId > returns the caller's profile id 1ms
+ ✓ src/lib/cc/__tests__/ownership.test.ts > getStudentProfileId > returns null when the user has no profile 0ms
+ ✓ src/lib/cc/__tests__/ownership.test.ts > getStudentProfileId > still resolves when a user has duplicate profile rows 0ms
+ ✓ src/lib/cc/__tests__/ownership.test.ts > getOwnedEssay > returns the essay when it belongs to the caller 1ms
+ ✓ src/lib/cc/__tests__/ownership.test.ts > getOwnedEssay > returns null for another student's essay 0ms
+ ✓ src/lib/cc/__tests__/ownership.test.ts > getOwnedEssay > returns null for a non-uuid id 0ms
+ ✓ src/lib/cc/__tests__/ownership.test.ts > getOwnedEssay > returns null when the caller has no profile 0ms
+ ✓ src/lib/cc/__tests__/ownership.test.ts > duplicate profile rows (no unique user_id) > finds an essay that hangs off the caller's second profile 0ms
+ ✓ src/lib/cc/__tests__/ownership.test.ts > duplicate profile rows (no unique user_id) > returns every profile id the user owns 0ms
+ ✓ src/components/cc/essay/__tests__/studio-grid-contract.test.ts > Essay Studio grids are responsive > src/app/cc/essays/[id]/page.tsx 3ms
+ ✓ src/components/cc/essay/__tests__/studio-grid-contract.test.ts > Essay Studio grids are responsive > src/components/cc/essay/BrainstormChat.tsx 2ms
+ ✓ src/components/cc/essay/__tests__/studio-grid-contract.test.ts > Essay Studio grids are responsive > src/components/cc/essay/DraftEditor.tsx 1ms
+ ✓ src/components/cc/essay/__tests__/studio-grid-contract.test.ts > Essay Studio grids are responsive > src/components/cc/essay/OutlinePicker.tsx 1ms
+ ✓ src/components/cc/essay/__tests__/studio-grid-contract.test.ts > Essay Studio grids are responsive > tokens.css defines the mobile rules 2ms
+ ✓ src/lib/cc/__tests__/affordability.test.ts > AFFORDABILITY_OPTIONS > places $0 first so it surfaces prominently 2ms
+ ✓ src/lib/cc/__tests__/affordability.test.ts > AFFORDABILITY_OPTIONS > has exactly 6 options 1ms
+ ✓ src/lib/cc/__tests__/affordability.test.ts > AFFORDABILITY_OPTIONS > has monotonically increasing maxAnnual values 0ms
+ ✓ src/lib/cc/__tests__/affordability.test.ts > financialNeedFromAffordability > maps zero and under_10k to essential 0ms
+ ✓ src/lib/cc/__tests__/affordability.test.ts > financialNeedFromAffordability > maps 10k_20k and 20k_30k to important 0ms
+ ✓ src/lib/cc/__tests__/affordability.test.ts > financialNeedFromAffordability > maps 30k_50k to nice-to-have 0ms
+ ✓ src/lib/cc/__tests__/affordability.test.ts > financialNeedFromAffordability > maps 50k_plus to not-a-concern 0ms
+ ✓ src/lib/cc/__tests__/affordability.test.ts > NEED_BLIND_INTERNATIONAL_IPEDS > contains exactly the 8 spec-named schools 0ms
+ ✓ src/lib/__tests__/credits-signup.test.ts > signup credits > backfills a missing credit row with 200, not 300 3ms
+ ✓ src/lib/__tests__/credits-signup.test.ts > signup credits > the migration grants 200 credits and a 7-day trial 3ms
+ ✓ src/lib/cc/__tests__/coach-languages.test.ts > COACH_LANGUAGES > covers 25 languages (7 Deepgram Aura, 10 Sarvam Indic, 8 Google TTS for top international student source markets) 2ms
+ ✓ src/lib/cc/__tests__/coach-languages.test.ts > COACH_LANGUAGES > marks Urdu as voice with isRTL — Google Cloud TTS hybrid path 0ms
+ ✓ src/lib/cc/__tests__/coach-languages.test.ts > COACH_LANGUAGES > marks Arabic as voice with isRTL 0ms
+ ✓ src/lib/cc/__tests__/coach-languages.test.ts > COACH_LANGUAGES > includes Mandarin, Korean, Vietnamese, Portuguese, Russian, Turkish — all voice 0ms
+ ✓ src/lib/cc/__tests__/coach-languages.test.ts > COACH_LANGUAGES > marks every language as voice (no text-only languages) 0ms
+ ✓ src/lib/cc/__tests__/coach-languages.test.ts > COACH_LANGUAGES > isVoiceLanguage returns true for Hindi, Urdu, and Mandarin 0ms
+ ✓ src/lib/cc/__tests__/coach-languages.test.ts > COACH_LANGUAGES > getCoachLanguage falls back to English for unknown code 0ms
+ ✓ src/lib/cc/canada/grade-conversion.test.ts > ontarioPercentageToUS > 92% → 3.95 1ms
+ ✓ src/lib/cc/canada/grade-conversion.test.ts > ontarioPercentageToUS > 95% → 4.0 0ms
+ ✓ src/lib/cc/canada/grade-conversion.test.ts > ontarioPercentageToUS > 80% → 3.3 0ms
+ ✓ src/lib/cc/canada/grade-conversion.test.ts > ontarioPercentageToUS > clamps at 4.0 0ms
+ ✓ src/lib/cc/canada/grade-conversion.test.ts > ontarioPercentageToUS > clamps at 0.0 0ms
+ ✓ src/lib/cc/canada/grade-conversion.test.ts > bcPercentageToUS > 90% → 3.7+ 0ms
+ ✓ src/lib/cc/canada/grade-conversion.test.ts > albertaDiplomaToUS > 90% diploma average → 3.9 (uses Ontario slope) 0ms
+ ✓ src/lib/cc/canada/grade-conversion.test.ts > quebecRScoreToUS > R=33 → ~3.7 0ms
+ ✓ src/lib/cc/canada/grade-conversion.test.ts > quebecRScoreToUS > R=30 → ~3.5 0ms
+ ✓ src/lib/cc/canada/grade-conversion.test.ts > quebecRScoreToUS > clamps at 4.0 above R=35 0ms
+ ✓ src/lib/cc/canada/grade-conversion.test.ts > type CanadianProvince > union covers ON / BC / AB / QC / other 1ms
+ ✓ src/lib/credential-ipfs.test.ts > credential-ipfs > pinJson throws when PINATA_JWT is missing 3ms
+ ✓ src/lib/credential-ipfs.test.ts > credential-ipfs > pinDiplomaMetadata throws on empty name 1ms
+ ✓ src/lib/cc/canada/schools.test.ts > getCanadianSchools > returns 12 schools 1ms
+ ✓ src/lib/cc/canada/schools.test.ts > getCanadianSchools > includes UofT, UBC, McGill, Waterloo by name 1ms
+ ✓ src/lib/cc/canada/schools.test.ts > getCanadianDeadline > returns deadline + portal info for UofT 0ms
+ ✓ src/lib/cc/canada/schools.test.ts > getCanadianDeadline > returns null for unknown school 0ms
+ ✓ src/lib/cc/canada/schools.test.ts > getCanadianApplicationPlan > returns rolling for Waterloo 0ms
+ ✓ src/lib/cc/canada/schools.test.ts > getCanadianApplicationPlan > marks every Canadian school need-aware-for-internationals 0ms
+ ✓ src/lib/cc/canada/schools.test.ts > getCanadianSupplementPrompts > returns prompts for UBC, Waterloo, Queen's, UofT 0ms
+ ✓ src/lib/cc/canada/schools.test.ts > getCanadianSupplementPrompts > returns null for grades-only schools (McGill) 0ms
+ ✓ src/lib/cc/__tests__/coach-mode-detector.test.ts > detectMode > returns intake when intake not completed 1ms
+ ✓ src/lib/cc/__tests__/coach-mode-detector.test.ts > detectMode > returns intake even if on another page when no profile 0ms
+ ✓ src/lib/cc/__tests__/coach-mode-detector.test.ts > detectMode > returns mode from explicit user request 1ms
+ ✓ src/lib/cc/__tests__/coach-mode-detector.test.ts > detectMode > returns page-based mode when on school pages 0ms
+ ✓ src/lib/cc/__tests__/coach-mode-detector.test.ts > detectMode > returns essay mode on essay pages 0ms
+ ✓ src/lib/cc/__tests__/coach-mode-detector.test.ts > detectMode > returns interview mode on interview pages 0ms
+ ✓ src/lib/cc/__tests__/coach-mode-detector.test.ts > detectMode > returns general as default 0ms
+ ✓ src/lib/cc/__tests__/coach-mode-detector.test.ts > detectMode > returns academic when GPA missing and intake done 0ms
+ ✓ src/lib/cc/__tests__/essay-profile.test.ts > getEssayProfile > returns null for the US default (personal_statement) 2ms
+ ✓ src/lib/cc/__tests__/essay-profile.test.ts > getEssayProfile > returns null for US supplements (default framing applies) 0ms
+ ✓ src/lib/cc/__tests__/essay-profile.test.ts > getEssayProfile > returns null when essayType is missing 0ms
+ ✓ src/lib/cc/__tests__/essay-profile.test.ts > getEssayProfile > UCAS PS questions > Q1 = subject fit; suppresses US expert tips 1ms
+ ✓ src/lib/cc/__tests__/essay-profile.test.ts > getEssayProfile > UCAS PS questions > Q2 = academic preparation; suppresses US expert tips 0ms
+ ✓ src/lib/cc/__tests__/essay-profile.test.ts > getEssayProfile > UCAS PS questions > Q3 = super-curriculars (NOT extracurriculars) 0ms
+ ✓ src/lib/cc/__tests__/essay-profile.test.ts > getEssayProfile > UCAS PS questions > UCAS profile is school-country-agnostic (school_id is null for UCAS) 0ms
+ ✓ src/lib/cc/__tests__/essay-profile.test.ts > getEssayProfile > Canadian supplements > supplement_* + schoolCountry=CA → academic-leaning Canadian profile 0ms
+ ✓ src/lib/cc/__tests__/essay-profile.test.ts > getEssayProfile > Canadian supplements > supplement_* + schoolCountry=US still returns null (default US framing) 0ms
+ ✓ src/lib/cc/__tests__/essay-profile.test.ts > getEssayProfile > Canadian supplements > Canadian school country is required — supplement_* without country = US default 0ms
+ ✓ src/lib/cc/__tests__/coach-actions-block.test.ts > parseActionsBlock > returns null when no block present 1ms
+ ✓ src/lib/cc/__tests__/coach-actions-block.test.ts > parseActionsBlock > parses add_schools array of strings (back-compat) 1ms
+ ✓ src/lib/cc/__tests__/coach-actions-block.test.ts > parseActionsBlock > parses add_schools array of objects with band 0ms
+ ✓ src/lib/cc/__tests__/coach-actions-block.test.ts > parseActionsBlock > ignores invalid band values and keeps the name 0ms
+ ✓ src/lib/cc/__tests__/coach-actions-block.test.ts > parseActionsBlock > returns null for empty arrays (no-op action) 0ms
+ ✓ src/lib/cc/__tests__/coach-actions-block.test.ts > parseActionsBlock > returns null for malformed JSON 0ms
+ ✓ src/lib/cc/__tests__/coach-actions-block.test.ts > parseActionsBlock > trims whitespace and newlines around the JSON 0ms
+ ✓ src/lib/cc/__tests__/coach-actions-block.test.ts > parseActionsBlock > only accepts the LAST block when multiple are present 0ms
+ ✓ src/lib/cc/__tests__/coach-actions-block.test.ts > stripActionsBlock > removes the block + trims trailing whitespace 0ms
+ ✓ src/lib/cc/__tests__/coach-actions-block.test.ts > stripActionsBlock > returns original when no block present 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > accepts "3.50" as 3.5 1ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > accepts "  3.50 " as 3.5 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > accepts "3.5/4.0" as 3.5 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > accepts "4.3" as 4.3 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > accepts "3.456" as 3.46 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > accepts 3.2 as 3.2 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > accepts "3,65" as 3.65 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > accepts "3,5/4" as 3.5 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > rejects "abc" 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > rejects "12" 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > rejects "0" 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > rejects "" 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > rejects null 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > rejects undefined 0ms
+ ✓ src/lib/cc/__tests__/parse-gpa.test.ts > parseGpa > rejects "-3" 0ms
+ ✓ src/lib/cc/__tests__/detect-language.test.ts > detectMessageLanguage > detects Urdu from Arabic-script characters 3ms
+ ✓ src/lib/cc/__tests__/detect-language.test.ts > detectMessageLanguage > detects Hindi from Devanagari characters 1ms
+ ✓ src/lib/cc/__tests__/detect-language.test.ts > detectMessageLanguage > detects Punjabi from Gurmukhi characters 1ms
+ ✓ src/lib/cc/__tests__/detect-language.test.ts > detectMessageLanguage > returns en for plain English 0ms
+ ✓ src/lib/cc/__tests__/detect-language.test.ts > detectMessageLanguage > returns unknown for empty string 0ms
+ ✓ src/lib/cc/__tests__/detect-language.test.ts > detectMessageLanguage > detects Urdu even when English proper nouns are mixed in 0ms
+ ✓ src/lib/cc/__tests__/detect-language.test.ts > buildLanguageInstruction > emits empty string for English with no preference 1ms
+ ✓ src/lib/cc/__tests__/detect-language.test.ts > buildLanguageInstruction > emits Urdu instruction when message is Urdu 1ms
+ ✓ src/lib/cc/__tests__/detect-language.test.ts > buildLanguageInstruction > preferred language overrides detected language 0ms
+ ✓ src/lib/cc/__tests__/detect-language.test.ts > buildLanguageInstruction > accepts both short code and human label for preference 0ms
+ ✓ src/lib/cc/__tests__/detect-language.test.ts > buildLanguageInstruction > ignores unrecognized preference strings 0ms
+ ✓ src/lib/cc/uk/scholarships.test.ts > relevantScholarships > Pakistani student applying to Oxford gets Saïd + Reach Oxford + HEC 3ms
+ ✓ src/lib/cc/uk/scholarships.test.ts > relevantScholarships > non-Pakistani student does NOT get pakistani-only awards (Saïd, HEC) 1ms
+ ✓ src/lib/cc/uk/scholarships.test.ts > relevantScholarships > undergraduate student does NOT get graduate-only awards (Chevening, Commonwealth Shared) 0ms
+ ✓ src/lib/cc/uk/scholarships.test.ts > relevantScholarships > filters by school — student applying only to LSE doesn't get Oxford-only awards 0ms
+ ✓ src/lib/cc/uk/scholarships.test.ts > getScholarship > returns Saïd Foundation by name 0ms
+ ✓ src/lib/cc/uk/scholarships.test.ts > getScholarship > returns null for unknown name 0ms
+ ✓ src/lib/cc/uk/scholarships.test.ts > ALL_SCHOLARSHIP_NAMES > includes the headline awards 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > keeps /join/abc 2ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > keeps /counselor/onboard 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > keeps /cc/dashboard?tab=1 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects "//evil.com" 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects "/\\evil.com" 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects "https://evil.com" 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects "javascript:alert(1)" 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects "" 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects null 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects undefined 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects "/\t/evil.com" 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects "/\n/evil.com" 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects "/\r/evil.com" 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects "/\t\\evil.com" 0ms
+ ✓ src/lib/__tests__/safe-next.test.ts > safeNextPath > rejects "/ok\u0000" 0ms
+ ✓ src/app/__tests__/privy-scope.test.ts > Privy is scoped to /credentials > the global providers don't mount it 3ms
+ ✓ src/app/__tests__/privy-scope.test.ts > Privy is scoped to /credentials > the credentials layout does 1ms
+ ✓ src/lib/__tests__/credits-pro-exempt.test.ts > deductCredits and Pro > does not charge a Pro user 1ms
+ ✓ src/lib/__tests__/credits-pro-exempt.test.ts > deductCredits and Pro > still charges free users 1ms
+ ✓ src/lib/credentials-pro-gate.test.ts > isPro > returns true when user is in CREDENTIALS_PRO_ALLOWLIST 2ms
+ ✓ src/lib/credentials-pro-gate.test.ts > isPro > returns false when not in allowlist and no subscription row 0ms
+ ✓ src/lib/credentials-pro-gate.test.ts > isPro > returns true for active pro plan row 0ms
+ ✓ src/lib/credentials-pro-gate.test.ts > isPro > returns false for active free plan row 0ms
+ ✓ src/lib/credentials-pro-gate.test.ts > isPro > returns false for canceled pro plan row 0ms
+ ✓ src/lib/cc/__tests__/agency-slug.test.ts > slugifyAgencyName > kebab-cases and strips punctuation 1ms
+ ✓ src/lib/cc/__tests__/agency-slug.test.ts > slugifyAgencyName > strips accents 1ms
+ ✓ src/lib/cc/__tests__/agency-slug.test.ts > slugifyAgencyName > caps at 40 chars with no trailing hyphen 1ms
+ ✓ src/lib/cc/__tests__/agency-slug.test.ts > slugifyAgencyName > always satisfies the API's slug rule or is too short to submit 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy-estimate.test.ts > estimateEDCost > zero affordability + full-need school = 0 out of pocket 1ms
+ ✓ src/lib/applications/__tests__/ed-strategy-estimate.test.ts > estimateEDCost > non-full-need school applies 75% haircut 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy-estimate.test.ts > estimateEDCost > 50k_plus bracket = student covers most of COA 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy-estimate.test.ts > estimateEDCost > null affordability defaults to mid-bracket EFC 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy-estimate.test.ts > estimateEDCost > public OOS school uses lower COA tier 0ms
+ ✓ src/lib/applications/__tests__/ed-strategy-estimate.test.ts > estimateEDCost > methodology line names the school 0ms
+ ✓ src/components/marketing/__tests__/footer-mobile-contract.test.ts > marketing footer at phone width > wraps its links and lets grid children shrink below 640px 2ms
+ ✓ src/lib/__tests__/stripe-period.test.ts > subscriptionPeriod > reads the period from the first subscription item 2ms
+ ✓ src/lib/__tests__/stripe-period.test.ts > subscriptionPeriod > falls back to the legacy subscription-level fields 0ms
+ ✓ src/lib/__tests__/stripe-period.test.ts > subscriptionPeriod > returns nulls for a missing subscription 0ms
+ ✓ src/lib/__tests__/credit-reservations-sql.test.ts > credit reservation SQL > reserve takes the per-user lock before looking for an existing reservation (concurrent replays return ok) 2ms
+ ✓ src/lib/__tests__/credit-reservations-sql.test.ts > credit reservation SQL > releasing an unknown key records a released tombstone so a late reserve can't hold credits 0ms
+ ✓ src/lib/__tests__/credit-reservations-sql.test.ts > credit reservation SQL > pins search_path with pg_temp last and grants only the service role 0ms
+ ✓ src/lib/cc/__tests__/language-fallback.test.ts > pickCoachLanguage > returns preferred_language when set 1ms
+ ✓ src/lib/cc/__tests__/language-fallback.test.ts > pickCoachLanguage > falls back to home_language when preferred is null 0ms
+ ✓ src/lib/cc/__tests__/language-fallback.test.ts > pickCoachLanguage > returns 'en' when both are null 0ms
+ ✓ src/lib/cc/__tests__/language-fallback.test.ts > pickCoachLanguage > returns 'en' when both are empty strings 0ms
+ ✓ src/lib/cc/__tests__/language-fallback.test.ts > pickCoachLanguage > treats undefined like null 0ms
+ ✓ src/lib/cc/__tests__/essay-type-label.test.ts > essayTypeLabel > "personal_statement" → Personal Statement 2ms
+ ✓ src/lib/cc/__tests__/essay-type-label.test.ts > essayTypeLabel > "supplemental" → School Supplemental 0ms
+ ✓ src/lib/cc/__tests__/essay-type-label.test.ts > essayTypeLabel > "scholarship" → Scholarship Essay 0ms
+ ✓ src/lib/cc/__tests__/essay-type-label.test.ts > essayTypeLabel > "why_us" → Why Us 0ms
+ ✓ src/lib/cc/__tests__/essay-type-label.test.ts > essayTypeLabel > null → Essay 0ms
+ ✓ src/lib/cc/__tests__/essay-type-label.test.ts > essayTypeLabel > "" → Essay 0ms
+ ✓ src/lib/__tests__/user-tier-view.test.ts > v_user_tier trial expiry > a Stripe-managed active/trialing subscription is Pro 1ms
+ ✓ src/lib/__tests__/user-tier-view.test.ts > v_user_tier trial expiry > a signup trial (no Stripe subscription) is Pro only until current_period_end 0ms
+ ✓ src/lib/__tests__/user-tier-view.test.ts > v_user_tier trial expiry > keeps the canceled-until-period-end grace and the guest rule 0ms
+ ✓ src/lib/__tests__/pricing-yearly-config.test.ts > yearlyCheckoutConfigured > is false until the yearly Stripe price is configured 2ms
+ ✓ src/lib/__tests__/pricing-yearly-config.test.ts > yearlyCheckoutConfigured > is true once it is set 0ms
+ ✓ src/lib/cc/__tests__/coach-error-message.test.ts > coachErrorMessage > shows the server's fair-use message instead of inviting a retry 2ms
+ ✓ src/lib/cc/__tests__/coach-error-message.test.ts > coachErrorMessage > shows a limit message for a 402 cap 0ms
+ ✓ src/lib/cc/__tests__/coach-error-message.test.ts > coachErrorMessage > falls back to the generic retry message for other failures 0ms
+ ✓ src/lib/device.test.ts > device constants > MOBILE_BREAKPOINT_PX = 1024 2ms
+ ✓ src/lib/device.test.ts > device constants > MOBILE_MEDIA_QUERY matches the breakpoint with .98 fudge 0ms
+
+ Test Files  92 passed (92)
+      Tests  626 passed (626)
+   Start at  20:20:49
+   Duration  612.76s (transform 7.95s, setup 104.46s, import 37.55s, tests 21.44s, environment 399.57s)
+

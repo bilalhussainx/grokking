@@ -1,0 +1,10 @@
+◇ injected env (0) from .env.local // tip: ⌘ override existing { override: true }
+
+ RUN  v4.1.5 C:/Users/bilal/Downloads/grokking-daybreak
+
+
+ Test Files  5 passed (5)
+      Tests  48 passed (48)
+   Start at  20:52:21
+   Duration  19.15s (transform 454ms, setup 3.14s, import 1.98s, tests 1.34s, environment 11.02s)
+

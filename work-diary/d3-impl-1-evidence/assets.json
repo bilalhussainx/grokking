@@ -1,0 +1,37 @@
+{
+  "fonts": [
+    {
+      "path": "public/fonts/daybreak/atkinson-hyperlegible-400.woff2",
+      "bytes": 17208,
+      "sha256": "d64ba838ef5472bba248620ec4fd8b5aa7cf0db2908e0bb230600caf279ba7bc"
+    },
+    {
+      "path": "public/fonts/daybreak/atkinson-hyperlegible-700.woff2",
+      "bytes": 17524,
+      "sha256": "140e2bd25a7315c8a062508391426b0d8c3297400c947b8d847be28f73a199f0"
+    },
+    {
+      "path": "public/fonts/daybreak/noto-nastaliq-urdu.woff2",
+      "bytes": 159368,
+      "sha256": "fecd45d69436d911d79ff10fc39ca7f7022cbe05214bc07f931820b7c7a7d15c"
+    },
+    {
+      "path": "public/fonts/daybreak/noto-sans-devanagari-400.woff2",
+      "bytes": 121192,
+      "sha256": "3b3cae4d2600cb502286577fcfbc7f0caa05d9bb3c28d6699aeb56302d35e730"
+    },
+    {
+      "path": "public/fonts/daybreak/noto-sans-gurmukhi-400.woff2",
+      "bytes": 33824,
+      "sha256": "fc4c2bf6b7387ce4b0a6b7d38c459fb50c31680a3148c186123af49cf73b2bfa"
+    },
+    {
+      "path": "public/fonts/daybreak/nunito-sans-400.woff2",
+      "bytes": 31076,
+      "sha256": "29e3890496844a9ea81975c52771c587c872b4eb317026422d1995b88d21b57d"
+    }
+  ],
+  "fontBytes": 380192,
+  "illustrationBytes": 961,
+  "illustrationSha256": "0a7aff3a0bb675b72c69c03195c883f37460656be51a9ce53bbd8162e171a7fd"
+}

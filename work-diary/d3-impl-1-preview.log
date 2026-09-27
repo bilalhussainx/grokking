@@ -1,0 +1,75 @@
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+Daybreak local preview: http://127.0.0.1:4180
+○ Compiling / ...
+ GET / 200 in 12.9s (compile: 11.0s, proxy.ts: 171ms, render: 1672ms)
+⨯ Error: SUPABASE_SERVICE_ROLE_KEY is not set
+    at createAdminSupabase (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\lib\supabase-server.ts:33:11)
+    at GET (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\app\api\cc\glossary\route.ts:10:39)
+  31 |   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  32 |   if (!serviceKey) {
+> 33 |     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+     |           ^
+  34 |   }
+  35 |   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+  36 | }
+ GET /api/cc/glossary 500 in 2.7s (compile: 2.6s, proxy.ts: 44ms, render: 105ms)
+✓ Finished filesystem cache database compaction in 11.8s
+✓ Finished writing to filesystem cache in 13.0s
+✓ Compiled in 143ms
+✓ Compiled in 351ms
+ GET / 200 in 2.2s (compile: 188ms, proxy.ts: 1105ms, render: 859ms)
+⨯ Error: SUPABASE_SERVICE_ROLE_KEY is not set
+    at createAdminSupabase (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\lib\supabase-server.ts:33:11)
+    at GET (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\app\api\cc\glossary\route.ts:10:39)
+  31 |   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  32 |   if (!serviceKey) {
+> 33 |     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+     |           ^
+  34 |   }
+  35 |   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+  36 | }
+ GET /api/cc/glossary 500 in 121ms (compile: 32ms, proxy.ts: 16ms, render: 73ms)
+✓ Compiled in 3.7s
+○ Compiling /pricing ...
+ GET /pricing 200 in 11.8s (compile: 11.1s, proxy.ts: 99ms, render: 533ms)
+ GET /api/cc/glossary 500 in 26ms (compile: 6ms, proxy.ts: 9ms, render: 11ms)
+⨯ Error: SUPABASE_SERVICE_ROLE_KEY is not set
+    at createAdminSupabase (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\lib\supabase-server.ts:33:11)
+    at GET (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\app\api\cc\glossary\route.ts:10:39)
+  31 |   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  32 |   if (!serviceKey) {
+> 33 |     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+     |           ^
+  34 |   }
+  35 |   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+  36 | }
+✓ Finished filesystem cache database compaction in 19.6s
+○ Compiling /courses ...
+ GET /courses 200 in 25.3s (compile: 13.9s, proxy.ts: 124ms, render: 11.3s)
+✓ Finished writing to filesystem cache in 19.2s
+⨯ Error: SUPABASE_SERVICE_ROLE_KEY is not set
+    at createAdminSupabase (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\lib\supabase-server.ts:33:11)
+    at GET (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\app\api\cc\glossary\route.ts:10:39)
+  31 |   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  32 |   if (!serviceKey) {
+> 33 |     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+     |           ^
+  34 |   }
+  35 |   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+  36 | }
+ GET /api/cc/glossary 500 in 84ms (compile: 13ms, proxy.ts: 24ms, render: 48ms)
+ GET /opengraph-image 200 in 1208ms (compile: 864ms, render: 344ms)
+✓ Finished filesystem cache database compaction in 60s
+✓ Finished filesystem cache database compaction in 28.5s
+ GET / 200 in 2.3s (compile: 629ms, proxy.ts: 16ms, render: 1677ms)
+⨯ Error: SUPABASE_SERVICE_ROLE_KEY is not set
+    at createAdminSupabase (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\lib\supabase-server.ts:33:11)
+    at GET (file:\C:\Users\bilal\Downloads\grokking-daybreak\src\app\api\cc\glossary\route.ts:10:39)
+  31 |   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  32 |   if (!serviceKey) {
+> 33 |     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+     |           ^
+  34 |   }
+  35 |   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+  36 | }
+ GET /api/cc/glossary 500 in 121ms (compile: 6ms, proxy.ts: 13ms, render: 101ms)

@@ -1,0 +1,31 @@
+[select] Selected "hi" in #quick-check-language
+
+[js] {
+  "interrupted": false
+}
+
+[screenshot] Screenshot saved (viewport): work-diary/d3-impl-1-evidence/home-hindi-375.png
+
+[js] {"language":"hi","width":375}
+
+[select] Selected "pa" in #quick-check-language
+
+[screenshot] Screenshot saved (viewport): work-diary/d3-impl-1-evidence/home-punjabi-375.png
+
+[js] {"language":"pa","width":375}
+
+[select] Selected "es" in #quick-check-language
+
+[screenshot] Screenshot saved (viewport): work-diary/d3-impl-1-evidence/home-spanish-375.png
+
+[js] {"language":"es","width":375}
+
+[select] Selected "en" in #quick-check-language
+
+[console] --- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://127.0.0.1:4180/#daybreak-main) ---
+[2026-09-27T00:39:44.374Z] [error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-09-27T00:43:45.164Z] [error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-09-27T00:45:11.792Z] [error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-09-27T00:46:48.625Z] [error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-09-27T00:49:12.930Z] [error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+--- END UNTRUSTED EXTERNAL CONTENT ---

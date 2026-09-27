@@ -1,0 +1,11 @@
+◇ injected env (0) from .env.local // tip: ⌁ auth for agents [www.vestauth.com]
+
+ RUN  v4.1.5 C:/Users/bilal/Downloads/grokking-daybreak
+
+
+ Test Files  91 passed (91)
+      Tests  622 passed (622)
+   Start at  20:16:01
+   Duration  277.19s (transform 5.87s, setup 35.14s, import 14.38s, tests 7.90s, environment 121.39s)
+
+STOPPED: no test results after more than 10 minutes; retry with threads pool, one worker.

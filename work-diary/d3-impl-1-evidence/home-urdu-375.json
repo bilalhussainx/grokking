@@ -1,0 +1,1045 @@
+{
+  "url": "/",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  },
+  "documentWidth": 375,
+  "documentHeight": 5161,
+  "navigation": {
+    "name": "http://127.0.0.1:4180/",
+    "entryType": "navigation",
+    "startTime": 0,
+    "duration": 3580.9000000059605,
+    "navigationId": 5894,
+    "initiatorType": "navigation",
+    "deliveryType": "",
+    "nextHopProtocol": "http/1.1",
+    "renderBlockingStatus": "non-blocking",
+    "contentType": "text/html",
+    "contentEncoding": "gzip",
+    "workerStart": 0,
+    "workerRouterEvaluationStart": 0,
+    "workerCacheLookupStart": 0,
+    "workerMatchedSourceType": "",
+    "workerFinalSourceType": "",
+    "redirectStart": 0,
+    "redirectEnd": 0,
+    "fetchStart": 81,
+    "domainLookupStart": 94.59999999403954,
+    "domainLookupEnd": 94.90000000596046,
+    "connectStart": 94.90000000596046,
+    "secureConnectionStart": 0,
+    "connectEnd": 95.7000000178814,
+    "requestStart": 96.59999999403954,
+    "responseStart": 2237.2000000178814,
+    "firstInterimResponseStart": 0,
+    "finalResponseHeadersStart": 2237.2000000178814,
+    "responseEnd": 2294.0999999940395,
+    "transferSize": 34772,
+    "encodedBodySize": 34472,
+    "decodedBodySize": 165307,
+    "responseStatus": 200,
+    "serverTiming": [],
+    "unloadEventStart": 2317.2000000178814,
+    "unloadEventEnd": 2317.2000000178814,
+    "domInteractive": 2428.5999999940395,
+    "domContentLoadedEventStart": 2428.5999999940395,
+    "domContentLoadedEventEnd": 2428.5999999940395,
+    "domComplete": 3580.300000011921,
+    "loadEventStart": 3580.9000000059605,
+    "loadEventEnd": 3580.9000000059605,
+    "type": "reload",
+    "redirectCount": 0,
+    "activationStart": 0,
+    "criticalCHRestart": 0,
+    "notRestoredReasons": null,
+    "confidence": {
+      "randomizedTriggerRate": 0.4994798,
+      "value": "high"
+    }
+  },
+  "paints": [
+    {
+      "name": "first-paint",
+      "startTimeMs": 2448
+    },
+    {
+      "name": "first-contentful-paint",
+      "startTimeMs": 3844
+    }
+  ],
+  "resources": [
+    {
+      "path": "/_next/static/media/01e4147cff8141ee-s.p.7787e134.woff2",
+      "type": "link",
+      "transferBytes": 0,
+      "encodedBytes": 37776,
+      "decodedBytes": 37776,
+      "durationMs": 0
+    },
+    {
+      "path": "/_next/static/media/5c285b27cdda1fe8-s.p.a62025f2.woff2",
+      "type": "link",
+      "transferBytes": 0,
+      "encodedBytes": 36980,
+      "decodedBytes": 36980,
+      "durationMs": 0
+    },
+    {
+      "path": "/_next/static/media/70bc3e132a0a741e-s.p.15008bfb.woff2",
+      "type": "link",
+      "transferBytes": 0,
+      "encodedBytes": 40480,
+      "decodedBytes": 40480,
+      "durationMs": 0
+    },
+    {
+      "path": "/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2",
+      "type": "link",
+      "transferBytes": 0,
+      "encodedBytes": 48432,
+      "decodedBytes": 48432,
+      "durationMs": 0
+    },
+    {
+      "path": "/_next/static/media/8bd76523131fa0fc-s.p.eb17b6b9.woff2",
+      "type": "link",
+      "transferBytes": 0,
+      "encodedBytes": 39304,
+      "decodedBytes": 39304,
+      "durationMs": 0
+    },
+    {
+      "path": "/_next/static/chunks/%5Broot-of-the-server%5D__1e23c4ec._.css",
+      "type": "link",
+      "transferBytes": 45919,
+      "encodedBytes": 45619,
+      "decodedBytes": 409577,
+      "durationMs": 21
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_components_marketing_daybreak_daybreak_8db68951.css",
+      "type": "link",
+      "transferBytes": 4440,
+      "encodedBytes": 4140,
+      "decodedBytes": 20421,
+      "durationMs": 10
+    },
+    {
+      "path": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_74cc1845._.js",
+      "type": "link",
+      "transferBytes": 971,
+      "encodedBytes": 671,
+      "decodedBytes": 671,
+      "durationMs": 42
+    },
+    {
+      "path": "/_next/static/chunks/aed1d_next_dist_compiled_react-dom_18d0161a._.js",
+      "type": "script",
+      "transferBytes": 182508,
+      "encodedBytes": 182208,
+      "decodedBytes": 1049966,
+      "durationMs": 129
+    },
+    {
+      "path": "/_next/static/chunks/aed1d_next_dist_compiled_react-server-dom-turbopack_136bd64f._.js",
+      "type": "script",
+      "transferBytes": 31454,
+      "encodedBytes": 31154,
+      "decodedBytes": 172086,
+      "durationMs": 97
+    },
+    {
+      "path": "/_next/static/chunks/aed1d_next_dist_compiled_3dc8137c._.js",
+      "type": "script",
+      "transferBytes": 28892,
+      "encodedBytes": 28592,
+      "decodedBytes": 148605,
+      "durationMs": 100
+    },
+    {
+      "path": "/_next/static/chunks/aed1d_next_dist_f40f6264._.js",
+      "type": "script",
+      "transferBytes": 39846,
+      "encodedBytes": 39546,
+      "decodedBytes": 225495,
+      "durationMs": 111
+    },
+    {
+      "path": "/_next/static/chunks/c9c56_%40swc_helpers_cjs_a8b19acd._.js",
+      "type": "script",
+      "transferBytes": 1066,
+      "encodedBytes": 766,
+      "decodedBytes": 2068,
+      "durationMs": 119
+    },
+    {
+      "path": "/_next/static/chunks/aed1d_next_dist_client_52862cd5._.js",
+      "type": "script",
+      "transferBytes": 124695,
+      "encodedBytes": 124395,
+      "decodedBytes": 664997,
+      "durationMs": 154
+    },
+    {
+      "path": "/_next/static/chunks/aed1d_next_dist_compiled_next-devtools_index_9397e1fd.js",
+      "type": "script",
+      "transferBytes": 224196,
+      "encodedBytes": 223896,
+      "decodedBytes": 816140,
+      "durationMs": 173
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_a0ff3932._.js",
+      "type": "script",
+      "transferBytes": 1034,
+      "encodedBytes": 734,
+      "decodedBytes": 734,
+      "durationMs": 114
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_app_favicon_ico_mjs_aa7425b5._.js",
+      "type": "script",
+      "transferBytes": 555,
+      "encodedBytes": 255,
+      "decodedBytes": 255,
+      "durationMs": 136
+    },
+    {
+      "path": "/_next/static/chunks/turbopack-grokking-daybreak_a34576f9._.js",
+      "type": "script",
+      "transferBytes": 18933,
+      "encodedBytes": 18633,
+      "decodedBytes": 75116,
+      "durationMs": 141
+    },
+    {
+      "path": "/_next/static/chunks/aed1d_next_dist_2b7a3a22._.js",
+      "type": "script",
+      "transferBytes": 22895,
+      "encodedBytes": 22595,
+      "decodedBytes": 137312,
+      "durationMs": 145
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_app_global-error_tsx_9bedf0e9._.js",
+      "type": "script",
+      "transferBytes": 540,
+      "encodedBytes": 240,
+      "decodedBytes": 240,
+      "durationMs": 151
+    },
+    {
+      "path": "/_next/static/chunks/_92ef6984._.js",
+      "type": "script",
+      "transferBytes": 5034,
+      "encodedBytes": 4734,
+      "decodedBytes": 21801,
+      "durationMs": 153
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_lib_cc_variant-walkthroughs_ts_f2c562ee._.js",
+      "type": "script",
+      "transferBytes": 1007,
+      "encodedBytes": 707,
+      "decodedBytes": 707,
+      "durationMs": 155
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_contexts_1f333319._.js",
+      "type": "script",
+      "transferBytes": 17658,
+      "encodedBytes": 17358,
+      "decodedBytes": 120915,
+      "durationMs": 170
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_hooks_87fe31b5._.js",
+      "type": "script",
+      "transferBytes": 18342,
+      "encodedBytes": 18042,
+      "decodedBytes": 120778,
+      "durationMs": 176
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_components_6347e54b._.js",
+      "type": "script",
+      "transferBytes": 60573,
+      "encodedBytes": 60273,
+      "decodedBytes": 671279,
+      "durationMs": 282
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_languages_spanish-intermediate_ts_1540e460._.js",
+      "type": "script",
+      "transferBytes": 30996,
+      "encodedBytes": 30696,
+      "decodedBytes": 132753,
+      "durationMs": 182
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_languages_spanish-beginner-v2_25f7a409._.js",
+      "type": "script",
+      "transferBytes": 63701,
+      "encodedBytes": 63401,
+      "decodedBytes": 249029,
+      "durationMs": 194
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_languages_english-intermediate_ts_feded8c9._.js",
+      "type": "script",
+      "transferBytes": 29100,
+      "encodedBytes": 28800,
+      "decodedBytes": 134504,
+      "durationMs": 195
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_languages_english-advanced_ts_5d76ba22._.js",
+      "type": "script",
+      "transferBytes": 33337,
+      "encodedBytes": 33037,
+      "decodedBytes": 133104,
+      "durationMs": 202
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_languages_french-beginner-v2_4e86e0ec._.js",
+      "type": "script",
+      "transferBytes": 83053,
+      "encodedBytes": 82753,
+      "decodedBytes": 297739,
+      "durationMs": 284
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_languages_english-for-spanish-speakers_1273054b._.js",
+      "type": "script",
+      "transferBytes": 60363,
+      "encodedBytes": 60063,
+      "decodedBytes": 223443,
+      "durationMs": 330
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_languages_1a9263b4._.js",
+      "type": "script",
+      "transferBytes": 162305,
+      "encodedBytes": 162005,
+      "decodedBytes": 741871,
+      "durationMs": 406
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_coding-interview_b3dac486._.js",
+      "type": "script",
+      "transferBytes": 66584,
+      "encodedBytes": 66284,
+      "decodedBytes": 272819,
+      "durationMs": 369
+    },
+    {
+      "path": "/_next/static/chunks/99383_src_data_system-design_01-system-design-foundations_ts_54f78b54._.js",
+      "type": "script",
+      "transferBytes": 48294,
+      "encodedBytes": 47994,
+      "decodedBytes": 141379,
+      "durationMs": 378
+    },
+    {
+      "path": "/_next/static/chunks/99383_src_data_system-design_02-scalability-and-performance_ts_fe699f7e._.js",
+      "type": "script",
+      "transferBytes": 49953,
+      "encodedBytes": 49653,
+      "decodedBytes": 151948,
+      "durationMs": 380
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_coding-interview-premium_9f3d51fd._.js",
+      "type": "script",
+      "transferBytes": 368947,
+      "encodedBytes": 368647,
+      "decodedBytes": 1425192,
+      "durationMs": 545
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_system-design_03-caching-strategies_ts_874c136e._.js",
+      "type": "script",
+      "transferBytes": 55463,
+      "encodedBytes": 55163,
+      "decodedBytes": 176472,
+      "durationMs": 391
+    },
+    {
+      "path": "/_next/static/chunks/99383_src_data_system-design_04-data-storage-and-databases_ts_2d1badd6._.js",
+      "type": "script",
+      "transferBytes": 58183,
+      "encodedBytes": 57883,
+      "decodedBytes": 174519,
+      "durationMs": 405
+    },
+    {
+      "path": "/_next/static/chunks/99383_src_data_system-design_05-distributed-systems-fundamentals_ts_3f15fba6._.js",
+      "type": "script",
+      "transferBytes": 65425,
+      "encodedBytes": 65125,
+      "decodedBytes": 207787,
+      "durationMs": 418
+    },
+    {
+      "path": "/_next/static/chunks/99383_src_data_system-design_07-reliability-and-resiliency_ts_64899108._.js",
+      "type": "script",
+      "transferBytes": 58471,
+      "encodedBytes": 58171,
+      "decodedBytes": 189005,
+      "durationMs": 416
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_system-design_08-core-system-case-studies_ts_a0e49847._.js",
+      "type": "script",
+      "transferBytes": 61839,
+      "encodedBytes": 61539,
+      "decodedBytes": 184413,
+      "durationMs": 432
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_system-design_5163d418._.js",
+      "type": "script",
+      "transferBytes": 84206,
+      "encodedBytes": 83906,
+      "decodedBytes": 268268,
+      "durationMs": 495
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_python-fundamentals_cca77b0a._.js",
+      "type": "script",
+      "transferBytes": 90022,
+      "encodedBytes": 89722,
+      "decodedBytes": 306605,
+      "durationMs": 500
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_cpp-fundamentals_d9cbc809._.js",
+      "type": "script",
+      "transferBytes": 27289,
+      "encodedBytes": 26989,
+      "decodedBytes": 130785,
+      "durationMs": 487
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_react-development_1729a40c._.js",
+      "type": "script",
+      "transferBytes": 35700,
+      "encodedBytes": 35400,
+      "decodedBytes": 172535,
+      "durationMs": 488
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_nodejs-backend_b376f018._.js",
+      "type": "script",
+      "transferBytes": 35782,
+      "encodedBytes": 35482,
+      "decodedBytes": 178545,
+      "durationMs": 505
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_mcp-claude-code_e0d89f29._.js",
+      "type": "script",
+      "transferBytes": 118842,
+      "encodedBytes": 118542,
+      "decodedBytes": 400336,
+      "durationMs": 552
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_ood-interview_a6405b1b._.js",
+      "type": "script",
+      "transferBytes": 57554,
+      "encodedBytes": 57254,
+      "decodedBytes": 236539,
+      "durationMs": 525
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_ml-interview_3034dff7._.js",
+      "type": "script",
+      "transferBytes": 82160,
+      "encodedBytes": 81860,
+      "decodedBytes": 275479,
+      "durationMs": 537
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_behavioral-interview_79e08b70._.js",
+      "type": "script",
+      "transferBytes": 64691,
+      "encodedBytes": 64391,
+      "decodedBytes": 197300,
+      "durationMs": 543
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_modern-system-design_c04fd13a._.js",
+      "type": "script",
+      "transferBytes": 199267,
+      "encodedBytes": 198967,
+      "decodedBytes": 624020,
+      "durationMs": 599
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_advanced-system-design_3fd1dc24._.js",
+      "type": "script",
+      "transferBytes": 221013,
+      "encodedBytes": 220713,
+      "decodedBytes": 695675,
+      "durationMs": 600
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_ds-interview_3b3d1f9a._.js",
+      "type": "script",
+      "transferBytes": 73752,
+      "encodedBytes": 73452,
+      "decodedBytes": 303795,
+      "durationMs": 570
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_api-design-interview_5bd17483._.js",
+      "type": "script",
+      "transferBytes": 144857,
+      "encodedBytes": 144557,
+      "decodedBytes": 471109,
+      "durationMs": 603
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_concurrency-multithreading_d78cded8._.js",
+      "type": "script",
+      "transferBytes": 62521,
+      "encodedBytes": 62221,
+      "decodedBytes": 232333,
+      "durationMs": 576
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_ai-agents_5ef3e65f._.js",
+      "type": "script",
+      "transferBytes": 49717,
+      "encodedBytes": 49417,
+      "decodedBytes": 164179,
+      "durationMs": 581
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_nn-zero-to-hero_a2527204._.js",
+      "type": "script",
+      "transferBytes": 60481,
+      "encodedBytes": 60181,
+      "decodedBytes": 216835,
+      "durationMs": 607
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_prompt-engineering_39c5b8c2._.js",
+      "type": "script",
+      "transferBytes": 56905,
+      "encodedBytes": 56605,
+      "decodedBytes": 164628,
+      "durationMs": 604
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_rag-engineering_03e339bd._.js",
+      "type": "script",
+      "transferBytes": 47220,
+      "encodedBytes": 46920,
+      "decodedBytes": 164670,
+      "durationMs": 611
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_corporate-finance_b359b4a8._.js",
+      "type": "script",
+      "transferBytes": 57260,
+      "encodedBytes": 56960,
+      "decodedBytes": 168347,
+      "durationMs": 639
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_personal-finance_23262c91._.js",
+      "type": "script",
+      "transferBytes": 67433,
+      "encodedBytes": 67133,
+      "decodedBytes": 200891,
+      "durationMs": 641
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_accounting-fundamentals_bf72ba95._.js",
+      "type": "script",
+      "transferBytes": 56701,
+      "encodedBytes": 56401,
+      "decodedBytes": 188706,
+      "durationMs": 639
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_microeconomics_c5b213b2._.js",
+      "type": "script",
+      "transferBytes": 57424,
+      "encodedBytes": 57124,
+      "decodedBytes": 177425,
+      "durationMs": 652
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_investment-banking_1afe095f._.js",
+      "type": "script",
+      "transferBytes": 58851,
+      "encodedBytes": 58551,
+      "decodedBytes": 179869,
+      "durationMs": 643
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_quantitative-finance_4b1c0e88._.js",
+      "type": "script",
+      "transferBytes": 66341,
+      "encodedBytes": 66041,
+      "decodedBytes": 212452,
+      "durationMs": 658
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_fintech-blockchain_f0a1920a._.js",
+      "type": "script",
+      "transferBytes": 64433,
+      "encodedBytes": 64133,
+      "decodedBytes": 186121,
+      "durationMs": 679
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_international-economics_479e4fa7._.js",
+      "type": "script",
+      "transferBytes": 61953,
+      "encodedBytes": 61653,
+      "decodedBytes": 181510,
+      "durationMs": 681
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_business-strategy_ab5ad489._.js",
+      "type": "script",
+      "transferBytes": 82633,
+      "encodedBytes": 82333,
+      "decodedBytes": 242053,
+      "durationMs": 696
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_macroeconomics_d46bcf63._.js",
+      "type": "script",
+      "transferBytes": 54960,
+      "encodedBytes": 54660,
+      "decodedBytes": 167628,
+      "durationMs": 678
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_stock-market-investing_a8a607e8._.js",
+      "type": "script",
+      "transferBytes": 67189,
+      "encodedBytes": 66889,
+      "decodedBytes": 199708,
+      "durationMs": 692
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_financial-modeling_7a856d7f._.js",
+      "type": "script",
+      "transferBytes": 55621,
+      "encodedBytes": 55321,
+      "decodedBytes": 173906,
+      "durationMs": 690
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_behavioral-economics_e1a5b293._.js",
+      "type": "script",
+      "transferBytes": 67088,
+      "encodedBytes": 66788,
+      "decodedBytes": 195909,
+      "durationMs": 719
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_entrepreneurship_5afcd216._.js",
+      "type": "script",
+      "transferBytes": 45616,
+      "encodedBytes": 45316,
+      "decodedBytes": 134632,
+      "durationMs": 712
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_grokking-dsa-python_d1d85d33._.js",
+      "type": "script",
+      "transferBytes": 36457,
+      "encodedBytes": 36157,
+      "decodedBytes": 144950,
+      "durationMs": 723
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_leadership-management_f419033d._.js",
+      "type": "script",
+      "transferBytes": 68513,
+      "encodedBytes": 68213,
+      "decodedBytes": 198343,
+      "durationMs": 724
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_islam-foundations_b3b88e90._.js",
+      "type": "script",
+      "transferBytes": 51020,
+      "encodedBytes": 50720,
+      "decodedBytes": 151485,
+      "durationMs": 725
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_stoic-philosophy_59d7d5c0._.js",
+      "type": "script",
+      "transferBytes": 47150,
+      "encodedBytes": 46850,
+      "decodedBytes": 141065,
+      "durationMs": 729
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_mental-health-resilience_12d087d3._.js",
+      "type": "script",
+      "transferBytes": 52900,
+      "encodedBytes": 52600,
+      "decodedBytes": 161278,
+      "durationMs": 746
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_political-strategy_9256b1fe._.js",
+      "type": "script",
+      "transferBytes": 37409,
+      "encodedBytes": 37109,
+      "decodedBytes": 114215,
+      "durationMs": 747
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_ap-biology_c5a5107f._.js",
+      "type": "script",
+      "transferBytes": 37636,
+      "encodedBytes": 37336,
+      "decodedBytes": 121854,
+      "durationMs": 749
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_intro-psychology_6e35872d._.js",
+      "type": "script",
+      "transferBytes": 39483,
+      "encodedBytes": 39183,
+      "decodedBytes": 125228,
+      "durationMs": 750
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_ai-ml-fundamentals_51e356a2._.js",
+      "type": "script",
+      "transferBytes": 333657,
+      "encodedBytes": 333357,
+      "decodedBytes": 1121958,
+      "durationMs": 860
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_world-history_bdcd83aa._.js",
+      "type": "script",
+      "transferBytes": 40860,
+      "encodedBytes": 40560,
+      "decodedBytes": 129075,
+      "durationMs": 752
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_react-complete_4b48b089._.js",
+      "type": "script",
+      "transferBytes": 37616,
+      "encodedBytes": 37316,
+      "decodedBytes": 135261,
+      "durationMs": 776
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_java-complete_17d5b60b._.js",
+      "type": "script",
+      "transferBytes": 34316,
+      "encodedBytes": 34016,
+      "decodedBytes": 119181,
+      "durationMs": 773
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_consulting-case-interview_da65dcc6._.js",
+      "type": "script",
+      "transferBytes": 47006,
+      "encodedBytes": 46706,
+      "decodedBytes": 135009,
+      "durationMs": 781
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_data_9eceb6eb._.js",
+      "type": "script",
+      "transferBytes": 927779,
+      "encodedBytes": 927479,
+      "decodedBytes": 3292434,
+      "durationMs": 1026
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_908a10ee._.js",
+      "type": "script",
+      "transferBytes": 27751,
+      "encodedBytes": 27451,
+      "decodedBytes": 148206,
+      "durationMs": 773
+    },
+    {
+      "path": "/_next/static/chunks/cce58_%40supabase_postgrest-js_dist_index_mjs_a33d5013._.js",
+      "type": "script",
+      "transferBytes": 23721,
+      "encodedBytes": 23421,
+      "decodedBytes": 133610,
+      "durationMs": 798
+    },
+    {
+      "path": "/_next/static/chunks/aed1d_next_d1b4f217._.js",
+      "type": "script",
+      "transferBytes": 49026,
+      "encodedBytes": 48726,
+      "decodedBytes": 262327,
+      "durationMs": 809
+    },
+    {
+      "path": "/_next/static/chunks/96f6e_tailwind-merge_dist_bundle-mjs_mjs_20284d2f._.js",
+      "type": "script",
+      "transferBytes": 19144,
+      "encodedBytes": 18844,
+      "decodedBytes": 149294,
+      "durationMs": 799
+    },
+    {
+      "path": "/_next/static/chunks/b275c_%40supabase_auth-js_dist_module_59594de8._.js",
+      "type": "script",
+      "transferBytes": 69019,
+      "encodedBytes": 68719,
+      "decodedBytes": 476120,
+      "durationMs": 817
+    },
+    {
+      "path": "/_next/static/chunks/0c4ef_framer-motion_dist_es_aa9d9243._.js",
+      "type": "script",
+      "transferBytes": 37352,
+      "encodedBytes": 37052,
+      "decodedBytes": 312615,
+      "durationMs": 829
+    },
+    {
+      "path": "/_next/static/chunks/3b78a_motion-dom_dist_es_d25a2a19._.js",
+      "type": "script",
+      "transferBytes": 94770,
+      "encodedBytes": 94470,
+      "decodedBytes": 729847,
+      "durationMs": 851
+    },
+    {
+      "path": "/_next/static/chunks/34767__pnpm_cb8abae6._.js",
+      "type": "script",
+      "transferBytes": 101775,
+      "encodedBytes": 101475,
+      "decodedBytes": 628432,
+      "durationMs": 862
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_app_layout_tsx_9bedf0e9._.js",
+      "type": "script",
+      "transferBytes": 1839,
+      "encodedBytes": 1539,
+      "decodedBytes": 6076,
+      "durationMs": 829
+    },
+    {
+      "path": "/_next/static/chunks/_4cbbc6b2._.js",
+      "type": "script",
+      "transferBytes": 3307,
+      "encodedBytes": 3007,
+      "decodedBytes": 24689,
+      "durationMs": 841
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_app_error_tsx_0a00e1e5._.js",
+      "type": "script",
+      "transferBytes": 540,
+      "encodedBytes": 240,
+      "decodedBytes": 240,
+      "durationMs": 838
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_app_not-found_tsx_0a00e1e5._.js",
+      "type": "script",
+      "transferBytes": 506,
+      "encodedBytes": 206,
+      "decodedBytes": 206,
+      "durationMs": 850
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_app_page_tsx_0a00e1e5._.js",
+      "type": "script",
+      "transferBytes": 699,
+      "encodedBytes": 399,
+      "decodedBytes": 399,
+      "durationMs": 861
+    },
+    {
+      "path": "/_next/static/chunks/34767__pnpm_f3671216._.js",
+      "type": "script",
+      "transferBytes": 5068,
+      "encodedBytes": 4768,
+      "decodedBytes": 57891,
+      "durationMs": 866
+    },
+    {
+      "path": "/_next/static/chunks/grokking-daybreak_src_c2036987._.js",
+      "type": "script",
+      "transferBytes": 75433,
+      "encodedBytes": 75133,
+      "decodedBytes": 825426,
+      "durationMs": 882
+    },
+    {
+      "path": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js",
+      "type": "script",
+      "transferBytes": 4121,
+      "encodedBytes": 3821,
+      "decodedBytes": 15433,
+      "durationMs": 619
+    },
+    {
+      "path": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_162ee0a9._.js",
+      "type": "script",
+      "transferBytes": 588,
+      "encodedBytes": 288,
+      "decodedBytes": 288,
+      "durationMs": 617
+    },
+    {
+      "path": "/api/cc/glossary",
+      "type": "fetch",
+      "transferBytes": 300,
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "durationMs": 127
+    },
+    {
+      "path": "/illustrations/daybreak/next-step.svg",
+      "type": "img",
+      "transferBytes": 300,
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "durationMs": 86
+    },
+    {
+      "path": "/fonts/daybreak/atkinson-hyperlegible-400.woff2",
+      "type": "css",
+      "transferBytes": 300,
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "durationMs": 6
+    },
+    {
+      "path": "/fonts/daybreak/nunito-sans-400.woff2",
+      "type": "css",
+      "transferBytes": 300,
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "durationMs": 12
+    },
+    {
+      "path": "/fonts/daybreak/atkinson-hyperlegible-700.woff2",
+      "type": "css",
+      "transferBytes": 300,
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "durationMs": 13
+    },
+    {
+      "path": "/fonts/daybreak/noto-sans-devanagari-400.woff2",
+      "type": "css",
+      "transferBytes": 300,
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "durationMs": 13
+    },
+    {
+      "path": "/fonts/daybreak/noto-sans-gurmukhi-400.woff2",
+      "type": "css",
+      "transferBytes": 300,
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "durationMs": 14
+    },
+    {
+      "path": "/fonts/daybreak/noto-nastaliq-urdu.woff2",
+      "type": "css",
+      "transferBytes": 300,
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "durationMs": 15
+    },
+    {
+      "path": "/v1/script.debug.js",
+      "type": "script",
+      "transferBytes": 0,
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "durationMs": 0
+    }
+  ],
+  "resourceTransferBytes": 6810915,
+  "resourceEncodedBytes": 6981787,
+  "fonts": [
+    {
+      "family": "Daybreak Atkinson",
+      "weight": "400",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Atkinson",
+      "weight": "700",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Nunito",
+      "weight": "400 700",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Devanagari",
+      "weight": "400 700",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Gurmukhi",
+      "weight": "400 700",
+      "status": "loaded"
+    },
+    {
+      "family": "Daybreak Urdu",
+      "weight": "400",
+      "status": "loaded"
+    }
+  ],
+  "styles": {
+    "body": {
+      "color": "rgb(52, 42, 36)",
+      "background": "rgb(255, 247, 238)",
+      "font": "\"Daybreak Atkinson\", Arial, sans-serif",
+      "fontSize": "17px",
+      "direction": "ltr",
+      "outline": "rgb(52, 42, 36) none 3px"
+    },
+    "heading": {
+      "color": "rgb(52, 42, 36)",
+      "background": "rgba(0, 0, 0, 0)",
+      "font": "\"Daybreak Urdu\", serif",
+      "fontSize": "26px",
+      "direction": "rtl",
+      "outline": "rgb(52, 42, 36) none 3px"
+    },
+    "selectedOption": {
+      "color": "rgb(52, 42, 36)",
+      "background": "rgb(230, 237, 223)",
+      "font": "\"Daybreak Urdu\", serif",
+      "fontSize": "16px",
+      "direction": "rtl",
+      "outline": "rgb(52, 42, 36) none 3px"
+    }
+  },
+  "overflowing": [],
+  "undersizedTargets": [],
+  "active": {
+    "tag": "BODY",
+    "id": "",
+    "text": "{\"@context\":\"https://schema.org\",\"@type\":\"Organization\",\"name\":\"KairosLearn\",\"url\":\"https://kairosle"
+  }
+}
