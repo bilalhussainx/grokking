@@ -147,7 +147,9 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Referral */}
+        {/* Referral — only when the account has a code (codes stopped being
+            generated at signup; see docs/handoff/claude-progress.md). */}
+        {p.referral_code && (
         <Card className="bg-white/[0.03] border-white/[0.08]">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
@@ -166,6 +168,7 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+        )}
 
       </div>
     </div>

@@ -29,4 +29,7 @@ describe("truthful UI", () => {
     expect(s).toMatch(/"Regular"/);
     expect(s).not.toMatch(/useState\(11\)/);
   });
+
+  it("settings only offers a referral link when the account has a code", () =>
+    expect(read("src/app/settings/page.tsx")).toMatch(/p\.referral_code\s*&&/));
 });
