@@ -39,12 +39,10 @@ interface TopNavProps {
 // dropdown so the bar stays readable. Order = importance to a logged-in
 // applicant on a daily basis.
 const MORE_LINKS: { href: string; label: string; icon: typeof BookOpen; cap?: string }[] = [
-  { href: "/talk", label: "Voice talk", icon: Mic, cap: "Open a voice session" },
   { href: "/cc/dashboard", label: "Coach Kairos dashboard", icon: BookOpen, cap: "Adaptive home" },
   { href: "/applications", label: "Applications", icon: Calendar, cap: "Deadlines + tracker" },
   { href: "/my-schools", label: "School list", icon: Building2 },
-  { href: "/career/interviews", label: "Career interviews", icon: Target, cap: "Tech interview prep" },
-  { href: "/courses", label: "Courses", icon: BookOpen },
+  { href: "/cc/interview-prep", label: "Interview prep", icon: Target, cap: "College interviews" },
   { href: "/glossary", label: "Glossary", icon: Library },
 ];
 

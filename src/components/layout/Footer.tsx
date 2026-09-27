@@ -5,14 +5,8 @@ import { usePathname } from 'next/navigation';
 
 // Hide footer on these routes (full-screen app pages)
 const HIDDEN_ROUTES = [
-  '/course/',
-  '/talk',
-  '/interviews/',
-  '/classrooms/',
   '/writing/',
-  '/sessions/',
   '/onboarding',
-  '/placement/',
 ];
 
 export default function Footer() {
@@ -29,20 +23,18 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-white mb-4">Platform</h3>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><Link href="/courses" className="hover:text-white transition">Courses</Link></li>
-              <li><Link href="/talk" className="hover:text-white transition">Voice Tutoring</Link></li>
+              <li><Link href="/cc" className="hover:text-white transition">Coach Kairos</Link></li>
+              <li><Link href="/schools" className="hover:text-white transition">School list</Link></li>
               <li><Link href="/pricing" className="hover:text-white transition">Pricing</Link></li>
-              <li><Link href="/career/interviews" className="hover:text-white transition">Mock Interviews</Link></li>
-              <li><Link href="/pathways" className="hover:text-white transition">Career Pathways</Link></li>
+              <li><Link href="/cc/interview-prep" className="hover:text-white transition">Interview prep</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="text-sm font-semibold text-white mb-4">Resources</h3>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
-              <li><Link href="/comparison/vs-leetcode" className="hover:text-white transition">vs LeetCode</Link></li>
-              <li><Link href="/tools/interview-roadmap" className="hover:text-white transition">Interview Roadmap</Link></li>
               <li><Link href="/about" className="hover:text-white transition">About</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition">FAQ</Link></li>
+              <li><Link href="/integrity" className="hover:text-white transition">Academic integrity</Link></li>
             </ul>
           </div>
           <div>
