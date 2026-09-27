@@ -19,7 +19,7 @@ const PUBLIC_ROUTES = [
   "/api/survey",
   "/survey.html",
   "/call",
-  // /cc is the public toolkit overview — linked from /landing as "Explore Coach Kairos".
+  // /cc is the public toolkit overview.
   // Individual tool pages under /cc/* still require auth (they're not matched by this exact-path rule).
   "/cc",
 ];
@@ -42,7 +42,6 @@ const PUBLIC_PREFIXES = [
   "/parent/",       // Feature 10 — token-gated parent portal, no auth needed
   "/call",
   "/admin/survey",
-  "/landing",
   "/about",
   "/privacy",
   "/terms",
@@ -137,8 +136,8 @@ export async function middleware(request: NextRequest) {
   // --- One-time onboarding gate -------------------------------------------
   // Real users (not anon) who haven't completed onboarding get bounced to
   // /onboarding (multi-step: language -> role -> grade/transfer -> concerns).
-  // Runs BEFORE isPublicRoute so authenticated users landing on "/" or
-  // "/landing" are caught. Skip the API surface, /onboarding itself, billing
+  // Runs BEFORE isPublicRoute so authenticated users landing on "/" are
+  // caught. Skip the API surface, /onboarding itself, billing
   // webhooks, shared content, and auth callbacks.
   // NB: language_picker_seen_at is the onboarding-complete sentinel — it's
   // set by /api/cc/onboarding/complete. The standalone /onboarding/language
@@ -153,7 +152,6 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/_next/") ||
     pathname === "/login" ||
     pathname === "/signup" ||
-    pathname === "/landing" ||
     // Counselor marketplace surfaces. The student-onboarding gate
     // (language picker → grade picker → concerns) is irrelevant to:
     //   /counselor/*       — counselor own onboarding + dashboard +
@@ -310,12 +308,6 @@ export async function middleware(request: NextRequest) {
     if (!isHead) {
       return NextResponse.redirect(new URL("/counselor/dashboard", request.url));
     }
-  }
-
-  // Real users hitting /landing bounce to dashboard. Anon users stay on
-  // landing because that's where the hero chat lives.
-  if (pathname === "/landing" && isRealUser) {
-    return NextResponse.redirect(new URL("/cc/dashboard", request.url));
   }
 
   // --- Pro-only gating ----------------------------------------------------

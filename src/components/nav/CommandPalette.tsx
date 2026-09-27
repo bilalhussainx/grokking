@@ -42,8 +42,14 @@ export default function CommandPalette() {
         setOpen(false);
       }
     };
+    // The TopNav search button asks for the palette with this event.
+    const onOpen = () => setOpen(true);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("open-global-search", onOpen);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("open-global-search", onOpen);
+    };
   }, [open]);
 
   // Reset state on close + autofocus on open.

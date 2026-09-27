@@ -11,13 +11,13 @@ import SurveyPrompt from "@/components/feedback/SurveyPrompt";
 import { CoachKairosProvider } from "@/contexts/CoachKairosContext";
 import CoachKairosShell from "@/components/cc/coach/CoachKairosShell";
 import { UpgradeGateProvider } from "@/hooks/useFetchWithUpgrade";
+import CommandPalette from "@/components/nav/CommandPalette";
 
 /** AppLayout — TopNav above the page. Coach Kairos mounts in AppOverlays. */
 function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
   const isDaybreakHome = (pathname === "/" || pathname === "/welcome") && !user;
-  const isCinematicPage = pathname === "/landing";
   // MarketingShell pages carry their own sticky marketing nav — mounting the
   // global TopNav above it produced a stacked double header with duplicate
   // sign-in CTAs on /product/* (and /pricing, /stories).
@@ -26,9 +26,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
     pathname === "/pricing" ||
     pathname === "/stories";
 
-  // Cinematic landing page needs full document scroll (GSAP ScrollTrigger)
-  // — no TopNav, no overflow-hidden wrapper
-  if (isCinematicPage || hasOwnMarketingNav || isDaybreakHome) {
+  if (hasOwnMarketingNav || isDaybreakHome) {
     return <>{children}</>;
   }
 
@@ -70,5 +68,5 @@ function AppOverlays() {
   const pathname = usePathname();
   const { user } = useAuth();
   if ((pathname === "/" || pathname === "/welcome") && !user) return null;
-  return <><CoachKairosShell /><ShortcutsHelp /><SurveyPrompt /></>;
+  return <><CoachKairosShell /><CommandPalette /><ShortcutsHelp /><SurveyPrompt /></>;
 }

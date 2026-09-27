@@ -247,7 +247,7 @@ export default function OnboardingPage() {
     } catch {
       /* ignore */
     }
-    router.push("/landing");
+    router.push("/");
   };
 
   return (

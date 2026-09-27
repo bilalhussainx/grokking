@@ -16,6 +16,8 @@ const MAP: Array<[string, string]> = [
   ["/dashboard", "/cc/dashboard"],
   ["/onboarding/language", "/onboarding"],
   ["/admin/courses", "/admin/survey"],
+  // The pre-Daybreak marketing page; the homepage at "/" replaces it.
+  ["/landing", HOME],
 ];
 
 export const RETIRED_ROUTE_REDIRECTS: { source: string; destination: string; permanent: false }[] = [

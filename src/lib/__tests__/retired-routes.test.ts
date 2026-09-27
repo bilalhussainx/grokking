@@ -17,6 +17,7 @@ describe("retired learning routes", () => {
     ["/admin", "/admin/survey"],
     ["/admin/courses/new", "/admin/survey"],
     ["/verify/2", "/"],
+    ["/landing", "/"],
   ])("%s redirects to %s", (path, dest) => {
     expect(retiredDestination(path)).toBe(dest);
   });

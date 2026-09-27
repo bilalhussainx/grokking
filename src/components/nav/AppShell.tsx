@@ -12,7 +12,6 @@
 
 import type { ReactNode } from "react";
 import Sidebar, { type SidebarGrade } from "@/components/nav/Sidebar";
-import CommandPalette from "@/components/nav/CommandPalette";
 
 export default function AppShell({
   grade,
@@ -28,7 +27,6 @@ export default function AppShell({
     >
       <Sidebar grade={grade} />
       <main className="flex-1 min-w-0">{children}</main>
-      <CommandPalette />
     </div>
   );
 }

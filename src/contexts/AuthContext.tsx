@@ -374,17 +374,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(key);
       }
     });
-    // Route: default to the cinematic /landing so the logged-out student
-    // falls back into the marketing funnel. Security-sensitive callers
-    // (password change, account-switch flow, etc.) can opt into /login by
-    // setting ?post_logout=login on the page that triggered signOut.
-    // ?loggedOut=1 renders a discreet toast in the landing page.
+    // Route: default to the homepage so the logged-out student falls back
+    // into the marketing funnel. Security-sensitive callers (password change,
+    // account-switch flow, etc.) can opt into /login by setting
+    // ?post_logout=login on the page that triggered signOut.
     const params = typeof window !== "undefined"
       ? new URLSearchParams(window.location.search)
       : null;
     const dest = params?.get("post_logout") === "login"
       ? "/login"
-      : "/landing?loggedOut=1";
+      : "/";
     window.location.replace(dest);
   };
 

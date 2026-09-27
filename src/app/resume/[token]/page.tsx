@@ -23,7 +23,7 @@ export default async function ResumePage({
   const { token } = await params;
 
   if (!token || token.length < 24) {
-    redirect("/landing");
+    redirect("/");
   }
 
   const admin = createAdminSupabase();
@@ -34,7 +34,7 @@ export default async function ResumePage({
     .maybeSingle();
 
   if (!lead) {
-    redirect("/landing");
+    redirect("/");
   }
 
   const snapshot = (lead.snapshot ?? null) as Snapshot | null;
