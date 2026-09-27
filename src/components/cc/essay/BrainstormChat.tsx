@@ -12,7 +12,6 @@ import {
   Lightbulb,
   BookOpen,
   ArrowRight,
-  Paperclip,
 } from "lucide-react";
 import VoiceQualityCheck from "@/components/voice/VoiceQualityCheck";
 import { useVoicePreference } from "@/hooks/useVoicePreference";
@@ -912,9 +911,6 @@ export default function BrainstormChat({
               className="kl-composer-input"
             />
             <div className="kl-composer-tools">
-              <button type="button" className="kl-tool-btn" title="Attach" aria-label="Attach">
-                <Paperclip className="w-4 h-4" />
-              </button>
               <button
                 type="button"
                 onClick={handleVoiceToggle}

@@ -296,6 +296,8 @@ export default function TeamPage() {
                   <td className="px-4 py-2.5 kl-sm">
                     {c.revokedAt ? (
                       <span className="text-white/45">revoked</span>
+                    ) : c.usedCount >= c.maxUses ? (
+                      <span className="text-white/45">used up</span>
                     ) : (
                       <span className="text-emerald-400">active</span>
                     )}

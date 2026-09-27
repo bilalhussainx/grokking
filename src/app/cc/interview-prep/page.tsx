@@ -186,7 +186,7 @@ export default function InterviewPrepPage() {
                     <p className="text-xs text-white/30">
                       {school.cc_schools.city}, {school.cc_schools.state}
                       {school.cc_schools.acceptance_rate
-                        ? ` · ${school.cc_schools.acceptance_rate}% acceptance`
+                        ? ` · ${Math.round(school.cc_schools.acceptance_rate * 100)}% acceptance`
                         : ""}
                     </p>
                   </div>

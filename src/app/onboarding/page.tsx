@@ -615,7 +615,7 @@ function StepTransfer({
           </label>
           <textarea
             rows={3}
-            placeholder="A few sentences is enough. Coach Kairos will draft your transfer essay from this — be honest, not polished."
+            placeholder="A few sentences is enough — be honest, not polished. You'll write the essay; Coach Kairos helps you find what to say."
             value={form.why}
             onChange={(e) => setForm({ ...form, why: e.target.value })}
           />

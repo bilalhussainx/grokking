@@ -22,13 +22,14 @@ type Rigor = {
 };
 
 const CURRICULA = ["US (AP)", "IB", "A-Levels", "FSc / Pakistan", "CBSE / India", "Other"];
-const LEVELS = ["", "Honors", "AP", "IB HL", "IB SL", "A-Level", "Dual enrollment"];
+const LEVELS = ["", "Regular", "Honors", "AP", "IB HL", "IB SL", "A-Level", "Dual enrollment"];
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [name, setName] = useState("");
   const [level, setLevel] = useState("");
-  const [gradeLevel, setGradeLevel] = useState(11);
+  // Default the grade from the student's profile; 11 only if it has none.
+  const [gradeLevel, setGradeLevel] = useState<number | null>(null);
   const [curriculumType, setCurriculumType] = useState("US (AP)");
   const [rigor, setRigor] = useState<Rigor | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -39,13 +40,22 @@ export default function CoursesPage() {
     setCourses((await r.json()).courses ?? []);
   };
   useEffect(() => { refresh().finally(() => setLoading(false)); }, []);
+  useEffect(() => {
+    fetch("/api/cc/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { profile?: { grade_level?: number | null } | null } | null) => {
+        const g = d?.profile?.grade_level;
+        setGradeLevel((cur) => cur ?? (typeof g === "number" && g >= 9 && g <= 12 ? g : 11));
+      })
+      .catch(() => setGradeLevel((cur) => cur ?? 11));
+  }, []);
 
   const add = async () => {
     if (!name.trim()) return;
     await fetch("/api/cc/courses", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ courseName: name, level: level || null, gradeLevel, curriculumType }),
+      body: JSON.stringify({ courseName: name, level: level || null, gradeLevel: gradeLevel ?? 11, curriculumType }),
     });
     setName("");
     setLevel("");
@@ -84,7 +94,7 @@ export default function CoursesPage() {
           <select value={curriculumType} onChange={(e) => setCurriculumType(e.target.value)} className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/85">
             {CURRICULA.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
-          <select value={gradeLevel} onChange={(e) => setGradeLevel(Number(e.target.value))} className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/85">
+          <select value={gradeLevel ?? 11} onChange={(e) => setGradeLevel(Number(e.target.value))} className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/85">
             {[9, 10, 11, 12].map((g) => <option key={g} value={g}>Grade {g}</option>)}
           </select>
           <button type="button" onClick={add} disabled={!name.trim()} className="px-3 py-2 rounded-lg bg-[#D4AF37] text-black text-[13px] font-medium hover:bg-[#C4A030] disabled:opacity-40 inline-flex items-center gap-1.5">
