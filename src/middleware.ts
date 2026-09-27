@@ -6,6 +6,7 @@ import { isGrade9BlockedPath } from "@/lib/cc/grade-route-policy";
 // Routes that don't require authentication
 const PUBLIC_ROUTES = [
   "/",
+  "/welcome",
   "/login",
   "/signup",
   "/pricing",
@@ -262,6 +263,17 @@ export async function middleware(request: NextRequest) {
       request.nextUrl.searchParams.forEach((v, k) => url.searchParams.set(k, v));
       return NextResponse.redirect(url);
     }
+  }
+
+  // Signed-out visitors on "/" get the lightweight, server-rendered homepage
+  // (/welcome). "/" itself is the signed-in app home and carries the dashboard
+  // and the whole course catalogue. Anonymous guest sessions keep "/".
+  if (pathname === "/" && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/welcome";
+    const rewrite = NextResponse.rewrite(url, { request });
+    response.cookies.getAll().forEach((c) => rewrite.cookies.set(c));
+    return rewrite;
   }
 
   // Skip remaining public-route checks (fastest path)

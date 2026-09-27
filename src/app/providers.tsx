@@ -12,9 +12,9 @@ import { GlossaryProvider } from "@/contexts/GlossaryContext";
 import AICoach from "@/components/ai/AICoach";
 import SessionNotes from "@/components/ai/SessionNotes";
 import { TranslationBar } from "@/components/language/TranslationBar";
-import { getLanguageCourse } from "@/data/languages";
+import { isLanguageCourseSlug } from "@/data/languages/slugs";
 import TopNav from "@/components/layout/TopNav";
-import GlobalSearch from "@/components/search/GlobalSearch";
+import GlobalSearchLauncher from "@/components/search/GlobalSearchLauncher";
 import ShortcutsHelp from "@/components/ui/ShortcutsHelp";
 import SurveyPrompt from "@/components/feedback/SurveyPrompt";
 import XPFlyUp from "@/components/gamification/XPFlyUp";
@@ -32,7 +32,7 @@ function useIsLanguageCourse() {
   // pathname like /course/french-beginner/some-lesson
   const match = pathname.match(/^\/course\/([^/]+)/);
   if (!match) return false;
-  return !!getLanguageCourse(match[1]);
+  return isLanguageCourseSlug(match[1]);
 }
 
 /**
@@ -202,7 +202,7 @@ function CoachFAB() {
 function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
-  const isDaybreakHome = pathname === "/" && !user;
+  const isDaybreakHome = (pathname === "/" || pathname === "/welcome") && !user;
   const isCinematicPage = pathname === "/landing";
   // MarketingShell pages carry their own sticky marketing nav — mounting the
   // global TopNav above it produced a stacked double header with duplicate
@@ -288,6 +288,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 function AppOverlays() {
   const pathname = usePathname();
   const { user } = useAuth();
-  if (pathname === "/" && !user) return null;
-  return <><CoachKairosShell /><CoachFAB /><GamificationOverlays /><GlobalSearch /><ShortcutsHelp /><TranslationBarWrapper /><SurveyPrompt /></>;
+  if ((pathname === "/" || pathname === "/welcome") && !user) return null;
+  return <><CoachKairosShell /><CoachFAB /><GamificationOverlays /><GlobalSearchLauncher /><ShortcutsHelp /><TranslationBarWrapper /><SurveyPrompt /></>;
 }

@@ -15,8 +15,9 @@ interface SearchResult {
   tier?: "free" | "pro";
 }
 
-export default function GlobalSearch() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function GlobalSearch({ defaultOpen = false }: { defaultOpen?: boolean } = {}) {
+  // Loaded lazily by GlobalSearchLauncher on the first open, so start open then.
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
