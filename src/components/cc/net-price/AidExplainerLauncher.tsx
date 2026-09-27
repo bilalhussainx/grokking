@@ -52,11 +52,12 @@ export default function AidExplainerLauncher({ aidContext }: { aidContext: AidCo
 
   if (language) {
     return (
+      // The aid-explainer preset and school figures need FamilyModeView and
+      // the family-mode API to accept them, which isn't committed yet; passing
+      // them broke the production build. Reconnect when that lands.
       <FamilyModeView
         language={language}
         onExit={() => router.push("/cc/net-price")}
-        preset="aid_explainer"
-        aidContext={aidContext}
       />
     );
   }
