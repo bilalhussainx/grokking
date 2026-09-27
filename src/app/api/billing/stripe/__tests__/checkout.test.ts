@@ -2,14 +2,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
-const h = vi.hoisted(() => ({ create: vi.fn(), user: { id: "u1", email: "s@example.com" } as { id: string; email: string } | null, existing: null as Record<string, unknown> | null }));
+const h = vi.hoisted(() => ({ create: vi.fn(), user: { id: "u1", email: "s@example.com" } as { id: string; email: string } | null, existing: null as Record<string, unknown> | null, profile: null as Record<string, unknown> | null }));
 vi.mock("stripe", () => ({
   default: class { checkout = { sessions: { create: h.create } }; },
 }));
 vi.mock("@/lib/supabase-auth", () => ({
   createServerSupabase: async () => ({
     auth: { getUser: async () => ({ data: { user: h.user } }) },
-    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: h.existing }) }) }) }),
+    from: (t: string) => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: t === "user_profiles" ? h.profile : h.existing }) }) }) }),
   }),
 }));
 
@@ -24,6 +24,7 @@ beforeEach(() => {
   h.create.mockReset().mockResolvedValue({ url: "https://checkout.stripe.test/s" });
   h.user = { id: "u1", email: "s@example.com" };
   h.existing = null;
+  h.profile = null;
   vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_x");
   vi.stubEnv("NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY", "price_month");
   vi.stubEnv("NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_YEARLY", "price_year");
@@ -80,5 +81,25 @@ describe("POST /api/billing/stripe/checkout", () => {
       method: "POST", body: "null", headers: { "Content-Type": "application/json", origin: "http://localhost" },
     }));
     expect(res.status).toBe(200);
+  });
+
+  // A student still in the free signup trial keeps the rest of it: Stripe
+  // starts billing when the trial ends. Stripe needs trial_end ≥ 48h away.
+  it("defers the first charge to the end of the signup trial", async () => {
+    const end = new Date(Date.now() + 5 * 24 * 3600 * 1000);
+    h.profile = { trial_ends_at: end.toISOString() };
+    expect((await POST(req({}))).status).toBe(200);
+    expect(h.create.mock.calls[0][0].subscription_data.trial_end).toBe(Math.floor(end.getTime() / 1000));
+  });
+
+  it("charges now when less than 48 hours of trial remain", async () => {
+    h.profile = { trial_ends_at: new Date(Date.now() + 24 * 3600 * 1000).toISOString() };
+    await POST(req({}));
+    expect(h.create.mock.calls[0][0].subscription_data.trial_end).toBeUndefined();
+  });
+
+  it("charges now when there is no trial", async () => {
+    await POST(req({}));
+    expect(h.create.mock.calls[0][0].subscription_data.trial_end).toBeUndefined();
   });
 });

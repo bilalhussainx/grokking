@@ -77,6 +77,21 @@ export async function POST(req: NextRequest) {
   }
   if (existing?.stripe_customer_id) customerId = existing.stripe_customer_id;
 
+  // A student still in the free signup trial keeps the rest of it: the
+  // subscription starts now and Stripe first charges when the trial ends.
+  // Stripe Checkout needs trial_end at least 48 hours away; with less left,
+  // charge now (they lose under two days of trial).
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("trial_ends_at")
+    .eq("id", user.id)
+    .maybeSingle<{ trial_ends_at?: string | null }>();
+  const trialEndMs = profile?.trial_ends_at ? Date.parse(profile.trial_ends_at) : NaN;
+  const trialEnd =
+    Number.isFinite(trialEndMs) && trialEndMs - Date.now() >= 48 * 3600 * 1000
+      ? Math.floor(trialEndMs / 1000)
+      : undefined;
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -91,10 +106,10 @@ export async function POST(req: NextRequest) {
       client_reference_id: user.id,
       subscription_data: {
         metadata: { user_id: user.id, plan: "pro", interval },
-        // No trial here. The free 7-day Pro trial is granted at signup
-        // by the Supabase trigger (create_signup_pro_trial in migration
-        // 013_align_pro_trial_to_7_days). Stripe Checkout is hit AFTER
-        // the trial expires, so we charge the Pro price immediately on subscribe.
+        // The free 7-day Pro trial is granted at signup (Supabase trigger
+        // create_signup_pro_trial). Subscribing during it defers the first
+        // charge to the trial's end; no new trial is created.
+        ...(trialEnd ? { trial_end: trialEnd } : {}),
       },
       allow_promotion_codes: true,
     });
