@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import path from "path";
+import { RETIRED_ROUTE_REDIRECTS } from "./src/lib/retired-routes";
 
 // Next.js applies header rules in declaration order; later rules override earlier
 // ones for duplicate keys. The general DENY block comes first, the demo-video
@@ -7,6 +8,9 @@ import path from "path";
 const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
+  },
+  async redirects() {
+    return RETIRED_ROUTE_REDIRECTS;
   },
   async headers() {
     return [
