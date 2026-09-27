@@ -15,6 +15,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import { X } from "lucide-react";
 import {
   ICONS,
@@ -35,6 +36,7 @@ interface Props {
 export default function MobileDrawer({ open, grade, onClose, pulseWaitlist = false }: Props) {
   const pathname = usePathname();
   const coach = useCoachKairos();
+  const { signOut } = useAuth();
   const sections = visibleFor(grade);
 
   const handleItemClick = (item: NavItem, e: React.MouseEvent) => {
@@ -129,9 +131,9 @@ export default function MobileDrawer({ open, grade, onClose, pulseWaitlist = fal
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
               <span className="text-white/35">v1.0.0</span>
-              <Link href="/account/sign-out" className="text-white/55 hover:text-white">
+              <button type="button" onClick={() => signOut()} className="text-white/55 hover:text-white">
                 Sign out
-              </Link>
+              </button>
             </div>
           </motion.aside>
         </>

@@ -9,6 +9,9 @@ vi.mock("@/contexts/CoachKairosContext", () => ({
   useCoachKairos: () => ({ openWithVariant: () => {} }),
 }));
 
+const signOut = vi.fn();
+vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => ({ signOut }) }));
+
 // Stub usePathname so Link can render without an App Router instance.
 vi.mock("next/navigation", () => ({
   usePathname: () => "/cc/dashboard",
@@ -51,5 +54,11 @@ describe("MobileDrawer", () => {
   it("shows transfer-specific 'Why-transfer essay' label", () => {
     render(<MobileDrawer open={true} grade="transfer" onClose={() => {}} />);
     expect(screen.getByText(/Why-transfer essay/i)).toBeTruthy();
+  });
+
+  it("Sign out signs the user out (there is no /account/sign-out page)", () => {
+    render(<MobileDrawer open grade="senior_writing" onClose={() => {}} />);
+    fireEvent.click(screen.getByText("Sign out"));
+    expect(signOut).toHaveBeenCalledTimes(1);
   });
 });

@@ -3,6 +3,7 @@ import { render, screen, waitFor, act, fireEvent } from "@testing-library/react"
 import MobileDashboard from "../MobileDashboard";
 import type { DashboardSummary } from "@/components/cc/dashboard/sections/types";
 
+vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => ({ signOut: async () => {} }) }));
 vi.mock("@/components/cc/coach/CoachChat", () => ({
   default: () => <div data-testid="coach-chat-mock">Coach</div>,
 }));

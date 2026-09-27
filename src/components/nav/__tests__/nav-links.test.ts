@@ -3,7 +3,7 @@
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 
-const SOURCES = ["src/components/nav/sidebar-data.ts", "src/components/nav/palette-data.ts"];
+const SOURCES = ["src/components/nav/sidebar-data.ts", "src/components/nav/palette-data.ts", "src/components/mobile/MobileDrawer.tsx"];
 
 function pageExists(href: string): boolean {
   const path = href.split(/[?#]/)[0];
@@ -12,7 +12,7 @@ function pageExists(href: string): boolean {
 }
 
 function internalHrefs(source: string): string[] {
-  return [...source.matchAll(/href:\s*"([^"]+)"/g)]
+  return [...source.matchAll(/href(?::\s*|=)"([^"]+)"/g)]
     .map((m) => m[1])
     .filter((h) => h.startsWith("/"));
 }

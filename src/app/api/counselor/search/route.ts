@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
   });
 
   return NextResponse.json({
-    counselors: results.map((r) => publicProfile(r as Record<string, unknown>)),
+    counselors: results.map((r) => publicProfile(r as unknown as Record<string, unknown>)),
     count: results.length,
   });
 }

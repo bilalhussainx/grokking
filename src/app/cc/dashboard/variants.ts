@@ -477,7 +477,9 @@ function buildPriority(key: VariantKey, d: DashboardData): PriorityCard[] {
             : "—",
           meta: d.nextDeadline
             ? `${d.nextDeadline.schoolName} · ${d.nextDeadline.key}`
-            : "All deadlines logged.",
+            : d.schoolCount === 0
+              ? "Add schools to see deadlines."
+              : "No upcoming deadlines found.",
           urgent: d.urgentDeadlineCount > 0,
         },
         {
@@ -692,7 +694,7 @@ function buildTiles(key: VariantKey): Tile[] {
         { href: "/schools", icon: "grad", label: "School list" },
         { href: "/cc/courses", icon: "book", label: "Course evaluations" },
         { href: "/?coach=open", icon: "sparkles", label: "Coach Kairos" },
-        { href: "/cc/recommenders", icon: "mail", label: "Translate-for-parent docs" },
+        { href: "/cc/recommenders", icon: "mail", label: "Professor recommendations" },
       ];
     case "unknown":
     default:
