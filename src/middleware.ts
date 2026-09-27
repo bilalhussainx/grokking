@@ -10,7 +10,6 @@ const PUBLIC_ROUTES = [
   "/login",
   "/signup",
   "/pricing",
-  "/courses",
   "/forgot-password",
   "/reset-password",
   "/onboarding",
@@ -32,7 +31,6 @@ const PUBLIC_PREFIXES = [
   "/favicon",
   "/api/webhooks/",
   "/api/admin/",
-  "/api/courses/",
   "/api/submissions",
   "/api/call/",
   "/api/cc/intake/",
@@ -42,24 +40,15 @@ const PUBLIC_PREFIXES = [
   "/api/leads/",    // exit-intent lead capture (email-only, no auth)
   "/resume/",       // email resume link landing page — public by design
   "/parent/",       // Feature 10 — token-gated parent portal, no auth needed
-  "/talk",
   "/call",
-  "/career",
   "/admin/survey",
   "/landing",
-  "/blog",
   "/about",
-  "/comparison",
-  "/pathways",
-  "/tools",
   "/privacy",
   "/terms",
   "/integrity",
-  "/interviews",
   "/college-interviews",
   "/history",
-  "/achievements",
-  "/leaderboard",
   "/faq",
   "/intake",
   "/cc/shared",
@@ -104,12 +93,6 @@ const PRO_ONLY_PREFIXES = [
 export function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.includes(pathname)) return true;
   if (PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return true;
-
-  // /course/<slug> (course overview) is public, but /course/<slug>/<lesson> requires auth
-  if (pathname.startsWith("/course/")) {
-    const segments = pathname.replace(/^\/course\//, "").split("/").filter(Boolean);
-    if (segments.length <= 1) return true;
-  }
 
   return false;
 }
@@ -265,15 +248,22 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Signed-out visitors on "/" get the lightweight, server-rendered homepage
-  // (/welcome). "/" itself is the signed-in app home and carries the dashboard
-  // and the whole course catalogue. Anonymous guest sessions keep "/".
+  // Signed-out visitors on "/" get the server-rendered admissions homepage
+  // (/welcome).
   if (pathname === "/" && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/welcome";
     const rewrite = NextResponse.rewrite(url, { request });
     response.cookies.getAll().forEach((c) => rewrite.cookies.set(c));
     return rewrite;
+  }
+
+  // Guest sessions on "/" go to the dashboard too (real users were redirected
+  // above). The legacy course home is gone; keep the query (focus=intake, coach=open).
+  if (pathname === "/" && user) {
+    const url = new URL("/cc/dashboard", request.url);
+    request.nextUrl.searchParams.forEach((v, k) => url.searchParams.set(k, v));
+    return NextResponse.redirect(url);
   }
 
   // Skip remaining public-route checks (fastest path)
@@ -322,21 +312,10 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // --- Root / landing routing ----------------------------------------------
-  // Anyone without a real account — guest sessions AND cookie-less visitors
-  // (crawlers included) — gets a server-side redirect to /landing, so search
-  // engines index the marketing page instead of the client "Loading…" shell.
-  if (pathname === "/") {
-    if (!isRealUser) {
-      return NextResponse.redirect(new URL("/landing", request.url));
-    }
-    return response;
-  }
-
   // Real users hitting /landing bounce to dashboard. Anon users stay on
   // landing because that's where the hero chat lives.
   if (pathname === "/landing" && isRealUser) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/cc/dashboard", request.url));
   }
 
   // --- Pro-only gating ----------------------------------------------------

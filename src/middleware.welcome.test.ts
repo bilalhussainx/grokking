@@ -1,6 +1,5 @@
-// Signed-out visitors on "/" are served the lightweight, server-rendered
-// Daybreak homepage from /welcome. "/" itself is the signed-in app home and
-// pulls in the dashboard and the whole course catalogue (~4.8 MB gzip).
+// Signed-out visitors on "/" are served the server-rendered Daybreak homepage
+// from /welcome. Any session on "/" (guest or real) goes to /cc/dashboard.
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
@@ -17,7 +16,7 @@ vi.mock("@supabase/ssr", () => ({
     },
   }),
 }));
-import { middleware } from "./middleware";
+import { middleware, isPublicRoute } from "./middleware";
 
 const rewriteTarget = (res: Response) => res.headers.get("x-middleware-rewrite");
 
@@ -43,5 +42,22 @@ describe("anonymous homepage rewrite", () => {
   it("does not rewrite other public pages", async () => {
     const res = await middleware(new NextRequest("https://www.kairoslearn.com/pricing"));
     expect(rewriteTarget(res)).toBeNull();
+  });
+});
+
+describe("sessions on / go to the dashboard", () => {
+  it("sends a guest session to /cc/dashboard and keeps the query", async () => {
+    h.user = { id: "g1", is_anonymous: true };
+    const res = await middleware(new NextRequest("https://www.kairoslearn.com/?focus=intake&coach=open"));
+    const loc = new URL(res.headers.get("location")!);
+    expect(loc.pathname).toBe("/cc/dashboard");
+    expect(loc.searchParams.get("focus")).toBe("intake");
+    expect(loc.searchParams.get("coach")).toBe("open");
+  });
+});
+
+describe("retired learning routes are no longer public", () => {
+  it.each(["/courses", "/course/x", "/talk", "/leaderboard", "/pathways", "/blog", "/career"])("%s", (p) => {
+    expect(isPublicRoute(p)).toBe(false);
   });
 });
