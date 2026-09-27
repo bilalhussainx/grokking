@@ -22,7 +22,7 @@ export async function POST() {
 
   const { data: activities } = await db
     .from("cc_activities")
-    .select("activity_type, position, organization_name, description, hours_per_week, weeks_per_year, grade_levels, impact_score")
+    .select("activity_type, role, organization, description_150, hours_per_week, weeks_per_year, grades_participated, impact_score")
     .eq("student_id", profile.id);
 
   const acts = activities ?? [];
@@ -75,7 +75,7 @@ Activities (${acts.length}):
 ${acts
   .map(
     (a, i) =>
-      `${i + 1}. [${a.activity_type ?? "?"}] ${a.position ?? ""} — ${a.organization_name ?? "?"}\n   ${a.description ?? "(no description)"}\n   ${a.hours_per_week ?? 0}h/wk × ${a.weeks_per_year ?? 0}wk/yr · grades ${(a.grade_levels ?? []).join(",") || "?"} · impact ${a.impact_score ?? "?"}`,
+      `${i + 1}. [${a.activity_type ?? "?"}] ${a.role ?? ""} — ${a.organization ?? "?"}\n   ${a.description_150 ?? "(no description)"}\n   ${a.hours_per_week ?? 0}h/wk × ${a.weeks_per_year ?? 0}wk/yr · grades ${(a.grades_participated ?? []).join(",") || "?"} · impact ${a.impact_score ?? "?"}`,
   )
   .join("\n")}
 

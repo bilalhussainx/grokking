@@ -158,7 +158,7 @@ export async function GET(req: NextRequest) {
       const [{ data: essays }, { data: activities }, { data: schools }, { data: testAttempt }] =
         await Promise.all([
           db.from("cc_essays").select("phase, essay_type, word_count").eq("student_id", studentRow.id),
-          db.from("cc_activities").select("name, role, hours_per_week").eq("student_id", studentRow.id),
+          db.from("cc_activities").select("organization, activity_type, role, hours_per_week").eq("student_id", studentRow.id),
           db
             .from("cc_student_schools")
             .select("application_status, chancing_band, cc_schools(name)")
@@ -193,13 +193,13 @@ export async function GET(req: NextRequest) {
       }
 
       if ((activities ?? []).length >= 3) {
-        const acts = (activities ?? []) as Array<{ name: string; role: string | null; hours_per_week: number | null }>;
+        const acts = (activities ?? []) as Array<{ organization: string | null; activity_type: string | null; role: string | null; hours_per_week: number | null }>;
         jobs.push({
           module: "Activities",
           contextLines: [
             `Total activities: ${acts.length}`,
             ...acts.slice(0, 10).map(
-              (a) => `- ${a.name}${a.role ? ` (${a.role})` : ""}${a.hours_per_week ? ` · ${a.hours_per_week}h/wk` : ""}`,
+              (a) => `- ${a.organization ?? a.activity_type ?? "Activity"}${a.role ? ` (${a.role})` : ""}${a.hours_per_week ? ` · ${a.hours_per_week}h/wk` : ""}`,
             ),
           ],
         });

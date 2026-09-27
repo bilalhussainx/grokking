@@ -276,7 +276,7 @@ export async function POST(req: NextRequest) {
 
   const { data: activitiesRows } = await supabase
     .from("cc_activities")
-    .select("activity_name, role, impact_score")
+    .select("organization, activity_type, role, impact_score")
     .eq("student_id", profile.id)
     .order("impact_score", { ascending: false, nullsFirst: false })
     .limit(3);
@@ -320,7 +320,7 @@ export async function POST(req: NextRequest) {
       total: activitiesAll?.length ?? 0,
       optimized: activitiesAll?.filter((a) => a.impact_score !== null).length ?? 0,
       topThree: (activitiesRows ?? []).map((a) => ({
-        name: (a.activity_name as string) ?? "Activity",
+        name: (a.organization as string | null) ?? (a.activity_type as string | null) ?? "Activity",
         role: (a.role as string | null) ?? null,
         impact: (a.impact_score as number | null) ?? null,
       })),
