@@ -13,6 +13,19 @@ doesn't re-test what's recorded here. Newest work goes at the top.
 | 4 | Stripe and credits for the new prices (Free 200 credits; $15/month; $99/year) | **Done in code**: `docs/superpowers/plans/2026-09-25-fix-4-stripe-credits-new-prices.md`; final-review fixes applied. Stripe prices created by Astra (`docs/handoff/stripe-setup-report.md`). **Credit lock-down applied in production 2026-09-26.** Branch not deployed; 3 other migrations not applied. |
 | 5 | Competitor research, phone app (PWA), Ad Astra readiness, full testing of every student type | Queued |
 
+## 2026-09-27 — DEPLOYED to production (kairoslearn.com)
+
+- `master` = `ae82a5a` (fast-forward from `b3e8b1f`; 80+ commits: security 1A/1B, fixes 2–5b, pricing/Stripe/credits, etc.). Both Vercel builds report success.
+- **The first attempt failed** (`119a09e`). The committed `AidExplainerLauncher` passed `preset`/`aidContext` props that the committed `FamilyModeView` doesn't accept; the props that support them exist only as uncommitted local work. Local tsc and build had passed because they read that local work. Fixed in `ae82a5a` (the props are dropped until that work lands; no behavior change). The **exact committed tree was type-checked in a clean worktree (exit 0)** before redeploying.
+- **Rule for future deploys:** always type-check the committed tree in a clean worktree (with a `node_modules` junction) before pushing to `master`. The working tree has about 25 locally modified source files.
+- **Production smoke tests** (no writes, apart from two unpaid checkout sessions):
+  - `/pricing` shows $15 and $99, and no $12;
+  - signed-in checkout goes to hosted Stripe at US$15.00/month and US$99.00/year, with the navy/gold emblem branding;
+  - `/api/cc/me` returns 401 signed out; `/api/cc/glossary` returns 200 publicly;
+  - old admin secrets get 403/401; cron with a bad bearer gets 401;
+  - `/settings`, `/cc/net-price`, `/` and `/credentials` return 200.
+- **Next:** OPS-2b (3 migrations) through the ops session, `docs/handoff/codex-prompts/session-c-go-ops-2b.md`. The Stripe product description still says "18 languages"; the fix is in the same prompt. The webhook upsert hasn't been exercised (there's no live payment; test mode needs `STRIPE_TEST_SECRET_KEY`).
+
 ## 2026-09-26 — Production security fix applied; CEO/CTO decisions
 
 **Applied in production (the founder ran the SQL; Claude verified):**
