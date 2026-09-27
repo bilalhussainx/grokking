@@ -1,6 +1,7 @@
 // src/app/signup/page.tsx
 "use client";
 
+import { PRICING } from "@/lib/pricing";
 import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { safeNextPath } from "@/lib/safe-next";
@@ -127,7 +128,7 @@ function SignupForm() {
           </div>
           <h2 className="text-xl font-semibold text-white mb-2">Verify your email</h2>
           <p className="text-sm text-white/50">We sent a confirmation link to <strong className="text-white/80">{email}</strong>.</p>
-          <p className="text-sm text-white/50 mt-2">Click the link to activate your account and start your <strong className="text-white/80">free 7-day Pro trial</strong> (300 AI credits included).</p>
+          <p className="text-sm text-white/50 mt-2">Click the link to activate your account and start your <strong className="text-white/80">free {PRICING.pro.trialDays}-day Pro trial</strong> ({PRICING.free.signupCredits} AI credits to start).</p>
           <div className="mt-6 space-y-3">
             <button
               onClick={handleResend}
@@ -168,7 +169,7 @@ function SignupForm() {
           <h1 className="text-2xl font-bold text-white">
             Join Kairos<span className="text-amber-400">Learn</span>
           </h1>
-          <p className="text-sm text-white/50 mt-2">Free 7-day Pro trial for students — 300 AI credits included</p>
+          <p className="text-sm text-white/50 mt-2">Free {PRICING.pro.trialDays}-day Pro trial for students — {PRICING.free.signupCredits} AI credits to start</p>
         </motion.div>
 
         {/* Google OAuth — primary action */}

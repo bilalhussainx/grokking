@@ -9,7 +9,7 @@ import { PRICING, proMonthlyLabel, proYearlyLabel, yearlySavingsPct } from "../p
 const ROOTS = ["src/app", "src/components", "src/lib"];
 const SKIP = [path.join("src", "lib", "__tests__"), path.join("src", "data")];
 const STALE = [
-  /\$12\b/, /\b300 credits\b/i, /\b300 Credits\b/, /30[- ]day (free )?(pro )?trial/i, /one month(,)? free/i, /1 month Pro/i,
+  /\$12\b/, /\b300 (AI )?credits\b/i,/\b300 Credits\b/, /30[- ]day (free )?(pro )?trial/i, /one month(,)? free/i, /1 month Pro/i,
   // Pro is fair-use unlimited and doesn't use credits; Free credits don't renew.
   /\b500 (AI )?credits/i, /Renews monthly/i, /no daily cap/i, /removes the 10-minute daily limit/i,
   // Pro can be yearly.
