@@ -1,10 +1,13 @@
 /* Opt-in Daybreak v2. Legacy --kl-* and global Tailwind tokens remain intact. */
+@font-face{font-family:"Daybreak Welcome Devanagari";src:url('/fonts/daybreak/noto-sans-devanagari-400-welcome.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:"Daybreak Welcome Gurmukhi";src:url('/fonts/daybreak/noto-sans-gurmukhi-400-welcome.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:"Daybreak Welcome Urdu";src:url('/fonts/daybreak/noto-nastaliq-urdu-welcome.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
 @font-face{font-family:"Daybreak Atkinson";src:url('/fonts/daybreak/atkinson-hyperlegible-400.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
 @font-face{font-family:"Daybreak Atkinson";src:url('/fonts/daybreak/atkinson-hyperlegible-700.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
-@font-face{font-family:"Daybreak Nunito";src:url('/fonts/daybreak/nunito-sans-400.woff2') format('woff2');font-style:normal;font-weight:400 700;font-display:swap}
-@font-face{font-family:"Daybreak Devanagari";src:url('/fonts/daybreak/noto-sans-devanagari-400.woff2') format('woff2');font-style:normal;font-weight:400 700;font-display:swap}
-@font-face{font-family:"Daybreak Gurmukhi";src:url('/fonts/daybreak/noto-sans-gurmukhi-400.woff2') format('woff2');font-style:normal;font-weight:400 700;font-display:swap}
-@font-face{font-family:"Daybreak Urdu";src:url('/fonts/daybreak/noto-nastaliq-urdu.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:"Daybreak Nunito";src:url('/fonts/daybreak/nunito-sans-400-subset.woff2') format('woff2');font-style:normal;font-weight:400 700;font-display:swap}
+@font-face{font-family:"Daybreak Devanagari";src:url('/fonts/daybreak/noto-sans-devanagari-400-subset.woff2') format('woff2');font-style:normal;font-weight:400 700;font-display:swap}
+@font-face{font-family:"Daybreak Gurmukhi";src:url('/fonts/daybreak/noto-sans-gurmukhi-400-subset.woff2') format('woff2');font-style:normal;font-weight:400 700;font-display:swap}
+@font-face{font-family:"Daybreak Urdu";src:url('/fonts/daybreak/noto-nastaliq-urdu-subset.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
 
 :root{
  --db-page:#FFF7EE;--db-card:#FFFFFF;--db-ink:#342A24;--db-muted:#69584B;
