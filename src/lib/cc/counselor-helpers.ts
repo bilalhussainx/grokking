@@ -154,6 +154,8 @@ export interface CounselorSearchParams {
   service?: string | null;
   languages?: string[];
   acceptingOnly?: boolean;
+  // Only admin-verified counselors (the public directory).
+  verifiedOnly?: boolean;
   limit?: number;
 }
 
@@ -181,6 +183,9 @@ export async function searchCounselors(
 
   if (params.q) {
     query = query.ilike("display_name", `%${params.q}%`);
+  }
+  if (params.verifiedOnly) {
+    query = query.eq("verified", true);
   }
   if (params.acceptingOnly !== false) {
     query = query.eq("accepts_new_students", true);

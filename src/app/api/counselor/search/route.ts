@@ -38,6 +38,9 @@ export async function GET(req: NextRequest) {
     service,
     languages,
     acceptingOnly: true,
+    // Public directory: admin-verified counselors only, so test or unvetted
+    // profiles never appear to students.
+    verifiedOnly: true,
     limit: 50,
   });
 
