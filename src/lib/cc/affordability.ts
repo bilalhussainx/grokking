@@ -54,3 +54,8 @@ export const NEED_BLIND_INTERNATIONAL_IPEDS: ReadonlySet<number> = new Set([
   168342, // Williams
   160977, // Bowdoin
 ]);
+
+// The words the student picked, for a stored affordability value.
+export function affordabilityLabel(v: string | null | undefined): string {
+  return AFFORDABILITY_OPTIONS.find((o) => o.value === v)?.label ?? "Not set";
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { affordabilityLabel } from "@/lib/cc/affordability";
 import { useEffect, useState } from "react";
 import { Loader2, ShieldCheck, TriangleAlert, ArrowRight, Languages } from "lucide-react";
 import Link from "next/link";
@@ -125,7 +126,7 @@ export default function NetPriceEstimator() {
         <div className="px-4 py-3 rounded-lg bg-white/5 border border-white/10">
           <div className="uppercase tracking-wider text-white/45 mb-1 font-mono">Affordability</div>
           <div className="text-white/85 leading-snug">
-            {data.inputs.affordabilityValue ?? "Not set"}
+            {affordabilityLabel(data.inputs.affordabilityValue)}
           </div>
         </div>
         <div className="px-4 py-3 rounded-lg bg-white/5 border border-white/10">
