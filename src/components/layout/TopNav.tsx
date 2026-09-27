@@ -1,5 +1,6 @@
 "use client";
 
+import { authHrefKeepingNext } from "@/lib/safe-next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -351,12 +352,21 @@ export default function TopNav({
           <div className="flex items-center gap-2">
             <Link
               href="/login"
+              onClick={(e) => {
+                const href = authHrefKeepingNext("/login", window.location.search);
+                if (href !== "/login") { e.preventDefault(); window.location.assign(href); }
+              }}
               className="hidden sm:inline-block px-3 py-1.5 rounded-lg text-white/60 text-sm font-medium hover:text-[#D4AF37] hover:bg-white/5 transition-all"
             >
               Sign In
             </Link>
             <Link
               href="/signup"
+              onClick={(e) => {
+                // Keep ?next= (an invite, say) when switching from sign-in to sign-up.
+                const href = authHrefKeepingNext("/signup", window.location.search);
+                if (href !== "/signup") { e.preventDefault(); window.location.assign(href); }
+              }}
               className="px-4 py-2 rounded-lg bg-[#D4AF37] text-black text-sm font-semibold hover:bg-[#C4A030] transition-colors"
             >
               Sign Up

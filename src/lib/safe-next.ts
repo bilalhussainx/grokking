@@ -13,3 +13,11 @@ export function safeNextPath(raw: string | null | undefined): string | null {
   }
   return raw;
 }
+
+// "/signup" or "/login" with the current page's safe ?next= carried over, so
+// switching between sign-in and sign-up keeps where the visitor was going
+// (e.g. an invite at /join/<code>).
+export function authHrefKeepingNext(base: "/signup" | "/login", search: string): string {
+  const next = safeNextPath(new URLSearchParams(search).get("next"));
+  return next ? `${base}?next=${encodeURIComponent(next)}` : base;
+}
