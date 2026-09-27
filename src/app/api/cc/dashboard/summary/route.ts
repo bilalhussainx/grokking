@@ -336,7 +336,7 @@ export async function GET() {
   const [coursesRes, whyTransferRes, observationsRes] = await Promise.all([
     db
       .from("cc_courses")
-      .select("id, course_name, level, grade")
+      .select("id, course_name, level, grade_received")
       .eq("student_id", studentId),
     db
       .from("cc_essays")
@@ -356,13 +356,13 @@ export async function GET() {
   ]);
 
   const courses: CourseRow[] | null = coursesRes.data
-    ? (coursesRes.data as Array<{ id: string; course_name: string; level: string | null; grade: string | null }>)
+    ? (coursesRes.data as Array<{ id: string; course_name: string; level: string | null; grade_received: string | null }>)
         .map((c) => ({
           id: c.id,
           courseName: c.course_name,
           level: c.level,
-          grade: c.grade,
-          inProgress: c.grade == null,
+          grade: c.grade_received,
+          inProgress: c.grade_received == null,
         }))
     : null;
 

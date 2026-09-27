@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
     const { data: e } = await supabase
       .from("cc_essays")
       .select(
-        "id, essay_type, prompt_text, word_limit, current_draft, revision_comments, supplement_id, school_id, created_at, updated_at",
+        "id, essay_type, prompt_text, word_limit, current_draft, revision_comments, supplement_id, school_id, updated_at",
       )
       .eq("id", focusEssayId)
       .eq("student_id", profile.id)

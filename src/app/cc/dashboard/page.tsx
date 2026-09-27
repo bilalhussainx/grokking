@@ -203,7 +203,7 @@ export default async function DashboardPage({
     safe(
       supabase
         .from("cc_test_attempts")
-        .select("sat_reading, sat_math, total_score")
+        .select("sat_reading_writing, sat_math, total_score")
         .eq("student_id", profile.id)
         .eq("test_type", "SAT")
         .order("test_date", { ascending: false })
@@ -276,7 +276,7 @@ export default async function DashboardPage({
 
   // SAT sub-scores from the most recent attempt.
   const sat = satAttempt as
-    | { sat_reading?: number | null; sat_math?: number | null; total_score?: number | null }
+    | { sat_reading_writing?: number | null; sat_math?: number | null; total_score?: number | null }
     | null;
 
   // Fetch fresh AI observations unless the user has opted out.
@@ -333,7 +333,7 @@ export default async function DashboardPage({
     transferTargetTerm: profile.transfer_target_term ?? null,
     personalStatementPhase,
     decisionCounts,
-    satReading: sat?.sat_reading ?? null,
+    satReading: sat?.sat_reading_writing ?? null,
     satMath: sat?.sat_math ?? null,
     satTotal: sat?.total_score ?? null,
     observations,

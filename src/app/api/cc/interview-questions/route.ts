@@ -28,12 +28,12 @@ export async function POST(req: NextRequest) {
   if (!interestSummary && profile) {
     const { data: schoolPrefs } = await db
       .from("cc_school_preferences")
-      .select("preferred_majors")
+      .select("intended_major")
       .eq("student_id", profile.id)
       .maybeSingle();
-    type Pref = { preferred_majors?: string[] | null };
-    const majors = (schoolPrefs as Pref | null)?.preferred_majors ?? [];
-    if (majors.length > 0) interestSummary = majors.join(", ");
+    type Pref = { intended_major?: string | null };
+    const major = (schoolPrefs as Pref | null)?.intended_major?.trim();
+    if (major) interestSummary = major;
   }
 
   const systemPrompt = `Generate exactly 3 questions a high-school senior should ask their college admissions interviewer at ${body.schoolName}. Each question must:

@@ -165,7 +165,7 @@ export async function GET(req: NextRequest) {
             .eq("student_id", studentRow.id),
           db
             .from("cc_test_attempts")
-            .select("sat_reading, sat_math, total_score")
+            .select("sat_reading_writing, sat_math, total_score")
             .eq("student_id", studentRow.id)
             .eq("test_type", "SAT")
             .order("test_date", { ascending: false })
@@ -224,13 +224,13 @@ export async function GET(req: NextRequest) {
       }
 
       const testRow = testAttempt as
-        | { sat_reading: number | null; sat_math: number | null; total_score: number | null }
+        | { sat_reading_writing: number | null; sat_math: number | null; total_score: number | null }
         | null;
-      if (testRow && (testRow.sat_reading || testRow.sat_math)) {
+      if (testRow && (testRow.sat_reading_writing || testRow.sat_math)) {
         jobs.push({
           module: "Test strategy",
           contextLines: [
-            `Reading: ${testRow.sat_reading ?? "—"}`,
+            `Reading & Writing: ${testRow.sat_reading_writing ?? "—"}`,
             `Math: ${testRow.sat_math ?? "—"}`,
             `Total: ${testRow.total_score ?? "—"}`,
             `Target: 1500`,

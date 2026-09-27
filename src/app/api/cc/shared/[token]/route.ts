@@ -46,13 +46,13 @@ export async function GET(
   if (sections.essays) {
     const { data: essays } = await db
       .from("cc_essays")
-      .select("essay_type, prompt_text, content, word_count, phase")
+      .select("essay_type, prompt_text, current_draft, word_count, phase")
       .eq("student_id", studentId)
       .order("updated_at", { ascending: false });
     result.essays = (essays || []).map((e) => ({
       essayType: e.essay_type,
       promptText: e.prompt_text,
-      content: e.content,
+      content: e.current_draft,
       wordCount: e.word_count,
       phase: e.phase,
     }));

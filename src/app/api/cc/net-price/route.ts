@@ -36,11 +36,17 @@ export async function POST(req: NextRequest) {
       .maybeSingle(),
     db
       .from("cc_student_schools")
-      .select("school_name")
+      .select("cc_schools(name)")
       .eq("student_id", profile.id),
   ]);
 
-  const listNames = (schools ?? []).map((s) => s.school_name).filter((s): s is string => typeof s === "string");
+  // cc_student_schools has no name column; the name lives on the joined school.
+  const listNames = (schools ?? [])
+    .map((s) => {
+      const rel = (s as { cc_schools?: { name?: string | null } | { name?: string | null }[] | null }).cc_schools;
+      return Array.isArray(rel) ? rel[0]?.name : rel?.name;
+    })
+    .filter((s): s is string => typeof s === "string");
   const allNames = Array.from(new Set([...listNames, ...extra]));
 
   const inputs: NetPriceInputs = {
