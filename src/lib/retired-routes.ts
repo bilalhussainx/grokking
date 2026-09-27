@@ -34,12 +34,3 @@ export function retiredDestination(pathname: string): string | null {
   }
   return null;
 }
-
-// API prefixes of the retired product. The routes are deleted; guard tests use this.
-export const RETIRED_API_PREFIXES = [
-  "/api/courses", "/api/progress", "/api/xp", "/api/streak", "/api/gems",
-  "/api/classrooms", "/api/sessions", "/api/credentials", "/api/career",
-  "/api/ai/coach", "/api/ai/hint", "/api/ai/grade", "/api/ai/generate-lesson",
-  "/api/ai/recommendations", "/api/language/session", "/api/language/placement",
-  "/api/interviews/run-code", "/api/interviews/problems",
-];

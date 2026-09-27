@@ -15,7 +15,7 @@ describe("retired learning links", () => {
 
   it("no shipped source links to a retired page or API", () => {
     const files = execSync("git ls-files src", { encoding: "utf8" }).split("\n")
-      .filter((f) => /\.(ts|tsx)$/.test(f) && fs.existsSync(f) && !/__tests__|\.test\.|retired-routes\.ts$/.test(f));
+      .filter((f) => /\.(ts|tsx|json)$/.test(f) && fs.existsSync(f) && !/__tests__|\.test\.|retired-routes\.ts$/.test(f));
     expect(findRetiredReferences(files)).toEqual([]);
   });
 
