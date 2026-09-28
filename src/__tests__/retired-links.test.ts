@@ -5,8 +5,8 @@ import { findRetiredReferences } from "./retired-links.helpers";
 
 const SHELL = [
   "src/app/providers.tsx", "src/components/layout/TopNav.tsx", "src/components/marketing/daybreak/DaybreakFooter.tsx",
-  "src/app/settings/page.tsx", "src/components/nav/sidebar-data.ts", "src/components/nav/palette-data.ts",
-  "src/components/app-shell/app-nav.ts", "src/components/app-shell/AppFrame.tsx",
+  "src/app/settings/page.tsx", "src/components/nav/palette-data.ts", "src/components/app-shell/app-nav.ts",
+  "src/components/app-shell/AppFrame.tsx", "src/app/cc/dashboard/today-model.ts", "src/components/cc/today/GradeQuestion.tsx",
 ];
 
 describe("retired learning links", () => {

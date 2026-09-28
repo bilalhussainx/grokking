@@ -88,7 +88,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   const [ttsError, setTtsError] = useState<string | null>(null);
   const [familyMode, setFamilyMode] = useState(false);
   const [pendingDraft, setPendingDraft] = useState<string | null>(null);
-  // Active dashboard variant — set by AdaptiveDashboard via setVariantKey or
+  // Active dashboard variant — set by TodayDashboard via setVariantKey or
   // openWithVariant. Null elsewhere so the API doesn't apply variant guidance
   // when the student is on, say, an essay page (the variant is dashboard-
   // scoped). Stored in a ref because we need to read it inside sendMessage
