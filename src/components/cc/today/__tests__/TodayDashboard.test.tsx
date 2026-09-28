@@ -29,7 +29,7 @@ import { deriveTodayInput, type RawDashboardRows } from "@/app/cc/dashboard/toda
 
 const raw = (over: Partial<RawDashboardRows> = {}): RawDashboardRows => ({
   profile: { preferred_name: null, transfer_current_school: null, transfer_target_term: null, transfer_credits_completed: null, dashboard_observations_enabled: null },
-  schools: [], essays: [], activities: [], observations: [], blocked: false, ...over,
+  schools: [], essays: [], activities: [], observations: [], blocked: false, deadlinesUnavailable: false, ...over,
 });
 const model = (v: Parameters<typeof buildTodayModel>[0], over: Partial<RawDashboardRows> = {}) =>
   buildTodayModel(v, deriveTodayInput(raw(over), "2026-09-27"));

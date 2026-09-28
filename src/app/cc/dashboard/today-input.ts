@@ -22,6 +22,10 @@ export type RawDashboardRows = {
   activities: { id: string }[] | null;
   observations: { module_label: string; observation: string; eyebrow: string }[] | null;
   blocked: boolean;
+  // True when the full cc_student_schools select (which carries the
+  // deadline_* columns) failed and the minimal fallback select succeeded.
+  // Deadlines are then unknown, not absent, even though schools loaded.
+  deadlinesUnavailable: boolean;
 };
 
 export type StatusCounts = { submitted: number; accepted: number; rejected: number; waitlisted: number; deferred: number; deposited: number };
@@ -39,6 +43,7 @@ export type TodayInput = {
   observationsEnabled: boolean;
   observation: { eyebrow: string; text: string } | null;
   blockedNotice: boolean;
+  deadlinesUnavailable: boolean;
 };
 
 const DEADLINES: Array<[DeadlineKey, string]> = [
@@ -95,5 +100,6 @@ export function deriveTodayInput(raw: RawDashboardRows, todayIso: string): Today
     observationsEnabled,
     observation: firstObservation ? { eyebrow: firstObservation.eyebrow, text: firstObservation.observation } : null,
     blockedNotice: raw.blocked,
+    deadlinesUnavailable: raw.deadlinesUnavailable,
   };
 }

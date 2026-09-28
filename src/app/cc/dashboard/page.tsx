@@ -84,10 +84,15 @@ export default async function DashboardPage({
       .select("application_status, deadline_ea, deadline_ed, deadline_edii, deadline_rea, deadline_rd, deadline_financial_aid, deadline_css_profile, deadline_fafsa, cc_schools(name)")
       .eq("student_id", profile.id),
   );
+  // The fallback drops the deadline_* columns, so a school list can load
+  // while deadlines stay unknown; that must read as "couldn't load", not as
+  // "no dates saved".
+  let deadlinesUnavailable = false;
   if (!schools) {
     schools = await safe<RawSchoolRow[]>(
       supabase.from("cc_student_schools").select("application_status, cc_schools(name)").eq("student_id", profile.id),
     );
+    deadlinesUnavailable = schools !== null;
   }
 
   const observationsEnabled = profile.dashboard_observations_enabled !== false;
@@ -120,6 +125,7 @@ export default async function DashboardPage({
     activities,
     observations,
     blocked: params.blocked === "grade9",
+    deadlinesUnavailable,
   };
   const variantKey = selectVariant(
     { is_transfer_student: profile.is_transfer_student, grade_level: profile.grade_level },

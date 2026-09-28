@@ -38,6 +38,7 @@ function schoolsRow(i: TodayInput, emptyText = "No schools saved yet. Start with
 function deadlinesRow(i: TodayInput): TodayRow {
   let detail: string;
   if (i.schoolCount === null) detail = UNAVAILABLE;
+  else if (i.deadlinesUnavailable) detail = "Couldn't load your saved deadlines right now. Your saved work is unchanged.";
   else if (i.nextDeadline) {
     detail = `Next saved date: ${i.nextDeadline.schoolName} ${i.nextDeadline.label}, ${formatIsoDate(i.nextDeadline.date)}. Confirm it on the school's official site.`;
   } else if (i.schoolCount > 0) detail = "No upcoming dates saved for your schools. Check each school's official requirements.";

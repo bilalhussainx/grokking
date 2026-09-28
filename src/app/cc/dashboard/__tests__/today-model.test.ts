@@ -12,7 +12,7 @@ const VARIANTS: VariantKey[] = ["g9", "g10", "junior", "senior_writing", "senior
 
 const raw = (over: Partial<RawDashboardRows> = {}): RawDashboardRows => ({
   profile: { preferred_name: null, transfer_current_school: null, transfer_target_term: null, transfer_credits_completed: null, dashboard_observations_enabled: null },
-  schools: [], essays: [], activities: [], observations: [], blocked: false, ...over,
+  schools: [], essays: [], activities: [], observations: [], blocked: false, deadlinesUnavailable: false, ...over,
 });
 const empty: TodayInput = deriveTodayInput(raw(), "2026-09-27");
 const school = (name: string, over: Partial<RawSchoolRow> = {}): RawSchoolRow => ({ application_status: null, cc_schools: { name }, ...over });
@@ -60,6 +60,12 @@ describe("deriveTodayInput", () => {
       school("E", { application_status: "submitted" }), school("F", { application_status: "deposited" }),
     ] }), "2026-09-27");
     expect(i.statusCounts).toEqual({ submitted: 1, accepted: 1, rejected: 1, waitlisted: 1, deferred: 1, deposited: 1 });
+  });
+
+  it("carries deadlinesUnavailable through, distinct from a fully failed schools read", () => {
+    const i = deriveTodayInput(raw({ schools: [school("A")], deadlinesUnavailable: true }), "2026-09-27");
+    expect(i.schoolCount).toBe(1);
+    expect(i.deadlinesUnavailable).toBe(true);
   });
 
   it("drops observations when the student turned suggestions off", () => {
@@ -143,6 +149,13 @@ describe("buildTodayModel", () => {
       expect(text, v).not.toMatch(/(coach|kairos|we|ai)\s+(will\s+)?(write|draft)s?\s+(your|the|an?)\s+(essay|statement)/i);
       expect(text, v).not.toMatch(/preview/i);
     }
+  });
+
+  it("says it couldn't load deadlines, never that none are saved, when the fallback schools read was used", () => {
+    const i = { ...empty, schoolCount: 2, deadlinesUnavailable: true };
+    const row = buildTodayModel("junior", i).rows.find((r) => r.id === "applications")!;
+    expect(row.detail).toMatch(/couldn't load/i);
+    expect(row.detail).not.toMatch(/No upcoming dates saved/);
   });
 
   it("carries the blocked-link flag through to the view", () => {
