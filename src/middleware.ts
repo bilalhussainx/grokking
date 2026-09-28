@@ -206,19 +206,25 @@ export async function middleware(request: NextRequest) {
     // doesn't touch a counselor's ability to open a specific student's view
     // under /counselor/students/[id].
     const isDashboardLanding = pathname === "/" || pathname === "/cc/dashboard";
+    // /settings is shared by students and counselors (D4.2 Settings). A
+    // counselor account has no cc_student_profiles row at all, so
+    // profileIncomplete is always true for them — without this exemption the
+    // checks below would bounce every counselor away from their own account
+    // page (to /counselor/dashboard, or even /onboarding) before it can render.
+    const isSettings = pathname === "/settings";
     if (profileIncomplete || isDashboardLanding) {
       const { data: counselor } = await supabase
         .from("cc_counselors")
         .select("id")
         .eq("user_id", user.id)
         .maybeSingle<{ id: string }>();
-      if (counselor) {
+      if (counselor && !isSettings) {
         return NextResponse.redirect(new URL("/counselor/dashboard", request.url));
       }
     }
 
     // Non-counselor with no completed student profile → student onboarding.
-    if (profileIncomplete) {
+    if (profileIncomplete && !isSettings) {
       return NextResponse.redirect(new URL("/onboarding", request.url));
     }
     // Grade-9 route guard (Feature 16). Page-level checks already exist on
