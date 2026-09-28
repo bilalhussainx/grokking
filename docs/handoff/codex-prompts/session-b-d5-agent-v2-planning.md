@@ -1,10 +1,12 @@
+> **HOLD: don't paste this yet.** The founder is running their own Codex research first (2026-09-27). Claude revises this prompt once that research is back.
+
 **ASTRA: SESSION B, D5 COUNSELOR AGENT v2 PLANNING.** Start this after you've delivered the D4.2 plan and prompt. It outranks D4.3–D4.9.
 
 The founder wants Coach Kairos to be a real admissions counselor agent: one that could stand in for much of an $8,000 counseling package for students in grades 9–12 and transfer students, applying in the US, UK and Canada. You own the planning and the agent UI/UX. Claude builds, runs the evaluations and deploys.
 
 ## Read first (summaries, not raw dumps)
 
-1. `docs/strategy/2026-09-27-counselor-agent-v2-cto-memo.md`. This is **binding**: the six v2 additions, the use of the $200 Anthropic credits, and the "will NOT do" table.
+1. `docs/strategy/2026-09-27-counselor-agent-v2-cto-memo.md`. This is **binding**: the six v2 additions, the corrected credits note (cloud compute, not Anthropic API spend), and the "will NOT do" table.
 2. `docs/superpowers/specs/2026-09-25-counselor-agent-design.md` (your D2, greenlit). v2 **extends** it; don't redesign what's settled there.
 3. `docs/superpowers/plans/2026-09-25-agent-slice-a1-*`, `-a2-*`, `-b-*`, `-c-f-outline.md`.
 4. `docs/research/2026-09-26-competitors-and-negative-reviews.md` and `docs/research/2026-09-27-agent-differentiation-research.md`. The second is **complete**. Its 40 golden-set seeds (§4) are the first cases. §6 recommends `web_lookup` as a background evidence-cache refresher, not `:online` answers. §5 and §8 list the sites whose terms forbid automated access (College Board, Common App, UCAS web, OUAC); design curated entry for those. OUAC now uses Group A/B, not 101/105.
@@ -34,7 +36,7 @@ The founder wants Coach Kairos to be a real admissions counselor agent: one that
   - a case schema that includes the verified correct answer or behaviour, the official source and the forbidden outputs;
   - the review process (human-verified before a case counts);
   - the dev/held-out split;
-  - Claude (Anthropic credits) as the independent judge, with GLM as generator. The judge's rubric must be calibrated against human labels on a sample.
+  - an independent judge from a different model family than the generator (GLM), via OpenRouter with founder-approved spend. The judge's rubric must be calibrated against human labels on a sample.
 - **Agent UX contract.** Specify:
   - proposal, evidence, unknown and progress cards (shared with D4.2 amendment A);
   - how the student sees and corrects what Kairos knows (D2 §2.5 context panel);

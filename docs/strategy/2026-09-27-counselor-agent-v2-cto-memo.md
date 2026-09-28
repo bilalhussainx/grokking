@@ -42,16 +42,14 @@ v2 **extends** that spec. Build order does not change: a1 → a2 → b come firs
 | 5 | **Golden set v2.** At least 300 problems with verified correct answers or behaviours across stages × countries × task families, plus refusal cases. It's built from the research (`docs/research/2026-09-27-agent-differentiation-research.md` §4) and ChatGPT Deep Research output, and reviewed by a human before it counts. | "Correct solutions" as an automated regression gate. | Extends D2 §9.2. It runs on every model, prompt, tool or knowledge-base change. |
 | 6 | **Counselor-in-the-loop.** For students linked to an agency (for example Ad Astra), the agent drafts briefings and flags risks for the human counselor; the human stays the authority. | This is what makes it a real $8k-grade service, and it's our pilot. | D2 `prepare_counselor_briefing`, D4.9. |
 
-### 2. Using the $200 Anthropic credits
+### 2. The $200 credits (corrected 2026-09-27)
 
-Claude (Sonnet) is **not** the day-to-day student model; that's GLM on OpenRouter, for cost. The credits buy **quality infrastructure**:
+The founder clarified that the $200 is **cloud compute credit, not Anthropic API spend**. There is no Anthropic API budget. Consequences:
 
-- **Evaluation judge** for the golden set and the 240-conversation suite. An independent model grades GLM's outputs against the verified answers, so the generator isn't grading itself. One full candidate run is roughly 240 conversations × about $0.03 of judging ≈ **$7–10**.
-- **Red-team and scenario generation.** Claude drafts adversarial probes: "write it for me", jailbreaks in Urdu or Hindi transliteration, fake deadlines. Humans label them. About **$10–20** once.
-- **Knowledge-base extraction.** Structured extraction of rules and facts from fetched official pages, then staff review. At about 60 institutions × a few pages, it's roughly **$20–40** for the first build.
-- **Escalation model.** D2's one-escalation rule applies, only for unresolved hard cases.
-
-That leaves roughly **$100** for about five to eight full evaluation rounds as the agent improves. Spending is logged per run in `.agent/VALIDATION_LOG.md`. Before any paid run, the founder is told the estimate, as the standing rule requires.
+- Student-facing and evaluation model calls both run through **OpenRouter**, with the existing key and founder-approved spend.
+- The golden-set **judge** must be a different model family from the generator (GLM), so the generator never grades itself. Pick it by cost when the harness is planned.
+- Each paid evaluation run is estimated and approved before it runs, as the standing rule requires.
+- Cloud compute credit can host long-running work: evaluation batches, knowledge-base ingestion jobs, and cloud agent sessions. Decide once the founder's research is back.
 
 ### 3. Things we will NOT do, and what we do instead
 
