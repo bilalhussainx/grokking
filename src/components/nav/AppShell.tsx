@@ -1,32 +1,19 @@
-"use client";
-
-// Shared layout wrapper for authenticated app surfaces. Mounts the
-// variant-aware Sidebar (left) + main content column + CommandPalette
-// overlay. Used by:
-//   - src/app/cc/layout.tsx (wraps every /cc/* route)
-//   - src/app/page.tsx (wraps the root home page when user is logged in)
-//
-// Centralizes the chrome so the wrapper isn't duplicated. The `grade`
-// prop is computed by the caller (server-side in cc/layout, client-side
-// in page.tsx) — keeps this component framework-agnostic.
-
+// Shared wrapper for signed-in app routes (GATE D4.2). Renders the Daybreak
+// AppFrame. Layouts pass the student's stage (loadShellStage) or
+// audience="staff" for counselor routes. CommandPalette stays mounted once,
+// globally, in providers.tsx.
 import type { ReactNode } from "react";
-import Sidebar, { type SidebarGrade } from "@/components/nav/Sidebar";
+import AppFrame from "@/components/app-shell/AppFrame";
+import type { ShellStage } from "@/components/app-shell/app-nav";
 
 export default function AppShell({
   grade,
+  audience = "student",
   children,
 }: {
-  grade: SidebarGrade;
+  grade: ShellStage;
+  audience?: "student" | "staff";
   children: ReactNode;
 }) {
-  return (
-    <div
-      className="kl-surface-app flex min-h-screen"
-      style={{ background: "var(--kl-app-bg, #000)" }}
-    >
-      <Sidebar grade={grade} />
-      <main className="flex-1 min-w-0">{children}</main>
-    </div>
-  );
+  return <AppFrame stage={grade} audience={audience}>{children}</AppFrame>;
 }

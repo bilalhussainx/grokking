@@ -12,6 +12,7 @@ import { FAMILY_MODE_LANGUAGES } from "@/lib/cc/family-mode-strings";
 import HandToParentButton from "@/components/family-mode/HandToParentButton";
 import FamilyModeView from "@/components/family-mode/FamilyModeView";
 import WorkingLatePrompt from "@/components/cc/WorkingLatePrompt";
+import { usesAppFrame } from "@/components/app-shell/app-nav";
 
 // Pages where the floating Coach drawer is suppressed — pre-auth surfaces and
 // pages where the page IS the voice UI. Essay workspace used to be suppressed
@@ -48,12 +49,13 @@ export default function CoachKairosShell() {
       )}
       <WorkingLatePrompt />
       <AnimatePresence>
-        {!isOpen && (
+        {!isOpen && !usesAppFrame(pathname) && (
           <motion.button
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={toggle}
+            aria-label="Open Coach Kairos"
             className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full bg-[#D4AF37] shadow-lg shadow-[#D4AF37]/20 flex items-center justify-center hover:bg-[#C4A030] transition-colors group"
           >
             <GraduationCap className="w-7 h-7 text-black" />
