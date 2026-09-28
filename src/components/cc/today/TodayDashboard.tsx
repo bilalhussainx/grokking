@@ -92,7 +92,7 @@ export default function TodayDashboard({ model }: { model: TodayModel }) {
             majors, record activities and plan high-school coursework now.
           </p>
           <div className="td-actions">
-            <button type="button" className="af-quiet" onClick={talk}>Ask Coach about my stage</button>
+            <button type="button" className="af-quiet" onClick={talk}>Ask Coach about my stage{" "}<AiBadge /></button>
             <button type="button" className="af-quiet" onClick={() => setStageHelp(false)}>Got it</button>
           </div>
         </section>
@@ -132,7 +132,7 @@ export default function TodayDashboard({ model }: { model: TodayModel }) {
                   <h2 id="td-skipped">We can start with your question.</h2>
                   <p>You can explore without choosing a grade. We&apos;ll ask before offering stage-specific guidance.</p>
                   <div className="td-actions">
-                    <button type="button" className="af-primary" onClick={() => coach.openWithDraft("")}>Open Coach Kairos</button>
+                    <button type="button" className="af-primary" onClick={() => coach.openWithDraft("")}>Open Coach Kairos{" "}<AiBadge /></button>
                   </div>
                 </section>
               )}
@@ -223,7 +223,7 @@ export default function TodayDashboard({ model }: { model: TodayModel }) {
           <section className="td-support" aria-labelledby="td-family">
             <h3 id="td-family">Bring your family in.</h3>
             <p>Talk through college and cost in a language that feels comfortable.</p>
-            <button type="button" className="af-quiet" onClick={() => openFamilyMode(coach)}>Open family mode</button>
+            <button type="button" className="af-quiet" onClick={() => openFamilyMode(coach)}>Open family mode{" "}<AiBadge /></button>
           </section>
         </aside>
       </div>

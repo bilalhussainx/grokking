@@ -205,7 +205,21 @@ describe("TodayDashboard", () => {
 
   it("opens family mode as a Coach action", () => {
     render(<TodayDashboard model={model("junior")} />);
-    fireEvent.click(screen.getByRole("button", { name: "Open family mode" }));
+    fireEvent.click(screen.getByRole("button", { name: /Open family mode/ }));
     expect(h.coach.toggleFamilyMode).toHaveBeenCalledWith(true);
+  });
+
+  it("badges every Coach entry point AI, including stage help, skipped-grade and family mode", () => {
+    const { unmount: unmountStageHelp } = render(<TodayDashboard model={model("g9", { blocked: true })} />);
+    expect(within(screen.getByRole("button", { name: /Ask Coach about my stage/ })).getByText("AI")).toBeTruthy();
+    unmountStageHelp();
+
+    const { unmount: unmountSkipped } = render(<TodayDashboard model={model("unknown")} />);
+    fireEvent.click(screen.getByRole("button", { name: "I'm not sure / skip for now" }));
+    expect(within(screen.getByRole("button", { name: /Open Coach Kairos/ })).getByText("AI")).toBeTruthy();
+    unmountSkipped();
+
+    render(<TodayDashboard model={model("junior")} />);
+    expect(within(screen.getByRole("button", { name: /Open family mode/ })).getByText("AI")).toBeTruthy();
   });
 });
