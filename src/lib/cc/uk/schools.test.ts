@@ -27,9 +27,10 @@ describe("getUKDeadline", () => {
     expect(d?.deadline_application).toBe("2026-10-15");
     expect(d?.oxbridge_or_medical).toBe(true);
   });
-  it("Imperial has Jan 14 deadline", () => {
+  // UCAS equal-consideration date for 2027 entry is 13 January 2027 (ucas.com).
+  it("Imperial has the Jan 13 equal-consideration deadline", () => {
     const d = getUKDeadline("Imperial College London");
-    expect(d?.deadline_application).toBe("2027-01-14");
+    expect(d?.deadline_application).toBe("2027-01-13");
     expect(d?.oxbridge_or_medical).toBe(false);
   });
   it("returns null for unknown school", () => {

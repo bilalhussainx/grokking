@@ -1,25 +1,4 @@
 {
-  "MAT": {
-    "name": "Mathematics Admissions Test",
-    "url": "https://www.ox.ac.uk/admissions/undergraduate/applying-to-oxford/guide/admissions-tests/mathematics-admissions-test-mat",
-    "registration_deadline": "2026-09-30",
-    "test_date": "2026-10-15",
-    "format": "2.5-hour paper-based test, 7 questions on AS-level + early A-level math",
-    "applies_to": [
-      { "school": "University of Oxford", "courses": ["Maths", "Mathematics & Statistics", "Maths & Computer Science", "Computer Science", "Computer Science & Philosophy"] },
-      { "school": "Imperial College London", "courses": ["Mathematics"] }
-    ]
-  },
-  "PAT": {
-    "name": "Physics Aptitude Test",
-    "url": "https://www.ox.ac.uk/admissions/undergraduate/applying-to-oxford/guide/admissions-tests/physics-aptitude-test-pat",
-    "registration_deadline": "2026-09-30",
-    "test_date": "2026-10-22",
-    "format": "2-hour paper-based test, physics + math problem-solving at A-level",
-    "applies_to": [
-      { "school": "University of Oxford", "courses": ["Physics", "Engineering Science", "Materials Science"] }
-    ]
-  },
   "LNAT": {
     "name": "Law National Aptitude Test",
     "url": "https://lnat.ac.uk",
@@ -27,56 +6,129 @@
     "test_date": "rolling — Sep 2026 to Jan 2027",
     "format": "Computer-based, 2 sections — 42 multiple-choice questions (95min) + 1 essay (40min)",
     "applies_to": [
-      { "school": "University of Oxford", "courses": ["Law", "Law with Law Studies in Europe"] },
-      { "school": "University of Cambridge", "courses": ["Law"] },
-      { "school": "University College London", "courses": ["Law"] },
-      { "school": "King's College London", "courses": ["Law"] },
-      { "school": "University of Bristol", "courses": ["Law"] },
-      { "school": "Durham University", "courses": ["Law"] }
+      {
+        "school": "University of Oxford",
+        "courses": [
+          "Law",
+          "Law with Law Studies in Europe"
+        ]
+      },
+      {
+        "school": "University of Cambridge",
+        "courses": [
+          "Law"
+        ]
+      },
+      {
+        "school": "University College London",
+        "courses": [
+          "Law"
+        ]
+      },
+      {
+        "school": "King's College London",
+        "courses": [
+          "Law"
+        ]
+      },
+      {
+        "school": "University of Bristol",
+        "courses": [
+          "Law"
+        ]
+      },
+      {
+        "school": "Durham University",
+        "courses": [
+          "Law"
+        ]
+      }
     ]
   },
   "TMUA": {
     "name": "Test of Mathematics for University Admission",
-    "url": "https://www.admissionstesting.org/for-test-takers/test-of-mathematics-for-university-admission/about-tmua/",
-    "registration_deadline": "2026-09-29",
-    "test_date": "2026-10-15",
+    "url": "https://esat-tmua.ac.uk/about-the-tests/tmua-test/",
+    "registration_deadline": "2026-09-28",
+    "test_date": "2026-10-12 to 2026-10-16 (October sitting; book by 28 Sep 2026, 18:00 UK)",
     "format": "Computer-based, 2.5 hours, 2 papers — multiple-choice math + reasoning",
     "applies_to": [
-      { "school": "University of Cambridge", "courses": ["Mathematics", "Computer Science", "Economics"] },
-      { "school": "London School of Economics and Political Science", "courses": ["Economics", "Economics & Mathematics", "Mathematics with Economics"] },
-      { "school": "University of Warwick", "courses": ["Mathematics", "MORSE", "Mathematics & Economics", "Computer Science"] },
-      { "school": "Durham University", "courses": ["Mathematics", "Economics"] }
+      {
+        "school": "University of Oxford",
+        "courses": [
+          "Mathematics",
+          "Mathematics and Statistics",
+          "Mathematics and Computer Science",
+          "Mathematics and Philosophy",
+          "Computer Science",
+          "Computer Science and Philosophy"
+        ]
+      },
+      {
+        "school": "University of Cambridge",
+        "courses": [
+          "Mathematics",
+          "Computer Science",
+          "Economics"
+        ]
+      },
+      {
+        "school": "London School of Economics and Political Science",
+        "courses": [
+          "Economics",
+          "Economics & Mathematics",
+          "Mathematics with Economics"
+        ]
+      },
+      {
+        "school": "University of Warwick",
+        "courses": [
+          "Mathematics",
+          "MORSE",
+          "Mathematics & Economics",
+          "Computer Science"
+        ]
+      },
+      {
+        "school": "Durham University",
+        "courses": [
+          "Mathematics",
+          "Economics"
+        ]
+      }
     ]
   },
   "ESAT": {
     "name": "Engineering and Science Admissions Test",
-    "url": "https://www.admissionstesting.org/for-test-takers/engineering-and-science-admissions-test-esat/",
-    "registration_deadline": "2026-09-29",
-    "test_date": "2026-10-15",
+    "url": "https://esat-tmua.ac.uk/about-the-tests/esat-test/",
+    "registration_deadline": "2026-09-28",
+    "test_date": "2026-10-12 to 2026-10-16 (October sitting; book by 28 Sep 2026, 18:00 UK)",
     "format": "Computer-based, 4 papers (1 hour each) — choose subset based on course",
     "applies_to": [
-      { "school": "University of Cambridge", "courses": ["Engineering", "Natural Sciences", "Chemical Engineering", "Veterinary Medicine"] },
-      { "school": "Imperial College London", "courses": ["Engineering (most disciplines)", "Chemistry"] }
-    ]
-  },
-  "TSA": {
-    "name": "Thinking Skills Assessment",
-    "url": "https://www.ox.ac.uk/admissions/undergraduate/applying-to-oxford/guide/admissions-tests/thinking-skills-assessment-tsa-oxford",
-    "registration_deadline": "2026-09-30",
-    "test_date": "2026-10-29",
-    "format": "2-hour test, multiple-choice critical thinking + writing task (Oxford only)",
-    "applies_to": [
-      { "school": "University of Oxford", "courses": ["PPE (Philosophy, Politics & Economics)", "Human Sciences", "Economics & Management", "History & Economics"] }
-    ]
-  },
-  "HAT": {
-    "name": "History Aptitude Test",
-    "url": "https://www.ox.ac.uk/admissions/undergraduate/applying-to-oxford/guide/admissions-tests/history-aptitude-test-hat",
-    "registration_deadline": "2026-09-30",
-    "test_date": "2026-10-22",
-    "format": "1-hour test, source-based historical analysis",
-    "applies_to": [
-      { "school": "University of Oxford", "courses": ["History", "History & Modern Languages", "History & Politics", "Ancient & Modern History"] }
+      {
+        "school": "University of Oxford",
+        "courses": [
+          "Biomedical Sciences",
+          "Engineering Science",
+          "Physics",
+          "Physics and Philosophy"
+        ]
+      },
+      {
+        "school": "University of Cambridge",
+        "courses": [
+          "Engineering",
+          "Natural Sciences",
+          "Chemical Engineering",
+          "Veterinary Medicine"
+        ]
+      },
+      {
+        "school": "Imperial College London",
+        "courses": [
+          "Engineering (most disciplines)",
+          "Chemistry"
+        ]
+      }
     ]
   },
   "UCAT": {
@@ -86,23 +138,80 @@
     "test_date": "rolling — Jul 2026 to Sep 2026",
     "format": "Computer-based, 2 hours, 5 cognitive sections — verbal reasoning, quantitative reasoning, abstract reasoning, decision making, situational judgement",
     "applies_to": [
-      { "school": "University of Cambridge", "courses": ["Medicine"] },
-      { "school": "Imperial College London", "courses": ["Medicine"] },
-      { "school": "University College London", "courses": ["Medicine"] },
-      { "school": "King's College London", "courses": ["Medicine", "Dentistry"] },
-      { "school": "University of Edinburgh", "courses": ["Medicine"] },
-      { "school": "University of Manchester", "courses": ["Medicine", "Dentistry"] },
-      { "school": "University of Bristol", "courses": ["Medicine", "Dentistry"] }
+      {
+        "school": "University of Oxford",
+        "courses": [
+          "Medicine",
+          "Graduate-entry Medicine"
+        ]
+      },
+      {
+        "school": "University of Cambridge",
+        "courses": [
+          "Medicine"
+        ]
+      },
+      {
+        "school": "Imperial College London",
+        "courses": [
+          "Medicine"
+        ]
+      },
+      {
+        "school": "University College London",
+        "courses": [
+          "Medicine"
+        ]
+      },
+      {
+        "school": "King's College London",
+        "courses": [
+          "Medicine",
+          "Dentistry"
+        ]
+      },
+      {
+        "school": "University of Edinburgh",
+        "courses": [
+          "Medicine"
+        ]
+      },
+      {
+        "school": "University of Manchester",
+        "courses": [
+          "Medicine",
+          "Dentistry"
+        ]
+      },
+      {
+        "school": "University of Bristol",
+        "courses": [
+          "Medicine",
+          "Dentistry"
+        ]
+      }
     ]
   },
-  "MLAT": {
-    "name": "Modern Languages Admissions Test",
-    "url": "https://www.ox.ac.uk/admissions/undergraduate/applying-to-oxford/guide/admissions-tests/modern-languages-admissions-test-mlat",
-    "registration_deadline": "2026-09-30",
-    "test_date": "2026-10-22",
-    "format": "Language-specific paper(s), 30-90 min depending on languages chosen",
+  "TARA": {
+    "name": "Test of Academic Reasoning for Admissions",
+    "url": "https://esat-tmua.ac.uk/about-the-tests/tara/",
+    "registration_deadline": "2026-09-28",
+    "test_date": "2026-10-12 to 2026-10-16 (October sitting; book by 28 Sep 2026, 18:00 UK)",
+    "format": "Computer-based UAT-UK test taken at a Pearson test centre; see esat-tmua.ac.uk for the current format",
     "applies_to": [
-      { "school": "University of Oxford", "courses": ["Modern Languages", "Modern Languages & Linguistics", "European & Middle Eastern Languages"] }
+      {
+        "school": "University of Oxford",
+        "courses": [
+          "Economics and Management",
+          "History and Economics",
+          "History and Politics",
+          "Human Sciences",
+          "Philosophy, Politics and Economics",
+          "PPE",
+          "Psychology (Experimental)",
+          "Psychology, Philosophy and Linguistics"
+        ]
+      }
     ]
   }
 }
