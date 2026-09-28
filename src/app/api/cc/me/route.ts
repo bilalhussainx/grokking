@@ -7,7 +7,7 @@ import { requireAuth, unauthorized, createAdminSupabase } from "../helpers";
 // transfer profile couldn't pre-fill saved answers).
 const FIELDS =
   "id, preferred_name, grade_level, is_transfer_student, is_international, affordability_value, needs_full_aid, " +
-  "transfer_current_school, transfer_credits_completed, transfer_target_term, transfer_reason";
+  "transfer_current_school, transfer_credits_completed, transfer_target_term, transfer_reason, dashboard_observations_enabled";
 
 type ProfileRow = { id: string } & Record<string, unknown>;
 
