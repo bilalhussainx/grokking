@@ -47,7 +47,7 @@ Give a structured record for each of these:
 - **US, the top 50 national universities** (US News 2026 or the latest list; name the list you used). For each: application platforms accepted, ED/EA/REA/RD deadlines for fall 2027 entry (or "not yet published" plus the last cycle's dates, labelled as such), test policy, supplemental essay count, interview policy, CSS Profile required (y/n), meets full need (y/n), need-blind for international students (y/n), net price calculator URL, and financial-aid deadline.
 - **UC system:** the UC application, the personal insight questions, dates, and the transfer (TAG) rules.
 - **UK:** the UCAS timeline, the 2026-entry personal statement format change, Oxford and Cambridge plus medicine, dentistry and veterinary deadlines, admissions tests currently in use, and predicted grades.
-- **Canada:** OUAC 101 vs 105, Ontario program supplements for the top programs, the BC/Alberta/Québec application systems, grade conversion guidance for international and US students, and OSAP basics.
+- **Canada:** the OUAC Undergraduate application (Group A/B; the 101/105 forms were retired for 2026–27), Ontario program supplements for the top programs, the BC/Alberta/Québec application systems, grade conversion guidance for international and US students, and OSAP basics.
 - **Transfer:** Common App for Transfer, typical credit evaluation practice, and articulation agreements. Use official examples only.
 
 Output: JSON `institutions[]` and `systems[]`, with **every field carrying `source_url` and `accessed`**. No unsourced fields.
@@ -76,6 +76,6 @@ Output: JSON `golden_set[]`.
 
 ## Part 5: Data sources and access terms
 
-Cover College Scorecard API, IPEDS, the Common Data Set, college net price calculators, studentaid.gov data, the CSS Profile school list, UCAS data services, OUAC, and OSAP. For each: what it contains, access method (API, bulk download or page only), licence and terms (**does it allow automated access?**), update cadence, and the fields useful to a counselor agent. Flag any source whose terms forbid scraping.
+Cover College Scorecard API, IPEDS, the Common Data Set, college net price calculators, studentaid.gov data, the CSS Profile school list, UCAS data services, OUAC, and OSAP. For each: what it contains, access method (API, bulk download or page only), licence and terms (**does it allow automated access?**), update cadence, and the fields useful to a counselor agent. Flag any source whose terms forbid scraping. Known already: College Board, Common App, UCAS web pages and OUAC restrict automated access. Confirm this and look for sanctioned alternatives (APIs, data services, permission contacts).
 
 Output: markdown table plus JSON `data_sources[]`.

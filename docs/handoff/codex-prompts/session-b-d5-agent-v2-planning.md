@@ -7,7 +7,7 @@ The founder wants Coach Kairos to be a real admissions counselor agent: one that
 1. `docs/strategy/2026-09-27-counselor-agent-v2-cto-memo.md`. This is **binding**: the six v2 additions, the use of the $200 Anthropic credits, and the "will NOT do" table.
 2. `docs/superpowers/specs/2026-09-25-counselor-agent-design.md` (your D2, greenlit). v2 **extends** it; don't redesign what's settled there.
 3. `docs/superpowers/plans/2026-09-25-agent-slice-a1-*`, `-a2-*`, `-b-*`, `-c-f-outline.md`.
-4. `docs/research/2026-09-26-competitors-and-negative-reviews.md` and `docs/research/2026-09-27-agent-differentiation-research.md`. The second is being written now; if it's missing, wait for it or use §4–§7 when they appear.
+4. `docs/research/2026-09-26-competitors-and-negative-reviews.md` and `docs/research/2026-09-27-agent-differentiation-research.md`. The second is **complete**. Its 40 golden-set seeds (§4) are the first cases. §6 recommends `web_lookup` as a background evidence-cache refresher, not `:online` answers. §5 and §8 list the sites whose terms forbid automated access (College Board, Common App, UCAS web, OUAC); design curated entry for those. OUAC now uses Group A/B, not 101/105.
 5. `docs/qa/2026-09-27-audit-resolution-matrix.md` in the `grokking-integrate` worktree: the coach-memory rows QA-30, 45, 53, 56, 58 and 59.
 
 ## Deliver, each behind its own gate
