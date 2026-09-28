@@ -7,7 +7,7 @@
 import "./today.css";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCoachKairos } from "@/contexts/CoachKairosContext";
 import AiBadge from "@/components/app-shell/AiBadge";
 import { openFamilyMode } from "@/components/app-shell/coach-actions";
@@ -31,9 +31,11 @@ export default function TodayDashboard({ model }: { model: TodayModel }) {
   const coach = useCoachKairos();
   const { setVariantKey } = coach;
   const router = useRouter();
+  const blockedParam = useSearchParams()?.get("blocked") === "grade9";
   const [inviteHidden, setInviteHidden] = useState(false);
   const [gradeSkipped, setGradeSkipped] = useState(false);
   const [stageHelp, setStageHelp] = useState(model.grade9 && model.blockedNotice);
+  const [helpFocusRequest, setHelpFocusRequest] = useState(0);
   const [status, setStatus] = useState("");
   const helpRef = useRef<HTMLHeadingElement>(null);
   const restoreRef = useRef<HTMLButtonElement>(null);
@@ -46,20 +48,25 @@ export default function TodayDashboard({ model }: { model: TodayModel }) {
     return () => setVariantKey(null);
   }, [setVariantKey, model.variantKey]);
 
-  // Middleware sends grade-9 deep links here with ?blocked=grade9. The server
-  // already rendered the explanation; drop the flag so a reload won't repeat it.
+  // Middleware and the phone More sheet send grade-9 students here with
+  // ?blocked=grade9. Next keeps Today mounted across a query-only change, so
+  // react to the query itself, not the initial model: show and focus the
+  // explanation, then drop the flag so a reload won't repeat it. Next syncs
+  // history.replaceState into useSearchParams without a server round trip.
   useEffect(() => {
-    if (!model.blockedNotice) return;
-    const url = new URL(window.location.href);
-    if (url.searchParams.has("blocked")) {
-      url.searchParams.delete("blocked");
-      window.history.replaceState(window.history.state, "", url.pathname + url.search);
+    if (!blockedParam) return;
+    if (model.grade9) {
+      setStageHelp(true);
+      setHelpFocusRequest((n) => n + 1);
     }
-  }, [model.blockedNotice]);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("blocked");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search);
+  }, [blockedParam, model.grade9]);
 
   useEffect(() => {
     if (stageHelp) helpRef.current?.focus();
-  }, [stageHelp]);
+  }, [stageHelp, helpFocusRequest]);
 
   useEffect(() => {
     if (!inviteToggled.current) return;

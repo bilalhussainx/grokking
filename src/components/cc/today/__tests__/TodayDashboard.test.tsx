@@ -14,7 +14,12 @@ const h = vi.hoisted(() => ({
   refresh: vi.fn(),
 }));
 vi.mock("@/contexts/CoachKairosContext", () => ({ useCoachKairos: () => h.coach }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }), usePathname: () => "/cc/dashboard" }));
+// useSearchParams reads the live URL, as Next's does after history.replaceState.
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: h.refresh }),
+  usePathname: () => "/cc/dashboard",
+  useSearchParams: () => new URLSearchParams(window.location.search),
+}));
 import TodayDashboard from "../TodayDashboard";
 import { buildTodayModel } from "@/app/cc/dashboard/today-model";
 import { deriveTodayInput, type RawDashboardRows } from "@/app/cc/dashboard/today-input";
@@ -117,6 +122,34 @@ describe("TodayDashboard", () => {
     expect(screen.queryByRole("heading", { name: "That tool opens later." })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "What can I use now?" }));
     expect(screen.getByRole("heading", { name: "That tool opens later." })).toBeTruthy();
+  });
+
+  it("explains a blocked link reached by soft navigation while Today is already open", () => {
+    // Next keeps Today mounted across a query-only change (the phone More
+    // sheet's "What can I use now?" links to /cc/dashboard?blocked=grade9).
+    const { rerender } = render(<TodayDashboard model={model("g9")} />);
+    expect(screen.queryByRole("heading", { name: "That tool opens later." })).toBeNull();
+
+    window.history.replaceState(null, "", "/cc/dashboard?blocked=grade9");
+    rerender(<TodayDashboard model={model("g9", { blocked: true })} />);
+    const heading = screen.getByRole("heading", { name: "That tool opens later." });
+    expect(document.activeElement).toBe(heading);
+    expect(window.location.search).toBe("");
+
+    // Again after an earlier blocked visit: the model's flag is already true.
+    fireEvent.click(screen.getByRole("button", { name: "Got it" }));
+    (document.activeElement as HTMLElement | null)?.blur();
+    window.history.replaceState(null, "", "/cc/dashboard?blocked=grade9");
+    rerender(<TodayDashboard model={model("g9", { blocked: true })} />);
+    expect(document.activeElement).toBe(screen.getByRole("heading", { name: "That tool opens later." }));
+    expect(window.location.search).toBe("");
+  });
+
+  it("drops a stray blocked flag for a student who isn't in grade 9 without showing the grade-9 note", () => {
+    window.history.replaceState(null, "", "/cc/dashboard?blocked=grade9");
+    render(<TodayDashboard model={model("junior", { blocked: true })} />);
+    expect(screen.queryByRole("heading", { name: "That tool opens later." })).toBeNull();
+    expect(window.location.search).toBe("");
   });
 
   it("shows a failed load as unavailable, with a retry, instead of an empty plan", () => {
