@@ -2,11 +2,6 @@ import type { ReactNode } from "react";
 import AppShell from "@/components/nav/AppShell";
 import { loadShellStage } from "@/components/app-shell/load-shell-stage";
 
-export const metadata = {
-  title: "Browse Schools — Coach Kairos",
-  description: "Search and explore colleges to build your list",
-};
-
-export default async function SchoolsLayout({ children }: { children: ReactNode }) {
+export default async function ApplicationsLayout({ children }: { children: ReactNode }) {
   return <AppShell grade={await loadShellStage()}>{children}</AppShell>;
 }

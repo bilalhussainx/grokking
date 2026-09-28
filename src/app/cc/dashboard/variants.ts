@@ -4,8 +4,9 @@
 // Icons are referenced by string name (IconName) — not by component reference —
 // because the variant config is built on the server and passed to a client
 // component, and React component functions can't cross the Server→Client
-// serialization boundary. The actual lucide-react component lookup happens
-// inside AdaptiveDashboard.tsx via a small ICONS registry.
+// serialization boundary. The legacy renderer that looked these up was removed
+// in GATE D4.2; /cc/dashboard now renders Today from today-model.ts and uses
+// only selectVariant from this file.
 
 export type IconName =
   | "calendar"

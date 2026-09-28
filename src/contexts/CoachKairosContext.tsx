@@ -61,6 +61,12 @@ interface CoachKairosContextValue {
   // by the voice-agent path so transcription + agent reply land in the same
   // message list the text flow uses.
   appendVoiceTurn: (role: "user" | "assistant", content: string) => void;
+  // Amendment A (GATE D4.2): text the student typed outside the drawer (the
+  // "Ask Kairos" box, or "" from the phone Coach tab). CoachChat moves it into
+  // its composer and focuses it; nothing is ever sent on the student's behalf.
+  pendingDraft: string | null;
+  openWithDraft: (text: string) => void;
+  clearPendingDraft: () => void;
 }
 
 const CoachKairosContext = createContext<CoachKairosContextValue | null>(null);
@@ -81,7 +87,8 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [ttsError, setTtsError] = useState<string | null>(null);
   const [familyMode, setFamilyMode] = useState(false);
-  // Active dashboard variant — set by AdaptiveDashboard via setVariantKey or
+  const [pendingDraft, setPendingDraft] = useState<string | null>(null);
+  // Active dashboard variant — set by TodayDashboard via setVariantKey or
   // openWithVariant. Null elsewhere so the API doesn't apply variant guidance
   // when the student is on, say, an essay page (the variant is dashboard-
   // scoped). Stored in a ref because we need to read it inside sendMessage
@@ -460,6 +467,15 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
     setFamilyMode((prev) => (on === undefined ? !prev : on));
   }, []);
 
+  const openWithDraft = useCallback((text: string) => {
+    // An explicit open spends the one-time proactive greeting, so the "/"
+    // auto-open can't fire a synthetic "hi" underneath the student's draft.
+    proactiveSent.current = true;
+    setPendingDraft(text.trim().slice(0, 2000));
+    setIsOpen(true);
+  }, []);
+  const clearPendingDraft = useCallback(() => setPendingDraft(null), []);
+
   const appendVoiceTurn = useCallback((role: "user" | "assistant", content: string) => {
     const trimmed = content.trim();
     if (!trimmed) return;
@@ -527,6 +543,7 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
         ttsError, clearTtsError: () => setTtsError(null),
         familyMode, toggleFamilyMode,
         appendVoiceTurn,
+        pendingDraft, openWithDraft, clearPendingDraft,
       }}
     >
       {children}

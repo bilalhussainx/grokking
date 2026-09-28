@@ -15,7 +15,8 @@ vi.mock("../helpers", () => ({
 const row = (id: string, user_id: string, over: Record<string, unknown> = {}) => ({
   id, user_id, preferred_name: "Ada", grade_level: null, is_transfer_student: true, is_international: false,
   affordability_value: "under_10k", needs_full_aid: true, transfer_current_school: "QA Community College",
-  transfer_credits_completed: 30, transfer_target_term: "Fall 2027", transfer_reason: "program fit", ...over,
+  transfer_credits_completed: 30, transfer_target_term: "Fall 2027", transfer_reason: "program fit",
+  dashboard_observations_enabled: false, ...over,
 });
 
 beforeEach(() => { h.user = ME; });
@@ -26,6 +27,7 @@ describe("GET /api/cc/me", () => {
     const json = await (await GET()).json();
     expect(json.profile).toMatchObject({ id: "p1", is_transfer_student: true, transfer_current_school: "QA Community College" });
     expect(json.profile.preferred_name).toBe("Ada");
+    expect(json.profile.dashboard_observations_enabled).toBe(false);
   });
 
   it("is deterministic when a user has duplicate profile rows", async () => {

@@ -12,9 +12,12 @@ import { CoachKairosProvider } from "@/contexts/CoachKairosContext";
 import CoachKairosShell from "@/components/cc/coach/CoachKairosShell";
 import { UpgradeGateProvider } from "@/hooks/useFetchWithUpgrade";
 import CommandPalette from "@/components/nav/CommandPalette";
+import { usesAppFrame } from "@/components/app-shell/app-nav";
 
-/** AppLayout — TopNav above the page. Coach Kairos mounts in AppOverlays. */
-function AppLayout({ children }: { children: React.ReactNode }) {
+/** AppLayout — TopNav above the page, except where the page owns its chrome:
+ *  marketing pages, the anonymous homepage, and every framed app route
+ *  (APP_FRAME_PREFIXES), whose layout renders the Daybreak AppFrame. */
+export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
   const isDaybreakHome = (pathname === "/" || pathname === "/welcome") && !user;
@@ -26,7 +29,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
     pathname === "/pricing" ||
     pathname === "/stories";
 
-  if (hasOwnMarketingNav || isDaybreakHome) {
+  if (hasOwnMarketingNav || isDaybreakHome || usesAppFrame(pathname)) {
     return <>{children}</>;
   }
 

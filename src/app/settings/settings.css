@@ -1,0 +1,22 @@
+/* Settings (GATE D4.2), rendered inside .af-root. */
+.st-wait{max-width:540px;margin:40px auto;font-size:16px}
+.st-head{margin-bottom:26px}
+.af-root .st-head h1{font-size:44px;line-height:1.12;margin:12px 0 14px}
+.st-intro{color:var(--db-muted);max-width:48ch}
+.st-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.st-card{background:var(--db-card);border:1px solid var(--db-border);border-radius:14px;padding:24px}
+.af-root .st-card h2{display:flex;align-items:center;gap:8px;font-size:23px;margin-bottom:18px}
+.af-root .st-card p{color:var(--db-muted);font-size:15px;margin-bottom:14px}
+.af-root .st-card .st-lead{margin-top:16px;color:var(--db-ink)}
+.af-root .st-card .af-notice{color:var(--db-ink)}
+.st-def{display:flex;justify-content:space-between;gap:15px;border-top:1px solid var(--db-border);padding:14px 0;font-size:15px}
+.st-def span{color:var(--db-muted)}
+.st-def strong{text-align:end;overflow-wrap:anywhere}
+.st-check{display:flex;align-items:center;gap:12px;min-height:48px;font-size:15px;cursor:pointer}
+.st-check input{width:22px;height:22px;accent-color:var(--db-clay)}
+.st-code{display:block;padding:10px 12px;margin-bottom:12px;background:var(--db-page);border:1px solid var(--db-border);border-radius:10px;font-size:14px;overflow-wrap:anywhere}
+.af-root .st-error{color:var(--db-error)}
+.st-billing{display:grid;gap:10px;justify-items:start;margin-top:8px}
+.af-root .st-billing .af-notice p{margin:6px 0 4px}
+@media (max-width:1100px){.st-grid{grid-template-columns:1fr}}
+@media (max-width:700px){.af-root .st-head h1{font-size:32px}.st-card{padding:22px 20px}.st-def{font-size:14px}}

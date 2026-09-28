@@ -8,6 +8,7 @@ const ALLOWED_FIELDS = [
   "home_language", "preferred_language", "is_first_gen", "is_international", "citizenship_status",
   "race_ethnicity", "gender",
   "affordability_value",
+  "dashboard_observations_enabled",
 ];
 
 const VALID_AFFORDABILITY: ReadonlySet<string> = new Set([
@@ -22,6 +23,10 @@ export async function PATCH(req: NextRequest) {
 
   if ("affordability_value" in body && body.affordability_value != null && !VALID_AFFORDABILITY.has(body.affordability_value)) {
     return NextResponse.json({ error: "invalid affordability_value" }, { status: 400 });
+  }
+
+  if ("dashboard_observations_enabled" in body && typeof body.dashboard_observations_enabled !== "boolean") {
+    return NextResponse.json({ error: "dashboard_observations_enabled must be true or false" }, { status: 400 });
   }
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
