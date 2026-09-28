@@ -4,7 +4,7 @@
 // Canadian school so they know what to expect.
 
 export type CanadianApplicationPlatform =
-  | "OUAC"          // Ontario Universities' Application Centre (101/105)
+  | "OUAC"          // Ontario Universities' Application Centre (Group A/B)
   | "UBC_direct"    // you.ubc.ca with Personal Profile
   | "McGill_direct" // uApply
   | "Waterloo_AIF"  // OUAC + Admission Information Form (engineering/math/CS)
@@ -24,7 +24,7 @@ export const PLATFORMS: Record<CanadianApplicationPlatform, PlatformInfo> = {
     name: "OUAC (Ontario Universities' Application Centre)",
     url: "https://www.ouac.on.ca/",
     oneLineExplainer:
-      "Single Ontario portal — pick OUAC 101 if you're a current Ontario HS student, OUAC 105 otherwise. $156 covers up to 3 university choices.",
+      "Single Ontario portal with one Undergraduate application: you're Group A if you're a current Ontario high-school student (under 21, working toward an OSSD), Group B otherwise. $159 covers 3 program choices; each extra choice is $51.",
     notableSteps: [
       "Submit application via OUAC by the deadline",
       "Some Ontario schools require additional supplementary forms (UofT supplementary essays, Waterloo AIF, Queen's PSE, McMaster Health Sciences). Check each school's site.",
