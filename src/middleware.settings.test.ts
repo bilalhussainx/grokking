@@ -60,3 +60,15 @@ describe("counselor without a student profile", () => {
     expect(new URL(location(res)!).pathname).toBe("/counselor/dashboard");
   });
 });
+
+describe("non-counselor with an incomplete profile", () => {
+  it("is sent to /onboarding even on /settings (the settings exemption is counselor-only)", async () => {
+    h.user = { id: "student-1", is_anonymous: false };
+    h.studentProfile = null; // no cc_student_profiles row -> profileIncomplete
+    h.counselor = null; // not a counselor either
+
+    const res = await middleware(new NextRequest("https://www.kairoslearn.com/settings"));
+
+    expect(new URL(location(res)!).pathname).toBe("/onboarding");
+  });
+});
