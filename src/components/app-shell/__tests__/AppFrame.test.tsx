@@ -100,6 +100,14 @@ describe("AppFrame (student)", () => {
     expect(document.activeElement).toBe(button);
   });
 
+  it("closes the More sheet when a link inside it is clicked, even to the same path", () => {
+    render(<AppFrame stage="g9"><p>page</p></AppFrame>);
+    fireEvent.click(screen.getByRole("button", { name: "More planning tools" }));
+    const dialog = screen.getByRole("dialog", { name: "Your planning space" });
+    fireEvent.click(within(dialog).getByRole("link", { name: "What can I use now?" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
   it("finds pages by label or keyword and says so when nothing matches", () => {
     render(<AppFrame stage="junior"><p>page</p></AppFrame>);
     fireEvent.click(screen.getByRole("button", { name: "Find a page" }));

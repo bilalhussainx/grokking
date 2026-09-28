@@ -85,7 +85,13 @@ export default function AppFrame({
       );
     }
     return (
-      <Link key={e.id} href={e.href} className={className} aria-current={isActiveHref(pathname, e.href) ? "page" : undefined}>
+      <Link
+        key={e.id}
+        href={e.href}
+        className={className}
+        aria-current={isActiveHref(pathname, e.href) ? "page" : undefined}
+        onClick={() => setPanel(null)}
+      >
         <Icon aria-hidden="true" />
         <span>{e.label}</span>
       </Link>
@@ -199,7 +205,7 @@ export default function AppFrame({
             <section className="af-sheet-group">
               <h3>Application tools come later</h3>
               <p>Essays, applications and interview prep aren&apos;t available in grade 9.</p>
-              <Link className="af-quiet" href="/cc/dashboard?blocked=grade9">What can I use now?</Link>
+              <Link className="af-quiet" href="/cc/dashboard?blocked=grade9" onClick={() => setPanel(null)}>What can I use now?</Link>
             </section>
           )}
           <section className="af-sheet-group">
