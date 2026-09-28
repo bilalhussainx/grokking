@@ -13,6 +13,27 @@ doesn't re-test what's recorded here. Newest work goes at the top.
 | 4 | Stripe and credits for the new prices (Free 200 credits; $15/month; $99/year) | **Done in code**: `docs/superpowers/plans/2026-09-25-fix-4-stripe-credits-new-prices.md`; final-review fixes applied. Stripe prices created by Astra (`docs/handoff/stripe-setup-report.md`). **Credit lock-down applied in production 2026-09-26.** Branch not deployed; 3 other migrations not applied. |
 | 5 | Competitor research, phone app (PWA), Ad Astra readiness, full testing of every student type | Queued |
 
+## 2026-09-27 — CHECKPOINT 1 DEPLOYED: admissions-only release (`master` = `a612a57`)
+
+The founder said "deploy everything". `refocus/admissions-only` was fast-forwarded onto `master` (from `ae82a5a`). Vercel build: success.
+
+Production smoke test on www.kairoslearn.com:
+- Every retired URL redirects (307).
+- `/ref/null` goes to /signup.
+- `/find-counselor` search is public and verified-only (currently empty).
+- `/pricing` shows only $15 and $99.
+- /signup says "200 AI credits".
+- The manifest is `#FFF7EE` with PWA icons; the sitemap has 13 URLs.
+- Homepage first load is 399 KiB.
+- A QA student logs in to /cc/dashboard, and 9 core pages return 200 with no failed /api calls.
+- Net price lists Michigan and Toronto ("2 schools covered") and "Under $10,000/year".
+
+Also included:
+- UK 2027-entry fixes: Oxford uses UAT-UK tests (booking closed 28 Sep 18:00 UK); the UCAS date is 13 Jan.
+- OUAC Group A/B, with the fee at $159 + $51.
+
+**Found in production, to fix next:** React #418 hydration mismatch on /cc/dashboard. It's likely a date/time rendered on a UTC server versus the local browser; it wasn't seen locally.
+
 ## 2026-09-27 — D3-IMPL-1.1 integrated (`04a87f2`)
 
 - Codex's font subsetting, BRAND-1 emblem and admissions footer are merged.
