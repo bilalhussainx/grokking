@@ -3,7 +3,7 @@
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 
-const SOURCES = ["src/components/nav/sidebar-data.ts", "src/components/nav/palette-data.ts", "src/components/mobile/MobileDrawer.tsx", "src/components/app-shell/app-nav.ts"];
+const SOURCES = ["src/components/nav/sidebar-data.ts", "src/components/nav/palette-data.ts", "src/components/mobile/MobileDrawer.tsx", "src/components/app-shell/app-nav.ts", "src/components/app-shell/AppFrame.tsx"];
 
 function pageExists(href: string): boolean {
   const path = href.split(/[?#]/)[0];
