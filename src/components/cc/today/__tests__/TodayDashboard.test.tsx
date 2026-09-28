@@ -14,7 +14,10 @@ const h = vi.hoisted(() => ({
   refresh: vi.fn(),
 }));
 vi.mock("@/contexts/CoachKairosContext", () => ({ useCoachKairos: () => h.coach }));
-// useSearchParams reads the live URL, as Next's does after history.replaceState.
+// The mock reads the live URL directly. Real Next only syncs useSearchParams
+// and canonicalUrl from history.replaceState when the call passes `null` as
+// the state; passing back window.history.state (which carries Next's own
+// internal marker once Next has navigated) leaves the router out of sync.
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: h.refresh }),
   usePathname: () => "/cc/dashboard",
@@ -143,6 +146,17 @@ describe("TodayDashboard", () => {
     rerender(<TodayDashboard model={model("g9", { blocked: true })} />);
     expect(document.activeElement).toBe(screen.getByRole("heading", { name: "That tool opens later." }));
     expect(window.location.search).toBe("");
+  });
+
+  it("replaces history state with null, not the previous state object, so Next's router stays in sync", () => {
+    // Next's own patched replaceState skips syncing the router (canonicalUrl,
+    // useSearchParams) when the state object it's given carries its internal
+    // __NA marker, which window.history.state holds once Next has navigated.
+    window.history.replaceState({ __NA: true }, "", "/cc/dashboard?blocked=grade9");
+    const replaceStateSpy = vi.spyOn(window.history, "replaceState");
+    render(<TodayDashboard model={model("g9", { blocked: true })} />);
+    expect(replaceStateSpy).toHaveBeenCalledWith(null, "", "/cc/dashboard");
+    replaceStateSpy.mockRestore();
   });
 
   it("drops a stray blocked flag for a student who isn't in grade 9 without showing the grade-9 note", () => {

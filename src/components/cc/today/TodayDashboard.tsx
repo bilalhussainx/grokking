@@ -51,8 +51,13 @@ export default function TodayDashboard({ model }: { model: TodayModel }) {
   // Middleware and the phone More sheet send grade-9 students here with
   // ?blocked=grade9. Next keeps Today mounted across a query-only change, so
   // react to the query itself, not the initial model: show and focus the
-  // explanation, then drop the flag so a reload won't repeat it. Next syncs
-  // history.replaceState into useSearchParams without a server round trip.
+  // explanation, then drop the flag so a reload won't repeat it. Pass `null`
+  // as the state, not `window.history.state`: Next's patched replaceState
+  // skips syncing its router (canonicalUrl, useSearchParams) when the state
+  // it's given carries Next's own internal marker, which is exactly what
+  // window.history.state holds once Next has navigated. Passing that state
+  // back leaves the router out of sync, so a second tap does nothing and a
+  // later router.refresh() puts the flag back in the address bar.
   useEffect(() => {
     if (!blockedParam) return;
     if (model.grade9) {
@@ -61,7 +66,7 @@ export default function TodayDashboard({ model }: { model: TodayModel }) {
     }
     const url = new URL(window.location.href);
     url.searchParams.delete("blocked");
-    window.history.replaceState(window.history.state, "", url.pathname + url.search);
+    window.history.replaceState(null, "", url.pathname + url.search);
   }, [blockedParam, model.grade9]);
 
   useEffect(() => {
