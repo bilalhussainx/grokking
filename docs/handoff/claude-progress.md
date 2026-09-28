@@ -406,3 +406,9 @@ Commits `f9f9caa..c80010a`. **Not deployed.**
   ownership lookup precedes it. Behavioral tests cover the known case.
 - Pre-existing lint errors on the counselor student page (`set-state-in-effect`,
   two `<a>` navigation links) are untouched.
+
+## Checkpoint 2 — D4.2 Daybreak shell + Today dashboard (deployed 2026-09-27)
+- master = e6c62aa (merge of feat/d4-2-dashboard-shell; tree identical to verified d27337e: 116 files / 764 tests, tsc 0, build exit 0). Vercel: success.
+- Final review (opus) 0 Critical / 2 Important; one fix wave; scoped re-review 4/4 addressed.
+- Prod smoke (student + head counselor, 1440 and 375): all pages 200, frame present, Ask Kairos + AI badges on Today, no page errors (React #418 gone), no failing /api calls.
+- Open: phone horizontal overflow from inner page content, not the frame — /schools school cards (439px wide, +80px) and /cc/essays essay rows (389px, +30px). Belongs to the next Astra design pass for those pages.
