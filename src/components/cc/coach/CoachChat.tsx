@@ -39,10 +39,22 @@ export default function CoachChat() {
     appendVoiceTurn,
     ttsError,
     clearTtsError,
+    pendingDraft,
+    clearPendingDraft,
   } = useCoachKairos();
 
   const [input, setInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Take a draft staged by openWithDraft (Ask Kairos / Coach tab): fill the
+  // composer and focus it. The student decides whether to send.
+  useEffect(() => {
+    if (pendingDraft === null) return;
+    setInput(pendingDraft);
+    clearPendingDraft();
+    inputRef.current?.focus();
+  }, [pendingDraft, clearPendingDraft]);
 
   // Inline toast surfaces when the coach actually mutates DB state (e.g.
   // adds schools via the canonical <<actions>> block). Listens to the
@@ -252,6 +264,8 @@ export default function CoachChat() {
       <form onSubmit={handleSubmit} className="px-4 py-3 border-t border-white/10 shrink-0">
         <div className="flex gap-2">
           <input
+            ref={inputRef}
+            aria-label="Message Coach Kairos"
             type="text"
             dir="auto"
             value={input}
