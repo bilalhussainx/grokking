@@ -59,3 +59,12 @@ The 48 affected tests overlap the 626 full-suite tests except the two new matche
 Source suite 93 files / 632 tests passed (exit 0); focused 38 overlap. TypeScript still fails on inherited aid props only. Targeted lint 0 errors / 3 image advisories. Actual browser font payload 583,164 to 83,564 unique bytes; six layout records pass overflow/touch checks. Five languages rendered; grouped money and single focus announcement path verified by DOM. See work-diary/d3-impl-1-1-validation.md for exact commands, limitations and gate requests. No deploy.
 
 Final artifact review confirmed test totals, font/icon hashes and DOM evidence. Its minor footer whitespace finding was repaired and recaptured. Implementation baea252. Production build attempt stopped without diagnostics/completion: inconclusive, not a pass.
+
+## 2026-09-27 — Checkpoint 1: admissions-only release (production)
+Deployed master a612a57. Production smoke (QA student): retired course routes 307 to admissions pages; pricing shows $15/mo and $99/yr; signup copy "200 AI credits"; manifest served; homepage first load 399 KiB; 9 core signed-in pages load with no page errors; net price shows schools with no raw enum values. Found React #418 on /cc/dashboard, fixed in checkpoint 2.
+
+## 2026-09-27 — Checkpoint 2: D4.2 Daybreak shell + Today dashboard (production)
+Expected: Astra GATE D4.2 design (Amendments A and B) live for students and counselors; no hydration errors.
+Actual: master e6c62aa (tree identical to d27337e: vitest 116 files / 764 tests pass, tsc 0 errors, next build exit 0). Final opus review 0 Critical / 2 Important, one fix wave, scoped re-review 4/4 addressed. Vercel status success. Production smoke, QA student and head counselor at 1440×900 and 375×812: every page 200, frame present, Ask Kairos and AI badges on Today, zero page errors (React #418 gone), zero failing /api calls.
+Open: phone horizontal overflow from page content, not the frame — /schools school cards 439px (+80px), /cc/essays essay rows 389px (+30px).
+No test:unit, no migrations, no env-file reads.
