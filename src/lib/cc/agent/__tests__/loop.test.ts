@@ -60,6 +60,20 @@ it("a checker that ignores its AbortSignal still cannot hang release",async()=>{
   await vi.advanceTimersByTimeAsync(8001);await assertion;
  }finally{vi.useRealTimers();}
 });
+it("a tool call observes its own signal aborted once the 2 s bound passes",async()=>{
+ vi.useFakeTimers();
+ try {
+  let seen:AbortSignal|undefined;
+  const tools=vi.fn<ReadTools>().mockImplementation((_name,_args,signal)=>{seen=signal;return new Promise(()=>{});});
+  const provider=vi.fn<Provider>().mockResolvedValue({content:null,calls:[{id:"1",name:"read_context",arguments:"{}"}]});
+  const work=runAgent(input,{provider,tools,check:allow,signal:new AbortController().signal,priorReleased:[]});
+  const assertion=expect(work).rejects.toThrow(/^operation_aborted_or_timeout$/);
+  await vi.advanceTimersByTimeAsync(1999);
+  expect(seen).toBeInstanceOf(AbortSignal);expect(seen!.aborted).toBe(false);
+  await vi.advanceTimersByTimeAsync(2);await assertion;
+  expect(seen!.aborted).toBe(true);expect((seen!.reason as Error).message).toBe("operation_timeout");
+ }finally{vi.useRealTimers();}
+});
 it("an already aborted caller does not invoke provider",async()=>{
  const signal=AbortSignal.abort(),provider=vi.fn();
  await expect(runAgent(input,{provider,tools:vi.fn(),check:denyAllCheck,signal,priorReleased:[]})).rejects.toThrow(/^operation_aborted$/);expect(provider).not.toHaveBeenCalled();

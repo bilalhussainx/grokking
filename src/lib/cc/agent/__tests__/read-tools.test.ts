@@ -3,8 +3,40 @@
 import {it,expect,vi} from "vitest";
 import {makeReadTools,validateToolArgs} from "../read-tools";
 import {studentWorld,asDb,ALICE,ALICE_PROFILE,ALICE_ESSAY,BOB_ESSAY} from "../../__tests__/helpers/fixtures";
-import {createFakeSupabase} from "../../__tests__/helpers/fake-supabase";
+import {createFakeSupabase,type FakeQuery,type FakeSupabase} from "../../__tests__/helpers/fake-supabase";
 const scope={userId:ALICE,profileIds:[ALICE_PROFILE]};
+// Runs `beforeResult` as each query is awaited; offers .abortSignal() only when `bind` is given.
+function instrumented(beforeResult:()=>void,bind?:(signal:AbortSignal)=>void):FakeSupabase {
+ const fake=studentWorld();
+ fake.tables.cc_counselor_comments=[{id:"1",artifact_type:"essay",artifact_id:ALICE_ESSAY,student_user_id:ALICE,status:"shipped",body:"Published critique"}];
+ return {tables:fake.tables,from:(table:string)=>{
+  const q=fake.from(table) as FakeQuery&{abortSignal?:(s:AbortSignal)=>FakeQuery};
+  const then=q.then.bind(q);
+  q.then=((ok,err)=>{beforeResult();return then(ok,err);}) as typeof q.then;
+  if(bind) q.abortSignal=s=>{bind(s);return q;};
+  return q;
+ }};
+}
+const calls=[["read_context",{}],["read_essay",{essayId:ALICE_ESSAY,versionNumber:1}],["read_published_feedback",{essayId:ALICE_ESSAY}]] as const;
+it("an already aborted signal makes no query",async()=>{
+ const fake=studentWorld();const from=vi.spyOn(fake,"from"),tools=makeReadTools(asDb(fake),scope);
+ for(const [name,args] of calls) await expect(tools(name,args,AbortSignal.abort(new Error("operation_timeout")))).rejects.toThrow(/^operation_timeout$/);
+ expect(from).not.toHaveBeenCalled();
+});
+it("binds the call signal to every query when the client supports abortSignal",async()=>{
+ for(const [name,args] of calls) {
+  const bound:AbortSignal[]=[],signal=new AbortController().signal;
+  const reply=await makeReadTools(asDb(instrumented(()=>{},s=>bound.push(s))),scope)(name,args,signal);
+  expect(reply.status).not.toBe("retryable_error");expect(bound.length).toBeGreaterThan(0);expect(bound.every(s=>s===signal)).toBe(true);
+ }
+});
+it("a signal aborted while a query is in flight discards the result",async()=>{
+ for(const [name,args] of calls) {
+  const controller=new AbortController();
+  const tools=makeReadTools(asDb(instrumented(()=>controller.abort(new Error("operation_timeout")))),scope);
+  await expect(tools(name,args,controller.signal)).rejects.toThrow(/^operation_timeout$/);
+ }
+});
 it("rejects unknown tools, extra properties and malformed arguments before any query",async()=>{
  const fake=studentWorld();const from=vi.spyOn(fake,"from"),tools=makeReadTools(asDb(fake),scope);
  for(const [name,args] of [["read_context",{userId:ALICE}],["read_context",{domains:"profile"}],["read_essay",{essayId:ALICE_ESSAY,versionNumber:1.5}],["sql",{}]] as const) expect((await tools(name,args)).status).toBe("denied");

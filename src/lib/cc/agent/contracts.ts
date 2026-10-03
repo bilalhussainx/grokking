@@ -70,7 +70,8 @@ export type ModelReply = {
 
 export type Provider = (messages: ChatMessage[], signal: AbortSignal) => Promise<ModelReply>;
 
-export type ReadTools = (name: string, args: unknown) => Promise<ToolReply>;
+// The loop passes its bounded per-call signal; a tool must not start or finish work after it aborts.
+export type ReadTools = (name: string, args: unknown, signal?: AbortSignal) => Promise<ToolReply>;
 
 export type RunDeps = {
   provider: Provider;

@@ -72,7 +72,7 @@ async function runBounded(input:AgentInput,deps:RunDeps,policy:RunPolicy):Promis
         for(let i=0;i<reply.calls.length;i++) {
           signal.throwIfAborted();toolCalls++;
           const call=reply.calls[i];
-          const result=await bounded(()=>deps.tools(call.name,parsed[i]),signal,2000);
+          const result=await bounded(s=>deps.tools(call.name,parsed[i],s),signal,2000);
           evidence.push(...result.evidence);
           const {evidence:serverOnlyEvidence,...modelReply}=result;
           void serverOnlyEvidence; // Evidence is retained server-side exactly once for the checker.
