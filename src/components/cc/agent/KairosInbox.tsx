@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import AiBadge from "@/components/app-shell/AiBadge";
 import type { InboxItem } from "@/lib/cc/agent/inbox";
 import { ProposalCard } from "./ProposalCard";
 import "./agent.css";
@@ -15,7 +16,7 @@ export function KairosInbox() {
   }
   return (
     <section className="ka-inbox" aria-labelledby="ka-inbox-h">
-      <h3 id="ka-inbox-h" className="ka-eyebrow">Kairos noticed</h3>
+      <h3 id="ka-inbox-h" className="ka-eyebrow">Kairos noticed <AiBadge /></h3>
       {items.map((it) => it.kind === "nudge" ? (
         <article key={it.id} className="ka-card">
           <h4 className="ka-title">{it.title}</h4>
