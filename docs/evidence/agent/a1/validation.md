@@ -86,3 +86,29 @@ All selected columns exist in `supabase/migrations` for cc_student_profiles, cc_
 - `npx vitest run --config vitest.agent-a1.config.ts`: 4 files / 22 tests passed
 - `npx vitest run src --config vitest.agent-source.config.ts`: 144 files / 976 tests passed (962 + 14 new)
 - `npx tsc --noEmit -p .`: 0 diagnostics
+
+## Task 5: probe module and script (offline only)
+
+### RED
+```
+ FAIL  src/lib/cc/agent/__tests__/probe.test.ts
+Error: Cannot find module '../probe' imported from .../probe.test.ts
+ Test Files  1 failed (1)
+      Tests  no tests
+```
+
+### GREEN
+```
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+```
+
+### Script refusal with empty env (no live call, no fence written)
+`env -i PATH=... npx tsx scripts/agent-compatibility-probe.ts` -> exit 1, stderr "Probe stopped; inspect the safe report/run fence. No automatic retry is authorized."; `probe-admitted.json` not created.
+
+### Gate
+- `npx vitest run src --config vitest.agent-source.config.ts`: 145 files / 988 tests passed
+- `npx tsc --noEmit -p .`: 0 diagnostics
+
+### Live probe
+Founder step, not run. `.env.agent-probe` not created; `.env.local` not read. No probe-admitted.json / compatibility.json exist.
