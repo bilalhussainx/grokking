@@ -76,4 +76,13 @@ run("S1 schema (local Postgres only)", () => {
       ["cc_agent_events", true], ["cc_agent_nudges", true], ["cc_agent_proposals", true], ["cc_agent_turns", true],
     ]);
   });
+
+  it("the migration can be re-run, leaving one read-own policy per table", async () => {
+    await db.query(fs.readFileSync(SQL, "utf8"));
+    const r = await db.query("select tablename, policyname from pg_policies where tablename like 'cc_agent_%' order by tablename");
+    expect(r.rows.map((x: { tablename: string; policyname: string }) => [x.tablename, x.policyname])).toEqual([
+      ["cc_agent_events", "cc_agent_events_read_own"], ["cc_agent_nudges", "cc_agent_nudges_read_own"],
+      ["cc_agent_proposals", "cc_agent_proposals_read_own"], ["cc_agent_turns", "cc_agent_turns_read_own"],
+    ]);
+  });
 });
