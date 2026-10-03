@@ -5,6 +5,7 @@ import { describe, it, expect } from "vitest";
 import {
   countWords, isTooEarlyToScore, earlyDraftReview, keepQuotedStrengths, finalizeReview,
 } from "../essay-review-gate";
+import { shouldGateEarlyDraft } from "../essay-review-gate";
 
 const DRAFT = `The kitchen smelled like burnt cumin the night my grandmother stopped remembering my name.
 I kept cooking anyway, because the recipe was the only map we still shared.`;
@@ -86,5 +87,18 @@ describe("finalizeReview", () => {
   });
   it("keeps only strengths that quote the draft", () => {
     expect(finalizeReview(review, { draft: DRAFT, hasSchools: true }).strengths).toEqual(['"burnt cumin" is a specific sensory detail.']);
+  });
+});
+
+describe("shouldGateEarlyDraft", () => {
+  it("never gates UCAS personal statement answers, whose limit is in characters", () => {
+    expect(shouldGateEarlyDraft({ essayType: "ucas_ps_q1", wordLimit: 1500, wordLimitIsSet: true, draftWords: 250 })).toBe(false);
+  });
+  it("never gates when the essay has no limit of its own (the 650 is only a fallback)", () => {
+    expect(shouldGateEarlyDraft({ essayType: "supplement_why", wordLimit: 650, wordLimitIsSet: false, draftWords: 120 })).toBe(false);
+  });
+  it("gates a real word-limited draft under 60%, and not one at exactly 60%", () => {
+    expect(shouldGateEarlyDraft({ essayType: "personal_statement", wordLimit: 650, wordLimitIsSet: true, draftWords: 130 })).toBe(true);
+    expect(shouldGateEarlyDraft({ essayType: "personal_statement", wordLimit: 650, wordLimitIsSet: true, draftWords: 390 })).toBe(false);
   });
 });

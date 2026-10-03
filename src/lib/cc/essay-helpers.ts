@@ -11,6 +11,7 @@ export interface EssayContext {
   essayType: string;
   promptText: string;
   wordLimit: number;
+  wordLimitIsSet: boolean;
   brainstormTranscript: { role: string; content: string }[] | null;
   outlineJson: Record<string, unknown> | null;
   currentDraft: string | null;
@@ -176,6 +177,7 @@ export async function buildEssayContext(
     essayType: essay.essay_type || "personal_statement",
     promptText: essay.prompt_text || "",
     wordLimit: essay.word_limit || 650,
+    wordLimitIsSet: typeof essay.word_limit === "number" && essay.word_limit > 0,
     brainstormTranscript: parseJsonField<{ role: string; content: string }[]>(essay.brainstorm_transcript),
     outlineJson: parseJsonField<Record<string, unknown>>(essay.outline_json),
     currentDraft: essay.current_draft,

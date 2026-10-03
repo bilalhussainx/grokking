@@ -46,7 +46,7 @@ import { getReviewSystemPrompt } from "@/lib/cc/essay-helpers";
 
 const baseCtx = (over: Partial<EssayContext> = {}): EssayContext => ({
   studentName: "Maya", activities: [], honors: [], academicHighlights: "", essayType: "personal_statement",
-  promptText: "Share an essay on any topic of your choice.", wordLimit: 650, brainstormTranscript: null,
+  promptText: "Share an essay on any topic of your choice.", wordLimit: 650, wordLimitIsSet: true, brainstormTranscript: null,
   outlineJson: null, currentDraft: words(130), schoolCountry: null, parentPersonalStatement: null, hasSchools: false, ...over,
 });
 

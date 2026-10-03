@@ -16,6 +16,14 @@ export function isTooEarlyToScore(wordCount: number, wordLimit: number): boolean
   return wordLimit > 0 && wordCount < wordLimit * MIN_SCORABLE_FRACTION;
 }
 
+// Gate only a real word limit. UCAS personal statement answers ("ucas_ps_*")
+// store a character limit in word_limit, and an essay with no limit of its own
+// only has the 650 fallback; neither can say a draft is "too early".
+export function shouldGateEarlyDraft(i: { essayType: string; wordLimit: number; wordLimitIsSet: boolean; draftWords: number }): boolean {
+  if (!i.wordLimitIsSet || i.essayType.startsWith("ucas_ps_")) return false;
+  return isTooEarlyToScore(i.draftWords, i.wordLimit);
+}
+
 export interface EarlyDraftReview {
   tooEarlyToScore: true;
   wordCount: number;

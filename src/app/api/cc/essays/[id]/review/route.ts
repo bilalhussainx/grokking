@@ -4,7 +4,7 @@ import { buildEssayContext, getReviewSystemPrompt } from "@/lib/cc/essay-helpers
 import { callLLMJSON, type ChatMessage } from "@/lib/cc/llm-stream";
 import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
 import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
-import { countWords, earlyDraftReview, finalizeReview, isTooEarlyToScore } from "@/lib/cc/essay-review-gate";
+import { countWords, earlyDraftReview, finalizeReview, shouldGateEarlyDraft } from "@/lib/cc/essay-review-gate";
 
 interface ReviewComment {
   paragraphIndex: number;
@@ -90,7 +90,7 @@ export async function POST(
   // develop instead, with no number. No credit, no model call, and it is not
   // saved as a review (so it doesn't use up a free review).
   const draftWords = countWords(ctx.currentDraft);
-  if (isTooEarlyToScore(draftWords, ctx.wordLimit)) {
+  if (shouldGateEarlyDraft({ essayType: ctx.essayType, wordLimit: ctx.wordLimit, wordLimitIsSet: ctx.wordLimitIsSet, draftWords })) {
     return NextResponse.json({ review: earlyDraftReview(draftWords, ctx.wordLimit) });
   }
 
