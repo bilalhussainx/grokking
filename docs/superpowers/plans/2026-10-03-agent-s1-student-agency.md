@@ -637,6 +637,13 @@ describe("proposals", () => {
     expect(r.status).toBe("unknown");
   });
 
+  it("an aborted turn inserts no proposal", async () => {
+    const db = fresh();
+    const tools = makeProposalTools(db as unknown as SupabaseClient, scope, { turnId: null, now });
+    await expect(tools("propose_task", { title: "x", dueDate: null, reason: "r" } as never, AbortSignal.abort())).rejects.toThrow();
+    expect(db.tables.cc_agent_proposals).toHaveLength(0);
+  });
+
   it("decline and undo leave the domain consistent", async () => {
     const db = fresh();
     const id = await propose(db, "propose_task", { title: "x", dueDate: null, reason: "r" });
@@ -715,8 +722,10 @@ export function verifyConfirmToken(token: string, p: { id: string; userId: strin
 
 export function makeProposalTools(db: SupabaseClient, scope: AuthScope, ctx: { turnId: string | null; now: Date }) {
   const studentId = scope.profileIds[0] ?? null;
-  return async (name: ProposalToolName, args: Record<string, Json>): Promise<ToolReply> => {
+  return async (name: ProposalToolName, args: Record<string, Json>, signal?: AbortSignal): Promise<ToolReply> => {
     if (!studentId) return { status: "unknown", data: { reason: "no_student_profile" }, evidence: [] };
+    // A1 final review I2: a turn that already timed out must not leave a confirmable proposal.
+    signal?.throwIfAborted();
     const kind = KIND[name];
     let payload: Record<string, Json>;
     if (kind === "add_schools") {
@@ -735,6 +744,7 @@ export function makeProposalTools(db: SupabaseClient, scope: AuthScope, ctx: { t
     }
     const payloadHash = hash({ kind, payload });
     const operationKey = hash({ kind, payloadHash, turn: ctx.turnId });
+    signal?.throwIfAborted();
     const { data, error } = await db.from("cc_agent_proposals").insert({
       user_id: scope.userId, student_id: studentId, turn_id: ctx.turnId, kind, payload, payload_hash: payloadHash,
       operation_key: operationKey, reason: args.reason, expires_at: new Date(ctx.now.getTime() + PROPOSAL_TTL_MS).toISOString(),
@@ -956,6 +966,17 @@ describe("S1 turn", () => {
     expect(provider).toHaveBeenCalledTimes(1);
   });
 
+  it("a failed turn logs only a stable code, and its replay is refused", async () => {
+    const provider = vi.fn<Provider>().mockResolvedValue({ content: "[Draft] I was born in Lahore", calls: [] });
+    const db = base();
+    await expect(runS1Turn(args(db, provider))).rejects.toThrow();
+    const failed = db.tables.cc_agent_events.find((e) => e.type === "turn.failed") as { payload: { code: string } };
+    expect(failed.payload.code).toMatch(/^[a-z_0-9]+$/);
+    expect(JSON.stringify(db.tables.cc_agent_events)).not.toMatch(/Lahore|Draft/);
+    const replay = await runS1Turn(args(db, provider));
+    expect(replay.status).toBe(409);
+  });
+
   it("essay-writing requests get the fixed integrity answer and no model call", async () => {
     const provider = vi.fn<Provider>();
     const r = await runS1Turn(args(base(), provider, "Write my personal statement intro for me"));
@@ -1032,10 +1053,11 @@ export function makeS1Tools(db: SupabaseClient, scope: AuthScope, ctx: { turnId:
   const read = makeReadTools(db, scope);
   const journey = makeJourneyTools(db, scope, ctx.now);
   const propose = makeProposalTools(db, scope, ctx);
-  return async (name, args) => {
+  return async (name, args, signal) => {
+    signal?.throwIfAborted();
     if (JOURNEY.has(name as JourneyToolName)) return journey(name as JourneyToolName, args as Record<string, never>);
-    if (PROPOSAL.has(name)) return propose(name as ProposalToolName, args as never);
-    return read(name, args);
+    if (PROPOSAL.has(name)) return propose(name as ProposalToolName, args as never, signal);
+    return read(name, args, signal);
   };
 }
 ```
@@ -1080,6 +1102,7 @@ export async function runS1Turn(i: { db: SupabaseClient; scope: AuthScope; opera
   if (prior) {
     const p = prior as { id: string; input_hash: string; status: string; result: { text: string; cards: Json[] } | null };
     if (p.input_hash !== inputHash) return { status: 409 as const, turnId: p.id, result: null, error: "operation_key_conflict" };
+    if (p.status !== "completed" || !p.result) return { status: 409 as const, turnId: p.id, result: null, error: "turn_not_replayable" };
     return { status: 200 as const, turnId: p.id, result: p.result };
   }
   const { data: turn, error } = await i.db.from("cc_agent_turns").insert({ user_id: i.scope.userId, operation_key: i.operationKey, input_hash: inputHash }).select("id").single();
@@ -1098,8 +1121,9 @@ export async function runS1Turn(i: { db: SupabaseClient; scope: AuthScope; opera
   }
 
   const inner = makeS1Tools(i.db, i.scope, { turnId, now: i.now });
-  const tools = async (name: string, args: unknown): Promise<ToolReply> => {
-    const r = await inner(name, args);
+  const tools = async (name: string, args: unknown, signal?: AbortSignal): Promise<ToolReply> => {
+    const r = await inner(name, args, signal);
+    signal?.throwIfAborted(); // never log a tool result for a turn that already timed out
     await log(name.startsWith("propose_") && r.status === "ok" ? "action.preview" : "tool.completed", LABELS[name] ?? "Checked something", { tool: name, status: r.status });
     return r;
   };
@@ -1111,7 +1135,9 @@ export async function runS1Turn(i: { db: SupabaseClient; scope: AuthScope; opera
     return { status: 200 as const, turnId, result };
   } catch (e) {
     await i.db.from("cc_agent_turns").update({ status: "failed", completed_at: i.now.toISOString() }).eq("id", turnId);
-    await log("turn.failed", "Something went wrong", { code: e instanceof Error ? e.message : "error" });
+    // Only a stable code reaches cc_agent_events (students can read it); never raw error text.
+    const code = e instanceof Error && /^[a-z_0-9]+$/.test(e.message) ? e.message : "agent_internal_error";
+    await log("turn.failed", "Something went wrong", { code });
     throw e;
   }
 }
@@ -1150,9 +1176,10 @@ export async function POST(req: NextRequest) {
   if (r.status === 409) return NextResponse.json({ error: r.error }, { status: 409 });
   const stream = new ReadableStream<Uint8Array>({
     start(c) {
-      c.enqueue(encodeEvent(0, "turn.accepted", { turnId: r.turnId }));
-      c.enqueue(encodeEvent(1, "text.delta", { text: r.result!.text }));
-      c.enqueue(encodeEvent(2, "turn.completed", { turnId: r.turnId, cards: r.result!.cards }));
+      // A1 sse.encodeEvent requires seq >= 1.
+      c.enqueue(encodeEvent(1, "turn.accepted", { turnId: r.turnId }));
+      c.enqueue(encodeEvent(2, "text.delta", { text: r.result!.text }));
+      c.enqueue(encodeEvent(3, "turn.completed", { turnId: r.turnId, cards: r.result!.cards }));
       c.close();
     },
   });
