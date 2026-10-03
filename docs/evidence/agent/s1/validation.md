@@ -43,3 +43,8 @@
   - The rewriting and opening-line essay requests reached the model (essay).
 - GREEN: the same set plus loop.test.ts and provider.test.ts -> 7 files, 115 passed.
 - Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 155 passed, 1 skipped files; 1142 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0.
+
+## Task 5: deterministic triggers and nudge cron (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/triggers.test.ts` (with triggers.ts moved aside) -> 1 file failed, no tests ran; import of `../triggers` unresolved.
+- GREEN: same command -> 1 file, 5 passed.
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 156 passed, 1 skipped files; 1147 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0.
