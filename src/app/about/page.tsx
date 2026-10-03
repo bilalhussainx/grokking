@@ -1,13 +1,14 @@
+import { pageMetadata } from "@/lib/seo";
 import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
-import { Metadata } from 'next';
 import Link from 'next/link';
 import { PRICING } from "@/lib/pricing";
 import { ArrowRight, GraduationCap, Code, Users, Sparkles, Briefcase, Rocket } from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'About KairosLearn - AI College Counseling for Every Student',
+export const metadata = pageMetadata({
+  title: "About us — AI college counseling for every student",
   description: `Meet the team behind KairosLearn. Harvard CS grad turned educator building an AI college counselor that speaks ${COACH_LANGUAGE_COUNT} languages — for the students the 415:1 counselor ratio leaves behind.`,
-};
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

@@ -1,12 +1,13 @@
+import { pageMetadata } from "@/lib/seo";
 import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import { PRICING, PRO_FAIR_USE, TRIAL_TERMS, proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
-import { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'Terms of Service - KairosLearn',
-  description: 'KairosLearn terms of service. Rules and guidelines for using our platform.',
-};
+export const metadata = pageMetadata({
+  title: "Terms of Service",
+  description: "KairosLearn terms of service. Rules and guidelines for using our platform.",
+  path: "/terms",
+});
 
 export default function TermsOfServicePage() {
   return (

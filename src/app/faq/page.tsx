@@ -1,12 +1,16 @@
 import { FAQ_ITEMS } from "@/lib/faq-items";
 import { Metadata } from 'next';
+import { pageMetadata } from "@/lib/seo";
 import Link from 'next/link';
 import { JsonLd } from '@/lib/schema';
 
 export const metadata: Metadata = {
-  title: 'Frequently Asked Questions',
-  description:
-    'Common questions about KairosLearn — how AI college counseling works, essay coaching and AI integrity, pricing, supported languages, and tools for counselors and families.',
+  ...pageMetadata({
+    title: "Frequently asked questions",
+    description:
+      "Common questions about KairosLearn: how AI college counseling works, essay coaching and AI integrity, pricing, supported languages, and tools for counselors and families.",
+    path: "/faq",
+  }),
   keywords: [
     'KairosLearn FAQ',
     'AI college counselor',
@@ -18,20 +22,14 @@ export const metadata: Metadata = {
     'college counseling in Hindi',
     'independent counselor software',
   ],
-  openGraph: {
-    title: 'FAQ — KairosLearn',
-    description: 'Common questions about KairosLearn AI college counseling, essays, and pricing.',
-    url: 'https://kairoslearn.com/faq',
-  },
-  alternates: { canonical: 'https://kairoslearn.com/faq' },
 };
 
 function faqPageSchema() {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
     mainEntity: FAQ_ITEMS.map((item) => ({
-      '@type': 'Question',
+    '@type': 'Question',
       name: item.question,
       acceptedAnswer: {
         '@type': 'Answer',

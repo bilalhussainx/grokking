@@ -1,16 +1,17 @@
 import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import { PRICING, PRO_FAIR_USE, TRIAL_TERMS, proMonthlyLabel, proYearlyLabel, yearlySavingsPct, yearlyCheckoutConfigured } from "@/lib/pricing";
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { ArrowRight, Check, Minus } from "lucide-react";
 import MarketingShell from "@/components/marketing/MarketingShell";
 import { FinalCTA } from "@/components/marketing/MarketingSections";
 import ProCheckoutButton from "@/components/marketing/ProCheckoutButton";
 
-export const metadata: Metadata = {
-  title: "Pricing — KairosLearn",
+export const metadata = pageMetadata({
+  title: "Pricing",
   description: `Free gives you ${PRICING.free.signupCredits} AI credits, once, to try Coach Kairos. Pro is ${proMonthlyLabel()} or ${proYearlyLabel()}, with fair use of ${PRO_FAIR_USE.coachMessagesPerDay} coach messages and ${PRO_FAIR_USE.voiceMinutesPerDay} voice minutes a day. Every new account starts with a ${PRICING.pro.trialDays}-day Pro trial, no card.`,
-};
+  path: "/pricing",
+});
 
 type Row = {
   feature: string;

@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/seo";
 import { NextResponse } from "next/server";
 import { ADMISSIONS_SUMMARY } from "@/lib/product-summary";
 import { FAQ_ITEMS } from "@/lib/faq-items";
@@ -23,12 +24,12 @@ ${languages}
 ${faq}
 
 ## Pages
-- https://kairoslearn.com/pricing
-- https://kairoslearn.com/product/counselor
-- https://kairoslearn.com/product/essays
-- https://kairoslearn.com/product/schools
-- https://kairoslearn.com/faq
-- https://kairoslearn.com/integrity
+- ${SITE_URL}/pricing
+- ${SITE_URL}/product/counselor
+- ${SITE_URL}/product/essays
+- ${SITE_URL}/product/schools
+- ${SITE_URL}/faq
+- ${SITE_URL}/integrity
 `;
   return new NextResponse(content, { headers: { "Content-Type": "text/plain; charset=utf-8" } });
 }

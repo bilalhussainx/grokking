@@ -1,13 +1,13 @@
+import { pageMetadata } from "@/lib/seo";
 import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
-import type { Metadata } from "next";
 import MarketingShell from "@/components/marketing/MarketingShell";
 import { FeatureGrid, FinalCTA, type IconName } from "@/components/marketing/MarketingSections";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Coach Kairos — your AI college counselor",
-  description:
-    `Voice-first AI counseling for college applicants in ${COACH_LANGUAGE_COUNT} languages. Trained on your profile, your grades, your school list. Available at 3 a.m. on a Saturday.`,
-};
+  description: `Voice-first AI counseling for college applicants in ${COACH_LANGUAGE_COUNT} languages. Trained on your profile, your grades, your school list. Available at 3 a.m. on a Saturday.`,
+  path: "/product/counselor",
+});
 
 const FEATURES: { icon: IconName; title: string; body: string }[] = [
   {

@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "./providers";
 import { Analytics } from "@vercel/analytics/next";
 import { JsonLd, organizationSchema, websiteSchema } from "@/lib/schema";
+import { SITE_URL } from "@/lib/seo";
 
 
 const inter = Inter({
@@ -32,7 +33,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://kairoslearn.com'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'KairosLearn — Your AI college counselor, for every student',
     template: '%s | KairosLearn',
@@ -54,7 +55,6 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://kairoslearn.com',
     siteName: 'KairosLearn',
     title: 'KairosLearn — Your future. One good next step.',
     description: 'College guidance, at your pace. Start with the question you have today.',
@@ -74,7 +74,6 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
   },
-  alternates: { canonical: 'https://kairoslearn.com' },
   verification: {
     google: 'KNMPohxROF74CLkjabDN0V0iiaeRPJ9WvQIObQik8HA',
   },

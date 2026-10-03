@@ -1,6 +1,8 @@
 // Generates schema.org JSON-LD for the site
 
-const BASE_URL = 'https://kairoslearn.com';
+import { SITE_URL } from '@/lib/seo';
+
+const BASE_URL = SITE_URL;
 
 // Organization schema (used on every page)
 export function organizationSchema() {

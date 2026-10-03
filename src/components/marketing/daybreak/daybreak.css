@@ -35,7 +35,7 @@
 .daybreak .db-footer{display:grid;grid-template-columns:2fr repeat(3,1fr);gap:32px;padding-block:40px 24px;border-top:1px solid var(--db-border)}
 .db-footer-intro p{max-width:30ch}
 .daybreak .db-footer nav{display:block}
-.daybreak .db-footer nav h2{font:700 15px/1.5 var(--db-font-body);letter-spacing:0;margin:6px 0 12px}
+.daybreak .db-footer nav .db-footer-heading{font:700 15px/1.5 var(--db-font-body);letter-spacing:0;margin:6px 0 12px}
 .db-footer nav ul{list-style:none;padding:0;margin:0}
 .daybreak .db-footer nav a{display:inline-flex;align-items:center;min-height:44px;font-size:15px}
 .db-footer-note{border-top:1px solid var(--db-border);padding-block:20px 28px}
