@@ -180,13 +180,17 @@ describe("S1 turn", () => {
       expect(db.tables.cc_agent_proposals).toHaveLength(1);
     });
 
-    it("redacts ungrounded dates in a proposal's title and reason", async () => {
+    it.each([
+      ["title", { title: "Apply to MIT by Nov 1", dueDate: null, reason: "MIT is on your list" }],
+      ["reason", { title: "Apply to MIT", dueDate: null, reason: "MIT EA is November 1." }],
+    ])("an ungrounded date in the %s makes the proposal unknown and stores nothing (no replacement sentence)", async (_field, a) => {
       const provider = vi.fn<Provider>()
-        .mockResolvedValueOnce({ content: null, calls: [{ id: "1", name: "propose_task", arguments: JSON.stringify({ title: "Apply to MIT by Nov 1", dueDate: null, reason: "MIT EA is November 1." }) }] })
+        .mockResolvedValueOnce({ content: null, calls: [{ id: "1", name: "propose_task", arguments: JSON.stringify(a) }] })
         .mockResolvedValueOnce({ content: "Okay.", calls: [] });
       const db = base();
       await runS1Turn(args(db, provider));
-      expect(JSON.stringify(db.tables.cc_agent_proposals[0])).not.toMatch(/Nov(ember)? 1/);
+      expect(toolReply(provider)).toEqual({ status: "unknown", data: { reason: "date_not_verified" } });
+      expect(db.tables.cc_agent_proposals).toHaveLength(0);
     });
 
     it("a failed turn expires the proposals it made", async () => {

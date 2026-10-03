@@ -27,8 +27,8 @@ const unknown = (reason: string): ToolReply => ({ status: "unknown", data: { rea
 
 // Proposal dates are suggestions the student confirms, allowed within
 // [today, today+180d]. A date not in this turn's tool evidence may not be
-// presented as a deadline. Title and reason get the same date redaction as
-// the answer text.
+// presented as a deadline. A title or reason that names an unverified date is
+// refused as a whole: the student would otherwise confirm the redaction sentence.
 export function groundProposal(name: ProposalToolName, args: Record<string, Json>, evidence: Json[], now: Date): { args: Record<string, Json> } | { reply: ToolReply } {
   const date = name === "propose_task" ? args.dueDate : name === "propose_calendar_hold" ? args.date : null;
   if (typeof date === "string") {
@@ -37,8 +37,9 @@ export function groundProposal(name: ProposalToolName, args: Record<string, Json
     if (date < today || date > last) return { reply: unknown("date_out_of_range") };
     if (!JSON.stringify(evidence).includes(date) && DEADLINE_CLAIM.test(`${args.title ?? ""} ${args.reason ?? ""}`)) return { reply: unknown("date_not_verified") };
   }
-  const redact = (v: Json) => (typeof v === "string" ? redactUngroundedDates({ text: v, cards: [] }, evidence).text : v);
-  return { args: { ...args, ...("title" in args ? { title: redact(args.title) } : {}), reason: redact(args.reason) } };
+  const changed = (v: Json | undefined) => typeof v === "string" && redactUngroundedDates({ text: v, cards: [] }, evidence).text !== v;
+  if (changed(args.title) || changed(args.reason)) return { reply: unknown("date_not_verified") };
+  return { args };
 }
 
 export function makeS1Tools(db: SupabaseClient, scope: AuthScope, ctx: { turnId: string | null; now: Date }): ReadTools {
