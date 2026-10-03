@@ -1,7 +1,7 @@
 // Counselor student file: the copy must not leak the "Unnamed student"
 // placeholder into a sentence.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 vi.mock("next/navigation", () => ({ useParams: () => ({ studentId: "stu-1" }) }));
 vi.mock("@/hooks/useCounselorRole", () => ({
@@ -33,6 +33,25 @@ describe("counselor student file copy", () => {
     render(<StudentFilePage />);
     const empty = await screen.findByText(/No essays yet/);
     expect(empty.textContent).toBe("No essays yet. They'll appear here once this student starts drafting.");
+  });
+
+  it("shows the server's error when a review action is refused (supervised counselor 403)", async () => {
+    const essay = {
+      id: "es-1", essayType: "personal_statement", promptText: "Prompt", phase: "draft", wordCount: 400,
+      updatedAt: "2026-10-01", reviewState: "resubmitted", shippedCommentCount: 0, openCommentCount: 0,
+    };
+    routes["/api/counselor/students/stu-1"] = json({ student: student({ preferredName: "Maya Patel" }), essays: [essay], viewerRole: "counselor" });
+    let posted = false;
+    routes["/api/counselor/students/stu-1/essays/es-1"] = () => {
+      if (!posted) return new Response(JSON.stringify({ essay: { ...essay, currentDraft: "Draft text", comments: [] } }), { status: 200 });
+      return new Response(JSON.stringify({ error: "Review decisions need your head counselor. Leave a comment instead; it goes to them for approval." }), { status: 403 });
+    };
+    render(<StudentFilePage />);
+    fireEvent.click(await screen.findByText(/Prompt/));
+    const approve = await screen.findByRole("button", { name: /approve/i });
+    posted = true;
+    fireEvent.click(approve);
+    expect(await screen.findByText("Review decisions need your head counselor. Leave a comment instead; it goes to them for approval.")).toBeTruthy();
   });
 
   it("uses the first name when there is one", async () => {

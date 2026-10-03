@@ -100,7 +100,7 @@ export default function EssayCard({
           </span>
           {commentCount > 0 && (
             <span className="inline-flex items-center gap-1">
-              <MessageSquare className="w-2.5 h-2.5" aria-hidden /> {commentCount} comments
+              <MessageSquare className="w-2.5 h-2.5" aria-hidden /> {commentCount} {commentCount === 1 ? "comment" : "comments"}
             </span>
           )}
         </div>

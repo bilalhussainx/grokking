@@ -126,13 +126,19 @@ export default function StudentFilePage() {
   async function setReview(state: "changes_requested" | "approved") {
     if (!selectedId) return;
     setBusy(true);
-    await fetch(`/api/counselor/students/${studentId}/essays/${selectedId}`, {
+    setError(null);
+    const r = await fetch(`/api/counselor/students/${studentId}/essays/${selectedId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "review", state }),
     });
-    await openEssay(selectedId);
-    await loadStudent();
+    // e.g. 403 for a supervised counselor: say so instead of silently
+    // reloading an unchanged status.
+    if (!r.ok) setError((await r.json().catch(() => ({}))).error ?? "could not update the review status");
+    else {
+      await openEssay(selectedId);
+      await loadStudent();
+    }
     setBusy(false);
   }
 
