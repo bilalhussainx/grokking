@@ -454,10 +454,8 @@ CANADIAN APPLICATION GUIDANCE:
 - Province-specific grade conversion for the student's intake: ${ctx.state ? `${ctx.state} system applies — convert directly without the Pakistani-FSc band table.` : `Ask which province (Ontario / BC / Alberta / Quebec / other) and apply the corresponding grade conversion.`}` : ""}`;
 }
 
-// UK-application guidance. Fires for explicit UK students AND for Pakistani
-// diaspora students (Saïd Foundation Scholarships specifically target
-// Pakistani students at top UK universities — almost no other platform
-// surfaces this). Mirrors the Canada pattern.
+// UK-application guidance. Fires for explicit UK students and for Pakistani
+// students (a common UK-applicant group). Mirrors the Canada pattern.
 // Also fires when the student's school list has a UK school. Intake writes
 // the UK as "GB"; the catalog uses "UK".
 const UK_CODES = ["UK", "GB"];
@@ -477,10 +475,10 @@ UK APPLICATION GUIDANCE:
 - 2026 cycle PERSONAL STATEMENT: changed from the old single 4000-character free-text essay to THREE structured questions (350+ chars each, 4000 combined max): (1) Why this course? (2) How have your qualifications prepared you? (3) What else have you done outside formal education? UK admissions read for SUBJECT FIT — not the 'find your story' framing of US Common App. Reference specific course modules, A-Level / IB topics, books, papers, super-curriculars (NOT extracurriculars).
 - ADMISSIONS TESTS: many top UK courses require subject-specific tests. Examples for 2027 entry — Oxford now uses the UAT-UK tests: Maths/Computer Science: TMUA; Physics/Engineering/Biomedical Sciences: ESAT; PPE/Economics & Management/History & Economics: TARA (check the test's own site for sitting and booking dates). Oxford Law: LNAT. Oxford Medicine: UCAT. Cambridge Maths/Econ/CS: TMUA. Cambridge Engineering / Natural Sciences: ESAT. UK Medicine: UCAT. Test registration deadlines are EARLIER than UCAS — typically late September / early October. Pakistani students sit Pearson VUE in Karachi, Lahore, Islamabad.
 - OXBRIDGE INTERVIEWS: December for both Oxford and Cambridge. Hybrid in-person + virtual since 2020. College-based for both.
-- CAMBRIDGE EXTRAS: After UCAS, Cambridge applicants complete the Cambridge Online Preliminary Application (COPA) and the Self-Assessment Questionnaire (SAQ). Oxford requires written work submitted to colleges for many humanities subjects (English, History, Modern Languages, Philosophy, Theology).
+- OXFORD AND CAMBRIDGE EXTRAS: both can require extra steps after UCAS (for example written work or an extra form, depending on the course). Tell the student to check the course page on the university's own site; do not name a form or date you have not been given.
 - AID for international students at UK universities is SCHOLARSHIP-BASED, mostly merit + limited need. NO FAFSA / CSS analog. International tuition runs £25K-£62K/year + ~£12K-£18K/year living costs (London higher).
 - SCOTLAND DIFFERENT: Scottish universities (Edinburgh, St Andrews) are 4-year degrees vs. 3-year English. Funding rules + tuition different.${ctx.country === "PK" ? `
-- PAKISTANI STUDENT — surface SAÏD FOUNDATION SCHOLARSHIPS proactively. Saïd funds Pakistani undergraduates at Oxford, Cambridge, Imperial, LSE, UCL, KCL — full tuition + living + flights. Almost no other platform surfaces this. Annual deadline February. ALSO surface Reach Oxford (low-income developing-country, undergraduate, full ride) when student adds Oxford. ALSO mention HEC Pakistan Need-Based Scholarship. DO NOT mention Chevening or Commonwealth Shared Scholarship — those are master's-only, not relevant for current undergraduate applicants.` : ""}`;
+- SCHOLARSHIPS: do not name a specific scholarship, amount or deadline unless it appears in the student's data or a tool result. Point the student to each university's own funding and scholarships page, and to their school counselor.` : ""}`;
 }
 
 function getModeInstructions(ctx: CoachContext): string {

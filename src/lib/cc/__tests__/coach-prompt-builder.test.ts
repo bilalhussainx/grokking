@@ -360,10 +360,11 @@ describe("buildSystemPrompt", () => {
       expect(prompt).toContain("UCAS");
       expect(prompt).toContain("October 15");
     });
-    it("UK guidance block appears for Pakistani students (Saïd Foundation surfacing)", () => {
+    it("UK guidance block appears for Pakistani students, without naming unverified scholarships", () => {
       const prompt = buildSystemPrompt({ ...baseContext, country: "PK" });
       expect(prompt).toContain("UK APPLICATION GUIDANCE");
-      expect(prompt).toContain("SAÏD FOUNDATION");
+      expect(prompt).not.toMatch(/SAÏD|Saïd/);
+      expect(prompt).toContain("do not name a specific scholarship");
     });
     it("UK guidance block does NOT appear for US students", () => {
       const prompt = buildSystemPrompt({ ...baseContext, country: "US" });
