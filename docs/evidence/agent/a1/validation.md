@@ -64,3 +64,25 @@ Error: Cannot find module '../read-tools' imported from .../read-tools.test.ts
 
 ### Schema verification
 All selected columns exist in `supabase/migrations` for cc_student_profiles, cc_academic_profiles, cc_financial_profiles, cc_essays. `cc_essay_drafts` and `cc_counselor_comments` have no CREATE TABLE in the repo migrations (created out of band); their columns are corroborated by live route code (drafts routes, counselor-comments.ts).
+
+## Task 4: provider adapter + context-budget
+
+### RED
+`npx vitest run --config vitest.agent-a1.config.ts src/lib/cc/agent/__tests__/provider.test.ts`
+```
+ FAIL  src/lib/cc/agent/__tests__/provider.test.ts
+ Error: Failed to resolve import "../provider" from "src/lib/cc/agent/__tests__/provider.test.ts". Does the file exist?
+ Test Files  1 failed (1)
+      Tests  no tests
+```
+
+### GREEN
+```
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+```
+
+### Gate
+- `npx vitest run --config vitest.agent-a1.config.ts`: 4 files / 22 tests passed
+- `npx vitest run src --config vitest.agent-source.config.ts`: 144 files / 976 tests passed (962 + 14 new)
+- `npx tsc --noEmit -p .`: 0 diagnostics
