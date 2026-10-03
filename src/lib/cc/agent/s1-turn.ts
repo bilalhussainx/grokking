@@ -6,7 +6,19 @@ import { redactUngroundedDates, echoCheck } from "./date-check";
 import { groundProposal, isProposalTool, makeS1Tools, validateS1ToolArgs } from "./s1-tools";
 import type { AuthScope, Json, Provider, ToolReply } from "./contracts";
 
-export const ESSAY_WRITING_REQUEST = /\b(?:write|draft|rewrite|rewriting|compose|finish)\b[^.?!]{0,40}\b(?:essay|statement|paragraph|intro|introduction|conclusion|supplement|sentences?|(?:opening|first) line)\b|\bgive me\b[^.?!]{0,20}\b(?:opening|first) (?:line|sentence)\b/i;
+// Only imperative or for-me writing requests: "Write my intro", "Can you rewrite
+// this paragraph?", "I need you to finish my essay", "... essay for me". A
+// planning question ("When should I finish my essay?", "Can you look at my
+// draft essay?") is not one.
+const WRITE_VERB = "(?:write|draft|rewrite|rewriting|compose|finish|redo)";
+const ESSAY_PIECE = "(?:essay|statement|paragraph|intro|introduction|conclusion|supplement|sentences?|(?:opening|first) line)";
+const SENTENCE_START = "(?:^|[.?!,;:]\\s*)\\s*(?:(?:please|can you|could you|would you|will you)\\s+(?:(?:please|try|help me)\\s+)?)?";
+export const ESSAY_WRITING_REQUEST = new RegExp([
+  `${SENTENCE_START}${WRITE_VERB}\\b[^.?!]{0,40}\\b${ESSAY_PIECE}\\b`,
+  `\\byou (?:to )?${WRITE_VERB}\\b[^.?!]{0,40}\\b${ESSAY_PIECE}\\b`,
+  `\\b${WRITE_VERB}\\b[^.?!]{0,40}\\b${ESSAY_PIECE}\\b[^.?!]{0,20}\\bfor me\\b`,
+  "\\bgive me\\b[^.?!]{0,20}\\b(?:opening|first) (?:line|sentence)\\b",
+].join("|"), "i");
 const INTEGRITY = "I can't write that for you — You write every word, and that's what makes it yours. I can ask you three questions to find your story, or review a draft you wrote. Open Essay Studio when you're ready.";
 const LABELS: Record<string, string> = {
   get_journey_state: "Checked your next steps", list_my_schools: "Read your school list", check_plan_conflicts: "Checked your early plans for conflicts",

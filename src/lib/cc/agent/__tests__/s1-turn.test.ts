@@ -108,6 +108,11 @@ describe("S1 turn", () => {
     "Give me an opening line for my Common App essay",
     "give me a good opening sentence",
     "Finish my essay for me",
+    "Rewrite this paragraph",
+    "Give me an opening line",
+    "Okay, write my supplement",
+    "Could you please draft my Why Michigan essay?",
+    "I need you to write my personal statement",
   ])("essay-writing request %j gets the integrity answer", async (message) => {
     const provider = vi.fn<Provider>();
     const r = await runS1Turn(args(base(), provider, message));
@@ -115,10 +120,23 @@ describe("S1 turn", () => {
     expect(r.result?.text).toMatch(/You write every word/);
   });
 
-  it.each(["What should I do this week?", "How far along is my essay?", "Give me feedback on this sentence", "When is my essay due?"])(
+  it.each([
+    "What should I do this week?", "How far along is my essay?", "Give me feedback on this sentence", "When is my essay due?",
+    "When should I finish my Common App essay?",
+    "Can you look at my draft essay?",
+    "I wrote a draft of my statement, is it on track?",
+    "How long should my supplement draft take?",
+  ])(
     "%j is not an essay-writing request", (message) => {
       expect(ESSAY_WRITING_REQUEST.test(message)).toBe(false);
     });
+
+  it("an essay planning question reaches the model instead of the integrity refusal", async () => {
+    const provider = vi.fn<Provider>().mockResolvedValue({ content: "Aim to have a full draft two weeks before you submit.", calls: [] });
+    const r = await runS1Turn(args(base(), provider, "When should I finish my Common App essay?"));
+    expect(provider).toHaveBeenCalled();
+    expect(r.result?.text).not.toMatch(/You write every word/);
+  });
 
   describe("proposal grounding", () => {
     const hold = (title: string, date: string, reason = "You asked for time") =>
