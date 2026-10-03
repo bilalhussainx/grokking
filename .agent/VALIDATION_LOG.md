@@ -68,3 +68,16 @@ Expected: Astra GATE D4.2 design (Amendments A and B) live for students and coun
 Actual: master e6c62aa (tree identical to d27337e: vitest 116 files / 764 tests pass, tsc 0 errors, next build exit 0). Final opus review 0 Critical / 2 Important, one fix wave, scoped re-review 4/4 addressed. Vercel status success. Production smoke, QA student and head counselor at 1440×900 and 375×812: every page 200, frame present, Ask Kairos and AI badges on Today, zero page errors (React #418 gone), zero failing /api calls.
 Open: phone horizontal overflow from page content, not the frame — /schools school cards 439px (+80px), /cc/essays essay rows 389px (+30px).
 No test:unit, no migrations, no env-file reads.
+
+## 2026-10-03: Oct 3 audit fixes (production, master 66cce03)
+Shipped, in order: phone overflow fix (f6270b0); removal of the unauthenticated /api/cc/coach/extract (82c7cb7); /stories retired (a6f09c8); agency self-claim removed (0bba14b); early-plan warnings match catalog names (819be76); UK/Canada schools by their own system (c905fee); marketing truth (w1) plus bug batch (w3) plus independent-review fixes (66cce03).
+Evidence:
+- Suite: 140 files, 954 tests. tsc clean. next build exit 0.
+- Built HTML checks: /faq shows "18 languages" with no raw placeholder; /pricing has og:image and the true trial rule.
+- Production smoke (student plus counselor, 1440 and 375): 0 failures, 0 page errors.
+- 375px overflow scan of 21 pages: 0.
+- Live homepage shows $15 and $99, the UK quiz option, and Start free in the mobile header.
+- Read-only production checks: 0 self-claimed agency rows; 0 non-US list rows carrying US deadlines.
+Not done:
+- The UK/Canada seed --apply (a production write) was blocked by the auto-mode classifier and needs the founder.
+- Reminder email opt-out: no preference column exists.
