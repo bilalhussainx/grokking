@@ -78,3 +78,16 @@
 
 ## Task 8 fix round 2: adjacent negation, won't/will not (2026-10-03)
 - RED: new tests vs round-1 score.ts -> 4 failed | 40 passed (44). GREEN: golden-score.test.ts -> 44 passed. Gate: 160 passed, 1 skipped files; 1204 passed, 6 skipped tests; tsc exit 0.
+
+## Final fix wave: I1-I5, M1-M4, M9 (2026-10-03)
+- I2 date-check.test.ts: RED 19 failed | 9 passed (28) -> GREEN 28 passed (996378bf).
+- I4 s1-turn.test.ts: RED 4 failed | 36 passed (40) -> GREEN 40 passed (85889149).
+- M2 s1-turn.test.ts: RED 2 failed | 39 passed (41), status 'ok' instead of 'unknown' -> GREEN agent lib 250 passed, 6 skipped (8ce26942).
+- M1 inbox.test.ts + proposals.test.ts: RED 3 failed | 25 passed (28) -> GREEN agent lib + agent UI 260 passed, 6 skipped (4ef16916).
+- I5 + M3 ProposalCard.test.tsx: RED 5 failed | 6 passed (11) -> GREEN agent UI + Today 29 passed (11a8cf95).
+- M4 triggers.test.ts: RED 1 failed | 5 passed, old copy -> GREEN 6 passed (601cb821).
+- M9 s1-schema.pg.test.ts on a local postgres:16 container (port 55432, stopped afterwards): RED 1 failed | 6 passed, `policy "cc_agent_turns_read_own" ... already exists` -> GREEN 7 passed (a67c2b48).
+- I3 activity page + KairosInbox link: RED page import unresolved, KairosInbox 2 failed -> GREEN 4 files, 34 passed (183a0551).
+- I1 server (/api/cc/me agentS1, flagged prompt): RED me 2 failed, prompt 4 failed | 52 passed (56) -> GREEN me 2 passed; prompt + api/cc 17 files, 133 passed (0fa3e62b).
+- I1 client (Coach to /api/cc/agent/turn, plus ProposalCards): RED coach-agent-s1.test.tsx 8 failed -> GREEN contexts + coach 12 passed (977e4b01).
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts`: 163 passed, 1 skipped files; 1265 passed, 7 skipped tests. pg 7 passed. `npx tsc --noEmit -p .`: exit 0.
