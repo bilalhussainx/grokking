@@ -126,13 +126,19 @@ export default function StudentFilePage() {
   async function setReview(state: "changes_requested" | "approved") {
     if (!selectedId) return;
     setBusy(true);
-    await fetch(`/api/counselor/students/${studentId}/essays/${selectedId}`, {
+    setError(null);
+    const r = await fetch(`/api/counselor/students/${studentId}/essays/${selectedId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "review", state }),
     });
-    await openEssay(selectedId);
-    await loadStudent();
+    // e.g. 403 for a supervised counselor: say so instead of silently
+    // reloading an unchanged status.
+    if (!r.ok) setError((await r.json().catch(() => ({}))).error ?? "could not update the review status");
+    else {
+      await openEssay(selectedId);
+      await loadStudent();
+    }
     setBusy(false);
   }
 
@@ -168,7 +174,9 @@ export default function StudentFilePage() {
     );
   }
 
-  const name = student.preferredName || student.legalFirstName || "Unnamed student";
+  const knownName = student.preferredName || student.legalFirstName;
+  const name = knownName || "Unnamed student";
+  const firstName = knownName ? knownName.split(" ")[0] : "this student";
   const gradeLabel = student.isTransfer ? "Transfer" : student.gradeLevel ? `Grade ${student.gradeLevel}` : "—";
 
   return (
@@ -217,7 +225,7 @@ export default function StudentFilePage() {
           <div className="kl-kbd mb-2">Essays</div>
           {essays.length === 0 && (
             <p className="text-sm text-white/40">
-              No essays yet. They&apos;ll appear here once {name.split(" ")[0]} starts drafting.
+              No essays yet. They&apos;ll appear here once {firstName} starts drafting.
             </p>
           )}
           {essays.map((e) => (

@@ -82,15 +82,8 @@ export async function listRosterForViewer(viewerUserId: string): Promise<RosterS
     return !p?.preferred_name && !p?.legal_first_name;
   });
   for (const l of nameless.slice(0, 25)) {
-    try {
-      const { data } = await db.auth.admin.getUserById(l.student_user_id);
-      const name =
-        (data?.user?.user_metadata?.full_name as string | undefined)?.trim() ||
-        (data?.user?.user_metadata?.name as string | undefined)?.trim();
-      if (name) authNameById.set(l.student_user_id, name);
-    } catch {
-      /* auth lookup is best-effort */
-    }
+    const name = await authMetadataName(db, l.student_user_id);
+    if (name) authNameById.set(l.student_user_id, name);
   }
 
   return linkRows.map((l) => {
@@ -111,6 +104,25 @@ export async function listRosterForViewer(viewerUserId: string): Promise<RosterS
       isTransfer: p?.is_transfer_student ?? false,
     };
   });
+}
+
+// The auth account's full_name (or name) for a student whose profile has no
+// name. Shared by the roster and the per-student file so both show the same
+// name. Best-effort: any lookup failure is null.
+export async function authMetadataName(
+  db: ReturnType<typeof createAdminSupabase>,
+  userId: string,
+): Promise<string | null> {
+  try {
+    const { data } = await db.auth.admin.getUserById(userId);
+    return (
+      (data?.user?.user_metadata?.full_name as string | undefined)?.trim() ||
+      (data?.user?.user_metadata?.name as string | undefined)?.trim() ||
+      null
+    );
+  } catch {
+    return null;
+  }
 }
 
 export interface StudentVisibility {

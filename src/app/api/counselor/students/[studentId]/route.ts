@@ -6,7 +6,7 @@
 // counselor: assigned only).
 import { NextResponse } from "next/server";
 import { getAuthUser, createAdminSupabase } from "@/lib/supabase-auth";
-import { getStudentVisibility } from "@/lib/cc/student-roster";
+import { authMetadataName, getStudentVisibility } from "@/lib/cc/student-roster";
 import { listStudentEssays } from "@/lib/cc/counselor-comments";
 
 export const runtime = "nodejs";
@@ -33,11 +33,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ student
     .maybeSingle();
 
   const essays = await listStudentEssays(studentId, { agencyId: vis.agencyId });
+  // Same fallback as the roster, so the header matches the roster's name.
+  const authName = profile?.preferred_name || profile?.legal_first_name ? null : await authMetadataName(db, studentId);
 
   return NextResponse.json({
     student: {
       userId: studentId,
-      preferredName: profile?.preferred_name ?? null,
+      preferredName: profile?.preferred_name ?? authName ?? null,
       legalFirstName: profile?.legal_first_name ?? null,
       gradeLevel: profile?.grade_level ?? null,
       graduationYear: profile?.graduation_year ?? null,

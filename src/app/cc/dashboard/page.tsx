@@ -81,7 +81,7 @@ export default async function DashboardPage({
   let schools = await safe<RawSchoolRow[]>(
     supabase
       .from("cc_student_schools")
-      .select("application_status, deadline_ea, deadline_ed, deadline_edii, deadline_rea, deadline_rd, deadline_financial_aid, deadline_css_profile, deadline_fafsa, cc_schools(name)")
+      .select("application_status, deadline_ea, deadline_ed, deadline_edii, deadline_rea, deadline_rd, deadline_financial_aid, deadline_css_profile, deadline_fafsa, cc_schools(name, regular_deadline, early_deadline)")
       .eq("student_id", profile.id),
   );
   // The fallback drops the deadline_* columns, so a school list can load

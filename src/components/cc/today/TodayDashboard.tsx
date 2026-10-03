@@ -160,6 +160,11 @@ export default function TodayDashboard({ model }: { model: TodayModel }) {
                     <div>
                       <strong>{row.label}</strong>
                       <p>{row.detail}</p>
+                      {row.items && (
+                        <ul className="td-row-items">
+                          {row.items.map((item) => <li key={item}>{item}</li>)}
+                        </ul>
+                      )}
                     </div>
                     <span aria-hidden="true">↗</span>
                   </Link>

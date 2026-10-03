@@ -4,6 +4,7 @@ import { buildEssayContext, getReviewSystemPrompt } from "@/lib/cc/essay-helpers
 import { callLLMJSON, type ChatMessage } from "@/lib/cc/llm-stream";
 import { deductCredits, CREDIT_COSTS } from "@/lib/credits";
 import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
+import { countWords, earlyDraftReview, finalizeReview, isTooEarlyToScore } from "@/lib/cc/essay-review-gate";
 
 interface ReviewComment {
   paragraphIndex: number;
@@ -23,7 +24,7 @@ interface ScoreBreakdown {
 
 interface ReviewResult {
   overallScore?: number;
-  scoreBreakdown?: ScoreBreakdown;
+  scoreBreakdown?: Partial<ScoreBreakdown>;
   strengths?: string[];
   suggestedNextStep?: "polish" | "restructure" | "re-brainstorm" | "ready";
   nextStepReason?: string;
@@ -80,14 +81,22 @@ export async function POST(
     if (!reviewCheck.ok) return blockedResponse(reviewCheck);
   }
 
-  const ok = await deductCredits(auth.user.id, CREDIT_COSTS.coach_text, "essay_review");
-  if (!ok) {
-    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
-  }
-
   const ctx = await buildEssayContext(auth.user.id, id);
   if (!ctx || !ctx.currentDraft) {
     return NextResponse.json({ error: "No draft to review" }, { status: 400 });
+  }
+
+  // Under 60% of the word limit, a score would be noise: return what to
+  // develop instead, with no number. No credit, no model call, and it is not
+  // saved as a review (so it doesn't use up a free review).
+  const draftWords = countWords(ctx.currentDraft);
+  if (isTooEarlyToScore(draftWords, ctx.wordLimit)) {
+    return NextResponse.json({ review: earlyDraftReview(draftWords, ctx.wordLimit) });
+  }
+
+  const ok = await deductCredits(auth.user.id, CREDIT_COSTS.coach_text, "essay_review");
+  if (!ok) {
+    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
   }
 
   await db.from("cc_essay_interactions").insert({
@@ -106,11 +115,14 @@ export async function POST(
   // Bumped from 2000 → 4000. The new review schema carries overallScore +
   // 6-axis scoreBreakdown + 3-5 strengths + suggestedNextStep + up to 12
   // variable comments — richer than the old fixed-7 shape.
-  const review = await callLLMJSON<ReviewResult>(messages, { maxTokens: 4000 });
+  const raw = await callLLMJSON<ReviewResult>(messages, { maxTokens: 4000 });
 
-  if (!review) {
+  if (!raw) {
     return NextResponse.json({ error: "Review generation failed" }, { status: 500 });
   }
+  // Keep only strengths that quote the draft; drop application fit when
+  // the student has no schools.
+  const review = finalizeReview(raw, { draft: ctx.currentDraft, hasSchools: ctx.hasSchools });
 
   await db
     .from("cc_essays")

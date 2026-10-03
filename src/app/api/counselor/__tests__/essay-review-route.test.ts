@@ -24,6 +24,7 @@ vi.mock("@/lib/cc/student-roster", () => ({
     primaryCounselorUserId: "c0c00000-0000-4000-8000-000000000001",
     viewerRole: "counselor",
   }),
+  authMetadataName: async () => null,
 }));
 vi.mock("@/lib/cc/agency-membership", () => ({ getAnyAgencyMembership: async () => h.membership }));
 

@@ -28,6 +28,9 @@ export interface EssayContext {
     draft: string;
     themes: string[];
   } | null;
+  // Whether the student has any school on their list. Without one, the
+  // review has nothing to judge "application fit" against.
+  hasSchools: boolean;
 }
 
 export async function buildEssayContext(
@@ -160,6 +163,11 @@ export async function buildEssayContext(
     schoolCountry = (school?.country as string | undefined) ?? null;
   }
 
+  const { count: schoolCount } = await db
+    .from("cc_student_schools")
+    .select("id", { count: "exact", head: true })
+    .eq("student_id", profile.id);
+
   return {
     studentName: profile.preferred_name || profile.legal_first_name || "Student",
     activities: activityList,
@@ -173,6 +181,7 @@ export async function buildEssayContext(
     currentDraft: essay.current_draft,
     schoolCountry,
     parentPersonalStatement,
+    hasSchools: (schoolCount ?? 0) > 0,
   };
 }
 
@@ -582,9 +591,20 @@ PS opening: """${ctx.parentPersonalStatement.draft.slice(0, 500)}"""
 
 When reviewing THIS supplement:
 - If the supplement rehashes the PS's angle or story, drop overallScore by 10-15 and add a high-severity comment type="ps-overlap" flagging exactly what duplicates the PS.
-- If the supplement surfaces a NEW side of the student (different activity, different thread, different voice), call that out in strengths — "This widens the application beyond the PS".
-- applicationFit axis should explicitly reward the supplement for adding signal the PS can't carry on its own.`
+- If the supplement surfaces a NEW side of the student (different activity, different thread, different voice), call that out in strengths — "This widens the application beyond the PS".${ctx.hasSchools ? `
+- applicationFit axis should explicitly reward the supplement for adding signal the PS can't carry on its own.` : ""}`
     : "";
+
+  // Application fit needs a school list to judge against.
+  const axisCount = ctx.hasSchools ? "six" : "five";
+  const applicationFitAxis = ctx.hasSchools
+    ? `
+  applicationFit  — does this essay surface a side of the student the activities list / scores can't show? (If activities were provided, rate honestly; otherwise default to 70.)`
+    : `
+
+The student has no schools on their list yet, so do NOT score application fit and do NOT include it in scoreBreakdown.`;
+  const applicationFitJson = ctx.hasSchools ? `,
+    "applicationFit": 0-100` : "";
 
   return `You are a senior admissions reader at a top-10 US college, reviewing ${ctx.studentName}'s draft. Your job is to give a holistic, honest read — not a template.
 
@@ -618,19 +638,18 @@ Score ranges:
 
 ## Score breakdown axes (0-100 each)
 
-Return a scoreBreakdown with these six axes — the student sees these as a radar/bar chart:
+Return a scoreBreakdown with these ${axisCount} axes — the student sees these as a radar/bar chart:
   promptFit       — does the draft actually answer the prompt's verb (challenge, belief, identity, etc.)?
   voiceAuthenticity — does this read like a 17-year-old's honest voice vs. a consultant template?
   specificity     — concrete sensory detail vs. generic abstraction
   reflectionDepth — is the "so what" earned by the narrative, or tacked on?
-  structuralCraft — pacing, flow, opening, ending beat
-  applicationFit  — does this essay surface a side of the student the activities list / scores can't show? (If activities were provided, rate honestly; otherwise default to 70.)
+  structuralCraft — pacing, flow, opening, ending beat${applicationFitAxis}
 
 Each axis 0-100. Total does not need to equal overallScore (overallScore is holistic, not a sum).
 
-## Strengths (3-5 items, always non-empty)
+## Strengths (what's working, up to 5 items)
 
-Always name 3-5 things the draft is ALREADY doing well — not sycophancy, actual specific moments. "You ground the scene in a physical detail (the bow in paragraph 2) — that's earning the abstraction about music." Students who only see criticism spiral. Make sure strengths are real.
+Name up to 5 things the draft is ALREADY doing well — not sycophancy, actual specific moments. Every strength MUST quote the student's exact words from the draft, copied character for character inside double quotes, then say why it works. Example: "the bow trembled against my collarbone" grounds the scene in a physical detail, which earns the later point about music. Never praise anything that is not in the draft: no dialogue, scene, detail or structure the student did not write. If you cannot quote it, do not claim it. Fewer real strengths beat more invented ones.
 
 ## Suggested next step
 
@@ -660,11 +679,10 @@ Return valid JSON only:
     "voiceAuthenticity": 0-100,
     "specificity": 0-100,
     "reflectionDepth": 0-100,
-    "structuralCraft": 0-100,
-    "applicationFit": 0-100
+    "structuralCraft": 0-100${applicationFitJson}
   },
   "strengths": [
-    "Specific moment the essay already lands (3-5 entries)"
+    "\\"exact quote from the draft\\" and why it works (up to 5 entries)"
   ],
   "suggestedNextStep": "polish" | "restructure" | "re-brainstorm" | "ready",
   "nextStepReason": "One paragraph explaining the recommendation.",

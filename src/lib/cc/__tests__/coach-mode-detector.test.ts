@@ -56,8 +56,33 @@ describe("detectMode", () => {
     expect(detectMode(fullProgress, "/", "hello")).toBe("general");
   });
 
-  it("returns academic when GPA missing and intake done", () => {
-    const progress = { ...emptyProgress, hasIntakeCompleted: true };
-    expect(detectMode(progress, "/", "")).toBe("academic");
+  // A missing GPA must not hijack unrelated questions with "what's your GPA?".
+  describe("student with intake done but no GPA", () => {
+    const noGpa = { ...emptyProgress, hasIntakeCompleted: true };
+
+    it("answers an unrelated question in general mode", () => {
+      expect(detectMode(noGpa, "/", "")).toBe("general");
+      expect(detectMode(noGpa, "/", "When is the UCAS deadline for Oxford?")).toBe("general");
+      expect(detectMode(noGpa, "/", "voice session start")).toBe("general");
+      expect(detectMode(noGpa, "/cc/dashboard", "what should I do this week?")).toBe("general");
+    });
+
+    it("does not read everyday words as test names", () => {
+      expect(detectMode(noGpa, "/", "I sat down with my mom to talk about cost")).toBe("general");
+      expect(detectMode(noGpa, "/", "how should I act at a campus visit?")).toBe("general");
+    });
+
+    it("enters academic mode when the message is about grades or tests", () => {
+      expect(detectMode(noGpa, "/", "my GPA is 3.7 unweighted")).toBe("academic");
+      expect(detectMode(noGpa, "/", "how do my grades look?")).toBe("academic");
+      expect(detectMode(noGpa, "/", "should I retake the SAT?")).toBe("academic");
+      expect(detectMode(noGpa, "/", "I got a 33 on the ACT")).toBe("academic");
+      expect(detectMode(noGpa, "/", "do I need test scores?")).toBe("academic");
+    });
+
+    it("enters academic mode when the student explicitly starts intake", () => {
+      expect(detectMode(noGpa, "/", "let's start my intake")).toBe("academic");
+      expect(detectMode(noGpa, "/", "Can we continue the intake questions?")).toBe("academic");
+    });
   });
 });

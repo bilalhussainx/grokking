@@ -33,6 +33,10 @@ interface ReviewData {
   strengths?: string[];
   suggestedNextStep?: NextStep;
   nextStepReason?: string;
+  // Set by the review route when the draft is under 60% of the word limit:
+  // no score, just what to develop.
+  tooEarlyToScore?: boolean;
+  whatToDevelop?: string[];
 }
 
 interface RevisionPanelProps {
@@ -130,6 +134,40 @@ export default function RevisionPanel({ review, loading, onNavigatePhase }: Revi
           <p className="text-[13px] text-white/45 text-center py-6">
             No review yet. Head back to the draft and press <strong className="text-white/75 font-medium">Request review</strong>.
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (review.tooEarlyToScore) {
+    return (
+      <div className="kl-rail">
+        <div className="kl-rail-card">
+          <div className="kl-rail-eyebrow">
+            <Sparkles className="w-3 h-3" />
+            Too early to score
+          </div>
+          <p className="text-[12.5px] text-white/70 leading-relaxed">{review.overallNotes}</p>
+        </div>
+        <div className="kl-rail-card">
+          <div className="kl-rail-eyebrow">
+            <ArrowRight className="w-3 h-3" />
+            What to develop
+          </div>
+          <ul className="flex flex-col gap-2 mt-1 list-disc pl-4 text-[12.5px] text-white/78 leading-relaxed">
+            {(review.whatToDevelop ?? []).map((s) => <li key={s}>{s}</li>)}
+          </ul>
+          {onNavigatePhase && (
+            <button
+              type="button"
+              onClick={() => onNavigatePhase("draft")}
+              className="mt-3 w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-semibold transition-colors"
+              style={{ background: "var(--kl-gold-app,#D4AF37)", color: "#000" }}
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Back to draft
+            </button>
+          )}
         </div>
       </div>
     );

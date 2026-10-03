@@ -5,8 +5,9 @@
 import type { VariantKey } from "./variants";
 import type { TodayInput } from "./today-input";
 import { formatIsoDate } from "@/lib/format-iso-date";
+import { formatMonthDay } from "@/lib/cc/catalog-deadline";
 
-export type TodayRow = { id: string; label: string; detail: string; href: string };
+export type TodayRow = { id: string; label: string; detail: string; href: string; items?: string[] };
 export type TodayStep = { eyebrow: string; title: string; body: string; cta: { label: string; href: string }; basis: string };
 export type TodayModel = {
   variantKey: VariantKey;
@@ -37,13 +38,19 @@ function schoolsRow(i: TodayInput, emptyText = "No schools saved yet. Start with
 
 function deadlinesRow(i: TodayInput): TodayRow {
   let detail: string;
+  let items: string[] | undefined;
   if (i.schoolCount === null) detail = UNAVAILABLE;
   else if (i.deadlinesUnavailable) detail = "Couldn't load your saved deadlines right now. Your saved work is unchanged.";
-  else if (i.nextDeadline) {
-    detail = `Next saved date: ${i.nextDeadline.schoolName} ${i.nextDeadline.label}, ${formatIsoDate(i.nextDeadline.date)}. Confirm it on the school's official site.`;
+  else if (i.upcomingDeadlines.length > 0) {
+    detail = "Your next dates. Confirm each one on the school's official site.";
+    // A catalog date's year is our inference from last cycle's catalog, so
+    // it shows month and day only, with its source.
+    items = i.upcomingDeadlines.map((d) => d.fromCatalog
+      ? `${d.schoolName} ${d.label} · ${formatMonthDay(d.date)} (from our school catalog; confirm on the school's site)`
+      : `${d.schoolName} ${d.label} · ${formatIsoDate(d.date)} (saved on your list)`);
   } else if (i.schoolCount > 0) detail = "No upcoming dates saved for your schools. Check each school's official requirements.";
   else detail = "Dates appear here after you save schools.";
-  return { id: "applications", label: "Applications & deadlines", detail, href: "/applications" };
+  return { id: "applications", label: "Applications & deadlines", detail, href: "/applications", ...(items ? { items } : {}) };
 }
 
 function essaysRow(i: TodayInput, label = "Essays"): TodayRow {

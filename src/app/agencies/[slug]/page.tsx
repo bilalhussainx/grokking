@@ -12,18 +12,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 import { createAdminSupabase } from "@/lib/supabase-server";
-import { getAgencyBySlug } from "@/lib/cc/counselor-helpers";
-
-interface CounselorListRow {
-  slug: string;
-  display_name: string;
-  headline: string | null;
-  photo_url: string | null;
-  verified: boolean;
-  total_sessions: number;
-  average_rating: number | null;
-  total_reviews: number;
-}
+import { getAgencyBySlug, listPublicAgencyCounselors } from "@/lib/cc/counselor-helpers";
 
 export default async function AgencyPage({
   params,
@@ -35,13 +24,8 @@ export default async function AgencyPage({
   if (!agency) notFound();
 
   const db = createAdminSupabase();
-  const [{ data: counselors }, { count: verifiedAdmits }] = await Promise.all([
-    db
-      .from("cc_counselors")
-      .select("slug, display_name, headline, photo_url, verified, total_sessions, average_rating, total_reviews")
-      .eq("agency_id", agency.id)
-      .order("verified", { ascending: false })
-      .order("average_rating", { ascending: false, nullsFirst: false }),
+  const [counselorList, { count: verifiedAdmits }] = await Promise.all([
+    listPublicAgencyCounselors(agency.id),
     db
       .from("cc_counselor_admissions_proof")
       .select("id", { count: "exact", head: true })
@@ -49,8 +33,6 @@ export default async function AgencyPage({
       .eq("decision", "admitted")
       .eq("verified_by_admin", true),
   ]);
-
-  const counselorList = (counselors ?? []) as CounselorListRow[];
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
