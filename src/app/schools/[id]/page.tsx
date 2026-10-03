@@ -21,6 +21,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { Tabs, type TabOption } from "@/components/cc/Tabs";
+import { applicationSystemFor, applicationSystemLabel, UCAS_DATES_URL } from "@/lib/applications/system";
 
 interface SchoolDetail {
   id: string;
@@ -29,6 +30,10 @@ interface SchoolDetail {
   city: string | null;
   state: string | null;
   country: string | null;
+  province?: string | null;
+  application_platform?: string | null;
+  regular_deadline?: string | null;
+  website?: string | null;
   institution_type: string | null;
   enrollment_undergrad: number | null;
   acceptance_rate: number | null;
@@ -171,6 +176,9 @@ export default function SchoolDetailPage({
     HK: "Hong Kong", JP: "Japan", AE: "UAE",
   };
   const countryLabel = !isUS ? COUNTRY_NAMES[school.country ?? ""] ?? school.country : null;
+  const systemLabel = applicationSystemLabel(school);
+  const isUCAS = applicationSystemFor(school) === "UCAS";
+  const websiteUrl = school.website_url || school.website || null;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
@@ -188,15 +196,16 @@ export default function SchoolDetailPage({
           {(school.city || school.state || countryLabel) && (
             <span className="flex items-center gap-1">
               <MapPin className="w-3 h-3" />
-              {[school.city, isUS ? school.state : countryLabel].filter(Boolean).join(", ")}
+              {[school.city, isUS ? school.state : school.province, countryLabel].filter(Boolean).join(", ")}
             </span>
           )}
           {school.institution_type && (
             <span className="capitalize">{school.institution_type}</span>
           )}
-          {school.website_url && (
+          {systemLabel && <span>{systemLabel}</span>}
+          {websiteUrl && (
             <a
-              href={school.website_url}
+              href={websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-[#D4AF37]/80 hover:text-[#D4AF37]"
@@ -256,6 +265,29 @@ export default function SchoolDetailPage({
 
       {tab === "overview" && (
         <div className="space-y-4">
+          {!isUS && (
+            <div className="p-3 rounded-lg bg-white/[0.03] border border-white/10 text-xs text-white/70 leading-relaxed">
+              <p className="text-white font-medium">How to apply</p>
+              {school.regular_deadline ? (
+                <p className="mt-1">Deadline: {school.regular_deadline}</p>
+              ) : isUCAS ? (
+                <p className="mt-1">
+                  Apply through UCAS:{" "}
+                  <a
+                    href={UCAS_DATES_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#D4AF37]/80 hover:text-[#D4AF37] underline"
+                  >
+                    see the UCAS deadline
+                  </a>
+                </p>
+              ) : (
+                <p className="mt-1">Check the university&apos;s admissions page for this cycle&apos;s deadline.</p>
+              )}
+            </div>
+          )}
+          {isUS && (
           <div className="grid grid-cols-2 gap-3">
             <StatCard icon={GraduationCap} label="Acceptance rate" value={acceptPct != null ? `${acceptPct}%` : "—"} />
             <StatCard icon={Users} label="Undergrads" value={school.enrollment_undergrad?.toLocaleString() || "—"} />
@@ -284,6 +316,7 @@ export default function SchoolDetailPage({
               />
             )}
           </div>
+          )}
 
           {school.mission_statement && (
             <Section title="Mission">

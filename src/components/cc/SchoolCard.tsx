@@ -3,19 +3,22 @@
 import Link from "next/link";
 import { MapPin, Clock, DollarSign, GraduationCap, ChevronRight, Building2 } from "lucide-react";
 import { ChanceBadge, tierFromBand } from "./ChanceBadge";
+import { applicationSystemFor, applicationSystemLabel, planOptionsFor } from "@/lib/applications/system";
 
+// UK/Canadian rows leave the US statistics NULL rather than invent them.
 interface School {
   id: string;
   name: string;
-  city: string;
-  state: string;
+  city: string | null;
+  state: string | null;
   country?: string | null;
   province?: string | null;
-  school_type: string;
-  acceptance_rate: number;
-  avg_net_price: number;
-  test_policy: string;
-  regular_deadline: string;
+  application_platform?: string | null;
+  school_type: string | null;
+  acceptance_rate: number | null;
+  avg_net_price: number | null;
+  test_policy: string | null;
+  regular_deadline: string | null;
   early_deadline: string | null;
 }
 
@@ -61,17 +64,12 @@ interface Props {
   aidWarning?: "need-aware";
 }
 
-const PLAN_OPTIONS: { value: string; label: string; early?: boolean }[] = [
-  { value: "ED", label: "ED", early: true },
-  { value: "EA", label: "EA", early: true },
-  { value: "REA", label: "REA", early: true },
-  { value: "RD", label: "RD" },
-  { value: "rolling", label: "Rolling" },
-];
-
 export default function SchoolCard({ school, onAdd, onRemove, onPlanChange, listEntryId, chancingBand, applicationPlan, showAddButton, added, aidWarning }: Props) {
-  const acceptPct = Math.round((school.acceptance_rate || 0) * 100);
+  const acceptPct = school.acceptance_rate ? Math.round(school.acceptance_rate * 100) : null;
   const chanceTier = tierFromBand(chancingBand);
+  const systemLabel = applicationSystemLabel(school);
+  const isUCAS = applicationSystemFor(school) === "UCAS";
+  const planOptions = planOptionsFor(school);
 
   return (
     <div>
@@ -102,25 +100,35 @@ export default function SchoolCard({ school, onAdd, onRemove, onPlanChange, list
               <MapPin className="w-3 h-3" aria-hidden />
               {formatLocation(school)}
             </span>
-            <span className="capitalize">{school.school_type}</span>
-            <span className="flex items-center gap-1">
-              <GraduationCap className="w-3 h-3" aria-hidden />
-              {acceptPct}% accept
-            </span>
+            {school.school_type && <span className="capitalize">{school.school_type}</span>}
+            {systemLabel && <span>{systemLabel}</span>}
+            {acceptPct != null && (
+              <span className="flex items-center gap-1">
+                <GraduationCap className="w-3 h-3" aria-hidden />
+                {acceptPct}% accept
+              </span>
+            )}
             {/* avg_net_price is a US IPEDS statistic — showing "$0 net" for
                 international schools (or any school missing the datum) reads
                 as "free", which is wrong. Only render when we have a value. */}
-            {school.avg_net_price > 0 && (
+            {school.avg_net_price != null && school.avg_net_price > 0 && (
               <span className="flex items-center gap-1">
                 <DollarSign className="w-3 h-3" aria-hidden />
                 ${school.avg_net_price.toLocaleString()} net
               </span>
             )}
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" aria-hidden />
-              {school.regular_deadline}
-            </span>
-            <span className="capitalize">Test {school.test_policy}</span>
+            {school.regular_deadline ? (
+              <span className="flex items-center gap-1">
+                <Clock className="w-3 h-3" aria-hidden />
+                {school.regular_deadline}
+              </span>
+            ) : isUCAS ? (
+              <span className="flex items-center gap-1">
+                <Clock className="w-3 h-3" aria-hidden />
+                Apply through UCAS: see the UCAS deadline
+              </span>
+            ) : null}
+            {school.test_policy && <span className="capitalize">Test {school.test_policy}</span>}
           </div>
         </Link>
 
@@ -159,11 +167,11 @@ export default function SchoolCard({ school, onAdd, onRemove, onPlanChange, list
         </div>
       </div>
 
-      {onPlanChange && listEntryId && (
+      {onPlanChange && listEntryId && planOptions.length > 0 && (
         <div className="mt-2 ml-12 flex items-center gap-2 flex-wrap">
           <span className="text-[10px] uppercase tracking-wider text-white/30">Applying as</span>
           <div className="flex flex-wrap gap-1">
-            {PLAN_OPTIONS.map((opt) => {
+            {planOptions.map((opt) => {
               const active = applicationPlan === opt.value;
               return (
                 <button

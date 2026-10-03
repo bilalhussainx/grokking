@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, unauthorized, ensureStudentProfile } from "../../helpers";
 import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
-import { lookupSchoolDeadlines } from "@/lib/applications/deadlines";
+import { seedDeadlinesFor } from "@/lib/applications/deadlines";
 
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
@@ -41,10 +41,10 @@ export async function POST(req: NextRequest) {
   // school names) matches without requiring an explicit school_id mapping.
   const { data: schoolMeta } = await supabase
     .from("cc_schools")
-    .select("name")
+    .select("name, country")
     .eq("id", school_id)
     .maybeSingle();
-  const deadlinesSeed = schoolMeta?.name ? lookupSchoolDeadlines(schoolMeta.name) : null;
+  const deadlinesSeed = schoolMeta?.name ? seedDeadlinesFor(schoolMeta.name, schoolMeta.country) : null;
 
   const { data, error } = await supabase
     .from("cc_student_schools")
