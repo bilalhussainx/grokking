@@ -1,6 +1,6 @@
 // @vitest-environment node
 // src/lib/cc/agent/__tests__/date-check.test.ts
-import { it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { redactUngroundedDates, echoCheck } from "../date-check";
 
 it("strips_dates_absent_from_evidence", () => {
@@ -42,6 +42,54 @@ it("the student's own message is not evidence", () => {
 it("a date is grounded only by a whole match, not a longer number", () => {
   expect(redactUngroundedDates({ text: "Due Nov 1.", cards: [] }, [{ kind: "task_due_date", value: "Nov 15" }]).text).not.toMatch(/Nov 1/);
   expect(redactUngroundedDates({ text: "Due Nov 1.", cards: [] }, [{ kind: "task_due_date", value: "Nov 1" }]).text).toBe("Due Nov 1.");
+});
+
+describe("C8: every common date format is redacted without evidence", () => {
+  const REDACTED = "I don't have a verified date for that yet — I can check.";
+  it.each([
+    ["lowercase month", "Your MIT EA date is nov 1"],
+    ["uppercase month", "MIT EA is NOVEMBER 1"],
+    ["NBSP between month and day", "MIT EA is Nov 1"],
+    ["tab between month and day", "MIT EA is Nov\t1"],
+    ["newline between month and day", "MIT EA is November\n1"],
+    ["dot with no space", "MIT EA is Nov.1"],
+    ["dot with a space, lowercase", "MIT EA is nov. 1"],
+    ["numeric month/day", "Stanford's regular deadline is 1/2"],
+    ["numeric month/day/year", "Stanford's regular deadline is 01/11/2026"],
+    ["numeric with a two-digit year", "Stanford's regular deadline is 11/1/26"],
+    ["day-first ordinal", "MIT EA is the 1st November"],
+    ["day-first ordinal with of", "MIT EA is the 1st of November"],
+    ["day-first ordinal word with of", "MIT EA is the first of November"],
+    ["ordinal word", "MIT EA is November first"],
+    ["compound ordinal word", "Apply by January twenty-first"],
+    ["thirty-first", "Apply by October thirty-first"],
+  ])("%s", (_label, text) => {
+    expect(redactUngroundedDates({ text, cards: [] }, []).text).toBe(REDACTED);
+  });
+
+  it("evidence 2026-11-01 grounds Nov 1, 11/1, November first and 1st November", () => {
+    const ev = [{ kind: "task_due_date", value: "2026-11-01" }];
+    for (const text of ["Your task is due Nov 1.", "Your task is due 11/1.", "Your task is due November first.", "Your task is due 1st November 2026.", "Your task is due nov. 1, 2026."]) {
+      expect(redactUngroundedDates({ text, cards: [] }, ev).text).toBe(text);
+    }
+  });
+
+  it("evidence for another day or year does not ground", () => {
+    const ev = [{ kind: "task_due_date", value: "2026-11-01" }];
+    for (const text of ["Due Nov 2.", "Due 11/2.", "Due Nov 1, 2027.", "Due 11/1/2027."]) {
+      expect(redactUngroundedDates({ text, cards: [] }, ev).text).toBe(REDACTED);
+    }
+  });
+
+  it("ISO timestamps in evidence still ground the day", () => {
+    expect(redactUngroundedDates({ text: "Due Nov 1.", cards: [] }, [{ kind: "task_due_date", value: "2026-11-01T00:00:00Z" }]).text).toBe("Due Nov 1.");
+  });
+
+  it("fractions, GPAs, 24/7 and 'may' the verb are not dates", () => {
+    for (const text of ["About 3/4 of applicants apply early.", "Your GPA is 3.8/4.0.", "I'm here 24/7.", "You may first want to finish your list.", "Option 1 may work best."]) {
+      expect(redactUngroundedDates({ text, cards: [] }, []).text).toBe(text);
+    }
+  });
 });
 
 it("echoCheck allows exactly the candidate it was given", async () => {
