@@ -81,3 +81,16 @@ Evidence:
 Not done:
 - The UK/Canada seed --apply (a production write) was blocked by the auto-mode classifier and needs the founder.
 - Reminder email opt-out: no preference column exists.
+
+## 2026-10-03: Agent A1 + S1 shipped dark (master 49a433f, then 32eb6a8)
+A1 (bounded loop, scoped read tools, provider, SSE) and S1 (journey tools, proposals with signed confirm, turn route, nudges cron, inbox, activity log, Coach wiring, golden scorer) were built through subagent-driven development: 16 tasks, a review per task, and a final opus review per slice, each with one fix wave and a scoped re-review.
+Evidence:
+- Suite: 164 files, 1,267 tests (7 skipped: local-PG, run separately on a postgres:16 container, 7/7). tsc clean. next build exit 0. Vercel success.
+- Prod dark check (unflagged QA student): /api/cc/me agentS1=false; inbox, activity, turn and proposals all 404; cron 403 without the secret; /cc/agent/activity 404; Today shows no inbox. 375px overflow scan: 0.
+Also shipped: one shared /api/counselor/me lookup (32eb6a8). Counselor roster went from 19-26 s to 6-7 s; team page from 40-49 s to 11-12 s.
+Not done (founder):
+- the production migration 20261003_agent_s1.sql;
+- AGENT_CONFIRM_SECRET;
+- the pricing probe;
+- the golden live run;
+- the flag-on blockers in docs/evidence/agent/rulings-a1-s1.md.
