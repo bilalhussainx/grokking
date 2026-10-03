@@ -1,7 +1,6 @@
 import { createAdminSupabase } from "@/lib/supabase-server";
 import { chatOnce, type ChatMessage } from "@/lib/cc/openrouter";
 import { convertToUS4, formatRawGPADisplay, type GradingSystem } from "@/lib/cc/gpa-converter";
-import { ACTIVITY_RUBRIC_COMPACT, ACTIVITY_ACTION_VERBS } from "@/lib/cc/activity-exemplars";
 import { financialNeedFromAffordability, type AffordabilityValue } from "@/lib/cc/affordability";
 import type { CoachActions } from "@/lib/cc/coach-actions-block";
 
@@ -532,21 +531,12 @@ async function extractActivities(supabase: AdminSupabase, studentId: string, tra
       content: `Extract extracurricular activities the student described in this conversation. Only activities the student themselves mentioned.
 
 CRITICAL CONSOLIDATION RULES:
-- If the same activity is described multiple times in different ways (e.g. "violin", "inter-school violin competitions", "plays violin", "violinist" are all ONE activity) — return ONE entry only. Merge all supporting details (competitions, awards, context) into that single entry's description.
+- If the same activity is described multiple times in different ways (e.g. "violin", "inter-school violin competitions", "plays violin", "violinist" are all ONE activity) — return ONE entry only.
 - Return EXACTLY ONE entry per distinct activity. If the student mentioned 4 distinct activities, return 4 entries. Do NOT return 7 or 10.
 - Do NOT pad the list to reach 10. Return only what the student ACTUALLY said — it's fine to return 3 entries, or even 0.
 - Do NOT invent activities, organizations, or awards the student did not mention.
 
-WRITE DESCRIPTIONS IN COMMON APP RUBRIC STYLE:
-${ACTIVITY_RUBRIC_COMPACT}
-
-${ACTIVITY_ACTION_VERBS}
-
-Example of a strong description extracted from "I play violin and won some inter-school competitions, and it's something I turn to when I'm dealing with being a religious minority at home":
-"Violinist; multiple inter-school competition wins; music serves as refuge navigating religious-minority identity"
-
-Example of a passion/self-directed activity without awards — "I taught myself tabla from YouTube and played at worker-rights community meetings, and taught my sister too":
-"Self-taught via YouTube videos; played drums at community meetings for worker rights awareness; helped my sister become proficient."
+Record only the activity's type, the organization or activity name, and the student's role, in the student's own words. Do NOT write a description: the student writes their own activity descriptions.
 
 Return ONLY valid JSON:
 {
@@ -554,8 +544,7 @@ Return ONLY valid JSON:
     {
       "activity_type": "Music",
       "organization": "Inter-school violin competitions",
-      "role": "Violinist",
-      "description_150": "Violinist; multiple inter-school competition wins; music as refuge navigating religious-minority identity"
+      "role": "Violinist"
     }
   ]
 }
@@ -570,21 +559,17 @@ If no activities were mentioned, return { "activities": [] }`,
   if (!match) return;
 
   const data = JSON.parse(match[0]);
-  const extracted: { activity_type: string; organization: string; role: string; description_150: string }[] =
-    data.activities || [];
+  // Only name, role and type are kept. Any description the model returns is
+  // dropped: the AI never writes application text for the student.
+  const extracted: { activity_type: string; organization: string; role: string }[] = (
+    (data.activities || []) as { activity_type: string; organization: string; role: string }[]
+  ).map(({ activity_type, organization, role }) => ({ activity_type, organization, role }));
   if (!extracted.length) return;
 
   // Dedupe WITHIN the freshly extracted list first — LLM may still repeat itself.
   const deduped: typeof extracted = [];
   for (const act of extracted) {
-    const dupe = deduped.find((d) => activitySimilarity(act, d) >= 0.5);
-    if (dupe) {
-      // merge: keep the richer description
-      if ((act.description_150 || "").length > (dupe.description_150 || "").length) {
-        dupe.description_150 = act.description_150;
-      }
-      continue;
-    }
+    if (deduped.some((d) => activitySimilarity(act, d) >= 0.5)) continue;
     deduped.push(act);
   }
 
@@ -603,20 +588,8 @@ If no activities were mentioned, return { "activities": [] }`,
 
   for (const act of deduped) {
     // Semantic match against existing rows — tokens overlap ≥ 50% = same activity
-    const dupRow = existingRows.find((row) => activitySimilarity(act, row) >= 0.5);
-
-    if (dupRow) {
-      // Existing entry covers this activity; only enrich description if new one is richer
-      const newDesc = (act.description_150 || "").slice(0, 150);
-      if (newDesc.length > (dupRow.description_150?.length ?? 0)) {
-        await supabase
-          .from("cc_activities")
-          .update({ description_150: newDesc, updated_at: new Date().toISOString() })
-          .eq("id", dupRow.id);
-        dupRow.description_150 = newDesc;
-      }
-      continue;
-    }
+    // Existing entry covers this activity; it is the student's, so leave it.
+    if (existingRows.some((row) => activitySimilarity(act, row) >= 0.5)) continue;
 
     // Find first available position 1..10
     const usedPositions = new Set(existingRows.map((r) => r.position));
@@ -632,7 +605,7 @@ If no activities were mentioned, return { "activities": [] }`,
         activity_type: act.activity_type,
         organization: act.organization || "",
         role: act.role,
-        description_150: (act.description_150 || "").slice(0, 150),
+        description_150: "", // the student writes this
       })
       .select("id, role, organization, description_150, position")
       .single();
