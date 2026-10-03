@@ -339,8 +339,8 @@ export default function PricingPage() {
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              {TRIAL_TERMS} Subscribing during your trial keeps the rest of it; your first
-              charge comes when the trial ends.
+              {TRIAL_TERMS} If you subscribe with at least two days of trial left, your first
+              charge waits until the trial ends; otherwise you are charged when you subscribe.
             </p>
           </div>
         </div>
