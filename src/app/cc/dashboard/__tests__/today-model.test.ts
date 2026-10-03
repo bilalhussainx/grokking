@@ -74,6 +74,18 @@ describe("deriveTodayInput", () => {
     ]);
   });
 
+  // Adding MIT seeds last cycle's ISO dates (deadline_ea 2025-11-01). A saved
+  // date that has already passed must not hide this cycle's catalog date.
+  it("a past saved date does not suppress the catalog date (MIT seeded with last cycle)", () => {
+    const i = deriveTodayInput(raw({ schools: [
+      school("Massachusetts Institute of Technology", { deadline_ea: "2025-11-01", deadline_rd: "2026-01-04", cc_schools: { name: "Massachusetts Institute of Technology", early_deadline: "Nov 1", regular_deadline: "Jan 4" } }),
+    ] }), "2026-10-03");
+    expect(i.upcomingDeadlines).toEqual([
+      { schoolName: "Massachusetts Institute of Technology", label: "early round", date: "2026-11-01", fromCatalog: true },
+      { schoolName: "Massachusetts Institute of Technology", label: "RD", date: "2027-01-04", fromCatalog: true },
+    ]);
+  });
+
   it("keeps only the next three dates and drops rolling or passed catalog dates", () => {
     const i = deriveTodayInput(raw({ schools: [
       school("A", { cc_schools: { name: "A", regular_deadline: "Jan 1" } }),

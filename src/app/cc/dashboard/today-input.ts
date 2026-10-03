@@ -75,11 +75,17 @@ export function deriveTodayInput(raw: RawDashboardRows, todayIso: string): Today
       if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < todayIso) continue;
       dated.push({ schoolName, label, date: day, fromCatalog: false });
     }
-    // A date saved on the list wins over the catalog's date for that round.
-    const savedEarly = EARLY_KEYS.some((k) => s[k]);
+    // A date saved on the list wins over the catalog's date for that round,
+    // but only while it is still ahead: adding a school seeds last cycle's
+    // dates, which must not hide this cycle's catalog date.
+    const upcoming = (v: string | null | undefined) => {
+      const d = (v ?? "").slice(0, 10);
+      return /^\d{4}-\d{2}-\d{2}$/.test(d) && d >= todayIso;
+    };
+    const savedEarly = EARLY_KEYS.some((k) => upcoming(s[k]));
     const catalog: Array<[string, string | null | undefined, boolean]> = [
       ["early round", school?.early_deadline, savedEarly],
-      ["RD", school?.regular_deadline, Boolean(s.deadline_rd)],
+      ["RD", school?.regular_deadline, upcoming(s.deadline_rd)],
     ];
     for (const [label, value, saved] of catalog) {
       const day = saved ? null : resolveCatalogDeadline(value, todayIso);
