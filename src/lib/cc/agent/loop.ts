@@ -63,7 +63,11 @@ export async function runAgentWithPolicy(input:AgentInput,deps:RunDeps,policy:Ru
       const verdict=await bounded(s=>deps.check(candidate,{locale:input.locale,evidence,priorReleased,signal:s}),signal,policy.checkerMs);
       signal.throwIfAborted();
       if(verdict.decision!=="allow") throw new Error("output_check_failed");
-      return verdict.result;
+      // Release only what was checked: the checker may not rewrite or omit content.
+      const checked=verdict.result;
+      if(typeof checked?.policyVersion!=="string"||!checked.policyVersion||checked.text!==candidate.text||
+        JSON.stringify(checked.cards)!==JSON.stringify(candidate.cards)) throw new Error("output_check_failed");
+      return {text:candidate.text,cards:candidate.cards,policyVersion:checked.policyVersion};
     }
     throw new Error("generation_budget_exceeded");
   },deps.signal,policy.turnMs);

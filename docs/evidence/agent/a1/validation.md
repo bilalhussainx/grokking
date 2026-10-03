@@ -131,3 +131,6 @@ Error: Cannot find module '../loop'
 ### Gate
 - `npx vitest run src --config vitest.agent-source.config.ts`: 146 files / 1002 tests passed
 - `npx tsc --noEmit -p .`: 0 diagnostics
+
+### Task 6 fix round 1 (release only checked candidate)
+RED: 5 failed | 14 passed. GREEN: 19 passed. Gate: 146 files / 1007 tests; tsc 0 diagnostics.
