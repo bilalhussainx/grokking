@@ -24,7 +24,7 @@ export function evaluateTriggers(input: TriggerInput, now: Date): Nudge[] {
   for (const e of input.essays) {
     if (e.reviewState !== "changes_requested" || !e.updatedAt) continue;
     const days = Math.floor((now.getTime() - new Date(e.updatedAt).getTime()) / DAY);
-    if (days >= 10) out.push({ trigger: "essay_stall", entityKey: `essay:${e.id}`, periodKey: period, reason: { title: "An essay is waiting on your revision", detail: `Your counselor asked for changes ${days} days ago.` } });
+    if (days >= 10) out.push({ trigger: "essay_stall", entityKey: `essay:${e.id}`, periodKey: period, reason: { title: "An essay is waiting on your revision", detail: `This essay has changes requested and hasn't been edited in ${days} days.` } });
   }
   if (input.lastLoginDate) {
     const days = Math.floor((now.getTime() - new Date(`${input.lastLoginDate}T00:00:00Z`).getTime()) / DAY);

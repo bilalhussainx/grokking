@@ -17,6 +17,8 @@ describe("triggers", () => {
       { id: "e2", reviewState: "changes_requested", phase: "revise", updatedAt: "2026-10-18T00:00:00Z" },
     ] }, now);
     expect(n.map((x) => x.entityKey)).toEqual(["essay:e1"]);
+    // updated_at is the last edit, not the review time: the copy says only what it measures.
+    expect(n[0].reason.detail).toBe("This essay has changes requested and hasn't been edited in 15 days.");
   });
 
   it("flags inactivity after 14 days and REA conflicts", () => {
