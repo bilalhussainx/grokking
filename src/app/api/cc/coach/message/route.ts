@@ -383,6 +383,8 @@ export async function POST(req: NextRequest) {
     needsFullAid: !!(profile as { needs_full_aid?: boolean | null }).needs_full_aid,
     variantKey: variantKey as CoachContext["variantKey"],
     schoolCountries,
+    // One writer: this route saves nothing for a flagged student, so the prompt claims nothing.
+    agentS1,
   };
 
   const detectedLang = detectMessageLanguage(message);
