@@ -57,3 +57,8 @@
 - RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/inbox.test.ts` (inbox.ts absent) -> 1 file failed, no tests ran; import of `../inbox` unresolved.
 - GREEN: same command -> 1 file, 3 passed (includes failed-turn proposal hidden).
 - Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 157 passed, 1 skipped files; 1151 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0.
+
+## Task 7: proposal cards, Kairos noticed inbox, activity log (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/components/cc/agent/__tests__/ProposalCard.test.tsx` (ProposalCard.tsx absent) -> 1 file failed, no tests ran; import of `../ProposalCard` unresolved.
+- GREEN: same file plus TodayDashboard.test.tsx -> 2 files, 23 passed (includes 202 Saving... then committed, 3x202 -> retry message never Saved, undo, inbox gated on agentEnabled).
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 158 passed, 1 skipped files; 1159 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0.

@@ -23,6 +23,7 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/cc/dashboard",
   useSearchParams: () => new URLSearchParams(window.location.search),
 }));
+vi.mock("@/components/cc/agent/KairosInbox", () => ({ KairosInbox: () => <p>inbox</p> }));
 import TodayDashboard from "../TodayDashboard";
 import { buildTodayModel } from "@/app/cc/dashboard/today-model";
 import { deriveTodayInput, type RawDashboardRows } from "@/app/cc/dashboard/today-input";
@@ -83,6 +84,19 @@ describe("TodayDashboard", () => {
     expect(h.coach.openWithDraft).toHaveBeenCalledWith("add Michigan and Toronto and tell me what's due");
     expect(h.coach.sendMessage).not.toHaveBeenCalled();
     expect((box as HTMLInputElement).value).toBe("");
+  });
+
+  it("renders the Kairos inbox only when agentEnabled", () => {
+    const { unmount } = render(<TodayDashboard model={model("junior")} agentEnabled={false} />);
+    expect(screen.queryByText("inbox")).toBeNull();
+    unmount();
+    render(<TodayDashboard model={model("junior")} />);
+    expect(screen.queryByText("inbox")).toBeNull();
+  });
+
+  it("renders the Kairos inbox when agentEnabled is true", () => {
+    render(<TodayDashboard model={model("junior")} agentEnabled />);
+    expect(screen.getByText("inbox")).toBeTruthy();
   });
 
   it("opens nothing by itself and badges every Coach entry as AI", () => {

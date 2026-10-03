@@ -1,0 +1,17 @@
+/* Kairos agent cards. Daybreak tokens from src/styles/daybreak-tokens.css (--db-*). Astra's D4.3 restyles these classes later. */
+.ka-inbox{display:grid;gap:12px;margin:16px 0;min-width:0}
+.ka-card{border:1px solid var(--db-border);border-radius:var(--db-radius-card);padding:16px;background:var(--db-card);color:var(--db-ink);min-width:0;overflow-wrap:anywhere}
+.ka-eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--db-green);margin:0 0 6px}
+.ka-title{font-size:16px;font-weight:700;margin:0 0 4px;color:var(--db-ink)}
+.ka-why,.ka-meta{font-size:14px;color:var(--db-muted);margin:4px 0}
+.ka-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.ka-primary,.ka-quiet{min-height:44px;min-width:44px;padding:0 16px;border-radius:var(--db-radius-control);font-size:14px;font-weight:600;cursor:pointer}
+.ka-primary{background:var(--db-clay);color:var(--db-on-clay);border:1px solid var(--db-clay)}
+.ka-primary:hover{background:var(--db-clay-hover)}
+.ka-quiet{background:transparent;border:1px solid var(--db-border);color:var(--db-ink)}
+.ka-primary:focus-visible,.ka-quiet:focus-visible{outline:3px solid var(--db-focus);outline-offset:3px}
+.ka-done{font-weight:700;color:var(--db-green);margin:0}
+.ka-error{color:var(--db-error);font-size:14px;margin:4px 0}
+.ka-log{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.ka-log li{overflow-wrap:anywhere}
+.ka-log-label{font-weight:600}
