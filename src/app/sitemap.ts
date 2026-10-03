@@ -10,7 +10,6 @@ const PAGES: Array<[path: string, changeFrequency: 'weekly' | 'monthly' | 'yearl
   ['/product/essays', 'monthly', 0.7],
   ['/product/schools', 'monthly', 0.7],
   ['/find-counselor', 'weekly', 0.7],
-  ['/stories', 'monthly', 0.6],
   ['/about', 'monthly', 0.6],
   ['/faq', 'monthly', 0.6],
   ['/integrity', 'yearly', 0.4],

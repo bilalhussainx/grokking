@@ -13,7 +13,6 @@ const NAV_LINKS: { label: string; href: string }[] = [
   { label: "Essays", href: "/product/essays" },
   { label: "Schools", href: "/product/schools" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Stories", href: "/stories" },
 ];
 
 export default function MarketingShell({ children }: { children: ReactNode }) {

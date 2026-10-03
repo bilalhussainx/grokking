@@ -23,11 +23,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const isDaybreakHome = (pathname === "/" || pathname === "/welcome") && !user;
   // MarketingShell pages carry their own sticky marketing nav — mounting the
   // global TopNav above it produced a stacked double header with duplicate
-  // sign-in CTAs on /product/* (and /pricing, /stories).
+  // sign-in CTAs on /product/* (and /pricing).
   const hasOwnMarketingNav =
     (pathname?.startsWith("/product/") ?? false) ||
-    pathname === "/pricing" ||
-    pathname === "/stories";
+    pathname === "/pricing";
 
   if (hasOwnMarketingNav || isDaybreakHome || usesAppFrame(pathname)) {
     return <>{children}</>;

@@ -18,6 +18,9 @@ const MAP: Array<[string, string]> = [
   ["/admin/courses", "/admin/survey"],
   // The pre-Daybreak marketing page; the homepage at "/" replaces it.
   ["/landing", HOME],
+  // Illustrative named "admits" read as real outcomes; grounded data only.
+  // Return when there are verified, consented stories.
+  ["/stories", HOME],
 ];
 
 export const RETIRED_ROUTE_REDIRECTS: { source: string; destination: string; permanent: false }[] = [

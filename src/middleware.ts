@@ -52,7 +52,6 @@ const PUBLIC_PREFIXES = [
   "/intake",
   "/cc/shared",
   "/product/",  // marketing pages: /product/counselor, /product/essays, /product/schools
-  "/stories",   // marketing testimonials page
   // Marketplace discovery is public — prospects should be able to browse
   // counselors and their services before creating an account. Booking is
   // still auth-gated at the API (/api/counselor/booking requires a session).
