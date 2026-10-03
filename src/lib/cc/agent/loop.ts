@@ -84,7 +84,8 @@ async function runBounded(input:AgentInput,deps:RunDeps,policy:RunPolicy):Promis
       if(estimateTokens(JSON.stringify(candidate))>1400) throw new Error("invalid_candidate");
       // Slice b owns the 6,000-token gate after source deduplication and system-prompt framing.
       const priorReleased=deps.priorReleased; // a2 summarizes once; preserve its exact marker and retained tails.
-      const verdict=await bounded(s=>deps.check(candidate,{locale:input.locale,evidence,priorReleased,signal:s}),signal,policy.checkerMs);
+      // The checker gets a copy, so an in-place rewrite cannot also change what the equality test compares against.
+      const verdict=await bounded(s=>deps.check(structuredClone(candidate),{locale:input.locale,evidence,priorReleased,signal:s}),signal,policy.checkerMs);
       signal.throwIfAborted();
       if(verdict.decision!=="allow") throw new Error("output_check_failed");
       // Release only what was checked: the checker may not rewrite or omit content.

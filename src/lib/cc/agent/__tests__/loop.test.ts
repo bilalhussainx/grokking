@@ -130,6 +130,11 @@ it.each([
  const check=fn as unknown as OutputCheck;
  await expect(runAgent(input,{provider:async()=>({content:"What changed?",calls:[]}),tools:vi.fn(),check,signal:new AbortController().signal,priorReleased:[]})).rejects.toThrow("output_check_failed");
 });
+it("a checker that rewrites its argument in place cannot get its text released",async()=>{
+ const check:OutputCheck=async c=>{c.text="checker-authored prose";c.cards.push({x:1});return {decision:"allow",result:{...c,policyVersion:"p"}};};
+ const content=JSON.stringify({text:"What changed?",cards:[]});
+ await expect(runAgent(input,{provider:async()=>({content,calls:[]}),tools:vi.fn(),check,signal:new AbortController().signal,priorReleased:[]})).rejects.toThrow(/^output_check_failed$/);
+});
 it("releases exactly the checked candidate with the checker's policyVersion",async()=>{
  const result=await runAgent(input,{provider:async()=>({content:"What changed?",calls:[]}),tools:vi.fn(),check:async c=>({decision:"allow",result:{...c,policyVersion:"v9",extra:"leak"} as never}),signal:new AbortController().signal,priorReleased:[]});
  expect(result).toEqual({text:"What changed?",cards:[],policyVersion:"v9"});
