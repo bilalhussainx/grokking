@@ -1,4 +1,4 @@
-import { proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
+import { PRICING, PRO_FAIR_USE, TRIAL_TERMS, proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
 import { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -41,14 +41,14 @@ export default function TermsOfServicePage() {
           <h2>4. Free and Pro Plans</h2>
           <h3>Free Plan</h3>
           <p>
-            Free forever for your first three schools, with limited AI coaching credits, free courses,
-            and basic voice tutoring. Free accounts may have usage limits that reset monthly.
+            The Free plan includes {PRICING.free.signupCredits} AI credits, granted once. Credits do not renew.
+            Once they are used, paid features need a Pro subscription.
           </p>
           <h3>Pro Plan ({proMonthlyLabel()} or {proYearlyLabel()})</h3>
           <p>
-            Unlimited schools, essays, voice sessions, languages, mock interviews, the full financial-aid
-            comparator, and access to all courses. New users get a free 7-day Pro trial with no card
-            required. Billed monthly or yearly through Stripe. You may cancel at any time.
+            Pro does not spend credits and is subject to fair use of {PRO_FAIR_USE.coachMessagesPerDay} coach
+            messages and {PRO_FAIR_USE.voiceMinutesPerDay} voice minutes a day. It includes the full
+            financial-aid comparator. {TRIAL_TERMS} Billed monthly or yearly through Stripe. You may cancel at any time.
           </p>
 
           <h2>5. Payments and Refunds</h2>

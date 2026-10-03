@@ -1,6 +1,6 @@
 // Public FAQ answers: the reviewed description of the admissions product.
 // Rendered on /faq and reused by /llms-full.txt.
-import { proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
+import { PRICING, PRO_FAIR_USE, TRIAL_TERMS, proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
 
 export const FAQ_ITEMS = [
   {
@@ -21,7 +21,7 @@ export const FAQ_ITEMS = [
   {
     question: 'Is KairosLearn free? What does Pro cost?',
     answer:
-      `Free forever for your first three schools — school list, essays, and core tools included. Pro is ${proMonthlyLabel()} (or ${proYearlyLabel()}) and unlocks unlimited schools, essays, voice sessions, languages, mock interviews, and the full financial-aid comparator. New users get a free 7-day Pro trial with no card required, and you can cancel within 14 days of any charge for a full refund.`,
+      `Free gives you ${PRICING.free.signupCredits} AI credits, once, to try Coach Kairos; they do not renew. Pro is ${proMonthlyLabel()} or ${proYearlyLabel()} and spends no credits, with fair use of ${PRO_FAIR_USE.coachMessagesPerDay} coach messages and ${PRO_FAIR_USE.voiceMinutesPerDay} voice minutes a day, plus the full financial-aid comparator. ${TRIAL_TERMS} You can cancel within 14 days of any charge for a full refund.`,
   },
   {
     question: 'What languages does KairosLearn support?',

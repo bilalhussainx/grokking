@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import DaybreakHomepage from "./DaybreakHomepage";
 import { QUICK_CHECK_COPY } from "@/lib/daybreak";
+import { TRIAL_TERMS } from "@/lib/pricing";
 
 const pricingState = vi.hoisted(() => ({ yearlyEnabled: false }));
 
@@ -198,15 +199,16 @@ describe("Daybreak homepage cost check", () => {
   });
 });
 
-describe("Daybreak homepage yearly price gate", () => {
-  it("shows the annual price only when yearly checkout is configured", () => {
-    const { unmount } = render(<DaybreakHomepage />);
-    expect(screen.queryByText(/\$99\/year USD/)).not.toBeInTheDocument();
-
-    unmount();
-    pricingState.yearlyEnabled = true;
+describe("Daybreak homepage plan story", () => {
+  it("always shows both Pro prices, whether or not yearly checkout is configured", () => {
     render(<DaybreakHomepage />);
-
+    expect(screen.getAllByText(/\$15/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/\$99\/year USD/).length).toBeGreaterThan(0);
+  });
+
+  it("states the trial the same honest way as pricing: no card, paying is optional", () => {
+    render(<DaybreakHomepage />);
+    expect(screen.getByText(TRIAL_TERMS)).toBeInTheDocument();
+    expect(screen.queryByText(/then \$15\/month/)).not.toBeInTheDocument();
   });
 });

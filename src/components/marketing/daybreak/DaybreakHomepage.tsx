@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Button, Select } from '@/components/ui/daybreak';
-import { PRICING, yearlyCheckoutConfigured, PRO_FAIR_USE } from "@/lib/pricing";
+import { PRICING, PRO_FAIR_USE, TRIAL_TERMS } from "@/lib/pricing";
 import { QUICK_CHECK_COPY, QUICK_CHECK_LANGUAGES, type QuickCheckLanguage } from '@/lib/daybreak';
 import DaybreakShell from './DaybreakShell';
 import NextStepCheck from './NextStepCheck';
@@ -34,7 +34,7 @@ export default function DaybreakHomepage() {
       <CostCheck/>
       <section id="plans" className="db-section db-plans" aria-labelledby="plans-title"><div className="db-section-intro"><p className="db-eyebrow">Start with room to explore</p><h2 id="plans-title">Clear plans. No pressure.</h2></div><div className="db-plan-grid">
         <article className="db-card"><p className="db-eyebrow">Free</p><h3 className="db-price">Free</h3><p>{PRICING.free.signupCredits} credits, once at signup.</p><ul><li>Try the AI tools at your own pace.</li><li>Credits do not renew monthly.</li></ul><Link href="/signup" className="db-button db-button--secondary">Start free <span aria-hidden="true">↗</span></Link></article>
-        <article className="db-card db-pro-plan"><p className="db-eyebrow">Pro</p><h3 className="db-price">${PRICING.pro.monthlyUsd}<span>/month USD</span></h3>{yearlyCheckoutConfigured()&&<p>Or ${PRICING.pro.yearlyUsd}/year USD.</p>}<ul><li>{PRICING.pro.trialDays}-day Pro trial, then ${PRICING.pro.monthlyUsd}/month USD{yearlyCheckoutConfigured()?` or $${PRICING.pro.yearlyUsd}/year USD`:""}.</li><li>Fair use: up to {PRO_FAIR_USE.coachMessagesPerDay} coach messages and {PRO_FAIR_USE.voiceMinutesPerDay} voice minutes a day.</li><li>Pro usage does not spend credits.</li></ul><Link href="/pricing" className="db-button db-button--secondary">Explore Pro <span aria-hidden="true">↗</span></Link></article>
+        <article className="db-card db-pro-plan"><p className="db-eyebrow">Pro</p><h3 className="db-price">${PRICING.pro.monthlyUsd}<span>/month USD</span></h3><p>Or ${PRICING.pro.yearlyUsd}/year USD.</p><ul><li>{TRIAL_TERMS}</li><li>Fair use: up to {PRO_FAIR_USE.coachMessagesPerDay} coach messages and {PRO_FAIR_USE.voiceMinutesPerDay} voice minutes a day.</li><li>Pro usage does not spend credits.</li></ul><Link href="/pricing" className="db-button db-button--secondary">Explore Pro <span aria-hidden="true">↗</span></Link></article>
       </div><p className="db-small">Plans cover AI tools. Human counselor services are separate. AI interviews, structures and critiques; you write every essay.</p></section>
       <section className="db-closing"><p className="db-eyebrow">A little progress is enough.</p><h2>You can begin with<br/>the question you have.</h2><a href="#next-step-title" className="db-button db-button--primary">Find my next step <span aria-hidden="true">↑</span></a></section>
     </main>

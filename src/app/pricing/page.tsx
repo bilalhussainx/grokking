@@ -1,4 +1,4 @@
-import { PRICING, proMonthlyLabel, proYearlyLabel, yearlySavingsPct, yearlyCheckoutConfigured } from "@/lib/pricing";
+import { PRICING, PRO_FAIR_USE, TRIAL_TERMS, proMonthlyLabel, proYearlyLabel, yearlySavingsPct, yearlyCheckoutConfigured } from "@/lib/pricing";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, Minus } from "lucide-react";
@@ -8,8 +8,7 @@ import ProCheckoutButton from "@/components/marketing/ProCheckoutButton";
 
 export const metadata: Metadata = {
   title: "Pricing — KairosLearn",
-  description:
-    `Free forever for the first three schools. Upgrade to Pro at ${proMonthlyLabel()} (or ${proYearlyLabel()}) for unlimited everything — schools, essays, voice sessions, languages, mock interviews, and the full FAFSA + aid comparator.`,
+  description: `Free gives you ${PRICING.free.signupCredits} AI credits, once, to try Coach Kairos. Pro is ${proMonthlyLabel()} or ${proYearlyLabel()}, with fair use of ${PRO_FAIR_USE.coachMessagesPerDay} coach messages and ${PRO_FAIR_USE.voiceMinutesPerDay} voice minutes a day. Every new account starts with a ${PRICING.pro.trialDays}-day Pro trial, no card.`,
 };
 
 type Row = {
@@ -19,11 +18,12 @@ type Row = {
 };
 
 const COMPARE: Row[] = [
-  { feature: "School list", free: "3 schools", pro: "Unlimited" },
-  { feature: "Essay drafts", free: "1", pro: "Unlimited" },
-  { feature: "Voice sessions", free: "3 / month", pro: "Unlimited (fair use)" },
-  { feature: "Languages", free: "English only", pro: "Hindi, Punjabi, French, Spanish + 14 more" },
-  { feature: "Interview prep", free: "1 mock", pro: "Unlimited" },
+  { feature: "AI credits", free: `${PRICING.free.signupCredits}, once (no renewal)`, pro: "Not spent on Pro" },
+  {
+    feature: "Coach messages and voice",
+    free: "Paid for with credits",
+    pro: `Fair use: ${PRO_FAIR_USE.coachMessagesPerDay} messages and ${PRO_FAIR_USE.voiceMinutesPerDay} voice min a day`,
+  },
   { feature: "Financial aid", free: "Basic", pro: "Full FAFSA + aid comparator" },
   { feature: "Application tracker", free: true, pro: true },
   { feature: "Activities optimizer", free: true, pro: true },
@@ -31,7 +31,6 @@ const COMPARE: Row[] = [
   { feature: "Family Mode (parent voice)", free: false, pro: true },
   { feature: "Reuse detector across supplements", free: false, pro: true },
   { feature: "Translate-for-parent (any document)", free: false, pro: true },
-  { feature: "Priority support", free: false, pro: true },
 ];
 
 function Cell({ value }: { value: string | true | false }) {
@@ -63,9 +62,9 @@ export default function PricingPage() {
           Free where it counts. <em>Pro</em> where it pays for itself.
         </h1>
         <p className="kl-mkt-lede">
-          Three schools and one essay are enough to feel the product. The full cycle —
-          unlimited schools, voice in your language, family mode, the aid comparator —
-          is one upgrade away.
+          Every new account starts with a {PRICING.pro.trialDays}-day Pro trial, no card. After
+          that, Free keeps {PRICING.free.signupCredits} AI credits to try the coach, and Pro is{" "}
+          {proMonthlyLabel()} or {proYearlyLabel()} when you want the full cycle.
         </p>
       </section>
 
@@ -144,8 +143,8 @@ export default function PricingPage() {
                   letterSpacing: "-.02em",
                 }}
               >
-                $0{" "}
-                <span style={{ fontSize: 14, color: "rgba(242,237,227,.45)" }}>forever</span>
+                {PRICING.free.signupCredits}{" "}
+                <span style={{ fontSize: 14, color: "rgba(242,237,227,.45)" }}>AI credits, once</span>
               </div>
               <p
                 style={{
@@ -156,8 +155,8 @@ export default function PricingPage() {
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
-                For students testing whether the product fits before committing. Real
-                feature access — just capped.
+                For students testing whether the product fits. Credits are a one-time grant and
+                do not renew.
               </p>
             </div>
             <ul
@@ -174,11 +173,9 @@ export default function PricingPage() {
               }}
             >
               {[
-                "3 schools",
-                "1 essay draft",
-                "3 voice sessions / month",
-                "English only",
-                "1 mock interview",
+                `${PRICING.free.signupCredits} AI credits, once. They do not renew.`,
+                "Coach Kairos chat and voice, paid for with credits",
+                "Application tracker and activities optimizer",
                 "Basic financial-aid view",
               ].map((f) => (
                 <li
@@ -206,6 +203,9 @@ export default function PricingPage() {
             >
               Start free
             </Link>
+            <p style={{ fontSize: 11.5, color: "rgba(242,237,227,.45)", margin: 0, textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+              Your {PRICING.pro.trialDays}-day Pro trial starts when you sign up. No card.
+            </p>
           </div>
 
           {/* Pro */}
@@ -268,11 +268,9 @@ export default function PricingPage() {
                 ${PRICING.pro.monthlyUsd}{" "}
                 <span style={{ fontSize: 14, color: "rgba(242,237,227,.55)" }}>/ month</span>
               </div>
-              {yearlyCheckoutConfigured() && (
-                <div style={{ marginTop: 6, fontSize: 13, color: "rgba(242,237,227,.7)", fontFamily: "'DM Sans', sans-serif" }}>
-                  or {proYearlyLabel()} — save {yearlySavingsPct()}%
-                </div>
-              )}
+              <div style={{ marginTop: 6, fontSize: 13, color: "rgba(242,237,227,.7)", fontFamily: "'DM Sans', sans-serif" }}>
+                or {proYearlyLabel()} — save {yearlySavingsPct()}%
+              </div>
               <p
                 style={{
                   marginTop: 12,
@@ -300,11 +298,11 @@ export default function PricingPage() {
               }}
             >
               {[
-                "Unlimited schools",
-                "Unlimited essay drafts + supplements",
-                "Unlimited voice sessions (fair use)",
+                `Fair use: ${PRO_FAIR_USE.coachMessagesPerDay} coach messages and ${PRO_FAIR_USE.voiceMinutesPerDay} voice minutes a day`,
+                "Pro usage does not spend credits",
+                "Unlimited schools and essay drafts + supplements",
                 "18 languages incl. Hindi, Punjabi, French, Spanish",
-                "Unlimited mock interviews",
+                "Mock interviews",
                 "Full FAFSA + aid comparator",
                 "Family Mode (parent voice)",
                 "Translate-for-parent docs",
@@ -322,11 +320,11 @@ export default function PricingPage() {
               className="kl-mkt-cta-gold"
               // Override layout to fill the card width.
             >
-              Start Pro — {proMonthlyLabel()} <ArrowRight size={14} />
+              Subscribe monthly — {proMonthlyLabel()} <ArrowRight size={14} />
             </ProCheckoutButton>
             {yearlyCheckoutConfigured() && (
               <ProCheckoutButton interval="year" className="kl-mkt-cta-gold">
-                Start Pro yearly — {proYearlyLabel()} <ArrowRight size={14} />
+                Subscribe yearly — {proYearlyLabel()} <ArrowRight size={14} />
               </ProCheckoutButton>
             )}
             <p
@@ -338,7 +336,8 @@ export default function PricingPage() {
                 fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              Free 7-day trial. No card required.
+              {TRIAL_TERMS} Subscribing during your trial keeps the rest of it; your first
+              charge comes when the trial ends.
             </p>
           </div>
         </div>
@@ -454,9 +453,9 @@ export default function PricingPage() {
       </section>
 
       <FinalCTA
-        headline={`Try Pro for <em>${PRICING.pro.trialDays} days</em>, free.`}
-        body="If it's not pulling its weight, cancel from settings. We don't email-trap you to keep the subscription."
-        primaryLabel="Start Pro free"
+        headline={`Start with a <em>${PRICING.pro.trialDays}-day Pro trial</em>, no card.`}
+        body="Paying only starts if you choose to subscribe, and you can cancel from settings. We don't email-trap you to keep the subscription."
+        primaryLabel="Create free account"
       />
     </MarketingShell>
   );
@@ -469,7 +468,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Is there really a free trial?",
-    a: `Yes. New users get a free 7-day Pro trial — no card required. After day 7, you'll be asked to subscribe at ${proMonthlyLabel()} (or ${proYearlyLabel()}) to keep Pro access. If you don't subscribe, your account stays usable on the free tier.`,
+    a: `Yes. ${TRIAL_TERMS} It starts when you sign up. After day 7, subscribe at ${proMonthlyLabel()} (or ${proYearlyLabel()}) to keep Pro access; if you don't, your account stays on Free. If you subscribe with at least two days of trial left, your first charge waits until the trial ends. Otherwise you are charged when you subscribe.`,
   },
   {
     q: `Why $${PRICING.pro.monthlyUsd} instead of free?`,

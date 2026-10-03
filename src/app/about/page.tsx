@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { PRICING } from "@/lib/pricing";
 import { ArrowRight, GraduationCap, Code, Users, Sparkles, Briefcase, Rocket } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -186,8 +187,8 @@ export default function AboutPage() {
               <div className="text-black/70">Application Tools</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">$0</div>
-              <div className="text-black/70">First Three Schools</div>
+              <div className="text-4xl font-bold mb-2">{PRICING.free.signupCredits}</div>
+              <div className="text-black/70">Free AI Credits to Start</div>
             </div>
           </div>
 
