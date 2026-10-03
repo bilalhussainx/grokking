@@ -63,11 +63,42 @@ it("an owned essay is allowed, another owner is denied, missing history stays un
 it("reads only shipped comments bound to the authenticated subject",async()=>{
  const fake=studentWorld();
  fake.tables.cc_counselor_comments=[
- {id:"1",artifact_type:"essay",artifact_id:ALICE_ESSAY,student_user_id:ALICE,status:"shipped",body:"Published critique"},
+ {id:"1",artifact_type:"essay",artifact_id:ALICE_ESSAY,student_user_id:ALICE,status:"shipped",body:"Published critique",author_user_id:"c0c0c0c0-0000-4000-8000-00000000c0c0"},
  {id:"2",artifact_type:"essay",artifact_id:ALICE_ESSAY,student_user_id:ALICE,status:"draft",body:"Private draft"},
  {id:"3",artifact_type:"essay",artifact_id:ALICE_ESSAY,student_user_id:"other",status:"shipped",body:"Different subject"}
  ];
  const reply=await makeReadTools(asDb(fake),scope)("read_published_feedback",{essayId:ALICE_ESSAY});
  expect(reply.status).toBe("ok");expect(reply.data).toMatchObject({comments:[{id:"1",body:"Published critique"}]});
  expect(JSON.stringify(reply)).not.toContain("Private draft");
+ // The counselor's internal id is private metadata: neither the model nor the checker evidence gets it.
+ expect(JSON.stringify(reply)).not.toContain("c0c0c0c0");expect(JSON.stringify(reply)).not.toContain("author_user_id");
+});
+it.each([
+ ["read_context",{domains:["profile"]},"cc_student_profiles"],
+ ["read_essay",{essayId:ALICE_ESSAY},"cc_essays"],
+ ["read_essay",{essayId:ALICE_ESSAY,versionNumber:1},"cc_essay_drafts"],
+ ["read_published_feedback",{essayId:ALICE_ESSAY},"cc_counselor_comments"],
+] as const)("a %s failure on %j logs only tool, table and code server-side",async(name,args,table)=>{
+ const warn=vi.spyOn(console,"warn").mockImplementation(()=>{});
+ try {
+  const fake=createFakeSupabase(studentWorld().tables,{columns:{[table]:["id"]}});
+  expect(await makeReadTools(asDb(fake),scope)(name,args)).toEqual({status:"retryable_error",data:null,evidence:[]});
+  expect(warn.mock.calls).toEqual([["agent_read_tool_failed",{tool:name,table,code:"42703"}]]);
+  expect(JSON.stringify(warn.mock.calls)).not.toContain("does not exist");
+ } finally { warn.mockRestore(); }
+});
+it("an unrecognized error code or a thrown exception is logged without its text",async()=>{
+ const warn=vi.spyOn(console,"warn").mockImplementation(()=>{});
+ try {
+  const fake=studentWorld();
+  const leaky={tables:fake.tables,from:(t:string)=>{const q=fake.from(t);q.then=((ok:(v:unknown)=>unknown)=>Promise.resolve({data:null,error:{message:"Key (current_draft)=(Alice wrote this.)",code:"Alice wrote this."}}).then(ok)) as typeof q.then;return q;}};
+  expect((await makeReadTools(asDb(leaky),scope)("read_essay",{essayId:ALICE_ESSAY})).status).toBe("retryable_error");
+  const throwing={tables:fake.tables,from:()=>{throw new Error("row: Alice wrote this.");}};
+  expect((await makeReadTools(asDb(throwing as never),scope)("read_essay",{essayId:ALICE_ESSAY})).status).toBe("retryable_error");
+  expect(warn.mock.calls).toEqual([
+   ["agent_read_tool_failed",{tool:"read_essay",table:"cc_essays",code:"unknown"}],
+   ["agent_read_tool_failed",{tool:"read_essay",table:"cc_essays",code:"exception"}],
+  ]);
+  expect(JSON.stringify(warn.mock.calls)).not.toContain("Alice");
+ } finally { warn.mockRestore(); }
 });

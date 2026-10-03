@@ -38,7 +38,14 @@ type Row = Record<string, Json>;
 function sorted(rows: unknown): Row[] {
   return [...((rows as Row[] | null) ?? [])].sort((a,b) => String(a.id).localeCompare(String(b.id), "en"));
 }
-const failed = (): ToolReply => ({ status: "retryable_error", data: null, evidence: [] });
+// Operators need to tell RLS, schema and timeout failures apart; the model never sees this.
+// Log only the tool, the table and a SQLSTATE/PostgREST code: error text can quote row data.
+const errorCode = (error: { code?: unknown }): string =>
+  typeof error.code === "string" && /^(?:[0-9A-Z]{5}|PGRST[0-9]{3})$/.test(error.code) ? error.code : "unknown";
+function failed(tool: string, table: string, code: string): ToolReply {
+  console.warn("agent_read_tool_failed", { tool, table, code });
+  return { status: "retryable_error", data: null, evidence: [] };
+}
 const denied = (): ToolReply => ({ status: "denied", data: null, evidence: [] });
 // supabase-js builders accept .abortSignal(); a client without it is still checked before and after each query.
 function bind<Q>(query: Q, signal?: AbortSignal): Q {
@@ -58,6 +65,7 @@ export function makeReadTools(db: SupabaseClient, scope: AuthScope): ReadTools {
     signal?.throwIfAborted();
     let args: Args;
     try { args = validateToolArgs(name, raw); } catch { return denied(); }
+    let table = "none";
     try {
       if (name === "read_context") {
         const domains = args.domains ?? [...DOMAINS];
@@ -66,8 +74,9 @@ export function makeReadTools(db: SupabaseClient, scope: AuthScope): ReadTools {
         for (const domain of [...domains].sort()) {
           const spec = CONTEXT[domain];
           const columns: string = spec.columns;
+          table = spec.table;
           const { data: rows, error } = await settled(bind(db.from(spec.table).select(columns).in(spec.owner, ids).order("id"), signal), signal);
-          if (error) return failed();
+          if (error) return failed(name, table, errorCode(error));
           const records = sorted(rows);
           // Never collapse duplicate profiles to one row or infer an authoritative value.
           data[domain] = { records, state: records.length ? "recorded" : "missing", reconciliationRequired: records.length > 1 };
@@ -75,24 +84,28 @@ export function makeReadTools(db: SupabaseClient, scope: AuthScope): ReadTools {
         }
         return { status: "ok", data, evidence };
       }
+      table = "cc_essays";
       const { data: essay, error } = await settled(bind(db.from("cc_essays")
         .select("id,student_id,school_id,essay_type,prompt_text,word_limit,phase,brainstorm_transcript,outline_json,current_draft,word_count,updated_at")
         .eq("id", args.essayId!).in("student_id", ids), signal).maybeSingle(), signal);
-      if (error) return failed();
+      if (error) return failed(name, table, errorCode(error));
       if (!essay) return denied();
       if (name === "read_published_feedback") {
+        table = "cc_counselor_comments";
+        // No author_user_id: the counselor's internal id is private metadata, and the table has no author role/label.
         const result = await settled(bind(db.from("cc_counselor_comments")
-          .select("id,author_user_id,body,range_start,range_end,range_text_snapshot,status,created_at,resolved_at")
+          .select("id,body,range_start,range_end,range_text_snapshot,status,created_at,resolved_at")
           .eq("artifact_type", "essay").eq("artifact_id", args.essayId!).eq("student_user_id", scope.userId).eq("status", "shipped").order("id"), signal), signal);
-        if (result.error) return failed();
+        if (result.error) return failed(name, table, errorCode(result.error));
         const comments = sorted(result.data);
         return { status: "ok", data: { comments }, evidence: [{ kind: "published_feedback_snapshot", essayId: args.essayId!, comments }] };
       }
       let draft: Json = null;
       if (args.versionNumber !== undefined) {
+        table = "cc_essay_drafts";
         const result = await settled(bind(db.from("cc_essay_drafts").select("id,essay_id,version_number,label,content,word_count,notes,created_at")
           .eq("essay_id", args.essayId!).eq("version_number", args.versionNumber), signal).maybeSingle(), signal);
-        if (result.error) return failed();
+        if (result.error) return failed(name, table, errorCode(result.error));
         if (!result.data) return { status: "unknown", data: { reason: "draft_version_missing" }, evidence: [] };
         draft = result.data as Json;
       }
@@ -101,7 +114,7 @@ export function makeReadTools(db: SupabaseClient, scope: AuthScope): ReadTools {
       return { status: "ok", data: snapshot, evidence: [{ kind: "essay_snapshot", ...(snapshot as Record<string, Json>) }] };
     } catch {
       signal?.throwIfAborted(); // An aborted call rejects; it never reports a result after its bound.
-      return failed();
+      return failed(name, table, "exception");
     }
   };
 }
