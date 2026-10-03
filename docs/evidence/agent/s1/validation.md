@@ -4,3 +4,8 @@
 - RED: `AGENT_PG_URL=postgres://postgres:agent@localhost:55432/postgres npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/s1-schema.pg.test.ts` failed with `ENOENT ... 20261003_agent_s1.sql`.
 - GREEN: same command, 4 passed (local container kairos-agent-pg, postgres:16, port 55432 only).
 - Gate: `npx vitest run src --config vitest.agent-source.config.ts` (AGENT_PG_URL unset): 148 files passed, 1 skipped (the pg test); 1048 passed, 4 skipped. `npx tsc --noEmit -p .`: 0 errors.
+
+## Task 1 fix round 1: localhost guard (2026-10-03)
+- Added `isLocalPgUrl` (`__tests__/helpers/local-pg.ts`) with 2 unit tests; the pg suite runs only for hostname localhost or 127.0.0.1, otherwise skips and writes one stderr warning.
+- Remote URL (db.x.supabase.co) run: suite skipped with warning. Local container run: pg suite 4/4 plus helper tests, 6 passed. Container stopped.
+- Gate: 149 files passed + 1 skipped, 1050 tests passed + 4 skipped; tsc 0.

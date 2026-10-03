@@ -5,9 +5,14 @@ import fs from "node:fs";
 import path from "node:path";
 // @ts-ignore -- @types/pg is not installed; pg is only used by this local-Postgres test
 import { Client } from "pg";
+import { isLocalPgUrl } from "./helpers/local-pg";
 
 const URL = process.env.AGENT_PG_URL;
-const run = URL ? describe : describe.skip;
+const local = isLocalPgUrl(URL);
+if (URL && !local) {
+  process.stderr.write("[warn] s1-schema.pg.test: AGENT_PG_URL is not localhost/127.0.0.1; skipping destructive schema tests.\n");
+}
+const run = local ? describe : describe.skip;
 const SQL = path.join(process.cwd(), "supabase/migrations/20261003_agent_s1.sql");
 const STUBS = `
   drop schema if exists auth cascade; create schema auth;
