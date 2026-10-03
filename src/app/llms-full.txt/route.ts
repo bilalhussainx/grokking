@@ -2,11 +2,10 @@ import { SITE_URL } from "@/lib/seo";
 import { NextResponse } from "next/server";
 import { ADMISSIONS_SUMMARY } from "@/lib/product-summary";
 import { FAQ_ITEMS } from "@/lib/faq-items";
-import { COACH_LANGUAGES } from "@/lib/cc/coach-languages";
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import { PRICING, proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
 
 export async function GET() {
-  const languages = COACH_LANGUAGES.map((l) => l.name).join(", ");
   const faq = FAQ_ITEMS.map((i) => `### ${i.question}\n${i.answer}`).join("\n\n");
   const content = `# KairosLearn
 
@@ -17,7 +16,7 @@ export async function GET() {
 - Pro: ${proMonthlyLabel()} or ${proYearlyLabel()}, unlimited under fair use, with a ${PRICING.pro.trialDays}-day free trial.
 
 ## Coach languages
-${languages}
+Coach Kairos speaks ${COACH_LANGUAGE_COUNT} languages, including English, Spanish, Hindi, Punjabi and Urdu.
 
 ## Questions and answers
 
