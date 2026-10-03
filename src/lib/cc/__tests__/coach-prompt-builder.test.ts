@@ -430,4 +430,29 @@ describe("buildSystemPrompt", () => {
       expect(buildSystemPrompt({ ...baseContext, country: "US", schoolCountries: ["GB"] })).toContain("UK APPLICATION GUIDANCE");
     });
   });
+
+  // S1 one writer: a flagged student's legacy Coach writes nothing, so its prompt
+  // must not ask for an actions block or claim a school was added.
+  describe("agentS1", () => {
+    const modes = ["general", "school-builder", "intake"] as const;
+    it.each(modes)("a flagged student's %s prompt has no actions-block instruction and no 'added' claim", (mode) => {
+      const prompt = buildSystemPrompt({ ...baseContext, mode, agentS1: true });
+      expect(prompt).not.toMatch(/<<\/?actions>>|add_schools|ACTIONS/);
+      expect(prompt).not.toMatch(/I've added|being added|save them automatically/i);
+      expect(prompt).toMatch(/can't add schools from this chat/);
+    });
+    it.each(modes)("an unflagged student's %s prompt is unchanged", (mode) => {
+      const legacy = buildSystemPrompt({ ...baseContext, mode });
+      expect(buildSystemPrompt({ ...baseContext, mode, agentS1: false })).toBe(legacy);
+      expect(legacy).toContain("<<actions>>");
+      expect(legacy).toContain("I've added your schools to your list");
+    });
+    it("both Coach routes thread the flag into the prompt context", () => {
+      for (const f of ["src/app/api/cc/coach/message/route.ts", "src/app/api/cc/coach/voice-prompt/route.ts"]) {
+        const src = fs.readFileSync(f, "utf8");
+        expect(src, f).toMatch(/isAgentS1User\((?:auth\.)?user\.id\)/);
+        expect(src, f).toMatch(/^\s+agentS1[,:]/m);
+      }
+    });
+  });
 });

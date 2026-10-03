@@ -15,6 +15,7 @@ import type { TodayModel } from "@/app/cc/dashboard/today-model";
 import AskKairos from "./AskKairos";
 import GradeQuestion from "./GradeQuestion";
 import YourPeople from "./YourPeople";
+import { KairosInbox } from "@/components/cc/agent/KairosInbox";
 
 function DayMark() {
   return (
@@ -27,7 +28,7 @@ function DayMark() {
   );
 }
 
-export default function TodayDashboard({ model }: { model: TodayModel }) {
+export default function TodayDashboard({ model, agentEnabled = false }: { model: TodayModel; agentEnabled?: boolean }) {
   const coach = useCoachKairos();
   const { setVariantKey } = coach;
   const router = useRouter();
@@ -150,6 +151,7 @@ export default function TodayDashboard({ model }: { model: TodayModel }) {
                   <p className="td-basis">{model.step.basis}</p>
                 </section>
               )}
+              {agentEnabled ? <KairosInbox /> : null}
               <section className="td-notes" aria-labelledby="td-notes-title">
                 <div className="td-section-head">
                   <h2 id="td-notes-title">{model.rowsTitle}</h2>

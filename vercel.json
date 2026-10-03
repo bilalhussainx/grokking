@@ -8,6 +8,10 @@
     {
       "path": "/api/cron/generate-observations",
       "schedule": "7 4 * * *"
+    },
+    {
+      "path": "/api/cron/agent-nudges",
+      "schedule": "17 13 * * *"
     }
   ]
 }

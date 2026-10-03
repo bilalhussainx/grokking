@@ -34,6 +34,7 @@ import {
   stripActionsBlock,
 } from "@/lib/cc/coach-actions-block";
 import { runCoachExtraction } from "@/lib/cc/coach-extract";
+import { isAgentS1User } from "@/lib/cc/agent/s1-flag";
 
 export async function POST(req: NextRequest) {
   const userSupabase = await createServerSupabase();
@@ -43,6 +44,9 @@ export async function POST(req: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  // One writer: for S1 users only confirmed agent proposals write, so this
+  // route neither applies <<actions>> nor runs extraction for them.
+  const agentS1 = isAgentS1User(user.id);
 
   const body = (await req.json().catch(() => ({}))) as {
     role?: string;
@@ -112,7 +116,7 @@ export async function POST(req: NextRequest) {
   // extraction. The bundled Deepgram LLM emits the same <<actions>>
   // block the text-mode coach does — the prompt is shared.
   let schoolsAddedCount = 0;
-  if (role === "assistant") {
+  if (role === "assistant" && !agentS1) {
     try {
       const actions = parseActionsBlock(content);
       console.log(

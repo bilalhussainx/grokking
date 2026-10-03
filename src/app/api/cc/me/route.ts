@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAuth, unauthorized, createAdminSupabase } from "../helpers";
+import { isAgentS1User } from "@/lib/cc/agent/s1-flag";
 
 // The signed-in student's own profile fields read by /schools, /applications,
 // the home walkthrough and /cc/transfer-profile. It was called in four places
@@ -21,5 +22,6 @@ export async function GET() {
   if (error) return NextResponse.json({ error: "Could not load profile" }, { status: 500 });
   // cc_student_profiles has no unique user_id: pick one row deterministically.
   const rows = ((data ?? []) as unknown as ProfileRow[]).slice().sort((a, b) => a.id.localeCompare(b.id));
-  return NextResponse.json({ profile: rows[0] ?? null });
+  // agentS1: the Coach routes this student's text turns to the S1 agent.
+  return NextResponse.json({ profile: rows[0] ?? null, agentS1: isAgentS1User(auth.user.id) });
 }

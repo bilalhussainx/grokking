@@ -14,6 +14,7 @@ import { assertCapacity, blockedResponse } from "@/lib/cc/tier-gate";
 import { detectMessageLanguage, buildLanguageInstruction } from "@/lib/cc/detect-language";
 import { parseActionsBlock, stripActionsBlock } from "@/lib/cc/coach-actions-block";
 import { pickCoachLanguage } from "@/lib/cc/language-fallback";
+import { isAgentS1User } from "@/lib/cc/agent/s1-flag";
 
 function extractEssayIdFromPath(path: string | null | undefined): string | null {
   if (!path) return null;
@@ -35,6 +36,9 @@ export async function POST(req: NextRequest) {
   if (!user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
+  // One writer: for S1 users only confirmed agent proposals write, so this
+  // route neither applies <<actions>> nor runs extraction for them.
+  const agentS1 = isAgentS1User(user.id);
 
   const { message, page_context, essay_id, source_event, variant_key } = await req.json();
   if (!message || typeof message !== "string") {
@@ -379,6 +383,8 @@ export async function POST(req: NextRequest) {
     needsFullAid: !!(profile as { needs_full_aid?: boolean | null }).needs_full_aid,
     variantKey: variantKey as CoachContext["variantKey"],
     schoolCountries,
+    // One writer: this route saves nothing for a flagged student, so the prompt claims nothing.
+    agentS1,
   };
 
   const detectedLang = detectMessageLanguage(message);
@@ -496,7 +502,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Parse actions + clean the response for DB persistence.
-        const actions = parseActionsBlock(fullResponse);
+        const actions = agentS1 ? null : parseActionsBlock(fullResponse);
         const cleanResponse = stripActionsBlock(fullResponse);
 
         // Save assistant message, then run extraction BEFORE emitting `done` +
@@ -532,15 +538,17 @@ export async function POST(req: NextRequest) {
           // Always run extraction — the coach may mention schools/activities in
           // any mode (including school-browse while the user is on /schools).
           // runCoachExtraction short-circuits internally when there's nothing to save.
-          console.log(
-            `[coach/message] dispatching runCoachExtraction(${profileId}, ${mode}, actions=${actions ? `block(${actions.add_schools?.length ?? 0} schools)` : "null"})`,
-          );
-          const result = await runCoachExtraction(profileId, mode, actions);
-          const r = result as { extracted: boolean; schoolsAddedCount?: number };
-          schoolsAddedCount = r.schoolsAddedCount ?? 0;
-          console.log(
-            `[coach/message] extraction result — schoolsAddedCount=${schoolsAddedCount}`,
-          );
+          if (!agentS1) {
+            console.log(
+              `[coach/message] dispatching runCoachExtraction(${profileId}, ${mode}, actions=${actions ? `block(${actions.add_schools?.length ?? 0} schools)` : "null"})`,
+            );
+            const result = await runCoachExtraction(profileId, mode, actions);
+            const r = result as { extracted: boolean; schoolsAddedCount?: number };
+            schoolsAddedCount = r.schoolsAddedCount ?? 0;
+            console.log(
+              `[coach/message] extraction result — schoolsAddedCount=${schoolsAddedCount}`,
+            );
+          }
         } catch (err) {
           console.error("[coach/message] post-stream task failed:", err);
         }

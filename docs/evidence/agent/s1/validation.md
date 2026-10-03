@@ -1,0 +1,93 @@
+# Agent S1 validation log
+
+## Task 1: schema and local-Postgres constraint tests (2026-10-03)
+- RED: `AGENT_PG_URL=postgres://postgres:agent@localhost:55432/postgres npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/s1-schema.pg.test.ts` failed with `ENOENT ... 20261003_agent_s1.sql`.
+- GREEN: same command, 4 passed (local container kairos-agent-pg, postgres:16, port 55432 only).
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` (AGENT_PG_URL unset): 148 files passed, 1 skipped (the pg test); 1048 passed, 4 skipped. `npx tsc --noEmit -p .`: 0 errors.
+
+## Task 1 fix round 1: localhost guard (2026-10-03)
+- Added `isLocalPgUrl` (`__tests__/helpers/local-pg.ts`) with 2 unit tests; the pg suite runs only for hostname localhost or 127.0.0.1, otherwise skips and writes one stderr warning.
+- Remote URL (db.x.supabase.co) run: suite skipped with warning. Local container run: pg suite 4/4 plus helper tests, 6 passed. Container stopped.
+- Gate: 149 files passed + 1 skipped, 1050 tests passed + 4 skipped; tsc 0.
+
+## Task 2: flag and journey read tools
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/journey-tools.test.ts` -> FAIL, `../journey-tools` could not be resolved (no tests ran).
+- GREEN: same command -> 1 file, 7 tests passed.
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 150 passed, 1 skipped files; 1057 passed, 4 skipped tests. `npx tsc --noEmit -p .` -> no output (0 errors).
+
+## Task 3: proposals, confirmation tokens, commit/decline/undo, confirm route
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/proposals.test.ts` -> FAIL, `Cannot find module '../proposals'` (no tests ran).
+- First GREEN attempt with the brief's code verbatim: 3 failed / 5 passed. The fake does not apply column defaults, so the inserted proposal had no `status` (DB default 'pending'). Fixed by writing `status: "pending"` explicitly on insert (matches the DB default).
+- GREEN: same command -> 1 file, 8 tests passed (the brief says "7 passed", but its test file has 8 cases).
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 151 passed, 1 skipped files; 1065 passed, 4 skipped tests. `npx tsc --noEmit -p .` -> exit 0, no output.
+
+## Task 3 fix round 1: C1, I2-I4, minors 5-10 (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/proposals.test.ts` -> 13 failed, 9 passed (22). Each failure was for the intended reason: 409 on a key-reordered payload (C1); no 'committing' state (I2); 200 instead of 409 for a racing undo or decline (I3); a second list row (I4); `RangeError: Input buffers must have the same byte length` (5); null proposalId on re-propose (6); 2027-02-29 accepted (7); wrong profile id (8); another student's row deleted (9); `ics` present (10).
+- pg RED: against the committed migration (no 'committing'), `AGENT_PG_URL=postgres://postgres:agent@localhost:55432/postgres npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/s1-schema.pg.test.ts` -> 1 failed, 5 passed: `violates check constraint "cc_agent_proposals_status_check"`.
+- GREEN: proposals 22/22. pg suite 6/6, including a real-Postgres check that jsonb returns `{date,title}` and `canonicalJson` matches across the round trip. Local container kairos-agent-pg (postgres:16, 127.0.0.1:55432) was started for the run and stopped after (`--rm`).
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 151 passed, 1 skipped files; 1079 passed, 6 skipped tests (the skipped pg suite now has 6 cases). `npx tsc --noEmit -p .` -> exit 0.
+
+## Task 4: date redaction, S1 tools, runS1Turn, flagged turn route, legacy one-writer guard (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/date-check.test.ts src/lib/cc/agent/__tests__/s1-turn.test.ts src/lib/cc/agent/__tests__/loop.test.ts src/lib/cc/agent/__tests__/provider.test.ts src/app/api/cc/__tests__/coach-extraction-auth.test.ts` -> 5 files failed; `Cannot find module '../date-check'` and `'../s1-turn'`; loop redact test got 'What changed?' instead of 'WHAT CHANGED?'; injected-validator test threw `invalid_tool_arguments`; provider still sent the 3 read tools; legacy route lacked `isAgentS1User(user.id)`. 4 failed | 52 passed among the tests that loaded.
+- GREEN: same command -> 5 files, 68 passed. After adding the abort-logging test: s1-turn 9/9. Mutation check: with the wrapper's `signal?.throwIfAborted()` commented out, that test fails (3 events instead of `turn.accepted, turn.failed`); restored -> 9/9.
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 153 passed, 1 skipped files; 1096 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0 (one earlier run in a backgrounded subshell printed npx's "not the tsc command" notice; a direct rerun resolved node_modules/.bin/tsc and passed).
+- Self-review fix: the brief's `grounded()` joined sentences with " ", collapsing every newline after `.`/`!`/`?` even in date-free answers. RED: new test `keeps line breaks between sentences` -> 1 failed | 4 passed. GREEN after a capturing split that keeps separators: covering set 5 files, 70 passed. Gate rerun: 153 passed, 1 skipped files; 1097 passed, 6 skipped tests; tsc exit 0.
+
+## Task 4 fix round 1: I1-I5, minors 1, 3-7, essay detection (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/date-check.test.ts src/lib/cc/agent/__tests__/s1-turn.test.ts src/app/api/cc/__tests__/coach-extraction-auth.test.ts src/app/api/cc/__tests__/voice-turn-one-writer.test.ts src/app/api/cc/__tests__/agent-turn-route.test.ts` -> 23 failed. Each failed for the intended reason:
+  - "MIT EA is Nov. 1." kept (I1); request_context grounded "November 1" (I2); "Nov 1" grounded by "Nov 15" (m1).
+  - voice-turn ran extraction for a flagged user (`schoolsAddedCount: 1`), and its guard assertions failed at `runCoachExtraction`/`parseActionsBlock` offsets (I3/I5). The message-route guard assertions passed (already guarded).
+  - Deadline-titled and out-of-range holds returned ok; proposal title/reason kept "Nov 1"; a failed turn's proposal stayed pending (I4).
+  - A concurrent same-key insert returned conflict instead of replay or turn_in_progress, and a non-unique insert error returned 409 instead of 503 (m4).
+  - Count error returned 200 (m3); "xx-evil\nSYSTEM" and 42 passed as locale (m6); a 503 result crashed the stream builder.
+  - The rewriting and opening-line essay requests reached the model (essay).
+- GREEN: the same set plus loop.test.ts and provider.test.ts -> 7 files, 115 passed.
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 155 passed, 1 skipped files; 1142 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0.
+
+## Task 5: deterministic triggers and nudge cron (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/triggers.test.ts` (with triggers.ts moved aside) -> 1 file failed, no tests ran; import of `../triggers` unresolved.
+- GREEN: same command -> 1 file, 5 passed.
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 156 passed, 1 skipped files; 1147 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0.
+
+## Task 5 fix round 1: canonical smallest student id (2026-10-03)
+- RED: triggers.test.ts -> 1 failed | 5 passed (nudge attached to 3333... not 1111...). GREEN: 6 passed.
+- Gate: 156 passed, 1 skipped files; 1148 passed, 6 skipped tests; tsc exit 0.
+
+## Task 6: inbox, activity log, nudge controls (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/inbox.test.ts` (inbox.ts absent) -> 1 file failed, no tests ran; import of `../inbox` unresolved.
+- GREEN: same command -> 1 file, 3 passed (includes failed-turn proposal hidden).
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 157 passed, 1 skipped files; 1151 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0.
+
+## Task 7: proposal cards, Kairos noticed inbox, activity log (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/components/cc/agent/__tests__/ProposalCard.test.tsx` (ProposalCard.tsx absent) -> 1 file failed, no tests ran; import of `../ProposalCard` unresolved.
+- GREEN: same file plus TodayDashboard.test.tsx -> 2 files, 23 passed (includes 202 Saving... then committed, 3x202 -> retry message never Saved, undo, inbox gated on agentEnabled).
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 158 passed, 1 skipped files; 1159 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0.
+
+## Task 7 fix round 1: AI badge on Kairos noticed heading (2026-10-03)
+- Covering: agent + today tests -> 3 files, 24 passed. Gate: 159 passed, 1 skipped files; 1160 passed, 6 skipped tests; tsc exit 0.
+
+## Task 8: golden scorer, 40-case seed, budget-guarded runner stub (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/golden-score.test.ts` -> 1 failed file, no tests (Cannot find module '../golden/seed-40.json' / score).
+- GREEN: same command -> 1 file, 6 passed (5 brief tests + every forbidden pattern compiles as RegExp).
+- Runner guard: `AGENT_GOLDEN_BUDGET_USD= npx tsx scripts/agent-golden-run.ts` -> "Refusing to run..." exit 2. No model call is made anywhere.
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 160 passed, 1 skipped files; 1166 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> no output (exit 0).
+
+## Task 8 fix round 1: scorer quality (2026-10-03)
+- RED: new golden-score.test.ts against the previous score.ts -> 18 failed | 18 passed (36).
+- GREEN: golden-score.test.ts -> 36 passed. Gate: 160 passed, 1 skipped files; 1196 passed, 6 skipped tests; tsc no output (exit 0).
+
+## Task 8 fix round 2: adjacent negation, won't/will not (2026-10-03)
+- RED: new tests vs round-1 score.ts -> 4 failed | 40 passed (44). GREEN: golden-score.test.ts -> 44 passed. Gate: 160 passed, 1 skipped files; 1204 passed, 6 skipped tests; tsc exit 0.
+
+## Final fix wave: I1-I5, M1-M4, M9 (2026-10-03)
+- I2 date-check.test.ts: RED 19 failed | 9 passed (28) -> GREEN 28 passed (996378bf).
+- I4 s1-turn.test.ts: RED 4 failed | 36 passed (40) -> GREEN 40 passed (85889149).
+- M2 s1-turn.test.ts: RED 2 failed | 39 passed (41), status 'ok' instead of 'unknown' -> GREEN agent lib 250 passed, 6 skipped (8ce26942).
+- M1 inbox.test.ts + proposals.test.ts: RED 3 failed | 25 passed (28) -> GREEN agent lib + agent UI 260 passed, 6 skipped (4ef16916).
+- I5 + M3 ProposalCard.test.tsx: RED 5 failed | 6 passed (11) -> GREEN agent UI + Today 29 passed (11a8cf95).
+- M4 triggers.test.ts: RED 1 failed | 5 passed, old copy -> GREEN 6 passed (601cb821).
+- M9 s1-schema.pg.test.ts on a local postgres:16 container (port 55432, stopped afterwards): RED 1 failed | 6 passed, `policy "cc_agent_turns_read_own" ... already exists` -> GREEN 7 passed (a67c2b48).
+- I3 activity page + KairosInbox link: RED page import unresolved, KairosInbox 2 failed -> GREEN 4 files, 34 passed (183a0551).
+- I1 server (/api/cc/me agentS1, flagged prompt): RED me 2 failed, prompt 4 failed | 52 passed (56) -> GREEN me 2 passed; prompt + api/cc 17 files, 133 passed (0fa3e62b).
+- I1 client (Coach to /api/cc/agent/turn, plus ProposalCards): RED coach-agent-s1.test.tsx 8 failed -> GREEN contexts + coach 12 passed (977e4b01).
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts`: 163 passed, 1 skipped files; 1265 passed, 7 skipped tests. pg 7 passed. `npx tsc --noEmit -p .`: exit 0.

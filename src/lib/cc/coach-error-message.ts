@@ -7,3 +7,12 @@ export function coachErrorMessage(status: number, body: unknown): string {
   if ((status === 402 || status === 429) && typeof error === "string" && error.trim()) return error;
   return GENERIC;
 }
+
+// The S1 agent route returns closed codes, never copy: map its status to fixed
+// lines. A 409 is an in-flight or conflicting key; a new send mints a new key.
+export function agentTurnErrorMessage(status: number): string {
+  if (status === 429) return "You've reached today's fair-use limit for Coach. Try again tomorrow.";
+  if (status === 404 || status === 503) return "Coach is unavailable right now. Try again in a little while.";
+  if (status === 409) return "That message didn't go through. Please send it again.";
+  return GENERIC;
+}

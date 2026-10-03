@@ -13,6 +13,7 @@ import { selectVariant } from "./variants";
 import { deriveTodayInput, type RawDashboardRows, type RawSchoolRow } from "./today-input";
 import { buildTodayModel } from "./today-model";
 import TodayDashboard from "@/components/cc/today/TodayDashboard";
+import { isAgentS1User } from "@/lib/cc/agent/s1-flag";
 
 export const dynamic = "force-dynamic";
 
@@ -132,5 +133,5 @@ export default async function DashboardPage({
     schools ?? [],
   );
   const todayIso = new Date().toISOString().slice(0, 10); // server calendar day (UTC on Vercel)
-  return <TodayDashboard model={buildTodayModel(variantKey, deriveTodayInput(raw, todayIso))} />;
+  return <TodayDashboard model={buildTodayModel(variantKey, deriveTodayInput(raw, todayIso))} agentEnabled={isAgentS1User(user.id)} />;
 }

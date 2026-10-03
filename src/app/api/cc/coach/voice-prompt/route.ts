@@ -8,6 +8,7 @@ import { detectMode } from "@/lib/cc/coach-mode-detector";
 import { buildSystemPrompt, type CoachContext } from "@/lib/cc/coach-prompt-builder";
 import { buildLanguageInstruction } from "@/lib/cc/detect-language";
 import { pickCoachLanguage } from "@/lib/cc/language-fallback";
+import { isAgentS1User } from "@/lib/cc/agent/s1-flag";
 
 const VOICE_TAIL = `
 
@@ -153,6 +154,8 @@ export async function GET() {
     // and grade context is still surfaced via ctx.grade.
     variantKey: null,
     schoolCountries,
+    // S1 one writer: voice-turn saves nothing for a flagged student, so the prompt claims nothing.
+    agentS1: isAgentS1User(auth.user.id),
   };
 
   // Voice mode prefers the user's chosen language over message-detection

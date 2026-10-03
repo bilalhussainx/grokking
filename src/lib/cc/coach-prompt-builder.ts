@@ -101,6 +101,9 @@ export interface CoachContext {
   // cc_schools.country of each school on the student's list ("US", "CA",
   // "UK"). Drives the UK/Canada guidance for students applying abroad.
   schoolCountries?: string[];
+  // S1 pilot student (isAgentS1User). One writer: their legacy Coach saves
+  // nothing, so the prompt drops the actions block and every "I've added" claim.
+  agentS1?: boolean;
 }
 
 const PERSONALITY = `You are Coach Kairos, a college admissions counselor who guides high school students through their entire application journey. Your personality:
@@ -115,6 +118,9 @@ const PERSONALITY = `You are Coach Kairos, a college admissions counselor who gu
 - Give exactly ONE next step at the end of each message. Never suggest two different tools or pages simultaneously. Pick the single most important next action.
 - When you say "I've added your schools to your list", the system will actually save them automatically. Tell the student to go to [School List Builder](/schools) to see their list.
 - Never recommend the same school twice in one response. When the student already has schools on their list, do not re-suggest ones that are already there — check the "School list" in the application snapshot before proposing adds.`;
+
+const LEGACY_ADD_LINE = `- When you say "I've added your schools to your list", the system will actually save them automatically. Tell the student to go to [School List Builder](/schools) to see their list.`;
+const S1_ADD_LINE = `- You can't add schools from this chat. When the student wants a school on their list, send them to [School List Builder](/schools) to add it. Never say you added or saved anything.`;
 
 // Catalog constraint — was previously gated by country (CA/PK/UK only got
 // to hear about international schools), but US students who explicitly
@@ -258,7 +264,8 @@ If they haven't filled out the transfer profile (current school + credits + targ
 }
 
 export function buildSystemPrompt(ctx: CoachContext): string {
-  const sections: string[] = [KAIROS_VOICE, PERSONALITY, buildCatalogConstraint(ctx)];
+  const personality = ctx.agentS1 ? PERSONALITY.replace(LEGACY_ADD_LINE, S1_ADD_LINE) : PERSONALITY;
+  const sections: string[] = [KAIROS_VOICE, personality, buildCatalogConstraint(ctx)];
 
   const variantBlock = buildVariantBlock(ctx);
   if (variantBlock) sections.push(variantBlock);
@@ -315,7 +322,7 @@ export function buildSystemPrompt(ctx: CoachContext): string {
 
   sections.push(`\n${getModeInstructions(ctx)}`);
 
-  sections.push(ACTIONS_DIRECTIVE);
+  if (!ctx.agentS1) sections.push(ACTIONS_DIRECTIVE);
 
   return sections.join("\n");
 }
@@ -567,7 +574,7 @@ ${ctx.isInternational && !ctx.needsFullAid ? "4. Do they need schools that meet 
 After gathering preferences, say "Let me build your list — give me a moment..." and the system will generate recommendations.
 Present the recommendations grouped by reach/match/safety with a one-line reason for each school.
 The student can accept all, remove specific schools, or ask for alternatives.
-When the student approves the list, confirm: "Done — those schools are being added to your list. Head to [School List Builder](/schools) to see them." Then stop — don't suggest essays or interviews yet.${fullAidBlock}${buildFirstGenBlock(ctx)}${buildInternationalBlock(ctx)}`;
+${ctx.agentS1 ? "When the student approves the list, say you can't add schools from this chat and send them to [School List Builder](/schools) to add them." : `When the student approves the list, confirm: "Done — those schools are being added to your list. Head to [School List Builder](/schools) to see them."`} Then stop — don't suggest essays or interviews yet.${fullAidBlock}${buildFirstGenBlock(ctx)}${buildInternationalBlock(ctx)}`;
     }
 
     case "school-browse":

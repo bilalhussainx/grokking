@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import { GraduationCap } from "lucide-react";
 import Link from "next/link";
-import { useCoachKairos } from "@/contexts/CoachKairosContext";
+import { useCoachKairos, type CoachProposal } from "@/contexts/CoachKairosContext";
+import { ProposalCard } from "@/components/cc/agent/ProposalCard";
 import { isGrade9BlockedPath } from "@/lib/cc/grade-route-policy";
 import { stripActionsBlock } from "@/lib/cc/coach-actions-block";
 
@@ -11,6 +12,8 @@ interface Props {
   role: "assistant" | "user";
   content: string;
   isStreaming?: boolean;
+  // S1 agent turns: this turn's suggestions, confirmed by the student on the card.
+  proposals?: CoachProposal[];
 }
 
 const ACTION_PATTERNS: { pattern: RegExp; href: string; label: string }[] = [
@@ -58,7 +61,7 @@ function getQuickActions(content: string): { href: string; label: string }[] {
   return actions.slice(0, 2);
 }
 
-export default function CoachMessage({ role, content, isStreaming }: Props) {
+export default function CoachMessage({ role, content, isStreaming, proposals }: Props) {
   if (role === "user") {
     return (
       <motion.div
@@ -115,6 +118,7 @@ export default function CoachMessage({ role, content, isStreaming }: Props) {
             ))}
           </div>
         )}
+        {proposals?.map((p) => <div key={p.id} className="mt-2"><ProposalCard item={p} /></div>)}
       </div>
     </motion.div>
   );
