@@ -71,3 +71,7 @@
 - GREEN: same command -> 1 file, 6 passed (5 brief tests + every forbidden pattern compiles as RegExp).
 - Runner guard: `AGENT_GOLDEN_BUDGET_USD= npx tsx scripts/agent-golden-run.ts` -> "Refusing to run..." exit 2. No model call is made anywhere.
 - Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 160 passed, 1 skipped files; 1166 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> no output (exit 0).
+
+## Task 8 fix round 1: scorer quality (2026-10-03)
+- RED: new golden-score.test.ts against the previous score.ts -> 18 failed | 18 passed (36).
+- GREEN: golden-score.test.ts -> 36 passed. Gate: 160 passed, 1 skipped files; 1196 passed, 6 skipped tests; tsc no output (exit 0).
