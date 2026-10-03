@@ -153,3 +153,25 @@ Error: Failed to resolve import "../sse"
 ### Gate
 - `npx vitest run src --config vitest.agent-source.config.ts`: 147 files / 1012 tests passed
 - `npx tsc --noEmit -p .`: 0 diagnostics
+
+## Task 8: integration-a1.test.ts
+
+### RED (mutation: sse.ts decoder `{stream:true}` -> `{stream:false}`, then restored)
+```
+npx vitest run --config vitest.agent-a1.config.ts src/lib/cc/agent/__tests__/integration-a1.test.ts
+TypeError: The encoded data was not valid for encoding utf-8  (sse.ts decodeEvents)
+ Test Files  1 failed (1)
+      Tests  2 failed | 3 passed (5)
+```
+(Modules already existed, so RED is by mutation of the decoder; the split-point tests catch it.)
+
+### GREEN
+```
+npx vitest run --config vitest.agent-a1.config.ts src/lib/cc/agent/__tests__
+ Test Files  8 passed (8)
+      Tests  63 passed (63)
+```
+
+### Gate
+- `npx vitest run src --config vitest.agent-source.config.ts`: 148 files / 1017 tests passed
+- `npx tsc --noEmit -p .`: 0 diagnostics
