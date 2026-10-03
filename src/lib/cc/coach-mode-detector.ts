@@ -24,7 +24,12 @@ const INTENT_PATTERNS: Array<{ pattern: RegExp; mode: CoachMode }> = [
   { pattern: /\bschool list\b/i, mode: "school-builder" },
   { pattern: /\b(essay|personal statement|supplemental)\b/i, mode: "essay" },
   { pattern: /\b(interviews?|mock interview|practice interview)\b/i, mode: "interview" },
-  { pattern: /\b(gpa|grades?|test score|sat|act)\b/i, mode: "academic" },
+  { pattern: /\b(gpa|grades?|test scores?)\b/i, mode: "academic" },
+  // Test names are matched in capitals so "I sat down" or "how should I act"
+  // is not read as a test question.
+  { pattern: /\b(SAT|ACT)\b/, mode: "academic" },
+  // The student explicitly asks to start or continue the intake questions.
+  { pattern: /\b(start|begin|continue|resume|do)\b.{0,20}\bintake\b/i, mode: "academic" },
 ];
 
 const PAGE_MODES: Array<{ pattern: RegExp; mode: CoachMode }> = [
@@ -58,7 +63,8 @@ export function detectMode(
     if (pattern.test(currentPage)) return mode;
   }
 
-  if (!progress.hasGPA) return "academic";
-
+  // A missing GPA alone never forces academic mode: that hijacked unrelated
+  // questions with "what's your GPA?". Academic mode comes only from the
+  // message (grades, tests, or an explicit intake request) above.
   return "general";
 }
