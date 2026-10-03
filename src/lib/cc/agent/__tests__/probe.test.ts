@@ -16,9 +16,39 @@ it("uses four calls maximum and keeps independent observed dimensions",async()=>
  expect(report.allPassed).toBe(true);
 });
 it("rejects unknown pricing before spending",async()=>{
- const fetcher=vi.fn();let report:unknown;
- await expect(probeModelCapabilities(["routine"],fetcher,{...env(),OPENROUTER_AGENT_PRICING_JSON:"{}"})).rejects.toThrow("pricing_unverified");
- expect(fetcher).not.toHaveBeenCalled();expect(report).toBeUndefined();
+ const fetcher=vi.fn();
+ const outcome=await probeModelCapabilities(["routine"],fetcher,{...env(),OPENROUTER_AGENT_PRICING_JSON:"{}"}).then(report=>({report}),(e:Error)=>({error:e.message}));
+ expect(outcome).toEqual({error:"pricing_unverified"});expect(fetcher).not.toHaveBeenCalled();
+});
+it("refuses a blank API key before any request",async()=>{
+ const fetcher=vi.fn();
+ await expect(probeModelCapabilities(["routine"],fetcher,{...env(),OPENROUTER_API_KEY:"  "})).rejects.toThrow(/^probe_key_missing$/);
+ expect(fetcher).not.toHaveBeenCalled();
+});
+it("a receipt above the reserved bound is an anomaly that stops later roles",async()=>{
+ const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>response(false,0.01)});
+ const report=await probeModelCapabilities(["routine","planner"],fetcher,env());
+ expect(fetcher).toHaveBeenCalledTimes(1);
+ expect(report.results[0]).toMatchObject({error:"probe_cost_bound_anomaly",costReceiptUsd:0.01,reachable:false});
+ expect(report.results[1].error).toBe("probe_not_run_after_unknown_cost");
+ expect(report.totalReceiptUsd).toBeNull();expect(report.allPassed).toBe(false);
+});
+it("a transport throw stops later roles and never reports its message",async()=>{
+ const fetcher=vi.fn().mockRejectedValue(new Error("socket reset SECRET"));
+ const report=await probeModelCapabilities(["routine","planner"],fetcher,env());
+ expect(fetcher).toHaveBeenCalledTimes(1);
+ expect(report.results[0].error).toBe("probe_transport_or_receipt_unknown");expect(report.results[1].error).toBe("probe_not_run_after_unknown_cost");
+ expect(report.totalReceiptUsd).toBeNull();expect(JSON.stringify(report)).not.toContain("SECRET");
+});
+it.each([
+ [{prompt:null,completion:"0.0000044",request:"0"},"probe_slug_or_price_unverified"],
+ [{prompt:"0.0000014",completion:"",request:"0"},"probe_slug_or_price_unverified"],
+ [{prompt:"0.0000014",completion:"0.0000044",request:"  "},"probe_slug_or_price_unverified"],
+ [{prompt:"0.0000014",completion:"0.0000044",request:"0",input_cache_read:""},"pricing_extra_dimension_unverified"],
+ [{prompt:"0.0000014",completion:"0.0000044",request:"0",internal_reasoning:null},"pricing_extra_dimension_unverified"],
+])("a null or blank catalog price %j fails closed instead of reading as zero",async(pricing,code)=>{
+ const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>({data:[{id:"fixture",pricing}]})});
+ await expect(fetchProbePricing(env(),fetcher)).rejects.toThrow(new RegExp(`^${code}$`));
 });
 it("unknown actual cost stops further calls and is never zero",async()=>{
  const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>response(false,null)});

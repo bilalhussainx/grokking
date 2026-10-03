@@ -27,22 +27,24 @@ export function prepareProbe(roles:AgentRole[],env:Record<string,string|undefine
  if(totalUpper>=0.05)throw Error("probe_budget_exceeded");
  return {env:{...env},requests,totalUpper};
 }
+// A catalog price must be a non-blank string or a number: Number(null) and Number("") read as $0.
+const present=(v:unknown)=>typeof v==="number"||(typeof v==="string"&&v.trim()!=="");
 // Free catalog lookup: no completion call and no authorization header/key in this request.
 export async function fetchProbePricing(env:Record<string,string|undefined>,transport:typeof fetch=fetch):Promise<Record<string,string|undefined>> {
  const response=await transport("https://openrouter.ai/api/v1/models",{signal:AbortSignal.timeout(10000)});
  if(!response.ok)throw Error("pricing_catalog_unavailable");
- const payload=await response.json() as {data?:Array<{id?:string;pricing?:Record<string,string|number>}>};
+ const payload=await response.json() as {data?:Array<{id?:string;pricing?:Record<string,unknown>}>};
  if(!Array.isArray(payload.data))throw Error("pricing_catalog_invalid");
  const prices:Record<string,Rates>={};
  for(const role of Object.keys(ROLE_ENV_VARS) as AgentRole[]){
   const model=env[ROLE_ENV_VARS[role]]?.trim();if(!model)throw Error("probe_model_missing");
   const entry=payload.data.find(row=>row.id===model),p=entry?.pricing;
-  if(!p||p.prompt===undefined||p.completion===undefined||p.request===undefined)throw Error("probe_slug_or_price_unverified");
+  if(!p||![p.prompt,p.completion,p.request].every(present))throw Error("probe_slug_or_price_unverified");
   const input=Number(p.prompt),output=Number(p.completion),fixed=Number(p.request);
   if(![input,output,fixed].every(n=>Number.isFinite(n)&&n>=0))throw Error("pricing_catalog_invalid");
   // Images/search are not requested; cached input is accepted only at or below prompt price.
   const irrelevant=new Set(["image","image_token","web_search"]);
-  if(Object.entries(p).some(([k,v])=>{if(["prompt","completion","request"].includes(k)||irrelevant.has(k))return false;if(["input_cache_read","input_cache_write"].includes(k))return !Number.isFinite(Number(v))||Number(v)<0||Number(v)>input;return Number(v)!==0;}))throw Error("pricing_extra_dimension_unverified");
+  if(Object.entries(p).some(([k,v])=>{if(["prompt","completion","request"].includes(k)||irrelevant.has(k))return false;if(!present(v))return true;if(["input_cache_read","input_cache_write"].includes(k))return !Number.isFinite(Number(v))||Number(v)<0||Number(v)>input;return Number(v)!==0;}))throw Error("pricing_extra_dimension_unverified");
   prices[model]={inputPerMillion:input*1e6,outputPerMillion:output*1e6,fixedPerRequest:fixed,verifiedAt:new Date().toISOString()};
  }
  return {...env,OPENROUTER_AGENT_PRICING_JSON:JSON.stringify(prices)};
