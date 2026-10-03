@@ -42,6 +42,49 @@ const EMPTY: Omit<CounselorRoleState, "loading"> = {
   isHead: false,
 };
 
+type MeResponse = {
+  counselor: { id: string; slug: string } | null;
+  membership: { agencyId: string; role: "head" | "counselor"; requiresReview: boolean } | null;
+};
+
+// One /api/counselor/me lookup per user, shared by every mounted instance (the
+// layout, AppFrame and page each use this hook) and reused briefly. A failed
+// lookup is dropped so the next mount retries.
+const SHARED_MS = 30_000;
+const shared = new Map<string, { at: number; promise: Promise<MeResponse | null> }>();
+
+export function __resetCounselorRoleCache(): void {
+  shared.clear();
+}
+
+// Right after sign-in there's an auth-settle window where /api/counselor/me can
+// transiently 401/500 (cookies not yet propagated). Treating that as "not a
+// counselor/member" makes gated pages (roster, team) wrongly redirect to the
+// dashboard. So on a non-ok or thrown response we retry once after a short delay.
+async function fetchMe(): Promise<MeResponse | null> {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const r = await fetch("/api/counselor/me");
+      if (r.ok) return (await r.json()) as MeResponse;
+    } catch {
+      /* network blip — fall through to retry */
+    }
+    if (attempt === 0) await new Promise((res) => setTimeout(res, 800));
+  }
+  return null; // both attempts failed
+}
+
+function loadMe(userId: string): Promise<MeResponse | null> {
+  const hit = shared.get(userId);
+  if (hit && Date.now() - hit.at < SHARED_MS) return hit.promise;
+  const promise = fetchMe().then((data) => {
+    if (!data) shared.delete(userId);
+    return data;
+  });
+  shared.set(userId, { at: Date.now(), promise });
+  return promise;
+}
+
 export function useCounselorRole(): CounselorRoleState {
   const { user, loading: authLoading } = useAuth();
   const [state, setState] = useState<CounselorRoleState>({ ...EMPTY, loading: true });
@@ -74,28 +117,7 @@ export function useCounselorRole(): CounselorRoleState {
 
     let cancelled = false;
 
-    // Fetch /me with one retry. Right after sign-in there's an auth-settle
-    // window where /api/counselor/me can transiently 401/500 (cookies not yet
-    // propagated). Treating that as "not a counselor/member" makes gated pages
-    // (roster, team) wrongly redirect to the dashboard. So on a non-ok or
-    // thrown response we retry once after a short delay before resolving.
-    async function loadMe(): Promise<{
-      counselor: { id: string; slug: string } | null;
-      membership: { agencyId: string; role: "head" | "counselor"; requiresReview: boolean } | null;
-    } | null> {
-      for (let attempt = 0; attempt < 2; attempt++) {
-        try {
-          const r = await fetch("/api/counselor/me");
-          if (r.ok) return await r.json();
-        } catch {
-          /* network blip — fall through to retry */
-        }
-        if (attempt === 0) await new Promise((res) => setTimeout(res, 800));
-      }
-      return null; // both attempts failed
-    }
-
-    loadMe().then((data) => {
+    loadMe(user.id).then((data) => {
       if (cancelled) return;
       if (!data) {
         // Lookup failed after retry. Don't downgrade a cached membership to
