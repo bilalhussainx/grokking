@@ -17,7 +17,7 @@ export default function DaybreakHomepage() {
   return <DaybreakShell languageControl={<div className="db-language"><Select id="quick-check-language" label="Quick check language" value={language} onChange={e=>setLanguage(e.target.value as QuickCheckLanguage)}>{QUICK_CHECK_LANGUAGES.map(lang=><option key={lang.code} value={lang.code}>{lang.nativeName}</option>)}</Select></div>}>
     <main id="daybreak-main" className="db-container" tabIndex={-1}>
       <section className="db-hero" aria-labelledby="daybreak-title">
-        <div className="db-hero-intro" lang={language} dir={language==='ur'?'rtl':'ltr'}><p className="db-eyebrow">{eyebrow[language]}</p><h1 id="daybreak-title">{language==='en'?<>Your future.<br/>One good <em>next step.</em></>:copy.headline}</h1><p className="db-hero-lead">{copy.intro}</p></div>
+        <div className="db-hero-intro" lang={language} dir={language==='ur'?'rtl':'ltr'}><p className="db-eyebrow">{eyebrow[language]}</p><h1 id="daybreak-title">{language==='en'?<>Your future.<br/>One good <em>next step.</em></>:copy.headline}</h1><p className="db-hero-identity" lang="en" dir="ltr">An AI admissions counselor for the US, UK and Canada. You write every essay.</p><p className="db-hero-lead">{copy.intro}</p></div>
         <figure className="db-hero-art"><img src="/illustrations/daybreak/next-step.svg" width="520" height="240" alt=""/><figcaption>There is more than one way forward.</figcaption></figure>
         <NextStepCheck language={language}/>
       </section>

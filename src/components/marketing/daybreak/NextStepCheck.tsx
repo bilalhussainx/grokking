@@ -1,10 +1,11 @@
 'use client';
+import Link from 'next/link';
 import { useRef, useState, type FormEvent } from 'react';
 import { Button, Select } from '@/components/ui/daybreak';
 import { QUICK_CHECK_COPY, getNextStep, firstPlanningQuestion, type QuickCheckLanguage, type Stage, type Destination, type Concern } from '@/lib/daybreak';
 
 const stages: Stage[] = ['early','junior','applying','submitted','decisions','transfer'];
-const destinations: Destination[] = ['us','ca','exploring'];
+const destinations: Destination[] = ['us','uk','ca','exploring'];
 const concerns: Concern[] = ['schools','cost','essay'];
 type Answers = { stage: Stage | ''; destination: Destination | ''; concern: Concern | '' };
 const empty: Answers = { stage: '', destination: '', concern: '' };
@@ -21,7 +22,16 @@ export default function NextStepCheck({ language }: { language: QuickCheckLangua
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const result = submitted && answers.stage && answers.destination && answers.concern ? getNextStep(answers.stage, answers.destination, answers.concern, language) : null;
   function invalidate() { setSubmitted(false);setReady(['','','','']);setPlanning(null);if(detailsRef.current)detailsRef.current.open=false; }
-  function submit(e: FormEvent<HTMLFormElement>) { e.preventDefault();setSubmitted(true);requestAnimationFrame(()=>resultRef.current?.focus()); }
+  function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();setSubmitted(true);
+    // The result renders below the fold on phones: focus it, then bring it into view.
+    requestAnimationFrame(()=>{
+      const el=resultRef.current;
+      el?.focus({preventScroll:true});
+      const reduced=typeof window.matchMedia==='function'&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el?.scrollIntoView?.({behavior:reduced?'auto':'smooth',block:'start'});
+    });
+  }
   return <section className="db-quick-check db-card" lang={language} dir={language==='ur'?'rtl':'ltr'} aria-labelledby="next-step-title">
     <div className="db-check-heading"><h2 id="next-step-title">{copy.check}</h2><span className="db-small db-check-note" lang="en" dir="ltr">A place to begin.</span></div>
     <form className="db-check-fields" onSubmit={submit}>
@@ -34,6 +44,7 @@ export default function NextStepCheck({ language }: { language: QuickCheckLangua
     <div aria-live="polite">{result && <section className="db-next-result">
       <p className="db-eyebrow">{copy.based}</p><h3 tabIndex={-1} ref={resultRef}>{copy.result}</h3><p>{result.action}</p><p className="db-small">{result.hint}</p>
       <div className="db-open-question"><strong>{copy.open}</strong><p>{result.question}</p></div>
+      <Link href="/signup" className="db-button db-button--primary db-next-cta" lang="en" dir="ltr">Keep going with Coach Kairos — free, no card <span aria-hidden="true">→</span></Link>
       <details ref={detailsRef} className="db-planning" lang="en" dir="ltr"><summary>Find the first missing piece · English</summary><p className="db-small">Optional: check what you already know. This is a planning check, not an admissions assessment.</p>
         <form onSubmit={e=>{e.preventDefault();setPlanning(firstPlanningQuestion(ready));}}>
           {['I have a school or program to research','I have checked its current requirements','I have recorded cost and possible funding','I know my next task'].map((label,i)=><Select key={label} label={label} value={ready[i]} onChange={e=>{setReady(ready.map((value,n)=>n===i?e.target.value as Ready:value));setPlanning(null);}}><option value="">Choose one</option><option value="yes">Yes</option><option value="no">Not yet</option><option value="unsure">Not sure</option></Select>)}
