@@ -19,3 +19,9 @@ export const yearlySavingsPct = () =>
 // button never leads to a "billing is not configured" error. (Literal
 // process.env access so Next inlines NEXT_PUBLIC_ vars.)
 export const yearlyCheckoutConfigured = () => Boolean(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_YEARLY);
+
+// One sentence for the trial, used wherever a page explains it. The trial
+// starts at signup with no card (Supabase trigger create_signup_pro_trial);
+// a Stripe subscription (checkout route) is created only if the student
+// chooses to subscribe.
+export const TRIAL_TERMS = `${PRICING.pro.trialDays}-day Pro trial, no card needed. Paying only starts if you choose to subscribe.`;

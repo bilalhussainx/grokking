@@ -1,5 +1,6 @@
 "use client";
 
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import "./onboarding.css";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -375,7 +376,7 @@ function StepLanguage({
       <div className="lang-foot">
         <div className="pill-info">
           <span className="dot-i" />
-          25 languages today &nbsp;·&nbsp; more rolling out through 2026
+          {COACH_LANGUAGE_COUNT} languages today &nbsp;·&nbsp; more rolling out through 2026
         </div>
         <div className="pill-info" style={{ color: "rgba(242,237,227,.40)" }}>
           <Headphones size={12} /> Voice mode uses your device mic. We never store raw audio.

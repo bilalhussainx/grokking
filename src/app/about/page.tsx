@@ -1,11 +1,14 @@
-import { Metadata } from 'next';
+import { pageMetadata } from "@/lib/seo";
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import Link from 'next/link';
-import { ArrowRight, GraduationCap, Code, Users, Sparkles, Briefcase, Rocket } from 'lucide-react';
+import { PRICING } from "@/lib/pricing";
+import { ArrowRight, GraduationCap, Code, Users, Sparkles, Briefcase } from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'About KairosLearn - AI College Counseling for Every Student',
-  description: 'Meet the team behind KairosLearn. Harvard CS grad turned educator building an AI college counselor that speaks 18 languages — for the students the 415:1 counselor ratio leaves behind.',
-};
+export const metadata = pageMetadata({
+  title: "About us — AI college counseling for every student",
+  description: `Meet the team behind KairosLearn. Harvard CS grad turned educator building an AI college counselor that speaks ${COACH_LANGUAGE_COUNT} languages — for the students an overstretched counselor system leaves behind.`,
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (
@@ -18,7 +21,7 @@ export default function AboutPage() {
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             KairosLearn is an AI-powered college counseling platform. Coach Kairos guides
-            students through school lists, essays, interviews, and financial aid — in 18
+            students through school lists, essays, interviews, and financial aid — in {COACH_LANGUAGE_COUNT}
             languages — and gives human counselors a workspace to support their whole caseload.
           </p>
         </div>
@@ -38,8 +41,8 @@ export default function AboutPage() {
             </p>
 
             <p className="text-gray-300 leading-relaxed mb-4">
-              At an elite school, every student had a college counselor who knew their story. But the average U.S.
-              public-school counselor serves 415 students. For first-gen, international, and underprivileged
+              At an elite school, every student had a college counselor who knew their story. But school counselors
+              often serve hundreds of students each. For first-gen, international, and underprivileged
               applicants — the students whose families can&apos;t pay $5,000 for a private consultant, or don&apos;t speak
               English at home — that ratio means almost no time, no translation, and no one who knows them.
             </p>
@@ -54,7 +57,7 @@ export default function AboutPage() {
             </p>
 
             <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
-              <li><strong>Coach Kairos in 18 languages</strong> — talk through your school list in Hindi, your essays in Punjabi, your aid forms in Spanish</li>
+              <li><strong>Coach Kairos in {COACH_LANGUAGE_COUNT} languages</strong> — talk through your school list in Hindi, your essays in Punjabi, your aid forms in Spanish</li>
               <li><strong>Essay Studio</strong> — brainstorm, outline, draft, and revise with coaching that never writes a word for you</li>
               <li><strong>School list + aid tools</strong> — reach/match/safety chancing, activities optimizer, mock interviews, financial-aid comparison</li>
               <li><strong>A counselor workspace</strong> — human counselors and agencies run their whole student book on the same platform</li>
@@ -67,8 +70,9 @@ export default function AboutPage() {
             </p>
 
             <p className="text-gray-300 leading-relaxed">
-              We&apos;re raising our pre-seed round now to bring this to 1 million students worldwide. If you&apos;re an investor,
-              partner, or just believe in this vision — <Link href="/pricing" className="text-[#D4AF37] underline">try the platform</Link> or <a href="mailto:bilalhussain.v1@gmail.com" className="text-[#D4AF37] underline">reach out</a>.
+              If you&apos;re a student, parent, counselor, or partner who believes in this —{" "}
+              <Link href="/pricing" className="text-[#D4AF37] underline">try the platform</Link> or{" "}
+              <a href="mailto:bilalhussain.v1@gmail.com" className="text-[#D4AF37] underline">reach out</a>.
             </p>
           </div>
         </div>
@@ -90,7 +94,7 @@ export default function AboutPage() {
             </h3>
             <p className="text-gray-300">
               A great application shouldn&apos;t require a $5,000 consultant or an English-speaking household.
-              Coach Kairos speaks 18 languages and knows every student&apos;s full story.
+              Coach Kairos speaks {COACH_LANGUAGE_COUNT} languages and knows every student&apos;s full story.
             </p>
           </div>
 
@@ -102,7 +106,7 @@ export default function AboutPage() {
               AI-Native from Day One
             </h3>
             <p className="text-gray-300">
-              Built with Claude Code, optimized for AI interactions. We&apos;re not retrofitting AI onto old systems —
+              Designed around AI from the first line. We&apos;re not retrofitting AI onto old systems —
               we&apos;re AI-first.
             </p>
           </div>
@@ -143,7 +147,6 @@ export default function AboutPage() {
               <p className="flex items-center gap-2"><GraduationCap className="w-4 h-4 text-gray-400 shrink-0" /><strong>Harvard CS</strong> (Class of 2022)</p>
               <p className="flex items-center gap-2"><Users className="w-4 h-4 text-gray-400 shrink-0" /><strong>Former CS Instructor</strong> at Milton Academy (2022-2024)</p>
               <p className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-gray-400 shrink-0" /><strong>Senior Full-Stack Developer</strong> at Penomo Protocol (MERN stack)</p>
-              <p className="flex items-center gap-2"><Rocket className="w-4 h-4 text-gray-400 shrink-0" /><strong>Built with AI</strong> — ships fast using Claude Code</p>
             </div>
             <div className="mt-6 flex justify-center gap-4">
               <a
@@ -165,7 +168,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Traction (Pre-seed pitch section) */}
+      {/* By the numbers */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-[#D4AF37] rounded-2xl p-8 text-black">
           <h2 className="text-3xl font-bold mb-6 text-center">
@@ -174,27 +177,24 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-4 gap-6 text-center mb-8">
             <div>
-              <div className="text-4xl font-bold mb-2">18</div>
+              <div className="text-4xl font-bold mb-2">{COACH_LANGUAGE_COUNT}</div>
               <div className="text-black/70">Coach Languages</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">415:1</div>
-              <div className="text-black/70">The Ratio We&apos;re Fixing</div>
+              <div className="text-4xl font-bold mb-2">{PRICING.pro.trialDays}-day</div>
+              <div className="text-black/70">Pro Trial, No Card</div>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">6</div>
               <div className="text-black/70">Application Tools</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">$0</div>
-              <div className="text-black/70">First Three Schools</div>
+              <div className="text-4xl font-bold mb-2">{PRICING.free.signupCredits}</div>
+              <div className="text-black/70">Free AI Credits to Start</div>
             </div>
           </div>
 
           <div className="text-center">
-            <p className="text-lg mb-6 text-black/80">
-              <strong>We&apos;re raising $500K–$1.5M in pre-seed funding</strong> to bring one-on-one college counseling to 1M students.
-            </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/pricing"
@@ -203,12 +203,6 @@ export default function AboutPage() {
                 Try the Platform
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
-              <a
-                href="mailto:bilalhussain.v1@gmail.com?subject=KairosLearn Investment Inquiry"
-                className="inline-flex items-center justify-center px-6 py-3 bg-black/10 text-black rounded-lg font-semibold hover:bg-black/20 transition"
-              >
-                Investor Deck
-              </a>
             </div>
           </div>
         </div>
@@ -220,7 +214,7 @@ export default function AboutPage() {
           Join Us on This Journey
         </h2>
         <p className="text-xl text-gray-300 mb-8">
-          Whether you&apos;re a student, investor, partner, or fellow builder — we&apos;d love to hear from you.
+          Whether you&apos;re a student, parent, counselor, or partner — we&apos;d love to hear from you.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link

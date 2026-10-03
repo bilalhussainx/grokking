@@ -56,5 +56,5 @@ export async function POST() {
     return NextResponse.json({ error: "Failed to activate Pro" }, { status: 500 });
   }
 
-  return NextResponse.json({ granted: true, message: "Pro access activated! You now have full access to all courses and features." });
+  return NextResponse.json({ granted: true, message: "Pro access activated! You now have full access to Pro." });
 }

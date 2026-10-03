@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import MarketingShell from "@/components/marketing/MarketingShell";
 import { FeatureGrid, FinalCTA, type IconName } from "@/components/marketing/MarketingSections";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Essay Studio — brainstorm, outline, draft, revise",
   description:
     "A 4-phase essay flow built around the way real students write. Voice brainstorm in your home language, English fragments lift to the canvas, and the coach pushes you through outline → draft → revise.",
-};
+  path: "/product/essays",
+});
 
 const FEATURES: { icon: IconName; title: string; body: string }[] = [
   {

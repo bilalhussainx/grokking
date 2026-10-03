@@ -1,7 +1,10 @@
 "use client";
 
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import { useEffect, useState } from "react";
 import { Moon, X } from "lucide-react";
+
+const NAMED_LANGUAGES = ["English", "Hindi", "Punjabi", "Spanish", "French", "German", "Italian", "Dutch", "Japanese"];
 
 const STORAGE_KEY = "kl-working-late-dismissed-date";
 const LATE_HOUR_START = 22; // 10pm
@@ -76,7 +79,7 @@ export default function WorkingLatePrompt() {
             Working late? Coach Kairos is here whenever you need.
           </p>
           <p className="text-[11.5px] mt-1 text-white/55">
-            English, Hindi, Punjabi, Spanish, French, German, Italian, Dutch, Japanese — and 8 more.
+            {NAMED_LANGUAGES.join(", ")} — and {COACH_LANGUAGE_COUNT - NAMED_LANGUAGES.length} more.
           </p>
         </div>
         <button

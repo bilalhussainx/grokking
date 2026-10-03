@@ -1,12 +1,13 @@
 // Public FAQ answers: the reviewed description of the admissions product.
 // Rendered on /faq and reused by /llms-full.txt.
-import { proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
+import { PRICING, PRO_FAIR_USE, TRIAL_TERMS, proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
 
 export const FAQ_ITEMS = [
   {
     question: 'What is KairosLearn?',
     answer:
-      'KairosLearn is an AI-powered college counseling platform. Coach Kairos — an AI counselor available in 18 languages — guides you through the whole application: building a school list with reach/match/safety chancing, brainstorming and revising essays, optimizing your Common App activities, practicing interviews with alumni AI personas, and comparing financial aid. Human counselors and agencies use the same platform to run their student caseload, review essays, and track progress.',
+      'KairosLearn is an AI-powered college counseling platform. Coach Kairos — an AI counselor available in ${COACH_LANGUAGE_COUNT} languages — guides you through the whole application: building a school list with reach/match/safety chancing, brainstorming and revising essays, optimizing your Common App activities, practicing interviews with alumni AI personas, and comparing financial aid. Human counselors and agencies use the same platform to run their student caseload, review essays, and track progress.',
   },
   {
     question: 'Does the AI write my college essay?',
@@ -21,12 +22,12 @@ export const FAQ_ITEMS = [
   {
     question: 'Is KairosLearn free? What does Pro cost?',
     answer:
-      `Free forever for your first three schools — school list, essays, and core tools included. Pro is ${proMonthlyLabel()} (or ${proYearlyLabel()}) and unlocks unlimited schools, essays, voice sessions, languages, mock interviews, and the full financial-aid comparator. New users get a free 7-day Pro trial with no card required, and you can cancel within 14 days of any charge for a full refund.`,
+      `Free gives you ${PRICING.free.signupCredits} AI credits, once, to try Coach Kairos; they do not renew. Pro is ${proMonthlyLabel()} or ${proYearlyLabel()} and spends no credits, with fair use of ${PRO_FAIR_USE.coachMessagesPerDay} coach messages and ${PRO_FAIR_USE.voiceMinutesPerDay} voice minutes a day, plus the full financial-aid comparator. ${TRIAL_TERMS} You can cancel within 14 days of any charge for a full refund.`,
   },
   {
     question: 'What languages does KairosLearn support?',
     answer:
-      'Coach Kairos supports 18 languages for voice and chat, including English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, Punjabi, and Urdu. You can talk through your school list in one language and get essay feedback in another. Family Mode lets you hand the phone to a parent and the coach switches to their language and answers their questions — financial aid included — without exposing your essay drafts.',
+      'Coach Kairos supports ${COACH_LANGUAGE_COUNT} languages for voice and chat, including English, Spanish, French, German, Italian, Dutch, Japanese, Hindi, Punjabi, and Urdu. You can talk through your school list in one language and get essay feedback in another. Family Mode lets you hand the phone to a parent and the coach switches to their language and answers their questions — financial aid included — without exposing your essay drafts.',
   },
   {
     question: 'I’m a counselor or run an agency. How does KairosLearn work for me?',

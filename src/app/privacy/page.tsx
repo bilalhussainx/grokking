@@ -1,10 +1,11 @@
-import { Metadata } from 'next';
+import { pageMetadata } from "@/lib/seo";
 import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy - KairosLearn',
-  description: 'KairosLearn privacy policy. How we collect, use, and protect your data.',
-};
+export const metadata = pageMetadata({
+  title: "Privacy Policy",
+  description: "KairosLearn privacy policy. How we collect, use, and protect your data.",
+  path: "/privacy",
+});
 
 export default function PrivacyPolicyPage() {
   return (

@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import MarketingShell from "@/components/marketing/MarketingShell";
 import { FeatureGrid, FinalCTA, type IconName } from "@/components/marketing/MarketingSections";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Schools — list builder + chancing + deadlines",
   description:
     "Build a balanced school list with reach / match / safety classification, real chances of admission, and every deadline tracked. Replace the spreadsheet your family is using.",
-};
+  path: "/product/schools",
+});
 
 const FEATURES: { icon: IconName; title: string; body: string }[] = [
   {

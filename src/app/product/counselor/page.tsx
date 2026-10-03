@@ -1,18 +1,19 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import MarketingShell from "@/components/marketing/MarketingShell";
 import { FeatureGrid, FinalCTA, type IconName } from "@/components/marketing/MarketingSections";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Coach Kairos — your AI college counselor",
-  description:
-    "Voice-first AI counseling for college applicants in 18 languages. Trained on your profile, your grades, your school list. Available at 3 a.m. on a Saturday.",
-};
+  description: `Voice-first AI counseling for college applicants in ${COACH_LANGUAGE_COUNT} languages. Trained on your profile, your grades, your school list. Available at 3 a.m. on a Saturday.`,
+  path: "/product/counselor",
+});
 
 const FEATURES: { icon: IconName; title: string; body: string }[] = [
   {
     icon: "mic",
-    title: "Voice-first, 18 languages",
-    body: "Talk through your school list in Hindi, your essay in Punjabi, your aid forms in Spanish. Coach Kairos speaks back in the same language with sub-second latency.",
+    title: `Voice-first, ${COACH_LANGUAGE_COUNT} languages`,
+    body: "Talk through your school list in Hindi, your essay in Punjabi, your aid forms in Spanish. Coach Kairos speaks back in the same language.",
   },
   {
     icon: "grad",
@@ -52,7 +53,7 @@ export default function CounselorPage() {
           Your AI counselor — for <em>every</em> student.
         </h1>
         <p className="kl-mkt-lede">
-          The average U.S. public-school counselor serves 415 students. For first-gen,
+          School counselors often serve hundreds of students each. For first-gen,
           international, and underprivileged applicants, that means almost no time, no translation,
           no institutional memory. Coach Kairos is one counselor per student — in your language,
           trained on your profile, available at 3 a.m. on a Saturday.

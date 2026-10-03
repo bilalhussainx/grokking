@@ -1,8 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import fs from "node:fs";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import DaybreakHomepage from "./DaybreakHomepage";
 import { QUICK_CHECK_COPY } from "@/lib/daybreak";
+import { TRIAL_TERMS } from "@/lib/pricing";
 
 const pricingState = vi.hoisted(() => ({ yearlyEnabled: false }));
 
@@ -75,7 +77,7 @@ describe("Daybreak homepage quick check", () => {
     submitQuickCheck();
 
     expect(screen.getByText(QUICK_CHECK_COPY.en.actions.submitted)).toBeInTheDocument();
-    expect(screen.getByText(QUICK_CHECK_COPY.en.hint[1])).toBeInTheDocument();
+    expect(screen.getByText(QUICK_CHECK_COPY.en.hint[2])).toBeInTheDocument();
     expect(screen.getByText(QUICK_CHECK_COPY.en.questions[0])).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: QUICK_CHECK_COPY.en.reset }));
@@ -198,15 +200,63 @@ describe("Daybreak homepage cost check", () => {
   });
 });
 
-describe("Daybreak homepage yearly price gate", () => {
-  it("shows the annual price only when yearly checkout is configured", () => {
-    const { unmount } = render(<DaybreakHomepage />);
-    expect(screen.queryByText(/\$99\/year USD/)).not.toBeInTheDocument();
-
-    unmount();
-    pricingState.yearlyEnabled = true;
+describe("Daybreak homepage identity and quick check additions", () => {
+  it("says what KairosLearn is right under the H1", () => {
     render(<DaybreakHomepage />);
+    const line = screen.getByText("An AI admissions counselor for the US, UK and Canada. You write every essay.");
+    const h1 = screen.getByRole("heading", { level: 1 });
+    expect(h1.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 
+  it("offers United Kingdom and answers with UCAS guidance and no invented dates", () => {
+    render(<DaybreakHomepage />);
+    const select = screen.getByLabelText(QUICK_CHECK_COPY.en.labels[1]);
+    expect(within(select).getByRole("option", { name: "United Kingdom" })).toBeInTheDocument();
+    chooseQuickCheck("applying", "uk", "essay");
+    submitQuickCheck();
+    const hint = screen.getByText(QUICK_CHECK_COPY.en.hint[1]);
+    expect(hint.textContent).toMatch(/UCAS/);
+    expect(hint.textContent).not.toMatch(/\d/);
+  });
+
+  it("attaches a Coach Kairos CTA to the result only after submitting", () => {
+    render(<DaybreakHomepage />);
+    expect(screen.queryByRole("link", { name: /Keep going with Coach Kairos/ })).not.toBeInTheDocument();
+    chooseQuickCheck();
+    submitQuickCheck();
+    const cta = screen.getByRole("link", { name: /Keep going with Coach Kairos — free, no card/ });
+    expect(cta).toHaveAttribute("href", "/signup");
+  });
+
+  it("scrolls the result into view after submit", async () => {
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    render(<DaybreakHomepage />);
+    chooseQuickCheck();
+    submitQuickCheck();
+    await waitFor(() => expect(scroll).toHaveBeenCalled());
+  });
+
+  it("keeps Start free in the header at phone width", () => {
+    render(<DaybreakHomepage />);
+    expect(within(screen.getByRole("banner")).getByRole("link", { name: /Start free/ })).toHaveAttribute("href", "/signup");
+    const css = fs.readFileSync("src/components/marketing/daybreak/daybreak.css", "utf8");
+    const phone = css.slice(css.lastIndexOf("@media(max-width:700px)"));
+    expect(phone).toMatch(/\.db-header \.db-create-account\{[^}]*display:inline-flex/);
+    expect(css.indexOf(".db-header .db-create-account{display:none}")).toBeLessThan(css.lastIndexOf(".db-header .db-create-account{display:inline-flex"));
+  });
+});
+
+describe("Daybreak homepage plan story", () => {
+  it("always shows both Pro prices, whether or not yearly checkout is configured", () => {
+    render(<DaybreakHomepage />);
+    expect(screen.getAllByText(/\$15/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/\$99\/year USD/).length).toBeGreaterThan(0);
+  });
+
+  it("states the trial the same honest way as pricing: no card, paying is optional", () => {
+    render(<DaybreakHomepage />);
+    expect(screen.getByText(TRIAL_TERMS)).toBeInTheDocument();
+    expect(screen.queryByText(/then \$15\/month/)).not.toBeInTheDocument();
   });
 });

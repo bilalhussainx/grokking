@@ -17,7 +17,7 @@ export default function DaybreakFooter() {
         <p>College guidance for students<br/>{' '}and the people beside them.</p>
       </div>
       {groups.map(group => <nav key={group.title} aria-label={group.title}>
-        <h2>{group.title}</h2>
+        <p className="db-footer-heading">{group.title}</p>
         <ul>{group.links.map(([label, href]) => <li key={href}><Link href={href}>{label}</Link></li>)}</ul>
       </nav>)}
     </div>

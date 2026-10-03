@@ -169,7 +169,7 @@ function SignupForm() {
           <h1 className="text-2xl font-bold text-white">
             Join Kairos<span className="text-amber-400">Learn</span>
           </h1>
-          <p className="text-sm text-white/50 mt-2">Free {PRICING.pro.trialDays}-day Pro trial for students — {PRICING.free.signupCredits} AI credits to start</p>
+          <p className="text-sm text-white/50 mt-2">{PRICING.pro.trialDays}-day Pro trial, no card. {PRICING.free.signupCredits} AI credits to start. Paying only starts if you subscribe.</p>
         </motion.div>
 
         {/* Google OAuth — primary action */}

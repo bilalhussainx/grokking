@@ -26,6 +26,24 @@ describe("quick check language metadata", () => {
   });
 });
 
+describe("United Kingdom path", () => {
+  it("points UK students to UCAS and personal statement planning, with no dates", () => {
+    const result = getNextStep("applying", "uk", "essay", "en");
+    expect(result.hint).toMatch(/UCAS/);
+    expect(result.hint).toMatch(/personal statement/i);
+    expect(result.hint).not.toMatch(/\d/);
+  });
+
+  it("offers four study places in every language, UK second, with a UCAS hint", () => {
+    for (const copy of Object.values(QUICK_CHECK_COPY)) {
+      expect(copy.destinations).toHaveLength(4);
+      expect(copy.hint).toHaveLength(4);
+      expect(copy.hint[1]).toMatch(/UCAS/);
+    }
+    expect(QUICK_CHECK_COPY.en.destinations[1]).toBe("United Kingdom");
+  });
+});
+
 describe("getNextStep", () => {
   it.each([
     ["early", "early"],
@@ -55,7 +73,7 @@ describe("getNextStep", () => {
     const result = getNextStep("junior", "exploring", "cost", "es");
     expect(result).toEqual({
       action: QUICK_CHECK_COPY.es.actions.cost,
-      hint: QUICK_CHECK_COPY.es.hint[2],
+      hint: QUICK_CHECK_COPY.es.hint[3],
       question: QUICK_CHECK_COPY.es.questions[1],
     });
   });

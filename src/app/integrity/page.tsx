@@ -1,12 +1,12 @@
-import { Metadata } from 'next';
+import { pageMetadata } from "@/lib/seo";
 import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'AI Integrity Policy - KairosLearn',
+export const metadata = pageMetadata({
+  title: "AI Integrity Policy",
   description:
-    'How KairosLearn uses AI in college essay coaching: the AI asks questions and gives feedback — it never writes your essay. What that means under Common App and college AI policies.',
-  alternates: { canonical: 'https://kairoslearn.com/integrity' },
-};
+    "How KairosLearn uses AI in college essay coaching: the AI asks questions and gives feedback — it never writes your essay. What that means under Common App and college AI policies.",
+  path: "/integrity",
+});
 
 export default function AIIntegrityPage() {
   return (
