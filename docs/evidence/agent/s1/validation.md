@@ -65,3 +65,9 @@
 
 ## Task 7 fix round 1: AI badge on Kairos noticed heading (2026-10-03)
 - Covering: agent + today tests -> 3 files, 24 passed. Gate: 159 passed, 1 skipped files; 1160 passed, 6 skipped tests; tsc exit 0.
+
+## Task 8: golden scorer, 40-case seed, budget-guarded runner stub (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/golden-score.test.ts` -> 1 failed file, no tests (Cannot find module '../golden/seed-40.json' / score).
+- GREEN: same command -> 1 file, 6 passed (5 brief tests + every forbidden pattern compiles as RegExp).
+- Runner guard: `AGENT_GOLDEN_BUDGET_USD= npx tsx scripts/agent-golden-run.ts` -> "Refusing to run..." exit 2. No model call is made anywhere.
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 160 passed, 1 skipped files; 1166 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> no output (exit 0).
