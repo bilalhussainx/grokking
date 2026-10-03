@@ -201,7 +201,7 @@ export default function ActivitiesOptimizerPage() {
       {showUpload && <ResumeUpload onImported={() => { loadProfile(); setShowUpload(false); }} />}
 
       {/* Tabs */}
-      <div className="flex items-center justify-between gap-3 mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <Tabs
           ariaLabel="Activities optimizer sections"
           active={tab}

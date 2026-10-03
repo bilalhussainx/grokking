@@ -125,7 +125,7 @@ export default function SchoolCard({ school, onAdd, onRemove, onPlanChange, list
         </Link>
 
         {/* Right cluster: badges + actions */}
-        <div className="shrink-0 flex items-center gap-2">
+        <div className="kl-school-actions shrink-0 flex items-center gap-2">
           {aidWarning === "need-aware" && (
             <span
               title="This school is need-aware for your status — applying will factor aid need into admission"

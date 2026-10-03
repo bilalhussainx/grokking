@@ -61,8 +61,8 @@ export default function EssayCard({
 
   return (
     <Link href={`/cc/essays/${id}`} className="kl-essay-row group" aria-label={`${typeLabel} — ${phaseKey}`}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3 min-w-0 flex-1">
+      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+        <div className="flex items-start gap-3 min-w-[12rem] flex-1">
           <span className="kl-essay-rail" style={{ background: rail }} aria-hidden />
           <div className="min-w-0">
             <div className="kl-essay-kind">{typeLabel}</div>
@@ -71,7 +71,7 @@ export default function EssayCard({
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 max-w-full">
           {reviewState && REVIEW_BADGES[reviewState] && (
             <span
               className={`text-[10px] px-2 py-0.5 rounded-xl border ${REVIEW_BADGES[reviewState].cls}`}

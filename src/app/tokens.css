@@ -421,6 +421,12 @@
   gap: 12px;
   transition: border-color var(--kl-dur-fast, 150ms) ease-out;
 }
+/* Phone: badges and Add/Remove move under the school name instead of
+   pushing the card past the screen edge (48px = icon 36px + gap 12px). */
+@media (max-width: 639px) {
+  .kl-school-row { flex-wrap: wrap; }
+  .kl-school-row .kl-school-actions { flex-basis: 100%; flex-wrap: wrap; padding-left: 48px; }
+}
 .kl-school-row:hover {
   border-color: var(--kl-app-gold-edge, rgba(212, 175, 55, 0.22));
 }
