@@ -1,23 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAuth, unauthorized } from "../../helpers";
-
-function parseDeadline(deadline: string | null): string | null {
-  if (!deadline || deadline === "Rolling") return null;
-  const months: Record<string, string> = {
-    Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06",
-    Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12",
-  };
-  const parts = deadline.split(" ");
-  if (parts.length !== 2) return null;
-  const month = months[parts[0]];
-  const day = parts[1].padStart(2, "0");
-  if (!month) return null;
-  const now = new Date();
-  let year = now.getFullYear();
-  const parsed = new Date(`${year}-${month}-${day}`);
-  if (parsed < now) year++;
-  return `${year}-${month}-${day}`;
-}
+import { resolveCatalogDeadline } from "@/lib/cc/catalog-deadline";
 
 function subtractDays(dateStr: string, days: number): string {
   const d = new Date(dateStr);
@@ -59,13 +42,14 @@ export async function POST() {
   );
 
   const tasksToInsert: Array<Record<string, unknown>> = [];
+  const todayIso = new Date().toISOString().slice(0, 10);
 
   for (const entry of schoolEntries) {
     const school = entry.cc_schools as unknown as { id: string; name: string; regular_deadline: string; early_deadline: string | null } | null;
     if (!school) continue;
 
-    const regularDate = parseDeadline(school.regular_deadline);
-    const earlyDate = parseDeadline(school.early_deadline);
+    const regularDate = resolveCatalogDeadline(school.regular_deadline, todayIso);
+    const earlyDate = resolveCatalogDeadline(school.early_deadline, todayIso);
 
     if (regularDate && !existingSet.has(`${school.id}:application`)) {
       tasksToInsert.push({

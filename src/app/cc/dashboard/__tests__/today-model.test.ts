@@ -50,7 +50,38 @@ describe("deriveTodayInput", () => {
       school("North College", { deadline_ea: "2026-11-01", deadline_rd: "2027-01-15" }),
       school("South University", { deadline_ed: "2026-09-27" }),
     ] }), "2026-09-27");
-    expect(i.nextDeadline).toEqual({ schoolName: "South University", label: "ED", date: "2026-09-27" });
+    expect(i.upcomingDeadlines[0]).toEqual({ schoolName: "South University", label: "ED", date: "2026-09-27", fromCatalog: false });
+    expect(i.upcomingDeadlines.map((d) => d.date)).toEqual(["2026-09-27", "2026-11-01", "2027-01-15"]);
+  });
+
+  it("dates a year-less catalog deadline in the current cycle (Michigan, Feb 1)", () => {
+    const i = deriveTodayInput(raw({ schools: [
+      school("University of Michigan", { application_status: "in_progress", cc_schools: { name: "University of Michigan", regular_deadline: "Feb 1", early_deadline: "Nov 1" } }),
+    ] }), "2026-10-03");
+    expect(i.upcomingDeadlines).toEqual([
+      { schoolName: "University of Michigan", label: "early round", date: "2026-11-01", fromCatalog: true },
+      { schoolName: "University of Michigan", label: "RD", date: "2027-02-01", fromCatalog: true },
+    ]);
+  });
+
+  it("prefers a date saved on the student's list over the catalog date of the same round", () => {
+    const i = deriveTodayInput(raw({ schools: [
+      school("North College", { deadline_rd: "2027-01-10", deadline_ea: "2026-11-05", cc_schools: { name: "North College", regular_deadline: "Feb 1", early_deadline: "Nov 1" } }),
+    ] }), "2026-10-03");
+    expect(i.upcomingDeadlines).toEqual([
+      { schoolName: "North College", label: "EA", date: "2026-11-05", fromCatalog: false },
+      { schoolName: "North College", label: "RD", date: "2027-01-10", fromCatalog: false },
+    ]);
+  });
+
+  it("keeps only the next three dates and drops rolling or passed catalog dates", () => {
+    const i = deriveTodayInput(raw({ schools: [
+      school("A", { cc_schools: { name: "A", regular_deadline: "Jan 1" } }),
+      school("B", { cc_schools: { name: "B", regular_deadline: "Rolling", early_deadline: "Oct 1" } }),
+      school("C", { cc_schools: { name: "C", regular_deadline: "Jan 15", early_deadline: "Nov 15" } }),
+      school("D", { cc_schools: { name: "D", regular_deadline: "Mar 1" } }),
+    ] }), "2026-10-03");
+    expect(i.upcomingDeadlines.map((d) => `${d.schoolName} ${d.date}`)).toEqual(["C 2026-11-15", "A 2027-01-01", "C 2027-01-15"]);
   });
 
   it("counts each decision status on its own", () => {
@@ -94,10 +125,22 @@ describe("buildTodayModel", () => {
   });
 
   it("shows the next saved date as the stored calendar day", () => {
-    const i = { ...empty, schoolCount: 2, nextDeadline: { schoolName: "North College", label: "EA", date: "2026-11-01" } };
+    const i = { ...empty, schoolCount: 2, upcomingDeadlines: [{ schoolName: "North College", label: "EA", date: "2026-11-01", fromCatalog: false }] };
     const row = buildTodayModel("junior", i).rows.find((r) => r.id === "applications")!;
-    expect(row.detail).toContain("North College EA, Nov 1, 2026");
+    expect(row.items).toEqual(["North College EA · Nov 1, 2026 (saved on your list)"]);
     expect(row.detail).toMatch(/official/);
+  });
+
+  it("labels a catalog date honestly, without claiming a year", () => {
+    const i = {
+      ...empty, schoolCount: 1,
+      upcomingDeadlines: [{ schoolName: "University of Michigan", label: "RD", date: "2027-02-01", fromCatalog: true }],
+    };
+    for (const v of ["junior", "senior_writing"] as const) {
+      const row = buildTodayModel(v, i).rows.find((r) => r.id === "applications")!;
+      expect(row.items).toEqual(["University of Michigan RD · Feb 1 (from our school catalog; confirm on the school's site)"]);
+      expect(row.detail).not.toMatch(/No upcoming/);
+    }
   });
 
   it("lets saved work replace the generic starting point", () => {

@@ -2,11 +2,14 @@
 // list means the read failed (shown as "Couldn't load"), which is different
 // from an empty list. `todayIso` is the server's YYYY-MM-DD; ISO dates compare
 // correctly as strings, so no Date object is needed here.
+import { resolveCatalogDeadline } from "@/lib/cc/catalog-deadline";
+
 export type DeadlineKey =
   | "deadline_ea" | "deadline_ed" | "deadline_edii" | "deadline_rea" | "deadline_rd"
   | "deadline_financial_aid" | "deadline_css_profile" | "deadline_fafsa";
 
-export type RawSchoolRow = { application_status: string | null; cc_schools: { name?: string } | { name?: string }[] | null } &
+type CatalogSchool = { name?: string; regular_deadline?: string | null; early_deadline?: string | null };
+export type RawSchoolRow = { application_status: string | null; cc_schools: CatalogSchool | CatalogSchool[] | null } &
   Partial<Record<DeadlineKey, string | null>>;
 
 export type RawDashboardRows = {
@@ -30,10 +33,14 @@ export type RawDashboardRows = {
 
 export type StatusCounts = { submitted: number; accepted: number; rejected: number; waitlisted: number; deferred: number; deposited: number };
 
+export type UpcomingDeadline = { schoolName: string; label: string; date: string; fromCatalog: boolean };
+
 export type TodayInput = {
   preferredName: string | null;
   schoolCount: number | null;
-  nextDeadline: { schoolName: string; label: string; date: string } | null;
+  // The next three dated items, soonest first. `fromCatalog` marks a date
+  // inferred from the year-less school catalog rather than saved on the list.
+  upcomingDeadlines: UpcomingDeadline[];
   statusCounts: StatusCounts | null;
   essaysTotal: number | null;
   essaysFinal: number | null;
@@ -52,22 +59,34 @@ const DEADLINES: Array<[DeadlineKey, string]> = [
   ["deadline_fafsa", "FAFSA"],
 ];
 
+const EARLY_KEYS: DeadlineKey[] = ["deadline_ea", "deadline_ed", "deadline_edii", "deadline_rea"];
+
 const STATUSES: Array<keyof StatusCounts> = ["submitted", "accepted", "rejected", "waitlisted", "deferred", "deposited"];
 
 export function deriveTodayInput(raw: RawDashboardRows, todayIso: string): TodayInput {
   const { schools, essays, activities } = raw;
 
-  let nextDeadline: TodayInput["nextDeadline"] = null;
+  const dated: UpcomingDeadline[] = [];
   for (const s of schools ?? []) {
     const school = Array.isArray(s.cc_schools) ? s.cc_schools[0] : s.cc_schools;
+    const schoolName = school?.name ?? "A saved school";
     for (const [key, label] of DEADLINES) {
       const day = (s[key] ?? "").slice(0, 10);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < todayIso) continue;
-      if (!nextDeadline || day < nextDeadline.date) {
-        nextDeadline = { schoolName: school?.name ?? "A saved school", label, date: day };
-      }
+      dated.push({ schoolName, label, date: day, fromCatalog: false });
+    }
+    // A date saved on the list wins over the catalog's date for that round.
+    const savedEarly = EARLY_KEYS.some((k) => s[k]);
+    const catalog: Array<[string, string | null | undefined, boolean]> = [
+      ["early round", school?.early_deadline, savedEarly],
+      ["RD", school?.regular_deadline, Boolean(s.deadline_rd)],
+    ];
+    for (const [label, value, saved] of catalog) {
+      const day = saved ? null : resolveCatalogDeadline(value, todayIso);
+      if (day) dated.push({ schoolName, label, date: day, fromCatalog: true });
     }
   }
+  const upcomingDeadlines = dated.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)).slice(0, 3);
 
   let statusCounts: StatusCounts | null = null;
   if (schools) {
@@ -86,7 +105,7 @@ export function deriveTodayInput(raw: RawDashboardRows, todayIso: string): Today
   return {
     preferredName: raw.profile.preferred_name,
     schoolCount: schools ? schools.length : null,
-    nextDeadline,
+    upcomingDeadlines,
     statusCounts,
     essaysTotal: essays ? essays.length : null,
     essaysFinal: essays ? essays.filter((e) => e.phase === "submitted" || e.phase === "final").length : null,

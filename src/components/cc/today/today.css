@@ -22,6 +22,8 @@
 .af-root .td-row:last-child{border-bottom:1px solid var(--db-border)}
 .td-row strong{font-size:16px}
 .af-root .td-row p{color:var(--db-muted);font-size:14px;margin-top:4px}
+.af-root .td-row-items{color:var(--db-ink);font-size:14px;margin:6px 0 0;padding-left:18px;list-style:disc}
+.af-root .td-row-items li+li{margin-top:2px}
 .td-row>span{font-size:24px;color:var(--db-clay)}
 .td-permission{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:16px 0;color:var(--db-muted);font-size:14px}
 .td-side{display:grid;gap:20px}
