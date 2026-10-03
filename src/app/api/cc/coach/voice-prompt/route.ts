@@ -65,11 +65,18 @@ export async function GET() {
 
   const { data: schools } = await supabase
     .from("cc_student_schools")
-    .select("chancing_band")
+    .select("chancing_band, cc_schools(country)")
     .eq("student_id", profile.id);
 
-  type SchoolRow = { chancing_band: string | null };
+  type SchoolRow = { chancing_band: string | null; cc_schools: { country: string | null } | { country: string | null }[] | null };
   const schoolList = (schools ?? []) as SchoolRow[];
+  const schoolCountries = [
+    ...new Set(
+      schoolList
+        .map((s) => (Array.isArray(s.cc_schools) ? s.cc_schools[0] : s.cc_schools)?.country)
+        .filter((c): c is string => !!c),
+    ),
+  ];
   const schoolCount = schoolList.length;
   const reach = schoolList.filter((s) => s.chancing_band === "reach").length;
   const match = schoolList.filter((s) => s.chancing_band === "match").length;
@@ -145,6 +152,7 @@ export async function GET() {
     // known. Leaving null is fine — the variant block is additive guidance,
     // and grade context is still surfaced via ctx.grade.
     variantKey: null,
+    schoolCountries,
   };
 
   // Voice mode prefers the user's chosen language over message-detection

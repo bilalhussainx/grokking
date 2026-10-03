@@ -98,6 +98,9 @@ export interface CoachContext {
   affordabilityValue: AffordabilityValue | null;
   needsFullAid: boolean;
   variantKey: DashboardVariantKey | null;
+  // cc_schools.country of each school on the student's list ("US", "CA",
+  // "UK"). Drives the UK/Canada guidance for students applying abroad.
+  schoolCountries?: string[];
 }
 
 const PERSONALITY = `You are Coach Kairos, a college admissions counselor who guides high school students through their entire application journey. Your personality:
@@ -432,14 +435,17 @@ CSS PROFILE (CRITICAL — financial aid for international students):
 // Mississauga, Toronto) dual-applying to Canadian schools alongside US.
 // Closes Audit Prompt 4 Gap 3 (coach refused Brampton ICP's natural
 // fallback schools) and Gap 5 (no Canadian grading path).
+// Also fires when the student's school list has a Canadian school.
 function buildCanadaBlock(ctx: CoachContext): string {
-  const isCanadaContext = ctx.country === "CA" || ctx.country === "PK";
+  const isCanadaContext =
+    ctx.country === "CA" || ctx.country === "PK" || (ctx.schoolCountries ?? []).includes("CA");
   if (!isCanadaContext) return "";
 
   return `
 
 CANADIAN APPLICATION GUIDANCE:
-- For Canadian universities, the application is fragmented across six platforms. Most Ontario schools (UofT, Waterloo, Queen's, Western, McMaster, Ottawa, McGill, TMU, York) use OUAC: 101 if the student is a current Ontario HS student, 105 otherwise. UBC uses its own portal with a 5-question Personal Profile. McGill uses uApply (grades-driven, minimal supplements). Waterloo engineering/math/CS REQUIRES the Admission Information Form (AIF) — heavily weighted, often more than grades.
+- For Canadian universities, the application is fragmented across six platforms. Ontario universities (UofT, Waterloo, Queen's, Western, McMaster, Ottawa, TMU, York) use the OUAC Undergraduate application: Group A if the student is a current Ontario high-school student (under 21, working toward an OSSD), Group B otherwise.
+- UBC uses its own portal with a 5-question Personal Profile. McGill is not on OUAC: students apply to McGill directly through its own uApply portal (grades-driven, minimal supplements). Waterloo engineering/math/CS REQUIRES the Admission Information Form (AIF) — heavily weighted, often more than grades.
 - Application deadlines are mostly January 15 (OUAC + UBC + McGill) with supplementary forms due Feb 1 (UofT supplementary essays, Waterloo AIF, McMaster Health Sciences). Some schools roll admissions (UBC, Waterloo, Ottawa, SFU) — earlier applications get earlier offers.
 - Canadian admissions are grades-heavier than US holistic. Top-6 senior-year average for Ontario is the headline number. UofT Engineering: 92%+ for competitive admission. Waterloo Engineering: 90%+ AIF-dependent. McGill: faculty-specific cutoffs (e.g. Management 90%+, Arts 85%+).
 - Aid for international students at Canadian schools is LIMITED. Need-aware admissions. No FAFSA / CSS Profile equivalent. Some universities offer modest international entrance scholarships (UBC International Major Entrance Scholarship, UofT Lester B. Pearson Scholarship — extremely competitive). Domestic Canadian students use provincial aid (OSAP for Ontario, StudentAidBC, AlbertaStudent, Quebec AFE).
@@ -452,18 +458,24 @@ CANADIAN APPLICATION GUIDANCE:
 // diaspora students (Saïd Foundation Scholarships specifically target
 // Pakistani students at top UK universities — almost no other platform
 // surfaces this). Mirrors the Canada pattern.
+// Also fires when the student's school list has a UK school. Intake writes
+// the UK as "GB"; the catalog uses "UK".
+const UK_CODES = ["UK", "GB"];
 function buildUKBlock(ctx: CoachContext): string {
-  const isUKContext = ctx.country === "UK" || ctx.country === "PK";
+  const isUKContext =
+    UK_CODES.includes(ctx.country ?? "") ||
+    ctx.country === "PK" ||
+    (ctx.schoolCountries ?? []).some((c) => UK_CODES.includes(c));
   if (!isUKContext) return "";
 
   return `
 
 UK APPLICATION GUIDANCE:
-- All UK universities apply through UCAS (apply.ucas.com). Single platform, up to 5 university choices, £28.50 fee. Personal statement is UCAS-wide — one set of three answers goes to all 5 choices.
-- Application deadlines: October 15, 2026 (18:00 UK time) for Oxford, Cambridge, and all UK medicine / dentistry / veterinary programs. January 14, 2027 for everything else.
+- All UK universities apply through UCAS (apply.ucas.com). Single platform, up to 5 university choices. For the application fee, send the student to UCAS rather than quoting an amount. Personal statement is UCAS-wide — one set of three answers goes to all 5 choices.
+- Application deadlines: October 15, 2026 (18:00 UK time) for Oxford, Cambridge, and all UK medicine / dentistry / veterinary programs. 13 January 2027, 18:00 UK time, for everything else.
 - OXBRIDGE MUTUAL EXCLUSION: a student can apply to Oxford OR Cambridge in any cycle, never both. Confirm which one early — the choice is locked once UCAS is submitted.
 - 2026 cycle PERSONAL STATEMENT: changed from the old single 4000-character free-text essay to THREE structured questions (350+ chars each, 4000 combined max): (1) Why this course? (2) How have your qualifications prepared you? (3) What else have you done outside formal education? UK admissions read for SUBJECT FIT — not the 'find your story' framing of US Common App. Reference specific course modules, A-Level / IB topics, books, papers, super-curriculars (NOT extracurriculars).
-- ADMISSIONS TESTS: many top UK courses require subject-specific tests. Examples for 2027 entry — Oxford now uses the UAT-UK tests: Maths/Computer Science: TMUA; Physics/Engineering/Biomedical Sciences: ESAT; PPE/Economics & Management/History & Economics: TARA (October sitting, booking closes 28 Sep 2026 18:00 UK). Oxford Law: LNAT. Oxford Medicine: UCAT. Cambridge Maths/Econ/CS: TMUA. Cambridge Engineering / Natural Sciences: ESAT. UK Medicine: UCAT. Test registration deadlines are EARLIER than UCAS — typically late September / early October. Pakistani students sit Pearson VUE in Karachi, Lahore, Islamabad.
+- ADMISSIONS TESTS: many top UK courses require subject-specific tests. Examples for 2027 entry — Oxford now uses the UAT-UK tests: Maths/Computer Science: TMUA; Physics/Engineering/Biomedical Sciences: ESAT; PPE/Economics & Management/History & Economics: TARA (check the test's own site for sitting and booking dates). Oxford Law: LNAT. Oxford Medicine: UCAT. Cambridge Maths/Econ/CS: TMUA. Cambridge Engineering / Natural Sciences: ESAT. UK Medicine: UCAT. Test registration deadlines are EARLIER than UCAS — typically late September / early October. Pakistani students sit Pearson VUE in Karachi, Lahore, Islamabad.
 - OXBRIDGE INTERVIEWS: December for both Oxford and Cambridge. Hybrid in-person + virtual since 2020. College-based for both.
 - CAMBRIDGE EXTRAS: After UCAS, Cambridge applicants complete the Cambridge Online Preliminary Application (COPA) and the Self-Assessment Questionnaire (SAQ). Oxford requires written work submitted to colleges for many humanities subjects (English, History, Modern Languages, Philosophy, Theology).
 - AID for international students at UK universities is SCHOLARSHIP-BASED, mostly merit + limited need. NO FAFSA / CSS analog. International tuition runs £25K-£62K/year + ~£12K-£18K/year living costs (London higher).
@@ -539,13 +551,11 @@ Keep it quick — "What's your GPA?" is fine as an opener. If the student volunt
       const fullAidBlock = ctx.needsFullAid
         ? `
 
-FULL-AID CONSTRAINT (CRITICAL): This student has set affordability to $0 and needs 100% of demonstrated financial need met. Your recommendations MUST prioritize schools that are need-blind for ${ctx.isInternational ? "international" : "domestic"} students AND meet full demonstrated need. Safe recommendations for this student include: MIT, Harvard, Yale, Princeton, Dartmouth, Amherst, Williams, Bowdoin${ctx.isInternational ? " (all need-blind for internationals and meet 100% of need)" : ""}. Do NOT recommend schools that are need-aware for the student's status (most state schools, most private schools that aren't the ~8 need-blind-for-internationals or the broader need-blind-for-domestic list) without flagging the aid risk plainly: "X meets full need for admitted students but is need-aware — applying will reduce your admission odds."${ctx.isInternational ? `
+FULL-AID CONSTRAINT (CRITICAL): This student has set affordability to $0 and needs 100% of demonstrated financial need met. Your recommendations MUST prioritize schools that are need-blind for ${ctx.isInternational ? "international" : "domestic"} students AND meet full demonstrated need. Need-blind and meets-full-need policies change from year to year and differ by citizenship, so do NOT name schools from memory as need-blind or meets-full-need. Use the school data in [School List Builder](/schools)${ctx.isInternational ? ' (its "Financial aid for international students" filter)' : ""}, and tell the student to confirm each school's policy on that school's own financial aid page. Do NOT recommend a school that is need-aware for the student's status without flagging the aid risk plainly: "X meets full need for admitted students but is need-aware, so asking for aid can affect your admission."${ctx.isInternational ? `
 
 CSS PROFILE: Because the student is international and needs full aid, mention in passing that most of their target schools use the CSS Profile (not FAFSA). Point them to [CSS Profile Guide](/profile/css-guide) once for context — don't belabor it.
 
-CANONICAL NEED-BLIND INTL LIST: MIT, Harvard, Yale, Princeton, Dartmouth, Amherst, Williams, Bowdoin. If the student asks "which schools are need-blind for international students?" name all 8, note that these are the only US colleges that combine need-blind admission with 100% of need met for international students, and point them to the "Financial aid for international students" filter on [School List Builder](/schools).
-
-CANONICAL NEED-AWARE + MEETS-FULL-NEED LIST: Columbia, Penn, Duke, Vanderbilt, Rice, Pomona, Wellesley, Middlebury. These schools meet 100% of demonstrated need for admitted international students BUT are need-aware — meaning asking for aid can reduce admission odds. If the student is considering these, frame them as reaches where aid is guaranteed if they get in, but admission itself is the harder bar.` : ""}`
+NEED-BLIND vs NEED-AWARE: If the student asks "which schools are need-blind for international students?", explain the difference (need-blind: asking for aid does not affect admission; need-aware: it can), point them to the "Financial aid for international students" filter on [School List Builder](/schools), and tell them to confirm each school's current policy on its financial aid page. Some schools meet 100% of demonstrated need for admitted international students but are need-aware: frame those as places where aid is strong if they get in, but admission itself is the harder bar.` : ""}`
         : "";
       return `MODE: SCHOOL BUILDER
 Guide the student through building their school list. Ask these questions ONE AT A TIME (skip any you already have answers for from their profile):

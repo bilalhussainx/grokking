@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import { describe, it, expect } from "vitest";
 import { buildSystemPrompt, type CoachContext } from "../coach-prompt-builder";
 
@@ -86,7 +87,7 @@ describe("buildSystemPrompt", () => {
     const prompt = buildSystemPrompt(ctx);
     expect(prompt).toContain("CSS Profile");
     expect(prompt).toContain("need-blind");
-    expect(prompt).toMatch(/MIT|Harvard|Yale|Princeton|Amherst/);
+    expect(prompt).toContain("School List Builder");
   });
 
   it("excludes full-aid guidance in school-builder when needsFullAid is false", () => {
@@ -112,7 +113,9 @@ describe("buildSystemPrompt", () => {
     expect(prompt.toLowerCase()).toContain("full financial aid");
   });
 
-  it("lists all 8 canonical need-blind schools for intl full-aid students in school-builder mode", () => {
+  // Need-blind and meets-full-need policies change by year and by
+  // citizenship, so the prompt must not carry a fixed roster of schools.
+  it("does not hard-code need-blind or need-aware school lists for full-aid students", () => {
     const ctx: CoachContext = {
       ...baseContext,
       mode: "school-builder",
@@ -122,24 +125,12 @@ describe("buildSystemPrompt", () => {
       needsFullAid: true,
     };
     const prompt = buildSystemPrompt(ctx);
-    for (const school of ["MIT", "Harvard", "Yale", "Princeton", "Dartmouth", "Amherst", "Williams", "Bowdoin"]) {
-      expect(prompt).toContain(school);
-    }
-  });
-
-  it("mentions the need-aware-meets-full-need distinction for intl full-aid students", () => {
-    const ctx: CoachContext = {
-      ...baseContext,
-      mode: "school-builder",
-      isInternational: true,
-      country: "PK",
-      affordabilityValue: "zero",
-      needsFullAid: true,
-    };
-    const prompt = buildSystemPrompt(ctx);
+    expect(prompt).not.toMatch(/CANONICAL/);
+    expect(prompt).not.toContain("MIT, Harvard, Yale, Princeton");
+    expect(prompt).not.toContain("Columbia, Penn, Duke");
+    expect(prompt).not.toMatch(/~8 need-blind/);
     expect(prompt.toLowerCase()).toMatch(/need-aware/);
-    const needAwareSchools = ["Columbia", "Penn", "Duke", "Vanderbilt", "Rice", "Pomona", "Wellesley", "Middlebury"];
-    expect(needAwareSchools.some((s) => prompt.includes(s))).toBe(true);
+    expect(prompt).toMatch(/confirm[^.]*financial aid (page|site)/i);
   });
 
   it("includes first-gen guidance block when isFirstGen is true", () => {
@@ -381,6 +372,61 @@ describe("buildSystemPrompt", () => {
     it("UK guidance block does NOT mention Saïd for Indian students", () => {
       const prompt = buildSystemPrompt({ ...baseContext, country: "IN" });
       expect(prompt).not.toContain("SAÏD FOUNDATION");
+    });
+  });
+
+  describe("hard-coded facts (Oct 3 audit)", () => {
+    const uk = () => buildSystemPrompt({ ...baseContext, country: "UK" });
+    const ca = () => buildSystemPrompt({ ...baseContext, country: "CA" });
+
+    it("does not quote a UCAS fee", () => {
+      expect(uk()).not.toContain("28.50");
+      expect(uk()).not.toMatch(/UCAS[^\n]*£\s?\d/);
+    });
+    it("gives the main UCAS date as 13 January 2027, 18:00 UK time", () => {
+      expect(uk()).toContain("13 January 2027, 18:00 UK time");
+      expect(uk()).not.toContain("January 14");
+    });
+    it("drops the admissions-test booking date that has passed", () => {
+      expect(uk()).not.toContain("28 Sep 2026");
+    });
+    it("uses OUAC Group A/B, not the retired 101/105", () => {
+      expect(ca()).toMatch(/OUAC Undergraduate application/);
+      expect(ca()).toMatch(/Group A/);
+      expect(ca()).toMatch(/Group B/);
+      expect(ca()).not.toMatch(/\b10[15]\b/);
+    });
+    it("lists McGill as a direct application, never under OUAC", () => {
+      const ouacLine = ca().split("\n").find((l) => l.includes("OUAC Undergraduate application"))!;
+      expect(ouacLine).not.toContain("McGill");
+      expect(ca()).toMatch(/McGill[^\n]*directly[^\n]*uApply/);
+    });
+  });
+
+  describe("UK and Canada guidance follows the school list", () => {
+    it("fires the UK block for a US student with a UK school on their list", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "US", schoolCountries: ["US", "UK"] });
+      expect(prompt).toContain("UK APPLICATION GUIDANCE");
+      expect(prompt).not.toContain("CANADIAN APPLICATION GUIDANCE");
+    });
+    it("fires the Canada block for a US student with a Canadian school on their list", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "US", schoolCountries: ["CA"] });
+      expect(prompt).toContain("CANADIAN APPLICATION GUIDANCE");
+      expect(prompt).not.toContain("UK APPLICATION GUIDANCE");
+    });
+    it("fires neither for a US-only list", () => {
+      const prompt = buildSystemPrompt({ ...baseContext, country: "US", schoolCountries: ["US"] });
+      expect(prompt).not.toContain("UK APPLICATION GUIDANCE");
+      expect(prompt).not.toContain("CANADIAN APPLICATION GUIDANCE");
+    });
+    it("is fed the school list's countries by both Coach routes", () => {
+      for (const f of ["src/app/api/cc/coach/message/route.ts", "src/app/api/cc/coach/voice-prompt/route.ts"]) {
+        expect(fs.readFileSync(f, "utf8"), f).toMatch(/schoolCountries[,:]/);
+      }
+    });
+    it("treats the GB country code (written by intake) as the UK", () => {
+      expect(buildSystemPrompt({ ...baseContext, country: "GB" })).toContain("UK APPLICATION GUIDANCE");
+      expect(buildSystemPrompt({ ...baseContext, country: "US", schoolCountries: ["GB"] })).toContain("UK APPLICATION GUIDANCE");
     });
   });
 });

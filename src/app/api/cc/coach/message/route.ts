@@ -299,6 +299,15 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
     if (school?.name) schoolListNames.push({ name: school.name, band: (row.chancing_band as string) ?? null });
   }
+  // Countries across the whole list, so a US student applying to UK or
+  // Canadian schools gets that guidance.
+  const schoolIds = (schoolListRows ?? []).map((r) => r.school_id).filter(Boolean);
+  const { data: schoolCountryRows } = schoolIds.length
+    ? await supabase.from("cc_schools").select("country").in("id", schoolIds)
+    : { data: [] as { country: string | null }[] };
+  const schoolCountries = [
+    ...new Set((schoolCountryRows ?? []).map((r) => r.country as string | null).filter((c): c is string => !!c)),
+  ];
 
   const applicationSnapshot: ApplicationSnapshot = {
     personalStatement: personalStatement
@@ -369,6 +378,7 @@ export async function POST(req: NextRequest) {
     affordabilityValue: (profile as { affordability_value?: string | null }).affordability_value as never ?? null,
     needsFullAid: !!(profile as { needs_full_aid?: boolean | null }).needs_full_aid,
     variantKey: variantKey as CoachContext["variantKey"],
+    schoolCountries,
   };
 
   const detectedLang = detectMessageLanguage(message);
