@@ -38,7 +38,7 @@ create table if not exists cc_agent_proposals (
   payload_hash text not null,
   operation_key text not null,
   reason text not null,
-  status text not null default 'pending' check (status in ('pending','committed','declined','expired','undone')),
+  status text not null default 'pending' check (status in ('pending','committing','committed','declined','expired','undone')),
   receipt jsonb,
   expires_at timestamptz not null,
   committed_at timestamptz,

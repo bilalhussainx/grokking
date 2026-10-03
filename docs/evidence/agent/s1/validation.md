@@ -20,3 +20,9 @@
 - First GREEN attempt with the brief's code verbatim: 3 failed / 5 passed. The fake does not apply column defaults, so the inserted proposal had no `status` (DB default 'pending'). Fixed by writing `status: "pending"` explicitly on insert (matches the DB default).
 - GREEN: same command -> 1 file, 8 tests passed (the brief says "7 passed", but its test file has 8 cases).
 - Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 151 passed, 1 skipped files; 1065 passed, 4 skipped tests. `npx tsc --noEmit -p .` -> exit 0, no output.
+
+## Task 3 fix round 1: C1, I2-I4, minors 5-10 (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/proposals.test.ts` -> 13 failed, 9 passed (22). Each failure was for the intended reason: 409 on a key-reordered payload (C1); no 'committing' state (I2); 200 instead of 409 for a racing undo or decline (I3); a second list row (I4); `RangeError: Input buffers must have the same byte length` (5); null proposalId on re-propose (6); 2027-02-29 accepted (7); wrong profile id (8); another student's row deleted (9); `ics` present (10).
+- pg RED: against the committed migration (no 'committing'), `AGENT_PG_URL=postgres://postgres:agent@localhost:55432/postgres npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/s1-schema.pg.test.ts` -> 1 failed, 5 passed: `violates check constraint "cc_agent_proposals_status_check"`.
+- GREEN: proposals 22/22. pg suite 6/6, including a real-Postgres check that jsonb returns `{date,title}` and `canonicalJson` matches across the round trip. Local container kairos-agent-pg (postgres:16, 127.0.0.1:55432) was started for the run and stopped after (`--rm`).
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 151 passed, 1 skipped files; 1079 passed, 6 skipped tests (the skipped pg suite now has 6 cases). `npx tsc --noEmit -p .` -> exit 0.

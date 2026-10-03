@@ -6,6 +6,7 @@ import path from "node:path";
 // @ts-ignore -- @types/pg is not installed; pg is only used by this local-Postgres test
 import { Client } from "pg";
 import { isLocalPgUrl } from "./helpers/local-pg";
+import { canonicalJson } from "../proposals";
 
 const URL = process.env.AGENT_PG_URL;
 const local = isLocalPgUrl(URL);
@@ -44,6 +45,23 @@ run("S1 schema (local Postgres only)", () => {
     await expect(db.query(
       "insert into cc_agent_proposals (user_id, student_id, kind, payload, payload_hash, operation_key, reason, expires_at) values ($1,$2,'email','{}','h','op-1','r', now())",
       [U, S])).rejects.toThrow(/check constraint/);
+  });
+
+  it("accepts the committing proposal status and rejects an unknown one", async () => {
+    const q = "insert into cc_agent_proposals (user_id, student_id, kind, payload, payload_hash, operation_key, reason, expires_at, status) values ($1,$2,'task','{}','h',$3,'r', now(), $4)";
+    expect((await db.query(q, [U, S, "op-committing", "committing"])).rowCount).toBe(1);
+    await expect(db.query(q, [U, S, "op-saving", "saving"])).rejects.toThrow(/check constraint/);
+  });
+
+  it("jsonb reorders payload keys, and the canonical hash survives the round trip", async () => {
+    const payload = { title: "Michigan EA hold", date: "2026-11-01" };
+    const r = await db.query(
+      "insert into cc_agent_proposals (user_id, student_id, kind, payload, payload_hash, operation_key, reason, expires_at) values ($1,$2,'calendar_hold',$3,'h','op-jsonb','r', now()) returning payload",
+      [U, S, JSON.stringify(payload)]);
+    const back = r.rows[0].payload as Record<string, string>;
+    expect(Object.keys(back)).toEqual(["date", "title"]);
+    expect(JSON.stringify(back)).not.toBe(JSON.stringify(payload));
+    expect(canonicalJson(back)).toBe(canonicalJson(payload));
   });
 
   it("dedupes nudges per student, trigger, entity and period", async () => {

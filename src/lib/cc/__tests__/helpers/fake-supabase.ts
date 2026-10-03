@@ -27,6 +27,7 @@ export class FakeQuery implements PromiseLike<FakeResult> {
     private readonly table: string,
     private readonly nextId: () => string,
     private readonly schema: string[] | null = null,
+    private readonly unique: string[][] = [],
   ) {}
 
   select(columns?: string): this {
@@ -72,6 +73,11 @@ export class FakeQuery implements PromiseLike<FakeResult> {
     this.filters.push((r) => (r[col] ?? null) === val);
     return this;
   }
+  gte(col: string, val: string | number): this {
+    this.referenced.push(col);
+    this.filters.push((r) => r[col] != null && (r[col] as string | number) >= val);
+    return this;
+  }
   order(col: string, _opts?: unknown): this {
     this.referenced.push(col);
     return this;
@@ -107,6 +113,15 @@ export class FakeQuery implements PromiseLike<FakeResult> {
     if (this.mode === "insert") {
       const list = Array.isArray(this.payload) ? this.payload : [this.payload as FakeRow];
       hit = list.map((r) => ({ id: this.nextId(), ...r }));
+      // Opt-in unique constraints (23505), all-or-nothing like one INSERT
+      // statement. NULLs never clash, as in Postgres.
+      const clash = (a: FakeRow, b: FakeRow, cols: string[]) => cols.every((c) => a[c] != null && a[c] === b[c]);
+      const dup = this.unique.find((cols) =>
+        hit.some((r, i) => rows.some((o) => clash(r, o, cols)) || hit.some((o, j) => j !== i && clash(r, o, cols))),
+      );
+      if (dup) {
+        return { data: null, error: { message: `duplicate key value violates unique constraint (${dup.join(", ")})`, code: "23505" } };
+      }
       rows.push(...hit);
     } else if (this.mode === "update") {
       hit = rows.filter(matches);
@@ -146,13 +161,13 @@ export class FakeQuery implements PromiseLike<FakeResult> {
 
 export function createFakeSupabase(
   seed: FakeTables = {},
-  opts: { columns?: Record<string, string[]> } = {},
+  opts: { columns?: Record<string, string[]>; unique?: Record<string, string[][]> } = {},
 ): FakeSupabase {
   const tables: FakeTables = JSON.parse(JSON.stringify(seed)) as FakeTables;
   let n = 0;
   const nextId = () => `00000000-0000-4000-8000-${String(++n).padStart(12, "0")}`;
   return {
     tables,
-    from: (table: string) => new FakeQuery(tables, table, nextId, opts.columns?.[table] ?? null),
+    from: (table: string) => new FakeQuery(tables, table, nextId, opts.columns?.[table] ?? null, opts.unique?.[table] ?? []),
   };
 }
