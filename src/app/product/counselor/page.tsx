@@ -13,7 +13,7 @@ const FEATURES: { icon: IconName; title: string; body: string }[] = [
   {
     icon: "mic",
     title: `Voice-first, ${COACH_LANGUAGE_COUNT} languages`,
-    body: "Talk through your school list in Hindi, your essay in Punjabi, your aid forms in Spanish. Coach Kairos speaks back in the same language with sub-second latency.",
+    body: "Talk through your school list in Hindi, your essay in Punjabi, your aid forms in Spanish. Coach Kairos speaks back in the same language.",
   },
   {
     icon: "grad",
@@ -53,7 +53,7 @@ export default function CounselorPage() {
           Your AI counselor — for <em>every</em> student.
         </h1>
         <p className="kl-mkt-lede">
-          The average U.S. public-school counselor serves 415 students. For first-gen,
+          School counselors often serve hundreds of students each. For first-gen,
           international, and underprivileged applicants, that means almost no time, no translation,
           no institutional memory. Coach Kairos is one counselor per student — in your language,
           trained on your profile, available at 3 a.m. on a Saturday.

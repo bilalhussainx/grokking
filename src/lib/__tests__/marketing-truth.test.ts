@@ -63,6 +63,11 @@ describe("one plan story", () => {
     ["continue learning", /continue learning/i],
     ["ambiguous trial button", /Start Pro free|Start Pro —|Start Pro yearly/],
     ["old trial line", /Free 7-day trial\. No card/i],
+    // Student-facing pages carry no build-tooling, investor or unsourced-stat copy.
+    ["Built with Claude Code", /Built with Claude Code|ships fast using Claude Code/i],
+    ["pre-seed / investor pitch", /pre-seed|Investor Deck|Investment Inquiry/i],
+    ["sub-second latency", /sub-second/i],
+    ["unsourced 415 counselor ratio", /\b415(:1| students)/],
   ];
   it.each(BANNED)("no shipped source says %s", (_name, re) => {
     expect(hits(re)).toEqual([]);
