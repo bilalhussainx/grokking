@@ -20,6 +20,13 @@ it("checks card fields too", () => {
   expect(JSON.stringify(out.cards)).not.toMatch(/Jan 1, 2027/);
 });
 
+it("keeps line breaks between sentences", () => {
+  const text = "Two steps:\n1. Finish your list.\n2. Ask for letters.\n\nYou've got this.";
+  expect(redactUngroundedDates({ text, cards: [] }, []).text).toBe(text);
+  expect(redactUngroundedDates({ text: "Done.\n\nMIT EA is November 1.\nNext.", cards: [] }, []).text)
+    .toBe("Done.\n\nI don't have a verified date for that yet — I can check.\nNext.");
+});
+
 it("echoCheck allows exactly the candidate it was given", async () => {
   const c = { text: "x", cards: [] };
   const v = await echoCheck(c, { locale: "en", evidence: [], priorReleased: [], signal: new AbortController().signal });

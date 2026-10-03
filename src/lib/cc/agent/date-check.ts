@@ -5,11 +5,13 @@ const MONTHS = "(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)
 const DATE_RE = new RegExp(`\\b(?:\\d{4}-\\d{2}-\\d{2}|${MONTHS}\\.? \\d{1,2}(?:st|nd|rd|th)?(?:,? \\d{4})?|\\d{1,2} ${MONTHS}(?: \\d{4})?)\\b`, "g");
 const REPLACEMENT = "I don't have a verified date for that yet — I can check.";
 
+// The capturing split keeps each separator (odd indexes), so line breaks survive.
 function grounded(text: string, evidence: string): string {
-  return text.split(/(?<=[.!?])\s+/).map((sentence) => {
-    const dates = sentence.match(DATE_RE) ?? [];
-    return dates.every((d) => evidence.includes(d)) ? sentence : REPLACEMENT;
-  }).join(" ");
+  return text.split(/(?<=[.!?])(\s+)/).map((part, i) => {
+    if (i % 2) return part;
+    const dates = part.match(DATE_RE) ?? [];
+    return dates.every((d) => evidence.includes(d)) ? part : REPLACEMENT;
+  }).join("");
 }
 
 function walk(v: Json, evidence: string): Json {
