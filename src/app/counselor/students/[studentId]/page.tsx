@@ -168,7 +168,9 @@ export default function StudentFilePage() {
     );
   }
 
-  const name = student.preferredName || student.legalFirstName || "Unnamed student";
+  const knownName = student.preferredName || student.legalFirstName;
+  const name = knownName || "Unnamed student";
+  const firstName = knownName ? knownName.split(" ")[0] : "this student";
   const gradeLabel = student.isTransfer ? "Transfer" : student.gradeLevel ? `Grade ${student.gradeLevel}` : "—";
 
   return (
@@ -217,7 +219,7 @@ export default function StudentFilePage() {
           <div className="kl-kbd mb-2">Essays</div>
           {essays.length === 0 && (
             <p className="text-sm text-white/40">
-              No essays yet. They&apos;ll appear here once {name.split(" ")[0]} starts drafting.
+              No essays yet. They&apos;ll appear here once {firstName} starts drafting.
             </p>
           )}
           {essays.map((e) => (
