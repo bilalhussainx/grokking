@@ -273,7 +273,7 @@ docker stop kairos-agent-pg
 **Interfaces:**
 - Consumes:
   - `AuthScope`, `ToolReply` and `Json` from `contracts.ts` (A1);
-  - `checkREAConflict(schools: {schoolName:string; plan:string|null}[]): REAConflict` from `src/lib/applications/ed-strategy.ts`;
+  - `checkREAConflict(schools: {schoolName:string; plan:string|null}[]): REAConflict` from `src/lib/applications/ed-strategy.ts`. It accepts catalog names since `819be76`;
   - `selectVariant(profile:{is_transfer_student:boolean|null; grade_level:number|null}, schools:{application_status:string|null}[]): VariantKey` from `src/app/cc/dashboard/variants.ts`;
   - `getStudentProfileIds(db, userId): Promise<string[]>` from `src/lib/cc/ownership.ts`.
 - Produces:
@@ -285,7 +285,6 @@ docker stop kairos-agent-pg
   export type JourneyToolName = "get_journey_state" | "list_my_schools" | "check_plan_conflicts" | "get_essay_status";
   export type NextAction = { id: string; reasonCode: "resolve_plan_conflict" | "revise_after_review" | "complete_task" | "stage_default"; title: string; entityId: string | null; dueDate: string | null; dueDateSource: "student_task" | "counselor_task" | null };
   export function makeJourneyTools(db: SupabaseClient, scope: AuthScope, now: Date): (name: JourneyToolName, args: Record<string, never>) => Promise<ToolReply>;
-  export function toPlanKey(name: string): string;
   export const JOURNEY_TOOL_DEFINITIONS: readonly { type: "function"; function: { name: JourneyToolName; description: string; parameters: object } }[];
   ```
 
@@ -296,7 +295,7 @@ docker stop kairos-agent-pg
 // src/lib/cc/agent/__tests__/journey-tools.test.ts
 import { describe, it, expect } from "vitest";
 import { createFakeSupabase } from "@/lib/cc/__tests__/helpers/fake-supabase";
-import { makeJourneyTools, toPlanKey } from "../journey-tools";
+import { makeJourneyTools } from "../journey-tools";
 import { isAgentS1User } from "../s1-flag";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -333,13 +332,7 @@ describe("journey tools", () => {
   it("reads_all_owned_profiles_for_conflicts", async () => {
     const r = await makeJourneyTools(seed(), scope, now)("check_plan_conflicts", {});
     expect(r.status).toBe("ok");
-    expect(r.data).toMatchObject({ conflict: true, reaSchool: "Harvard", conflictingSchools: ["Northwestern"] });
-  });
-
-  it("maps catalog names to the plan engine's short keys", () => {
-    expect(toPlanKey("Harvard University")).toBe("Harvard");
-    expect(toPlanKey("Northwestern University")).toBe("Northwestern");
-    expect(toPlanKey("University of Toronto")).toBe("University of Toronto");
+    expect(r.data).toMatchObject({ conflict: true, reaSchool: "Harvard University", conflictingSchools: ["Northwestern University"] });
   });
 
   it("never reads another student's schools", async () => {
@@ -401,17 +394,10 @@ export function isAgentS1User(userId: string, env: Record<string, string | undef
 ```ts
 // src/lib/cc/agent/journey-tools.ts
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { checkREAConflict, getSchoolPlanInfo } from "@/lib/applications/ed-strategy";
+import { checkREAConflict } from "@/lib/applications/ed-strategy";
 import { selectVariant } from "@/app/cc/dashboard/variants";
 import type { AuthScope, Json, ToolReply } from "./contracts";
-
-// ed-strategy keys plans by short names ("Harvard", "Northwestern"); the catalog
-// stores "Harvard University". Without this the conflict check never fires.
-export function toPlanKey(name: string): string {
-  if (getSchoolPlanInfo(name)) return name;
-  const short = name.replace(/\s+(University|College)$/i, "").trim();
-  return getSchoolPlanInfo(short) ? short : name;
-}
+// ed-strategy accepts catalog spellings ("Harvard University") since commit 819be76.
 
 export type JourneyToolName = "get_journey_state" | "list_my_schools" | "check_plan_conflicts" | "get_essay_status";
 export type NextAction = {
@@ -476,7 +462,7 @@ export function makeJourneyTools(db: SupabaseClient, scope: AuthScope, now: Date
       const list = await schools();
       if (!list) return failed();
       if (name === "check_plan_conflicts") {
-        const result = checkREAConflict(list.map((x) => ({ schoolName: toPlanKey(String(x.school!.name)), plan: (x.row.application_plan as string) ?? null })));
+        const result = checkREAConflict(list.map((x) => ({ schoolName: String(x.school!.name), plan: (x.row.application_plan as string) ?? null })));
         return { status: "ok", data: result as unknown as Json, evidence: [{ kind: "plan_conflict_rule", value: "REA restricts private EA/ED", sourceId: "ed-strategy" }] };
       }
       const out = list.map((x) => ({
@@ -518,7 +504,7 @@ export function makeJourneyTools(db: SupabaseClient, scope: AuthScope, now: Date
     const variant = selectVariant({ is_transfer_student: transfer, grade_level: grade }, list.map((x) => ({ application_status: (x.row.application_status as string) ?? null })));
 
     const actions: NextAction[] = [];
-    const conflict = checkREAConflict(list.map((x) => ({ schoolName: toPlanKey(String(x.school!.name)), plan: (x.row.application_plan as string) ?? null })));
+    const conflict = checkREAConflict(list.map((x) => ({ schoolName: String(x.school!.name), plan: (x.row.application_plan as string) ?? null })));
     if (conflict.conflict) actions.push({ id: `conflict:${conflict.reaSchool}`, reasonCode: "resolve_plan_conflict", title: `Fix your early plan: ${conflict.conflictingSchools.join(", ")} conflicts with ${conflict.reaSchool} REA`, entityId: null, dueDate: null, dueDateSource: null });
     for (const e of essays.filter((x) => x.counselor_review_state === "changes_requested").sort((a, b) => String(a.id).localeCompare(String(b.id), "en"))) {
       actions.push({ id: `revise:${e.id}`, reasonCode: "revise_after_review", title: "Revise the essay your counselor reviewed", entityId: String(e.id), dueDate: null, dueDateSource: null });
@@ -539,7 +525,7 @@ export function makeJourneyTools(db: SupabaseClient, scope: AuthScope, now: Date
 
 - [ ] **Step 4: Run it to verify it passes**
 
-Run the Step 2 command. Expected: 8 passed. If `selectVariant`'s import pulls in React, move the import of `variants.ts` behind a type-only dependency: copy the 15-line `selectVariant` body into `journey-tools.ts`, with a comment pointing at the original and a test that both agree on all 8 variants. Record that as a deviation.
+Run the Step 2 command. Expected: 7 passed. If `selectVariant`'s import pulls in React, move the import of `variants.ts` behind a type-only dependency: copy the 15-line `selectVariant` body into `journey-tools.ts`, with a comment pointing at the original and a test that both agree on all 8 variants. Record that as a deviation.
 
 - [ ] **Step 5: Commit**
 
@@ -1235,7 +1221,7 @@ describe("triggers", () => {
   });
 
   it("flags inactivity after 14 days and REA conflicts", () => {
-    const n = evaluateTriggers({ ...base, lastLoginDate: "2026-10-01", schools: [{ schoolName: "Harvard", plan: "REA" }, { schoolName: "Northwestern", plan: "EA" }] }, now);
+    const n = evaluateTriggers({ ...base, lastLoginDate: "2026-10-01", schools: [{ schoolName: "Harvard University", plan: "REA" }, { schoolName: "Northwestern University", plan: "EA" }] }, now);
     expect(n.map((x) => x.trigger).sort()).toEqual(["inactivity", "plan_conflict"]);
   });
 
@@ -1281,7 +1267,6 @@ Expected: FAIL with `Cannot find module '../triggers'`.
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { checkREAConflict } from "@/lib/applications/ed-strategy";
 import { isAgentS1User } from "./s1-flag";
-import { toPlanKey } from "./journey-tools";
 
 export type TriggerInput = { userId: string; studentId: string; schools: { schoolName: string; plan: string | null }[]; essays: { id: string; reviewState: string | null; phase: string | null; updatedAt: string | null }[]; lastLoginDate: string | null };
 export type Nudge = { trigger: "plan_conflict" | "essay_stall" | "inactivity"; entityKey: string; periodKey: string; reason: { title: string; detail: string } };
@@ -1331,7 +1316,7 @@ export async function runNudgeCron(db: SupabaseClient, now: Date, env: Record<st
     const nameOf = new Map(((names ?? []) as { id: string; name: string }[]).map((s) => [s.id, s.name]));
     const nudges = evaluateTriggers({
       userId, studentId: ids[0],
-      schools: ((ss ?? []) as { school_id: string; application_plan: string | null }[]).filter((r) => nameOf.has(r.school_id)).map((r) => ({ schoolName: toPlanKey(nameOf.get(r.school_id)!), plan: r.application_plan })),
+      schools: ((ss ?? []) as { school_id: string; application_plan: string | null }[]).filter((r) => nameOf.has(r.school_id)).map((r) => ({ schoolName: nameOf.get(r.school_id)!, plan: r.application_plan })),
       essays: ((essays ?? []) as { id: string; counselor_review_state: string | null; phase: string | null; updated_at: string | null }[]).map((e) => ({ id: e.id, reviewState: e.counselor_review_state, phase: e.phase, updatedAt: e.updated_at })),
       lastLoginDate: ((up ?? null) as { last_login_date: string | null } | null)?.last_login_date ?? null,
     }, now);
