@@ -7,7 +7,8 @@ export function parseCandidate(content:string|null):Candidate {
   const text=(content??"").trim();
   if(!text) throw new Error("invalid_candidate");
   if(!text.startsWith("{") && !text.startsWith("[")) return {text:content!,cards:[]};
-  const value:unknown=JSON.parse(text);
+  let value:unknown;
+  try { value=JSON.parse(text); } catch { throw new Error("invalid_candidate"); } // Parser messages quote unchecked model text.
   if(!value || typeof value!=="object" || Array.isArray(value)) throw new Error("invalid_candidate");
   const item=value as Record<string,unknown>;
   if(Object.keys(item).length!==2 || typeof item.text!=="string" || !Array.isArray(item.cards)) throw new Error("invalid_candidate");
@@ -20,12 +21,35 @@ export function parseCandidate(content:string|null):Candidate {
   if(!item.cards.every(isJson) || (!item.text.trim() && !item.cards.length)) throw new Error("invalid_candidate");
   return {text:item.text,cards:item.cards};
 }
+function parseToolArguments(text:string):unknown {
+  try { return JSON.parse(text); } catch { throw new Error("invalid_tool_arguments"); }
+}
+// Closed allowlist of error codes a caller may see or persist. Any other message (parser excerpts,
+// provider bodies, row text, checker or tool exceptions) becomes agent_internal_error.
+export const AGENT_ERROR_CODES:ReadonlySet<string>=new Set([
+  "invalid_run_policy","context_budget_exceeded","tool_budget_exceeded","duplicate_tool_call_id","invalid_tool_arguments",
+  "invalid_candidate","output_check_failed","generation_budget_exceeded",
+  "operation_aborted","operation_timeout","operation_aborted_or_timeout",
+  "provider_key_missing","provider_model_missing","capability_config_invalid","capability_unverified",
+  "pricing_config_invalid","pricing_age_invalid","pricing_unverified",
+  "provider_stopped_after_unknown_cost","call_budget_exceeded","provider_invalid_response","provider_receipt_anomaly",
+  "provider_invalid_tools","checker_tool_call_denied","candidate_too_large"
+]);
+const PROVIDER_HTTP_CODE=/^provider_http_[1-5][0-9]{2}$/;
+export function agentErrorCode(error:unknown):string {
+  const message=error instanceof Error?error.message:"";
+  return /^[a-z_0-9]+$/.test(message)&&(AGENT_ERROR_CODES.has(message)||PROVIDER_HTTP_CODE.test(message))?message:"agent_internal_error";
+}
 export type RunPolicy={generationMs:number;checkerMs:number;turnMs:number};
 export async function runAgent(input:AgentInput,deps:RunDeps):Promise<CheckedResult>{
  return runAgentWithPolicy(input,deps,{generationMs:20000,checkerMs:8000,turnMs:60000});
 }
 // The evaluation harness alone uses this explicit seam; runtime callers keep runAgent defaults.
 export async function runAgentWithPolicy(input:AgentInput,deps:RunDeps,policy:RunPolicy):Promise<CheckedResult>{
+ // No cause is attached: the original error may quote model, provider or row bytes.
+ try { return await runBounded(input,deps,policy); } catch(error) { throw new Error(agentErrorCode(error)); }
+}
+async function runBounded(input:AgentInput,deps:RunDeps,policy:RunPolicy):Promise<CheckedResult>{
  if(![policy.generationMs,policy.checkerMs,policy.turnMs].every(n=>Number.isFinite(n)&&n>0)||
   policy.generationMs>45000||policy.checkerMs>20000||policy.turnMs>240000)throw Error("invalid_run_policy");
  return bounded(async signal=>{
@@ -43,7 +67,7 @@ export async function runAgentWithPolicy(input:AgentInput,deps:RunDeps,policy:Ru
         // Validate the complete batch before making any DB call; no parse-failure fallback to {}.
         if(toolCalls+reply.calls.length>8) throw new Error("tool_budget_exceeded");
         if(new Set(reply.calls.map(c=>c.id)).size!==reply.calls.length) throw new Error("duplicate_tool_call_id");
-        const parsed=reply.calls.map(c=>validateToolArgs(c.name,JSON.parse(c.arguments)));
+        const parsed=reply.calls.map(c=>validateToolArgs(c.name,parseToolArguments(c.arguments)));
         messages.push({role:"assistant",content:reply.content,tool_calls:reply.calls.map(c=>({id:c.id,type:"function",function:{name:c.name,arguments:c.arguments}}))});
         for(let i=0;i<reply.calls.length;i++) {
           signal.throwIfAborted();toolCalls++;

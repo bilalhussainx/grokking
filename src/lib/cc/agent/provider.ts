@@ -8,10 +8,16 @@ export const ROLE_ENV_VARS: Record<AgentRole, string> = {
   check: "OPENROUTER_AGENT_CHECK_MODEL", escalation: "OPENROUTER_AGENT_ESCALATION_MODEL"
 };
 export type Rates = { inputPerMillion: number; outputPerMillion: number; fixedPerRequest: number; verifiedAt: string };
+// Parser messages quote the input, so config JSON failures surface only as a fixed code.
+function parseConfig(text: string, code: string): unknown {
+  try { return JSON.parse(text); } catch { throw new Error(code); }
+}
 export function ratesFor(model: string, env: Record<string,string|undefined>): Rates {
   const ageDays=Number(env.OPENROUTER_AGENT_PRICING_MAX_AGE_DAYS??"30");
   if(!Number.isFinite(ageDays)||ageDays<=0||ageDays>30)throw new Error("pricing_age_invalid");
-  const rates = JSON.parse(env.OPENROUTER_AGENT_PRICING_JSON ?? "{}")[model] as Rates | undefined;
+  const table=parseConfig(env.OPENROUTER_AGENT_PRICING_JSON ?? "{}","pricing_config_invalid");
+  if(!table || typeof table!=="object" || Array.isArray(table)) throw new Error("pricing_config_invalid");
+  const rates = (table as Record<string, Rates | undefined>)[model];
   if (!rates || ![rates.inputPerMillion,rates.outputPerMillion,rates.fixedPerRequest].every(v => Number.isFinite(v) && v >= 0) || !Number.isFinite(Date.parse(rates.verifiedAt)) || Math.abs(Date.now()-Date.parse(rates.verifiedAt)) > ageDays*86400000) throw new Error("pricing_unverified");
   return rates;
 }
@@ -27,7 +33,7 @@ export function outputMultiplier(env:Record<string,string|undefined>):number {
   return n;
 }
 export async function bounded<T>(work: (signal: AbortSignal) => Promise<T>, parent: AbortSignal, ms: number): Promise<T> {
-  parent.throwIfAborted();
+  if(parent.aborted) throw new Error("operation_aborted"); // A fixed code, not the caller's arbitrary abort reason.
   const controller = new AbortController();
   const abort = () => controller.abort(new Error("operation_aborted"));
   parent.addEventListener("abort",abort,{once:true});
@@ -44,10 +50,12 @@ export async function bounded<T>(work: (signal: AbortSignal) => Promise<T>, pare
 export function makeProvider(role: AgentRole, customFetch?: typeof fetch, envOverride?: Record<string,string|undefined>): Provider {
   const env=envOverride ?? process.env;
   const apiKey=env.OPENROUTER_API_KEY?.trim(), model=env[ROLE_ENV_VARS[role]]?.trim();
-  if(!apiKey) throw new Error("OPENROUTER_API_KEY missing");
-  if(!model) throw new Error(`${ROLE_ENV_VARS[role]} missing`);
-  const approvals=JSON.parse(env.OPENROUTER_AGENT_CAPABILITIES_JSON ?? "[]") as Array<{role:string;model:string;toolCalling:unknown;jsonMode:unknown;reachable:boolean;error?:string;costReceiptUsd?:number|null}>;
-  const approval=approvals.find(a=>a.role===role && a.model===model);
+  if(!apiKey) throw new Error("provider_key_missing");
+  if(!model) throw new Error("provider_model_missing");
+  const approvals=parseConfig(env.OPENROUTER_AGENT_CAPABILITIES_JSON ?? "[]","capability_config_invalid");
+  if(!Array.isArray(approvals)) throw new Error("capability_config_invalid");
+  const approval=(approvals as Array<{role:string;model:string;toolCalling:unknown;jsonMode:unknown;reachable:boolean;error?:string;costReceiptUsd?:number|null}|null>)
+    .find(a=>a?.role===role && a?.model===model);
   if(!approval?.reachable || approval.error || typeof approval.costReceiptUsd!=="number" || (role==="check" ? approval.jsonMode!==true : approval.toolCalling!==true)) throw new Error("capability_unverified");
   const rates=ratesFor(model,env);
   // One fresh adapter instance per role per turn; never reset or switch roles to evade this budget.
@@ -68,7 +76,8 @@ export function makeProvider(role: AgentRole, customFetch?: typeof fetch, envOve
         method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${apiKey}`},body:JSON.stringify(body),signal:callSignal
       });
       if(!res.ok) throw new Error(`provider_http_${res.status}`);
-      const raw:unknown=await res.json();
+      let raw:unknown;
+      try { raw=await res.json(); } catch { throw new Error("provider_invalid_response"); } // Never rethrow body excerpts.
       if(!raw || typeof raw!=="object") throw new Error("provider_invalid_response");
       const data=raw as {usage?:{cost?:unknown};choices?:Array<{finish_reason?:string;message?:{content?:unknown;tool_calls?:unknown}}>};
       const cost=data?.usage?.cost;

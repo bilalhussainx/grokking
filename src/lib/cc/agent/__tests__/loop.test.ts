@@ -39,9 +39,11 @@ it.each(["block","uncertain"] as const)("returns no candidate for %s",async deci
  await expect(runAgent(input,{provider,tools:vi.fn(),check,signal:new AbortController().signal,priorReleased:[]})).rejects.toThrow("output_check_failed");
 });
 it("rejects malformed or unregistered tool batches before a read",async()=>{
- for(const call of [{id:"1",name:"read_context",arguments:"bad json"},{id:"1",name:"sql",arguments:"{}"}]) {
+ for(const call of [{id:"1",name:"read_context",arguments:"{\"domains\":[\"Lahore secret"},{id:"1",name:"sql",arguments:"{}"}]) {
   const tools=vi.fn();const provider=vi.fn<Provider>().mockResolvedValue({content:null,calls:[call]});
-  await expect(runAgent(input,{provider,tools,check:allow,signal:new AbortController().signal,priorReleased:[]})).rejects.toThrow();expect(tools).not.toHaveBeenCalled();
+  const err=await runAgent(input,{provider,tools,check:allow,signal:new AbortController().signal,priorReleased:[]}).then(()=>null,(e:Error)=>e);
+  expect(err?.message).toBe("invalid_tool_arguments");expect(err?.message).not.toContain("Lahore");expect(err?.message).not.toContain("domains");
+  expect(tools).not.toHaveBeenCalled();
  }
 });
 it("does not exceed four model calls or eight tool calls",async()=>{
@@ -60,7 +62,7 @@ it("a checker that ignores its AbortSignal still cannot hang release",async()=>{
 });
 it("an already aborted caller does not invoke provider",async()=>{
  const signal=AbortSignal.abort(),provider=vi.fn();
- await expect(runAgent(input,{provider,tools:vi.fn(),check:denyAllCheck,signal,priorReleased:[]})).rejects.toThrow();expect(provider).not.toHaveBeenCalled();
+ await expect(runAgent(input,{provider,tools:vi.fn(),check:denyAllCheck,signal,priorReleased:[]})).rejects.toThrow(/^operation_aborted$/);expect(provider).not.toHaveBeenCalled();
 });
 
 it("passes every structured card field through the same output checker",async()=>{
@@ -69,10 +71,31 @@ it("passes every structured card field through the same output checker",async()=
  const result=await runAgent(input,{provider:async()=>({content:JSON.stringify(candidate),calls:[]}),tools:vi.fn(),check,signal:new AbortController().signal,priorReleased:[]});
  expect(result.cards).toEqual(candidate.cards);expect(check.mock.calls[0][0]).toEqual(candidate);
 });
-it.each(['{"text":"x","cards":{},"extra":true}','{"text":"x","cards":[],"extra":true}','{"text":'])('rejects malformed structured candidate %s before checking',async content=>{
+it.each(['{"text":"x","cards":{},"extra":true}','{"text":"x","cards":[],"extra":true}','{"text":"x","cards":{}}','{"text":','[1,2]'])('rejects malformed structured candidate %s before checking',async content=>{
  const check=vi.fn<OutputCheck>();
- await expect(runAgent(input,{provider:async()=>({content,calls:[]}),tools:vi.fn(),check,signal:new AbortController().signal,priorReleased:[]})).rejects.toThrow();
+ await expect(runAgent(input,{provider:async()=>({content,calls:[]}),tools:vi.fn(),check,signal:new AbortController().signal,priorReleased:[]})).rejects.toThrow(/^invalid_candidate$/);
  expect(check).not.toHaveBeenCalled();
+});
+it("an unparseable reply fails with a fixed code that carries no model bytes",async()=>{
+ const check=vi.fn<OutputCheck>();
+ const err=await runAgent(input,{provider:async()=>({content:"[Draft] I was born in Lahore",calls:[]}),tools:vi.fn(),check,signal:new AbortController().signal,priorReleased:[]}).then(()=>null,(e:Error)=>e);
+ expect(err?.message).toBe("invalid_candidate");expect(err?.message).not.toContain("Lahore");expect(err?.message).not.toContain("Draft");
+ expect(check).not.toHaveBeenCalled();
+});
+it.each([
+ ["provider",{provider:async()=>{throw new Error("Unexpected token '<', \"<html>Lahore\"... is not valid JSON");}}],
+ ["tool",{provider:async()=>({content:null,calls:[{id:"1",name:"read_context",arguments:"{}"}]}),tools:async()=>{throw new Error("row: Lahore");}}],
+ ["checker",{provider:async()=>({content:"What changed?",calls:[]}),check:async()=>{throw new Error("checker saw Lahore");}}],
+])("maps an unlisted %s error message to agent_internal_error",async(_n,over)=>{
+ const base={tools:vi.fn(),check:allow,signal:new AbortController().signal,priorReleased:[]};
+ const err=await runAgent(input,{...base,...over} as never).then(()=>null,(e:Error)=>e);
+ expect(err?.message).toBe("agent_internal_error");
+});
+it("keeps allowlisted codes, including provider HTTP status codes",async()=>{
+ for(const code of ["provider_http_503","provider_receipt_anomaly"]) {
+  await expect(runAgent(input,{provider:async()=>{throw new Error(code);},tools:vi.fn(),check:allow,signal:new AbortController().signal,priorReleased:[]})).rejects.toThrow(new RegExp(`^${code}$`));
+ }
+ await expect(runAgent(input,{provider:async()=>{throw new Error("provider_http_99999");},tools:vi.fn(),check:allow,signal:new AbortController().signal,priorReleased:[]})).rejects.toThrow(/^agent_internal_error$/);
 });
 
 it("keeps evidence server-side rather than duplicating it in tool messages",async()=>{

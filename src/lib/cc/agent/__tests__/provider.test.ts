@@ -9,9 +9,26 @@ function env() {return {OPENROUTER_API_KEY:"test",OPENROUTER_AGENT_ROUTINE_MODEL
   OPENROUTER_AGENT_CAPABILITIES_JSON:JSON.stringify([{role:"routine",model:"fixture",reachable:true,costReceiptUsd:0.000001,toolCalling:true,jsonMode:"unknown"},{role:"check",model:"fixture",reachable:true,costReceiptUsd:0.000001,toolCalling:"unknown",jsonMode:true}])};}
 describe("openrouter provider adapter",()=>{
 it("fails closed without model, capability observation or verified pricing",()=>{
- expect(()=>makeProvider("routine",vi.fn(),{})).toThrow("OPENROUTER_API_KEY");
+ expect(()=>makeProvider("routine",vi.fn(),{})).toThrow(/^provider_key_missing$/);
+ expect(()=>makeProvider("routine",vi.fn(),{OPENROUTER_API_KEY:"test"})).toThrow(/^provider_model_missing$/);
  expect(()=>makeProvider("routine",vi.fn(),{...env(),OPENROUTER_AGENT_CAPABILITIES_JSON:"[]"})).toThrow("capability_unverified");
  expect(()=>makeProvider("routine",vi.fn(),{...env(),OPENROUTER_AGENT_PRICING_JSON:"{}"})).toThrow("pricing_unverified");
+});
+it.each([
+ ["OPENROUTER_AGENT_PRICING_JSON",'{"fixture":SECRETPRICE',"pricing_config_invalid"],
+ ["OPENROUTER_AGENT_PRICING_JSON","null","pricing_config_invalid"],
+ ["OPENROUTER_AGENT_CAPABILITIES_JSON",'[{"role":SECRETCAP',"capability_config_invalid"],
+ ["OPENROUTER_AGENT_CAPABILITIES_JSON",'{"role":"routine"}',"capability_config_invalid"],
+])("malformed %s=%s fails with a named code and no env value",(key,value,code)=>{
+ let message="";
+ try{makeProvider("routine",vi.fn(),{...env(),[key]:value});}catch(e){message=(e as Error).message;}
+ expect(message).toBe(code);expect(message).not.toContain("SECRET");
+});
+it("an HTTP 200 non-JSON provider body fails as provider_invalid_response with no body bytes",async()=>{
+ const fetcher=vi.fn().mockResolvedValue(new Response("<html>upstream error</html>",{status:200}));
+ const err=await makeProvider("routine",fetcher,env())([{role:"user",content:"Help"}],new AbortController().signal).then(()=>null,(e:Error)=>e);
+ expect(err?.message).toBe("provider_invalid_response");
+ expect(err?.message).not.toContain("<html>");expect(err?.message).not.toContain("upstream");
 });
 it("sends exactly three schemas and parses a structured call",async()=>{
  const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>({usage:{cost:0.000001},choices:[{message:{content:null,tool_calls:[{id:"1",type:"function",function:{name:"read_context",arguments:"{}"}}]}}]})});
