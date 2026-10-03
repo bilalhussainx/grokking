@@ -134,3 +134,22 @@ Error: Cannot find module '../loop'
 
 ### Task 6 fix round 1 (release only checked candidate)
 RED: 5 failed | 14 passed. GREEN: 19 passed. Gate: 146 files / 1007 tests; tsc 0 diagnostics.
+
+## Task 7 (SSE encoder / fragment-resilient parser)
+### RED
+```
+npx vitest run --config vitest.agent-a1.config.ts src/lib/cc/agent/__tests__/sse.test.ts
+Error: Failed to resolve import "../sse"
+ Test Files  1 failed (1)
+      Tests  no tests
+```
+
+### GREEN
+```
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+```
+
+### Gate
+- `npx vitest run src --config vitest.agent-source.config.ts`: 147 files / 1012 tests passed
+- `npx tsc --noEmit -p .`: 0 diagnostics
