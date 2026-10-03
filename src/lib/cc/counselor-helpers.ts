@@ -121,6 +121,46 @@ export async function getAgencyBySlug(slug: string): Promise<AgencyRow | null> {
   return data;
 }
 
+// The counselors shown on the public /agencies/[slug] page. Membership is
+// cc_agency_members (cc_counselors.agency_id is no longer set); a member is
+// listed only if they have a counselor profile, and only its public fields.
+const PUBLIC_COUNSELOR_FIELDS =
+  "slug, display_name, headline, photo_url, verified, total_sessions, average_rating, total_reviews";
+
+export interface PublicAgencyCounselor {
+  slug: string;
+  display_name: string;
+  headline: string | null;
+  photo_url: string | null;
+  verified: boolean;
+  total_sessions: number;
+  average_rating: number | null;
+  total_reviews: number;
+}
+
+export async function listPublicAgencyCounselors(agencyId: string): Promise<PublicAgencyCounselor[]> {
+  const db = createAdminSupabase();
+  const { data: members } = await db
+    .from("cc_agency_members")
+    .select("user_id")
+    .eq("agency_id", agencyId);
+  const userIds = ((members ?? []) as { user_id: string }[]).map((m) => m.user_id);
+  if (userIds.length === 0) return [];
+
+  const { data } = await db
+    .from("cc_counselors")
+    .select(PUBLIC_COUNSELOR_FIELDS)
+    .in("user_id", userIds);
+  const fields = PUBLIC_COUNSELOR_FIELDS.split(", ") as (keyof PublicAgencyCounselor)[];
+  const rows = ((data ?? []) as Record<string, unknown>[]).map(
+    (r) => Object.fromEntries(fields.map((f) => [f, r[f] ?? null])) as unknown as PublicAgencyCounselor,
+  );
+  // Verified first, then highest rating (unrated last).
+  return rows.sort(
+    (a, b) => Number(b.verified) - Number(a.verified) || (b.average_rating ?? -1) - (a.average_rating ?? -1),
+  );
+}
+
 // Counselor lookup by slug for the public profile page.
 export async function getCounselorBySlug(slug: string): Promise<CounselorRow | null> {
   const db = createAdminSupabase();
