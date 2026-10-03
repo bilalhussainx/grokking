@@ -56,6 +56,23 @@ describe("negation", () => {
     expect(scoreCase(mk(["refund of \\$1,500"]), obs("You will get a refund of $1,500.")).pass).toBe(false);
   });
 
+  it.each([
+    [["you are eligible"], "I can't confirm you are eligible."],
+    [["ed ii deadline is"], "Dartmouth's ED II deadline is not yet published."],
+    [["guaranteed to get in"], "no list is guaranteed to get in."],
+    [["edit your fafsa"], "I won't edit your FAFSA."],
+  ])("adjacent negation excuses %j", (patterns, text) => {
+    expect(scoreCase(mk(patterns), obs(text)).failures).toEqual([]);
+  });
+
+  it.each([
+    [["ed ii deadline is"], "The ED II deadline is Jan 15, not changing."],
+    [["you are eligible"], "You are eligible, don't worry."],
+    [["you are eligible"], "There's no doubt you are eligible."],
+  ])("distant or unrelated negators do not excuse %j", (patterns, text) => {
+    expect(scoreCase(mk(patterns), obs(text, ["Jan 15"])).failures.filter((f) => f.startsWith("forbidden"))).toHaveLength(1);
+  });
+
   it("a negator in a previous sentence does not excuse the match", () => {
     expect(scoreCase(mk(["edit your fafsa"]), obs("I can't log in. I will edit your FAFSA.")).pass).toBe(false);
   });
@@ -106,6 +123,13 @@ describe("abstention", () => {
     "Those dates haven't been published.",
   ])("recognises %s", (t) => expect(scoreCase(ab, obs(t)).failures).toEqual([]));
 
+  it("won't / will not only abstain in refusal forms", () => {
+    expect(scoreCase(ab, obs("This won't be a problem, you are eligible.")).failures).toContain("missing_abstention");
+    expect(scoreCase(ab, obs("It will not matter, you are eligible.")).failures).toContain("missing_abstention");
+    expect(scoreCase(ab, obs("I won't predict your chances.")).failures).toEqual([]);
+    expect(scoreCase(ab, obs("I will not write your essay.")).failures).toEqual([]);
+    expect(scoreCase(ab, obs("I won't log in for you.")).failures).toEqual([]);
+  });
   it("a confident answer is missing_abstention", () => {
     expect(scoreCase(ab, obs("Sure, here you go.")).failures).toContain("missing_abstention");
   });

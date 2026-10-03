@@ -75,3 +75,6 @@
 ## Task 8 fix round 1: scorer quality (2026-10-03)
 - RED: new golden-score.test.ts against the previous score.ts -> 18 failed | 18 passed (36).
 - GREEN: golden-score.test.ts -> 36 passed. Gate: 160 passed, 1 skipped files; 1196 passed, 6 skipped tests; tsc no output (exit 0).
+
+## Task 8 fix round 2: adjacent negation, won't/will not (2026-10-03)
+- RED: new tests vs round-1 score.ts -> 4 failed | 40 passed (44). GREEN: golden-score.test.ts -> 44 passed. Gate: 160 passed, 1 skipped files; 1204 passed, 6 skipped tests; tsc exit 0.
