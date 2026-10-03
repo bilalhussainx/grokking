@@ -18,11 +18,14 @@ export function ratesFor(model: string, env: Record<string,string|undefined>): R
   const table=parseConfig(env.OPENROUTER_AGENT_PRICING_JSON ?? "{}","pricing_config_invalid");
   if(!table || typeof table!=="object" || Array.isArray(table)) throw new Error("pricing_config_invalid");
   const rates = (table as Record<string, Rates | undefined>)[model];
-  if (!rates || ![rates.inputPerMillion,rates.outputPerMillion,rates.fixedPerRequest].every(v => Number.isFinite(v) && v >= 0) || !Number.isFinite(Date.parse(rates.verifiedAt)) || Math.abs(Date.now()-Date.parse(rates.verifiedAt)) > ageDays*86400000) throw new Error("pricing_unverified");
+  const verifiedAt = rates ? Date.parse(rates.verifiedAt) : NaN, now = Date.now();
+  // A future timestamp beyond clock skew (e.g. a typo'd year) must not keep prices "fresh" indefinitely.
+  if (!rates || ![rates.inputPerMillion,rates.outputPerMillion,rates.fixedPerRequest].every(v => Number.isFinite(v) && v >= 0) || !Number.isFinite(verifiedAt) || verifiedAt-now > 5*60000 || now-verifiedAt > ageDays*86400000) throw new Error("pricing_unverified");
   return rates;
 }
 // Monetary reservations deliberately remain separate from approximate context gates.
-// UTF-8 bytes + framing pessimistically reserve input; caller supplies a reasoning-output multiplier.
+// UTF-8 bytes + framing pessimistically reserve input; the caller passes its output-token bound
+// (the runtime adapter a flat 1,500; the probe 256 x outputMultiplier for reasoning tokens).
 // Receipts reconcile actual spend. A pricing/receipt anomaly stops further paid calls.
 export function upperCost(body: unknown, output: number, rates: Rates): number {
   return (new TextEncoder().encode(JSON.stringify(body)).length + 1024) * rates.inputPerMillion / 1e6 + output * rates.outputPerMillion / 1e6 + rates.fixedPerRequest;

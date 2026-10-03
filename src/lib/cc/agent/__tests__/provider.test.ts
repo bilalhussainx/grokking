@@ -88,6 +88,12 @@ it("keeps verified catalog prices usable for 30 days, configurable downward",()=
  expect(()=>ratesFor("fixture",{...updated,OPENROUTER_AGENT_PRICING_JSON:JSON.stringify(prices)})).toThrow("pricing_unverified");
 });
 
+it("rejects a verifiedAt beyond five minutes of clock skew in the future",()=>{
+ const at=(ms:number)=>({...env(),OPENROUTER_AGENT_PRICING_JSON:JSON.stringify({fixture:{inputPerMillion:0.04,outputPerMillion:0.14,fixedPerRequest:0,verifiedAt:new Date(Date.now()+ms).toISOString()}})});
+ expect(ratesFor("fixture",at(4*60000)).inputPerMillion).toBe(0.04);
+ expect(()=>ratesFor("fixture",at(6*60000))).toThrow(/^pricing_unverified$/);
+ expect(()=>ratesFor("fixture",at(365*86400000))).toThrow(/^pricing_unverified$/);
+});
 it.each([ENGLISH_650,URDU_650])("admits representative Sonnet/GLM essay calls and reconciles receipts",async essay=>{
  const base=env();
  // Reservation per call is roughly $0.05, so two unreconciled calls would exhaust the $0.12 ceiling.
