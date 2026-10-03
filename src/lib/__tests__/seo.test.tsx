@@ -47,6 +47,13 @@ describe("pageMetadata", () => {
     expect(m.twitter).toMatchObject({ title: "Pricing | KairosLearn" });
     expect(m.robots).toBeUndefined();
   });
+  // A page's own openGraph replaces the parent's, file-based image included,
+  // so shared links to /pricing, /faq and /about had no preview image.
+  it("keeps the site preview image on every page", () => {
+    const m = pageMetadata({ title: "Pricing", description: "d", path: "/pricing" });
+    expect(m.openGraph?.images).toEqual([{ url: `${SITE_URL}/opengraph-image`, width: 1200, height: 630, alt: "KairosLearn" }]);
+    expect((m.twitter as { images?: unknown }).images).toEqual([`${SITE_URL}/opengraph-image`]);
+  });
   it("uses the bare site URL for the homepage and can noindex", () => {
     expect(pageMetadata({ title: "x", description: "d", path: "/" }).alternates?.canonical).toBe("https://www.kairoslearn.com/");
     expect(pageMetadata({ title: "x", description: "d", path: "/a", noindex: true }).robots).toEqual({ index: false, follow: true });
