@@ -25,14 +25,15 @@ export async function GET() {
        common_app_filled, essays_complete, supplements_complete, recs_submitted,
        transcript_submitted, test_scores_submitted, financial_aid_filed,
        portal_url, portal_login_note, notes,
-       cc_schools(name)`,
+       cc_schools(name, country, application_platform)`,
     )
     .eq("student_id", profile.id)
     .order("added_at", { ascending: true });
 
+  type SchoolMeta = { name?: string; country?: string | null; application_platform?: string | null };
   type Row = {
     id: string;
-    cc_schools?: { name?: string } | { name?: string }[] | null;
+    cc_schools?: SchoolMeta | SchoolMeta[] | null;
     [k: string]: unknown;
   };
 
@@ -40,7 +41,12 @@ export async function GET() {
     const sch = Array.isArray(r.cc_schools) ? r.cc_schools[0] : r.cc_schools;
     const { cc_schools: _drop, ...rest } = r;
     void _drop;
-    return { ...rest, school_name: sch?.name ?? "Unknown school" };
+    return {
+      ...rest,
+      school_name: sch?.name ?? "Unknown school",
+      school_country: sch?.country ?? null,
+      school_application_platform: sch?.application_platform ?? null,
+    };
   });
 
   return NextResponse.json({ rows: flat });

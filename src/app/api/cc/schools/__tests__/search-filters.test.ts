@@ -11,6 +11,9 @@ function createMockChain() {
     ilike: vi.fn(function (this: unknown) {
       return this;
     }),
+    in: vi.fn(function (this: unknown) {
+      return this;
+    }),
     order: vi.fn(function (this: unknown) {
       return this;
     }),
@@ -67,5 +70,17 @@ describe("/api/cc/schools/search filter behavior", () => {
     expect(calls).not.toContain("need_blind_international");
     expect(calls).not.toContain("meets_full_need_international");
     expect(calls).not.toContain("css_profile_required");
+  });
+
+  it("matches UK rows whether the filter sends GB or UK", async () => {
+    await callSearch({ country: "GB" });
+    expect(lastChain.in).toHaveBeenCalledWith("country", ["UK", "GB"]);
+    await callSearch({ country: "UK" });
+    expect(lastChain.in).toHaveBeenCalledWith("country", ["UK", "GB"]);
+  });
+
+  it("filters other countries by exact code", async () => {
+    await callSearch({ country: "CA" });
+    expect(lastChain.eq).toHaveBeenCalledWith("country", "CA");
   });
 });

@@ -28,6 +28,7 @@ import {
   APPLICATION_PLAN_EXPLAINER_TABLE,
 } from "@/lib/applications/ed-strategy";
 import type { AffordabilityValue } from "@/lib/cc/affordability";
+import { applicationSystemLabel, checklistFor, planOptionsFor } from "@/lib/applications/system";
 
 const PLAN_OPTIONS = ["RD", "EA", "ED", "EDII", "REA", "QuestBridge", "Coalition"] as const;
 const STATUS_OPTIONS = [
@@ -363,7 +364,16 @@ function SchoolCard({
   const next = nextUpcomingDeadline(row);
   const days = next ? daysUntil(next.date) : null;
   const urgency = days !== null ? urgencyClass(days) : "ok";
-  const progress = componentProgress(row);
+  const system = {
+    name: row.school_name,
+    country: row.school_country,
+    application_platform: row.school_application_platform,
+  };
+  const checklist = checklistFor(system);
+  const systemLabel = applicationSystemLabel(system);
+  // US plan types (ED/EA/REA, QuestBridge, ...) only apply to US schools.
+  const usPlans = planOptionsFor(system).length > 0;
+  const progress = componentProgress(row, checklist.map((i) => i.key));
   const isED = row.application_plan === "ED" || row.application_plan === "EDII";
   const planNotAccepted =
     row.application_plan != null && !schoolAcceptsPlan(row.school_name, row.application_plan);
@@ -435,16 +445,20 @@ function SchoolCard({
       {expanded && (
         <div className="mt-3 pt-3 border-t border-white/10 space-y-3">
           <div className="grid grid-cols-2 gap-2 text-[11.5px]">
-            <select
-              value={row.application_plan ?? ""}
-              onChange={(e) => onUpdate({ application_plan: e.target.value || null })}
-              className="px-2 py-1.5 rounded bg-white/5 border border-white/10 text-white/80"
-            >
-              <option value="">Plan…</option>
-              {PLAN_OPTIONS.map((p) => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
+            {usPlans ? (
+              <select
+                value={row.application_plan ?? ""}
+                onChange={(e) => onUpdate({ application_plan: e.target.value || null })}
+                className="px-2 py-1.5 rounded bg-white/5 border border-white/10 text-white/80"
+              >
+                <option value="">Plan…</option>
+                {PLAN_OPTIONS.map((p) => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+            ) : (
+              <span className="px-2 py-1.5 text-white/60">{systemLabel}</span>
+            )}
             <select
               value={row.application_status ?? "not_started"}
               onChange={(e) => onUpdate({ application_status: e.target.value })}
@@ -513,17 +527,7 @@ function SchoolCard({
           )}
 
           <div className="grid grid-cols-2 gap-2">
-            {(
-              [
-                ["common_app_filled", "Common App"],
-                ["essays_complete", "Essays"],
-                ["supplements_complete", "Supplements"],
-                ["recs_submitted", "Recs"],
-                ["transcript_submitted", "Transcript"],
-                ["test_scores_submitted", "Test scores"],
-                ["financial_aid_filed", "Aid filed"],
-              ] as const
-            ).map(([key, label]) => (
+            {checklist.map(({ key, label }) => (
               <label key={key} className="flex items-center gap-1.5 text-[11.5px] text-white/70 cursor-pointer">
                 <input
                   type="checkbox"

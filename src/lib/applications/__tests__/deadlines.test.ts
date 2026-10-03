@@ -4,6 +4,7 @@ import {
   daysUntil,
   urgencyClass,
   lookupSchoolDeadlines,
+  seedDeadlinesFor,
   kanbanColumnFor,
   buildICalendar,
   nextUpcomingDeadline,
@@ -97,6 +98,20 @@ describe("lookupSchoolDeadlines", () => {
   it("returns null for unknown school", () => {
     const r = lookupSchoolDeadlines("ZZZ University");
     expect(r).toBeNull();
+  });
+});
+
+describe("seedDeadlinesFor", () => {
+  it("seeds US deadlines for US (and legacy NULL-country) schools", () => {
+    expect(seedDeadlinesFor("MIT", "US")?.deadline_ea).toBe("2025-11-01");
+    expect(seedDeadlinesFor("MIT", null)?.deadline_ea).toBe("2025-11-01");
+  });
+  it("never seeds US deadlines onto UK or Canadian schools", () => {
+    // Substring matching maps "University of British Columbia" onto Columbia's
+    // ED/CSS/FAFSA dates; non-US schools must skip the US seed entirely.
+    expect(lookupSchoolDeadlines("University of British Columbia")).not.toBeNull();
+    expect(seedDeadlinesFor("University of British Columbia", "CA")).toBeNull();
+    expect(seedDeadlinesFor("University of Oxford", "UK")).toBeNull();
   });
 });
 

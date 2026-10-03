@@ -28,7 +28,10 @@ export async function POST(req: NextRequest) {
   if (state) q = q.eq("state", state);
   if (country) {
     // "US" rows may predate the country column (NULL default) — treat NULL as US.
-    q = country === "US" ? q.or("country.eq.US,country.is.null") : q.eq("country", country);
+    // cc_schools stores the UK as "UK"; the /schools filter sends ISO "GB".
+    if (country === "US") q = q.or("country.eq.US,country.is.null");
+    else if (country === "GB" || country === "UK") q = q.in("country", ["UK", "GB"]);
+    else q = q.eq("country", country);
   }
   if (type) q = q.eq("school_type", type);
   if (test_policy) q = q.eq("test_policy", test_policy);

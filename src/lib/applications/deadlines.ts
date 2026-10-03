@@ -32,6 +32,9 @@ export type SchoolDeadlineRow = {
   financial_aid_filed: boolean;
   portal_url: string | null;
   notes: string | null;
+  // From cc_schools, so the board can pick the right application system.
+  school_country?: string | null;
+  school_application_platform?: string | null;
 };
 
 const COMPONENT_FIELDS = [
@@ -44,6 +47,8 @@ const COMPONENT_FIELDS = [
   "financial_aid_filed",
 ] as const;
 
+export type ComponentField = (typeof COMPONENT_FIELDS)[number];
+
 const DEADLINE_KEYS: DeadlineKey[] = [
   "deadline_ea",
   "deadline_ed",
@@ -55,14 +60,18 @@ const DEADLINE_KEYS: DeadlineKey[] = [
   "deadline_fafsa",
 ];
 
+// `fields` narrows progress to one application system's checklist (UCAS and
+// Canadian schools don't use every US component). Defaults to all seven.
 export function componentProgress(
-  row: Pick<SchoolDeadlineRow, (typeof COMPONENT_FIELDS)[number]>,
+  row: Pick<SchoolDeadlineRow, ComponentField>,
+  fields: readonly ComponentField[] = COMPONENT_FIELDS,
 ): { complete: number; total: number; pct: number } {
   let complete = 0;
-  for (const k of COMPONENT_FIELDS) {
+  for (const k of fields) {
     if (row[k]) complete++;
   }
-  return { complete, total: COMPONENT_FIELDS.length, pct: Math.round((complete / COMPONENT_FIELDS.length) * 100) };
+  const total = fields.length;
+  return { complete, total, pct: total ? Math.round((complete / total) * 100) : 0 };
 }
 
 export function nextUpcomingDeadline(row: SchoolDeadlineRow): { key: DeadlineKey; date: string } | null {
@@ -110,6 +119,16 @@ export function lookupSchoolDeadlines(schoolName: string): Partial<SchoolDeadlin
     if (lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower)) return data[key] as never;
   }
   return null;
+}
+
+// The deadline seed is US-only (ED/EA/CSS/FAFSA). Its fuzzy matching would
+// otherwise hand a UK or Canadian school a US school's dates (UBC -> Columbia).
+export function seedDeadlinesFor(
+  schoolName: string,
+  country: string | null | undefined,
+): Partial<SchoolDeadlineRow> | null {
+  if (country && country !== "US") return null;
+  return lookupSchoolDeadlines(schoolName);
 }
 
 export type KanbanColumn = "not_started" | "in_progress" | "submitted" | "decisions";
