@@ -74,7 +74,7 @@
 | `src/lib/cc/agent/journey-tools.ts` | `get_journey_state`, `list_my_schools`, `check_plan_conflicts`, `get_essay_status` |
 | `src/lib/cc/agent/proposals.ts` | Proposal tools, token sign/verify, commit/decline/undo adapters |
 | `src/lib/cc/agent/s1-tools.ts` | Combined definitions, validator and dispatcher (A1 + S1) |
-| `src/lib/cc/agent/date-check.ts` | `groundedDateCheck` output check |
+| `src/lib/cc/agent/date-check.ts` | `redactUngroundedDates` (pre-check) and `echoCheck` |
 | `src/lib/cc/agent/s1-turn.ts` | Turn orchestration: operation key, run, persist events |
 | `src/app/api/cc/agent/turn/route.ts` | SSE turn endpoint |
 | `src/app/api/cc/agent/proposals/[id]/route.ts` | `POST {action: confirm|decline|undo}` |
@@ -870,7 +870,8 @@ git commit -m "feat(agent-s1): proposals with signed 10-minute confirmation, ide
 - Produces:
 
   ```ts
-  export const groundedDateCheck: OutputCheck;            // date-check.ts
+  export function redactUngroundedDates(candidate: Candidate, evidence: Json[]): Candidate; // date-check.ts, pure
+  export const echoCheck: OutputCheck;                    // date-check.ts: allows the candidate unchanged
   export const S1_TOOL_DEFINITIONS: readonly object[];   // s1-tools.ts
   export function validateS1ToolArgs(name: string, value: unknown): unknown;
   export function makeS1Tools(db, scope, ctx: { turnId: string | null; now: Date }): ReadTools;
@@ -884,27 +885,29 @@ git commit -m "feat(agent-s1): proposals with signed 10-minute confirmation, ide
 // @vitest-environment node
 // src/lib/cc/agent/__tests__/date-check.test.ts
 import { it, expect } from "vitest";
-import { groundedDateCheck } from "../date-check";
-const ctx = (evidence: unknown[]) => ({ locale: "en", evidence: evidence as never, priorReleased: [], signal: new AbortController().signal });
+import { redactUngroundedDates, echoCheck } from "../date-check";
 
-it("strips_dates_absent_from_evidence", async () => {
-  const v = await groundedDateCheck({ text: "MIT EA is November 1. Start your list today.", cards: [] }, ctx([]));
-  expect(v.decision).toBe("allow");
-  if (v.decision === "allow") {
-    expect(v.result.text).not.toMatch(/November 1/);
-    expect(v.result.text).toMatch(/I don't have a verified date for that yet/);
-    expect(v.result.text).toMatch(/Start your list today/);
-  }
+it("strips_dates_absent_from_evidence", () => {
+  const out = redactUngroundedDates({ text: "MIT EA is November 1. Start your list today.", cards: [] }, []);
+  expect(out.text).not.toMatch(/November 1/);
+  expect(out.text).toMatch(/I don't have a verified date for that yet/);
+  expect(out.text).toMatch(/Start your list today/);
 });
 
-it("keeps_task_due_dates_from_tool_evidence", async () => {
-  const v = await groundedDateCheck({ text: "Your task is due 2026-10-25.", cards: [] }, ctx([{ kind: "task_due_date", value: "2026-10-25" }]));
-  expect(v.decision === "allow" && v.result.text).toBe("Your task is due 2026-10-25.");
+it("keeps_task_due_dates_from_tool_evidence", () => {
+  const out = redactUngroundedDates({ text: "Your task is due 2026-10-25.", cards: [] }, [{ kind: "task_due_date", value: "2026-10-25" }]);
+  expect(out.text).toBe("Your task is due 2026-10-25.");
 });
 
-it("checks card fields too", async () => {
-  const v = await groundedDateCheck({ text: "ok", cards: [{ title: "Due Jan 1, 2027" }] }, ctx([]));
-  expect(v.decision === "allow" && JSON.stringify(v.result.cards)).not.toMatch(/Jan 1, 2027/);
+it("checks card fields too", () => {
+  const out = redactUngroundedDates({ text: "ok", cards: [{ title: "Due Jan 1, 2027" }] }, []);
+  expect(JSON.stringify(out.cards)).not.toMatch(/Jan 1, 2027/);
+});
+
+it("echoCheck allows exactly the candidate it was given", async () => {
+  const c = { text: "x", cards: [] };
+  const v = await echoCheck(c, { locale: "en", evidence: [], priorReleased: [], signal: new AbortController().signal });
+  expect(v).toEqual({ decision: "allow", result: { ...c, policyVersion: "s1-date-grounding-1" } });
 });
 ```
 
@@ -992,10 +995,16 @@ function walk(v: Json, evidence: string): Json {
   return v;
 }
 
-export const groundedDateCheck: OutputCheck = async (candidate: Candidate, context: CheckContext) => {
-  const evidence = JSON.stringify(context.evidence);
-  return { decision: "allow", result: { text: grounded(candidate.text, evidence), cards: candidate.cards.map((c) => walk(c, evidence)), policyVersion: "s1-date-grounding-1" } };
-};
+// Deterministic, pre-check redaction (A1 Task 6 ruling: the loop releases only
+// the candidate it checked, so redaction must happen before the check).
+export function redactUngroundedDates(candidate: Candidate, evidence: Json[]): Candidate {
+  const ev = JSON.stringify(evidence);
+  return { text: grounded(candidate.text, ev), cards: candidate.cards.map((c) => walk(c, ev)) };
+}
+
+// S1 turns carry no essay prose, so the check after redaction is a pass-through.
+export const echoCheck: OutputCheck = async (candidate: Candidate, _context: CheckContext) =>
+  ({ decision: "allow", result: { ...candidate, policyVersion: "s1-date-grounding-1" } });
 ```
 
 ```ts
@@ -1034,7 +1043,7 @@ export function makeS1Tools(db: SupabaseClient, scope: AuthScope, ctx: { turnId:
 Modify A1's `contracts.ts`, replacing the `RunDeps` line with:
 
 ```ts
-export type RunDeps = { provider: Provider; tools: ReadTools; check: OutputCheck; signal: AbortSignal; priorReleased: string[]; validate?: (name: string, value: unknown) => unknown };
+export type RunDeps = { provider: Provider; tools: ReadTools; check: OutputCheck; signal: AbortSignal; priorReleased: string[]; validate?: (name: string, value: unknown) => unknown; redact?: (candidate: Candidate, evidence: Json[]) => Candidate };
 ```
 
 Modify A1's `loop.ts`, replacing `const parsed=reply.calls.map(c=>validateToolArgs(c.name,JSON.parse(c.arguments)));` with:
@@ -1044,7 +1053,7 @@ const validate=deps.validate??validateToolArgs;
 const parsed=reply.calls.map(c=>validate(c.name,JSON.parse(c.arguments)));
 ```
 
-Also change the next loop line to pass `parsed[i]`, unchanged in form.
+Also change the next loop line to pass `parsed[i]`, unchanged in form. Then, where the loop computes `const candidate=parseCandidate(reply.content);`, change it to `const candidate=deps.redact?deps.redact(parseCandidate(reply.content),evidence):parseCandidate(reply.content);`, so redaction happens before the size check and the output check. The release path (A1 Task 6 ruling) then returns exactly this redacted candidate. Add a loop test: with a `redact` that uppercases the text and an echo checker, the result text is uppercased. That shows the checked and released text are the same.
 
 Modify A1's `provider.ts`: give `makeProvider` the signature `makeProvider(role, customFetch?, envOverride?, toolDefinitions: readonly unknown[] = READ_TOOL_DEFINITIONS)`, and use `tools: toolDefinitions` where it currently uses `tools: READ_TOOL_DEFINITIONS`.
 
@@ -1053,7 +1062,7 @@ Modify A1's `provider.ts`: give `makeProvider` the signature `makeProvider(role,
 import crypto from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { runAgent } from "./loop";
-import { groundedDateCheck } from "./date-check";
+import { redactUngroundedDates, echoCheck } from "./date-check";
 import { makeS1Tools, validateS1ToolArgs } from "./s1-tools";
 import type { AuthScope, Json, Provider, ToolReply } from "./contracts";
 
@@ -1095,7 +1104,7 @@ export async function runS1Turn(i: { db: SupabaseClient; scope: AuthScope; opera
     return r;
   };
   try {
-    const checked = await runAgent({ message: i.message, essayId: null, locale: i.locale }, { provider: i.provider, tools, check: groundedDateCheck, signal: i.signal, priorReleased: [], validate: validateS1ToolArgs });
+    const checked = await runAgent({ message: i.message, essayId: null, locale: i.locale }, { provider: i.provider, tools, check: echoCheck, redact: redactUngroundedDates, signal: i.signal, priorReleased: [], validate: validateS1ToolArgs });
     const result = { text: checked.text, cards: checked.cards };
     await i.db.from("cc_agent_turns").update({ status: "completed", result, completed_at: i.now.toISOString() }).eq("id", turnId);
     await log("turn.completed", "Answered");
