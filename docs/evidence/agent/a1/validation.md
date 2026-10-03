@@ -112,3 +112,22 @@ Error: Cannot find module '../probe' imported from .../probe.test.ts
 
 ### Live probe
 Founder step, not run. `.env.agent-probe` not created; `.env.local` not read. No probe-admitted.json / compatibility.json exist.
+
+## Task 6: bounded loop with full-output holdback
+### RED
+```
+npx vitest run --config vitest.agent-a1.config.ts src/lib/cc/agent/__tests__/loop.test.ts
+Error: Cannot find module '../loop'
+ Test Files  1 failed (1)
+      Tests  no tests
+```
+
+### GREEN
+```
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+```
+
+### Gate
+- `npx vitest run src --config vitest.agent-source.config.ts`: 146 files / 1002 tests passed
+- `npx tsc --noEmit -p .`: 0 diagnostics
