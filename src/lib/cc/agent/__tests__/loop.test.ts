@@ -139,3 +139,17 @@ it("releases exactly the checked candidate with the checker's policyVersion",asy
  const result=await runAgent(input,{provider:async()=>({content:"What changed?",calls:[]}),tools:vi.fn(),check:async c=>({decision:"allow",result:{...c,policyVersion:"v9",extra:"leak"} as never}),signal:new AbortController().signal,priorReleased:[]});
  expect(result).toEqual({text:"What changed?",cards:[],policyVersion:"v9"});
 });
+it("redacts before the check, so the checked and released text are the same",async()=>{
+ const check=vi.fn<OutputCheck>().mockImplementation(async c=>({decision:"allow",result:{...c,policyVersion:"echo"}}));
+ const result=await runAgent(input,{provider:async()=>({content:"What changed?",calls:[]}),tools:vi.fn(),check,signal:new AbortController().signal,priorReleased:[],redact:c=>({...c,text:c.text.toUpperCase()})});
+ expect(check.mock.calls[0][0].text).toBe("WHAT CHANGED?");
+ expect(result).toEqual({text:"WHAT CHANGED?",cards:[],policyVersion:"echo"});
+});
+it("uses an injected argument validator instead of the read-tool validator",async()=>{
+ const provider=vi.fn<Provider>().mockResolvedValueOnce({content:null,calls:[{id:"1",name:"get_journey_state",arguments:"{}"}]}).mockResolvedValueOnce({content:"Next step.",calls:[]});
+ const tools=vi.fn<ReadTools>().mockResolvedValue(reply);
+ const validate=vi.fn((_n:string,v:unknown)=>v);
+ await runAgent(input,{provider,tools,check:allow,signal:new AbortController().signal,priorReleased:[],validate});
+ expect(validate).toHaveBeenCalledWith("get_journey_state",{});
+ expect(tools.mock.calls[0][0]).toBe("get_journey_state");
+});

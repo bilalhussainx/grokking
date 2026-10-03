@@ -38,6 +38,12 @@ it("sends exactly three schemas and parses a structured call",async()=>{
  expect(body.tools.every((t:{function:{parameters:{additionalProperties:boolean}}})=>t.function.parameters.additionalProperties===false)).toBe(true);
  expect(answer.calls).toEqual([{id:"1",name:"read_context",arguments:"{}"}]);
 });
+it("sends the caller's tool definitions when given",async()=>{
+ const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>({usage:{cost:0.000001},choices:[{message:{content:"Hi"}}]})});
+ const defs=[{type:"function",function:{name:"get_journey_state",parameters:{type:"object",properties:{},additionalProperties:false}}}];
+ await makeProvider("routine",fetcher,env(),defs)([{role:"user",content:"Help"}],new AbortController().signal);
+ expect(JSON.parse(fetcher.mock.calls[0][1].body).tools).toEqual(defs);
+});
 it("checker requests JSON with no callable tools",async()=>{
  const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>({usage:{cost:0.000001},choices:[{message:{content:'{"decision":"uncertain"}'}}]})});
  await makeProvider("check",fetcher,env())([{role:"user",content:"Return JSON."}],new AbortController().signal);

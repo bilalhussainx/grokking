@@ -50,7 +50,7 @@ export async function bounded<T>(work: (signal: AbortSignal) => Promise<T>, pare
     })]);
   } finally { clearTimeout(timer); parent.removeEventListener("abort",abort); controller.signal.removeEventListener("abort",rejectAbort); }
 }
-export function makeProvider(role: AgentRole, customFetch?: typeof fetch, envOverride?: Record<string,string|undefined>): Provider {
+export function makeProvider(role: AgentRole, customFetch?: typeof fetch, envOverride?: Record<string,string|undefined>, toolDefinitions: readonly unknown[] = READ_TOOL_DEFINITIONS): Provider {
   const env=envOverride ?? process.env;
   const apiKey=env.OPENROUTER_API_KEY?.trim(), model=env[ROLE_ENV_VARS[role]]?.trim();
   if(!apiKey) throw new Error("provider_key_missing");
@@ -67,7 +67,7 @@ export function makeProvider(role: AgentRole, customFetch?: typeof fetch, envOve
   return async (messages: ChatMessage[],signal: AbortSignal) => {
     if(stopped)throw new Error("provider_stopped_after_unknown_cost");
     const body={ model, messages, max_tokens:1500, temperature:0.2, provider:{require_parameters:true},usage:{include:true},
-      ...(role==="check" ? {response_format:{type:"json_object"}} : {tools:READ_TOOL_DEFINITIONS,tool_choice:"auto"}) };
+      ...(role==="check" ? {response_format:{type:"json_object"}} : {tools:toolDefinitions,tool_choice:"auto"}) };
     if(estimateTokens(JSON.stringify(body))+256>(role==="check"?6000:12000)) throw new Error("context_budget_exceeded");
     // Reserve before dispatch; failed/aborted calls consume the bound too.
     const reserve=upperCost(body,1500,rates); // Runtime allowance; the separate probe uses its reasoning multiplier.

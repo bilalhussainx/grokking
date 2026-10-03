@@ -34,3 +34,8 @@ describe("routes that run Coach extraction", () => {
     },
   );
 });
+
+it("the legacy message route skips actions and extraction for S1 users", () => {
+  const src = fs.readFileSync(path.join(API_ROOT, "cc/coach/message/route.ts"), "utf8");
+  expect(src).toMatch(/isAgentS1User\(user\.id\)/);
+});

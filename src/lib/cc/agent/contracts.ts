@@ -79,6 +79,10 @@ export type RunDeps = {
   check: OutputCheck;
   signal: AbortSignal;
   priorReleased: string[];
+  // Tool argument validator; defaults to the A1 read-tool validator.
+  validate?: (name: string, value: unknown) => unknown;
+  // Deterministic pre-check rewrite; the checker sees, and the loop releases, its output.
+  redact?: (candidate: Candidate, evidence: Json[]) => Candidate;
 };
 
 /**

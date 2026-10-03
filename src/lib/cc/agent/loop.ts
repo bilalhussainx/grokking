@@ -67,7 +67,8 @@ async function runBounded(input:AgentInput,deps:RunDeps,policy:RunPolicy):Promis
         // Validate the complete batch before making any DB call; no parse-failure fallback to {}.
         if(toolCalls+reply.calls.length>8) throw new Error("tool_budget_exceeded");
         if(new Set(reply.calls.map(c=>c.id)).size!==reply.calls.length) throw new Error("duplicate_tool_call_id");
-        const parsed=reply.calls.map(c=>validateToolArgs(c.name,parseToolArguments(c.arguments)));
+        const validate=deps.validate??validateToolArgs;
+        const parsed=reply.calls.map(c=>validate(c.name,parseToolArguments(c.arguments)));
         messages.push({role:"assistant",content:reply.content,tool_calls:reply.calls.map(c=>({id:c.id,type:"function",function:{name:c.name,arguments:c.arguments}}))});
         for(let i=0;i<reply.calls.length;i++) {
           signal.throwIfAborted();toolCalls++;
@@ -80,7 +81,8 @@ async function runBounded(input:AgentInput,deps:RunDeps,policy:RunPolicy):Promis
         }
         continue;
       }
-      const candidate=parseCandidate(reply.content);
+      // Redaction runs before the size gate and the check, so the released text is the checked text.
+      const candidate=deps.redact?deps.redact(parseCandidate(reply.content),evidence):parseCandidate(reply.content);
       if(estimateTokens(JSON.stringify(candidate))>1400) throw new Error("invalid_candidate");
       // Slice b owns the 6,000-token gate after source deduplication and system-prompt framing.
       const priorReleased=deps.priorReleased; // a2 summarizes once; preserve its exact marker and retained tails.
