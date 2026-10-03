@@ -40,3 +40,27 @@ TypeScript: `npx tsc --noEmit -p .`
 ```
 exit 0, 0 diagnostics (no new failures)
 ```
+
+## Task 3: server-scoped read tools
+
+### RED
+`npx vitest run --config vitest.agent-a1.config.ts src/lib/cc/agent/__tests__/read-tools.test.ts`
+```
+ FAIL  src/lib/cc/agent/__tests__/read-tools.test.ts
+Error: Cannot find module '../read-tools' imported from .../read-tools.test.ts
+ Test Files  1 failed (1)
+      Tests  no tests
+```
+
+### GREEN
+```
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+```
+
+### Gate
+- `npx vitest run src --config vitest.agent-source.config.ts`: 143 files / 962 tests passed (957 baseline + 5 new)
+- `npx tsc --noEmit -p .`: 0 diagnostics
+
+### Schema verification
+All selected columns exist in `supabase/migrations` for cc_student_profiles, cc_academic_profiles, cc_financial_profiles, cc_essays. `cc_essay_drafts` and `cc_counselor_comments` have no CREATE TABLE in the repo migrations (created out of band); their columns are corroborated by live route code (drafts routes, counselor-comments.ts).
