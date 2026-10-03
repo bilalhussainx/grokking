@@ -69,7 +69,8 @@ export function finalizeReview<T extends ScoredReview>(review: T, opts: { draft:
   const out: T = { ...review };
   if (review.strengths) out.strengths = keepQuotedStrengths(review.strengths, opts.draft);
   if (review.scoreBreakdown && !opts.hasSchools) {
-    const { applicationFit: _dropped, ...rest } = review.scoreBreakdown;
+    const rest = { ...review.scoreBreakdown };
+    delete rest.applicationFit;
     out.scoreBreakdown = rest;
   }
   return out;
