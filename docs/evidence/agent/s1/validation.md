@@ -48,3 +48,7 @@
 - RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/triggers.test.ts` (with triggers.ts moved aside) -> 1 file failed, no tests ran; import of `../triggers` unresolved.
 - GREEN: same command -> 1 file, 5 passed.
 - Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 156 passed, 1 skipped files; 1147 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0.
+
+## Task 5 fix round 1: canonical smallest student id (2026-10-03)
+- RED: triggers.test.ts -> 1 failed | 5 passed (nudge attached to 3333... not 1111...). GREEN: 6 passed.
+- Gate: 156 passed, 1 skipped files; 1148 passed, 6 skipped tests; tsc exit 0.

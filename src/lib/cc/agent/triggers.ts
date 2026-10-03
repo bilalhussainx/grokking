@@ -41,6 +41,7 @@ export async function runNudgeCron(db: SupabaseClient, now: Date, env: Record<st
   const byUser = new Map<string, string[]>();
   for (const p of (profiles ?? []) as { id: string; user_id: string }[]) byUser.set(p.user_id, [...(byUser.get(p.user_id) ?? []), p.id]);
   for (const [userId, ids] of byUser) {
+    ids.sort(); // canonical student id = lexicographically smallest profile id (Task 3 ruling)
     const [{ data: ss }, { data: essays }, { data: up }] = await Promise.all([
       db.from("cc_student_schools").select("school_id,application_plan").in("student_id", ids),
       db.from("cc_essays").select("id,counselor_review_state,phase,updated_at").in("student_id", ids),

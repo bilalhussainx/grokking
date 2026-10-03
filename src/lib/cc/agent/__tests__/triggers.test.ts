@@ -45,6 +45,24 @@ describe("triggers", () => {
     expect(d.tables.cc_agent_nudges).toHaveLength(1);
   });
 
+  it("duplicate_profiles_use_smallest_id_regardless_of_row_order", async () => {
+    const lo = "11111111-1111-4111-8111-111111111111";
+    const hi = "33333333-3333-4333-8333-333333333333";
+    const mk = (profiles: { id: string; user_id: string }[]) => createFakeSupabase({
+      cc_student_profiles: profiles, cc_student_schools: [], cc_schools: [],
+      cc_essays: [{ id: "e1", student_id: lo, counselor_review_state: "changes_requested", phase: "revise", updated_at: "2026-10-05T00:00:00Z" }],
+      user_profiles: [{ id: U, last_login_date: "2026-10-19" }],
+      cc_agent_nudges: [], cc_agent_events: [],
+    });
+    const d = mk([{ id: hi, user_id: U }, { id: lo, user_id: U }]);
+    expect((await runNudgeCron(d as unknown as SupabaseClient, now, env)).inserted).toBe(1);
+    expect(d.tables.cc_agent_nudges[0].student_id).toBe(lo);
+    // same nudge rows, profile rows now in reverse order: must dedupe
+    d.tables.cc_student_profiles.reverse();
+    expect((await runNudgeCron(d as unknown as SupabaseClient, now, env)).inserted).toBe(0);
+    expect(d.tables.cc_agent_nudges).toHaveLength(1);
+  });
+
   it("unflagged_students_never_nudged", async () => {
     const d = db();
     await runNudgeCron(d as unknown as SupabaseClient, now, env);
