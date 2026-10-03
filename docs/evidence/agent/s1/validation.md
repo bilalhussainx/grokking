@@ -14,3 +14,9 @@
 - RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/journey-tools.test.ts` -> FAIL, `../journey-tools` could not be resolved (no tests ran).
 - GREEN: same command -> 1 file, 7 tests passed.
 - Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 150 passed, 1 skipped files; 1057 passed, 4 skipped tests. `npx tsc --noEmit -p .` -> no output (0 errors).
+
+## Task 3: proposals, confirmation tokens, commit/decline/undo, confirm route
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/proposals.test.ts` -> FAIL, `Cannot find module '../proposals'` (no tests ran).
+- First GREEN attempt with the brief's code verbatim: 3 failed / 5 passed. The fake does not apply column defaults, so the inserted proposal had no `status` (DB default 'pending'). Fixed by writing `status: "pending"` explicitly on insert (matches the DB default).
+- GREEN: same command -> 1 file, 8 tests passed (the brief says "7 passed", but its test file has 8 cases).
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 151 passed, 1 skipped files; 1065 passed, 4 skipped tests. `npx tsc --noEmit -p .` -> exit 0, no output.
