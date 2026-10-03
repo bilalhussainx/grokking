@@ -12,13 +12,43 @@ const PLANS = plansData as Record<string, SchoolPlanInfo>;
 
 const REA_SCHOOLS = ["Harvard", "Yale", "Princeton", "Georgetown", "Stanford"];
 
+// Plan data is keyed by short names; the school catalog and the school list
+// use full names, sometimes in IPEDS spelling ("University of Michigan-Ann Arbor").
+const ALIASES: Record<string, string[]> = {
+  MIT: ["Massachusetts Institute of Technology"],
+  Harvard: ["Harvard University"],
+  Yale: ["Yale University"],
+  Princeton: ["Princeton University"],
+  Stanford: ["Stanford University"],
+  Georgetown: ["Georgetown University"],
+  Columbia: ["Columbia University", "Columbia University in the City of New York"],
+  UPenn: ["University of Pennsylvania"],
+  Cornell: ["Cornell University"],
+  Brown: ["Brown University"],
+  Dartmouth: ["Dartmouth College"],
+  Northwestern: ["Northwestern University"],
+  Duke: ["Duke University"],
+  NYU: ["New York University"],
+  Vanderbilt: ["Vanderbilt University"],
+  USC: ["University of Southern California"],
+  BU: ["Boston University"],
+  UCLA: ["University of California, Los Angeles", "University of California-Los Angeles"],
+  UMich: ["University of Michigan", "University of Michigan, Ann Arbor", "University of Michigan-Ann Arbor"],
+  UNC: ["University of North Carolina at Chapel Hill"],
+};
+const normName = (s: string) => s.toLowerCase().replace(/[–—-]/g, " ").replace(/[,.]/g, "").replace(/\s+/g, " ").trim();
+const KEY_BY_NAME = new Map<string, string>();
+for (const key of Object.keys(PLANS)) KEY_BY_NAME.set(normName(key), key);
+for (const [key, names] of Object.entries(ALIASES)) for (const n of names) KEY_BY_NAME.set(normName(n), key);
+
+// The plan-data key for a school name in any known spelling, or null.
+export function planKey(schoolName: string): string | null {
+  return KEY_BY_NAME.get(normName(schoolName)) ?? null;
+}
+
 export function getSchoolPlanInfo(schoolName: string): SchoolPlanInfo | null {
-  if (PLANS[schoolName]) return PLANS[schoolName];
-  const lower = schoolName.toLowerCase();
-  for (const k of Object.keys(PLANS)) {
-    if (k.toLowerCase() === lower) return PLANS[k];
-  }
-  return null;
+  const key = planKey(schoolName);
+  return key ? PLANS[key] ?? null : null;
 }
 
 export function schoolAcceptsPlan(schoolName: string, plan: string): boolean {
@@ -88,7 +118,7 @@ export type REAConflict = {
 export function checkREAConflict(
   schools: { schoolName: string; plan: string | null }[],
 ): REAConflict {
-  const reaSchool = schools.find((s) => s.plan === "REA" && REA_SCHOOLS.includes(s.schoolName));
+  const reaSchool = schools.find((s) => s.plan === "REA" && REA_SCHOOLS.includes(planKey(s.schoolName) ?? ""));
   if (!reaSchool) {
     return { conflict: false, reaSchool: null, conflictingSchools: [], message: "" };
   }

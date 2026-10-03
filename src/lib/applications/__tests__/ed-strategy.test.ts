@@ -101,3 +101,30 @@ describe("getSchoolPlanInfo", () => {
     expect(getSchoolPlanInfo("ZZ College")).toBeNull();
   });
 });
+
+// The school list and Applications board pass catalog names ("Harvard
+// University", "University of Michigan-Ann Arbor"), not the short plan keys.
+describe("catalog school names", () => {
+  it("finds plan info for catalog spellings", () => {
+    expect(getSchoolPlanInfo("Harvard University")?.plans).toContain("REA");
+    expect(getSchoolPlanInfo("Massachusetts Institute of Technology")).not.toBeNull();
+    expect(getSchoolPlanInfo("University of Michigan-Ann Arbor")).not.toBeNull();
+    expect(getSchoolPlanInfo("University of Michigan, Ann Arbor")).not.toBeNull();
+    expect(getSchoolPlanInfo("University of Pennsylvania")).not.toBeNull();
+    expect(getSchoolPlanInfo("Penn State University")).toBeNull();
+  });
+
+  it("flags an REA conflict using catalog names and keeps them in the message", () => {
+    const r = checkREAConflict([
+      { schoolName: "Harvard University", plan: "REA" },
+      { schoolName: "Northwestern University", plan: "ED" },
+    ]);
+    expect(r.conflict).toBe(true);
+    expect(r.reaSchool).toBe("Harvard University");
+    expect(r.conflictingSchools).toEqual(["Northwestern University"]);
+  });
+
+  it("checks plan validity for catalog names", () => {
+    expect(schoolAcceptsPlan("Northwestern University", "EA")).toBe(false);
+  });
+});
