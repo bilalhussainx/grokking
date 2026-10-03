@@ -3,7 +3,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { createFakeSupabase } from "@/lib/cc/__tests__/helpers/fake-supabase";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { runS1Turn } from "../s1-turn";
+import { runS1Turn, ESSAY_WRITING_REQUEST } from "../s1-turn";
 import type { Provider } from "../contracts";
 
 const U = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
@@ -94,6 +94,143 @@ describe("S1 turn", () => {
     release();
     await new Promise((r) => setTimeout(r, 20));
     expect(db.tables.cc_agent_events.map((e) => e.type)).toEqual(["turn.accepted", "turn.failed"]);
+  });
+
+  it("a date the student typed does not ground the model's answer", async () => {
+    const provider = vi.fn<Provider>().mockResolvedValue({ content: "MIT EA is November 1.", calls: [] });
+    const r = await runS1Turn(args(base(), provider, "Is MIT EA November 1?"));
+    expect(r.result?.text).not.toMatch(/November 1/);
+  });
+
+  it.each([
+    "Write my personal statement intro for me",
+    "Can you try rewriting my conclusion?",
+    "Give me an opening line for my Common App essay",
+    "give me a good opening sentence",
+    "Finish my essay for me",
+  ])("essay-writing request %j gets the integrity answer", async (message) => {
+    const provider = vi.fn<Provider>();
+    const r = await runS1Turn(args(base(), provider, message));
+    expect(provider).not.toHaveBeenCalled();
+    expect(r.result?.text).toMatch(/You write every word/);
+  });
+
+  it.each(["What should I do this week?", "How far along is my essay?", "Give me feedback on this sentence", "When is my essay due?"])(
+    "%j is not an essay-writing request", (message) => {
+      expect(ESSAY_WRITING_REQUEST.test(message)).toBe(false);
+    });
+
+  describe("proposal grounding", () => {
+    const hold = (title: string, date: string, reason = "You asked for time") =>
+      ({ content: null, calls: [{ id: "1", name: "propose_calendar_hold", arguments: JSON.stringify({ title, date, reason }) }] });
+    const toolReply = (provider: ReturnType<typeof vi.fn<Provider>>, call = 1) =>
+      JSON.parse(provider.mock.calls[call][0].filter((m) => m.role === "tool").at(-1)!.content!) as { status: string; data: { reason?: string } };
+
+    it("a deadline-titled hold on an unevidenced date is unknown and saves nothing", async () => {
+      const provider = vi.fn<Provider>().mockResolvedValueOnce(hold("MIT EA deadline", "2026-11-01")).mockResolvedValueOnce({ content: "Okay.", calls: [] });
+      const db = base();
+      await runS1Turn(args(db, provider));
+      expect(toolReply(provider)).toEqual({ status: "unknown", data: { reason: "date_not_verified" } });
+      expect(db.tables.cc_agent_proposals).toHaveLength(0);
+    });
+
+    it("a work-session hold three days out is ok", async () => {
+      const provider = vi.fn<Provider>().mockResolvedValueOnce(hold("Work on Why Michigan", "2026-10-23")).mockResolvedValueOnce({ content: "Okay.", calls: [] });
+      const db = base();
+      await runS1Turn(args(db, provider));
+      expect(toolReply(provider).status).toBe("ok");
+      expect(db.tables.cc_agent_proposals).toHaveLength(1);
+    });
+
+    it.each(["2026-10-19", "2027-04-19"])("a hold on %s is out of range", async (date) => {
+      const provider = vi.fn<Provider>().mockResolvedValueOnce(hold("Work on Why Michigan", date)).mockResolvedValueOnce({ content: "Okay.", calls: [] });
+      const db = base();
+      await runS1Turn(args(db, provider));
+      expect(toolReply(provider)).toEqual({ status: "unknown", data: { reason: "date_out_of_range" } });
+      expect(db.tables.cc_agent_proposals).toHaveLength(0);
+    });
+
+    it("a deadline word is allowed when the date comes from this turn's tool evidence", async () => {
+      const provider = vi.fn<Provider>()
+        .mockResolvedValueOnce({ content: null, calls: [{ id: "1", name: "get_journey_state", arguments: "{}" }] })
+        .mockResolvedValueOnce(hold("Finish the task due then", "2026-10-25"))
+        .mockResolvedValueOnce({ content: "Okay.", calls: [] });
+      const db = base();
+      db.tables.cc_tasks.push({ id: "t1", student_id: P, title: "Ask for letters", due_date: "2026-10-25", status: "todo", task_type: "student" });
+      await runS1Turn(args(db, provider));
+      expect(toolReply(provider, 2).status).toBe("ok");
+      expect(db.tables.cc_agent_proposals).toHaveLength(1);
+    });
+
+    it("redacts ungrounded dates in a proposal's title and reason", async () => {
+      const provider = vi.fn<Provider>()
+        .mockResolvedValueOnce({ content: null, calls: [{ id: "1", name: "propose_task", arguments: JSON.stringify({ title: "Apply to MIT by Nov 1", dueDate: null, reason: "MIT EA is November 1." }) }] })
+        .mockResolvedValueOnce({ content: "Okay.", calls: [] });
+      const db = base();
+      await runS1Turn(args(db, provider));
+      expect(JSON.stringify(db.tables.cc_agent_proposals[0])).not.toMatch(/Nov(ember)? 1/);
+    });
+
+    it("a failed turn expires the proposals it made", async () => {
+      const provider = vi.fn<Provider>().mockResolvedValueOnce(hold("Work on Why Michigan", "2026-10-23")).mockResolvedValueOnce({ content: "[not json", calls: [] });
+      const db = base();
+      await expect(runS1Turn(args(db, provider))).rejects.toThrow("invalid_candidate");
+      expect(db.tables.cc_agent_proposals.map((p) => p.status)).toEqual(["expired"]);
+    });
+  });
+
+  describe("concurrent same-key requests", () => {
+    // The first read misses (the other request has not inserted yet); the insert then hits the unique key.
+    const racing = (db: ReturnType<typeof base>, insertError?: { code: string; message: string }) => {
+      let reads = 0;
+      return {
+        from: (t: string) => {
+          if (t !== "cc_agent_turns") return db.from(t);
+          const q = db.from(t);
+          return {
+            select: (c: string) => reads++ === 0
+              ? { eq: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) }
+              : q.select(c),
+            insert: (row: Record<string, unknown>) => insertError
+              ? { select: () => ({ single: async () => ({ data: null, error: insertError }) }) }
+              : q.insert(row),
+            update: (patch: Record<string, unknown>) => q.update(patch),
+          };
+        },
+      } as unknown as SupabaseClient;
+    };
+    const uniqueBase = () => createFakeSupabase(base().tables, { unique: { cc_agent_turns: [["user_id", "operation_key"]] } });
+
+    it("replays the other request's completed result", async () => {
+      const provider = vi.fn<Provider>().mockResolvedValue({ content: "Hi.", calls: [] });
+      const db = uniqueBase();
+      await runS1Turn(args(db, provider));
+      const r = await runS1Turn({ ...args(db, provider), db: racing(db) });
+      expect(r).toMatchObject({ status: 200, result: { text: "Hi." } });
+      expect(provider).toHaveBeenCalledTimes(1);
+    });
+
+    it("reports a running turn as in progress", async () => {
+      const provider = vi.fn<Provider>().mockResolvedValue({ content: "Hi.", calls: [] });
+      const db = uniqueBase();
+      await runS1Turn(args(db, provider));
+      Object.assign(db.tables.cc_agent_turns[0], { status: "running", result: null });
+      expect(await runS1Turn({ ...args(db, provider), db: racing(db) })).toMatchObject({ status: 409, error: "turn_in_progress" });
+    });
+
+    it("a different input under the same key is a conflict", async () => {
+      const provider = vi.fn<Provider>().mockResolvedValue({ content: "Hi.", calls: [] });
+      const db = uniqueBase();
+      await runS1Turn(args(db, provider));
+      expect(await runS1Turn({ ...args(db, provider, "Something else"), db: racing(db) })).toMatchObject({ status: 409, error: "operation_key_conflict" });
+    });
+
+    it("any other insert error is a 503 store failure", async () => {
+      const provider = vi.fn<Provider>();
+      const r = await runS1Turn({ ...args(base(), provider), db: racing(base(), { code: "XX000", message: "boom" }) });
+      expect(r).toMatchObject({ status: 503, error: "turn_store_failed" });
+      expect(provider).not.toHaveBeenCalled();
+    });
   });
 
   it("a tool name outside the S1 set fails the turn with a closed code", async () => {

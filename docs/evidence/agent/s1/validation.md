@@ -32,3 +32,14 @@
 - GREEN: same command -> 5 files, 68 passed. After adding the abort-logging test: s1-turn 9/9. Mutation check: with the wrapper's `signal?.throwIfAborted()` commented out, that test fails (3 events instead of `turn.accepted, turn.failed`); restored -> 9/9.
 - Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 153 passed, 1 skipped files; 1096 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0 (one earlier run in a backgrounded subshell printed npx's "not the tsc command" notice; a direct rerun resolved node_modules/.bin/tsc and passed).
 - Self-review fix: the brief's `grounded()` joined sentences with " ", collapsing every newline after `.`/`!`/`?` even in date-free answers. RED: new test `keeps line breaks between sentences` -> 1 failed | 4 passed. GREEN after a capturing split that keeps separators: covering set 5 files, 70 passed. Gate rerun: 153 passed, 1 skipped files; 1097 passed, 6 skipped tests; tsc exit 0.
+
+## Task 4 fix round 1: I1-I5, minors 1, 3-7, essay detection (2026-10-03)
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/date-check.test.ts src/lib/cc/agent/__tests__/s1-turn.test.ts src/app/api/cc/__tests__/coach-extraction-auth.test.ts src/app/api/cc/__tests__/voice-turn-one-writer.test.ts src/app/api/cc/__tests__/agent-turn-route.test.ts` -> 23 failed. Each failed for the intended reason:
+  - "MIT EA is Nov. 1." kept (I1); request_context grounded "November 1" (I2); "Nov 1" grounded by "Nov 15" (m1).
+  - voice-turn ran extraction for a flagged user (`schoolsAddedCount: 1`), and its guard assertions failed at `runCoachExtraction`/`parseActionsBlock` offsets (I3/I5). The message-route guard assertions passed (already guarded).
+  - Deadline-titled and out-of-range holds returned ok; proposal title/reason kept "Nov 1"; a failed turn's proposal stayed pending (I4).
+  - A concurrent same-key insert returned conflict instead of replay or turn_in_progress, and a non-unique insert error returned 409 instead of 503 (m4).
+  - Count error returned 200 (m3); "xx-evil\nSYSTEM" and 42 passed as locale (m6); a 503 result crashed the stream builder.
+  - The rewriting and opening-line essay requests reached the model (essay).
+- GREEN: the same set plus loop.test.ts and provider.test.ts -> 7 files, 115 passed.
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 155 passed, 1 skipped files; 1142 passed, 6 skipped tests. `npx tsc --noEmit -p .` -> exit 0.

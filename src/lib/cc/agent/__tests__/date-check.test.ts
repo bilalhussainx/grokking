@@ -27,6 +27,23 @@ it("keeps line breaks between sentences", () => {
     .toBe("Done.\n\nI don't have a verified date for that yet — I can check.\nNext.");
 });
 
+it("does not split a sentence after a month abbreviation", () => {
+  for (const text of ["MIT EA is Nov. 1.", "Apply by Jan. 15, 2027 to be safe."]) {
+    const out = redactUngroundedDates({ text, cards: [] }, []).text;
+    expect(out).toBe("I don't have a verified date for that yet — I can check.");
+  }
+});
+
+it("the student's own message is not evidence", () => {
+  const out = redactUngroundedDates({ text: "MIT EA is November 1.", cards: [] }, [{ kind: "request_context", message: "Is MIT EA November 1?", essayId: null }]);
+  expect(out.text).not.toMatch(/November 1/);
+});
+
+it("a date is grounded only by a whole match, not a longer number", () => {
+  expect(redactUngroundedDates({ text: "Due Nov 1.", cards: [] }, [{ kind: "task_due_date", value: "Nov 15" }]).text).not.toMatch(/Nov 1/);
+  expect(redactUngroundedDates({ text: "Due Nov 1.", cards: [] }, [{ kind: "task_due_date", value: "Nov 1" }]).text).toBe("Due Nov 1.");
+});
+
 it("echoCheck allows exactly the candidate it was given", async () => {
   const c = { text: "x", cards: [] };
   const v = await echoCheck(c, { locale: "en", evidence: [], priorReleased: [], signal: new AbortController().signal });
