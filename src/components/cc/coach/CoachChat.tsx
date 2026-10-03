@@ -204,6 +204,7 @@ export default function CoachChat() {
             key={msg.id}
             role={msg.role}
             content={msg.content}
+            proposals={msg.proposals}
             isStreaming={isStreaming && i === messages.length - 1 && msg.role === "assistant"}
           />
         ))}

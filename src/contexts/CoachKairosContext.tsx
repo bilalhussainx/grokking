@@ -5,7 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
 import { useCoachVoice } from "@/hooks/useCoachVoice";
 import { DEFAULT_COACH_LANGUAGE } from "@/lib/cc/coach-languages";
-import { coachErrorMessage } from "@/lib/cc/coach-error-message";
+import { agentTurnErrorMessage, coachErrorMessage } from "@/lib/cc/coach-error-message";
+import { decodeEvents } from "@/lib/cc/agent/sse";
+import type { InboxItem } from "@/lib/cc/agent/inbox";
+
+export type CoachProposal = Extract<InboxItem, { kind: "proposal" }>;
 
 export interface CoachMessage {
   id: string;
@@ -13,6 +17,18 @@ export interface CoachMessage {
   content: string;
   mode: string;
   createdAt: string;
+  // S1 agent turns only: this turn's pending suggestions, shown as cards under the reply.
+  proposals?: CoachProposal[];
+}
+
+// ReadableStream is not async-iterable in every browser; read it by hand.
+async function* bodyChunks(body: ReadableStream<Uint8Array>): AsyncGenerator<Uint8Array> {
+  const reader = body.getReader();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) return;
+    if (value) yield value;
+  }
 }
 
 export interface CoachSendContext {
@@ -98,6 +114,9 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
   const [currentVariantKey, setCurrentVariantKey] = useState<string | null>(null);
   const proactiveSent = useRef(false);
   const historyLoaded = useRef(false);
+  // Resolves to true only for an S1 pilot student (/api/cc/me agentS1). Their
+  // typed turns go to the agent route; any failure keeps the legacy Coach.
+  const agentS1Ready = useRef<Promise<boolean>>(Promise.resolve(false));
 
   const { speak, stop: stopSpeakingImpl } = useCoachVoice();
 
@@ -143,6 +162,14 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
         }
       })
       .catch(() => {});
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    agentS1Ready.current = fetch("/api/cc/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => data?.agentS1 === true)
+      .catch(() => false);
   }, [user]);
 
   useEffect(() => {
@@ -293,7 +320,13 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
     let extracted = 0;
     let actionKinds: string[] = [];
 
-    try {
+    if (await agentS1Ready.current) {
+      try {
+        finalContent = await runAgentTurn(text, assistantMsg.id);
+      } finally {
+        setIsStreaming(false);
+      }
+    } else try {
       const res = await fetch("/api/cc/coach/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -402,6 +435,45 @@ export function CoachKairosProvider({ children }: { children: React.ReactNode })
         })
         .finally(() => setIsSpeaking(false));
     }
+  }
+
+  // One S1 agent turn: a fresh operation key per send, the SSE reply as the
+  // assistant message, then this turn's pending proposals from the inbox.
+  async function runAgentTurn(text: string, assistantId: string): Promise<string> {
+    const update = (patch: Partial<CoachMessage>) =>
+      setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, ...patch } : m)));
+    let content = "";
+    let turnId: string | null = null;
+    try {
+      const res = await fetch("/api/cc/agent/turn", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, operationKey: crypto.randomUUID(), locale: language }),
+      });
+      if (!res.ok || !res.body) {
+        update({ content: agentTurnErrorMessage(res.status) });
+        return "";
+      }
+      for await (const ev of decodeEvents(bodyChunks(res.body))) {
+        const data = (ev.data ?? {}) as { turnId?: unknown; text?: unknown };
+        if (typeof data.turnId === "string") turnId = data.turnId;
+        if (ev.type === "text.delta" && typeof data.text === "string") {
+          content += data.text;
+          update({ content });
+        }
+      }
+    } catch {
+      update({ content: "Connection error. Please try again." });
+      return "";
+    }
+    if (turnId) {
+      const inbox = await fetch("/api/cc/agent/inbox")
+        .then((r) => (r.ok ? r.json() : { items: [] }))
+        .catch(() => ({ items: [] })) as { items?: InboxItem[] };
+      const proposals = (inbox.items ?? []).filter((i): i is CoachProposal => i.kind === "proposal" && i.turnId === turnId);
+      if (proposals.length) update({ proposals });
+    }
+    return content;
   }
 
   const open = useCallback(() => setIsOpen(true), []);
