@@ -29,7 +29,9 @@ it("checker requests JSON with no callable tools",async()=>{
 });
 it("never puts provider response bodies in thrown errors",async()=>{
  const fetcher=vi.fn().mockResolvedValue({ok:false,status:401,text:async()=>"private candidate"});
- await expect(makeProvider("routine",fetcher,env())([{role:"user",content:"Help"}],new AbortController().signal)).rejects.toThrow("provider_http_401");
+ const err=await makeProvider("routine",fetcher,env())([{role:"user",content:"Help"}],new AbortController().signal).then(()=>null,(e:Error)=>e);
+ expect(err?.message).toBe("provider_http_401");
+ expect(err?.message).not.toContain("private candidate");
  expect(fetcher).toHaveBeenCalledTimes(1);
 });
 
@@ -71,16 +73,28 @@ it("keeps verified catalog prices usable for 30 days, configurable downward",()=
 
 it.each([ENGLISH_650,URDU_650])("admits representative Sonnet/GLM essay calls and reconciles receipts",async essay=>{
  const base=env();
- const prices={fixture:{inputPerMillion:3,outputPerMillion:15,fixedPerRequest:0,verifiedAt:new Date().toISOString()}};
- const generationFetch=vi.fn().mockResolvedValue({ok:true,json:async()=>({usage:{cost:0.008},choices:[{message:{content:"What changed?"}}]})});
+ // Reservation per call is roughly $0.05, so two unreconciled calls would exhaust the $0.12 ceiling.
+ const prices={fixture:{inputPerMillion:3,outputPerMillion:30,fixedPerRequest:0,verifiedAt:new Date().toISOString()}};
+ const generationFetch=vi.fn().mockResolvedValue({ok:true,json:async()=>({usage:{cost:0.001},choices:[{message:{content:"What changed?"}}]})});
  const generation=makeProvider("routine",generationFetch,{...base,OPENROUTER_AGENT_PRICING_JSON:JSON.stringify(prices)});
  const messages=[{role:"user" as const,content:JSON.stringify({request:"Critique only",essay})}];
- await generation(messages,new AbortController().signal);await generation(messages,new AbortController().signal);
- expect(generationFetch).toHaveBeenCalledTimes(2);
- const checkFetch=vi.fn().mockResolvedValue({ok:true,json:async()=>({usage:{cost:0.005},choices:[{message:{content:'{"decision":"uncertain"}'}}]})});
+ for(let i=0;i<4;i++)await generation(messages,new AbortController().signal);
+ expect(generationFetch).toHaveBeenCalledTimes(4);
+ await expect(generation(messages,new AbortController().signal)).rejects.toThrow("call_budget_exceeded");
+ expect(generationFetch).toHaveBeenCalledTimes(4);
+ const checkFetch=vi.fn().mockResolvedValue({ok:true,json:async()=>({usage:{cost:0.001},choices:[{message:{content:'{"decision":"uncertain"}'}}]})});
  const checkPrices={fixture:{...prices.fixture,inputPerMillion:1.4,outputPerMillion:4.4}};
  const checker=makeProvider("check",checkFetch,{...base,OPENROUTER_AGENT_PRICING_JSON:JSON.stringify(checkPrices)});
  await checker(messages,new AbortController().signal);expect(checkFetch).toHaveBeenCalledTimes(1);
+});
+it("without receipts the next call is refused instead of reconciling",async()=>{
+ const prices={fixture:{inputPerMillion:3,outputPerMillion:30,fixedPerRequest:0,verifiedAt:new Date().toISOString()}};
+ const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>({choices:[{message:{content:"What changed?"}}]})});
+ const provider=makeProvider("routine",fetcher,{...env(),OPENROUTER_AGENT_PRICING_JSON:JSON.stringify(prices)});
+ const messages=[{role:"user" as const,content:"Hi"}];
+ await expect(provider(messages,new AbortController().signal)).rejects.toThrow("provider_receipt_anomaly");
+ await expect(provider(messages,new AbortController().signal)).rejects.toThrow("provider_stopped_after_unknown_cost");
+ expect(fetcher).toHaveBeenCalledTimes(1);
 });
 it("a missing receipt prevents further calls on the same instance",async()=>{
  const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>({choices:[{message:{content:"Hello"}}]})});
