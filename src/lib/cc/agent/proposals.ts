@@ -128,7 +128,7 @@ export function makeProposalTools(db: SupabaseClient, scope: AuthScope, ctx: { t
   };
 }
 
-type ProposalRow = { id: string; user_id: string; student_id: string; kind: ProposalKind; payload: Record<string, Json>; payload_hash: string; status: string; receipt: Json | null; expires_at: string; committed_at: string | null };
+type ProposalRow = { id: string; user_id: string; student_id: string; turn_id: string | null; kind: ProposalKind; payload: Record<string, Json>; payload_hash: string; status: string; receipt: Json | null; expires_at: string; committed_at: string | null };
 type Receipt = { kind: ProposalKind; taskId?: string; listEntryIds?: string[] };
 type Result = { status: number; body: Json };
 
@@ -201,6 +201,12 @@ export async function commitProposal(db: SupabaseClient, scope: AuthScope, id: s
   if (now.getTime() > new Date(row.expires_at).getTime()) {
     await db.from("cc_agent_proposals").update({ status: "expired" }).eq("id", id).eq("status", "pending");
     return { status: 409, body: { error: "proposal_expired" } };
+  }
+  // A proposal is confirmable only once its turn's answer reached the student (completed).
+  if (row.turn_id) {
+    const { data: turn, error: turnError } = await db.from("cc_agent_turns").select("status").eq("id", row.turn_id).eq("user_id", scope.userId).maybeSingle();
+    if (turnError) return RETRY;
+    if ((turn as { status: string } | null)?.status !== "completed") return { status: 409, body: { error: "turn_not_completed" } };
   }
   const planned = await planReceipt(db, scope, row);
   if (!planned) return RETRY;

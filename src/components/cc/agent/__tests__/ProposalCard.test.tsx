@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { ProposalCard } from "../ProposalCard";
 
-const item = { kind: "proposal" as const, id: "p1", proposalKind: "task", payload: { title: "Draft your Why Michigan answer", dueDate: "2026-10-28" }, reason: "Michigan is on your list", token: "t", tokenExpiresAtMs: Date.now() + 600000 };
+const item = { kind: "proposal" as const, id: "p1", turnId: null, proposalKind: "task", payload: { title: "Draft your Why Michigan answer", dueDate: "2026-10-28" }, reason: "Michigan is on your list", token: "t", tokenExpiresAtMs: Date.now() + 600000 };
 const json = (body: unknown, status: number) => new Response(JSON.stringify(body), { status });
 afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); });
 

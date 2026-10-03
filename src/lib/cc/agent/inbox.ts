@@ -4,7 +4,7 @@ import { signConfirmToken } from "./proposals";
 
 export type InboxItem =
   | { kind: "nudge"; id: string; trigger: string; title: string; detail: string; createdAt: string }
-  | { kind: "proposal"; id: string; proposalKind: string; payload: Json; reason: string; token: string; tokenExpiresAtMs: number };
+  | { kind: "proposal"; id: string; turnId: string | null; proposalKind: string; payload: Json; reason: string; token: string; tokenExpiresAtMs: number };
 
 export async function loadInbox(db: SupabaseClient, scope: AuthScope, now: Date, secret: string): Promise<InboxItem[]> {
   const today = now.toISOString().slice(0, 10);
@@ -18,18 +18,19 @@ export async function loadInbox(db: SupabaseClient, scope: AuthScope, now: Date,
     .map((x): InboxItem => ({ kind: "nudge", id: x.id, trigger: x.trigger, title: x.reason.title, detail: x.reason.detail, createdAt: x.created_at }));
   const live = ((proposals ?? []) as { id: string; kind: string; payload: Json; payload_hash: string; reason: string; expires_at: string; turn_id: string | null }[])
     .filter((x) => new Date(x.expires_at).getTime() > now.getTime());
-  // Defense in depth: a failed turn's proposals must never surface, even if Task 4's expiry missed them.
+  // Only a completed turn's proposals surface: a running turn's answer hasn't
+  // reached the student yet, and a failed turn's never will.
   const turnIds = [...new Set(live.map((x) => x.turn_id).filter((t): t is string => !!t))];
-  const failed = new Set<string>();
+  const completed = new Set<string>();
   if (turnIds.length > 0) {
     const { data: turns } = await db.from("cc_agent_turns").select("id,status").eq("user_id", scope.userId).in("id", turnIds);
-    for (const t of (turns ?? []) as { id: string; status: string }[]) if (t.status === "failed") failed.add(t.id);
+    for (const t of (turns ?? []) as { id: string; status: string }[]) if (t.status === "completed") completed.add(t.id);
   }
   const p = live
-    .filter((x) => !x.turn_id || !failed.has(x.turn_id))
+    .filter((x) => !x.turn_id || completed.has(x.turn_id))
     .map((x): InboxItem => {
       const t = signConfirmToken({ id: x.id, userId: scope.userId, payloadHash: x.payload_hash }, now, secret);
-      return { kind: "proposal", id: x.id, proposalKind: x.kind, payload: x.payload, reason: x.reason, token: t.token, tokenExpiresAtMs: t.expiresAtMs };
+      return { kind: "proposal", id: x.id, turnId: x.turn_id, proposalKind: x.kind, payload: x.payload, reason: x.reason, token: t.token, tokenExpiresAtMs: t.expiresAtMs };
     });
   return [...n, ...p];
 }

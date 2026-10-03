@@ -235,6 +235,7 @@ describe("proposals", () => {
   // I4: the list is re-read at commit.
   it("two pending proposals for the same school leave one list row", async () => {
     const db = fresh();
+    db.tables.cc_agent_turns = ["aaaa0000-0000-4000-8000-000000000001", "aaaa0000-0000-4000-8000-000000000002"].map((id) => ({ id, user_id: U, status: "completed" }));
     const a = await propose(db, "propose_add_schools", { schoolIds: [S_MICH], reason: "r" }, "aaaa0000-0000-4000-8000-000000000001");
     const b = await propose(db, "propose_add_schools", { schoolIds: [S_MICH], reason: "r" }, "aaaa0000-0000-4000-8000-000000000002");
     expect(a).not.toBe(b);
@@ -297,5 +298,23 @@ describe("proposals", () => {
     const id = await propose(db, "propose_calendar_hold", { title: "Michigan EA hold", date: "2026-11-01", reason: "r" });
     const res = await commitProposal(sb(db), scope, id, tokenFor(db, id), now, SECRET);
     expect((res.body as { receipt: Record<string, unknown> }).receipt).not.toHaveProperty("ics");
+  });
+
+  it.each(["running", "failed"])("confirm is 409 turn_not_completed while the proposal's turn is %s, and saves nothing", async (status) => {
+    const db = fresh();
+    db.tables.cc_agent_turns = [{ id: "t1", user_id: U, status }];
+    const id = await propose(db, "propose_task", { title: "Draft Why Michigan answer", dueDate: null, reason: "r" }, "t1");
+    const res = await commitProposal(sb(db), scope, id, tokenFor(db, id), now, SECRET);
+    expect(res).toEqual({ status: 409, body: { error: "turn_not_completed" } });
+    expect(db.tables.cc_tasks).toHaveLength(0);
+    expect(rowOf(db, id).status).toBe("pending");
+  });
+
+  it("confirm commits once the proposal's turn is completed", async () => {
+    const db = fresh();
+    db.tables.cc_agent_turns = [{ id: "t1", user_id: U, status: "completed" }];
+    const id = await propose(db, "propose_task", { title: "Draft Why Michigan answer", dueDate: null, reason: "r" }, "t1");
+    expect((await commitProposal(sb(db), scope, id, tokenFor(db, id), now, SECRET)).status).toBe(200);
+    expect(db.tables.cc_tasks).toHaveLength(1);
   });
 });
