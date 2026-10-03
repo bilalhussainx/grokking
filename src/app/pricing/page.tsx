@@ -1,3 +1,4 @@
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import { PRICING, PRO_FAIR_USE, TRIAL_TERMS, proMonthlyLabel, proYearlyLabel, yearlySavingsPct, yearlyCheckoutConfigured } from "@/lib/pricing";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -24,6 +25,7 @@ const COMPARE: Row[] = [
     free: "Paid for with credits",
     pro: `Fair use: ${PRO_FAIR_USE.coachMessagesPerDay} messages and ${PRO_FAIR_USE.voiceMinutesPerDay} voice min a day`,
   },
+  { feature: "Languages", free: `${COACH_LANGUAGE_COUNT} languages`, pro: `${COACH_LANGUAGE_COUNT} languages` },
   { feature: "Financial aid", free: "Basic", pro: "Full FAFSA + aid comparator" },
   { feature: "Application tracker", free: true, pro: true },
   { feature: "Activities optimizer", free: true, pro: true },
@@ -301,7 +303,7 @@ export default function PricingPage() {
                 `Fair use: ${PRO_FAIR_USE.coachMessagesPerDay} coach messages and ${PRO_FAIR_USE.voiceMinutesPerDay} voice minutes a day`,
                 "Pro usage does not spend credits",
                 "Unlimited schools and essay drafts + supplements",
-                "18 languages incl. Hindi, Punjabi, French, Spanish",
+                `${COACH_LANGUAGE_COUNT} languages incl. Hindi, Punjabi, French, Spanish`,
                 "Mock interviews",
                 "Full FAFSA + aid comparator",
                 "Family Mode (parent voice)",

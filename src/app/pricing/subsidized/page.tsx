@@ -1,4 +1,5 @@
 "use client";
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import { proMonthlyLabel } from "@/lib/pricing";
 
 import { useState, useEffect } from "react";
@@ -83,7 +84,7 @@ export default function SubsidizedPage() {
             <ul className="space-y-2 text-sm text-white/70">
               <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Every admissions tool: school list, essay feedback, aid and net price</li>
               <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Unlimited Coach Kairos, under fair use</li>
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Voice practice in 9 languages</li>
+              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Voice practice in {COACH_LANGUAGE_COUNT} languages</li>
               <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#D4AF37]" /> Priority support</li>
             </ul>
           </div>

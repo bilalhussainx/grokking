@@ -1,5 +1,6 @@
 "use client";
 
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, PhoneOff, Mic, MicOff, ArrowRight, Globe, Clock, Zap, Copy, Check } from "lucide-react";
@@ -169,7 +170,7 @@ export default function CallPage() {
               Real-Time Translation
             </div>
             <h1 className="text-3xl font-bold text-white">Translated Call</h1>
-            <p className="text-white/40 text-sm mt-2">Talk to anyone in 7 languages — translated in real-time</p>
+            <p className="text-white/40 text-sm mt-2">Talk to anyone in {COACH_LANGUAGE_COUNT} languages — translated in real-time</p>
           </div>
 
           {/* Call Form */}

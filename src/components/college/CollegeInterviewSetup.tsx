@@ -5,6 +5,7 @@
 // Design refresh 2026-04-20: aligned with site dark+gold palette, mobile-first layout,
 // persona preview card after selection.
 
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -318,7 +319,7 @@ export default function CollegeInterviewSetup() {
             Practice with an <span className="text-[#D4AF37]">Ivy+ alumni</span> interviewer
           </h1>
           <p className="text-sm sm:text-base text-white/55 max-w-2xl leading-relaxed">
-            Pick a school. Get an AI trained on how <em>that</em> school&apos;s alumni actually interview. Interview stays in English to mirror the real thing — your feedback comes back in any of 9 languages.
+            Pick a school. Get an AI trained on how <em>that</em> school&apos;s alumni actually interview. Interview stays in English to mirror the real thing — your feedback comes back in any of {COACH_LANGUAGE_COUNT} languages.
           </p>
         </motion.div>
 

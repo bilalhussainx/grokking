@@ -1,3 +1,4 @@
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import type { Metadata } from "next";
 import MarketingShell from "@/components/marketing/MarketingShell";
 import { FeatureGrid, FinalCTA, type IconName } from "@/components/marketing/MarketingSections";
@@ -5,13 +6,13 @@ import { FeatureGrid, FinalCTA, type IconName } from "@/components/marketing/Mar
 export const metadata: Metadata = {
   title: "Coach Kairos — your AI college counselor",
   description:
-    "Voice-first AI counseling for college applicants in 18 languages. Trained on your profile, your grades, your school list. Available at 3 a.m. on a Saturday.",
+    `Voice-first AI counseling for college applicants in ${COACH_LANGUAGE_COUNT} languages. Trained on your profile, your grades, your school list. Available at 3 a.m. on a Saturday.`,
 };
 
 const FEATURES: { icon: IconName; title: string; body: string }[] = [
   {
     icon: "mic",
-    title: "Voice-first, 18 languages",
+    title: `Voice-first, ${COACH_LANGUAGE_COUNT} languages`,
     body: "Talk through your school list in Hindi, your essay in Punjabi, your aid forms in Spanish. Coach Kairos speaks back in the same language with sub-second latency.",
   },
   {

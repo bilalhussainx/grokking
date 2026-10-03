@@ -1,3 +1,4 @@
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { PRICING } from "@/lib/pricing";
@@ -5,7 +6,7 @@ import { ArrowRight, GraduationCap, Code, Users, Sparkles, Briefcase, Rocket } f
 
 export const metadata: Metadata = {
   title: 'About KairosLearn - AI College Counseling for Every Student',
-  description: 'Meet the team behind KairosLearn. Harvard CS grad turned educator building an AI college counselor that speaks 18 languages — for the students the 415:1 counselor ratio leaves behind.',
+  description: `Meet the team behind KairosLearn. Harvard CS grad turned educator building an AI college counselor that speaks ${COACH_LANGUAGE_COUNT} languages — for the students the 415:1 counselor ratio leaves behind.`,
 };
 
 export default function AboutPage() {
@@ -19,7 +20,7 @@ export default function AboutPage() {
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             KairosLearn is an AI-powered college counseling platform. Coach Kairos guides
-            students through school lists, essays, interviews, and financial aid — in 18
+            students through school lists, essays, interviews, and financial aid — in {COACH_LANGUAGE_COUNT}
             languages — and gives human counselors a workspace to support their whole caseload.
           </p>
         </div>
@@ -55,7 +56,7 @@ export default function AboutPage() {
             </p>
 
             <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
-              <li><strong>Coach Kairos in 18 languages</strong> — talk through your school list in Hindi, your essays in Punjabi, your aid forms in Spanish</li>
+              <li><strong>Coach Kairos in {COACH_LANGUAGE_COUNT} languages</strong> — talk through your school list in Hindi, your essays in Punjabi, your aid forms in Spanish</li>
               <li><strong>Essay Studio</strong> — brainstorm, outline, draft, and revise with coaching that never writes a word for you</li>
               <li><strong>School list + aid tools</strong> — reach/match/safety chancing, activities optimizer, mock interviews, financial-aid comparison</li>
               <li><strong>A counselor workspace</strong> — human counselors and agencies run their whole student book on the same platform</li>
@@ -91,7 +92,7 @@ export default function AboutPage() {
             </h3>
             <p className="text-gray-300">
               A great application shouldn&apos;t require a $5,000 consultant or an English-speaking household.
-              Coach Kairos speaks 18 languages and knows every student&apos;s full story.
+              Coach Kairos speaks {COACH_LANGUAGE_COUNT} languages and knows every student&apos;s full story.
             </p>
           </div>
 
@@ -175,7 +176,7 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-4 gap-6 text-center mb-8">
             <div>
-              <div className="text-4xl font-bold mb-2">18</div>
+              <div className="text-4xl font-bold mb-2">{COACH_LANGUAGE_COUNT}</div>
               <div className="text-black/70">Coach Languages</div>
             </div>
             <div>

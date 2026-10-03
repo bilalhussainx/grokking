@@ -1,5 +1,6 @@
 "use client";
 
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import { useEffect, useState, useLayoutEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ChevronRight } from "lucide-react";
@@ -25,7 +26,7 @@ const SENIOR_STEPS: Step[] = [
   { target: "schools", title: "School Builder", body: "Add reach, match, and safety schools — with Coach's help or browse manually." },
   { target: "activities", title: "Activities", body: "Log extracurriculars. Coach optimizes them for maximum impact." },
   { target: "essays", title: "Essays", body: "Draft your personal statement and supplements with live AI feedback." },
-  { target: "interview", title: "Interview Prep", body: "Practice mock admissions interviews by voice — in 7+ languages." },
+  { target: "interview", title: "Interview Prep", body: `Practice mock admissions interviews by voice — in ${COACH_LANGUAGE_COUNT} languages.` },
   { target: "share", title: "Share", body: "Share progress with your human counselor or parents." },
 ];
 

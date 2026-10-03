@@ -1,3 +1,4 @@
+import { COACH_LANGUAGE_COUNT } from "@/lib/coach-language-claim";
 import { PRICING, PRO_FAIR_USE, TRIAL_TERMS, proMonthlyLabel, proYearlyLabel } from "@/lib/pricing";
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -25,9 +26,8 @@ export default function TermsOfServicePage() {
           <p>
             KairosLearn is an AI-powered college counseling platform. It helps students plan and manage
             college applications — school lists, essays, activities, interviews, and financial aid — with
-            an AI counselor (Coach Kairos) available in 18 languages, and gives human counselors and
-            agencies a workspace to support their students on the same data. The platform also includes
-            a library of interactive courses and AI voice tutoring.
+            an AI counselor (Coach Kairos) available in {COACH_LANGUAGE_COUNT} languages, and gives human counselors and
+            agencies a workspace to support their students on the same data.
           </p>
 
           <h2>3. Accounts</h2>
