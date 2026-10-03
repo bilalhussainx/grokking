@@ -1,10 +1,3 @@
-# Gate D2 response + plan brief: paste into the Codex (Astra) session
-
-> Written 2026-09-25 by the founder's Claude Code session. Paste everything
-> below the line into the **same** Codex session.
-
----
-
 **GATE D2: GREENLIT with amendments.** `docs/superpowers/specs/2026-09-25-counselor-agent-design.md` is approved as the basis for the executable plans. What makes it strong: the server-derived AuthScope, output that is buffered and checked before any student-visible byte, a deterministic JourneyState, "a missing record is unknown, not a negative fact", shipped-only counselor feedback, and model routing treated as an evaluated hypothesis. This greenlight does **not** approve deploys, production migrations, live price changes, paid model runs beyond the compatibility probe in amendment 6, or contacting users.
 
 ## Amendments (binding on the plans)
