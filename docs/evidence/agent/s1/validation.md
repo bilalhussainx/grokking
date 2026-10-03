@@ -9,3 +9,8 @@
 - Added `isLocalPgUrl` (`__tests__/helpers/local-pg.ts`) with 2 unit tests; the pg suite runs only for hostname localhost or 127.0.0.1, otherwise skips and writes one stderr warning.
 - Remote URL (db.x.supabase.co) run: suite skipped with warning. Local container run: pg suite 4/4 plus helper tests, 6 passed. Container stopped.
 - Gate: 149 files passed + 1 skipped, 1050 tests passed + 4 skipped; tsc 0.
+
+## Task 2: flag and journey read tools
+- RED: `npx vitest run --config vitest.agent-source.config.ts src/lib/cc/agent/__tests__/journey-tools.test.ts` -> FAIL, `../journey-tools` could not be resolved (no tests ran).
+- GREEN: same command -> 1 file, 7 tests passed.
+- Gate: `npx vitest run src --config vitest.agent-source.config.ts` -> 150 passed, 1 skipped files; 1057 passed, 4 skipped tests. `npx tsc --noEmit -p .` -> no output (0 errors).
