@@ -15,3 +15,7 @@
 .ka-log{list-style:none;padding:0;margin:0;display:grid;gap:8px}
 .ka-log li{overflow-wrap:anywhere}
 .ka-log-label{font-weight:600}
+.ka-page{max-width:720px;margin:0 auto;padding:24px 16px;color:var(--db-ink);min-width:0}
+.ka-page-title{font-size:24px;font-weight:700;margin:0 0 8px;color:var(--db-ink)}
+.ka-link{font-size:14px;font-weight:600;color:var(--db-green);text-decoration:underline;text-underline-offset:2px}
+.ka-link:focus-visible{outline:3px solid var(--db-focus);outline-offset:3px}

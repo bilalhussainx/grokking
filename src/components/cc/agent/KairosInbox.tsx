@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import AiBadge from "@/components/app-shell/AiBadge";
 import type { InboxItem } from "@/lib/cc/agent/inbox";
 import { ProposalCard } from "./ProposalCard";
@@ -9,7 +10,10 @@ export function KairosInbox() {
   const [items, setItems] = useState<InboxItem[] | null>(null);
   const load = () => fetch("/api/cc/agent/inbox").then((r) => (r.ok ? r.json() : { items: [] })).then((b) => setItems(b.items ?? [])).catch(() => setItems([]));
   useEffect(() => { load(); }, []);
-  if (!items || items.length === 0) return null;
+  if (!items) return null;
+  const activity = <Link href="/cc/agent/activity" className="ka-link">What Kairos did</Link>;
+  // Nothing waiting: only the way to the log, so it stays reachable.
+  if (items.length === 0) return <p className="ka-meta">{activity}</p>;
   async function nudge(id: string, action: "dismiss" | "snooze") {
     await fetch(`/api/cc/agent/nudges/${id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }) }).catch(() => undefined);
     load();
@@ -27,6 +31,7 @@ export function KairosInbox() {
           </div>
         </article>
       ) : <ProposalCard key={it.id} item={it} onDone={load} />)}
+      <p className="ka-meta">{activity}</p>
     </section>
   );
 }

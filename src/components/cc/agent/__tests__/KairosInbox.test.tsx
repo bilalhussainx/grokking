@@ -17,5 +17,14 @@ describe("KairosInbox", () => {
     expect(screen.getByText("Michigan deadline is close")).toBeTruthy();
     expect(screen.getByText("Your ED date is in 12 days")).toBeTruthy();
     expect(screen.getByText("Draft your Why Michigan answer")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "What Kairos did" }).getAttribute("href")).toBe("/cc/agent/activity");
+  });
+
+  it("keeps the activity link reachable when nothing is waiting", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ items: [] }), { status: 200 }));
+    render(<KairosInbox />);
+    const link = await waitFor(() => screen.getByRole("link", { name: "What Kairos did" }));
+    expect(link.getAttribute("href")).toBe("/cc/agent/activity");
+    expect(screen.queryByRole("heading", { name: /Kairos noticed/ })).toBeNull();
   });
 });
