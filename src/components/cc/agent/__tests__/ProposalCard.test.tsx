@@ -62,6 +62,50 @@ describe("ProposalCard", () => {
     expect(screen.queryByText("Saved")).toBeNull();
   });
 
+  it("labels an agent task date as a suggestion, never as Due", () => {
+    render(<ProposalCard item={item} />);
+    expect(screen.getByText("Suggested date: 2026-10-28")).toBeTruthy();
+    expect(screen.queryByText(/\bDue\b/)).toBeNull();
+  });
+
+  it("labels a calendar hold as a suggested hold", () => {
+    render(<ProposalCard item={{ ...item, proposalKind: "calendar_hold", payload: { title: "Work on Why Michigan", date: "2026-11-01" } }} />);
+    expect(screen.getByText("Suggested calendar hold on 2026-11-01")).toBeTruthy();
+  });
+
+  it("a failed confirm offers Retry, which confirms again", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(json({ error: "commit_failed_retry" }, 503))
+      .mockResolvedValueOnce(json({ status: "committed", receipt: { kind: "task", taskId: "t1" } }, 200));
+    render(<ProposalCard item={item} />);
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+    fireEvent.click(await waitFor(() => screen.getByRole("button", { name: "Retry" })));
+    await waitFor(() => expect(screen.getByText("Saved")).toBeTruthy());
+    expect(JSON.parse(String(fetchMock.mock.calls[1][1]?.body))).toEqual({ action: "confirm", token: "t" });
+  });
+
+  it("a failed undo keeps Saved and the Undo button, and says it couldn't undo", async () => {
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(json({ status: "committed", receipt: { kind: "task", taskId: "t1" } }, 200))
+      .mockResolvedValueOnce(json({ error: "undo_failed_retry" }, 503));
+    render(<ProposalCard item={item} />);
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+    fireEvent.click(await waitFor(() => screen.getByRole("button", { name: "Undo" })));
+    await waitFor(() => expect(screen.getByText("Couldn't undo — try again")).toBeTruthy());
+    expect(screen.getByText("Saved")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Undo" })).toBeTruthy();
+    expect(screen.queryByText(/didn't save/)).toBeNull();
+  });
+
+  it("a failed decline keeps Not now and says it couldn't update", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new Error("offline"));
+    render(<ProposalCard item={item} />);
+    fireEvent.click(screen.getByRole("button", { name: "Not now" }));
+    await waitFor(() => expect(screen.getByText("Couldn't update — try again")).toBeTruthy());
+    expect(screen.getByRole("button", { name: "Not now" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Confirm" })).toBeTruthy();
+  });
+
   it("undo after Saved posts undo and shows Undone", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(json({ status: "committed", receipt: { kind: "task", taskId: "t1" } }, 200))

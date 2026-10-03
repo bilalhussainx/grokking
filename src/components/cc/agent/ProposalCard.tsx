@@ -21,11 +21,14 @@ function summary(item: Item): string {
 function when(item: Item): string | null {
   const p = item.payload as Record<string, unknown>;
   const d = (p.dueDate ?? p.date) as string | null | undefined;
-  return d ? (item.proposalKind === "calendar_hold" ? `Calendar hold on ${d}` : `Due ${d} (you can change this later)`) : null;
+  // Agent dates are suggestions the student confirms, never a verified deadline.
+  return d ? (item.proposalKind === "calendar_hold" ? `Suggested calendar hold on ${d}` : `Suggested date: ${d}`) : null;
 }
 
 export function ProposalCard({ item, onDone }: { item: Item; onDone?: () => void }) {
   const [state, setState] = useState<State>(Date.now() > item.tokenExpiresAtMs ? "expired" : "pending");
+  // A failed undo or decline leaves the data as it was, so the card keeps its state and says so.
+  const [note, setNote] = useState<string | null>(null);
   const alive = useRef(true);
   useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
 
@@ -38,6 +41,7 @@ export function ProposalCard({ item, onDone }: { item: Item; onDone?: () => void
   // A 202 {status:"saving"} means the commit is still in flight: never show
   // Saved for it. Re-confirm (idempotent) up to MAX_TRIES, then ask to retry.
   async function confirm() {
+    setNote(null);
     setState("saving");
     for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
       let out: Awaited<ReturnType<typeof post>>;
@@ -58,13 +62,15 @@ export function ProposalCard({ item, onDone }: { item: Item; onDone?: () => void
   }
 
   async function other(action: "decline" | "undo") {
+    setNote(null);
+    const failed = action === "undo" ? "Couldn't undo — try again" : "Couldn't update — try again";
     try {
-      const { res, data } = await post({ action });
+      const { res } = await post({ action });
       if (!alive.current) return;
-      if (!res.ok) { setState(data.error === "token_invalid_or_expired" ? "expired" : "failed"); return; }
+      if (!res.ok) { setNote(failed); return; }
       setState(action === "decline" ? "declined" : "undone");
       onDone?.();
-    } catch { if (alive.current) setState("failed"); }
+    } catch { if (alive.current) setNote(failed); }
   }
 
   const due = when(item);
@@ -87,7 +93,10 @@ export function ProposalCard({ item, onDone }: { item: Item; onDone?: () => void
       {state === "declined" && <p className="ka-meta">Okay, not now.</p>}
       {state === "undone" && <p className="ka-meta">Undone.</p>}
       {state === "expired" && <p className="ka-meta">This suggestion needs a refresh. Reload to see it again.</p>}
-      {state === "failed" && <p className="ka-error">That didn&apos;t save. Try again in a moment.</p>}
+      {state === "failed" && (
+        <div className="ka-actions"><p className="ka-error">That didn&apos;t save. Try again in a moment.</p><button type="button" className="ka-quiet" onClick={confirm}>Retry</button></div>
+      )}
+      {note && <p className="ka-error">{note}</p>}
     </article>
   );
 }
