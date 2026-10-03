@@ -175,3 +175,52 @@ npx vitest run --config vitest.agent-a1.config.ts src/lib/cc/agent/__tests__
 ### Gate
 - `npx vitest run src --config vitest.agent-source.config.ts`: 148 files / 1017 tests passed
 - `npx tsc --noEmit -p .`: 0 diagnostics
+
+## Final-review fix wave (I1, I2, M1-M5), 2026-10-03
+
+All RED commands are `npx vitest run --config vitest.agent-a1.config.ts <file>`. All GREEN runs are the full A1 suite.
+
+### I1 error normalization (fa3a1a17)
+RED (loop.test.ts + provider.test.ts): `Tests 14 failed | 32 passed (46)`. Received messages carried input bytes:
+```
+Received: "Unexpected token 'D', "[Draft] I w"... is not valid JSON"
+Received: "Unexpected token '<', "<html>upst"... is not valid JSON"
+Received: "Unexpected token 'S', ...""fixture":SECRETPRIC"... is not valid JSON"
+Received: "Unterminated string in JSON at position 26 (line 1 column 27)"
+Received: "OPENROUTER_API_KEY missing" / "approvals.find is not a function" / "checker saw Lahore"
+```
+GREEN: `Test Files 8 passed (8) / Tests 75 passed (75)`
+
+### I2 tool cancellation (617925d5)
+RED (loop.test.ts + read-tools.test.ts): `Tests 4 failed | 31 passed (35)`
+```
+AssertionError: expected undefined to be an instance of AbortSignal
+AssertionError: promise resolved "{ status: 'ok', data: { …(3) }, …(1) }" instead of rejecting
+AssertionError: expected 0 to be greater than 0
+```
+GREEN: `Tests 79 passed (79)`
+
+### M1 checker receives a clone (f08520b3)
+RED: `AssertionError: promise resolved "{ text: 'checker-authored prose', …(2) }" instead of rejecting`
+GREEN: `Tests 80 passed (80)`
+
+### M2 future verifiedAt, plus the upperCost comment (b2354626)
+RED: `× rejects a verifiedAt beyond five minutes of clock skew in the future` / `expected [Function] to throw an error`
+GREEN: `Tests 81 passed (81)`
+
+### M3 null or blank probe prices (50cdfacc)
+RED (probe.test.ts): `Tests 5 failed | 14 passed (19)`. Each null or blank price case gave `promise resolved "{ OPENROUTER_API_KEY: 'test', …(5) }" instead of rejecting`.
+The new probe_key_missing, cost_bound_anomaly and transport-throw tests passed at RED; they pin behavior that was already correct but untested.
+GREEN: `Tests 89 passed (89)`
+
+### M4 server log and M5 no author_user_id (c2268857)
+RED (read-tools.test.ts): `Tests 6 failed | 7 passed (13)`
+```
+AssertionError: expected '{"status":"ok","data":{"comments":[{"…' not to contain 'c0c0c0c0'
+AssertionError: expected [] to deeply equal [ [ 'agent_read_tool_failed', …(1) ] ]   (x5)
+```
+GREEN: `Test Files 8 passed (8) / Tests 94 passed (94)`
+
+### Gate (after every commit; final numbers)
+- `npx vitest run src --config vitest.agent-source.config.ts`: 148 files / 1048 tests passed, 0 failed
+- `npx tsc --noEmit -p .`: exit 0, 0 diagnostics
