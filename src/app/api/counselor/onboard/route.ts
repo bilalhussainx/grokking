@@ -5,7 +5,8 @@
 // Once the row exists, the role-aware nav swaps in the counselor sidebar
 // (see useCounselorRole hook).
 //
-// Phase 1 scope: name + optional agency slug. Stripe Connect onboarding,
+// Phase 1 scope: name only. Agency affiliation comes from creating an agency
+// or being added by its head, never from a typed slug. Stripe Connect onboarding,
 // service catalog, and admission-proof submission live in Phase 2/4.
 
 import { NextRequest, NextResponse } from "next/server";
@@ -23,7 +24,6 @@ export async function POST(req: NextRequest) {
 
   const body = (await req.json().catch(() => ({}))) as {
     displayName?: string;
-    agencySlug?: string;
   };
   const displayName = body.displayName?.trim();
   if (!displayName || displayName.length < 2) {
@@ -34,10 +34,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const counselor = await ensureCounselorProfile(user.id, {
-      displayName,
-      agencySlug: body.agencySlug?.trim() || undefined,
-    });
+    const counselor = await ensureCounselorProfile(user.id, { displayName });
     return NextResponse.json({
       counselor: {
         id: counselor.id,

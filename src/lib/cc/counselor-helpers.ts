@@ -61,28 +61,18 @@ export async function getCounselorForUser(userId: string): Promise<CounselorRow 
 // if it does (idempotent).
 export async function ensureCounselorProfile(
   userId: string,
-  init: { displayName: string; agencySlug?: string },
+  init: { displayName: string },
 ): Promise<CounselorRow> {
   const db = createAdminSupabase();
   const existing = await getCounselorForUser(userId);
   if (existing) return existing;
 
   const slug = await pickUniqueCounselorSlug(init.displayName);
-  let agencyId: string | null = null;
-  if (init.agencySlug) {
-    const { data: agency } = await db
-      .from("cc_agencies")
-      .select("id")
-      .eq("slug", init.agencySlug)
-      .maybeSingle<{ id: string }>();
-    agencyId = agency?.id ?? null;
-  }
 
   const { data, error } = await db
     .from("cc_counselors")
     .insert({
       user_id: userId,
-      agency_id: agencyId,
       slug,
       display_name: init.displayName,
     })

@@ -17,7 +17,6 @@ export default function CounselorOnboardPage() {
   const router = useRouter();
   const role = useCounselorRole();
   const [displayName, setDisplayName] = useState("");
-  const [agencySlug, setAgencySlug] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,10 +38,7 @@ export default function CounselorOnboardPage() {
       const res = await fetch("/api/counselor/onboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          displayName: displayName.trim(),
-          agencySlug: agencySlug.trim() || undefined,
-        }),
+        body: JSON.stringify({ displayName: displayName.trim() }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Failed (${res.status})`);
@@ -90,24 +86,6 @@ export default function CounselorOnboardPage() {
           />
           <p className="text-[11px] text-white/40 mt-1">
             How your name appears on your public profile + search results.
-          </p>
-        </div>
-
-        <div>
-          <label htmlFor="agency-slug" className="block text-[12px] uppercase tracking-wider text-white/55 mb-1.5">
-            Agency slug <span className="text-white/40">(optional)</span>
-          </label>
-          <input
-            id="agency-slug"
-            type="text"
-            value={agencySlug}
-            onChange={(e) => setAgencySlug(e.target.value)}
-            placeholder="e.g. ivy-edge-consulting"
-            className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-white/30 focus:outline-none focus:border-[#D4AF37]/50"
-          />
-          <p className="text-[11px] text-white/40 mt-1">
-            If you work with an existing agency, enter its slug. Solo counselors
-            leave this blank — you can join an agency later.
           </p>
         </div>
 
