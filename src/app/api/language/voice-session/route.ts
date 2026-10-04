@@ -4,19 +4,15 @@ import { deductCredits, addCredits } from "@/lib/credits";
 import { getLanguagePersona, getDefaultPersona, type ProficiencyLevel } from "@/lib/language-personas";
 import { buildAgentContext, getConversationCheckpoint, buildResumeContext, updateConversationCheckpoint } from "@/lib/language-agent";
 import type { ConversationCheckpoint } from "@/lib/voice/language-types";
+import { mintDeepgramClientAuth, managedThink, VOICE_UNAVAILABLE } from "@/lib/voice/deepgram-agent-auth";
 
-// Force Node.js runtime and disable caching for guest reliability
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// Server-only. The browser gets a short-lived token (mintDeepgramClientAuth).
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const CREDIT_COST_VOICE_MINUTE = 3;
-
-// Voice agent LLM brain — OpenRouter primary (Claude Sonnet 4.5), Kimi fallback.
-// Override per-deployment via OPENROUTER_VOICE_MODEL env var.
-const VOICE_LLM_MODEL = process.env.OPENROUTER_VOICE_MODEL || "anthropic/claude-sonnet-4.5";
 
 // Handle CORS preflight
 export async function OPTIONS() {
@@ -63,10 +59,14 @@ const DEEPGRAM_VOICES_MALE: Record<string, string> = {
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Sign in to use voice." }, { status: 401 });
+  }
 
-  // Allow guest access for trial sessions — skip credit deduction
-  if (!DEEPGRAM_API_KEY) {
-    return NextResponse.json({ error: "Deepgram API key not configured" }, { status: 500 });
+  // Mint the browser's short-lived token before charging credits.
+  const clientAuth = await mintDeepgramClientAuth(DEEPGRAM_API_KEY);
+  if (!clientAuth) {
+    return NextResponse.json(VOICE_UNAVAILABLE, { status: 503 });
   }
 
   const body = await req.json().catch(() => ({}));
@@ -264,25 +264,9 @@ APPROACH:
             model: "nova-3",
           },
         },
-        // OpenRouter primary (Claude Sonnet 4.5 for natural voice),
-        // Kimi/Moonshot fallback if OPENROUTER_API_KEY is missing.
-        think: OPENROUTER_API_KEY
-          ? {
-              provider: { type: "open_ai", model: VOICE_LLM_MODEL },
-              endpoint: {
-                url: "https://openrouter.ai/api/v1/chat/completions",
-                headers: { authorization: `Bearer ${OPENROUTER_API_KEY}` },
-              },
-              prompt: fullSystemPrompt,
-            }
-          : {
-              provider: { type: "open_ai", model: "kimi-k2-turbo-preview" },
-              endpoint: {
-                url: "https://api.moonshot.ai/v1/chat/completions",
-                headers: { authorization: `Bearer ${MOONSHOT_API_KEY}` },
-              },
-              prompt: fullSystemPrompt,
-            },
+        // Deepgram-hosted model: these settings travel through the browser,
+        // so they must carry no LLM endpoint or key.
+        think: managedThink(fullSystemPrompt),
         speak: {
           provider: {
             type: "deepgram",
@@ -337,7 +321,7 @@ APPROACH:
     // Return SAME format as /api/ai/voice-session
     return NextResponse.json({
       url: "wss://agent.deepgram.com/v1/agent/converse",
-      key: DEEPGRAM_API_KEY,
+      auth: clientAuth,
       settings,
       persona: {
         id: persona.id,

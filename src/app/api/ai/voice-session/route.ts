@@ -8,27 +8,21 @@ import {
   COACH_PERSONAS,
 } from "@/lib/voice-personas";
 import { getCoachEnthusiasm } from "@/lib/rewards";
+import {
+  mintDeepgramClientAuth,
+  managedThink,
+  DEEPGRAM_THINK_MODEL,
+  DEEPGRAM_THINK_MODEL_FAST,
+  VOICE_UNAVAILABLE,
+} from "@/lib/voice/deepgram-agent-auth";
 
 // Force Node.js runtime — this route uses dynamic imports of node-only libs
 // (e.g. @/lib/agent-intelligence, @/lib/trace) that fail under Edge.
 export const runtime = "nodejs";
-// Disable caching — guest sessions must always hit the handler fresh
 export const dynamic = "force-dynamic";
 
+// Server-only. The browser gets a short-lived token (mintDeepgramClientAuth).
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
-const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY || "";
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
-
-// Voice agent LLM brain — OpenRouter primary, Kimi fallback.
-// Coach Kairos uses Haiku 4.5 for sub-second first-token (the user is in a
-// real-time conversation; Sonnet's 1.5-2s TTFT was the source of the 'voice
-// reply takes 2s' complaint). Sonnet stays as the default for lessons-mode
-// AICoach where natural prose matters more than turn-taking speed.
-// Override per-deployment via OPENROUTER_VOICE_MODEL or
-// OPENROUTER_VOICE_MODEL_COACH env vars.
-const VOICE_LLM_MODEL = process.env.OPENROUTER_VOICE_MODEL || "anthropic/claude-sonnet-4.5";
-const VOICE_LLM_MODEL_COACH =
-  process.env.OPENROUTER_VOICE_MODEL_COACH || "anthropic/claude-haiku-4.5";
 
 // Handle CORS preflight — browsers send OPTIONS before POST with credentials
 export async function OPTIONS() {
@@ -60,18 +54,19 @@ export async function POST(req: NextRequest) {
   console.log("[voice-session] POST received");
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
-  console.log("[voice-session] auth check:", user ? `user=${user.id.slice(0, 8)}` : "guest");
-
-  // Allow guest access for trial sessions — skip credit deduction
-  if (user) {
-    const ok = await deductCredits(user.id, CREDIT_COSTS.voice_session, "voice_session");
-    if (!ok) {
-      return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
-    }
+  if (!user) {
+    return NextResponse.json({ error: "Sign in to use voice." }, { status: 401 });
   }
 
-  if (!DEEPGRAM_API_KEY) {
-    return Response.json({ error: "Deepgram API key not configured" }, { status: 500 });
+  // Mint the browser's short-lived token before charging credits.
+  const clientAuth = await mintDeepgramClientAuth(DEEPGRAM_API_KEY);
+  if (!clientAuth) {
+    return NextResponse.json(VOICE_UNAVAILABLE, { status: 503 });
+  }
+
+  const ok = await deductCredits(user.id, CREDIT_COSTS.voice_session, "voice_session");
+  if (!ok) {
+    return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
   }
 
   const body = await req.json().catch(() => ({}));
@@ -332,36 +327,10 @@ Your responses will be spoken aloud by a text-to-speech engine. You MUST:
           endpointing: 300,
         },
       },
-      // OpenRouter primary, Kimi/Moonshot fallback. Coach mode uses the
-      // faster Haiku model for sub-second TTFT; lesson AICoach keeps Sonnet
-      // for richer prose. Both models honor the SAME prompt — only TTFT differs.
-      think: OPENROUTER_API_KEY
-        ? {
-            provider: {
-              type: "open_ai",
-              model: mode === "coach" ? VOICE_LLM_MODEL_COACH : VOICE_LLM_MODEL,
-            },
-            endpoint: {
-              url: "https://openrouter.ai/api/v1/chat/completions",
-              headers: {
-                authorization: `Bearer ${OPENROUTER_API_KEY}`,
-              },
-            },
-            prompt: contextPrompt,
-          }
-        : {
-            provider: {
-              type: "open_ai",
-              model: "kimi-k2-turbo-preview",
-            },
-            endpoint: {
-              url: "https://api.moonshot.ai/v1/chat/completions",
-              headers: {
-                authorization: `Bearer ${MOONSHOT_API_KEY}`,
-              },
-            },
-            prompt: contextPrompt,
-          },
+      // Deepgram-hosted model: these settings travel through the browser, so
+      // they must carry no LLM endpoint or key. Coach mode uses the faster
+      // model for first-token speed; both honor the same prompt.
+      think: managedThink(contextPrompt, mode === "coach" ? DEEPGRAM_THINK_MODEL_FAST : DEEPGRAM_THINK_MODEL),
       speak: {
         provider: {
           type: "deepgram",
@@ -373,11 +342,11 @@ Your responses will be spoken aloud by a text-to-speech engine. You MUST:
   };
 
   // Trace voice session start (authenticated users only)
-  if (user) import("@/lib/trace").then(({ traceGeneration }) => {
+  import("@/lib/trace").then(({ traceGeneration }) => {
     traceGeneration({
       userId: user.id,
       name: "coach-voice-session",
-      model: OPENROUTER_API_KEY ? `deepgram-agent/openrouter/${VOICE_LLM_MODEL}` : "deepgram-agent/kimi-k2",
+      model: `deepgram-agent/${mode === "coach" ? DEEPGRAM_THINK_MODEL_FAST : DEEPGRAM_THINK_MODEL}`,
       input: {
         systemPrompt: contextPrompt.slice(0, 2000),
         userMessage: `Voice session started: ${lessonTitle || "no lesson"}`,
@@ -395,7 +364,7 @@ Your responses will be spoken aloud by a text-to-speech engine. You MUST:
 
   return Response.json({
     url: "wss://agent.deepgram.com/v1/agent/converse",
-    key: DEEPGRAM_API_KEY,
+    auth: clientAuth,
     settings,
     persona: { id: persona.id, name: persona.name },
     voice: { id: voice.id, name: voice.name },

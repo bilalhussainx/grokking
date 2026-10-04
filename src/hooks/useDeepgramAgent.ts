@@ -242,10 +242,11 @@ export function useDeepgramAgent(callbacks?: DeepgramAgentCallbacks) {
           throw new Error(errMsg);
         }
 
-        const { url, key, settings } = await resp.json();
+        // auth is a short-lived Deepgram token; the API key never leaves the server.
+        const { url, auth, settings } = await resp.json();
 
         // Open WebSocket
-        const ws = new WebSocket(url, ["token", key]);
+        const ws = new WebSocket(url, [auth.scheme, auth.value]);
         ws.binaryType = "arraybuffer";
         wsRef.current = ws;
 
