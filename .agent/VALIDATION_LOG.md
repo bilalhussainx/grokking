@@ -94,3 +94,10 @@ Not done (founder):
 - the pricing probe;
 - the golden live run;
 - the flag-on blockers in docs/evidence/agent/rulings-a1-s1.md.
+
+## 2026-10-04 Security hotfix: voice-session key exposure (e5e3362)
+- Found: anonymous POST to /api/ai/voice-session and /api/language/voice-session on prod returned the raw Deepgram key and the OpenRouter + Moonshot keys (think.endpoint.headers). Checked with booleans only, no key printed.
+- Fix: sign-in required; browser gets a 30 s token from Deepgram /v1/auth/grant (no raw-key fallback, 503 if grant fails); agent thinks with Deepgram-hosted anthropic claude-haiku-4-5 / claude-sonnet-4-5 (verified accepted by the agent API), so settings carry no LLM key.
+- Tests: src/app/api/__tests__/voice-session-secrets.test.ts 6/6 RED then GREEN; full `npx vitest run src` 1273 passed / 7 skipped.
+- Prod after deploy (master e5e3362, Vercel success): anonymous 401 on both routes, no key/Bearer/sk-or in body; signed-in QA student 503 "Voice is temporarily unavailable", no key in body.
+- Open (founder): both Deepgram keys lack the Member role, so grant returns 403 and voice is down until a Member-role key is set in Vercel. Rotate OpenRouter, old Deepgram (project ...c8a3) and Moonshot keys (exposed). Old SARVAM_API_KEY is already rejected (403); new key verified (400 on empty body = auth OK).
