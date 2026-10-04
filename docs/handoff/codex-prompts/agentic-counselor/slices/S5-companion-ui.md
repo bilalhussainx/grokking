@@ -1,7 +1,7 @@
-# S4 — Companion UI: Kairos everywhere, the team, handoffs, "take me there" (effort: High)
+# S5 — Companion UI: Kairos everywhere, the team, handoffs, "take me there" (effort: High)
 
 ## Why
-The founder wants a "toy like a ChatGPT pet" that students use to move through the platform. The role engine (S3) gives Kairos a mind; this slice gives it a face, a home on every page, and hands.
+The founder wants a "toy like a ChatGPT pet" that students use to move through the platform. The role engine (S4) gives Kairos a mind; this slice gives it a face, a home on every page, and hands.
 
 ## Read first
 - 03-DESIGN-DIRECTION §3–§4 (binding).
@@ -21,7 +21,8 @@ The founder wants a "toy like a ChatGPT pet" that students use to move through t
    - Also add a Storybook-free preview page at `/dev/companion` that's only reachable when `NODE_ENV !== "production"`. Use it for screenshots.
 2. **The dock:** `src/components/companion/CompanionDock.tsx`, mounted once in the signed-in app frame.
    - Desktop is a right rail (collapsed 64 px / expanded 380 px); phone is an avatar button plus a bottom sheet.
-   - It contains: status line (`role="status"`), active role chip plus role picker, the Kairos inbox pinned on top, chat (the text stream from `/api/cc/agent/turn` for flagged users and the legacy coach otherwise), a voice button (S1 voice), and links to "What Kairos knows" and the activity log.
+   - It contains: status line (`role="status"`), active role chip plus role picker, the Kairos inbox pinned on top, chat (the text stream from `/api/cc/agent/turn` for flagged users and the legacy coach otherwise), a voice button (S1 voice), links to "What Kairos knows" and the activity log, and a **pace switch** (Gentle / Steady / Full control) that writes `cc_nudge_settings.pace` (the S4 column).
+   - Chat replies render S3 citation chips, `NotVerified` and rule conflict cards inline.
    - Remove other Coach entry points on pages that render the dock (C4). List every removed launcher in the ledger.
 3. **State machine:** `src/components/companion/useCompanionState.ts` derives the mood from real events only. The inputs are: inbox count; an in-flight tool call (SSE events from `src/lib/cc/agent/sse.ts`); confirm or completion events (celebrating, ≤ 3 s); active role ≠ kairos (handoff); quiet hours or paused (quiet). Unit-test the reducer.
 4. **Handoff UI:**
@@ -29,11 +30,14 @@ The founder wants a "toy like a ChatGPT pet" that students use to move through t
    - The dock shows both faces; "Back to Kairos" is always visible while a specialist is active.
    - The role picker lets the student call a specialist directly.
 5. **"Take me there":** a `navigate_to({ path, focus? })` tool result. The client routes with `next/navigation`, then focuses and pulses the target (`data-kairos-target="<id>"` attributes on key fields: school search, essay editor, plan tasks, recommender list). Paths come from an **allowlist** of internal app routes; reject anything else. Test the allowlist.
-6. **"What Kairos knows":** the page `/cc/kairos/knows` lists confirmed facts and stories (S3 tables) with source turn links, edit, delete, "don't use this", and "Forget everything" (confirm dialog). The API routes enforce ownership.
+6. **"What Kairos knows":** the page `/cc/kairos/knows` lists confirmed facts and stories (S4 tables) with source turn links, edit, delete, "don't use this", and "Forget everything" (confirm dialog). The API routes enforce ownership.
 7. **Play modes:**
    - **60-second spark** (Kairos asks one story-mining question and the answer can become a `save_story` proposal);
    - **Hot seat** (Sam asks one interview question by voice and gives one tip; saved as an interview attempt in the existing interview tables);
-   - **Myth or fact** (one card a day from a curated, sourced list in `src/data/myths.ts`, at least 30 items, each with a source URL).
+   - **Myth or fact** (one card a day, at least 30 items).
+     - Each card's answer comes from an **S3 evidence row** (with its chip), never from free text.
+     - Good seeds from the 09-27 research: "Harvard is test-optional" (myth for fall 2027), "Dartmouth has ED II" (myth), "you can apply to Oxford and Cambridge in the same year" (myth for school-leavers), "a negative SAI means the college pays you" (myth), "FAFSA opens October 1" (myth for 2027–28; it's already open), "OUAC has 101 and 105 forms" (myth now), "UCAS personal statement is one free essay" (myth from 2026 entry).
+     - The item list lives in `src/data/myths.ts` as `{ id, claim, answer: "myth" | "fact", evidenceId }`.
    - Entry is from the dock's empty state and Today.
 8. **Journey map plus growth traits:** a compact milestone map (list built, 5 stories, first draft, mock interview, apps submitted) computed from real data. Each completed milestone adds a visual trait to KairosFace (a scarf badge). There's no streak loss and no guilt copy.
 
@@ -44,7 +48,7 @@ The founder wants a "toy like a ChatGPT pet" that students use to move through t
 - Only one Coach door per page (render the frame with sample pages and assert a single launcher).
 - The `navigate_to` allowlist.
 - The knows-page APIs: ownership, delete, forget-all.
-- The myths data has a source URL on every item.
+- Every myth item references a published S3 evidence id (test against the seed fixture).
 
 ## Evidence
 Screenshots at 375 and 1440 of:

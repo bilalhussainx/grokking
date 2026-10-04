@@ -10,25 +10,35 @@ Written 2026-10-04 by Claude (CTO role) for the founder and for Codex. This fold
 | `01-CONTEXT.md` | Repo, stack, commands, rules, current state, gotchas | Codex, every session |
 | `02-SPEC.md` | The product: Kairos companion, specialist roles, workflows, surfaces | Codex, every session |
 | `03-DESIGN-DIRECTION.md` | Visual and interaction direction | Codex, UI slices |
-| `04-RESEARCH-BRIEF.md` | Competitors, student pain points, voice findings, data rules | Codex, every session |
-| `slices/S0-*.md` … `slices/S9-*.md` | One self-contained prompt per slice | Codex, one per session |
+| `04-RESEARCH-BRIEF.md` | Competitors, the eight differentiators, research trust order, voice findings, data rules | Codex, every session |
+| `slices/S0-*.md` … `slices/S11-*.md` | One self-contained prompt per slice | Codex, one per session |
+
+Revision 2 (2026-10-04) added the differentiation research:
+- two new slices: S3 (evidence cache and rule engine) and S10 (trust and safety);
+- renumbered slices;
+- chance bands replaced by published admit rates;
+- a research trust order in 04 §0.
 
 ## Order and effort
 
 | # | Slice | Effort | Depends on | Ships to students? |
 |---|---|---|---|---|
-| S0 | Workspace, baseline, ledger | Medium | none | No |
+| S0 | Workspace, baseline, ledger, remove public test passwords | Medium | none | No |
 | S1 | Voice core: role prompts, reply cap, latency probe (7 Deepgram languages) | High | S0 | Yes |
 | S2 | Indic voice: all 10 Sarvam languages routed and streaming | High | S1 | Yes |
-| S3 | Roles engine: Kairos orchestrator plus 6 specialist playbooks with evals | High | S1 | Yes, behind flag |
-| S4 | Companion UI: Kairos everywhere, handoffs, "take me there" | High | S3 | Yes, behind flag |
-| S5 | Landing page and `/counselors` page | High | S1 to S4 shipped (claims) | Yes |
-| S6 | Today dashboard and counselor work queue | High | S3, S4 | Yes |
-| S7 | Money: scholarship and aid finder, FAFSA/CSS walkthrough | High | S3 | Yes |
-| S8 | Role workflows: story bank, weekly mentor plan, interview hookup | Medium | S3, S4 | Yes |
-| S9 | Rollout: flags on, live checks in 17 languages, claims sync | Medium | all | Yes |
+| S3 | Evidence cache, citations, refresh job, cross-list rule engine | High | S0 | Yes (rule checks and citation chips) |
+| S4 | Roles engine: Kairos plus 5 specialist playbooks, handoffs, memory, evals | High | S1, S3 | Yes, behind flag |
+| S5 | Companion UI: Kairos everywhere, handoffs, temperament, "take me there" | High | S4 | Yes, behind flag |
+| S6 | Landing page and `/counselors` page | High | S1 to S5 shipped (claims) | Yes |
+| S7 | Today dashboard and counselor work queue | High | S3, S4, S5 | Yes |
+| S8 | Money: NPC routing, aid forms, scholarships, ED affordability | High | S3, S4 | Yes |
+| S9 | Role workflows: weekly plan, story bank, mock interview, balanced list (no chances), requirements checklist | Medium/High | S3, S4, S5 | Yes |
+| S10 | Trust and safety: integrity log, family digest, escalation, credential redaction, age gate | High | S4 | Yes |
+| S11 | Rollout: flags on, live checks in 17 languages, claims sync | Medium | all | Yes |
 
-Use **High** for anything that touches the agent loop, voice transport, auth, money data or the database. **Medium** is enough for S0, S8 and S9. If a Medium session reports two failed attempts at the same step, rerun that slice on High.
+Use **High** for anything that touches the agent loop, voice transport, auth, evidence or money data, minors' data or the database. **Medium** is enough for S0 and S11.
+
+Time-sensitive: S3's curated seed should include the **UCAS 15 Oct 2026, 18:00 UK** deadline (Oxford, Cambridge, most medicine). If S3 can't ship before then, the founder may want a one-off sourced banner; ask. If a Medium session reports two failed attempts at the same step, rerun that slice on High.
 
 ## How to start each Codex session
 
@@ -44,6 +54,7 @@ Read, in this order, before touching code:
   docs/handoff/codex-prompts/agentic-counselor/03-DESIGN-DIRECTION.md   (UI slices only)
   docs/handoff/codex-prompts/agentic-counselor/slices/SN-file.md
 Then read .agent/codex-ledger.md to see what earlier slices did.
+Facts conflict between research files: follow the trust order in 04-RESEARCH-BRIEF §0.
 Write your own task-by-task plan for this slice into .agent/codex-plans/SN.md before coding.
 Work test-first. Do not start the next slice.
 ```

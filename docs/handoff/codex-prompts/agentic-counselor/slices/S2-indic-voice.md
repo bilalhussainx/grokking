@@ -39,7 +39,7 @@ The UI offers voice in hi, bn, ta, te, gu, kn, ml, mr, pa and od. The server acc
 - All 10 languages return a reply in the right script in 100% of probe turns.
 - Time from end of speech to first audio: p50 ≤ 1.5 s, p90 ≤ 2.2 s, with a stretch target of ≤ 1.0 s. Report the real numbers.
 - Replies ≤ 35 words.
-- **Native review gate:** generate a review sheet `docs/qa/evidence/voice/<date>-indic-review.md` with 3 replies per language plus back-translations. Mark every language as `UNREVIEWED` in `src/lib/voice/verified-voice-languages.ts` (created in S9; create it now if it doesn't exist). The founder arranges native reviewers. Languages stay unclaimed in marketing until they're marked reviewed.
+- **Native review gate:** generate a review sheet `docs/qa/evidence/voice/<date>-indic-review.md` with 3 replies per language plus back-translations. Mark every language as `UNREVIEWED` in `src/lib/voice/verified-voice-languages.ts` (created in S11; create it now if it doesn't exist). The founder arranges native reviewers. Languages stay unclaimed in marketing until they're marked reviewed.
 
 ## UI honesty (ship with phase A)
 If a language fails the probe, set it to `text-only` voice mode in `coach-languages.ts`, so the UI never offers a broken voice. The text coach still works in that language.

@@ -1,4 +1,4 @@
-# S6 — Today dashboard and counselor work queue (effort: High)
+# S7 — Today dashboard and counselor work queue (effort: High)
 
 ## Why
 - **Students:** Today must answer "what do I do now, and how far along am I?" with real data, not prose.
@@ -14,11 +14,13 @@
 
 ## Student: Today
 1. **Next step card:**
-   - the first open weekly-plan task (S3 `weekly_plan`), otherwise `get_journey_state().nextAction`;
+   - the first open weekly-plan task (S4 `weekly_plan`), otherwise `get_journey_state().nextAction`;
    - shows a finish line ("Done when: 3 schools saved");
-   - one primary button that opens the right screen through the same `navigate_to` allowlist (S4).
-2. **Journey map:** the S4 milestones, compact, with the current one highlighted.
-3. **Deadline countdown:** the next 3 deadlines from the student's applications, **sourced only**. A deadline without a source shows "check date" with a link to verify. Never invent one.
+   - one primary button that opens the right screen through the same `navigate_to` allowlist (S5).
+2. **Journey map:** the S5 milestones, compact, with the current one highlighted.
+3. **Deadline countdown:** the next 3 deadlines from the student's applications, **from S3 evidence only**, each with a `CitationChip`. A deadline without evidence shows `NotVerified` with "I can check". Never invent one. Times keep their zone (e.g. "18:00 UK time").
+3b. **Rule conflicts:** any S3 `checkList` conflicts, as `RuleConflictCard`s, above the countdown.
+3c. **Pace:** Gentle mode shows only the next step and the map (the rest behind "Show more"); Full control expands everything (03-DESIGN §6).
 4. **Essay pipeline:** per prompt (Common App, UCAS Q1–Q3, each supplement), a 4-stage strip: story → outline → draft → review. Derive it from `get_essay_status` plus `cc_stories` mapping.
 5. **Kairos inbox** (flagged users): reuse `KairosInbox`. The dock stays the only Coach door. Remove `AskKairos` from Today if the dock covers it (C4).
 6. Keep the grade 9, junior and transfer variants working: map each to the same layout with variant-specific next steps. Write one test per variant.
@@ -31,7 +33,8 @@
    - `comment_approval` (heads): draft comments from counselors flagged `requires_review`;
    - `stalled`: an assigned student with no activity for 10+ days (no turns, edits or task completions);
    - `deadline_soon`: an assigned student with a sourced deadline in ≤ 7 days and missing requirements;
-   - `agent_flag`: an S1/S3 nudge of type `plan_conflict` on an assigned student (only students who share agent activity with their counselor; respect the share settings in `src/app/cc/share-settings`).
+   - `rule_conflict`: an S3 rule-engine conflict (or an S1/S4 `plan_conflict` nudge) on an assigned student (only students who share agent activity with their counselor; respect the share settings in `src/app/cc/share-settings`);
+   - `referral`: an S10 `refer_to_human` item the student consented to share. Show the reason category only (e.g. "aid appeal", "accommodations"), never the conversation text.
 3. **Each row:** student name, the reason in plain words, age, and one action (open essay review / approve comments / message student / open plan).
 4. **Scope:** a counselor sees only assigned students and a head sees the agency. Use the existing helpers; tests must prove a counselor in agency A can't see agency B or unassigned students.
 5. **Assign and reassign** (heads): from the queue or the roster, reassign a student's primary counselor. Audit it in an existing or new `cc_assignment_events` table (a migration file, not applied; stop at deploy).

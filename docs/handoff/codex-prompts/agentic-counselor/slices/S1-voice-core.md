@@ -11,7 +11,7 @@ Students hear Kairos before they read anything. Today the voice prompt is about 
 ## Scope
 1. **A compact voice prompt builder**: `src/lib/voice/voice-prompt.ts`, `buildVoicePrompt({ role, student, step, language })`.
    - Inputs:
-     - the role's `voicePrompt`. In S1, create only `src/lib/cc/roles/playbooks/kairos.ts`, exporting a minimal object with `id`, `name` and `voicePrompt` and the `RolePlaybook` type from 02-SPEC §4.2 (fields not needed yet may be stubs). S3 completes it and adds the other roles at the same paths;
+     - the role's `voicePrompt`. In S1, create only `src/lib/cc/roles/playbooks/kairos.ts`, exporting a minimal object with `id`, `name` and `voicePrompt` and the `RolePlaybook` type from 02-SPEC §4.2 (fields not needed yet may be stubs). S4 completes it and adds the other roles at the same paths;
      - a **student card** of ≤ 600 chars: name, grade, countries, top 3 schools, current journey step, one recent fact;
      - the language block;
      - the voice rules.
@@ -41,7 +41,7 @@ Students hear Kairos before they read anything. Today the voice prompt is about 
    - You may start from Claude's scratch harness logic described in 04-RESEARCH-BRIEF §6, but write it cleanly.
 
 ## Out of scope
-Indic routing (S2), handoffs and specialist voices (S3/S4), UI redesign.
+Indic routing (S2), handoffs and specialist voices (S4/S5), UI redesign.
 
 ## Tests first (vitest)
 - `buildVoicePrompt` returns ≤ 2,000 chars for a maximal student card; it contains the language name for es, ja and hi; it contains no "English only" for non-English; and its last section is the voice rules.

@@ -1,10 +1,12 @@
-# S9 — Rollout: flags on, live checks in all voice languages, claims sync (effort: Medium)
+# S11 — Rollout: flags on, live checks in all voice languages, claims sync (effort: Medium)
 
 ## Why
 Everything so far ships behind flags and allowlists. This slice turns it on safely, measures it in production, and makes the marketing claims match the measurements.
 
 ## Pre-conditions (the founder does these; Codex prepares a checklist and stops until they're done)
-- All migrations from S1, S3, S6 and S7 are applied to production (list the files).
+- All migrations from S1, S3, S4, S7, S8 and S10 are applied to production, and the S3 evidence seed is loaded (list the files).
+- An Exa or Firecrawl key is set for the S3 refresh job, or the founder accepts curated-only evidence for launch.
+- The founder has chosen the under-13 consent verification method (S10), or under-13 signups are blocked.
 - `AGENT_CONFIRM_SECRET` is set (≥ 32 chars).
 - The OpenRouter account has a balance for real traffic (at least $50 suggested), and the per-key limit is set.
 - Native reviewers have marked the Indic languages they approve in `docs/qa/evidence/voice/<date>-indic-review.md`.
@@ -21,14 +23,17 @@ Everything so far ships behind flags and allowlists. This slice turns it on safe
    - proposal confirm and decline rates;
    - nudge send, open and dismiss counts;
    - voice latency p50 and p90 per language (`voice_latency_events`);
-   - overlong replies.
+   - overlong replies;
+   - evidence health: published, stale and quarantined counts, refresh job failures, and the share of agent facts answered "not yet verified";
+   - rule-engine conflicts raised and resolved;
+   - safety: credential redactions, referrals and distress components shown (counts only).
 3. **Verified voice languages:** `src/lib/voice/verified-voice-languages.ts`.
    - The probe (S1/S2) runs against production for all 17 languages, and the results are written into this file.
    - A language is `verified` only if it passes: the latency target for its group, 100% language-correct, ≤ 35 words median, and (Indic) native-review approved.
    - The landing voice band, FAQ and any "N languages for voice" copy read from this file.
    - The text coach keeps `COACH_LANGUAGE_COUNT` (18).
-4. **Claims sync:** run the S5 claims test with the real config, update copy, and redeploy. Record the final claims in `docs/qa/evidence/codex-S9/claims.md` with the evidence for each.
-5. **Golden-set run:** run the full 120-case golden set through the role engine once, with a $5 cap. Commit the report and fix any rule violations before Stage 3.
+4. **Claims sync:** run the S6 claims test with the real config, update copy, and redeploy. Record the final claims in `docs/qa/evidence/codex-S11/claims.md` with the evidence for each.
+5. **Golden-set run:** run the full 120-case golden set plus the 40 seeds from 09-27 §4 through the role engine once, with a $5 cap. Commit the report and fix any rule violations before Stage 3. Hard zero is required for: prose, ungrounded dates, personal probabilities and accepted credentials.
 
 ## Acceptance
 - Stage 1 has run 48 h with:

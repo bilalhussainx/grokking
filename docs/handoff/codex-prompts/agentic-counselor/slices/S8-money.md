@@ -1,13 +1,19 @@
-# S7 — Money: scholarship and aid finder, aid forms walkthrough, Ana's tools (effort: High)
+# S8 — Money: scholarship and aid finder, aid forms walkthrough, Ana's tools (effort: High)
 
 ## Why
-The founder asked for "access to aid and scholarships". Kollegio and Kolly both have scholarship finders; ours returns an empty list. Cost is the first question families ask, especially first-generation and international families.
+- The founder asked for "access to aid and scholarships". Kollegio and Kolly both have scholarship finders; ours returns an empty list.
+- Differentiator 4 is **affordability first**. Competitors lead with "chances"; NACAC's standard is the "best academic, personal, and **financial** college match", and families can be released from ED when aid makes attendance impossible.
+- Cost is the first question families ask, especially first-generation and international families.
 
 ## Read first
 - 02-SPEC §5.4.
 - 04-RESEARCH-BRIEF §3 and §5 (data rules: **curate by hand, cite every field**).
 - `docs/research/2026-10-03-part2-counselor-playbook.md` Topic 7.
 - `docs/research/2026-10-03-part3-systems-rules.md` (FAFSA, CSS, UK and Canada aid sections).
+- `docs/research/2026-09-27-agent-differentiation-research.md`:
+  - §2.1, the "Financial aid and merit strategy" row: what to do and NOT do;
+  - §4 A, seeds #1–#11: FAFSA already open, SAI −1500 is not a refund, contributor consent, FSA ID refusal, special circumstances, CSS fees and waivers, CSS per college, the NPC, Harvard international aid, FAFSA for internationals, ED release;
+  - §5, the NPC and studentaid.gov flags.
 - Existing code:
   - `src/app/api/cc/scholarships/*` (stubs) and `src/app/api/cc/financial-aid/**` (stubs);
   - `src/app/cc/net-price/page.tsx` and `src/lib/cc/net-price.ts` (rule-based, about 12 schools);
@@ -40,14 +46,26 @@ The founder asked for "access to aid and scholarships". Kollegio and Kolly both 
 2. **APIs:** `GET /api/cc/scholarships` (list and filter), `GET /api/cc/scholarships/match` (for the signed-in student), `POST /api/cc/scholarships/save`. These replace the stubs. Auth and rate limits apply.
 3. **UI:** `/cc/money`, a hub with three tabs:
    - **Scholarships:** matched list with filters (country, need-based, deadline window), save, and add the deadline to the plan (a `propose_calendar_hold` via Ana);
-   - **Cost:** the existing net-price tool, reframed. Unknown is never zero, and "estimate for select schools" is labeled;
-   - **Forms:** a walkthrough of FAFSA, CSS Profile, UK Student Finance and provincial aid (OSAP and others). Steps, documents needed and sourced dates from Part 3, "not yet verified" otherwise.
+   - **Cost:**
+     - Per school, a link to **that college's own net price calculator** (Title IV schools must post one). The student runs it and types the result in; Kairos never submits family finances to an NPC.
+     - The existing rule-based estimator stays as a labeled "rough estimate for select schools".
+     - Grants are kept separate from loans and work. Unknown is never zero.
+     - An **ED affordability check:** if a school on an ED or REA plan has no entered estimate, show a warning plus the NACAC release rule (seed #11).
+   - **Forms:**
+     - A walkthrough of FAFSA (2027–28 is already open), contributor consent, SAI literacy, CSS Profile (fees and waivers from evidence; participating schools per college, "not yet verified" otherwise), UK Student Finance and provincial aid (OSAP: citizens, PRs and protected persons only).
+     - A **special-circumstances checklist** (the student writes and sends the request).
+     - All dates and amounts come from S3 evidence.
+     - **Refuse FSA ID or credential handling** (seed #4); this uses S10's redaction once it exists, and a fixed refusal now.
 
    Replace the stubbed FAFSA routes with this content-driven walkthrough (no form filling).
-4. **Ana's playbook tools:** `search_scholarships`, `get_cost_picture` and `get_aid_forms` (read tools), plus the existing proposal tools. Add evals for: "how much will Harvard cost me?" (no number without data; ask for inputs), "find me scholarships" (uses the tool, cites URLs), "write my appeal letter" (coaches and doesn't write).
+4. **Ana's playbook tools:** `search_scholarships`, `get_cost_picture` and `get_aid_forms` (read tools), plus the existing proposal tools. Add evals for:
+   - "how much will Harvard cost me?" (no number without data; route to the NPC);
+   - "find me scholarships" (uses the tool, cites URLs);
+   - "write my appeal letter" (coaches and doesn't write);
+   - 09-27 seeds #1–#11 as written.
 5. **Trigger `aid_form_window`:** only from sourced open dates.
 6. **Fix the FinancialForm copy** to match reality.
-7. **Landing:** S5 shows the aid tile once a server helper `isMoneyHubLive()` returns true. Flip it in this slice after the prod checks pass.
+7. **Landing:** S6 shows the aid tile once a server helper `isMoneyHubLive()` returns true. Flip it in this slice after the prod checks pass.
 
 ## Acceptance
 - ≥ 50 records, all with a URL and checked date, and zero `deadline.date` without a quote.

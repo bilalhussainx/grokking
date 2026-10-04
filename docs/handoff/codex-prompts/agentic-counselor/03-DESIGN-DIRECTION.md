@@ -72,7 +72,8 @@ Never screenshot-and-paste static PNGs for core claims; a frame must be the actu
   - active role chip with a role picker;
   - chat (text plus voice toggle);
   - Kairos inbox (pinned above chat);
-  - "What Kairos knows" link.
+  - "What Kairos knows" link;
+  - a pace switch (Gentle / Steady / Full control) in the dock menu.
 - Expansion state persists per user (localStorage, wrapped in try/catch).
 - It must never overlap page content; the main column reflows.
 
@@ -89,37 +90,62 @@ Never screenshot-and-paste static PNGs for core claims; a frame must be the actu
 
 **"Take me there":** when Kairos navigates, the target field gets a 2 s focus ring pulse and the dock shows "I opened your school list".
 
-## 5. Landing page structure (S5)
+## 4b. Trust components (S3, S10)
+
+- **Citation chip:** a small pill showing `publisher · checked Oct 4` with an external-link icon; it expands to the quoted line. Use it next to every date, fee, requirement and policy.
+- **"Not yet verified for 2026–27" state:** a neutral, information-styled inline note with an "I can check" button. It's never styled as an error, and it's never hidden.
+- **Rule conflict card:** a short title ("Two binding Early Decision plans"), a plain explanation, the rule source chip, and one action (change plan / ask Juno / dismiss with reason).
+- **Integrity log row:** date · essay · "3 questions, 2 critiques, 0 words written for you".
+- **Escalation card:** "This needs a person" with who to contact and why. Crisis resources come from a fixed, reviewed component.
+
+## 5. Landing page structure (S6)
+
+The page sells **being known, accountability and being right**: the three things families pay human counselors for. Kairos does them for $15/month, in your language, without writing your essay.
 
 1. **Hero.**
-   - Left: an H1 that names what it is. Draft: "Meet Kairos. The admissions counselor in your pocket." The sub-line covers US · UK · Canada · transfer, talking in your language, never writing your essay.
-   - Primary CTA "Start free"; secondary "Hear Kairos" (plays a recorded voice clip with captions).
-   - Right: the companion at 120 px plus a live product frame of a real conversation fixture, where Wren is brought in and a story card is saved.
-2. **"Your counseling team":** six cards, Kairos plus the five specialists, each with face, role, and one thing they do *with you* (a product frame snippet).
-3. **"What Kairos does while you're busy":** a timeline of real proactive behavior (weekly plan, deadline reminder, conflict caught, story gap). Label anything not yet on for everyone as "rolling out".
-4. **Signature workflows:** story bank, hot seat, balanced list, requirements checklist, and aid plan once S7 ships. Each is a product frame plus a 1-line outcome.
-5. **"What students told us they hate about other tools":** a 6-row table pairing the complaint with what Kairos does. Use only true statements (02-SPEC §9).
-6. **Voice band:** verified languages in native script with measured latency (from S9), plus a "Hear it" sample per language (pre-recorded clips; no live anonymous voice).
-7. **For counselors:** a teaser leading to `/counselors`.
-8. **Pricing:** Free and Pro from `src/lib/pricing.ts`, the trial wording from `TRIAL_TERMS`, and the integrity promise.
-9. **FAQ** (`src/lib/faq-items.ts`).
+   - Left: an H1 that names what it is. Draft: "Meet Kairos. The admissions counselor who knows you." The sub-line covers US · UK · Canada · transfer, talking in your language, never writing your essay.
+   - Primary CTA "Start free"; secondary "Hear Kairos" (a recorded clip with captions).
+   - Right: the companion at 120 px plus a live product frame of a fixture conversation. Wren is brought in, a story is saved, and a citation chip shows on a deadline.
+2. **"Your counseling team":** six cards (Kairos plus the five specialists), each with face, role and one thing they do *with you*. Names and titles come from the playbook registry.
+3. **"Right, not just fast" (differentiators 1, 2, 5):**
+   - Show a deadline with its citation chip and checked date.
+   - Show the "not yet verified" state.
+   - Show a rule conflict card catching "ED at two schools" or "Oxford plus Cambridge".
+   - Copy: Kairos says "not verified" instead of guessing.
+4. **"What Kairos does while you're busy" (differentiators 6, 8):** a weekly plan, a check-in, a deadline reminder, a conflict caught, all in the student's chosen pace (gentle / steady / full control). Label anything not on for everyone as "Rolling out".
+5. **"Your words. Always." (differentiator 3):**
+   - The integrity log row and the export button.
+   - A line: "Common App treats AI-written content as fraud. Kairos coaches; you write. Export a 'coached, not written' record."
+   - Cite Common App's fraud policy page.
+6. **Signature workflows:** story bank, hot seat, balanced list (published admit rates, no chance numbers), requirements checklist, and aid plan **only once S8 ships**.
+7. **"What families tell us they hate about other tools":** a complaint-to-answer table with only true statements (02-SPEC §9).
+8. **"Built on the rules professional counselors follow":** IECA and NACAC principles quoted briefly (never writes essays, never guarantees outcomes, never shares your status without permission), with links. **No logos, no implied membership or endorsement.**
+9. **Family band (differentiator 7):** the parent digest in the parent's language, which the student controls.
+10. **Voice band:** verified languages (S11) in native script with measured latency and pre-recorded samples. No live anonymous voice.
+11. **For counselors:** a teaser leading to `/counselors`.
+12. **Pricing:** from `src/lib/pricing.ts` and `TRIAL_TERMS`; a contrast line: "Private counselors charge thousands. Pro is $15/month." No competitor names or prices without a citation.
+13. **FAQ** (`src/lib/faq-items.ts`).
+
+No testimonials, admit outcomes, "X× more likely" stats or counts of students until they're real and consented.
 
 The header has a Students | Counselors switch and a mobile "Start free" button. One header and one footer across all signed-out pages.
 
-## 6. Today and the counselor work queue (S6)
+## 6. Today and the counselor work queue (S7)
 
 **Today:**
 - The top card is the single next step: the first open weekly-plan task, with its finish line (C2).
 - Below it:
   - the journey map, compact (C3);
-  - a deadline countdown (sourced dates only);
+  - a deadline countdown (sourced dates only, each with a citation chip);
+  - rule conflict cards (S3), if any;
   - the essay pipeline (stories → outline → draft → review, per prompt);
   - the Kairos inbox.
 - The dock is the only Coach door.
+- In Gentle mode, Today shows only the next step and the map, with the rest behind "Show more". In Full control mode, everything is expanded.
 
 **Counselor work queue:**
 - One list, sorted by urgency.
-- Each row has the student, why they're here (essay awaiting review / stalled 10 days / deadline in 5 days / agent flagged plan conflict), and one primary action.
+- Each row has the student, why they're here (essay awaiting review / stalled 10 days / deadline in 5 days / rule conflict / referred by Kairos), and one primary action.
 - Filters: mine / agency (heads).
 - Empty state: "Nobody needs you right now."
 

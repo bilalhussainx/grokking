@@ -4,6 +4,8 @@
 
 KairosLearn (https://www.kairoslearn.com) is an AI admissions counselor for high-school students applying to the US, UK and Canada, including transfer students. Coach Kairos talks by text and voice, builds school lists, plans deadlines, coaches essays (it never writes them), runs mock interviews and brings in parents through family mode. Agencies of human counselors use the same platform to manage their students. Pricing: Free is 200 credits once at signup; Pro is $15/month or $99/year with a 7-day trial and no card. The source of truth is `src/lib/pricing.ts`. The site claims 18 coach languages (`src/lib/coach-language-claim.ts`, never hard-code the number).
 
+**Terminology:** "A1+S1", "the S1 agent" and `AGENT_S1_*` mean the agent slices shipped dark on 2026-10-03 (`src/lib/cc/agent/*`). Codex slices are written "slice S1", "S1-voice-core" and so on. They are different things.
+
 ## Repo and branches
 
 - GitHub: `bilalhussainx/grokking`. **The repository is PUBLIC.** Never commit secrets, API keys, QA passwords, student data or `.env*` files. Before every commit, run `git diff --cached | grep -nE "sk-or-|sk_[a-z0-9]{6,}_|[0-9a-f]{40}"` and stop if it matches anything that is not a test fixture.
@@ -65,6 +67,9 @@ gh api repos/bilalhussainx/grokking/commits/<sha>/status --jq .state   # poll un
 7. **Design:** Daybreak tokens only (`src/styles/daybreak-tokens.css`, components in `src/components/ui/daybreak`). Read 03-DESIGN-DIRECTION.md.
 8. **Copy:** no em dashes in UI copy. Plain words a 16-year-old understands. Explain every admissions term on first use (glossary linking exists: `/glossary`, inline term linking).
 9. **Commits:** explicit `git add <paths>`, never `-A`. Message ends with `Co-Authored-By: claude-flow <ruv@ruv.net>`.
+10. **No personal admission probabilities**, no "safety"/"chance" labels in new work. Show published admit rates with their year and source (02-SPEC §5.5).
+11. **Never ask for, store or use portal credentials** (FSA ID, Common App, UCAS, OUAC, CSS), never automate those portals, and never contact colleges or recommenders for the student.
+12. **Research conflicts:** follow 04-RESEARCH-BRIEF §0. `docs/research/2026-10-04-chatgpt-research-lower-trust.md` is never a source of facts.
 
 ## Current state (2026-10-04)
 
@@ -75,7 +80,7 @@ Shipped and live:
   - the UCAS 3-question personal statement.
 - **Schools:**
   - search, detail, saved list and AI list generation;
-  - LLM "chance estimate" bands (call them estimates);
+  - LLM "chance estimate" bands (`api/cc/chances`, plus `band: reach|match|safety` in `coach-actions-block.ts`, `coach-agents.ts`, `coach-extract.ts`, `coach-prompt-builder.ts`). **S9 replaces these** with published admit-rate tiers;
   - UK and Canada catalogs, deadlines and grade conversion for a limited set of schools.
 - **Applications:** board, calendar (iCal) export, ED/REA conflict check (`src/lib/applications/ed-strategy.ts`).
 - **Reminders:** deadline emails at 14, 7, 3 and 1 days (`/api/cron/deadline-reminders`).
@@ -106,6 +111,13 @@ Stubs, so do not claim them:
 - `/counselor/admit-history` (scaffold).
 
 Net price is rule-based for about 12 schools.
+
+Not built yet:
+- an evidence cache (`cc_public_evidence`);
+- a general rule engine (only `ed-strategy.ts` exists);
+- an integrity log, family digest grants, an age gate, credential redaction and `refer_to_human`.
+
+These are S3 and S10.
 
 Voice today (see `docs/qa/2026-10-04-voice-language-validation.md`):
 - Auth is fixed and the language is passed (commits e5e3362, 6b1d025).
