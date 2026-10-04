@@ -24,6 +24,9 @@ export const dynamic = "force-dynamic";
 // Server-only. The browser gets a short-lived token (mintDeepgramClientAuth).
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || "";
 
+// Languages the Deepgram agent listens and speaks in natively.
+const DEEPGRAM_AGENT_LANGUAGES = new Set(["en", "es", "fr", "de", "it", "nl", "ja"]);
+
 // Handle CORS preflight — browsers send OPTIONS before POST with credentials
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -254,10 +257,12 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Language instruction — teach in the selected language
-  if (language !== "en") {
-    contextPrompt += `\n\n## LANGUAGE INSTRUCTION\nThe student has chosen to learn in ${langName}. You MUST:\n- Speak and respond entirely in ${langName}\n- Explain all concepts in ${langName}\n- Use natural ${langName} phrasing and accent — do NOT read ${langName} words with English pronunciation\n- If the lesson content is in English, translate and explain it in ${langName}\n- Only use English for technical terms that have no good translation`;
-  }
+  // Language instruction — teach in the selected language. Kept in a variable
+  // because the coach's client prompt (below) replaces contextPrompt.
+  const languageBlock = language !== "en"
+    ? `\n\n## LANGUAGE INSTRUCTION\nThe student has chosen to speak ${langName}. This overrides any instruction to use English. You MUST:\n- Speak and respond entirely in ${langName}\n- Explain all concepts in ${langName}\n- Use natural ${langName} phrasing and accent — do NOT read ${langName} words with English pronunciation\n- If the lesson content is in English, translate and explain it in ${langName}\n- Only use English for proper nouns (university, program and form names) and terms with no good translation`
+    : "";
+  contextPrompt += languageBlock;
 
   if (lessonTitle) {
     contextPrompt += `\n\nCURRENT LESSON: ${courseTitle || "Course"} > ${moduleTitle || ""} > ${lessonTitle}`;
@@ -298,8 +303,13 @@ Your responses will be spoken aloud by a text-to-speech engine. You MUST:
   // with the dynamic, intake-aware prompt fetched from /api/cc/coach/voice-prompt.
   // Keep userProfileContext appended so per-user XP/streak signals still flow.
   if (mode === "coach" && typeof clientSystemPrompt === "string" && clientSystemPrompt.length > 100) {
-    contextPrompt = clientSystemPrompt + (userProfileContext ? "\n" + userProfileContext : "");
+    contextPrompt = clientSystemPrompt + (userProfileContext ? "\n" + userProfileContext : "") + languageBlock;
   }
+
+  // Speech recognition must be told the language: without it nova-3 assumes
+  // English (Oct 4 check: Spanish and Japanese transcribed as silence).
+  // Other codes reach this agent only with English as the carrier.
+  const listenLanguage = DEEPGRAM_AGENT_LANGUAGES.has(language) ? language : "en";
 
   const greeting = persona.greeting(lessonTitle);
 
@@ -318,6 +328,7 @@ Your responses will be spoken aloud by a text-to-speech engine. You MUST:
       },
     },
     agent: {
+      language: listenLanguage,
       listen: {
         provider: {
           type: "deepgram",

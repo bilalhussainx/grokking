@@ -87,3 +87,29 @@ describe.each(routes)("%s", (path, handler, body) => {
     expect(json.settings.agent.think.provider.type).toBe("anthropic");
   });
 });
+
+// Oct 4 live check: only English worked. Nothing told Deepgram's speech
+// recognition the language (nova-3 heard Spanish as silence), and the coach's
+// own prompt replaced the route's language instruction.
+describe("/api/ai/voice-session coach language", () => {
+  beforeEach(() => { vi.restoreAllMocks(); auth.user = { id: "u-1", user_metadata: {} }; });
+
+  const coachPrompt = "You are Coach Kairos. ".repeat(10) + "Plain spoken English only.";
+
+  it.each([["es", "Spanish"], ["ja", "Japanese"], ["de", "German"]])(
+    "%s: recognition listens in that language and the coach prompt says to speak it",
+    async (code, name) => {
+      grantOk();
+      const json = await (await coachVoice(req("/api/ai/voice-session", { mode: "coach", language: code, systemPrompt: coachPrompt }))).json();
+      expect(json.settings.agent.language).toBe(code);
+      expect(json.settings.agent.think.prompt).toContain(`entirely in ${name}`);
+    },
+  );
+
+  it("English sessions stay English", async () => {
+    grantOk();
+    const json = await (await coachVoice(req("/api/ai/voice-session", { mode: "coach", language: "en", systemPrompt: coachPrompt }))).json();
+    expect(json.settings.agent.language).toBe("en");
+    expect(json.settings.agent.think.prompt).not.toContain("LANGUAGE INSTRUCTION");
+  });
+});
