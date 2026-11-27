@@ -7,7 +7,7 @@
   "vars": {
     "APP_URL": "https://kairoslearn.com",
     // Flip to "true" (and redeploy) once kairoslearn.com serves the Cloudflare app.
-    "ENABLED": "false"
+    "ENABLED": "true"
   },
   // Same schedules as vercel.json (UTC).
   "triggers": { "crons": ["7 9 * * *", "7 4 * * *", "17 13 * * *"] },
