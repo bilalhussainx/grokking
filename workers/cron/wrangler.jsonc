@@ -1,0 +1,15 @@
+{
+  // Scheduled jobs for KairosLearn. Deploy from this folder: npx wrangler deploy
+  "name": "kairoslearn-cron",
+  "main": "index.ts",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "vars": {
+    "APP_URL": "https://kairoslearn.com",
+    // Flip to "true" (and redeploy) once kairoslearn.com serves the Cloudflare app.
+    "ENABLED": "true"
+  },
+  // Same schedules as vercel.json (UTC).
+  "triggers": { "crons": ["7 9 * * *", "7 4 * * *", "17 13 * * *"] },
+  "observability": { "enabled": true }
+}

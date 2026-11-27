@@ -62,3 +62,6 @@ tests/screenshots/
 
 # Git worktrees
 .worktrees/
+/dist/
+.vinext/
+.cloudflare/
