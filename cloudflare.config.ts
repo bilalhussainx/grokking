@@ -5,6 +5,7 @@ export default defineConfig({
     name: "kairoslearn",
     entrypoint: "vinext/server/fetch-handler",
     compatibilityDate: "2026-11-27",
+    domains: ["kairoslearn.com", "www.kairoslearn.com"],
     assets: {
       htmlHandling: "none",
       notFoundHandling: "none",
