@@ -125,6 +125,13 @@ try {
   Write-Host "`nUploading $($final.Count) settings to the Cloudflare Worker '$Worker'..."
   npx wrangler secret bulk $upload --name $Worker | Out-Null
   if ($LASTEXITCODE -ne 0) { throw "Cloudflare did not accept the upload." }
+
+  # The scheduled-jobs Worker (workers/cron) needs only CRON_SECRET.
+  if ($final.Contains('CRON_SECRET')) {
+    [IO.File]::WriteAllText($upload, (@{ CRON_SECRET = $final['CRON_SECRET'] } | ConvertTo-Json), (New-Object Text.UTF8Encoding $false))
+    npx wrangler secret bulk $upload --name "$Worker-cron" | Out-Null
+    if ($LASTEXITCODE -eq 0) { Write-Host "Gave the scheduled-jobs Worker its CRON_SECRET." } else { Write-Host "Could not set CRON_SECRET on $Worker-cron (tell Claude)." }
+  }
   Write-Host "Done. Tell Claude: settings copied."
 } finally {
   Remove-Item -LiteralPath $pulled, $upload -Force -ErrorAction SilentlyContinue
