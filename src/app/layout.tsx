@@ -104,7 +104,8 @@ export default function RootLayout({
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />
         <Providers>{children}</Providers>
-        <Analytics />
+        {/* Vercel sets NEXT_PUBLIC_VERCEL_ENV at build time; elsewhere (Cloudflare) the analytics script has no endpoint. */}
+        {process.env.NEXT_PUBLIC_VERCEL_ENV ? <Analytics /> : null}
       </body>
     </html>
   );
